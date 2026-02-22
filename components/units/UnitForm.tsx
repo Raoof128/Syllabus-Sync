@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { Unit, ClassTime, DayOfWeek } from '@/lib/types';
-import { UNIT_COLORS } from '@/lib/config';
-import { v4 as uuidv4 } from 'uuid';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
+import { useState, useEffect, useCallback } from "react";
+import { useUnitsStore } from "@/lib/store/unitsStore";
+import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
+import { Unit, ClassTime, DayOfWeek } from "@/lib/types";
+import { UNIT_COLORS } from "@/lib/config";
+import { v4 as uuidv4 } from "uuid";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 import {
   Dialog,
   DialogContent,
@@ -15,25 +15,32 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/mq/button';
-import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
-import { toastUtils } from '@/lib/utils/toast';
-import { useRetry } from '@/lib/hooks/use-retry';
-import { Input } from '@/components/ui/mq/input';
-import { Label } from '@/components/ui/label';
-import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/mq/button";
+import {
+  errorHandler,
+  createFormValidator,
+  validationRules,
+} from "@/lib/utils/errorHandling";
+import { toastUtils } from "@/lib/utils/toast";
+import { useRetry } from "@/lib/hooks/use-retry";
+import { Input } from "@/components/ui/mq/input";
+import { Label } from "@/components/ui/label";
+import {
+  validateBuildingStrict,
+  BUILDING_VALIDATION_ERROR,
+} from "@/lib/utils/buildingValidation";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Plus, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
-import UnitAutocomplete from '@/components/ui/UnitAutocomplete';
+} from "@/components/ui/select";
+import { Plus, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import BuildingAutocomplete from "@/components/ui/BuildingAutocomplete";
+import UnitAutocomplete from "@/components/ui/UnitAutocomplete";
 
 interface UnitFormProps {
   open: boolean;
@@ -42,25 +49,31 @@ interface UnitFormProps {
 }
 
 const DAYS: DayOfWeek[] = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
 ];
 
-export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps) {
+export default function UnitForm({
+  open,
+  onOpenChange,
+  editUnit,
+}: UnitFormProps) {
   const { t } = useTypedTranslation();
   const { addUnit, updateUnit } = useUnitsStore();
-  const removeDeadlinesByUnit = useDeadlinesStore((state) => state.removeDeadlinesByUnit);
+  const removeDeadlinesByUnit = useDeadlinesStore(
+    (state) => state.removeDeadlinesByUnit,
+  );
 
   // Form state
-  const [code, setCode] = useState('');
-  const [name, setName] = useState('');
-  const [building, setBuilding] = useState('');
-  const [room, setRoom] = useState(''); // Optional room field
+  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
+  const [building, setBuilding] = useState("");
+  const [room, setRoom] = useState(""); // Optional room field
   const [color, setColor] = useState<string>(UNIT_COLORS[0].value);
   const [schedule, setSchedule] = useState<ClassTime[]>([]);
 
@@ -79,24 +92,27 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     [editUnit, updateUnit, addUnit],
   );
 
-  const { execute: saveWithRetry, isLoading: isSaving } = useRetry(performSave, {
-    maxAttempts: 3,
-    showToastOnError: false, // We'll handle toasts manually
-    errorMessage: t('failedToSaveUnit'),
-  });
+  const { execute: saveWithRetry, isLoading: isSaving } = useRetry(
+    performSave,
+    {
+      maxAttempts: 3,
+      showToastOnError: false, // We'll handle toasts manually
+      errorMessage: t("failedToSaveUnit"),
+    },
+  );
 
   const createDefaultClassTime = (): ClassTime => ({
     id: uuidv4(),
-    day: 'Monday' as DayOfWeek,
-    startTime: '09:00',
-    endTime: '11:00',
+    day: "Monday" as DayOfWeek,
+    startTime: "09:00",
+    endTime: "11:00",
   });
 
   const resetForm = () => {
-    setCode('');
-    setName('');
-    setBuilding('');
-    setRoom('');
+    setCode("");
+    setName("");
+    setBuilding("");
+    setRoom("");
     setColor(UNIT_COLORS[0].value);
     setSchedule([createDefaultClassTime()]);
     setErrors({});
@@ -108,7 +124,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       setCode(editUnit.code);
       setName(editUnit.name);
       setBuilding(editUnit.location.building);
-      setRoom(editUnit.location.room || '');
+      setRoom(editUnit.location.room || "");
       setColor(editUnit.color);
       setSchedule([...editUnit.schedule]);
     } else {
@@ -125,9 +141,9 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
   const addClassTime = () => {
     const newClassTime: ClassTime = {
       id: uuidv4(),
-      day: 'Monday',
-      startTime: '09:00',
-      endTime: '11:00',
+      day: "Monday",
+      startTime: "09:00",
+      endTime: "11:00",
     };
     setSchedule([...schedule, newClassTime]);
   };
@@ -136,8 +152,14 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     setSchedule(schedule.filter((ct) => ct.id !== id));
   };
 
-  const updateClassTime = (id: string, field: keyof ClassTime, value: string) => {
-    setSchedule(schedule.map((ct) => (ct.id === id ? { ...ct, [field]: value } : ct)));
+  const updateClassTime = (
+    id: string,
+    field: keyof ClassTime,
+    value: string,
+  ) => {
+    setSchedule(
+      schedule.map((ct) => (ct.id === id ? { ...ct, [field]: value } : ct)),
+    );
   };
 
   const validateForm = (): boolean => {
@@ -146,18 +168,18 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
     const validator = createFormValidator({
       code: (value) => {
-        const requiredError = validationRules.required(t('unitCode'))(value);
+        const requiredError = validationRules.required(t("unitCode"))(value);
         if (requiredError) return requiredError;
 
         const stringValue = String(value).trim().toUpperCase();
         if (!UNIT_CODE_REGEX.test(stringValue)) {
-          return t('invalidUnitCodeFormat');
+          return t("invalidUnitCodeFormat");
         }
         return null;
       },
-      name: validationRules.required(t('unitName')),
+      name: validationRules.required(t("unitName")),
       building: (value) => {
-        const requiredError = validationRules.required(t('building'))(value);
+        const requiredError = validationRules.required(t("building"))(value);
         if (requiredError) return requiredError;
         // Validate building strictly against map data - exact match only
         const validatedBuilding = validateBuildingStrict(value as string);
@@ -167,8 +189,10 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
         return null;
       },
       schedule: (scheduleValue) =>
-        !scheduleValue || !Array.isArray(scheduleValue) || scheduleValue.length === 0
-          ? t('atLeastOneClass')
+        !scheduleValue ||
+        !Array.isArray(scheduleValue) ||
+        scheduleValue.length === 0
+          ? t("atLeastOneClass")
           : null,
     });
 
@@ -182,7 +206,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       if (!startTimeValid || !endTimeValid) {
         classTimeErrors.push({
           field: `time_${index}`,
-          message: t('invalidTimeFormat'),
+          message: t("invalidTimeFormat"),
         });
         return;
       }
@@ -191,7 +215,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       if (ct.startTime >= ct.endTime) {
         classTimeErrors.push({
           field: `time_${index}`,
-          message: t('endTimeAfterStart'),
+          message: t("endTimeAfterStart"),
         });
       }
     });
@@ -203,7 +227,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       if (timesSet.has(timeKey)) {
         classTimeErrors.push({
           field: `duplicate_${index}`,
-          message: t('duplicateClassTime'),
+          message: t("duplicateClassTime"),
         });
       }
       timesSet.add(timeKey);
@@ -246,15 +270,15 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       // Success - show toast and close form
       if (editUnit) {
         toastUtils.success(
-          t('unitUpdated'),
+          t("unitUpdated"),
           `${unitData.code} - ${unitData.name} has been updated successfully.`,
-          { id: 'unit-updated-toast' },
+          { id: "unit-updated-toast" },
         );
       } else {
         toastUtils.success(
-          t('unitAdded'),
+          t("unitAdded"),
           `${unitData.code} - ${unitData.name} has been added successfully.`,
-          { id: 'unit-added-toast' },
+          { id: "unit-added-toast" },
         );
       }
       onOpenChange(false);
@@ -271,9 +295,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
-          <DialogTitle>{editUnit ? t('editUnit') : t('addNewUnit')}</DialogTitle>
+          <DialogTitle>
+            {editUnit ? t("editUnit") : t("addNewUnit")}
+          </DialogTitle>
           <DialogDescription>
-            {editUnit ? t('updateUnitDetails') : t('fillUnitDetails')}
+            {editUnit ? t("updateUnitDetails") : t("fillUnitDetails")}
           </DialogDescription>
         </DialogHeader>
 
@@ -281,7 +307,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           {/* MQ Unit Search - Combined Code and Name */}
           <div className="space-y-2">
             <Label>
-              {t('unitCodeLabel')} & {t('unitNameLabel')} <span className="text-mq-error">*</span>
+              {t("unitCodeLabel")} & {t("unitNameLabel")}{" "}
+              <span className="text-mq-error">*</span>
             </Label>
             <UnitAutocomplete
               codeValue={code}
@@ -295,7 +322,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
               allowCustom
             />
             <p id="unit-code-help" className="text-xs text-mq-content-tertiary">
-              {t('unitCodeHelp')}
+              {t("unitCodeHelp")}
             </p>
           </div>
 
@@ -303,34 +330,39 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="building">
-                {t('buildingLabel')} <span className="text-mq-error">*</span>
+                {t("buildingLabel")} <span className="text-mq-error">*</span>
               </Label>
               <BuildingAutocomplete
                 value={building}
                 onChange={setBuilding}
                 error={errors.building}
                 required
-                placeholder={t('buildingPlaceholder')}
+                placeholder={t("buildingPlaceholder")}
               />
-              <p id="unit-building-help" className="text-xs text-mq-content-tertiary">
-                {t('buildingHelp')}
+              <p
+                id="unit-building-help"
+                className="text-xs text-mq-content-tertiary"
+              >
+                {t("buildingHelp")}
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="room">{t('roomLabel')}</Label>
+              <Label htmlFor="room">{t("roomLabel")}</Label>
               <Input
                 id="room"
-                placeholder={t('roomPlaceholder')}
+                placeholder={t("roomPlaceholder")}
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
               />
-              <p className="text-xs text-mq-content-tertiary">{t('optional')}</p>
+              <p className="text-xs text-mq-content-tertiary">
+                {t("optional")}
+              </p>
             </div>
           </div>
 
           {/* Color Selection - Scrollable */}
           <div className="space-y-2">
-            <Label>{t('unitColor')}</Label>
+            <Label>{t("unitColor")}</Label>
             <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
               {UNIT_COLORS.map((c) => (
                 <button
@@ -338,10 +370,10 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                   type="button"
                   onClick={() => setColor(c.value)}
                   className={cn(
-                    'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                    "w-8 h-8 rounded-full border-2 shrink-0 transition-all",
                     color === c.value
-                      ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
-                      : 'border-transparent hover:border-mq-border',
+                      ? "border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset"
+                      : "border-transparent hover:border-mq-border",
                   )}
                   style={{ backgroundColor: c.value }}
                   title={t(c.translationKey as TranslationKey)}
@@ -355,11 +387,16 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label>
-                {t('classTimesLabel')} <span className="text-mq-error">*</span>
+                {t("classTimesLabel")} <span className="text-mq-error">*</span>
               </Label>
-              <Button type="button" variant="outline" size="sm" onClick={addClassTime}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addClassTime}
+              >
                 <Plus className="w-4 h-4 mr-1" />
-                {t('addClassTime')}
+                {t("addClassTime")}
               </Button>
             </div>
 
@@ -369,20 +406,23 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
             <div className="space-y-3">
               {schedule.map((ct, index) => {
-                const hasTimeError = errors[`time_${index}`] || errors[`duplicate_${index}`];
+                const hasTimeError =
+                  errors[`time_${index}`] || errors[`duplicate_${index}`];
                 return (
                   <div
                     key={ct.id}
-                    className={`p-3 border rounded-lg ${hasTimeError ? 'border-mq-error' : ''}`}
+                    className={`p-3 border rounded-lg ${hasTimeError ? "border-mq-error" : ""}`}
                   >
                     <div className="flex flex-col items-start gap-2 sm:flex-row">
                       <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-3">
                         {/* Day */}
                         <div className="space-y-1">
-                          <Label className="text-xs">{t('day')}</Label>
+                          <Label className="text-xs">{t("day")}</Label>
                           <Select
                             value={ct.day}
-                            onValueChange={(value) => updateClassTime(ct.id, 'day', value)}
+                            onValueChange={(value) =>
+                              updateClassTime(ct.id, "day", value)
+                            }
                           >
                             <SelectTrigger className="h-9">
                               <SelectValue />
@@ -403,23 +443,31 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
                         {/* Start Time */}
                         <div className="space-y-1">
-                          <Label className="text-xs">{t('start')}</Label>
+                          <Label className="text-xs">{t("start")}</Label>
                           <Input
                             type="time"
                             value={ct.startTime}
-                            onChange={(e) => updateClassTime(ct.id, 'startTime', e.target.value)}
-                            className={`h-9 ${hasTimeError ? 'border-mq-error' : ''}`}
+                            onChange={(e) =>
+                              updateClassTime(
+                                ct.id,
+                                "startTime",
+                                e.target.value,
+                              )
+                            }
+                            className={`h-9 ${hasTimeError ? "border-mq-error" : ""}`}
                           />
                         </div>
 
                         {/* End Time */}
                         <div className="space-y-1">
-                          <Label className="text-xs">{t('end')}</Label>
+                          <Label className="text-xs">{t("end")}</Label>
                           <Input
                             type="time"
                             value={ct.endTime}
-                            onChange={(e) => updateClassTime(ct.id, 'endTime', e.target.value)}
-                            className={`h-9 ${hasTimeError ? 'border-mq-error' : ''}`}
+                            onChange={(e) =>
+                              updateClassTime(ct.id, "endTime", e.target.value)
+                            }
+                            className={`h-9 ${hasTimeError ? "border-mq-error" : ""}`}
                           />
                         </div>
                       </div>
@@ -431,7 +479,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                         size="sm"
                         onClick={() => removeClassTime(ct.id)}
                         className="mt-1 sm:mt-6"
-                        aria-label={t('removeClassTime')}
+                        aria-label={t("removeClassTime")}
                       >
                         <X className="w-4 h-4" />
                       </Button>
@@ -440,7 +488,8 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
                     {/* Errors for this class time - now properly below inputs */}
                     {hasTimeError && (
                       <p className="mt-2 text-xs text-mq-error" role="alert">
-                        {errors[`time_${index}`] || errors[`duplicate_${index}`]}
+                        {errors[`time_${index}`] ||
+                          errors[`duplicate_${index}`]}
                       </p>
                     )}
                   </div>
@@ -453,10 +502,11 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
         <DialogFooter className="flex justify-end">
           <div className="flex gap-2">
             <Button type="button" variant="outline" onClick={handleCancel}>
-              {t('cancel')}
+              {t("cancel")}
             </Button>
             <Button type="button" onClick={handleSave} disabled={isSaving}>
-              {isSaving ? t('saving') : editUnit ? t('update') : t('add')} {t('unit')}
+              {isSaving ? t("saving") : editUnit ? t("update") : t("add")}{" "}
+              {t("unit")}
             </Button>
           </div>
         </DialogFooter>

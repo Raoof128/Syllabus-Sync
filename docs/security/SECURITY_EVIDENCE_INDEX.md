@@ -3,6 +3,7 @@
 This index groups security-relevant files for fast reviewer navigation.
 
 ## Authentication & Sessions
+
 - `app/api/auth/signin/route.ts`
 - `app/api/auth/signup/route.ts`
 - `app/api/auth/signout/route.ts`
@@ -16,6 +17,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `app/auth/callback/route.ts`
 
 ## MFA / TOTP / SMS
+
 - `app/api/auth/mfa/enroll/route.ts`
 - `app/api/auth/mfa/verify/route.ts`
 - `app/api/auth/mfa/challenge-verify/route.ts`
@@ -27,6 +29,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `lib/security/two-factor-backup-codes.ts`
 
 ## Passkeys / WebAuthn
+
 - `app/api/webauthn/register/options/route.ts`
 - `app/api/webauthn/register/verify/route.ts`
 - `app/api/webauthn/authenticate/options/route.ts`
@@ -43,6 +46,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `supabase/migrations/20260214003000_restore_missing_core_security_tables.sql`
 
 ## Authorization / Tenant Boundaries
+
 - `app/api/_lib/middleware.ts`
 - `app/api/units/route.ts`
 - `app/api/units/[id]/route.ts`
@@ -58,6 +62,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `supabase/migrations/20260216090000_harden_security_functions.sql`
 
 ## Input Validation / Output Safety
+
 - `app/api/_lib/response.ts`
 - `app/api/_lib/middleware.ts`
 - `app/api/units/route.ts`
@@ -66,6 +71,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `app/api/navigate/route.ts`
 
 ## CSRF / CORS / Security Headers
+
 - `lib/security/csrf.ts`
 - `lib/utils/api.ts`
 - `lib/proxy.ts`
@@ -76,6 +82,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `app/api/csp-report/route.ts`
 
 ## Rate Limiting / Abuse Prevention
+
 - `lib/services/rateLimitService.ts`
 - `lib/security/ip.ts`
 - `lib/utils/rate-limit.ts`
@@ -85,6 +92,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `lib/security/headers-scanner.ts`
 
 ## Data Protection / Secrets / Privacy
+
 - `.env.example`
 - `.env.local.example`
 - `.gitignore`
@@ -96,6 +104,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `app/api/auth/email/cleanup/route.ts`
 
 ## Cache & Client Data Hygiene
+
 - `public/sw.js`
 - `lib/utils/clientStorage.ts`
 - `lib/utils/serviceWorker.ts`
@@ -103,6 +112,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `app/api/auth/mfa/enroll/route.ts`
 
 ## Logging / Monitoring / Audit
+
 - `lib/security/audit.ts`
 - `app/api/audit/route.ts`
 - `lib/utils/requestLogger.ts`
@@ -111,6 +121,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `supabase/migrations/20260201084007_add_audit_logging_and_feature_flags.sql`
 
 ## Dependency & Supply-Chain Controls
+
 - `package.json`
 - `package-lock.json`
 - `tools/security/check-secrets.mjs`
@@ -118,6 +129,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `.github/workflows/production-deploy.yml`
 
 ## Deployment / Operations Hardening
+
 - `.github/workflows/ci-cd.yml`
 - `.github/workflows/production-deploy.yml`
 - `config/next/next.config.ts`
@@ -127,6 +139,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `app/api/health/route.ts`
 
 ## Incident Readiness / Recovery Controls
+
 - `app/api/auth/signup/route.ts` (signup kill switch consumption)
 - `supabase/migrations/20260201084007_add_audit_logging_and_feature_flags.sql` (`app_config.signup_enabled`)
 - `app/api/auth/email/cleanup/route.ts` (cron secret-protected cleanup)
@@ -135,6 +148,7 @@ This index groups security-relevant files for fast reviewer navigation.
 - `lib/security/two-factor-backup-codes.ts` (helpers present; runtime wiring not evidenced)
 
 ## Historical Security Documentation
+
 - `AGENT.md`
 - `CHANGELOG.md`
 - `SECURITY.md`

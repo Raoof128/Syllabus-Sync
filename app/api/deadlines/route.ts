@@ -1,31 +1,37 @@
-import { NextResponse } from 'next/server';
-import { z } from 'zod';
-import { createServerClient } from '@/lib/supabase/server';
-import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
-import { mapDeadlineRow, serializeDeadline } from '@/app/api/_lib/mappers';
-import { requireAuth, requireAuthWithRateLimit, parseJsonBody } from '@/app/api/_lib/middleware';
-import { logger } from '@/lib/logger';
-import { isValidBuilding } from '@/lib/utils/buildingValidation';
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { createServerClient } from "@/lib/supabase/server";
+import { jsonError, ERROR_CODES } from "@/app/api/_lib/response";
+import { mapDeadlineRow, serializeDeadline } from "@/app/api/_lib/mappers";
+import {
+  requireAuth,
+  requireAuthWithRateLimit,
+  parseJsonBody,
+} from "@/app/api/_lib/middleware";
+import { logger } from "@/lib/logger";
+import { isValidBuilding } from "@/lib/utils/buildingValidation";
 
 const dateSchema = z.preprocess((value) => value, z.coerce.date());
 const deadlineSchema = z.object({
   id: z.string().min(1).optional(),
   title: z
     .string()
-    .min(1, 'Title is required')
-    .regex(/^[^<>]*$/, 'Title contains invalid characters'),
+    .min(1, "Title is required")
+    .regex(/^[^<>]*$/, "Title contains invalid characters"),
   unitCode: z
     .string()
-    .min(1, 'Unit code is required')
-    .regex(/^[^<>]*$/, 'Unit code contains invalid characters')
+    .min(1, "Unit code is required")
+    .regex(/^[^<>]*$/, "Unit code contains invalid characters")
     .transform((val) => val.trim().toUpperCase()),
   unitId: z.string().optional(),
   building: z.string().optional(), // For exams: building code
   room: z.string().optional(), // For exams: room number
   color: z.string().optional(), // Custom color override
   dueDate: dateSchema,
-  priority: z.enum(['Low', 'Medium', 'High', 'Urgent']).default('Medium'),
-  type: z.enum(['Assignment', 'Exam', 'Quiz', 'Presentation']).default('Assignment'),
+  priority: z.enum(["Low", "Medium", "High", "Urgent"]).default("Medium"),
+  type: z
+    .enum(["Assignment", "Exam", "Quiz", "Presentation"])
+    .default("Assignment"),
   completed: z.boolean().default(false),
   createdAt: dateSchema.optional(),
 });
@@ -37,20 +43,28 @@ export async function GET(request: Request) {
       // Security: Filter by user_id to prevent IDOR - only return user's own deadlines
       // Exclude soft-deleted records
       const { data, error } = await supabase
-        .from('deadlines')
-        .select('*')
-        .eq('user_id', userId)
-        .is('deleted_at', null)
-        .order('due_date', { ascending: true });
+        .from("deadlines")
+        .select("*")
+        .eq("user_id", userId)
+        .is("deleted_at", null)
+        .order("due_date", { ascending: true });
 
       if (error) {
-        return jsonError('A database error occurred', 500, ERROR_CODES.DATABASE_ERROR);
+        return jsonError(
+          "A database error occurred",
+          500,
+          ERROR_CODES.DATABASE_ERROR,
+        );
       }
 
       return NextResponse.json(data?.map(mapDeadlineRow) ?? []);
     } catch (error) {
-      logger.error('Deadlines GET error:', error);
-      return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
+      logger.error("Deadlines GET error:", error);
+      return jsonError(
+        "Internal server error",
+        500,
+        ERROR_CODES.INTERNAL_ERROR,
+      );
     }
   });
 }
@@ -69,21 +83,32 @@ export async function POST(request: Request) {
 
       if (!parsed.success) {
         const error: z.ZodError = parsed.error;
-        logger.error('Deadline validation failed:', JSON.stringify(error.issues, null, 2));
-        logger.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
-        return jsonError('Invalid deadline payload.', 400, ERROR_CODES.VALIDATION_ERROR, {
-          errors: error.issues,
-        });
+        logger.error(
+          "Deadline validation failed:",
+          JSON.stringify(error.issues, null, 2),
+        );
+        logger.error(
+          "Request body was:",
+          JSON.stringify(bodyResult.data, null, 2),
+        );
+        return jsonError(
+          "Invalid deadline payload.",
+          400,
+          ERROR_CODES.VALIDATION_ERROR,
+          {
+            errors: error.issues,
+          },
+        );
       }
 
       // VALIDATION: Check building against the 118 supported buildings (for Exams)
       const building = parsed.data.building;
-      if (building && building.trim() !== '' && !isValidBuilding(building)) {
+      if (building && building.trim() !== "" && !isValidBuilding(building)) {
         return jsonError(
-          'Building not found in the campus list. Please select a valid building.',
+          "Building not found in the campus list. Please select a valid building.",
           400,
           ERROR_CODES.VALIDATION_ERROR,
-          { field: 'building', value: building },
+          { field: "building", value: building },
         );
       }
 
@@ -97,13 +122,15 @@ export async function POST(request: Request) {
       if (unitId) {
         // Verify specific unit exists and belongs to user
         const { count } = await supabase
-          .from('units')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', userId)
-          .eq('id', unitId);
+          .from("units")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("id", unitId);
 
         if (!count) {
-          console.warn(`Provided unitId ${unitId} invalid or not found. Falling back to unitCode.`);
+          console.warn(
+            `Provided unitId ${unitId} invalid or not found. Falling back to unitCode.`,
+          );
           unitId = undefined;
         }
       }
@@ -111,10 +138,10 @@ export async function POST(request: Request) {
       if (!unitId && parsed.data.unitCode) {
         // Try to resolve unit_id from unitCode
         const { data: unit } = await supabase
-          .from('units')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('code', parsed.data.unitCode)
+          .from("units")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("code", parsed.data.unitCode)
           .maybeSingle();
 
         if (unit) {
@@ -124,26 +151,26 @@ export async function POST(request: Request) {
           // This ensures strict referential integrity without blocking the user
           console.warn(`Auto-creating unit for code: ${parsed.data.unitCode}`);
           const { data: newUnit, error: createError } = await supabase
-            .from('units')
+            .from("units")
             .insert({
               user_id: userId,
               code: parsed.data.unitCode,
               name: parsed.data.unitCode, // Default name
-              color: '#3B82F6', // Default color
+              color: "#3B82F6", // Default color
             })
-            .select('id')
+            .select("id")
             .single();
 
           if (newUnit) {
             unitId = newUnit.id;
           } else {
-            logger.error('Failed to auto-create unit:', createError);
+            logger.error("Failed to auto-create unit:", createError);
             // One last try: maybe it was created concurrently?
             const { data: retryUnit } = await supabase
-              .from('units')
-              .select('id')
-              .eq('user_id', userId)
-              .eq('code', parsed.data.unitCode)
+              .from("units")
+              .select("id")
+              .eq("user_id", userId)
+              .eq("code", parsed.data.unitCode)
               .maybeSingle();
             if (retryUnit) unitId = retryUnit.id;
           }
@@ -159,13 +186,18 @@ export async function POST(request: Request) {
       };
 
       const { data, error } = await supabase
-        .from('deadlines')
+        .from("deadlines")
         .insert(serializeDeadline(payload))
-        .select('*')
+        .select("*")
         .single();
 
       if (error) {
-        logger.error('Database error creating deadline:', error.code, error.message, error.details);
+        logger.error(
+          "Database error creating deadline:",
+          error.code,
+          error.message,
+          error.details,
+        );
         // Return actual error for debugging
         return jsonError(
           `Failed to create deadline: ${error.message}`,
@@ -176,8 +208,12 @@ export async function POST(request: Request) {
 
       return NextResponse.json(mapDeadlineRow(data));
     } catch (error) {
-      logger.error('Deadlines POST error:', error);
-      return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
+      logger.error("Deadlines POST error:", error);
+      return jsonError(
+        "Internal server error",
+        500,
+        ERROR_CODES.INTERNAL_ERROR,
+      );
     }
   });
 }

@@ -5,76 +5,76 @@
 // SECURITY: This service worker implements a strict caching policy to prevent
 // sensitive data from being cached and exposed after logout or on shared devices.
 
-const CACHE_NAME = 'syllabus-sync-v6'; // Bump version for cache invalidation
-const STATIC_CACHE = 'syllabus-sync-static-v6';
-const DYNAMIC_CACHE = 'syllabus-sync-dynamic-v6';
-const MAP_CACHE = 'syllabus-sync-map-v1'; // Dedicated cache for map assets
+const CACHE_NAME = "syllabus-sync-v6"; // Bump version for cache invalidation
+const STATIC_CACHE = "syllabus-sync-static-v6";
+const DYNAMIC_CACHE = "syllabus-sync-dynamic-v6";
+const MAP_CACHE = "syllabus-sync-map-v1"; // Dedicated cache for map assets
 
 // SECURITY: Only cache truly static assets - NO HTML pages that may contain user data
 // Exception: /offline is a static shell page with no user data, safe to precache
 const STATIC_ASSETS = [
-  '/manifest.webmanifest',
-  '/favicon.ico',
-  '/MQ_Logo_Final.png',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/offline', // Offline fallback page - safe to precache (no user data)
+  "/manifest.webmanifest",
+  "/favicon.ico",
+  "/MQ_Logo_Final.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/offline", // Offline fallback page - safe to precache (no user data)
 ];
 
 // Map assets — loaded lazily when user visits the map page, NOT precached.
 // Precaching ~12MB of PNGs was stalling first-visit performance.
 const MAP_ASSETS = [
-  '/images/leaflet/marker-icon.png',
-  '/images/leaflet/marker-icon-2x.png',
-  '/images/leaflet/marker-shadow.png',
+  "/images/leaflet/marker-icon.png",
+  "/images/leaflet/marker-icon-2x.png",
+  "/images/leaflet/marker-shadow.png",
 ];
 
 // SECURITY: Paths that should NEVER be cached (authenticated/sensitive data)
 // This includes ALL dynamic HTML pages, API routes, and auth-related paths
 const NO_CACHE_PATHS = [
-  '/api/',
-  '/auth/',
+  "/api/",
+  "/auth/",
   // SECURITY: Don't cache any HTML pages - they may contain user-specific data
-  '/home',
-  '/calendar',
-  '/settings',
-  '/feed',
-  '/map',
-  '/login',
-  '/signup',
-  '/test-auth',
-  '/manage-profiles',
+  "/home",
+  "/calendar",
+  "/settings",
+  "/feed",
+  "/map",
+  "/login",
+  "/signup",
+  "/test-auth",
+  "/manage-profiles",
 ];
 
 // SECURITY: File extensions that are safe to cache (static assets only)
 const SAFE_TO_CACHE_EXTENSIONS = [
-  '.css',
-  '.woff',
-  '.woff2',
-  '.ttf',
-  '.eot',
-  '.svg',
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.gif',
-  '.webp',
-  '.ico',
-  '.json', // Only for non-API JSON files like manifest
+  ".css",
+  ".woff",
+  ".woff2",
+  ".ttf",
+  ".eot",
+  ".svg",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".webp",
+  ".ico",
+  ".json", // Only for non-API JSON files like manifest
 ];
 
 // Install event - cache essential static assets only (map overlays cached on demand)
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
       return cache.addAll(STATIC_ASSETS);
-    })
+    }),
   );
   self.skipWaiting();
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   const validCaches = [STATIC_CACHE, DYNAMIC_CACHE, MAP_CACHE];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -84,37 +84,40 @@ self.addEventListener('activate', (event) => {
           if (!validCaches.includes(cacheName)) {
             return caches.delete(cacheName);
           }
-        })
+        }),
       );
-    })
+    }),
   );
   // Take control immediately
   self.clients.claim();
 });
 
 // Handle messages from the app
-self.addEventListener('message', (event) => {
+self.addEventListener("message", (event) => {
   // Skip waiting and activate immediately when app requests it
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+  if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
     return;
   }
 
   // SECURITY: Handle cache clear message from app (on logout)
-  if (event.data && event.data.type === 'CLEAR_ALL_CACHES') {
+  if (event.data && event.data.type === "CLEAR_ALL_CACHES") {
     event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName))
-        );
-      }).then(() => {
-        // Notify all clients that caches are cleared
-        self.clients.matchAll().then((clients) => {
-          clients.forEach((client) => {
-            client.postMessage({ type: 'CACHES_CLEARED' });
+      caches
+        .keys()
+        .then((cacheNames) => {
+          return Promise.all(
+            cacheNames.map((cacheName) => caches.delete(cacheName)),
+          );
+        })
+        .then(() => {
+          // Notify all clients that caches are cleared
+          self.clients.matchAll().then((clients) => {
+            clients.forEach((client) => {
+              client.postMessage({ type: "CACHES_CLEARED" });
+            });
           });
-        });
-      })
+        }),
     );
   }
 });
@@ -127,21 +130,21 @@ function isCacheable(url) {
   const pathname = url.pathname;
 
   // Never cache Next.js runtime/chunk assets in SW to avoid stale chunk load errors.
-  if (pathname.startsWith('/_next/')) {
+  if (pathname.startsWith("/_next/")) {
     return false;
   }
-  
+
   // Never cache paths in the no-cache list
-  if (NO_CACHE_PATHS.some(path => pathname.startsWith(path))) {
+  if (NO_CACHE_PATHS.some((path) => pathname.startsWith(path))) {
     return false;
   }
-  
+
   // Only cache files with safe extensions
-  const hasExtension = pathname.includes('.');
+  const hasExtension = pathname.includes(".");
   if (hasExtension) {
-    return SAFE_TO_CACHE_EXTENSIONS.some(ext => pathname.endsWith(ext));
+    return SAFE_TO_CACHE_EXTENSIONS.some((ext) => pathname.endsWith(ext));
   }
-  
+
   // Don't cache navigation requests (HTML pages) - they may contain user data
   return false;
 }
@@ -151,9 +154,11 @@ function isCacheable(url) {
  */
 function isMapAsset(url) {
   const pathname = url.pathname;
-  return pathname.startsWith('/maps/') || 
-         pathname.startsWith('/images/leaflet/') ||
-         MAP_ASSETS.some(asset => pathname === asset);
+  return (
+    pathname.startsWith("/maps/") ||
+    pathname.startsWith("/images/leaflet/") ||
+    MAP_ASSETS.some((asset) => pathname === asset)
+  );
 }
 
 /**
@@ -162,58 +167,58 @@ function isMapAsset(url) {
  */
 function getOfflineResponse(request) {
   const isDocumentRequest =
-    request.mode === 'navigate' || request.destination === 'document';
+    request.mode === "navigate" || request.destination === "document";
 
   if (isDocumentRequest) {
     // Try to serve the precached offline page first
-    return caches.match('/offline').then((cachedOffline) => {
+    return caches.match("/offline").then((cachedOffline) => {
       if (cachedOffline) return cachedOffline;
       // Fallback: inline HTML if offline page isn't cached yet
       return new Response(
         '<!doctype html><html><head><meta charset="utf-8"><title>Offline</title></head><body><h1>Offline</h1><p>Please reconnect and try again.</p></body></html>',
         {
           status: 503,
-          statusText: 'Offline',
+          statusText: "Offline",
           headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'no-store',
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "no-store",
           },
-        }
+        },
       );
     });
   }
 
-  const acceptHeader = request.headers.get('accept') || '';
+  const acceptHeader = request.headers.get("accept") || "";
   const isJsonRequest =
-    acceptHeader.includes('application/json') || request.url.includes('/api/');
+    acceptHeader.includes("application/json") || request.url.includes("/api/");
 
   if (isJsonRequest) {
-    return new Response(JSON.stringify({ error: 'Network unavailable' }), {
+    return new Response(JSON.stringify({ error: "Network unavailable" }), {
       status: 503,
-      statusText: 'Offline',
+      statusText: "Offline",
       headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'no-store',
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
       },
     });
   }
 
-  return new Response('', {
+  return new Response("", {
     status: 503,
-    statusText: 'Offline',
+    statusText: "Offline",
     headers: {
-      'Cache-Control': 'no-store',
+      "Cache-Control": "no-store",
     },
   });
 }
 
 // Fetch event - network-first for most content, cache only static assets
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
   // Skip non-GET requests and external requests
-  if (request.method !== 'GET' || !url.origin.includes(self.location.origin)) {
+  if (request.method !== "GET" || !url.origin.includes(self.location.origin)) {
     return;
   }
 
@@ -223,7 +228,7 @@ self.addEventListener('fetch', (event) => {
       fetch(request).catch(() => {
         // getOfflineResponse may return a Promise (for document requests)
         return Promise.resolve(getOfflineResponse(request));
-      })
+      }),
     );
     return;
   }
@@ -235,26 +240,35 @@ self.addEventListener('fetch', (event) => {
         return cache.match(request).then((cachedResponse) => {
           if (cachedResponse) {
             // Return from cache, update in background
-            fetch(request).then((response) => {
-              if (response.ok) {
-                cache.put(request, response);
-              }
-            }).catch(() => {/* ignore */});
+            fetch(request)
+              .then((response) => {
+                if (response.ok) {
+                  cache.put(request, response);
+                }
+              })
+              .catch(() => {
+                /* ignore */
+              });
             return cachedResponse;
           }
-          
+
           // Not in cache, fetch and cache
-          return fetch(request).then((response) => {
-            if (response.ok) {
-              cache.put(request, response.clone());
-            }
-            return response;
-          }).catch(() => {
-            // Return offline placeholder if map fails to load
-            return new Response('', { status: 503, statusText: 'Map unavailable offline' });
-          });
+          return fetch(request)
+            .then((response) => {
+              if (response.ok) {
+                cache.put(request, response.clone());
+              }
+              return response;
+            })
+            .catch(() => {
+              // Return offline placeholder if map fails to load
+              return new Response("", {
+                status: 503,
+                statusText: "Map unavailable offline",
+              });
+            });
         });
-      })
+      }),
     );
     return;
   }
@@ -264,14 +278,18 @@ self.addEventListener('fetch', (event) => {
     caches.match(request).then((cachedResponse) => {
       if (cachedResponse) {
         // Return cache, but also update in background (stale-while-revalidate)
-        fetch(request).then((response) => {
-          if (response.ok) {
-            caches.open(DYNAMIC_CACHE).then((cache) => {
-              cache.put(request, response);
-            });
-          }
-        }).catch(() => {/* ignore fetch errors for background update */});
-        
+        fetch(request)
+          .then((response) => {
+            if (response.ok) {
+              caches.open(DYNAMIC_CACHE).then((cache) => {
+                cache.put(request, response);
+              });
+            }
+          })
+          .catch(() => {
+            /* ignore fetch errors for background update */
+          });
+
         return cachedResponse;
       }
 
@@ -289,6 +307,6 @@ self.addEventListener('fetch', (event) => {
 
         return response;
       });
-    })
+    }),
   );
 });

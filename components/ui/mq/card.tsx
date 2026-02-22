@@ -1,34 +1,40 @@
-import React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
-const cardVariants = cva('mq-card rounded-mq-lg transition-all duration-mq-mid ease-mq-ease', {
-  variants: {
-    variant: {
-      default: 'border border-mq-border bg-mq-card-background shadow-mq-sm',
-      elevated: 'border border-mq-border bg-mq-card-background shadow-mq hover:shadow-mq-lg',
-      glass: 'mq-liquid-glass',
-      'glass-elevated': 'mq-liquid-glass-elevated',
-      'glass-subtle': 'mq-liquid-glass-subtle',
-      'glass-security': 'mq-liquid-glass-security',
+const cardVariants = cva(
+  "mq-card rounded-mq-lg transition-all duration-mq-mid ease-mq-ease",
+  {
+    variants: {
+      variant: {
+        default: "border border-mq-border bg-mq-card-background shadow-mq-sm",
+        elevated:
+          "border border-mq-border bg-mq-card-background shadow-mq hover:shadow-mq-lg",
+        glass: "mq-liquid-glass",
+        "glass-elevated": "mq-liquid-glass-elevated",
+        "glass-subtle": "mq-liquid-glass-subtle",
+        "glass-security": "mq-liquid-glass-security",
+      },
+      interactive: {
+        true: "cursor-pointer hover:-translate-y-0.5 hover:shadow-mq-lg active:scale-[0.99]",
+        false: "",
+      },
     },
-    interactive: {
-      true: 'cursor-pointer hover:-translate-y-0.5 hover:shadow-mq-lg active:scale-[0.99]',
-      false: '',
+    defaultVariants: {
+      variant: "default",
+      interactive: false,
     },
   },
-  defaultVariants: {
-    variant: 'default',
-    interactive: false,
-  },
-});
+);
 
 interface CardProps
-  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof cardVariants> {
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
   /** @deprecated Use variant="glass" or variant="glass-elevated" instead */
   glass?: boolean;
   /** @deprecated Use variant prop instead */
-  glassVariant?: 'default' | 'elevated' | 'subtle' | 'security';
+  glassVariant?: "default" | "elevated" | "subtle" | "security";
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
@@ -38,73 +44,99 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     if (glass && !variant) {
       const glassVariantMap: Record<
         string,
-        'glass' | 'glass-elevated' | 'glass-subtle' | 'glass-security'
+        "glass" | "glass-elevated" | "glass-subtle" | "glass-security"
       > = {
-        default: 'glass',
-        elevated: 'glass-elevated',
-        subtle: 'glass-subtle',
-        security: 'glass-security',
+        default: "glass",
+        elevated: "glass-elevated",
+        subtle: "glass-subtle",
+        security: "glass-security",
       };
-      resolvedVariant = glassVariantMap[glassVariant || 'default'];
+      resolvedVariant = glassVariantMap[glassVariant || "default"];
     }
 
     return (
       <div
         ref={ref}
-        className={cn(cardVariants({ variant: resolvedVariant, interactive }), className)}
+        className={cn(
+          cardVariants({ variant: resolvedVariant, interactive }),
+          className,
+        )}
         {...props}
       />
     );
   },
 );
-Card.displayName = 'Card';
+Card.displayName = "Card";
 
-const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />
-  ),
-);
-CardHeader.displayName = 'CardHeader';
+const CardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+));
+CardHeader.displayName = "CardHeader";
 
 interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
   /** Heading level for proper document hierarchy - defaults to h2 for section titles */
-  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 }
 
 const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
-  ({ className, as: Component = 'h2', ...props }, ref) => (
+  ({ className, as: Component = "h2", ...props }, ref) => (
     <Component
       ref={ref}
       className={cn(
-        'text-mq-2xl font-semibold leading-none tracking-tight text-mq-content',
+        "text-mq-2xl font-semibold leading-none tracking-tight text-mq-content",
         className,
       )}
       {...props}
     />
   ),
 );
-CardTitle.displayName = 'CardTitle';
+CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-mq-sm text-mq-content-secondary', className)} {...props} />
+  <p
+    ref={ref}
+    className={cn("text-mq-sm text-mq-content-secondary", className)}
+    {...props}
+  />
 ));
-CardDescription.displayName = 'CardDescription';
+CardDescription.displayName = "CardDescription";
 
-const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
-  ),
-);
-CardContent.displayName = 'CardContent';
+const CardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+));
+CardContent.displayName = "CardContent";
 
-const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />
-  ),
-);
-CardFooter.displayName = 'CardFooter';
+const CardFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  />
+));
+CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, cardVariants };
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  cardVariants,
+};

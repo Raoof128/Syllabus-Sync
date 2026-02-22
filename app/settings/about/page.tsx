@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { AboutSettings } from '@/features/settings/components';
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { AboutSettings } from "@/features/settings/components";
 
 export default function AboutSettingsPage() {
   const { t } = useTypedTranslation();

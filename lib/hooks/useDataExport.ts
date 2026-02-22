@@ -1,13 +1,13 @@
-import { useCallback } from 'react';
-import { toastUtils } from '@/lib/utils/toast';
-import { errorHandler } from '@/lib/utils/errorHandling';
-import { useGamificationStore } from '@/lib/store/gamificationStore';
-import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useThemeStore } from '@/lib/store/themeStore';
-import { APP_CONFIG } from '@/lib/config';
-import type { TranslationKey } from '@/lib/i18n/translations';
+import { useCallback } from "react";
+import { toastUtils } from "@/lib/utils/toast";
+import { errorHandler } from "@/lib/utils/errorHandling";
+import { useGamificationStore } from "@/lib/store/gamificationStore";
+import { useNotificationPreferencesStore } from "@/lib/store/notificationPreferencesStore";
+import { useUnitsStore } from "@/lib/store/unitsStore";
+import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
+import { useThemeStore } from "@/lib/store/themeStore";
+import { APP_CONFIG } from "@/lib/config";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 type UseDataExportProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -20,19 +20,21 @@ const sanitizeData = (data: unknown): unknown => {
     return data.map(sanitizeData);
   }
 
-  if (typeof data === 'object' && data !== null) {
+  if (typeof data === "object" && data !== null) {
     const sanitized: Record<string, unknown> = {};
 
-    for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+    for (const [key, value] of Object.entries(
+      data as Record<string, unknown>,
+    )) {
       // Skip sensitive keys
       const lowerKey = key.toLowerCase();
       if (
-        lowerKey.includes('token') ||
-        lowerKey.includes('password') ||
-        lowerKey.includes('secret') ||
-        lowerKey.includes('sessionid') ||
-        lowerKey.includes('auth') ||
-        lowerKey.includes('key')
+        lowerKey.includes("token") ||
+        lowerKey.includes("password") ||
+        lowerKey.includes("secret") ||
+        lowerKey.includes("sessionid") ||
+        lowerKey.includes("auth") ||
+        lowerKey.includes("key")
       ) {
         continue;
       }
@@ -82,31 +84,33 @@ export function useDataExport({ t, language }: UseDataExportProps) {
           notifications: notificationPreferences,
         },
         exportedAt: new Date().toISOString(),
-        version: '1.0',
+        version: "1.0",
         appVersion: APP_CONFIG.version,
       };
 
       const sanitizedData = sanitizeData(data);
 
-      const blob = new Blob([JSON.stringify(sanitizedData, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(sanitizedData, null, 2)], {
+        type: "application/json",
+      });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `syllabus-sync-data-${new Date().toISOString().split('T')[0]}.json`;
-      a.style.display = 'none';
+      a.download = `syllabus-sync-data-${new Date().toISOString().split("T")[0]}.json`;
+      a.style.display = "none";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      toastUtils.success(t('exportComplete'), t('exportCompleteMsg'));
+      toastUtils.success(t("exportComplete"), t("exportCompleteMsg"));
     } catch (error) {
       errorHandler.logError(
-        error instanceof Error ? error : new Error('Failed to export data'),
-        'Settings Export Data',
-        'medium',
+        error instanceof Error ? error : new Error("Failed to export data"),
+        "Settings Export Data",
+        "medium",
       );
-      toastUtils.error(t('exportFailed'), t('exportFailedMsg'));
+      toastUtils.error(t("exportFailed"), t("exportFailedMsg"));
     }
   }, [t, language]);
 

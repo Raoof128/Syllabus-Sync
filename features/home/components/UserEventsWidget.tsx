@@ -1,20 +1,27 @@
-'use client';
+"use client";
 
-import React, { useMemo, memo } from 'react';
-import { useRouter } from 'next/navigation';
-import { useEventsStore } from '@/lib/store/eventsStore';
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Badge } from '@/components/ui/mq/badge';
-import { Calendar, ExternalLink, Clock, MapPin, Eye } from 'lucide-react';
-import { isToday, format, isValid, endOfMonth, isBefore, startOfDay } from 'date-fns';
-import { enAU, es, faIR } from 'date-fns/locale';
-import Link from 'next/link';
-import { useHydration } from '@/lib/hooks';
-import { Button } from '@/components/ui/mq/button';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import { CardSolid } from '@/features/home/components/HomeCard';
-import { cn } from '@/lib/utils';
+import React, { useMemo, memo } from "react";
+import { useRouter } from "next/navigation";
+import { useEventsStore } from "@/lib/store/eventsStore";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/mq/card";
+import { Badge } from "@/components/ui/mq/badge";
+import { Calendar, ExternalLink, Clock, MapPin, Eye } from "lucide-react";
+import {
+  isToday,
+  format,
+  isValid,
+  endOfMonth,
+  isBefore,
+  startOfDay,
+} from "date-fns";
+import { enAU, es, faIR } from "date-fns/locale";
+import Link from "next/link";
+import { useHydration } from "@/lib/hooks";
+import { Button } from "@/components/ui/mq/button";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { CardSolid } from "@/features/home/components/HomeCard";
+import { cn } from "@/lib/utils";
 
 const UserEventsWidget = memo(() => {
   const isHydrated = useHydration();
@@ -29,9 +36,9 @@ const UserEventsWidget = memo(() => {
 
   const currentLocale = useMemo(() => {
     switch (language) {
-      case 'es':
+      case "es":
         return es;
-      case 'fa':
+      case "fa":
         return faIR;
       default:
         return enAU;
@@ -49,9 +56,13 @@ const UserEventsWidget = memo(() => {
         // Handle both Date objects and string dates from API/persistence
         let eventDate: Date;
         if (event.startAt) {
-          eventDate = event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
+          eventDate =
+            event.startAt instanceof Date
+              ? event.startAt
+              : new Date(event.startAt);
         } else if (event.date) {
-          eventDate = event.date instanceof Date ? event.date : new Date(event.date);
+          eventDate =
+            event.date instanceof Date ? event.date : new Date(event.date);
         } else {
           return false;
         }
@@ -81,36 +92,44 @@ const UserEventsWidget = memo(() => {
       });
   }, [events]);
 
-  const formatEventTime = (event: { startAt: Date; date: Date; time?: string }) => {
-    const startDate = event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
-    return format(startDate, 'EEE, MMM d • h:mm a', { locale: currentLocale });
+  const formatEventTime = (event: {
+    startAt: Date;
+    date: Date;
+    time?: string;
+  }) => {
+    const startDate =
+      event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
+    return format(startDate, "EEE, MMM d • h:mm a", { locale: currentLocale });
   };
 
   // Category colors
   const categoryColors: Record<string, string> = {
-    Career: '#3B82F6',
-    Social: '#8B5CF6',
-    Academic: '#10B981',
-    'Free Food': '#F59E0B',
+    Career: "#3B82F6",
+    Social: "#8B5CF6",
+    Academic: "#10B981",
+    "Free Food": "#F59E0B",
   };
 
   return (
     <CardSolid className="h-full flex flex-col">
       <CardHeader
         className="flex flex-row items-center justify-between"
-        style={{ color: 'var(--mq-content)', WebkitTextFillColor: 'var(--mq-content)' }}
+        style={{
+          color: "var(--mq-content)",
+          WebkitTextFillColor: "var(--mq-content)",
+        }}
       >
         <div className="flex items-center gap-2">
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            {tOr('myEvents', 'My Events')}
+            {tOr("myEvents", "My Events")}
           </CardTitle>
           {isHydrated && monthEndEvents.length > 0 && (
             <Badge
               variant="neutral"
               className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
             >
-              {monthEndEvents.length} {tOr('upcoming', 'upcoming')}
+              {monthEndEvents.length} {tOr("upcoming", "upcoming")}
             </Badge>
           )}
           {/* View Only Badge */}
@@ -120,24 +139,24 @@ const UserEventsWidget = memo(() => {
               className="ml-1 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 flex items-center gap-1"
             >
               <Eye className="h-3 w-3" aria-hidden="true" />
-              {t('viewOnly')}
+              {t("viewOnly")}
             </Badge>
           )}
         </div>
         <Button size="sm" variant="outline" className="gap-1.5" asChild>
           <Link
             href="/calendar?section=events&highlight=true"
-            aria-label={`${t('viewAll')} ${tOr('myEvents', 'My Events')}`}
+            aria-label={`${t("viewAll")} ${tOr("myEvents", "My Events")}`}
           >
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{t('viewAll')}</span>
+            <span>{t("viewAll")}</span>
           </Link>
         </Button>
       </CardHeader>
       <CardContent className="space-y-3 flex-1">
         {!isHydrated ? (
           <div className="h-48 flex items-center justify-center">
-            <p className="text-lg text-mq-content">{t('loading')}</p>
+            <p className="text-lg text-mq-content">{t("loading")}</p>
           </div>
         ) : monthEndEvents.length === 0 ? (
           <div className="text-center py-8">
@@ -145,15 +164,18 @@ const UserEventsWidget = memo(() => {
               className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
               aria-hidden="true"
             />
-            <p className="text-mq-content-tertiary">{tOr('noEventsYet', 'No events yet')}</p>
+            <p className="text-mq-content-tertiary">
+              {tOr("noEventsYet", "No events yet")}
+            </p>
             <p className="text-mq-content-tertiary text-sm mt-1">
-              {tOr('addEventsInCalendar', 'Add events in the Calendar tab')}
+              {tOr("addEventsInCalendar", "Add events in the Calendar tab")}
             </p>
           </div>
         ) : (
           <div className="space-y-2">
             {monthEndEvents.map((event) => {
-              const eventColor = event.color || categoryColors[event.category] || '#A6192E';
+              const eventColor =
+                event.color || categoryColors[event.category] || "#A6192E";
               const eventStartDate = event.startAt
                 ? event.startAt instanceof Date
                   ? event.startAt
@@ -163,26 +185,37 @@ const UserEventsWidget = memo(() => {
                     ? event.date
                     : new Date(event.date)
                   : null;
-              const eventIsToday = eventStartDate ? isToday(eventStartDate) : false;
-              const eventDateStr = eventStartDate ? format(eventStartDate, 'yyyy-MM-dd') : '';
+              const eventIsToday = eventStartDate
+                ? isToday(eventStartDate)
+                : false;
+              const eventDateStr = eventStartDate
+                ? format(eventStartDate, "yyyy-MM-dd")
+                : "";
 
               return (
                 <div
                   key={event.id}
                   className={cn(
-                    'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer',
-                    'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
+                    "group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer",
+                    "bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background",
                   )}
-                  style={{ borderLeftColor: eventColor, borderLeftWidth: '4px' }}
+                  style={{
+                    borderLeftColor: eventColor,
+                    borderLeftWidth: "4px",
+                  }}
                   onClick={() =>
-                    router.push(`/calendar?date=${eventDateStr}&highlightEvent=${event.id}`)
+                    router.push(
+                      `/calendar?date=${eventDateStr}&highlightEvent=${event.id}`,
+                    )
                   }
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
+                    if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      router.push(`/calendar?date=${eventDateStr}&highlightEvent=${event.id}`);
+                      router.push(
+                        `/calendar?date=${eventDateStr}&highlightEvent=${event.id}`,
+                      );
                     }
                   }}
                 >
@@ -205,7 +238,7 @@ const UserEventsWidget = memo(() => {
                           variant="neutral"
                           className="text-[10px] px-1.5 py-0.5 font-medium shrink-0 bg-mq-background-secondary text-mq-content-secondary"
                         >
-                          {tOr('today', 'Today')}
+                          {tOr("today", "Today")}
                         </Badge>
                       )}
                     </div>
@@ -233,6 +266,6 @@ const UserEventsWidget = memo(() => {
   );
 });
 
-UserEventsWidget.displayName = 'UserEventsWidget';
+UserEventsWidget.displayName = "UserEventsWidget";
 
 export default UserEventsWidget;

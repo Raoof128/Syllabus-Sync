@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createMarkerIcon } from '@/features/map/lib/mapUtils';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { createMarkerIcon } from "@/features/map/lib/mapUtils";
 
 // Mock Leaflet
 const mockIconConstructor = vi.fn();
@@ -7,7 +7,7 @@ const mockL = {
   Icon: mockIconConstructor,
 };
 
-describe('mapUtils', () => {
+describe("mapUtils", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // We need to access the module's internal cache or rely on the fact that constructor isn't called twice
@@ -15,30 +15,30 @@ describe('mapUtils', () => {
     // we will rely on the side effect: L.Icon constructor call count.
   });
 
-  describe('createMarkerIcon', () => {
-    it('should create a new icon if not in cache', () => {
+  describe("createMarkerIcon", () => {
+    it("should create a new icon if not in cache", () => {
       // @ts-ignore
-      createMarkerIcon(mockL, false, 'test-class');
+      createMarkerIcon(mockL, false, "test-class");
       expect(mockIconConstructor).toHaveBeenCalledTimes(1);
     });
 
-    it('should return cached icon if called with same parameters', () => {
+    it("should return cached icon if called with same parameters", () => {
       // @ts-ignore
-      const icon1 = createMarkerIcon(mockL, true, 'cached-class');
+      const icon1 = createMarkerIcon(mockL, true, "cached-class");
       // @ts-ignore
-      const icon2 = createMarkerIcon(mockL, true, 'cached-class');
+      const icon2 = createMarkerIcon(mockL, true, "cached-class");
 
       expect(mockIconConstructor).toHaveBeenCalledTimes(1); // Still 1, meaning 2nd call used cache
       expect(icon1).toBe(icon2);
     });
 
-    it('should create different icons for different parameters', () => {
+    it("should create different icons for different parameters", () => {
       // @ts-ignore
-      createMarkerIcon(mockL, false, 'class-a');
+      createMarkerIcon(mockL, false, "class-a");
       // @ts-ignore
-      createMarkerIcon(mockL, true, 'class-a'); // different selected state
+      createMarkerIcon(mockL, true, "class-a"); // different selected state
       // @ts-ignore
-      createMarkerIcon(mockL, false, 'class-b'); // different class
+      createMarkerIcon(mockL, false, "class-b"); // different class
 
       // 1 from previous test (global cache persistence in module scope during test run)
       // + 3 new calls = 4 total?
@@ -58,9 +58,9 @@ describe('mapUtils', () => {
       const initialCalls = mockIconConstructor.mock.calls.length;
 
       // @ts-ignore
-      createMarkerIcon(mockL, false, 'unique-1');
+      createMarkerIcon(mockL, false, "unique-1");
       // @ts-ignore
-      createMarkerIcon(mockL, false, 'unique-2');
+      createMarkerIcon(mockL, false, "unique-2");
 
       expect(mockIconConstructor).toHaveBeenCalledTimes(initialCalls + 2);
     });

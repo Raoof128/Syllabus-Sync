@@ -1,11 +1,11 @@
-import { NextRequest } from 'next/server';
-import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
-import { apiLimiter } from '@/lib/services/rateLimitService';
-import { getClientIP } from '@/lib/security/ip';
-import { logger } from '@/lib/logger';
-import { OpenMeteoProvider } from '@/lib/weather/providers/openMeteoProvider';
-import { z } from 'zod';
-import { WeatherResult } from '@/lib/weather/types';
+import { NextRequest } from "next/server";
+import { jsonSuccess, jsonError, ERROR_CODES } from "@/app/api/_lib/response";
+import { apiLimiter } from "@/lib/services/rateLimitService";
+import { getClientIP } from "@/lib/security/ip";
+import { logger } from "@/lib/logger";
+import { OpenMeteoProvider } from "@/lib/weather/providers/openMeteoProvider";
+import { z } from "zod";
+import { WeatherResult } from "@/lib/weather/types";
 
 /**
  * Weather API Proxy Endpoint
@@ -14,9 +14,13 @@ import { WeatherResult } from '@/lib/weather/types';
  */
 
 // Cache weather data for 5 minutes (current) to 15 minutes (hourly)
-const weatherCache = new Map<string, { data: WeatherResult; timestamp: number }>();
+const weatherCache = new Map<
+  string,
+  { data: WeatherResult; timestamp: number }
+>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes standard ttl
-const EDGE_CACHE_CONTROL = 'public, max-age=0, s-maxage=300, stale-while-revalidate=60';
+const EDGE_CACHE_CONTROL =
+  "public, max-age=0, s-maxage=300, stale-while-revalidate=60";
 
 const provider = new OpenMeteoProvider();
 
@@ -53,7 +57,7 @@ export async function GET(request: NextRequest) {
 
   if (!allowed) {
     return jsonError(
-      'Rate limit exceeded. Please try again later.',
+      "Rate limit exceeded. Please try again later.",
       429,
       ERROR_CODES.RATE_LIMITED,
       { retryAfter: resetIn },
@@ -61,12 +65,16 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const lat = searchParams.get('lat');
-  const lon = searchParams.get('lon');
+  const lat = searchParams.get("lat");
+  const lon = searchParams.get("lon");
 
   // Validate required parameters
   if (!lat || !lon) {
-    return jsonError('Missing required parameters: lat and lon', 400, ERROR_CODES.VALIDATION_ERROR);
+    return jsonError(
+      "Missing required parameters: lat and lon",
+      400,
+      ERROR_CODES.VALIDATION_ERROR,
+    );
   }
 
   // Validate coordinate format
@@ -75,14 +83,18 @@ export async function GET(request: NextRequest) {
 
   if (isNaN(latitude) || isNaN(longitude)) {
     return jsonError(
-      'Invalid coordinates: lat and lon must be numbers',
+      "Invalid coordinates: lat and lon must be numbers",
       400,
       ERROR_CODES.VALIDATION_ERROR,
     );
   }
 
   if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-    return jsonError('Coordinates out of range', 400, ERROR_CODES.VALIDATION_ERROR);
+    return jsonError(
+      "Coordinates out of range",
+      400,
+      ERROR_CODES.VALIDATION_ERROR,
+    );
   }
 
   // Create cache key (rounded to 4 decimal places, ~11m precision as requested)
@@ -95,7 +107,7 @@ export async function GET(request: NextRequest) {
   if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
     return jsonSuccess(cached.data, 200, undefined, {
       headers: {
-        'Cache-Control': EDGE_CACHE_CONTROL,
+        "Cache-Control": EDGE_CACHE_CONTROL,
       },
     });
   }
@@ -103,7 +115,10 @@ export async function GET(request: NextRequest) {
   try {
     const start = Date.now();
 
-    const weatherData = await provider.getWeather({ lat: roundedLat, lon: roundedLon });
+    const weatherData = await provider.getWeather({
+      lat: roundedLat,
+      lon: roundedLon,
+    });
 
     // 4.2 Sanity thresholds via Zod
     const validatedData = WeatherResultSchema.parse(weatherData);
@@ -115,8 +130,8 @@ export async function GET(request: NextRequest) {
     });
 
     // Logging for observability (6.1)
-    logger.info('Weather fetched successfully', {
-      source: 'Open-Meteo',
+    logger.info("Weather fetched successfully", {
+      source: "Open-Meteo",
       model: validatedData.modelUsed,
       lat: roundedLat,
       lon: roundedLon,
@@ -135,20 +150,29 @@ export async function GET(request: NextRequest) {
 
     return jsonSuccess(validatedData, 200, undefined, {
       headers: {
-        'Cache-Control': EDGE_CACHE_CONTROL,
+        "Cache-Control": EDGE_CACHE_CONTROL,
       },
     });
   } catch (error) {
-    logger.error('Weather API error:', error);
+    logger.error("Weather API error:", error);
 
     // Fallback to cache if available, even if stale (sanity check fallback)
     if (cached) {
-      logger.info('Falling back to stale weather cache due to API error');
-      return jsonSuccess({ ...cached.data, isStaleFallback: true }, 200, undefined, {
-        headers: { 'Cache-Control': 'no-cache' },
-      });
+      logger.info("Falling back to stale weather cache due to API error");
+      return jsonSuccess(
+        { ...cached.data, isStaleFallback: true },
+        200,
+        undefined,
+        {
+          headers: { "Cache-Control": "no-cache" },
+        },
+      );
     }
 
-    return jsonError('Failed to fetch weather data', 503, ERROR_CODES.EXTERNAL_SERVICE_ERROR);
+    return jsonError(
+      "Failed to fetch weather data",
+      503,
+      ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+    );
   }
 }

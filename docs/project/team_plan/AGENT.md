@@ -1,71 +1,86 @@
 # Agent Progress Summary
+
 ## Current Development Session (January 22-February 14, 2026)
+
 **Primary Focus:** Next.js 16 Migration, Authentication Systems, Infrastructure Stability, Security Enhancements, Responsive Design, and Documentation
 
 ### Raouf: 2026-02-16 (Australia/Sydney) - Full Performance Audit & Fix — Site Load Speed + Supabase Timeout Resolution
+
 Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline, client-layout auth waterfall, duplicate CSS, framer-motion template, chunk splitting, DNS/CORP headers, SW precache, login image. All 443 tests pass.
 
 ### Raouf: 2026-02-16 (Australia/Sydney) - Privacy Policy (APP-Compliant) — Policy Page, Collection Notices, Legal Links
+
 - **Status:** ✅ Complete - Full APP-compliant privacy policy, signup collection notice, login footer links, internal routing.
 
 ### Raouf: 2026-02-16 (Australia/Sydney) - PWA Hardening — Icon Set, Manifest, Offline Page, Layout Metadata
+
 - **Status:** ✅ Complete - PWA installable with proper icons, manifest, iOS support, offline page.
 
 ### Raouf: 2026-02-14 (Australia/Sydney) - Repository Documentation Audit & Full System Check
+
 - **Status:** ✅ Complete - All docs synced and system verified.
 - **Scope:** Documentation audit, README refresh, AGENT/CHANGELOG sync.
 - **Summary:** Full repo audit — updated README (test badge 425→443, added email verification/gamification/responsive features, expanded directory tree), synced all AGENT.md and CHANGELOG.md files. Ran full `npm run check` pipeline.
 - **Verification:** `npm run check` ✅ (443/443 tests pass, build successful).
 
 ### Raouf: 2026-02-14 (Australia/Sydney) - Supabase CLI Recovery + Full Remote Migration Push
+
 - **Status:** ✅ Complete - All migrations pushed and verified.
 - **Scope:** Database Operations / Migration Reliability.
 - **Summary:** Fixed CLI auth, resolved non-idempotent constraints/duplicate versions, pushed all pending migrations, added recovery migrations for missing DB objects. Final state: remote database fully aligned.
 - **Verification:** `supabase db push --dry-run --include-all` ✅, migration history local=remote.
 
 ### Raouf: 2026-02-14 (Australia/Sydney) - Gamification Logic and Security Production Audit
+
 - **Status:** ✅ Complete - Gamification system hardened for production.
 - **Scope:** Security / Reliability / Correctness.
 - **Summary:** XP math fix, store reset hardening, API validation/CSRF, DB RPC security lockdown with cross-user mutation guards.
 - **Verification:** `npm run test -- tests/gamification` ✅ (96/96), `npm run typecheck` ✅.
 
 ### Raouf: 2026-02-14 (Australia/Sydney) - Responsive Breakpoint Passes (All Pages)
+
 - **Status:** ✅ Complete - All pages responsive 360px-2560px.
 - **Scope:** UI Responsiveness — Layout/Overflow.
 - **Summary:** Mobile-first responsive passes for `/calendar`, `/map`, `/settings`, `/login`, `/manage-profiles` without redesign. Fixed rigid grids, overflow, dialog sizing, HUD behavior.
 - **Verification:** `npm run test` ✅ (443/443 tests pass).
 
 ### Raouf: 2026-02-14 (Australia/Sydney) - Service Worker + HMR + Map UX Fixes
+
 - **Status:** ✅ Complete.
 - **Scope:** Bug fixes — PWA/Dev Tooling/Map UX.
 - **Summary:** Fixed sw.js offline fetch errors, HMR WebSocket proxy exclusion, off-campus warning 3s popup, mobile Places button visibility.
 - **Verification:** `npm run lint` ✅, `npm run typecheck` ✅, `npm run test -- tests/map` ✅ (64/64).
 
 ### Raouf: 2026-02-13 (Australia/Sydney) - Custom Email Verification System (Resend)
+
 - **Status:** ✅ Complete - Production-ready email verification.
 - **Scope:** Feature — Security Infrastructure.
 - **Summary:** SHA-256 token hashing, 20-min expiry, rate limiting, Resend API, verify page, cleanup cron.
 - **Verification:** `npm run test` ✅ (442/442).
 
 ### Raouf: 2026-02-13 (Australia/Sydney) - Security Settings Integration + Login Wiring
+
 - **Status:** ✅ Complete.
 - **Scope:** Feature Integration / Bug Fix.
 - **Summary:** Integrated all MFA/security options into Privacy settings. Fixed passkey status API. Added security indicators to login. Standardized toggle components.
 - **Verification:** `npm run test` ✅ (442/442).
 
 ### Raouf: 2026-02-13 (Australia/Sydney) - Feed UX + Select/Notification Bug Fixes
+
 - **Status:** ✅ Complete.
 - **Scope:** Bug Fix / Enhancement.
 - **Summary:** Announcement dialogs, clickable stats, event highlight timing, Select scroll fix, notification bulk delete.
 - **Verification:** `npm run test` ✅ (442/442).
 
 ### Raouf: 2026-02-12 (Australia/Sydney) - Settings/Calendar Refactor + System Integrity
+
 - **Status:** ✅ Complete.
 - **Scope:** Refactor / QA.
 - **Summary:** Extracted reusable toggle components. Calendar accessibility refactor. Full system checks with test ID fix.
 - **Verification:** `npm run check` ✅ (428/428 tests pass).
 
 ### Raouf: 2026-02-12 (Australia/Sydney) - Weather Widget Audit & Refactor
+
 - **Status:** ✅ Complete - Weather widget refactored and fully tested.
 - **Scope:** Technical debt reduction and test coverage.
 - **Summary:** Conducted a full audit of the weather widget, removed dead code (`useWeather.ts` hook), refactored the widget to use a new modular custom hook (`components/layout/weather/useWeather.ts`), and added comprehensive unit tests. Fixed logic duplication and improved maintainability.
@@ -74,6 +89,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Optional Paths Removal Batch
+
 - **Status:** ✅ Complete - Requested optional directories/files removed and repo remains check-green.
 - **Scope:** Requested repository structure trimming.
 - **Summary:** Removed `.devcontainer`, `docker`, `k8s`, `scripts`, `docs`, `security`, `COMPLETION-SUMMARY.md`, and `opencode.jsonc`. Updated `package.json` scripts that depended on removed paths with placeholder commands to avoid broken npm scripts. Fixed `tests/maskToken.test.ts` to remove dependency on deleted `scripts/test-api.js`.
@@ -82,6 +98,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Optional: reintroduce standalone secret-check tooling if strict secret scanning is still desired.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Root File Cleanup (`.eslintrc.json`, `LICENSE.md`)
+
 - **Status:** ✅ Complete - Redundant root files removed safely.
 - **Scope:** Root-level repository hygiene.
 - **Summary:** Removed legacy `.eslintrc.json` (unused under current `eslint.config.mjs`) and duplicate `LICENSE.md` (canonical `LICENSE` retained). Kept all other audited root files.
@@ -90,6 +107,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Rollback: Restore Sketch Only
+
 - **Status:** ✅ Complete - `Sketch/` restored as requested.
 - **Scope:** Targeted rollback of previous directory cleanup.
 - **Summary:** Reverted only the `Sketch` directory deletion and kept all other cleanup decisions unchanged.
@@ -98,6 +116,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Extended Directory Audit (Sketch/Team Config/Logs)
+
 - **Status:** ✅ Complete - Additional directory cleanup done with full validation.
 - **Scope:** Repository structure hygiene and artifact reduction.
 - **Summary:** Reviewed requested directories and removed non-essential tracked content: `Sketch/` (UI snapshots), `team-opencode-config/` (assistant workflow prompts/config), and tracked `logs` audit artifact file. Kept all runtime/source/infra directories plus `.devcontainer`, `.github`, and `Team_Plan`.
@@ -106,6 +125,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Optional archive path (`docs/archive/`) for future design snapshots.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Directory Audit + Artifact Removal
+
 - **Status:** ✅ Complete - Non-essential tooling/IDE artifacts removed, repo remains green.
 - **Scope:** Repository hygiene, security hardening.
 - **Summary:** Audited `.codex/environments`, `.devcontainer`, `.gemini`, `.github`, `.idea`, and `.playwright-mcp`. Removed tracked files under `.codex`, `.gemini`, `.idea`, and `.playwright-mcp` as not required for runtime/build/deploy. Kept `.github` and `.devcontainer` as project-relevant infrastructure. Removed a plaintext SSH credential exposure by deleting tracked `.gemini/settings.json`.
@@ -114,6 +134,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Rotate credentials previously present in `.gemini/settings.json`.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Documentation Suite Refresh
+
 - **Status:** ✅ Complete - README/docs are now aligned with current repository state.
 - **Scope:** Documentation consistency, link integrity, and onboarding accuracy.
 - **Summary:** Updated README metrics and architecture tree details, corrected broken relative links across docs, replaced outdated script references (`test:lighthouse`), updated onboarding toolchain/check pipeline notes, and added a new `docs/i18n.md` reference guide. Local markdown link audit now reports zero broken internal links.
@@ -122,6 +143,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Optional deep rewrite of template-style operational docs to fully repo-specific runbooks.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Settings Link Integrity + Repo Hygiene
+
 - **Status:** ✅ Complete - Settings links validated and cleanup finished.
 - **Scope:** Settings navigation reliability, dead-code cleanup, repo hygiene.
 - **Summary:** Verified settings internal links and quick actions resolve to existing routes; added an automated route-integrity test to prevent regressions. Removed redundant client redirect logic in settings layout (server redirect already handles `/settings`). Deleted unused `AccountSettings` component/export. Updated broken documentation URL constant and removed local `.DS_Store` + stale Puppeteer log artifacts from workspace.
@@ -130,6 +152,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Optional CI optimization: run settings-specific integrity tests on PRs touching `app/settings/**`.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Settings Page Audit + Redirect/Test Hardening
+
 - **Status:** ✅ Complete - Settings root routing and test stability improved.
 - **Scope:** Settings UX reliability, QA signal quality.
 - **Summary:** Audited the settings page flow and removed root-route blank render behavior by switching `/settings` to a server redirect toward `/settings/general`. Also fixed the settings privacy test to await password-strength UI updates, removing React `act(...)` warning noise.
@@ -138,6 +161,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-07 (Australia/Sydney) - Selected-Pin Indicator + Search/Zoom Polish
+
 - **Status:** ✅ Complete - Selection visibility and search UX improved.
 - **Scope:** Map Marker UX, Dark Mode Search, Map Controls.
 - **Summary:** Added a selected-building pulse indicator rendered at the chosen building location, enabled zoom controls and moved them to bottom-right to avoid HUD overlap, and improved building search behavior by matching normalized translated names + metadata fields. Also polished search UI in dark mode with a clear-search action and accurate visible result counts.
@@ -146,6 +170,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-07 (Australia/Sydney) - Map Pin Stability + Responsive Polish
+
 - **Status:** ✅ Complete - Pins and responsive behavior improved for light/dark mode.
 - **Scope:** Map Markers, Responsive UI, Theme Consistency.
 - **Summary:** Added explicit marker stacking behavior for selected pins (`riseOnHover`, `riseOffset`, `zIndexOffset`) to avoid "bugged" marker overlap behavior, removed marker hover/active scale transforms to avoid transform interference on Leaflet-managed markers, tuned map container and HUD sizing for smaller screens using `svh`, and increased Leaflet zoom control touch target size across light and dark mode.
@@ -154,6 +179,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-06 (Australia/Sydney) - Repository-wide i18n Coverage
+
 - **Status:** ✅ Complete - Locale parity achieved across all shipped languages.
 - **Scope:** Internationalization, Translation Completeness, Accessibility Labels.
 - **Summary:** Audited all locale files against English, added missing keys to each non-English locale, fixed placeholder-token mismatches, and replaced hardcoded public-feed/map aria text with translation keys.
@@ -162,6 +188,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Optional secondary pass for position-editor-only hardcoded copy if that tool is promoted to end-user surface.
 
 ### Raouf: 2026-02-06 (Australia/Sydney) - Public Feed i18n Flow Formatting
+
 - **Status:** ✅ Complete - Callback formatting clean.
 - **Scope:** Code Readability.
 - **Summary:** Fixed indentation in `handleAddToCalendar` control flow after i18n refactor to avoid misread nested-branch logic.
@@ -170,6 +197,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-06 (Australia/Sydney) - Position Editor Title i18n
+
 - **Status:** ✅ Complete - No remaining hardcoded `title` attributes in app/components (except numeric-only placeholder).
 - **Scope:** Internationalization, Accessibility Attributes.
 - **Summary:** Localized position editor icon-button `title` attributes and synced new keys across all locales.
@@ -178,6 +206,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-02 (Australia/Sydney) - QA Lint Cleanup
+
 - **Status:** ✅ Complete - Fixed unused variable warning in calendar components.
 - **Scope:** Linting, QA.
 - **Summary:** Resolved a persistent linting warning in `ItemActionButtons.tsx` by prefixing the unused `itemType` prop with an underscore.
@@ -189,6 +218,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-02 (Australia/Sydney) - Level 5 Blueprint: Testing & Validation
+
 - **Status:** ✅ Complete - Verified stability and accessibility with new unit tests.
 - **Scope:** Testing, Validation, QA.
 - **Summary:** Completed Level 5 of the Map Architecture Blueprint by implementing targeted unit tests for critical map logic. Validated geospatial calibration accuracy and accessibility announcement behavior.
@@ -201,6 +231,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Production Deployment.
 
 ### Raouf: 2026-02-02 (Australia/Sydney) - Map Stability: Calibration & Assets
+
 - **Status:** ✅ Complete - Fixed geospatial calibration RMSE, font security warnings, and asset loading.
 - **Scope:** Map Stability, Security, Assets.
 - **Summary:** Addressed remaining stability issues. Fixed high RMSE in geospatial calibration by applying pixel offsets. Resolved font preload warnings by updating CSP. Fixed broken Leaflet marker images.
@@ -213,6 +244,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Level 5 Blueprint (Testing & Validation).
 
 ### Raouf: 2026-02-02 (Australia/Sydney) - Level 4 Blueprint: Advanced Accessibility
+
 - **Status:** ✅ Complete - Implemented advanced focus management, screen reader announcements, and high contrast support.
 - **Scope:** Accessibility (A11y), Focus Management, High Contrast.
 - **Summary:** Completed Level 4 of the Map Architecture Blueprint by implementing advanced accessibility features. Added `aria-live` region for search results to provide immediate feedback to screen reader users. Implemented focus trap and auto-focus logic for the "Map Overlay Layers" panel to ensure keyboard users don't get lost. Added high-contrast overrides to `LayeredCard` to ensure UI remains legible in high contrast mode (solid backgrounds, no blur).
@@ -225,6 +257,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Level 5 Blueprint (Testing & Validation).
 
 ### Raouf: 2026-02-02 (Australia/Sydney) - Level 3 Blueprint: Accessibility (A11y) & UX Polish
+
 - **Status:** ✅ Complete - Made the map usable for everyone including screen reader users and keyboard power users.
 - **Scope:** Map Accessibility, UX Polish, Keyboard Navigation, Performance.
 - **Summary:** Implemented Level 3 of the Map Architecture Blueprint focusing on accessibility features and UX polish. Created `RouteAnnouncer` component for screen reader announcements with intelligent throttling. Added Cmd/Ctrl+K keyboard shortcut for power users to instantly focus search. Implemented "Skip to Search" skip link to fix keyboard trap issue with Leaflet markers. Added smooth loading transitions with cross-fade animation for native app feel. Preloaded critical map image asset using `ReactDOM.preload` for better LCP.
@@ -239,6 +272,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Level 4 Blueprint (Advanced accessibility: focus management, high contrast mode, screen reader testing).
 
 ### Raouf: 2026-02-02 (Australia/Sydney) - Map Stability & Security Fixes
+
 - **Status:** ✅ Complete - Resolved security violations, deprecation warnings, and performance issues.
 - **Scope:** Security, Performance, Maintenance.
 - **Summary:** addressed several critical stability and security issues in the Map module. Fixed Content Security Policy (CSP) font violation, resolved Framer Motion deprecation warnings, fixed CSS variable animation issues, and optimized geolocation hook to prevent duplicate watch calls and stale closures.
@@ -252,6 +286,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Level 4 Blueprint.
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 2 Blueprint: Component Implementation & Type Safety
+
 - **Status:** ✅ Complete - Eliminated `@ts-expect-error` hacks and extracted Leaflet side-effects into isolated hooks.
 - **Scope:** Map Architecture, Type Safety, Hook Composition.
 - **Summary:** Implemented Level 2 of the Map Architecture Blueprint focusing on type safety and code quality. Created `useSafeTranslation` hook to eliminate the `@ts-expect-error` hack in `CampusMap.tsx`. Extracted map view logic into `useMapController` hook (The Brain) and overlay management into `useMapOverlays` hook (The Clothes). Updated `MapCore.tsx` to use the new composition pattern with clean hook imports. All hooks are now properly exported from `hooks/index.ts` barrel file.
@@ -265,6 +300,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Level 3 Blueprint (Performance optimizations: memoization, virtualization, bundle analysis).
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 1 Blueprint: Map Architecture Refactor
+
 - **Status:** ✅ Complete - Migrated from "God Component" to Modular Composition architecture.
 - **Scope:** Map Architecture, Code Organization, Performance.
 - **Summary:** Implemented Level 1 Blueprint for the Map module following modular composition principles. Extracted 100+ lines of simulation logic into dedicated hook (`useMapSimulation.ts`), created `MapController.tsx` for view/bounds logic, and `MapCore.tsx` as pure Leaflet wrapper. Updated `MapClient.tsx` to remove IntersectionObserver and use `<Suspense>` for instant map loading (better LCP). Simulation logic is now tree-shaken in production builds.
@@ -273,6 +309,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Level 2 Blueprint (Server Actions for map features if needed).
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Map Tier 1 Improvements
+
 - **Status:** ✅ Complete - Visual Hierarchy & Depth (with Reverts).
 - **Scope:** Map UX/UI.
 - **Summary:** Implemented Tier 1 improvements for the Map section. Enhanced `LayeredCard` with glassmorphism and depth. Grouped HUD actions into a floating toolbar. **Note:** Reverted dark mode color refinements and fixed a syntax error in `dark-mode.css` as per user request.
@@ -281,6 +318,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Map Dark Mode Alignment & Safety
+
 - **Status:** ✅ Complete - Dark mode aligned with MQ tokens and safe external links.
 - **Scope:** Map UX, Theming, Security.
 - **Summary:** Audited map theming and link handling. Removed hard-coded dark-mode overrides in `dark-mode.css` so dark colors now come exclusively from `mq-tokens.css`. Ensured map cards/buttons reuse token-based backgrounds and primary colors. Hardened Google Maps deep-link by adding `noopener,noreferrer` and enabled `touch-optimized` sizing on the external navigation button.
@@ -289,6 +327,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Map Dark Mode Build Fix
+
 - **Status:** ✅ Complete - Dark mode CSS verified.
 - **Scope:** Build Fix.
 - **Summary:** Re-validated `dark-mode.css` form focus block to ensure the selector group is properly closed and Tailwind parsing is stable.
@@ -297,6 +336,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Dark Mode CSS Parse Stabilization
+
 - **Status:** ✅ Complete - Form input selectors normalized.
 - **Scope:** Build Fix.
 - **Summary:** Rewrote the dark-mode form input and focus selector blocks to normalize brace closure and eliminate Tailwind CssSyntaxError.
@@ -305,6 +345,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Dark Mode Form Placeholder Fix
+
 - **Status:** ✅ Complete - Placeholder selector simplified.
 - **Scope:** Build Fix.
 - **Summary:** Simplified placeholder selector list in `dark-mode.css` to reduce Tailwind parsing ambiguity while keeping input/textarea placeholder styling.
@@ -313,6 +354,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Map Tier 2 & 3 Improvements
+
 - **Status:** ✅ Complete - Map Micro-Interactions & Touch Polish.
 - **Scope:** Map UX/UI.
 - **Summary:** Implemented Tier 2 (Micro-Interactions) and Tier 3 (Touch Polish) features for the Map section. Added `marker-drop-in` animations with hover/active states, route dash animations, and overlay toggle ripple effects. Integrated haptic feedback for markers, overlays, and building cards.
@@ -322,6 +364,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Dark Mode CSS Build Fix (Final)
+
 - **Status:** ✅ Complete - Form focus selectors split.
 - **Scope:** Build Fix.
 - **Summary:** Resolved persistent `CssSyntaxError` by splitting comma-separated focus selectors in `dark-mode.css` into individual rules. Verified with `npm run check`.
@@ -330,18 +373,20 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Lint & Console Cleanup
+
 - **Status:** ✅ Complete - Fixed lint warnings and suppressed console noise.
 - **Scope:** QA, Linting.
 - **Summary:** Addressed lint warnings in `app/map` and `app/client-layout.tsx`.
-    - `CampusMap.tsx`: Restored used imports, fixed `inertia` boolean prop usage.
-    - `MapClient.tsx`: Removed unused `LayeredCard`.
-    - `client-layout.tsx`: Suppressed intentional `console.error` and `console.info` overrides for third-party noise (React DevTools, Turbopack) using `eslint-disable`.
-    - `BuildingAutocomplete.tsx`: Suppressed `jsx-a11y/click-events-have-key-events` for visual list items where keyboard navigation is handled by the parent input.
+  - `CampusMap.tsx`: Restored used imports, fixed `inertia` boolean prop usage.
+  - `MapClient.tsx`: Removed unused `LayeredCard`.
+  - `client-layout.tsx`: Suppressed intentional `console.error` and `console.info` overrides for third-party noise (React DevTools, Turbopack) using `eslint-disable`.
+  - `BuildingAutocomplete.tsx`: Suppressed `jsx-a11y/click-events-have-key-events` for visual list items where keyboard navigation is handled by the parent input.
 - **Files:** app/map/CampusMap.tsx; app/map/MapClient.tsx; app/client-layout.tsx; components/ui/BuildingAutocomplete.tsx.
 - **Verification:** `npm run check` (all pass: secrets, format, typecheck, lint, tests, build).
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Console Logs & Documentation
+
 - **Status:** ✅ Complete - Added console logs explanation guide and verified clean build.
 - **Scope:** Documentation, QA.
 - **Summary:** Added `docs/LOGS_EXPLANATION.md` to document common console logs (React DevTools, HMR, Rokt warnings) and their fixes/explanations. Verified codebase is free of "Rokt" references (confirming the warning is external). Ran `npm run check` and fixed formatting issues.
@@ -350,6 +395,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Critical Bug Fixes (Sidebar & Auth)
+
 - **Status:** ✅ Complete - Fixed Chrome sidebar visibility, 401 Auth errors, and Login/Sidebar image issues.
 - **Scope:** Bug Fixes, QA.
 - **Summary:** Resolved critical UI/functional regressions. Fixed Sidebar visibility in Chrome by increasing z-index. Fixed persistent 401 Unauthorized errors on `api/notifications` by adding `credentials: 'include'` to `apiRequest` and implementing client-side redirect to login on 401 in `notificationsStore`. Fixed `next/image` aspect ratio warnings in `LoginClient.tsx` and `Sidebar.tsx`. Suppressed React DevTools and Chrome extension noise in console.
@@ -358,6 +404,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Auth Logs & Image QA
+
 - **Status:** ✅ Complete - Fixed console noise and image warnings.
 - **Scope:** QA, Bug Fixes.
 - **Summary:** Investigated and resolved console errors. Suppressed "Refresh Token Not Found" spam in Supabase middleware (expected behavior for expired sessions). Fixed `next/image` aspect ratio warning in `Sidebar.tsx` by ensuring `width: auto` is applied when height is constrained. Verified Service Worker safety despite external extension errors.
@@ -366,6 +413,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-01-31 (Australia/Sydney) - Solid Surface Final Polish & Gamification QA
+
 - **Status:** ✅ Complete - Final "Glass" removal and Gamification/Translation fixes.
 - **Scope:** UX, QA.
 - **Summary:** Removed residual glassmorphism effects in `UnitDetailPanel` to match "Solid Surface" design system. Fixed `LevelBadge` translation interpolation issue in tests by updating mocks to handle dynamic values.
@@ -374,6 +422,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 3 Blueprint: Login Polish & Hooks
+
 - **Status:** ✅ Complete - Login Refactor with Custom Hooks.
 - **Scope:** Architecture, DX, UX.
 - **Summary:** Implemented "Level 3 Blueprint" for the Login module.
@@ -386,6 +435,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - QA: Login Client Final Polish
+
 - **Status:** ✅ Complete - Zero Lint Warnings in Login.
 - **Scope:** QA, Cleanup.
 - **Summary:** Cleaned up unused state and suppressed necessary library warnings in `LoginClient.tsx`.
@@ -394,6 +444,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Login Flow Final Polish: Reliability & Observability
+
 - **Status:** ✅ Complete - Production-ready Login Flow.
 - **Scope:** Reliability, Observability, Security, I18n.
 - **Summary:** Finalized the Login module with enterprise-grade monitoring and UX stability.
@@ -406,6 +457,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** None.
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 1 Blueprint: Signup Refactor
+
 - **Status:** ✅ Complete - Signup module modernized and hardened.
 - **Scope:** Architecture, Security, Forms.
 - **Summary:** Implemented "Level 1 Blueprint" for the Signup module.
@@ -419,6 +471,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Level 2 Blueprint (Server Actions for Signup).
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 2 Blueprint: Signup Architecture
+
 - **Status:** ✅ Complete - Signup module refined with Polyglot Validation & Atomic Components.
 - **Scope:** Architecture, Security, UX.
 - **Summary:** Implemented "Level 2 Blueprint" upgrades for the Signup module.
@@ -432,10 +485,11 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Follow-ups:** Level 3 Blueprint (Server Actions).
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 3 Blueprint: Resilient & Polished Signup
+
 - **Status:** ✅ Complete - Signup module upgraded to production-grade with draft persistence, surgical errors, and fluid transitions.
 - **Scope:** Resilience, UX, Security.
 - **Summary:** Implemented "Level 3 Blueprint" upgrades for the Signup module to address "Rage Quit" factors and elevate UX from functional to polished.
-  - **Draft Persistence (Anti-Ragequit):** Added automatic `sessionStorage` save/restore for form data. Excludes sensitive fields (password, confirmPassword, _gotcha) per security protocol. Data survives accidental refreshes.
+  - **Draft Persistence (Anti-Ragequit):** Added automatic `sessionStorage` save/restore for form data. Excludes sensitive fields (password, confirmPassword, \_gotcha) per security protocol. Data survives accidental refreshes.
   - **Surgical Error Handling:** Enhanced `onSubmit` to map backend errors directly to specific form fields (email, studentId). Auto-focuses problematic fields and switches steps as needed.
   - **Fluid Transitions:** Integrated `framer-motion` with `AnimatePresence` for smooth sliding transitions between Auth and Profile steps. Eliminates jarring instant cuts.
   - **Visual Password Meter:** Created reusable `StrengthMeter` component with segmented progress bar and color-coded strength levels (red → yellow → blue → green).
@@ -443,6 +497,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Verification:** `npm run check` passed (358 tests, 0 errors, build successful).
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 4 Blueprint: The Fortress (Security & QA)
+
 - **Status:** ✅ Complete - Signup module hardened with enterprise-grade security measures and comprehensive testing.
 - **Scope:** Security, Data Sanitization, QA, Rate Limiting.
 - **Summary:** Implemented "Level 4 Blueprint" upgrades following Zero Trust principles. The frontend now sanitizes data before transmission, handles brute-force defenses gracefully, and includes comprehensive test coverage.
@@ -467,6 +522,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Verification:** `npm run check` passed (361 tests, all security tests green, build successful).
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 5 Blueprint: The Backend Vault
+
 - **Status:** ✅ Complete - Backend API route fortified with Zero Trust security, transaction safety, and comprehensive error handling.
 - **Scope:** Backend Security, API Hardening, Transaction Rollback, Zero Trust Architecture.
 - **Summary:** Implemented "Level 5 Blueprint" upgrades - the backend "Controller" now enforces the same strict validation as the frontend, preventing any client-side bypass attempts. Following the security principle "Never trust the client" (even your own).
@@ -497,6 +553,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Status:** Signup system is now FORT KNOX - Production Ready 🏰
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 6 Blueprint: The Handoff & Hardening
+
 - **Status:** ✅ Complete - Email verification flow, session exchange, and transport layer security implemented.
 - **Scope:** Email Verification Loop, Session Exchange, HTTP Security Headers, State Consistency.
 - **Summary:** Implemented "Level 6 Blueprint" - the final handoff from signup to authenticated user. Focuses on the email verification UX, secure session exchange, and transport layer protection.
@@ -532,6 +589,7 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
 - **Status:** Signup system is COMPLETE - Enterprise-grade with 6 levels of hardening 🏰🔒
 
 ### Raouf: 2026-02-01 (Australia/Sydney) - Level 7 Blueprint: The "Black Box" & "Kill Switch"
+
 - **Status:** ✅ Complete - Forensic audit logging and emergency kill switch implemented.
 - **Scope:** Security Monitoring, Feature Flags, Forensic Analysis, Emergency Response.
 - **Summary:** Implemented "Level 7 Blueprint" - the ultimate security layer with comprehensive audit trails and emergency controls. This enables security teams to detect attacks in real-time and respond instantly to threats.
@@ -565,21 +623,25 @@ Fixed 10 critical/high performance issues: Supabase timeout, proxy auth deadline
   - Level 7: Audit Logging + Kill Switch
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Team Plan Relocation into Docs Project
+
 - **Status:** ✅ Complete
 - **Scope:** Documentation structure alignment with feature-first repository organization.
 - **Summary:** Moved `Team_Plan/` to `docs/project/team_plan/` and updated repository-level docs to make `docs/` the canonical home for project planning assets.
 - **Verification:** `npm run check` ✅.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Post-Restructure Reference Cleanup
+
 - **Status:** ✅ Complete
 - **Scope:** Consistency update after folder migration.
 - **Summary:** Updated root docs/comments/config references to the new `features/` + `docs/project/*` layout and re-validated the full check pipeline.
 - **Verification:** `npm run check` ✅.
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Empty Legacy Directory Cleanup
+
 - **Status:** ✅ Complete
 - **Summary:** Removed empty legacy dirs from repository root after migration (`__tests__`, `types`).
 
 ### Raouf: 2026-02-10 (Australia/Sydney) - Feature Tree Cleanup
+
 - **Summary:** Removed empty scaffold-only `features/*` subfolders and kept populated feature paths only.
 - **Verification:** `npm run typecheck` ✅.

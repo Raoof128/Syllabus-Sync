@@ -12,9 +12,7 @@
  * - Integration with Next.js Script component
  */
 
-import crypto from 'crypto';
-
-
+import crypto from "crypto";
 
 // ============================================================================
 // SRI HASH REGISTRY - Pre-computed hashes for common CDN resources
@@ -26,22 +24,22 @@ import crypto from 'crypto';
  */
 export const EXTERNAL_RESOURCES = {
   // Leaflet CSS (map library)
-  'leaflet-css': {
-    url: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-    hash: 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=',
-    crossOrigin: 'anonymous' as const,
+  "leaflet-css": {
+    url: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+    hash: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=",
+    crossOrigin: "anonymous" as const,
   },
   // Leaflet JS (map library)
-  'leaflet-js': {
-    url: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-    hash: 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=',
-    crossOrigin: 'anonymous' as const,
+  "leaflet-js": {
+    url: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+    hash: "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=",
+    crossOrigin: "anonymous" as const,
   },
   // Google Fonts (optional, if using external fonts)
-  'google-fonts': {
-    url: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-    hash: 'sha256-PLACEHOLDER', // Fonts don't support SRI, but included for completeness
-    crossOrigin: 'anonymous' as const,
+  "google-fonts": {
+    url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+    hash: "sha256-PLACEHOLDER", // Fonts don't support SRI, but included for completeness
+    crossOrigin: "anonymous" as const,
   },
 } as const;
 
@@ -52,7 +50,7 @@ export const EXTERNAL_RESOURCES = {
 export interface SRIResource {
   url: string;
   hash: string;
-  crossOrigin?: 'anonymous' | 'use-credentials';
+  crossOrigin?: "anonymous" | "use-credentials";
 }
 
 export interface SRIScriptOptions extends SRIResource {
@@ -81,9 +79,9 @@ export interface SRIStyleOptions extends SRIResource {
  */
 export function generateSRIHash(
   content: string | Buffer,
-  algorithm: 'sha256' | 'sha384' | 'sha512' = 'sha384'
+  algorithm: "sha256" | "sha384" | "sha512" = "sha384",
 ): string {
-  const hash = crypto.createHash(algorithm).update(content).digest('base64');
+  const hash = crypto.createHash(algorithm).update(content).digest("base64");
   return `${algorithm}-${hash}`;
 }
 
@@ -97,7 +95,7 @@ export function generateSRIHash(
  */
 export async function generateSRIHashFromURL(
   url: string,
-  algorithm: 'sha256' | 'sha384' | 'sha512' = 'sha384'
+  algorithm: "sha256" | "sha384" | "sha512" = "sha384",
 ): Promise<string> {
   const response = await fetch(url);
   if (!response.ok) {
@@ -117,9 +115,9 @@ export async function generateSRIHashFromURL(
  */
 export async function generateSRIHashFromFile(
   filePath: string,
-  algorithm: 'sha256' | 'sha384' | 'sha512' = 'sha384'
+  algorithm: "sha256" | "sha384" | "sha512" = "sha384",
 ): Promise<string> {
-  const fs = await import('fs/promises');
+  const fs = await import("fs/promises");
   const content = await fs.readFile(filePath);
   return generateSRIHash(content, algorithm);
 }
@@ -138,7 +136,7 @@ export function generateSRIScript(options: SRIScriptOptions): string {
   const {
     url,
     hash,
-    crossOrigin = 'anonymous',
+    crossOrigin = "anonymous",
     async = false,
     defer = false,
     type,
@@ -146,17 +144,17 @@ export function generateSRIScript(options: SRIScriptOptions): string {
   } = options;
 
   const attributes: string[] = [
-    id ? `id="${escapeHtml(id)}"` : '',
+    id ? `id="${escapeHtml(id)}"` : "",
     `src="${escapeHtml(url)}"`,
     `integrity="${escapeHtml(hash)}"`,
     `crossorigin="${crossOrigin}"`,
   ].filter(Boolean);
 
-  if (async) attributes.push('async');
-  if (defer) attributes.push('defer');
+  if (async) attributes.push("async");
+  if (defer) attributes.push("defer");
   if (type) attributes.push(`type="${escapeHtml(type)}"`);
 
-  return `<script ${attributes.join(' ')}></script>`;
+  return `<script ${attributes.join(" ")}></script>`;
 }
 
 /**
@@ -166,10 +164,10 @@ export function generateSRIScript(options: SRIScriptOptions): string {
  * @returns HTML link tag string
  */
 export function generateSRIStyle(options: SRIStyleOptions): string {
-  const { url, hash, crossOrigin = 'anonymous', media, id } = options;
+  const { url, hash, crossOrigin = "anonymous", media, id } = options;
 
   const attributes: string[] = [
-    id ? `id="${escapeHtml(id)}"` : '',
+    id ? `id="${escapeHtml(id)}"` : "",
     `rel="stylesheet"`,
     `href="${escapeHtml(url)}"`,
     `integrity="${escapeHtml(hash)}"`,
@@ -178,7 +176,7 @@ export function generateSRIStyle(options: SRIStyleOptions): string {
 
   if (media) attributes.push(`media="${escapeHtml(media)}"`);
 
-  return `<link ${attributes.join(' ')} />`;
+  return `<link ${attributes.join(" ")} />`;
 }
 
 // ============================================================================
@@ -193,13 +191,15 @@ export function generateSRIStyle(options: SRIStyleOptions): string {
  */
 export function isValidSRIHash(hash: string): boolean {
   // SRI hashes must start with algorithm prefix
-  const validPrefixes = ['sha256-', 'sha384-', 'sha512-'];
-  const hasValidPrefix = validPrefixes.some((prefix) => hash.startsWith(prefix));
+  const validPrefixes = ["sha256-", "sha384-", "sha512-"];
+  const hasValidPrefix = validPrefixes.some((prefix) =>
+    hash.startsWith(prefix),
+  );
 
   if (!hasValidPrefix) return false;
 
   // Base64url encoded hash should be reasonable length
-  const hashPart = hash.split('-')[1];
+  const hashPart = hash.split("-")[1];
   if (!hashPart) return false;
 
   // Minimum length check (sha256 = 32 bytes = 44 base64 chars)
@@ -233,7 +233,8 @@ export function validateSREResources(): { valid: boolean; errors: string[] } {
  * Escape HTML special characters to prevent XSS
  */
 function escapeHtml(text: string): string {
-  const div = typeof document !== 'undefined' ? document.createElement('div') : null;
+  const div =
+    typeof document !== "undefined" ? document.createElement("div") : null;
   if (div) {
     div.textContent = text;
     return div.innerHTML;
@@ -241,11 +242,11 @@ function escapeHtml(text: string): string {
 
   // Server-side fallback
   return text
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
+    .replace(/&/g, "&")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
     .replace(/"/g, '"')
-    .replace(/'/g, '&#039;');
+    .replace(/'/g, "&#039;");
 }
 
 // ============================================================================
@@ -260,7 +261,7 @@ export function getSRIScriptProps(options: SRIScriptOptions) {
   return {
     src: options.url,
     integrity: options.hash,
-    crossOrigin: options.crossOrigin || 'anonymous',
+    crossOrigin: options.crossOrigin || "anonymous",
     async: options.async,
     defer: options.defer,
     id: options.id,
@@ -272,9 +273,9 @@ export function getSRIScriptProps(options: SRIScriptOptions) {
  * Use this in pages/_document.tsx to inject external scripts with SRI
  */
 export function generateSRIScriptsForDocument(
-  scripts: SRIScriptOptions[]
+  scripts: SRIScriptOptions[],
 ): string {
-  return scripts.map(generateSRIScript).join('\n');
+  return scripts.map(generateSRIScript).join("\n");
 }
 
 /**
@@ -282,9 +283,9 @@ export function generateSRIScriptsForDocument(
  * Use this in pages/_document.tsx to inject external stylesheets with SRI
  */
 export function generateSRIStylesForDocument(
-  styles: SRIStyleOptions[]
+  styles: SRIStyleOptions[],
 ): string {
-  return styles.map(generateSRIStyle).join('\n');
+  return styles.map(generateSRIStyle).join("\n");
 }
 
 // ============================================================================

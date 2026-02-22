@@ -11,7 +11,7 @@
  * - Environment-specific policies
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 // ============================================================================
 // SCRIPT DEFINITIONS (keep in sync with app/layout.tsx)
@@ -43,8 +43,8 @@ export const RTL_SCRIPT = `(function(){try{var stored=localStorage.getItem('lang
  * Generate with: echo -n '<script>' | openssl dgst -sha256 -binary | base64
  */
 export const CSP_SCRIPT_HASHES = {
-  theme: 'sha256-euA/nX7OMJt6hghOJ/qTKFU59who5Fhoj7IWVSgwBss=',
-  rtl: 'sha256-7IUh1B8MYhdIeSKtKih/ERxZm0rfT5jNWzQqe73/yeY=',
+  theme: "sha256-euA/nX7OMJt6hghOJ/qTKFU59who5Fhoj7IWVSgwBss=",
+  rtl: "sha256-7IUh1B8MYhdIeSKtKih/ERxZm0rfT5jNWzQqe73/yeY=",
 };
 
 // ============================================================================
@@ -76,63 +76,57 @@ export interface CSPOptions {
 
 /**
  * Build a Content Security Policy header value
- * 
+ *
  * SECURITY: CSP reporting helps detect and prevent XSS attacks by monitoring
  * policy violations. Configure CSP_REPORT_URI or CSP_REPORT_TO env vars.
  */
 export function buildCSP(options: CSPOptions = {}): string {
   const {
-    upgradeInsecure = process.env.NODE_ENV === 'production',
+    upgradeInsecure = process.env.NODE_ENV === "production",
     additionalScriptSrc = [],
     additionalConnectSrc = [],
     additionalStyleSrc = [],
     additionalImgSrc = [],
     additionalFontSrc = [],
-    reportUri = process.env.CSP_REPORT_URI || '/api/csp-report',
-    reportTo = process.env.CSP_REPORT_TO || 'csp-endpoint',
-    strict = process.env.NODE_ENV === 'production',
+    reportUri = process.env.CSP_REPORT_URI || "/api/csp-report",
+    reportTo = process.env.CSP_REPORT_TO || "csp-endpoint",
+    strict = process.env.NODE_ENV === "production",
   } = options;
 
   // Build script-src with hashes
   const scriptHashes = Object.values(CSP_SCRIPT_HASHES).map((h) => `'${h}'`);
-  const scriptSrc = [
-    "'self'",
-    ...scriptHashes,
-    ...additionalScriptSrc,
-  ].join(' ');
+  const scriptSrc = ["'self'", ...scriptHashes, ...additionalScriptSrc].join(
+    " ",
+  );
 
   // Build style-src
   const styleSrc = [
     "'self'",
     "'unsafe-inline'", // Required for Tailwind/CSS-in-JS
     ...additionalStyleSrc,
-  ].join(' ');
+  ].join(" ");
 
   // Build img-src
   const imgSrc = [
     "'self'",
-    'data:',
-    'blob:',
-    'https:',
+    "data:",
+    "blob:",
+    "https:",
     ...additionalImgSrc,
-  ].join(' ');
+  ].join(" ");
 
   // Build font-src
-  const fontSrc = [
-    "'self'",
-    'data:',
-    ...additionalFontSrc,
-  ].join(' ');
+  const fontSrc = ["'self'", "data:", ...additionalFontSrc].join(" ");
 
   // Build connect-src
   const connectSrc = [
     "'self'",
-    'https://*.supabase.co',
-    'https://*.openrouteservice.org',
-    'https://api.open-meteo.com',
-    'wss://*.supabase.co',
+    "https://*.supabase.co",
+    "https://*.openrouteservice.org",
+    "https://api.open-meteo.com",
+    "wss://*.supabase.co",
     ...additionalConnectSrc,
-  ].join(' ');
+  ].join(" ");
 
   const directives = [
     // Default fallback
@@ -176,7 +170,7 @@ export function buildCSP(options: CSPOptions = {}): string {
     "manifest-src 'self'",
 
     // Upgrade insecure in production
-    ...(upgradeInsecure ? ['upgrade-insecure-requests'] : []),
+    ...(upgradeInsecure ? ["upgrade-insecure-requests"] : []),
 
     // Report-To directive (modern browsers, preferred over report-uri)
     ...(reportTo ? [`report-to ${reportTo}`] : []),
@@ -185,7 +179,7 @@ export function buildCSP(options: CSPOptions = {}): string {
     ...(reportUri ? [`report-uri ${reportUri}`] : []),
   ];
 
-  return directives.join('; ');
+  return directives.join("; ");
 }
 
 /**
@@ -225,7 +219,7 @@ export function buildDevCSP(): string {
     "manifest-src 'self'",
   ];
 
-  return directives.join('; ');
+  return directives.join("; ");
 }
 
 /**
@@ -254,7 +248,7 @@ export function getCSP(options?: CSPOptions): string {
   if (options?.reportOnly) {
     return buildReportOnlyCSP();
   }
-  return process.env.NODE_ENV === 'production' ? buildProdCSP() : buildDevCSP();
+  return process.env.NODE_ENV === "production" ? buildProdCSP() : buildDevCSP();
 }
 
 // ============================================================================
@@ -267,16 +261,16 @@ export function getCSP(options?: CSPOptions): string {
  */
 export function applyCSPHeaders(
   response: NextResponse,
-  options?: CSPOptions
+  options?: CSPOptions,
 ): NextResponse {
   const csp = getCSP(options);
-  response.headers.set('Content-Security-Policy', csp);
+  response.headers.set("Content-Security-Policy", csp);
 
   // Add Reporting-Endpoints header for modern browsers
   if (options?.reportTo) {
     response.headers.set(
-      'Reporting-Endpoints',
-      `csp-endpoint="${options.reportTo}"`
+      "Reporting-Endpoints",
+      `csp-endpoint="${options.reportTo}"`,
     );
   }
 
@@ -289,16 +283,16 @@ export function applyCSPHeaders(
  */
 export function applyCSPReportOnlyHeaders(
   response: NextResponse,
-  options?: CSPOptions
+  options?: CSPOptions,
 ): NextResponse {
   const csp = buildReportOnlyCSP();
-  response.headers.set('Content-Security-Policy-Report-Only', csp);
+  response.headers.set("Content-Security-Policy-Report-Only", csp);
 
   // Add Reporting-Endpoints header for modern browsers
   if (options?.reportTo) {
     response.headers.set(
-      'Reporting-Endpoints',
-      `csp-endpoint="${options.reportTo}"`
+      "Reporting-Endpoints",
+      `csp-endpoint="${options.reportTo}"`,
     );
   }
 
@@ -313,61 +307,61 @@ export function applyCSPReportOnlyHeaders(
  * CSP violation report interface
  */
 export interface CSPViolationReport {
-  'csp-report': {
-    'document-uri': string;
+  "csp-report": {
+    "document-uri": string;
     referrer: string;
-    'blocked-uri': string;
-    'violated-directive': string;
-    'effective-directive': string;
-    'original-policy': string;
-    disposition: 'enforce' | 'report';
-    'line-number'?: number;
-    'column-number'?: number;
-    'source-file'?: string;
-    'status-code'?: number;
+    "blocked-uri": string;
+    "violated-directive": string;
+    "effective-directive": string;
+    "original-policy": string;
+    disposition: "enforce" | "report";
+    "line-number"?: number;
+    "column-number"?: number;
+    "source-file"?: string;
+    "status-code"?: number;
   };
 }
 
 /**
  * Severity levels for CSP violations
  */
-export type CSPSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type CSPSeverity = "low" | "medium" | "high" | "critical";
 
 /**
  * Determine severity of CSP violation
  */
 export function getCSPViolationSeverity(
-  report: CSPViolationReport['csp-report']
+  report: CSPViolationReport["csp-report"],
 ): CSPSeverity {
-  const { 'violated-directive': violatedDirective, disposition } = report;
+  const { "violated-directive": violatedDirective, disposition } = report;
 
   // Critical: Script violations in enforce mode
   if (
-    disposition === 'enforce' &&
-    (violatedDirective === 'script-src' ||
-      violatedDirective === 'script-src-elem' ||
-      violatedDirective === 'script-src-attr')
+    disposition === "enforce" &&
+    (violatedDirective === "script-src" ||
+      violatedDirective === "script-src-elem" ||
+      violatedDirective === "script-src-attr")
   ) {
-    return 'critical';
+    return "critical";
   }
 
   // High: Object-src, frame-src violations in enforce mode
   if (
-    disposition === 'enforce' &&
-    (violatedDirective === 'object-src' ||
-      violatedDirective === 'frame-src' ||
-      violatedDirective === 'worker-src')
+    disposition === "enforce" &&
+    (violatedDirective === "object-src" ||
+      violatedDirective === "frame-src" ||
+      violatedDirective === "worker-src")
   ) {
-    return 'high';
+    return "high";
   }
 
   // Medium: Other violations in enforce mode
-  if (disposition === 'enforce') {
-    return 'medium';
+  if (disposition === "enforce") {
+    return "medium";
   }
 
   // Low: Report-only mode violations
-  return 'low';
+  return "low";
 }
 
 /**
@@ -375,15 +369,15 @@ export function getCSPViolationSeverity(
  * Removes sensitive information like full URLs
  */
 export function sanitizeCSPReport(
-  report: CSPViolationReport['csp-report']
-): Partial<CSPViolationReport['csp-report']> {
+  report: CSPViolationReport["csp-report"],
+): Partial<CSPViolationReport["csp-report"]> {
   return {
-    'blocked-uri': sanitizeUri(report['blocked-uri']),
-    'violated-directive': report['violated-directive'],
-    'effective-directive': report['effective-directive'],
+    "blocked-uri": sanitizeUri(report["blocked-uri"]),
+    "violated-directive": report["violated-directive"],
+    "effective-directive": report["effective-directive"],
     disposition: report.disposition,
-    'line-number': report['line-number'],
-    'column-number': report['column-number'],
+    "line-number": report["line-number"],
+    "column-number": report["column-number"],
     // Don't include document-uri or referrer to avoid logging sensitive URLs
     // Don't include original-policy to avoid cluttering logs
   };
@@ -393,14 +387,15 @@ export function sanitizeCSPReport(
  * Sanitize URI to prevent log injection
  */
 function sanitizeUri(uri: string): string {
-  if (!uri) return 'empty';
+  if (!uri) return "empty";
 
   // Truncate long URIs
   const maxLength = 200;
-  let sanitized = uri.length > maxLength ? `${uri.substring(0, maxLength)}...` : uri;
+  let sanitized =
+    uri.length > maxLength ? `${uri.substring(0, maxLength)}...` : uri;
 
   // Remove newlines and control characters
-  sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+  sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, "");
 
   return sanitized;
 }

@@ -1,8 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from "vitest";
 
 const sendPasswordResetEmailMock = vi.fn();
 
-vi.mock('@/lib/services/emailService', () => ({
+vi.mock("@/lib/services/emailService", () => ({
   sendPasswordResetEmail: sendPasswordResetEmailMock,
 }));
 
@@ -27,7 +27,10 @@ function makePasswordResetsBuilder(state: {
 
   const insertChain = {
     select: vi.fn(() => insertChain),
-    single: vi.fn(async () => ({ data: { id: state.insertedId }, error: null })),
+    single: vi.fn(async () => ({
+      data: { id: state.insertedId },
+      error: null,
+    })),
   };
 
   const deleteChain = {
@@ -47,50 +50,66 @@ function makePasswordResetsBuilder(state: {
   return builder as FromBuilder;
 }
 
-describe('createAndSendPasswordReset', () => {
+describe("createAndSendPasswordReset", () => {
   beforeEach(() => {
     vi.resetModules();
     sendPasswordResetEmailMock.mockReset();
   });
 
-  it('deletes the inserted token record when email send fails', async () => {
-    sendPasswordResetEmailMock.mockResolvedValue({ success: false, error: 'fail' });
+  it("deletes the inserted token record when email send fails", async () => {
+    sendPasswordResetEmailMock.mockResolvedValue({
+      success: false,
+      error: "fail",
+    });
 
-    const state = { insertedId: 'reset_1', deleteCalls: [] as Array<{ field: string; value: string }> };
+    const state = {
+      insertedId: "reset_1",
+      deleteCalls: [] as Array<{ field: string; value: string }>,
+    };
     const passwordResets = makePasswordResetsBuilder(state);
 
     const adminClient = {
       from: (table: string) => {
-        if (table === 'password_resets') return passwordResets;
+        if (table === "password_resets") return passwordResets;
         throw new Error(`unexpected table: ${table}`);
       },
     } as any;
 
-    const mod = await import('@/lib/security/passwordReset');
-    const res = await mod.createAndSendPasswordReset(adminClient, 'user_1', 'user@example.com');
+    const mod = await import("@/lib/security/passwordReset");
+    const res = await mod.createAndSendPasswordReset(
+      adminClient,
+      "user_1",
+      "user@example.com",
+    );
 
     expect(res.success).toBe(false);
-    expect(state.deleteCalls).toEqual([{ field: 'id', value: 'reset_1' }]);
+    expect(state.deleteCalls).toEqual([{ field: "id", value: "reset_1" }]);
   });
 
-  it('does not delete the inserted token record when email send succeeds', async () => {
+  it("does not delete the inserted token record when email send succeeds", async () => {
     sendPasswordResetEmailMock.mockResolvedValue({ success: true });
 
-    const state = { insertedId: 'reset_2', deleteCalls: [] as Array<{ field: string; value: string }> };
+    const state = {
+      insertedId: "reset_2",
+      deleteCalls: [] as Array<{ field: string; value: string }>,
+    };
     const passwordResets = makePasswordResetsBuilder(state);
 
     const adminClient = {
       from: (table: string) => {
-        if (table === 'password_resets') return passwordResets;
+        if (table === "password_resets") return passwordResets;
         throw new Error(`unexpected table: ${table}`);
       },
     } as any;
 
-    const mod = await import('@/lib/security/passwordReset');
-    const res = await mod.createAndSendPasswordReset(adminClient, 'user_2', 'user@example.com');
+    const mod = await import("@/lib/security/passwordReset");
+    const res = await mod.createAndSendPasswordReset(
+      adminClient,
+      "user_2",
+      "user@example.com",
+    );
 
     expect(res.success).toBe(true);
     expect(state.deleteCalls).toEqual([]);
   });
 });
-

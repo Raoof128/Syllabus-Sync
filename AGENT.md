@@ -1,12 +1,25 @@
 Raouf: 2026-02-22 (Australia/Sydney)
+Scope: Map UI Polish & Interactive Tweaks
+Summary: Added automatic closing of the map's floating Places sidebar when users explicitly select an active building hook, enhancing UX clarity. Lowered the active Google Find-Me and user routing location HUD logic avoiding responsive mobile cutoff. Resolved lingering `eslint` exceptions in `CalendarWidgets`, `MapClient`, and `LoginClient` files to maintain strict compilation tests.
+Files Changed:
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/CampusMapHUD.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/calendar/components/CalendarWidgets.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/login/LoginClient.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/MapClient.tsx`
+Verification: Verified using `npm run check`. Passes 482 tests cleanly.
+Follow-ups: None.
+
+Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Map Navigation Enhancements & UI Redesign
 Summary: Upgraded the Map navigation to a fully responsive, borderless, and full-bleed layout. Eliminated redundant `MagicCard` constraints in `MapClient.tsx`. Down-shifted the floating Places widget during Google Maps embedded routing mode to prevent spatial collision with top UI controls. Eliminated `custom-scrollbar` abstractions from `Sidebar.tsx` effectively dropping users back to robust native scroll rails for reliable navigation on touch devices.
 Files Changed:
+
 - `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/MapClient.tsx`
 - `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/CampusMapHUD.tsx`
 - `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/components/layout/Sidebar.tsx`
-Verification: Full `npm run check` pipeline passes cleanly natively with 0 linting errors or compilation failures. Deployed straight into production flawlessly via Vercel CLI.
-Follow-ups: None.
+  Verification: Full `npm run check` pipeline passes cleanly natively with 0 linting errors or compilation failures. Deployed straight into production flawlessly via Vercel CLI.
+  Follow-ups: None.
 
 Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Calendar UI Refinement & Cleanup

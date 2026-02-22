@@ -1,15 +1,19 @@
-'use client';
+"use client";
 
-import React from 'react';
-import dayjs from 'dayjs';
-import { Unit, Deadline, Event, ClassTime } from '@/lib/types';
-import { cn } from '@/lib/utils';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { formatLocalizedDate } from '@/lib/utils/locale';
-import { Card, CardContent } from '@/components/ui/mq/card';
-import { Badge } from '@/components/ui/mq/badge';
-import { Clock, MapPin, AlertCircle } from 'lucide-react';
-import { parseTimeRange, getEventColors, getDeadlineColor } from '@/lib/calendar-utils';
+import React from "react";
+import dayjs from "dayjs";
+import { Unit, Deadline, Event, ClassTime } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { formatLocalizedDate } from "@/lib/utils/locale";
+import { Card, CardContent } from "@/components/ui/mq/card";
+import { Badge } from "@/components/ui/mq/badge";
+import { Clock, MapPin, AlertCircle } from "lucide-react";
+import {
+  parseTimeRange,
+  getEventColors,
+  getDeadlineColor,
+} from "@/lib/calendar-utils";
 
 interface AgendaViewProps {
   date: Date; // The start date (usually start of week)
@@ -36,11 +40,13 @@ export default function AgendaView({
   const startDate = dayjs(date);
 
   // Generate array of days to show
-  const days = Array.from({ length: daysToShow }, (_, i) => startDate.add(i, 'day'));
+  const days = Array.from({ length: daysToShow }, (_, i) =>
+    startDate.add(i, "day"),
+  );
 
   // Get items for a specific day
   const getItemsForDay = (day: dayjs.Dayjs) => {
-    const dayName = day.format('dddd');
+    const dayName = day.format("dddd");
 
     // Units (Classes)
     const dayUnits = units.flatMap((u) => {
@@ -50,7 +56,7 @@ export default function AgendaView({
         .map((s) => ({
           item: u,
           scheduleInstance: s,
-          agendaType: 'class' as const,
+          agendaType: "class" as const,
           sortTime: parseTimeRange(`${s.startTime}`)?.startHour || 0,
           id: `unit-${u.id}-${s.day}-${s.startTime}`,
         }));
@@ -58,10 +64,10 @@ export default function AgendaView({
 
     // Deadlines
     const dayDeadlines = deadlines
-      .filter((d) => dayjs(d.dueDate).isSame(day, 'day'))
+      .filter((d) => dayjs(d.dueDate).isSame(day, "day"))
       .map((d) => ({
         item: d,
-        agendaType: 'deadline' as const,
+        agendaType: "deadline" as const,
         sortTime: dayjs(d.dueDate).hour(),
         id: `deadline-${d.id}`,
       }));
@@ -70,14 +76,14 @@ export default function AgendaView({
     const dayEvents = events
       .filter((e) => {
         const start = e.startAt ? dayjs(e.startAt) : null;
-        if (start) return start.isSame(day, 'day');
-        return dayjs(e.date).isSame(day, 'day');
+        if (start) return start.isSame(day, "day");
+        return dayjs(e.date).isSame(day, "day");
       })
       .map((e) => {
         const timeInfo = parseTimeRange(e.time);
         return {
           item: e,
-          agendaType: 'event' as const,
+          agendaType: "event" as const,
           sortTime: timeInfo?.startHour || 0,
           id: `event-${e.id}`,
         };
@@ -95,40 +101,43 @@ export default function AgendaView({
     <div className="space-y-6 pb-20">
       {days.map((day) => {
         const items = getItemsForDay(day);
-        const isToday = day.isSame(dayjs(), 'day');
+        const isToday = day.isSame(dayjs(), "day");
 
         return (
           <div
             key={day.toISOString()}
             className={cn(
-              'group relative pl-8 border-l-2',
-              isToday ? 'border-mq-primary' : 'border-mq-border',
+              "group relative pl-8 border-l-2",
+              isToday ? "border-mq-primary" : "border-mq-border",
             )}
           >
             {/* Date Header bubble */}
             <div
               className={cn(
-                'absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 transition-colors',
+                "absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 transition-colors",
                 isToday
-                  ? 'bg-mq-primary border-mq-primary'
-                  : 'bg-mq-card-background border-mq-border group-hover:border-mq-content-tertiary',
+                  ? "bg-mq-primary border-mq-primary"
+                  : "bg-mq-card-background border-mq-border group-hover:border-mq-content-tertiary",
               )}
             />
 
             <div className="mb-4">
               <h3
                 className={cn(
-                  'text-lg font-bold flex items-center gap-2',
-                  isToday ? 'text-mq-primary' : 'text-mq-content',
+                  "text-lg font-bold flex items-center gap-2",
+                  isToday ? "text-mq-primary" : "text-mq-content",
                 )}
               >
-                {day.format('dddd')}
+                {day.format("dddd")}
                 <span className="text-sm font-normal text-mq-content-secondary">
-                  {formatLocalizedDate(day.toDate(), language, { month: 'long', day: 'numeric' })}
+                  {formatLocalizedDate(day.toDate(), language, {
+                    month: "long",
+                    day: "numeric",
+                  })}
                 </span>
                 {isToday && (
                   <Badge variant="neutral" className="ml-2">
-                    {t('today')}
+                    {t("today")}
                   </Badge>
                 )}
               </h3>
@@ -137,12 +146,12 @@ export default function AgendaView({
             <div className="space-y-3">
               {items.length === 0 ? (
                 <p className="text-sm text-mq-content-tertiary italic pl-1">
-                  {t('noItemsScheduled')}
+                  {t("noItemsScheduled")}
                 </p>
               ) : (
                 items.map((entry, idx) => {
                   // Render logic based on type
-                  if (entry.agendaType === 'class') {
+                  if (entry.agendaType === "class") {
                     // Unit
                     const u = entry.item as Unit;
                     const s = entry.scheduleInstance as ClassTime;
@@ -155,7 +164,9 @@ export default function AgendaView({
                       >
                         <CardContent className="p-3 flex items-center gap-4">
                           <div className="flex-col w-16 text-center hidden sm:flex">
-                            <span className="text-xs font-bold text-mq-content">{s.startTime}</span>
+                            <span className="text-xs font-bold text-mq-content">
+                              {s.startTime}
+                            </span>
                             <span className="text-[10px] text-mq-content-tertiary">
                               {s.endTime}
                             </span>
@@ -166,26 +177,30 @@ export default function AgendaView({
                                 variant="neutral"
                                 className="text-[10px] px-1 py-0 h-4 border border-mq-primary/30 text-mq-primary bg-mq-primary/5"
                               >
-                                {t('class')}
+                                {t("class")}
                               </Badge>
-                              <h4 className="font-semibold text-sm">{u.code}</h4>
+                              <h4 className="font-semibold text-sm">
+                                {u.code}
+                              </h4>
                             </div>
                             <p className="text-xs text-mq-content-secondary line-clamp-1">
                               {u.name}
                             </p>
                             <div className="flex items-center gap-3 mt-2 text-[10px] text-mq-content-tertiary">
                               <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" /> {s.startTime} - {s.endTime}
+                                <Clock className="w-3 h-3" /> {s.startTime} -{" "}
+                                {s.endTime}
                               </span>
                               <span className="flex items-center gap-1">
-                                <MapPin className="w-3 h-3" /> {u.location?.room}
+                                <MapPin className="w-3 h-3" />{" "}
+                                {u.location?.room}
                               </span>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
                     );
-                  } else if (entry.agendaType === 'deadline') {
+                  } else if (entry.agendaType === "deadline") {
                     const d = entry.item as Deadline;
                     const deadlineColor = getDeadlineColor(d, units);
                     return (
@@ -198,7 +213,7 @@ export default function AgendaView({
                         <CardContent className="p-3 flex items-center gap-4">
                           <div className="flex-col w-16 text-center hidden sm:flex">
                             <span className="text-xs font-bold text-mq-content">
-                              {dayjs(d.dueDate).format('HH:mm')}
+                              {dayjs(d.dueDate).format("HH:mm")}
                             </span>
                           </div>
                           <div className="flex-1">
@@ -216,18 +231,20 @@ export default function AgendaView({
                               </Badge>
                               <h4
                                 className={cn(
-                                  'font-semibold text-sm',
-                                  d.completed && 'line-through opacity-60',
+                                  "font-semibold text-sm",
+                                  d.completed && "line-through opacity-60",
                                 )}
                               >
                                 {d.title}
                               </h4>
                             </div>
-                            <p className="text-xs text-mq-content-secondary">{d.unitCode}</p>
+                            <p className="text-xs text-mq-content-secondary">
+                              {d.unitCode}
+                            </p>
                             <div className="flex items-center gap-3 mt-2 text-[10px] text-mq-content-tertiary">
                               <span className="flex items-center gap-1">
-                                <AlertCircle className="w-3 h-3" /> {t('due')}{' '}
-                                {dayjs(d.dueDate).format('h:mm A')}
+                                <AlertCircle className="w-3 h-3" /> {t("due")}{" "}
+                                {dayjs(d.dueDate).format("h:mm A")}
                               </span>
                             </div>
                           </div>
@@ -242,13 +259,15 @@ export default function AgendaView({
                       <Card
                         key={entry.id}
                         className="border-l-4 border-l-mq-success border-t-0 border-b-0 border-r-0 rounded-none bg-mq-card-background shadow-sm hover:bg-mq-background-secondary transition-colors cursor-pointer"
-                        style={{ borderLeftColor: colors.style?.backgroundColor }}
+                        style={{
+                          borderLeftColor: colors.style?.backgroundColor,
+                        }}
                         onClick={() => onEventClick(e)}
                       >
                         <CardContent className="p-3 flex items-center gap-4">
                           <div className="flex-col w-16 text-center hidden sm:flex">
                             <span className="text-xs font-bold text-mq-content">
-                              {e.time.split('-')[0]}
+                              {e.time.split("-")[0]}
                             </span>
                           </div>
                           <div className="flex-1">
@@ -257,9 +276,11 @@ export default function AgendaView({
                                 variant="neutral"
                                 className="text-[10px] px-1 py-0 h-4 border border-mq-success/30 text-mq-success bg-mq-success/5"
                               >
-                                {t('event')}
+                                {t("event")}
                               </Badge>
-                              <h4 className="font-semibold text-sm">{e.title}</h4>
+                              <h4 className="font-semibold text-sm">
+                                {e.title}
+                              </h4>
                             </div>
                             <div className="flex items-center gap-3 mt-2 text-[10px] text-mq-content-tertiary">
                               <span className="flex items-center gap-1">

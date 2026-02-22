@@ -1,14 +1,18 @@
 // lib/store/eventsStore.ts
 // Events store with Supabase API integration
 // Follows the same pattern as unitsStore for consistency
-'use client';
+"use client";
 
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { Event } from '@/lib/types';
-import { errorHandler } from '@/lib/utils/errorHandling';
-import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
-import { v4 as uuidv4 } from 'uuid';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { Event } from "@/lib/types";
+import { errorHandler } from "@/lib/utils/errorHandling";
+import {
+  apiRequest,
+  isLikelyNetworkError,
+  isBrowserOffline,
+} from "@/lib/utils/api";
+import { v4 as uuidv4 } from "uuid";
 let hasLoggedNetworkFallback = false;
 
 interface EventsState {
@@ -16,7 +20,9 @@ interface EventsState {
   isLoading: boolean;
   hasLoaded: boolean;
   loadEvents: () => Promise<void>;
-  addEvent: (event: Omit<Event, 'id' | 'date' | 'time'> & { id?: string }) => Promise<Event | null>;
+  addEvent: (
+    event: Omit<Event, "id" | "date" | "time"> & { id?: string },
+  ) => Promise<Event | null>;
   updateEvent: (id: string, updates: Partial<Event>) => Promise<Event | null>;
   removeEvent: (id: string) => Promise<void>;
   toggleNotification: (id: string) => Promise<void>;
@@ -29,7 +35,8 @@ interface EventsState {
 // Normalize event dates from API response
 const normalizeEvent = (event: Event): Event => ({
   ...event,
-  startAt: event.startAt instanceof Date ? event.startAt : new Date(event.startAt),
+  startAt:
+    event.startAt instanceof Date ? event.startAt : new Date(event.startAt),
   endAt: event.endAt
     ? event.endAt instanceof Date
       ? event.endAt
@@ -37,10 +44,10 @@ const normalizeEvent = (event: Event): Event => ({
     : undefined,
   date: event.startAt instanceof Date ? event.startAt : new Date(event.startAt),
   time: event.allDay
-    ? ''
-    : new Date(event.startAt).toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
+    ? ""
+    : new Date(event.startAt).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
         hour12: true,
       }),
 });
@@ -56,7 +63,9 @@ export const useEventsStore = create<EventsState>()(
         if (get().hasLoaded) return;
         set({ isLoading: true });
         try {
-          const data = await apiRequest<Event[]>('/api/events', { noRetry: true });
+          const data = await apiRequest<Event[]>("/api/events", {
+            noRetry: true,
+          });
           const normalizedApi = data.map(normalizeEvent);
           // Use database data directly - no sample data fallback for authenticated users
           // This ensures proper user isolation and data ownership
@@ -68,9 +77,9 @@ export const useEventsStore = create<EventsState>()(
           // Check if this is an auth error
           const isAuthError =
             error instanceof Error &&
-            (error.message.includes('401') ||
-              error.message.includes('authentication') ||
-              error.message.includes('Unauthorized'));
+            (error.message.includes("401") ||
+              error.message.includes("authentication") ||
+              error.message.includes("Unauthorized"));
 
           if (isAuthError) {
             // Auth failure: clear persisted data to prevent showing stale user data
@@ -79,12 +88,18 @@ export const useEventsStore = create<EventsState>()(
           } else {
             // Non-auth error: keep persisted data but mark as loaded
             // Do NOT fall back to sample data - this causes "ghost" events
-            const isNetworkError = isLikelyNetworkError(error) || isBrowserOffline();
+            const isNetworkError =
+              isLikelyNetworkError(error) || isBrowserOffline();
             if (!isNetworkError) {
-              console.warn('Failed to load events from API, using persisted data:', error);
+              console.warn(
+                "Failed to load events from API, using persisted data:",
+                error,
+              );
             } else if (!hasLoggedNetworkFallback) {
               hasLoggedNetworkFallback = true;
-              console.warn('Events API unavailable; using persisted data fallback.');
+              console.warn(
+                "Events API unavailable; using persisted data fallback.",
+              );
             }
             set({ hasLoaded: true });
           }
@@ -99,15 +114,17 @@ export const useEventsStore = create<EventsState>()(
           ...eventInput,
           id:
             eventInput.id &&
-            eventInput.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+            eventInput.id.match(
+              /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+            )
               ? eventInput.id
               : uuidv4(),
           date: eventInput.startAt,
           time: eventInput.allDay
-            ? ''
-            : eventInput.startAt.toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
+            ? ""
+            : eventInput.startAt.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
                 hour12: true,
               }),
         };
@@ -123,9 +140,9 @@ export const useEventsStore = create<EventsState>()(
         });
 
         try {
-          const created = await apiRequest<Event>('/api/events', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+          const created = await apiRequest<Event>("/api/events", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               id: normalized.id,
               title: normalized.title,
@@ -144,17 +161,23 @@ export const useEventsStore = create<EventsState>()(
           const serverNormalized = normalizeEvent(created);
           // Update with server response
           set((state) => ({
-            events: state.events.map((e) => (e.id === normalized.id ? serverNormalized : e)),
+            events: state.events.map((e) =>
+              e.id === normalized.id ? serverNormalized : e,
+            ),
           }));
           return serverNormalized;
         } catch (error) {
           // Silently handle API errors - stores work with local data
-          const errorMessage = error instanceof Error ? error.message : String(error);
-          if (!errorMessage.includes('authentication') && !errorMessage.includes('unauthorized')) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          if (
+            !errorMessage.includes("authentication") &&
+            !errorMessage.includes("unauthorized")
+          ) {
             errorHandler.logError(
-              error instanceof Error ? error : new Error('Failed to add event'),
-              'EventsStore.addEvent',
-              'medium',
+              error instanceof Error ? error : new Error("Failed to add event"),
+              "EventsStore.addEvent",
+              "medium",
             );
           }
           return normalized; // Return the local version on error
@@ -165,7 +188,10 @@ export const useEventsStore = create<EventsState>()(
         const currentEvent = get().events.find((e) => e.id === id);
         if (!currentEvent) return null;
 
-        const optimisticUpdate = normalizeEvent({ ...currentEvent, ...updates });
+        const optimisticUpdate = normalizeEvent({
+          ...currentEvent,
+          ...updates,
+        });
         set((state) => ({
           events: state.events.map((e) => (e.id === id ? optimisticUpdate : e)),
         }));
@@ -173,38 +199,54 @@ export const useEventsStore = create<EventsState>()(
         try {
           const updatePayload: Record<string, unknown> = {};
           if (updates.title !== undefined) updatePayload.title = updates.title;
-          if (updates.description !== undefined) updatePayload.description = updates.description;
-          if (updates.location !== undefined) updatePayload.location = updates.location;
-          if (updates.building !== undefined) updatePayload.building = updates.building;
+          if (updates.description !== undefined)
+            updatePayload.description = updates.description;
+          if (updates.location !== undefined)
+            updatePayload.location = updates.location;
+          if (updates.building !== undefined)
+            updatePayload.building = updates.building;
           if (updates.room !== undefined) updatePayload.room = updates.room;
-          if (updates.category !== undefined) updatePayload.category = updates.category;
+          if (updates.category !== undefined)
+            updatePayload.category = updates.category;
           if (updates.color !== undefined) updatePayload.color = updates.color;
-          if (updates.imageUrl !== undefined) updatePayload.imageUrl = updates.imageUrl;
+          if (updates.imageUrl !== undefined)
+            updatePayload.imageUrl = updates.imageUrl;
           if (updates.notificationEnabled !== undefined)
             updatePayload.notificationEnabled = updates.notificationEnabled;
           if (updates.startAt !== undefined)
             updatePayload.startAt =
-              updates.startAt instanceof Date ? updates.startAt.toISOString() : updates.startAt;
+              updates.startAt instanceof Date
+                ? updates.startAt.toISOString()
+                : updates.startAt;
           if (updates.endAt !== undefined)
             updatePayload.endAt =
-              updates.endAt instanceof Date ? updates.endAt.toISOString() : updates.endAt;
-          if (updates.allDay !== undefined) updatePayload.allDay = updates.allDay;
+              updates.endAt instanceof Date
+                ? updates.endAt.toISOString()
+                : updates.endAt;
+          if (updates.allDay !== undefined)
+            updatePayload.allDay = updates.allDay;
 
           const updated = await apiRequest<Event>(`/api/events/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updatePayload),
           });
           const serverNormalized = normalizeEvent(updated);
           set((state) => ({
-            events: state.events.map((e) => (e.id === id ? serverNormalized : e)),
+            events: state.events.map((e) =>
+              e.id === id ? serverNormalized : e,
+            ),
           }));
           return serverNormalized;
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
           // 404: Event doesn't exist on server, try to create it
-          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+          if (
+            errorMessage.includes("404") ||
+            errorMessage.includes("not found")
+          ) {
             console.warn(
               `Event ${id} not found on server during update, attempting to create it...`,
             );
@@ -217,9 +259,11 @@ export const useEventsStore = create<EventsState>()(
             events: state.events.map((e) => (e.id === id ? currentEvent : e)),
           }));
           errorHandler.logError(
-            error instanceof Error ? error : new Error(`Failed to update event ${id}`),
-            'EventsStore.updateEvent',
-            'high',
+            error instanceof Error
+              ? error
+              : new Error(`Failed to update event ${id}`),
+            "EventsStore.updateEvent",
+            "high",
           );
           // Rethrow so UI can show error feedback
           throw error;
@@ -235,13 +279,19 @@ export const useEventsStore = create<EventsState>()(
         }));
 
         try {
-          await apiRequest<{ id: string }>(`/api/events/${id}`, { method: 'DELETE' });
+          await apiRequest<{ id: string }>(`/api/events/${id}`, {
+            method: "DELETE",
+          });
           // SUCCESS: Delete persisted to DB
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
           // 404 means event doesn't exist on server - that's fine, local delete succeeded
-          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+          if (
+            errorMessage.includes("404") ||
+            errorMessage.includes("not found")
+          ) {
             return; // Delete successful (event was local-only or already deleted)
           }
 
@@ -250,9 +300,11 @@ export const useEventsStore = create<EventsState>()(
             set((state) => ({ events: [...state.events, eventToRestore] }));
           }
           errorHandler.logError(
-            error instanceof Error ? error : new Error(`Failed to remove event ${id}`),
-            'EventsStore.removeEvent',
-            'high',
+            error instanceof Error
+              ? error
+              : new Error(`Failed to remove event ${id}`),
+            "EventsStore.removeEvent",
+            "high",
           );
           // Rethrow so UI can show error feedback
           throw error;
@@ -262,7 +314,9 @@ export const useEventsStore = create<EventsState>()(
       toggleNotification: async (id) => {
         const existing = get().events.find((event) => event.id === id);
         if (!existing) return;
-        await get().updateEvent(id, { notificationEnabled: !existing.notificationEnabled });
+        await get().updateEvent(id, {
+          notificationEnabled: !existing.notificationEnabled,
+        });
       },
 
       getEventsByDate: (date) => {
@@ -287,14 +341,17 @@ export const useEventsStore = create<EventsState>()(
             const eventDate = new Date(event.startAt);
             return eventDate >= now && eventDate <= futureDate;
           })
-          .sort((a, b) => new Date(a.startAt).getTime() - new Date(b.startAt).getTime());
+          .sort(
+            (a, b) =>
+              new Date(a.startAt).getTime() - new Date(b.startAt).getTime(),
+          );
       },
 
       clearEvents: () => set({ events: [], hasLoaded: false }),
       reset: () => set({ events: [], hasLoaded: false, isLoading: false }),
     }),
     {
-      name: 'events-storage',
+      name: "events-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ events: state.events }),
       // When rehydrating, ensure hasLoaded stays false so we fetch fresh data

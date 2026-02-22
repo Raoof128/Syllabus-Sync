@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
-import { errorHandler } from '@/lib/utils/errorHandling';
-import { toastUtils } from '@/lib/utils/toast';
-import { withRetry, RetryError } from '@/lib/utils/retry';
+import { useState, useCallback } from "react";
+import { errorHandler } from "@/lib/utils/errorHandling";
+import { toastUtils } from "@/lib/utils/toast";
+import { withRetry, RetryError } from "@/lib/utils/retry";
 
 export interface UseRetryOptions {
   maxAttempts?: number;
@@ -24,7 +24,7 @@ export function useRetry<T extends unknown[], R>(
     delayMs = 1000,
     backoffMultiplier = 2,
     showToastOnError = true,
-    errorMessage = 'Operation failed. Please try again.',
+    errorMessage = "Operation failed. Please try again.",
     successMessage,
   } = options;
 
@@ -41,30 +41,31 @@ export function useRetry<T extends unknown[], R>(
           retryCondition: (error) => {
             // Retry on network-related errors
             return (
-              error.name === 'NetworkError' ||
-              error.name === 'TimeoutError' ||
-              error.name === 'AbortError' ||
-              error.message.toLowerCase().includes('network') ||
-              error.message.toLowerCase().includes('fetch')
+              error.name === "NetworkError" ||
+              error.name === "TimeoutError" ||
+              error.name === "AbortError" ||
+              error.message.toLowerCase().includes("network") ||
+              error.message.toLowerCase().includes("fetch")
             );
           },
         });
 
         if (successMessage) {
-          toastUtils.success('Success', successMessage);
+          toastUtils.success("Success", successMessage);
         }
 
         return result;
       } catch (err) {
-        const error = err instanceof RetryError ? err.lastError : (err as Error);
+        const error =
+          err instanceof RetryError ? err.lastError : (err as Error);
         setError(error);
 
         // Log to error handler
-        errorHandler.logError(error, 'Retry Hook Operation', 'medium');
+        errorHandler.logError(error, "Retry Hook Operation", "medium");
 
         // Show toast if enabled
         if (showToastOnError) {
-          toastUtils.error('Error', errorMessage);
+          toastUtils.error("Error", errorMessage);
         }
 
         return null;

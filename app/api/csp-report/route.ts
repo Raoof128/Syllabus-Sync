@@ -11,32 +11,32 @@
  * Reports are sent by browsers when a CSP violation occurs.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
-import { getClientIP } from '@/lib/security/ip';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { jsonError, ERROR_CODES } from "@/app/api/_lib/response";
+import { getClientIP } from "@/lib/security/ip";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
 interface CSPReport {
-  'document-uri': string;
+  "document-uri": string;
   referrer: string;
-  'blocked-uri': string;
-  'violated-directive': string;
-  'original-policy': string;
-  disposition: 'enforce' | 'report';
-  'effective-directive'?: string;
-  'line-number'?: number;
-  'column-number'?: number;
-  'source-file'?: string;
-  'script-sample'?: string;
-  'status-code'?: number;
+  "blocked-uri": string;
+  "violated-directive": string;
+  "original-policy": string;
+  disposition: "enforce" | "report";
+  "effective-directive"?: string;
+  "line-number"?: number;
+  "column-number"?: number;
+  "source-file"?: string;
+  "script-sample"?: string;
+  "status-code"?: number;
 }
 
 interface CSPReportBody {
-  'csp-report': CSPReport;
+  "csp-report": CSPReport;
 }
 
 // ============================================================================
@@ -74,12 +74,12 @@ function isRateLimited(ip: string): boolean {
  */
 function sanitizeReport(report: CSPReport): Partial<CSPReport> {
   return {
-    'blocked-uri': sanitizeUri(report['blocked-uri']),
-    'violated-directive': report['violated-directive'],
-    'effective-directive': report['effective-directive'],
+    "blocked-uri": sanitizeUri(report["blocked-uri"]),
+    "violated-directive": report["violated-directive"],
+    "effective-directive": report["effective-directive"],
     disposition: report.disposition,
-    'line-number': report['line-number'],
-    'column-number': report['column-number'],
+    "line-number": report["line-number"],
+    "column-number": report["column-number"],
     // Don't include document-uri or referrer to avoid logging sensitive URLs
     // Don't include original-policy to avoid cluttering logs
   };
@@ -89,14 +89,15 @@ function sanitizeReport(report: CSPReport): Partial<CSPReport> {
  * Sanitize URI to prevent log injection
  */
 function sanitizeUri(uri: string): string {
-  if (!uri) return 'empty';
+  if (!uri) return "empty";
 
   // Truncate long URIs
   const maxLength = 200;
-  let sanitized = uri.length > maxLength ? `${uri.substring(0, maxLength)}...` : uri;
+  let sanitized =
+    uri.length > maxLength ? `${uri.substring(0, maxLength)}...` : uri;
 
   // Remove newlines and control characters
-  sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+  sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, "");
 
   return sanitized;
 }
@@ -110,31 +111,35 @@ export async function POST(request: NextRequest) {
 
   // Rate limiting
   if (isRateLimited(clientIP)) {
-    return jsonError('Rate limit exceeded', 429, ERROR_CODES.RATE_LIMITED);
+    return jsonError("Rate limit exceeded", 429, ERROR_CODES.RATE_LIMITED);
   }
 
   try {
     const body: CSPReportBody = await request.json();
-    const report = body['csp-report'];
+    const report = body["csp-report"];
 
     if (!report) {
-      return jsonError('Invalid CSP report format', 400, ERROR_CODES.BAD_REQUEST);
+      return jsonError(
+        "Invalid CSP report format",
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
 
     // Sanitize and log the report
     const sanitizedReport = sanitizeReport(report);
 
     // Log based on severity
-    const isEnforced = report.disposition === 'enforce';
+    const isEnforced = report.disposition === "enforce";
 
     if (isEnforced) {
-      logger.error('CSP Violation Report:', {
+      logger.error("CSP Violation Report:", {
         ...sanitizedReport,
         timestamp: new Date().toISOString(),
         ip: `${clientIP.substring(0, 7)}***`, // Partial IP for privacy
       });
     } else {
-      console.warn('CSP Violation Report:', {
+      console.warn("CSP Violation Report:", {
         ...sanitizedReport,
         timestamp: new Date().toISOString(),
         ip: `${clientIP.substring(0, 7)}***`, // Partial IP for privacy
@@ -145,25 +150,25 @@ export async function POST(request: NextRequest) {
     if (process.env.CSP_REPORT_WEBHOOK) {
       try {
         await fetch(process.env.CSP_REPORT_WEBHOOK, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            type: 'csp-violation',
-            severity: isEnforced ? 'high' : 'low',
+            type: "csp-violation",
+            severity: isEnforced ? "high" : "low",
             ...sanitizedReport,
             timestamp: new Date().toISOString(),
           }),
         });
       } catch (webhookError) {
-        logger.error('Failed to send CSP report to webhook:', webhookError);
+        logger.error("Failed to send CSP report to webhook:", webhookError);
       }
     }
 
     // Return 204 No Content (browsers don't need a response body)
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    logger.error('CSP report processing error:', error);
-    return jsonError('Failed to process report', 400, ERROR_CODES.BAD_REQUEST);
+    logger.error("CSP report processing error:", error);
+    return jsonError("Failed to process report", 400, ERROR_CODES.BAD_REQUEST);
   }
 }
 
@@ -174,10 +179,10 @@ export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Max-Age': '86400',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Max-Age": "86400",
     },
   });
 }

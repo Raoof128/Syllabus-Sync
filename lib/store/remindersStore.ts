@@ -1,21 +1,26 @@
 // lib/store/remindersStore.ts
-'use client';
+"use client";
 
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { v4 as uuidv4 } from "uuid";
 
-export type ReminderItemType = 'unit' | 'exam' | 'assignment' | 'event' | 'todo';
+export type ReminderItemType =
+  | "unit"
+  | "exam"
+  | "assignment"
+  | "event"
+  | "todo";
 
 export type ReminderTiming =
-  | '15min'
-  | '30min'
-  | '1hour'
-  | '2hours'
-  | '1day'
-  | '2days'
-  | '1week'
-  | 'custom';
+  | "15min"
+  | "30min"
+  | "1hour"
+  | "2hours"
+  | "1day"
+  | "2days"
+  | "1week"
+  | "custom";
 
 export interface Reminder {
   id: string;
@@ -36,12 +41,18 @@ interface RemindersState {
   setHasHydrated: (state: boolean) => void;
 
   // CRUD operations
-  addReminder: (reminder: Omit<Reminder, 'id' | 'createdAt'>) => Reminder;
-  updateReminder: (id: string, updates: Partial<Omit<Reminder, 'id' | 'createdAt'>>) => void;
+  addReminder: (reminder: Omit<Reminder, "id" | "createdAt">) => Reminder;
+  updateReminder: (
+    id: string,
+    updates: Partial<Omit<Reminder, "id" | "createdAt">>,
+  ) => void;
   removeReminder: (id: string) => void;
 
   // Getters
-  getReminderForItem: (itemId: string, itemType: ReminderItemType) => Reminder | undefined;
+  getReminderForItem: (
+    itemId: string,
+    itemType: ReminderItemType,
+  ) => Reminder | undefined;
   getRemindersForItem: (itemId: string) => Reminder[];
   getPendingReminders: () => Reminder[];
 
@@ -58,10 +69,10 @@ export function calculateReminderDate(
   customDate?: string,
   customTime?: string,
 ): Date {
-  if (timing === 'custom' && customDate) {
-    const [year, month, day] = customDate.split('-').map(Number);
+  if (timing === "custom" && customDate) {
+    const [year, month, day] = customDate.split("-").map(Number);
     if (customTime) {
-      const [hours, minutes] = customTime.split(':').map(Number);
+      const [hours, minutes] = customTime.split(":").map(Number);
       return new Date(year, month - 1, day, hours, minutes);
     }
     return new Date(year, month - 1, day, 9, 0); // Default to 9 AM
@@ -69,25 +80,25 @@ export function calculateReminderDate(
 
   const date = new Date(targetDate);
   switch (timing) {
-    case '15min':
+    case "15min":
       date.setMinutes(date.getMinutes() - 15);
       break;
-    case '30min':
+    case "30min":
       date.setMinutes(date.getMinutes() - 30);
       break;
-    case '1hour':
+    case "1hour":
       date.setHours(date.getHours() - 1);
       break;
-    case '2hours':
+    case "2hours":
       date.setHours(date.getHours() - 2);
       break;
-    case '1day':
+    case "1day":
       date.setDate(date.getDate() - 1);
       break;
-    case '2days':
+    case "2days":
       date.setDate(date.getDate() - 2);
       break;
-    case '1week':
+    case "1week":
       date.setDate(date.getDate() - 7);
       break;
   }
@@ -97,22 +108,22 @@ export function calculateReminderDate(
 // Get timing label for display
 export function getTimingLabel(timing: ReminderTiming): string {
   switch (timing) {
-    case '15min':
-      return '15 minutes before';
-    case '30min':
-      return '30 minutes before';
-    case '1hour':
-      return '1 hour before';
-    case '2hours':
-      return '2 hours before';
-    case '1day':
-      return '1 day before';
-    case '2days':
-      return '2 days before';
-    case '1week':
-      return '1 week before';
-    case 'custom':
-      return 'Custom time';
+    case "15min":
+      return "15 minutes before";
+    case "30min":
+      return "30 minutes before";
+    case "1hour":
+      return "1 hour before";
+    case "2hours":
+      return "2 hours before";
+    case "1day":
+      return "1 day before";
+    case "2days":
+      return "2 days before";
+    case "1week":
+      return "1 week before";
+    case "custom":
+      return "Custom time";
     default:
       return timing;
   }
@@ -142,7 +153,9 @@ export const useRemindersStore = create<RemindersState>()(
 
       updateReminder: (id, updates) => {
         set((state) => ({
-          reminders: state.reminders.map((r) => (r.id === id ? { ...r, ...updates } : r)),
+          reminders: state.reminders.map((r) =>
+            r.id === id ? { ...r, ...updates } : r,
+          ),
         }));
       },
 
@@ -190,7 +203,7 @@ export const useRemindersStore = create<RemindersState>()(
       },
     }),
     {
-      name: 'syllabus-sync-reminders',
+      name: "syllabus-sync-reminders",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         reminders: state.reminders,

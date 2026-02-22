@@ -1,17 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useCallback, useEffect } from 'react';
-import { Button } from '@/components/ui/mq/button';
-import { Input } from '@/components/ui/mq/input';
-import { Shield, Loader2, AlertTriangle, Smartphone, ArrowLeft } from 'lucide-react';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import { toastUtils } from '@/lib/utils/toast';
-import { API_ROUTES } from '@/lib/constants/config';
-import { apiRequest } from '@/lib/utils/api';
+import { useState, useCallback, useEffect } from "react";
+import { Button } from "@/components/ui/mq/button";
+import { Input } from "@/components/ui/mq/input";
+import {
+  Shield,
+  Loader2,
+  AlertTriangle,
+  Smartphone,
+  ArrowLeft,
+} from "lucide-react";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { toastUtils } from "@/lib/utils/toast";
+import { API_ROUTES } from "@/lib/constants/config";
+import { apiRequest } from "@/lib/utils/api";
 
 export interface MFAFactorInfo {
   id: string;
-  type: 'totp' | 'phone';
+  type: "totp" | "phone";
   name?: string;
   phone?: string;
 }
@@ -27,46 +33,56 @@ interface MFAChallengeProps {
  * MFA Challenge component shown during login flow.
  * Handles both TOTP and SMS verification via Supabase MFA API.
  */
-export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengeProps) {
-  const [code, setCode] = useState('');
+export function MFAChallenge({
+  t,
+  factors,
+  onSuccess,
+  onCancel,
+}: MFAChallengeProps) {
+  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFactor, setSelectedFactor] = useState<MFAFactorInfo | null>(null);
+  const [selectedFactor, setSelectedFactor] = useState<MFAFactorInfo | null>(
+    null,
+  );
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
 
   // Auto-select the first TOTP factor, or fall back to phone
   useEffect(() => {
-    const totpFactor = factors.find((f) => f.type === 'totp');
-    const phoneFactor = factors.find((f) => f.type === 'phone');
+    const totpFactor = factors.find((f) => f.type === "totp");
+    const phoneFactor = factors.find((f) => f.type === "phone");
     setSelectedFactor(totpFactor || phoneFactor || null);
   }, [factors]);
 
   const createChallenge = useCallback(async () => {
     if (!selectedFactor) return;
-    if (selectedFactor.type !== 'phone') return;
+    if (selectedFactor.type !== "phone") return;
 
     setError(null);
     try {
-      const data = await apiRequest<{ challengeId: string }>(API_ROUTES.AUTH.MFA_CHALLENGE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ factorId: selectedFactor.id }),
-        noRetry: true,
-      });
+      const data = await apiRequest<{ challengeId: string }>(
+        API_ROUTES.AUTH.MFA_CHALLENGE,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ factorId: selectedFactor.id }),
+          noRetry: true,
+        },
+      );
       setChallengeId(data.challengeId);
     } catch {
-      setError(t('failedToSendCode' as TranslationKey));
+      setError(t("failedToSendCode" as TranslationKey));
     }
   }, [selectedFactor, t]);
 
   // When switching to SMS factor, create a challenge (triggers SMS send).
   useEffect(() => {
     setChallengeId(null);
-    setCode('');
+    setCode("");
     setError(null);
-    if (selectedFactor?.type === 'phone') {
+    if (selectedFactor?.type === "phone") {
       void createChallenge();
     }
   }, [selectedFactor, createChallenge]);
@@ -75,7 +91,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     if (!selectedFactor || code.length !== 6) return;
 
     if (attemptsLeft <= 0) {
-      setError(t('tooManyAttempts' as TranslationKey));
+      setError(t("tooManyAttempts" as TranslationKey));
       return;
     }
 
@@ -86,44 +102,55 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
       // SECURITY: Route through server-side API to enforce server-side rate
       // limiting (5 attempts / 15 min) instead of calling Supabase MFA API
       // directly from the browser which bypasses our rate limiter.
-      const result = await apiRequest<{ verified: boolean }>(API_ROUTES.AUTH.MFA_CHALLENGE_VERIFY, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          factorId: selectedFactor.id,
-          challengeId: selectedFactor.type === 'phone' ? challengeId : undefined,
-          code: code.trim(),
-        }),
-        noRetry: true,
-      });
+      const result = await apiRequest<{ verified: boolean }>(
+        API_ROUTES.AUTH.MFA_CHALLENGE_VERIFY,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            factorId: selectedFactor.id,
+            challengeId:
+              selectedFactor.type === "phone" ? challengeId : undefined,
+            code: code.trim(),
+          }),
+          noRetry: true,
+        },
+      );
 
       if (!result?.verified) {
         setAttemptsLeft((prev) => prev - 1);
         if (attemptsLeft <= 1) {
-          setError(t('tooManyFailedAttempts' as TranslationKey));
+          setError(t("tooManyFailedAttempts" as TranslationKey));
           setTimeout(onCancel, 2000);
         } else {
-          setError(t('invalidCodeAttempts' as TranslationKey, { count: attemptsLeft - 1 }));
+          setError(
+            t("invalidCodeAttempts" as TranslationKey, {
+              count: attemptsLeft - 1,
+            }),
+          );
         }
         return;
       }
 
       // Success — session upgraded to aal2 via server-side cookies
-      toastUtils.success(t('welcomeBack'), t('identityVerified' as TranslationKey));
+      toastUtils.success(
+        t("welcomeBack"),
+        t("identityVerified" as TranslationKey),
+      );
       onSuccess();
     } catch {
-      setError(t('mfaVerificationFailed' as TranslationKey));
+      setError(t("mfaVerificationFailed" as TranslationKey));
     } finally {
       setIsLoading(false);
     }
   }, [selectedFactor, code, attemptsLeft, t, onSuccess, onCancel, challengeId]);
 
   const switchFactor = useCallback(
-    (type: 'totp' | 'phone') => {
+    (type: "totp" | "phone") => {
       const factor = factors.find((f) => f.type === type);
       if (factor) {
         setSelectedFactor(factor);
-        setCode('');
+        setCode("");
         setError(null);
       }
     },
@@ -131,11 +158,16 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
   );
 
   const handleResendSMS = useCallback(async () => {
-    if (!selectedFactor || selectedFactor.type !== 'phone' || resendCooldown > 0) return;
+    if (
+      !selectedFactor ||
+      selectedFactor.type !== "phone" ||
+      resendCooldown > 0
+    )
+      return;
 
     try {
       await createChallenge();
-      toastUtils.success(t('security'), t('newCodeSent' as TranslationKey));
+      toastUtils.success(t("security"), t("newCodeSent" as TranslationKey));
 
       // Start cooldown
       setResendCooldown(60);
@@ -149,12 +181,13 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
         });
       }, 1000);
     } catch {
-      setError(t('failedToResendCode' as TranslationKey));
+      setError(t("failedToResendCode" as TranslationKey));
     }
   }, [selectedFactor, resendCooldown, t, createChallenge]);
 
   const hasMultipleFactorTypes =
-    factors.some((f) => f.type === 'totp') && factors.some((f) => f.type === 'phone');
+    factors.some((f) => f.type === "totp") &&
+    factors.some((f) => f.type === "phone");
 
   return (
     <div className="space-y-5 sm:space-y-6 w-full max-w-sm mx-auto">
@@ -166,13 +199,13 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
           </div>
         </div>
         <h2 className="text-lg sm:text-xl font-bold text-mq-content">
-          {t('twoStepVerification' as TranslationKey)}
+          {t("twoStepVerification" as TranslationKey)}
         </h2>
         <p className="text-xs sm:text-sm text-mq-content-secondary">
-          {selectedFactor?.type === 'totp'
-            ? t('mfaTotpPrompt' as TranslationKey)
-            : t('mfaSmsPrompt' as TranslationKey, {
-                last4: selectedFactor?.phone?.slice(-4) ?? '',
+          {selectedFactor?.type === "totp"
+            ? t("mfaTotpPrompt" as TranslationKey)
+            : t("mfaSmsPrompt" as TranslationKey, {
+                last4: selectedFactor?.phone?.slice(-4) ?? "",
               })}
         </p>
       </div>
@@ -187,12 +220,12 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
           placeholder="000000"
           value={code}
           onChange={(e) => {
-            const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+            const val = e.target.value.replace(/\D/g, "").slice(0, 6);
             setCode(val);
             setError(null);
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && code.length === 6) handleVerify();
+            if (e.key === "Enter" && code.length === 6) handleVerify();
           }}
           className="text-center text-2xl sm:text-3xl tracking-[0.35em] sm:tracking-[0.5em] font-mono h-14 sm:h-16"
           autoFocus
@@ -217,15 +250,15 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            {t('verifying' as TranslationKey)}
+            {t("verifying" as TranslationKey)}
           </>
         ) : (
-          t('verify' as TranslationKey)
+          t("verify" as TranslationKey)
         )}
       </Button>
 
       {/* SMS Resend */}
-      {selectedFactor?.type === 'phone' && (
+      {selectedFactor?.type === "phone" && (
         <div className="text-center">
           <Button
             variant="ghost"
@@ -235,8 +268,8 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
             className="text-xs"
           >
             {resendCooldown > 0
-              ? t('resendIn' as TranslationKey, { seconds: resendCooldown })
-              : t('resendCode' as TranslationKey)}
+              ? t("resendIn" as TranslationKey, { seconds: resendCooldown })
+              : t("resendCode" as TranslationKey)}
           </Button>
         </div>
       )}
@@ -248,12 +281,14 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
             variant="ghost"
             size="sm"
             className="w-full text-xs text-mq-content-secondary"
-            onClick={() => switchFactor(selectedFactor?.type === 'totp' ? 'phone' : 'totp')}
+            onClick={() =>
+              switchFactor(selectedFactor?.type === "totp" ? "phone" : "totp")
+            }
           >
             <Smartphone className="h-3 w-3 mr-1" />
-            {selectedFactor?.type === 'totp'
-              ? t('useSmsInstead' as TranslationKey)
-              : t('useTotpInstead' as TranslationKey)}
+            {selectedFactor?.type === "totp"
+              ? t("useSmsInstead" as TranslationKey)
+              : t("useTotpInstead" as TranslationKey)}
           </Button>
         </div>
       )}
@@ -267,7 +302,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
           className="text-xs text-mq-content-secondary"
         >
           <ArrowLeft className="h-3 w-3 mr-1" />
-          {t('backToLogin')}
+          {t("backToLogin")}
         </Button>
       </div>
     </div>

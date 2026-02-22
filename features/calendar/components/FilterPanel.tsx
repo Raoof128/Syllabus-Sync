@@ -1,10 +1,15 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Switch } from '@/components/ui/mq/switch';
-import { Button } from '@/components/ui/mq/button';
-import { Check, BookOpen, AlertCircle, Calendar as CalendarIcon } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from "react";
+import { Switch } from "@/components/ui/mq/switch";
+import { Button } from "@/components/ui/mq/button";
+import {
+  Check,
+  BookOpen,
+  AlertCircle,
+  Calendar as CalendarIcon,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export interface CalendarFilters {
   showUnits: boolean;
@@ -49,7 +54,7 @@ export default function FilterPanel({
       {isOpen && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
+          animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           className="bg-mq-card-background border-b border-mq-border overflow-hidden"
         >
@@ -61,20 +66,21 @@ export default function FilterPanel({
               <div className="flex items-center gap-2">
                 <Switch
                   checked={filters.showUnits}
-                  onCheckedChange={() => toggleFilter('showUnits')}
+                  onCheckedChange={() => toggleFilter("showUnits")}
                   id="filter-units"
                 />
                 <label
                   htmlFor="filter-units"
                   className="text-sm font-medium flex items-center gap-2 cursor-pointer select-none"
                 >
-                  <BookOpen className="w-4 h-4 text-mq-primary" /> Units & Classes
+                  <BookOpen className="w-4 h-4 text-mq-primary" /> Units &
+                  Classes
                 </label>
               </div>
               <div className="flex items-center gap-2">
                 <Switch
                   checked={filters.showDeadlines}
-                  onCheckedChange={() => toggleFilter('showDeadlines')}
+                  onCheckedChange={() => toggleFilter("showDeadlines")}
                   id="filter-deadlines"
                 />
                 <label
@@ -93,7 +99,7 @@ export default function FilterPanel({
               <div className="flex items-center gap-2">
                 <Switch
                   checked={filters.showEvents}
-                  onCheckedChange={() => toggleFilter('showEvents')}
+                  onCheckedChange={() => toggleFilter("showEvents")}
                   id="filter-events"
                 />
                 <label
@@ -106,7 +112,7 @@ export default function FilterPanel({
               <div className="flex items-center gap-2">
                 <Switch
                   checked={filters.showCompleted}
-                  onCheckedChange={() => toggleFilter('showCompleted')}
+                  onCheckedChange={() => toggleFilter("showCompleted")}
                   id="filter-completed"
                 />
                 <label
@@ -120,10 +126,20 @@ export default function FilterPanel({
 
             <div className="col-span-1 flex h-full items-end justify-start md:col-span-2 md:justify-end lg:col-span-4 xl:col-span-2">
               <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={resetFilters} className="text-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetFilters}
+                  className="text-xs"
+                >
                   Reset
                 </Button>
-                <Button variant="outline" size="sm" onClick={onClose} className="text-xs">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onClose}
+                  className="text-xs"
+                >
                   Close
                 </Button>
               </div>

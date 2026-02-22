@@ -15,27 +15,27 @@
  * Body: { changes: [{ id: string, position: [number, number] }] }
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
-import { parseJsonBody } from '@/app/api/_lib/middleware';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import path from "path";
+import { jsonSuccess, jsonError, ERROR_CODES } from "@/app/api/_lib/response";
+import { parseJsonBody } from "@/app/api/_lib/middleware";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // CRITICAL SECURITY: HARD PRODUCTION BLOCK
 // ============================================================================
 // This block CANNOT be bypassed by any environment variable.
 // The endpoint will simply not exist in production.
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 // ============================================================================
 // SECURITY CONFIGURATION
 // ============================================================================
 
 // SECURITY: Multiple checks required for this dangerous endpoint
-const isDevelopment = process.env.NODE_ENV === 'development';
-const isAdminEnabled = process.env.ADMIN_API_ENABLED === 'true';
+const isDevelopment = process.env.NODE_ENV === "development";
+const isAdminEnabled = process.env.ADMIN_API_ENABLED === "true";
 const adminSecretToken = process.env.ADMIN_SECRET_TOKEN;
 const isEndpointAllowed = isDevelopment && isAdminEnabled;
 
@@ -47,7 +47,7 @@ function validateAdminToken(request: NextRequest): boolean {
   }
   // If token is configured, it must match
   if (adminSecretToken) {
-    const providedToken = request.headers.get('x-admin-token');
+    const providedToken = request.headers.get("x-admin-token");
     return providedToken === adminSecretToken;
   }
   return false;
@@ -58,125 +58,125 @@ function validateAdminToken(request: NextRequest): boolean {
 // Generated from: grep "id:" features/map/lib/buildings.ts | sed "s/.*'\(.*\)'.*/'\1',/"
 const ALLOWED_BUILDING_IDS = [
   // Core Campus Buildings
-  '18WW',
-  'LIB',
-  'SEC',
-  '25BWW',
-  '17WW',
-  '4ER',
-  '75TAL',
-  '16UA',
-  '9WW',
-  '4RPD',
-  '12WW',
-  '6WW',
-  '4WW',
-  'LOTUS',
-  'MQTH',
-  'PRICE',
-  'LIGHT',
-  'AINS',
-  'HOSP',
-  'CLINIC',
-  'WOOL',
-  'SPORT',
-  'FIELDS',
-  'UBAR',
-  'CULT',
-  'LACH',
-  '8SCO',
-  '16WW',
-  '12SW',
-  '19ER',
-  'OBS',
-  'INCUB',
-  'CHAP',
-  'WALU',
-  'BANK',
-  'GUMNUT',
-  'MIAMIA',
-  'WARATAH',
-  'NEXTSENSE',
-  'NEXTSCHOOL',
-  'METS',
-  'WALLYS',
-  'LIBCAFE',
-  'DLC',
-  'RMC',
-  'MQV',
-  'GALLERY',
-  'BIODISC',
-  '11WW',
-  '13RPD',
-  '6ER',
-  '1CC',
-  '13ARPD',
-  'COCHLEAR',
-  '10SCO',
-  '14ER',
-  '6SR',
-  '14FW',
-  '14SCO',
-  '4WR',
-  'EAST3',
-  'EAST2',
-  '75TR',
-  '3SR',
-  '6FW',
-  '17MW',
-  '1MD',
-  '3MD',
-  '5MD',
-  '1EXR',
-  '2FW',
-  '4FW',
-  '2LR',
-  '6LR',
-  '4LR',
-  'DESTINATIO',
-  '3IR',
-  '1IR',
-  '15RPD',
-  'RONREILLYP',
-  'VILLAS',
-  '6MD',
-  '7MD',
-  '12MW',
-  '18ER',
-  '2WW',
-  '23WW',
-  'SIEMENS',
-  '10HA',
-  '16MW',
-  'LAKESIDEHO',
-  '8LR',
-  'MACQUARIEC',
-  '11GR',
-  '10GR',
-  'DUNMORELAN',
-  '29WW',
-  '27WW',
-  '25WW',
-  '21WW',
+  "18WW",
+  "LIB",
+  "SEC",
+  "25BWW",
+  "17WW",
+  "4ER",
+  "75TAL",
+  "16UA",
+  "9WW",
+  "4RPD",
+  "12WW",
+  "6WW",
+  "4WW",
+  "LOTUS",
+  "MQTH",
+  "PRICE",
+  "LIGHT",
+  "AINS",
+  "HOSP",
+  "CLINIC",
+  "WOOL",
+  "SPORT",
+  "FIELDS",
+  "UBAR",
+  "CULT",
+  "LACH",
+  "8SCO",
+  "16WW",
+  "12SW",
+  "19ER",
+  "OBS",
+  "INCUB",
+  "CHAP",
+  "WALU",
+  "BANK",
+  "GUMNUT",
+  "MIAMIA",
+  "WARATAH",
+  "NEXTSENSE",
+  "NEXTSCHOOL",
+  "METS",
+  "WALLYS",
+  "LIBCAFE",
+  "DLC",
+  "RMC",
+  "MQV",
+  "GALLERY",
+  "BIODISC",
+  "11WW",
+  "13RPD",
+  "6ER",
+  "1CC",
+  "13ARPD",
+  "COCHLEAR",
+  "10SCO",
+  "14ER",
+  "6SR",
+  "14FW",
+  "14SCO",
+  "4WR",
+  "EAST3",
+  "EAST2",
+  "75TR",
+  "3SR",
+  "6FW",
+  "17MW",
+  "1MD",
+  "3MD",
+  "5MD",
+  "1EXR",
+  "2FW",
+  "4FW",
+  "2LR",
+  "6LR",
+  "4LR",
+  "DESTINATIO",
+  "3IR",
+  "1IR",
+  "15RPD",
+  "RONREILLYP",
+  "VILLAS",
+  "6MD",
+  "7MD",
+  "12MW",
+  "18ER",
+  "2WW",
+  "23WW",
+  "SIEMENS",
+  "10HA",
+  "16MW",
+  "LAKESIDEHO",
+  "8LR",
+  "MACQUARIEC",
+  "11GR",
+  "10GR",
+  "DUNMORELAN",
+  "29WW",
+  "27WW",
+  "25WW",
+  "21WW",
   // Legacy IDs for backward compatibility
-  '1CC',
-  '4AW',
-  '6ER',
-  '7W',
-  '9W',
-  '10H',
-  '12SC',
-  '14SCO',
-  '17CC',
-  '19SL',
-  '25W',
-  '27W',
-  'LIBRARY',
-  'WALANGA',
-  'IGLU',
-  'MACQUARIE_CENTRE',
-  'MQ_METRO',
-  'SPORT_AQUATIC',
+  "1CC",
+  "4AW",
+  "6ER",
+  "7W",
+  "9W",
+  "10H",
+  "12SC",
+  "14SCO",
+  "17CC",
+  "19SL",
+  "25W",
+  "27W",
+  "LIBRARY",
+  "WALANGA",
+  "IGLU",
+  "MACQUARIE_CENTRE",
+  "MQ_METRO",
+  "SPORT_AQUATIC",
 ];
 
 // SECURITY: Position bounds (Campus map is 4678x3307 pixels)
@@ -193,7 +193,7 @@ const POSITION_BOUNDS = {
 // ============================================================================
 
 function isValidBuildingId(id: string): boolean {
-  if (typeof id !== 'string') return false;
+  if (typeof id !== "string") return false;
   // Check against allowlist
   return ALLOWED_BUILDING_IDS.includes(id.toUpperCase());
 }
@@ -201,12 +201,16 @@ function isValidBuildingId(id: string): boolean {
 function isValidPosition(position: unknown): position is [number, number] {
   if (!Array.isArray(position)) return false;
   if (position.length !== 2) return false;
-  if (typeof position[0] !== 'number' || typeof position[1] !== 'number') return false;
-  if (!Number.isFinite(position[0]) || !Number.isFinite(position[1])) return false;
+  if (typeof position[0] !== "number" || typeof position[1] !== "number")
+    return false;
+  if (!Number.isFinite(position[0]) || !Number.isFinite(position[1]))
+    return false;
 
   // Bounds checking
-  if (position[0] < POSITION_BOUNDS.minX || position[0] > POSITION_BOUNDS.maxX) return false;
-  if (position[1] < POSITION_BOUNDS.minY || position[1] > POSITION_BOUNDS.maxY) return false;
+  if (position[0] < POSITION_BOUNDS.minX || position[0] > POSITION_BOUNDS.maxX)
+    return false;
+  if (position[1] < POSITION_BOUNDS.minY || position[1] > POSITION_BOUNDS.maxY)
+    return false;
 
   return true;
 }
@@ -236,18 +240,18 @@ export async function POST(request: NextRequest) {
 
   // SECURITY: Multi-layer check - must pass ALL conditions
   if (!isDevelopment) {
-    console.warn('Admin API blocked: Not in development mode');
+    console.warn("Admin API blocked: Not in development mode");
     return jsonError(
-      'This endpoint is only available in development mode',
+      "This endpoint is only available in development mode",
       403,
       ERROR_CODES.FORBIDDEN,
     );
   }
 
   if (!isAdminEnabled) {
-    console.warn('Admin API blocked: ADMIN_API_ENABLED not set to true');
+    console.warn("Admin API blocked: ADMIN_API_ENABLED not set to true");
     return jsonError(
-      'Admin API is disabled. Set ADMIN_API_ENABLED=true in .env.local to enable.',
+      "Admin API is disabled. Set ADMIN_API_ENABLED=true in .env.local to enable.",
       403,
       ERROR_CODES.FORBIDDEN,
     );
@@ -255,9 +259,9 @@ export async function POST(request: NextRequest) {
 
   // SECURITY: Validate admin token if configured
   if (!validateAdminToken(request)) {
-    console.warn('Admin API blocked: Invalid or missing admin token');
+    console.warn("Admin API blocked: Invalid or missing admin token");
     return jsonError(
-      'Invalid admin token. Provide X-Admin-Token header.',
+      "Invalid admin token. Provide X-Admin-Token header.",
       403,
       ERROR_CODES.FORBIDDEN,
     );
@@ -272,9 +276,13 @@ export async function POST(request: NextRequest) {
     const body = parseResult.data;
 
     // Validate request body structure
-    if (!body.changes || !Array.isArray(body.changes) || body.changes.length === 0) {
+    if (
+      !body.changes ||
+      !Array.isArray(body.changes) ||
+      body.changes.length === 0
+    ) {
       return jsonError(
-        'Invalid request body. Expected { changes: [{ id: string, position: [x, y] }] }',
+        "Invalid request body. Expected { changes: [{ id: string, position: [x, y] }] }",
         400,
         ERROR_CODES.VALIDATION_ERROR,
       );
@@ -283,7 +291,7 @@ export async function POST(request: NextRequest) {
     // SECURITY: Limit number of changes per request (DoS prevention)
     if (body.changes.length > 50) {
       return jsonError(
-        'Too many changes. Maximum 50 per request.',
+        "Too many changes. Maximum 50 per request.",
         400,
         ERROR_CODES.VALIDATION_ERROR,
       );
@@ -311,33 +319,47 @@ export async function POST(request: NextRequest) {
 
       validatedChanges.push({
         id: change.id.toUpperCase(),
-        position: [Math.round(change.position[0]), Math.round(change.position[1])],
+        position: [
+          Math.round(change.position[0]),
+          Math.round(change.position[1]),
+        ],
       });
     }
 
     if (invalidIds.length > 0) {
       return jsonError(
-        `Invalid building IDs: ${invalidIds.join(', ')}. Use valid building codes.`,
+        `Invalid building IDs: ${invalidIds.join(", ")}. Use valid building codes.`,
         400,
         ERROR_CODES.VALIDATION_ERROR,
       );
     }
 
     if (validatedChanges.length === 0) {
-      return jsonError('No valid changes to apply', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError(
+        "No valid changes to apply",
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
     }
 
     // Read the buildings.ts file
-    const buildingsPath = path.join(process.cwd(), 'features/map/lib/buildings.ts');
+    const buildingsPath = path.join(
+      process.cwd(),
+      "features/map/lib/buildings.ts",
+    );
 
     // SECURITY: Verify file exists and is in expected location
     try {
       await fs.access(buildingsPath);
     } catch {
-      return jsonError('Buildings file not found', 500, ERROR_CODES.INTERNAL_ERROR);
+      return jsonError(
+        "Buildings file not found",
+        500,
+        ERROR_CODES.INTERNAL_ERROR,
+      );
     }
 
-    let content = await fs.readFile(buildingsPath, 'utf-8');
+    let content = await fs.readFile(buildingsPath, "utf-8");
 
     // Track successful updates
     const updatedBuildings: string[] = [];
@@ -349,7 +371,7 @@ export async function POST(request: NextRequest) {
 
       // SECURITY: Use exact string matching with escaped ID (no regex injection possible)
       // Since we validated against allowlist, the ID is safe
-      const idPattern = new RegExp(`id:\\s*['"]${id}['"]`, 'i');
+      const idPattern = new RegExp(`id:\\s*['"]${id}['"]`, "i");
       const idMatch = content.match(idPattern);
 
       if (!idMatch || idMatch.index === undefined) {
@@ -381,10 +403,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Write back to file
-    await fs.writeFile(buildingsPath, content, 'utf-8');
+    await fs.writeFile(buildingsPath, content, "utf-8");
 
     // eslint-disable-next-line no-console
-    console.log(`Admin API: Updated ${updatedBuildings.length} building positions`);
+    console.log(
+      `Admin API: Updated ${updatedBuildings.length} building positions`,
+    );
 
     // Create summary
     const summary = {
@@ -395,16 +419,20 @@ export async function POST(request: NextRequest) {
       failedBuildings,
       message:
         failedBuildings.length > 0
-          ? `Updated ${updatedBuildings.length} buildings. Failed to update: ${failedBuildings.join(', ')}`
+          ? `Updated ${updatedBuildings.length} buildings. Failed to update: ${failedBuildings.join(", ")}`
           : `Successfully updated ${updatedBuildings.length} building positions`,
     };
 
     return jsonSuccess(summary);
   } catch (error) {
-    logger.error('Error updating building positions:', error);
+    logger.error("Error updating building positions:", error);
 
     // SECURITY: Don't leak error details even in dev
-    return jsonError('Failed to update building positions', 500, ERROR_CODES.INTERNAL_ERROR);
+    return jsonError(
+      "Failed to update building positions",
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 }
 
@@ -417,7 +445,7 @@ export async function GET() {
 
   if (!isEndpointAllowed) {
     return jsonError(
-      'This endpoint is only available in development mode with ADMIN_API_ENABLED=true',
+      "This endpoint is only available in development mode with ADMIN_API_ENABLED=true",
       403,
       ERROR_CODES.FORBIDDEN,
     );
@@ -425,8 +453,8 @@ export async function GET() {
 
   return jsonSuccess({
     available: true,
-    message: 'Building position update API is ready',
-    usage: 'POST with { changes: [{ id: string, position: [x, y] }] }',
+    message: "Building position update API is ready",
+    usage: "POST with { changes: [{ id: string, position: [x, y] }] }",
     allowedBuildings: ALLOWED_BUILDING_IDS,
     positionBounds: POSITION_BOUNDS,
   });

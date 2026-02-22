@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export function useHomeErrorBoundary() {
   const [hasError, setHasError] = useState(false);
@@ -15,20 +15,23 @@ export function useHomeErrorBoundary() {
   useEffect(() => {
     const handleUnhandledError = (event: ErrorEvent) => {
       setHasError(true);
-      setErrorMessage(event.error?.message || 'An unexpected error occurred');
+      setErrorMessage(event.error?.message || "An unexpected error occurred");
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       setHasError(true);
-      setErrorMessage(event.reason?.message || 'An unexpected error occurred');
+      setErrorMessage(event.reason?.message || "An unexpected error occurred");
     };
 
-    window.addEventListener('error', handleUnhandledError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener("error", handleUnhandledError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
 
     return () => {
-      window.removeEventListener('error', handleUnhandledError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener("error", handleUnhandledError);
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection,
+      );
     };
   }, []);
 

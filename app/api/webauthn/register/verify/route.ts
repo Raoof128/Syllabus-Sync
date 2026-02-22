@@ -1,6 +1,9 @@
-import { NextRequest } from 'next/server';
-import { verifyRegistrationResponse, type RegistrationResponseJSON } from '@simplewebauthn/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { NextRequest } from "next/server";
+import {
+  verifyRegistrationResponse,
+  type RegistrationResponseJSON,
+} from "@simplewebauthn/server";
+import { createServerClient } from "@/lib/supabase/server";
 import {
   jsonSuccess,
   jsonError,
@@ -8,22 +11,22 @@ import {
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
-} from '@/app/api/_lib/response';
+} from "@/app/api/_lib/response";
 import {
   consumeChallenge,
   storeCredential,
   getRelyingPartyId,
   getExpectedOrigin,
   webauthnRegisterLimiter,
-} from '@/lib/security/webauthn';
-import { bufferToBase64Url } from '@/app/api/auth/passkey/_lib';
-import { getClientIP } from '@/lib/security/ip';
-import { logger } from '@/lib/logger';
-import { z } from 'zod';
+} from "@/lib/security/webauthn";
+import { bufferToBase64Url } from "@/app/api/auth/passkey/_lib";
+import { getClientIP } from "@/lib/security/ip";
+import { logger } from "@/lib/logger";
+import { z } from "zod";
 
 const verifySchema = z.object({
   credential: z.record(z.string(), z.unknown()),
-  deviceName: z.string().max(100).optional().default('Passkey'),
+  deviceName: z.string().max(100).optional().default("Passkey"),
 });
 
 /**
@@ -50,49 +53,64 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return jsonUnauthorized('Authentication required');
+      return jsonUnauthorized("Authentication required");
     }
 
-    const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: parseError } = await parseJsonBody(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (parseError) return parseError;
 
     const parsed = verifySchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError('Invalid registration payload', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError(
+        "Invalid registration payload",
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
     }
 
     const { credential: credentialResponse, deviceName } = parsed.data;
 
     // Extract challenge from credential response to look it up
-    const clientDataJSON = (credentialResponse as Record<string, unknown>).response as
-      | Record<string, unknown>
-      | undefined;
+    const clientDataJSON = (credentialResponse as Record<string, unknown>)
+      .response as Record<string, unknown> | undefined;
     if (!clientDataJSON) {
-      return jsonError('Invalid credential response', 400, ERROR_CODES.BAD_REQUEST);
+      return jsonError(
+        "Invalid credential response",
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
 
-    const host = request.headers.get('host') ?? new URL(request.url).hostname;
+    const host = request.headers.get("host") ?? new URL(request.url).hostname;
     const rpId = getRelyingPartyId(host);
-    const origin = request.headers.get('origin') ?? new URL(request.url).origin;
+    const origin = request.headers.get("origin") ?? new URL(request.url).origin;
     const expectedOrigin = getExpectedOrigin(origin);
 
     // Try to find the challenge for this user from database
     // We need to decode the challenge from the clientDataJSON
-    const regResponse = credentialResponse as unknown as RegistrationResponseJSON;
+    const regResponse =
+      credentialResponse as unknown as RegistrationResponseJSON;
 
     // Decode clientDataJSON to get the challenge
-    const clientDataStr = Buffer.from(regResponse.response.clientDataJSON, 'base64url').toString(
-      'utf-8',
-    );
+    const clientDataStr = Buffer.from(
+      regResponse.response.clientDataJSON,
+      "base64url",
+    ).toString("utf-8");
     const clientData = JSON.parse(clientDataStr) as { challenge: string };
     const challengeFromClient = clientData.challenge;
 
     // Consume challenge from DB (one-time use, validates expiry)
-    const storedChallenge = await consumeChallenge(challengeFromClient, 'registration');
+    const storedChallenge = await consumeChallenge(
+      challengeFromClient,
+      "registration",
+    );
 
     if (!storedChallenge) {
       return jsonError(
-        'Challenge expired or invalid. Please try again.',
+        "Challenge expired or invalid. Please try again.",
         400,
         ERROR_CODES.BAD_REQUEST,
       );
@@ -100,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     // Verify user ID matches
     if (storedChallenge.userId !== user.id) {
-      return jsonError('Challenge mismatch', 400, ERROR_CODES.BAD_REQUEST);
+      return jsonError("Challenge mismatch", 400, ERROR_CODES.BAD_REQUEST);
     }
 
     const verification = await verifyRegistrationResponse({
@@ -112,7 +130,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (!verification.verified || !verification.registrationInfo) {
-      return jsonError('Passkey verification failed', 400, ERROR_CODES.BAD_REQUEST);
+      return jsonError(
+        "Passkey verification failed",
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
 
     const { credential } = verification.registrationInfo;
@@ -124,13 +146,13 @@ export async function POST(request: NextRequest) {
       publicKey: bufferToBase64Url(credential.publicKey),
       counter: credential.counter,
       transports: (credentialResponse as Record<string, unknown>).response
-        ? (((credentialResponse as Record<string, Record<string, unknown>>).response
-            ?.transports as string[]) ?? [])
+        ? (((credentialResponse as Record<string, Record<string, unknown>>)
+            .response?.transports as string[]) ?? [])
         : [],
       deviceName,
     });
 
-    logger.info('WebAuthn credential registered', {
+    logger.info("WebAuthn credential registered", {
       userId: user.id,
       credentialId: credential.id,
       deviceName,
@@ -142,7 +164,11 @@ export async function POST(request: NextRequest) {
       deviceName,
     });
   } catch (error) {
-    logger.error('WebAuthn register verify error:', error);
-    return jsonError('Failed to register passkey', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("WebAuthn register verify error:", error);
+    return jsonError(
+      "Failed to register passkey",
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 }

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { Button } from './button';
-import { MQLink } from './link';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import React from "react";
+import Link from "next/link";
+import { Button } from "./button";
+import { MQLink } from "./link";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
 
 interface NavbarProps {
   title?: string;
@@ -16,17 +16,22 @@ interface NavbarProps {
   actionLabel?: string;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ title, navItems, onAction, actionLabel }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  title,
+  navItems,
+  onAction,
+  actionLabel,
+}) => {
   const { t } = useTypedTranslation();
 
-  const defaultTitle = t('macquarieUniversity');
+  const defaultTitle = t("macquarieUniversity");
   const defaultNavItems = [
-    { label: t('navHome'), href: '/' },
-    { label: t('navAbout'), href: '/about' },
-    { label: t('navPrograms'), href: '/programs' },
-    { label: t('navContact'), href: '/contact' },
+    { label: t("navHome"), href: "/" },
+    { label: t("navAbout"), href: "/about" },
+    { label: t("navPrograms"), href: "/programs" },
+    { label: t("navContact"), href: "/contact" },
   ];
-  const defaultActionLabel = t('applyNow');
+  const defaultActionLabel = t("applyNow");
 
   const finalTitle = title || defaultTitle;
   const finalNavItems = navItems || defaultNavItems;

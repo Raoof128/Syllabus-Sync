@@ -1,4 +1,4 @@
-import crypto from 'node:crypto';
+import crypto from "node:crypto";
 
 /**
  * Produce a short, stable identifier suitable for logs/keys.
@@ -9,11 +9,10 @@ import crypto from 'node:crypto';
  */
 export function sha256HexPrefix(input: string, hexChars: number = 16): string {
   const normalized = input.trim().toLowerCase();
-  const full = crypto.createHash('sha256').update(normalized).digest('hex');
+  const full = crypto.createHash("sha256").update(normalized).digest("hex");
   return full.slice(0, Math.max(8, Math.min(64, hexChars)));
 }
 
 export function emailKeyPrefix(email: string): string {
   return sha256HexPrefix(email, 16);
 }
-

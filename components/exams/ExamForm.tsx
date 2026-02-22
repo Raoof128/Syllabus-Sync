@@ -1,13 +1,13 @@
 // components/exams/ExamForm.tsx
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { Deadline } from '@/lib/types';
-import { v4 as uuidv4 } from 'uuid';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
+import { useUnitsStore } from "@/lib/store/unitsStore";
+import { Deadline } from "@/lib/types";
+import { v4 as uuidv4 } from "uuid";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 import {
   Dialog,
   DialogContent,
@@ -15,26 +15,33 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/mq/button';
-import { Input } from '@/components/ui/mq/input';
-import { toastUtils } from '@/lib/utils/toast';
-import { useRetry } from '@/lib/hooks/use-retry';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/mq/button";
+import { Input } from "@/components/ui/mq/input";
+import { toastUtils } from "@/lib/utils/toast";
+import { useRetry } from "@/lib/hooks/use-retry";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { PRIORITY_LEVELS } from '@/lib/constants';
-import { format, isValid } from 'date-fns';
-import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
-import { UNIT_COLORS } from '@/lib/config';
-import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
-import { cn } from '@/lib/utils';
-import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
+} from "@/components/ui/select";
+import { PRIORITY_LEVELS } from "@/lib/constants";
+import { format, isValid } from "date-fns";
+import {
+  errorHandler,
+  createFormValidator,
+  validationRules,
+} from "@/lib/utils/errorHandling";
+import { UNIT_COLORS } from "@/lib/config";
+import {
+  validateBuildingStrict,
+  BUILDING_VALIDATION_ERROR,
+} from "@/lib/utils/buildingValidation";
+import { cn } from "@/lib/utils";
+import BuildingAutocomplete from "@/components/ui/BuildingAutocomplete";
 
 interface ExamFormProps {
   open: boolean;
@@ -42,20 +49,24 @@ interface ExamFormProps {
   editExam?: Deadline | null;
 }
 
-export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps) {
+export default function ExamForm({
+  open,
+  onOpenChange,
+  editExam,
+}: ExamFormProps) {
   const { t } = useTypedTranslation();
   const { addDeadline, updateDeadline, removeDeadline } = useDeadlinesStore();
   const units = useUnitsStore((state) => state.units);
 
-  const [title, setTitle] = useState('');
-  const [unitCode, setUnitCode] = useState('');
-  const [building, setBuilding] = useState('');
-  const [room, setRoom] = useState(''); // Optional room field
-  const [color, setColor] = useState<string>(''); // Empty means inherit from unit
+  const [title, setTitle] = useState("");
+  const [unitCode, setUnitCode] = useState("");
+  const [building, setBuilding] = useState("");
+  const [room, setRoom] = useState(""); // Optional room field
+  const [color, setColor] = useState<string>(""); // Empty means inherit from unit
   const [useCustomColor, setUseCustomColor] = useState(false);
-  const [dueDate, setDueDate] = useState('');
-  const [dueTime, setDueTime] = useState('09:00'); // Exams typically start in the morning
-  const [priority, setPriority] = useState<Deadline['priority']>('High'); // Exams are usually high priority
+  const [dueDate, setDueDate] = useState("");
+  const [dueTime, setDueTime] = useState("09:00"); // Exams typically start in the morning
+  const [priority, setPriority] = useState<Deadline["priority"]>("High"); // Exams are usually high priority
   const [completed, setCompleted] = useState(false);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -88,19 +99,19 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
   const { execute: saveWithRetry } = useRetry(performSave, {
     maxAttempts: 3,
     showToastOnError: false,
-    errorMessage: t('failedToSaveDeadline'),
+    errorMessage: t("failedToSaveDeadline"),
   });
 
   const resetForm = () => {
-    setTitle('');
-    setUnitCode('');
-    setBuilding('');
-    setRoom('');
-    setColor('');
+    setTitle("");
+    setUnitCode("");
+    setBuilding("");
+    setRoom("");
+    setColor("");
     setUseCustomColor(false);
-    setDueDate('');
-    setDueTime('09:00');
-    setPriority('High');
+    setDueDate("");
+    setDueTime("09:00");
+    setPriority("High");
     setCompleted(false);
     setErrors({});
   };
@@ -109,23 +120,23 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
     if (editExam) {
       setTitle(editExam.title);
       setUnitCode(editExam.unitCode);
-      setBuilding(editExam.building || '');
-      setRoom(editExam.room || ''); // Load optional room
+      setBuilding(editExam.building || "");
+      setRoom(editExam.room || ""); // Load optional room
       // If exam has a custom color, use it; otherwise inherit from unit
       if (editExam.color) {
         setColor(editExam.color);
         setUseCustomColor(true);
       } else {
-        setColor('');
+        setColor("");
         setUseCustomColor(false);
       }
       const parsedDate = new Date(editExam.dueDate);
       if (isValid(parsedDate)) {
-        setDueDate(format(parsedDate, 'yyyy-MM-dd'));
-        setDueTime(format(parsedDate, 'HH:mm'));
+        setDueDate(format(parsedDate, "yyyy-MM-dd"));
+        setDueTime(format(parsedDate, "HH:mm"));
       } else {
-        setDueDate('');
-        setDueTime('09:00');
+        setDueDate("");
+        setDueTime("09:00");
       }
       setPriority(editExam.priority);
       setCompleted(editExam.completed);
@@ -137,13 +148,13 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
 
   const validateForm = (): boolean => {
     const validator = createFormValidator({
-      title: validationRules.required(t('title')),
-      unitCode: validationRules.required(t('unit')),
-      dueDate: validationRules.required(t('dueDate')),
-      dueTime: validationRules.required(t('time' as TranslationKey) || 'Time'),
+      title: validationRules.required(t("title")),
+      unitCode: validationRules.required(t("unit")),
+      dueDate: validationRules.required(t("dueDate")),
+      dueTime: validationRules.required(t("time" as TranslationKey) || "Time"),
       building: (value) => {
         const requiredError = validationRules.required(
-          t('building' as TranslationKey) || 'Building',
+          t("building" as TranslationKey) || "Building",
         )(value);
         if (requiredError) return requiredError;
         // Validate building strictly against map data - exact match only
@@ -155,7 +166,13 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       },
     });
 
-    const validationErrors = validator({ title, unitCode, dueDate, dueTime, building });
+    const validationErrors = validator({
+      title,
+      unitCode,
+      dueDate,
+      dueTime,
+      building,
+    });
     const formErrors = errorHandler.handleValidationError(validationErrors);
 
     setErrors(formErrors);
@@ -167,12 +184,14 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
 
     setIsSaving(true);
 
-    const [year, month, day] = dueDate.split('-').map(Number);
-    const timeParts = dueTime ? dueTime.split(':') : [];
+    const [year, month, day] = dueDate.split("-").map(Number);
+    const timeParts = dueTime ? dueTime.split(":") : [];
     const parsedHours = Number(timeParts[0]);
     const parsedMinutes = Number(timeParts[1]);
     const hasValidTime =
-      timeParts.length === 2 && !Number.isNaN(parsedHours) && !Number.isNaN(parsedMinutes);
+      timeParts.length === 2 &&
+      !Number.isNaN(parsedHours) &&
+      !Number.isNaN(parsedMinutes);
     const dueDateObj = new Date(
       year,
       month - 1,
@@ -191,7 +210,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       color: useCustomColor ? color : undefined, // Only save custom color
       dueDate: dueDateObj,
       priority,
-      type: 'Exam', // Fixed type for exams
+      type: "Exam", // Fixed type for exams
       completed,
       createdAt: editExam?.createdAt || new Date(),
     };
@@ -201,12 +220,12 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       if (result !== null) {
         if (editExam) {
           toastUtils.success(
-            t('examUpdated' as TranslationKey) || 'Exam Updated',
+            t("examUpdated" as TranslationKey) || "Exam Updated",
             `"${examData.title}" has been updated successfully.`,
           );
         } else {
           toastUtils.success(
-            t('examAdded' as TranslationKey) || 'Exam Added',
+            t("examAdded" as TranslationKey) || "Exam Added",
             `"${examData.title}" has been added successfully.`,
           );
         }
@@ -228,8 +247,8 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
     if (editExam) {
       removeDeadline(editExam.id);
       toastUtils.success(
-        t('examDeleted' as TranslationKey) || 'Exam Deleted',
-        `"${editExam.title}" ${t('deletedMsg')}`,
+        t("examDeleted" as TranslationKey) || "Exam Deleted",
+        `"${editExam.title}" ${t("deletedMsg")}`,
       );
       onOpenChange(false);
       resetForm();
@@ -249,13 +268,15 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
           <DialogHeader>
             <DialogTitle>
               {editExam
-                ? t('editExam' as TranslationKey) || 'Edit Exam'
-                : t('addExam' as TranslationKey) || 'Add Exam'}
+                ? t("editExam" as TranslationKey) || "Edit Exam"
+                : t("addExam" as TranslationKey) || "Add Exam"}
             </DialogTitle>
             <DialogDescription>
               {editExam
-                ? t('updateExamDetails' as TranslationKey) || 'Update the exam details below.'
-                : t('fillExamDetails' as TranslationKey) || 'Fill in the exam details below.'}
+                ? t("updateExamDetails" as TranslationKey) ||
+                  "Update the exam details below."
+                : t("fillExamDetails" as TranslationKey) ||
+                  "Fill in the exam details below."}
             </DialogDescription>
           </DialogHeader>
 
@@ -263,20 +284,27 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="exam-title">
-                {t('title')} <span className="text-mq-error">*</span>
+                {t("title")} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="exam-title"
-                placeholder={t('examTitlePlaceholder' as TranslationKey) || 'e.g., Final Exam'}
+                placeholder={
+                  t("examTitlePlaceholder" as TranslationKey) ||
+                  "e.g., Final Exam"
+                }
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={Boolean(errors.title)}
                 aria-required="true"
-                aria-describedby={errors.title ? 'exam-title-error' : undefined}
-                className={errors.title ? 'border-mq-error' : ''}
+                aria-describedby={errors.title ? "exam-title-error" : undefined}
+                className={errors.title ? "border-mq-error" : ""}
               />
               {errors.title && (
-                <p id="exam-title-error" className="text-sm text-mq-error" role="alert">
+                <p
+                  id="exam-title-error"
+                  className="text-sm text-mq-error"
+                  role="alert"
+                >
                   {errors.title}
                 </p>
               )}
@@ -285,17 +313,19 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             {/* Unit */}
             <div className="space-y-2">
               <Label htmlFor="exam-unit">
-                {t('unitCode')} <span className="text-mq-error">*</span>
+                {t("unitCode")} <span className="text-mq-error">*</span>
               </Label>
               <Select value={unitCode} onValueChange={setUnitCode}>
                 <SelectTrigger
                   id="exam-unit"
-                  className={errors.unitCode ? 'border-mq-error' : ''}
+                  className={errors.unitCode ? "border-mq-error" : ""}
                   aria-invalid={Boolean(errors.unitCode)}
                   aria-required="true"
-                  aria-describedby={errors.unitCode ? 'exam-unit-error' : undefined}
+                  aria-describedby={
+                    errors.unitCode ? "exam-unit-error" : undefined
+                  }
                 >
-                  <SelectValue placeholder={t('selectUnit')} />
+                  <SelectValue placeholder={t("selectUnit")} />
                 </SelectTrigger>
                 <SelectContent>
                   {units.map((unit) => (
@@ -306,7 +336,11 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 </SelectContent>
               </Select>
               {errors.unitCode && (
-                <p id="exam-unit-error" className="text-sm text-mq-error" role="alert">
+                <p
+                  id="exam-unit-error"
+                  className="text-sm text-mq-error"
+                  role="alert"
+                >
                   {errors.unitCode}
                 </p>
               )}
@@ -316,7 +350,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="exam-building">
-                  {t('building' as TranslationKey) || 'Building'}{' '}
+                  {t("building" as TranslationKey) || "Building"}{" "}
                   <span className="text-mq-error">*</span>
                 </Label>
                 <BuildingAutocomplete
@@ -324,18 +358,22 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   onChange={setBuilding}
                   error={errors.building}
                   required
-                  placeholder={t('buildingPlaceholder')}
+                  placeholder={t("buildingPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="exam-room">{t('room' as TranslationKey) || 'Room'}</Label>
+                <Label htmlFor="exam-room">
+                  {t("room" as TranslationKey) || "Room"}
+                </Label>
                 <Input
                   id="exam-room"
-                  placeholder={t('roomPlaceholder')}
+                  placeholder={t("roomPlaceholder")}
                   value={room}
                   onChange={(e) => setRoom(e.target.value)}
                 />
-                <p className="text-xs text-mq-content-tertiary">{t('optional')}</p>
+                <p className="text-xs text-mq-content-tertiary">
+                  {t("optional")}
+                </p>
               </div>
             </div>
 
@@ -343,7 +381,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="exam-date">
-                  {t('examDate' as TranslationKey) || 'Exam Date'}{' '}
+                  {t("examDate" as TranslationKey) || "Exam Date"}{" "}
                   <span className="text-mq-error">*</span>
                 </Label>
                 <Input
@@ -353,18 +391,24 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   onChange={(e) => setDueDate(e.target.value)}
                   aria-invalid={Boolean(errors.dueDate)}
                   aria-required="true"
-                  aria-describedby={errors.dueDate ? 'exam-date-error' : undefined}
-                  className={errors.dueDate ? 'border-mq-error' : ''}
+                  aria-describedby={
+                    errors.dueDate ? "exam-date-error" : undefined
+                  }
+                  className={errors.dueDate ? "border-mq-error" : ""}
                 />
                 {errors.dueDate && (
-                  <p id="exam-date-error" className="text-sm text-mq-error" role="alert">
+                  <p
+                    id="exam-date-error"
+                    className="text-sm text-mq-error"
+                    role="alert"
+                  >
                     {errors.dueDate}
                   </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="exam-time">
-                  {t('examTime' as TranslationKey) || 'Exam Time'}{' '}
+                  {t("examTime" as TranslationKey) || "Exam Time"}{" "}
                   <span className="text-mq-error">*</span>
                 </Label>
                 <Input
@@ -374,7 +418,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   onChange={(e) => setDueTime(e.target.value)}
                   aria-invalid={Boolean(errors.dueTime)}
                   aria-required="true"
-                  className={errors.dueTime ? 'border-mq-error' : ''}
+                  className={errors.dueTime ? "border-mq-error" : ""}
                 />
                 {errors.dueTime && (
                   <p className="text-sm text-mq-error" role="alert">
@@ -386,13 +430,13 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
 
             {/* Priority */}
             <div className="space-y-2">
-              <Label htmlFor="exam-priority">{t('priority')}</Label>
+              <Label htmlFor="exam-priority">{t("priority")}</Label>
               <Select
                 value={priority}
-                onValueChange={(v) => setPriority(v as Deadline['priority'])}
+                onValueChange={(v) => setPriority(v as Deadline["priority"])}
               >
                 <SelectTrigger id="exam-priority">
-                  <SelectValue placeholder={t('selectPriority')} />
+                  <SelectValue placeholder={t("selectPriority")} />
                 </SelectTrigger>
                 <SelectContent>
                   {PRIORITY_LEVELS.map((p) => (
@@ -406,7 +450,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
 
             {/* Color Selection */}
             <div className="space-y-2">
-              <Label>{t('color' as TranslationKey) || 'Color'}</Label>
+              <Label>{t("color" as TranslationKey) || "Color"}</Label>
 
               {/* Unit Color Inheritance Toggle */}
               <div className="flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-surface/50">
@@ -416,14 +460,15 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-mq-content">
-                    {useCustomColor ? 'Custom Color' : 'Inherits Unit Color'}
+                    {useCustomColor ? "Custom Color" : "Inherits Unit Color"}
                   </p>
                   <p className="text-xs text-mq-content-secondary truncate">
                     {useCustomColor
-                      ? UNIT_COLORS.find((c) => c.value === color)?.name || color
+                      ? UNIT_COLORS.find((c) => c.value === color)?.name ||
+                        color
                       : selectedUnit
                         ? `From ${selectedUnit.code}`
-                        : 'Select a unit first'}
+                        : "Select a unit first"}
                   </p>
                 </div>
                 <button
@@ -436,7 +481,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   }}
                   className="text-xs px-2 py-1 rounded border border-mq-border hover:bg-mq-hover-background transition-colors"
                 >
-                  {useCustomColor ? 'Use Unit Color' : 'Customize'}
+                  {useCustomColor ? "Use Unit Color" : "Customize"}
                 </button>
               </div>
 
@@ -449,10 +494,10 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                       type="button"
                       onClick={() => setColor(c.value)}
                       className={cn(
-                        'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                        "w-8 h-8 rounded-full border-2 shrink-0 transition-all",
                         color === c.value
-                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
-                          : 'border-transparent hover:border-mq-border',
+                          ? "border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset"
+                          : "border-transparent hover:border-mq-border",
                       )}
                       style={{ backgroundColor: c.value }}
                       title={t(c.translationKey as TranslationKey)}
@@ -467,19 +512,26 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
           <DialogFooter className="flex gap-2">
             {editExam && (
               <Button variant="destructive" onClick={handleDelete}>
-                {t('delete')}
+                {t("delete")}
               </Button>
             )}
             <div className="flex-1" />
-            <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
-              {t('cancel')}
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isSaving}
+            >
+              {t("cancel")}
             </Button>
-            <Button onClick={handleSave} disabled={units.length === 0 || isSaving}>
+            <Button
+              onClick={handleSave}
+              disabled={units.length === 0 || isSaving}
+            >
               {isSaving
-                ? t('savingChanges' as TranslationKey) || 'Saving...'
+                ? t("savingChanges" as TranslationKey) || "Saving..."
                 : editExam
-                  ? t('saveChanges')
-                  : t('addExam' as TranslationKey) || 'Add Exam'}
+                  ? t("saveChanges")
+                  : t("addExam" as TranslationKey) || "Add Exam"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -489,18 +541,23 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t('deleteExam' as TranslationKey) || 'Delete Exam'}</DialogTitle>
+            <DialogTitle>
+              {t("deleteExam" as TranslationKey) || "Delete Exam"}
+            </DialogTitle>
             <DialogDescription>
-              {t('deleteExamConfirm' as TranslationKey) ||
-                'Are you sure you want to delete this exam? This action cannot be undone.'}
+              {t("deleteExamConfirm" as TranslationKey) ||
+                "Are you sure you want to delete this exam? This action cannot be undone."}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
-              {t('cancel')}
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              {t("cancel")}
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              {t('delete')}
+              {t("delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

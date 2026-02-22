@@ -20,16 +20,16 @@
 //   </>
 // );
 // ============================================================================
-'use client';
+"use client";
 
-import { useMemo, useId, createElement } from 'react';
-import type { ReactNode } from 'react';
+import { useMemo, useId, createElement } from "react";
+import type { ReactNode } from "react";
 import {
   generateCircularDisplacementMap,
   generateRoundedRectDisplacementMap,
   generateSpecularMap,
   type SurfaceType,
-} from '@/components/ui/LiquidFilter';
+} from "@/components/ui/LiquidFilter";
 
 interface UseLiquidGlassOptions {
   /** Width of the element (for rounded rect) */
@@ -77,7 +77,7 @@ export function useLiquidGlass({
   width = 256,
   height = 256,
   cornerRadius = 20,
-  surfaceType = 'squircle',
+  surfaceType = "squircle",
   bezelWidth = 0.4,
   thickness = 1.0,
   specularIntensity = 0.6,
@@ -87,15 +87,20 @@ export function useLiquidGlass({
   size = 256,
 }: UseLiquidGlassOptions = {}): UseLiquidGlassResult {
   const uniqueId = useId();
-  const filterId = `liquid-glass-${uniqueId.replace(/:/g, '')}`;
+  const filterId = `liquid-glass-${uniqueId.replace(/:/g, "")}`;
 
   const displacementMap = useMemo(() => {
-    if (typeof window === 'undefined') {
-      return { dataUrl: '', maxDisplacement: 20, width: 256, height: 256 };
+    if (typeof window === "undefined") {
+      return { dataUrl: "", maxDisplacement: 20, width: 256, height: 256 };
     }
 
     if (circular) {
-      return generateCircularDisplacementMap(size, surfaceType, bezelWidth, thickness);
+      return generateCircularDisplacementMap(
+        size,
+        surfaceType,
+        bezelWidth,
+        thickness,
+      );
     }
 
     return generateRoundedRectDisplacementMap(
@@ -106,15 +111,30 @@ export function useLiquidGlass({
       bezelWidth,
       thickness,
     );
-  }, [circular, size, width, height, cornerRadius, surfaceType, bezelWidth, thickness]);
+  }, [
+    circular,
+    size,
+    width,
+    height,
+    cornerRadius,
+    surfaceType,
+    bezelWidth,
+    thickness,
+  ]);
 
   const specularMapUrl = useMemo(() => {
-    if (!includeSpecular || typeof window === 'undefined') {
+    if (!includeSpecular || typeof window === "undefined") {
       return null;
     }
 
     const mapSize = circular ? size : Math.max(width, height);
-    return generateSpecularMap(mapSize, surfaceType, bezelWidth, lightAngle, specularIntensity);
+    return generateSpecularMap(
+      mapSize,
+      surfaceType,
+      bezelWidth,
+      lightAngle,
+      specularIntensity,
+    );
   }, [
     includeSpecular,
     circular,
@@ -135,78 +155,78 @@ export function useLiquidGlass({
     // Build filter children
     const filterChildren: ReactNode[] = [
       // Displacement map image
-      createElement('feImage', {
-        key: 'displacement',
+      createElement("feImage", {
+        key: "displacement",
         href: displacementMap.dataUrl,
-        x: '0',
-        y: '0',
-        width: '100%',
-        height: '100%',
-        preserveAspectRatio: 'none',
-        result: 'displacement_map',
+        x: "0",
+        y: "0",
+        width: "100%",
+        height: "100%",
+        preserveAspectRatio: "none",
+        result: "displacement_map",
       }),
       // Displacement map filter
-      createElement('feDisplacementMap', {
-        key: 'refraction',
-        in: 'SourceGraphic',
-        in2: 'displacement_map',
+      createElement("feDisplacementMap", {
+        key: "refraction",
+        in: "SourceGraphic",
+        in2: "displacement_map",
         scale: displacementMap.maxDisplacement,
-        xChannelSelector: 'R',
-        yChannelSelector: 'G',
-        result: 'refracted',
+        xChannelSelector: "R",
+        yChannelSelector: "G",
+        result: "refracted",
       }),
     ];
 
     // Add specular if enabled
     if (specularMapUrl) {
       filterChildren.push(
-        createElement('feImage', {
-          key: 'specular',
+        createElement("feImage", {
+          key: "specular",
           href: specularMapUrl,
-          x: '0',
-          y: '0',
-          width: '100%',
-          height: '100%',
-          preserveAspectRatio: 'none',
-          result: 'specular_map',
+          x: "0",
+          y: "0",
+          width: "100%",
+          height: "100%",
+          preserveAspectRatio: "none",
+          result: "specular_map",
         }),
-        createElement('feBlend', {
-          key: 'blend',
-          in: 'specular_map',
-          in2: 'refracted',
-          mode: 'screen',
+        createElement("feBlend", {
+          key: "blend",
+          in: "specular_map",
+          in2: "refracted",
+          mode: "screen",
         }),
       );
     }
 
     // Create filter element
     const filter = createElement(
-      'filter',
+      "filter",
       {
         id: filterId,
-        x: '-50%',
-        y: '-50%',
-        width: '200%',
-        height: '200%',
-        colorInterpolationFilters: 'sRGB',
+        x: "-50%",
+        y: "-50%",
+        width: "200%",
+        height: "200%",
+        colorInterpolationFilters: "sRGB",
       },
       ...filterChildren,
     );
 
     // Create defs element
-    const defs = createElement('defs', { key: 'defs' }, filter);
+    const defs = createElement("defs", { key: "defs" }, filter);
 
     // Create SVG element
     return createElement(
-      'svg',
+      "svg",
       {
-        'aria-hidden': true,
+        "aria-hidden": true,
         style: {
-          position: 'absolute' as const,
+          position: "absolute" as const,
           width: 0,
           height: 0,
-          overflow: 'hidden' as const,
-          pointerEvents: 'none' as const,
+          overflow: "hidden" as const,
+          pointerEvents: "none" as const,
         },
       },
       defs,
@@ -228,7 +248,7 @@ export function useLiquidGlass({
 export const LIQUID_GLASS_PRESETS = {
   /** Standard glass panel (Apple default) */
   panel: {
-    surfaceType: 'squircle' as SurfaceType,
+    surfaceType: "squircle" as SurfaceType,
     bezelWidth: 0.4,
     thickness: 1.0,
     specularIntensity: 0.6,
@@ -236,7 +256,7 @@ export const LIQUID_GLASS_PRESETS = {
   },
   /** Magnifying glass effect */
   magnifier: {
-    surfaceType: 'circle' as SurfaceType,
+    surfaceType: "circle" as SurfaceType,
     bezelWidth: 0.6,
     thickness: 1.5,
     specularIntensity: 0.8,
@@ -244,7 +264,7 @@ export const LIQUID_GLASS_PRESETS = {
   },
   /** Switch/toggle (lip surface) */
   toggle: {
-    surfaceType: 'lip' as SurfaceType,
+    surfaceType: "lip" as SurfaceType,
     bezelWidth: 0.5,
     thickness: 1.0,
     specularIntensity: 0.4,
@@ -252,7 +272,7 @@ export const LIQUID_GLASS_PRESETS = {
   },
   /** Concave/bowl effect */
   bowl: {
-    surfaceType: 'concave' as SurfaceType,
+    surfaceType: "concave" as SurfaceType,
     bezelWidth: 0.5,
     thickness: 0.8,
     specularIntensity: 0.3,
@@ -260,7 +280,7 @@ export const LIQUID_GLASS_PRESETS = {
   },
   /** Subtle effect for buttons */
   button: {
-    surfaceType: 'squircle' as SurfaceType,
+    surfaceType: "squircle" as SurfaceType,
     bezelWidth: 0.3,
     thickness: 0.5,
     specularIntensity: 0.4,

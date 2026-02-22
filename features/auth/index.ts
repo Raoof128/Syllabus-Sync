@@ -1,1 +1,1 @@
-export * from './components/FingerprintButton';
+export * from "./components/FingerprintButton";

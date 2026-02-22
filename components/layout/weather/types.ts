@@ -5,7 +5,14 @@ export type SydneyRegion = {
   lon: number;
 };
 
-export type Vibe = 'sunny' | 'cloudy' | 'rainy' | 'thunder' | 'snowy' | 'windy' | 'night';
+export type Vibe =
+  | "sunny"
+  | "cloudy"
+  | "rainy"
+  | "thunder"
+  | "snowy"
+  | "windy"
+  | "night";
 
 export interface WeatherData {
   temp: number;
@@ -14,7 +21,7 @@ export interface WeatherData {
   windSpeed?: number;
   condition: string;
   location: string;
-  locationType?: 'gps' | 'building' | 'saved' | 'approx';
+  locationType?: "gps" | "building" | "saved" | "approx";
   vibe: Vibe;
   isDay: boolean;
   timestamp?: number;

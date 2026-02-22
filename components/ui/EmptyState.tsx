@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/mq/button';
-import { MagicCard } from '@/components/ui/MagicCard';
-import type { TranslationKey } from '@/lib/i18n/translations';
+import React from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/mq/button";
+import { MagicCard } from "@/components/ui/MagicCard";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -29,17 +29,20 @@ export function EmptyState({
   t,
   isMagicCard = true,
 }: EmptyStateProps) {
-  const resolvedTitle = typeof title === 'function' ? title(t) : title;
-  const resolvedDescription = typeof description === 'function' ? description(t) : description;
+  const resolvedTitle = typeof title === "function" ? title(t) : title;
+  const resolvedDescription =
+    typeof description === "function" ? description(t) : description;
 
   const content = (
-    <div className={cn('text-center py-12', className)}>
+    <div className={cn("text-center py-12", className)}>
       {icon && (
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center text-mq-content-tertiary">
           {icon}
         </div>
       )}
-      <h3 className="text-mq-lg font-semibold text-mq-content mb-2">{resolvedTitle}</h3>
+      <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
+        {resolvedTitle}
+      </h3>
       {resolvedDescription && (
         <p className="text-mq-content-secondary text-sm max-w-md mx-auto mb-4">
           {resolvedDescription}

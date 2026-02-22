@@ -1,19 +1,19 @@
-import { cookies } from 'next/headers';
-import { NextRequest } from 'next/server';
+import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
 import {
   verifyAuthenticationResponse,
   type AuthenticationResponseJSON,
   type AuthenticatorTransportFuture,
-} from '@simplewebauthn/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { createServerClient } from '@/lib/supabase/server';
+} from "@simplewebauthn/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createServerClient } from "@/lib/supabase/server";
 import {
   jsonSuccess,
   jsonError,
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
-} from '@/app/api/_lib/response';
+} from "@/app/api/_lib/response";
 import {
   getRpId,
   getOrigin,
@@ -21,9 +21,9 @@ import {
   PASSKEY_USER_COOKIE,
   clearPasskeyCookies,
   base64UrlToBuffer,
-} from '@/app/api/auth/passkey/_lib';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+} from "@/app/api/auth/passkey/_lib";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const verifySchema = z.object({
   credential: z.record(z.string(), z.unknown()),
@@ -33,15 +33,26 @@ export async function POST(request: NextRequest) {
   try {
     const adminClient = createAdminClient();
     if (!adminClient) {
-      return jsonError('Passkey login is not configured', 503, ERROR_CODES.EXTERNAL_SERVICE_ERROR);
+      return jsonError(
+        "Passkey login is not configured",
+        503,
+        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+      );
     }
 
-    const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: parseError } = await parseJsonBody(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (parseError) return parseError;
 
     const parsed = verifySchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError('Invalid passkey payload', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError(
+        "Invalid passkey payload",
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
     }
 
     const cookieStore = await cookies();
@@ -49,25 +60,35 @@ export async function POST(request: NextRequest) {
     const userId = cookieStore.get(PASSKEY_USER_COOKIE)?.value;
 
     if (!expectedChallenge || !userId) {
-      return jsonError('Passkey challenge expired', 400, ERROR_CODES.BAD_REQUEST);
+      return jsonError(
+        "Passkey challenge expired",
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
 
-    const { data: userRecord, error: userError } = await adminClient.auth.admin.getUserById(userId);
+    const { data: userRecord, error: userError } =
+      await adminClient.auth.admin.getUserById(userId);
     if (userError || !userRecord?.user) {
-      return jsonError('Passkey login unavailable', 404, ERROR_CODES.NOT_FOUND);
+      return jsonError("Passkey login unavailable", 404, ERROR_CODES.NOT_FOUND);
     }
 
-    const metadata = (userRecord.user.user_metadata || {}) as Record<string, unknown>;
+    const metadata = (userRecord.user.user_metadata || {}) as Record<
+      string,
+      unknown
+    >;
     const credentialId = metadata.biometric_credential_id as string | undefined;
     const publicKey = metadata.biometric_public_key as string | undefined;
     const counter = (metadata.biometric_counter as number | undefined) ?? 0;
 
     if (!credentialId || !publicKey) {
-      return jsonError('Passkey login unavailable', 404, ERROR_CODES.NOT_FOUND);
+      return jsonError("Passkey login unavailable", 404, ERROR_CODES.NOT_FOUND);
     }
 
     const transports =
-      (metadata.biometric_transports as AuthenticatorTransportFuture[] | undefined) ?? undefined;
+      (metadata.biometric_transports as
+        | AuthenticatorTransportFuture[]
+        | undefined) ?? undefined;
 
     const verification = await verifyAuthenticationResponse({
       response: parsed.data.credential as unknown as AuthenticationResponseJSON,
@@ -84,46 +105,67 @@ export async function POST(request: NextRequest) {
     });
 
     if (!verification.verified || !verification.authenticationInfo) {
-      return jsonError('Passkey verification failed', 401, ERROR_CODES.UNAUTHORIZED);
+      return jsonError(
+        "Passkey verification failed",
+        401,
+        ERROR_CODES.UNAUTHORIZED,
+      );
     }
 
     const newCounter = verification.authenticationInfo.newCounter;
-    const { error: updateError } = await adminClient.auth.admin.updateUserById(userId, {
-      user_metadata: {
-        biometric_counter: newCounter,
-        biometric_updated_at: new Date().toISOString(),
+    const { error: updateError } = await adminClient.auth.admin.updateUserById(
+      userId,
+      {
+        user_metadata: {
+          biometric_counter: newCounter,
+          biometric_updated_at: new Date().toISOString(),
+        },
       },
-    });
+    );
 
     if (updateError) {
-      logger.error('Passkey counter update failed:', updateError.message);
+      logger.error("Passkey counter update failed:", updateError.message);
     }
 
     const serverClient = await createServerClient();
-    const { data: linkData, error: linkError } = await adminClient.auth.admin.generateLink({
-      type: 'magiclink',
-      email: userRecord.user.email ?? '',
-    });
+    const { data: linkData, error: linkError } =
+      await adminClient.auth.admin.generateLink({
+        type: "magiclink",
+        email: userRecord.user.email ?? "",
+      });
 
     if (linkError || !linkData?.properties?.email_otp) {
-      return jsonError('Failed to complete sign-in', 500, ERROR_CODES.INTERNAL_ERROR);
+      return jsonError(
+        "Failed to complete sign-in",
+        500,
+        ERROR_CODES.INTERNAL_ERROR,
+      );
     }
 
-    const { data: sessionData, error: verifyError } = await serverClient.auth.verifyOtp({
-      email: userRecord.user.email ?? '',
-      token: linkData.properties.email_otp,
-      type: 'magiclink',
-    });
+    const { data: sessionData, error: verifyError } =
+      await serverClient.auth.verifyOtp({
+        email: userRecord.user.email ?? "",
+        token: linkData.properties.email_otp,
+        type: "magiclink",
+      });
 
     if (verifyError || !sessionData.session) {
-      return jsonError('Failed to complete sign-in', 500, ERROR_CODES.INTERNAL_ERROR);
+      return jsonError(
+        "Failed to complete sign-in",
+        500,
+        ERROR_CODES.INTERNAL_ERROR,
+      );
     }
 
     const response = jsonSuccess({ signedIn: true });
     clearPasskeyCookies(response);
     return response;
   } catch (error) {
-    logger.error('Passkey verify error:', error);
-    return jsonError('Failed to verify passkey', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("Passkey verify error:", error);
+    return jsonError(
+      "Failed to verify passkey",
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 }

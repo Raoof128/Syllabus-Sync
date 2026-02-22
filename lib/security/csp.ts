@@ -37,8 +37,8 @@ export const RTL_SCRIPT = `(function(){try{var stored=localStorage.getItem('lang
  * Generate with: echo -n '<script>' | openssl dgst -sha256 -binary | base64
  */
 export const CSP_SCRIPT_HASHES = {
-  theme: 'sha256-euA/nX7OMJt6hghOJ/qTKFU59who5Fhoj7IWVSgwBss=',
-  rtl: 'sha256-7IUh1B8MYhdIeSKtKih/ERxZm0rfT5jNWzQqe73/yeY=',
+  theme: "sha256-euA/nX7OMJt6hghOJ/qTKFU59who5Fhoj7IWVSgwBss=",
+  rtl: "sha256-7IUh1B8MYhdIeSKtKih/ERxZm0rfT5jNWzQqe73/yeY=",
 };
 
 // ============================================================================
@@ -62,13 +62,13 @@ export interface CSPOptions {
 
 /**
  * Build a Content Security Policy header value
- * 
+ *
  * SECURITY: CSP reporting helps detect and prevent XSS attacks by monitoring
  * policy violations. Configure CSP_REPORT_URI or CSP_REPORT_TO env vars.
  */
 export function buildCSP(options: CSPOptions = {}): string {
   const {
-    upgradeInsecure = process.env.NODE_ENV === 'production',
+    upgradeInsecure = process.env.NODE_ENV === "production",
     additionalScriptSrc = [],
     additionalConnectSrc = [],
     reportUri = process.env.CSP_REPORT_URI,
@@ -77,7 +77,9 @@ export function buildCSP(options: CSPOptions = {}): string {
 
   // Build script-src with hashes
   const scriptHashes = Object.values(CSP_SCRIPT_HASHES).map((h) => `'${h}'`);
-  const scriptSrc = ["'self'", ...scriptHashes, ...additionalScriptSrc].join(' ');
+  const scriptSrc = ["'self'", ...scriptHashes, ...additionalScriptSrc].join(
+    " ",
+  );
 
   const directives = [
     // Default fallback
@@ -97,7 +99,7 @@ export function buildCSP(options: CSPOptions = {}): string {
     "font-src 'self' data: https://r2cdn.perplexity.ai",
 
     // Connect: API endpoints, Supabase, routing services
-    `connect-src 'self' https://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com wss://*.supabase.co ${additionalConnectSrc.join(' ')}`.trim(),
+    `connect-src 'self' https://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com wss://*.supabase.co ${additionalConnectSrc.join(" ")}`.trim(),
 
     // Frame ancestors: Prevent clickjacking
     "frame-ancestors 'self'",
@@ -115,7 +117,7 @@ export function buildCSP(options: CSPOptions = {}): string {
     "object-src 'none'",
 
     // Upgrade insecure in production
-    ...(upgradeInsecure ? ['upgrade-insecure-requests'] : []),
+    ...(upgradeInsecure ? ["upgrade-insecure-requests"] : []),
 
     // Report-To directive (modern browsers, preferred over report-uri)
     ...(reportTo ? [`report-to ${reportTo}`] : []),
@@ -124,7 +126,7 @@ export function buildCSP(options: CSPOptions = {}): string {
     ...(reportUri ? [`report-uri ${reportUri}`] : []),
   ];
 
-  return directives.join('; ');
+  return directives.join("; ");
 }
 
 /**
@@ -160,7 +162,7 @@ export function buildDevCSP(): string {
     "object-src 'none'",
   ];
 
-  return directives.join('; ');
+  return directives.join("; ");
 }
 
 /**
@@ -202,7 +204,7 @@ export function buildProdCSP(): string {
     // Object sources: Disable plugins
     "object-src 'none'",
     // Upgrade insecure requests in production
-    'upgrade-insecure-requests',
+    "upgrade-insecure-requests",
   ];
 
   // Add report-uri if configured
@@ -215,12 +217,12 @@ export function buildProdCSP(): string {
     directives.push(`report-uri ${reportUri}`);
   }
 
-  return directives.join('; ');
+  return directives.join("; ");
 }
 
 /**
  * Get appropriate CSP based on environment
  */
 export function getCSP(): string {
-  return process.env.NODE_ENV === 'production' ? buildProdCSP() : buildDevCSP();
+  return process.env.NODE_ENV === "production" ? buildProdCSP() : buildDevCSP();
 }

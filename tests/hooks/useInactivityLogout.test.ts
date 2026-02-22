@@ -1,8 +1,8 @@
-import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useInactivityLogout } from '@/lib/hooks/useInactivityLogout';
+import { renderHook, act } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { useInactivityLogout } from "@/lib/hooks/useInactivityLogout";
 
-describe('useInactivityLogout', () => {
+describe("useInactivityLogout", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -12,7 +12,7 @@ describe('useInactivityLogout', () => {
     vi.clearAllMocks();
   });
 
-  it('triggers timeout when enabled and no activity occurs', () => {
+  it("triggers timeout when enabled and no activity occurs", () => {
     const onTimeout = vi.fn();
 
     renderHook(() =>
@@ -30,7 +30,7 @@ describe('useInactivityLogout', () => {
     expect(onTimeout).toHaveBeenCalledTimes(1);
   });
 
-  it('resets timer when user activity occurs', () => {
+  it("resets timer when user activity occurs", () => {
     const onTimeout = vi.fn();
 
     renderHook(() =>
@@ -47,7 +47,7 @@ describe('useInactivityLogout', () => {
     expect(onTimeout).not.toHaveBeenCalled();
 
     act(() => {
-      window.dispatchEvent(new Event('mousemove'));
+      window.dispatchEvent(new Event("mousemove"));
       vi.advanceTimersByTime(800);
     });
     expect(onTimeout).not.toHaveBeenCalled();
@@ -58,7 +58,7 @@ describe('useInactivityLogout', () => {
     expect(onTimeout).toHaveBeenCalledTimes(1);
   });
 
-  it('does not trigger timeout when disabled', () => {
+  it("does not trigger timeout when disabled", () => {
     const onTimeout = vi.fn();
 
     renderHook(() =>

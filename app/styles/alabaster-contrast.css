@@ -88,13 +88,13 @@ html:not(.dark) .signup-page .btn-premium {
   color: var(--c-content) !important;
 }
 
-html:not(.dark) .feed-page [data-slot='button'],
-html:not(.dark) .map-page [data-slot='button'],
-html:not(.dark) .calendar-page [data-slot='button'],
-html:not(.dark) .home-page [data-slot='button'],
-html:not(.dark) .settings-page [data-slot='button'],
-html:not(.dark) .login-page [data-slot='button'],
-html:not(.dark) .signup-page [data-slot='button'],
+html:not(.dark) .feed-page [data-slot="button"],
+html:not(.dark) .map-page [data-slot="button"],
+html:not(.dark) .calendar-page [data-slot="button"],
+html:not(.dark) .home-page [data-slot="button"],
+html:not(.dark) .settings-page [data-slot="button"],
+html:not(.dark) .login-page [data-slot="button"],
+html:not(.dark) .signup-page [data-slot="button"],
 html:not(.dark) .feed-page .bg-mq-card-background,
 html:not(.dark) .map-page .bg-mq-card-background,
 html:not(.dark) .calendar-page .bg-mq-card-background,
@@ -155,51 +155,51 @@ html:not(.dark) .signup-page {
 html:not(.dark)
   .feed-page
   :where(
-    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
-        textarea
-      ):not(select)
+    *:not(svg):not(path):not(circle):not(line):not([role="img"]):not(
+        button
+      ):not(a):not(input):not(textarea):not(select)
   ),
 html:not(.dark)
   .map-page
   :where(
-    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
-        textarea
-      ):not(select)
+    *:not(svg):not(path):not(circle):not(line):not([role="img"]):not(
+        button
+      ):not(a):not(input):not(textarea):not(select)
   ),
 html:not(.dark)
   .feed-page
   :where(
-    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
-        textarea
-      ):not(select)
+    *:not(svg):not(path):not(circle):not(line):not([role="img"]):not(
+        button
+      ):not(a):not(input):not(textarea):not(select)
   ),
 html:not(.dark)
   .calendar-page
   :where(
-    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
-        textarea
-      ):not(select)
+    *:not(svg):not(path):not(circle):not(line):not([role="img"]):not(
+        button
+      ):not(a):not(input):not(textarea):not(select)
   ),
 html:not(.dark)
   .settings-page
   :where(
-    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
-        textarea
-      ):not(select)
+    *:not(svg):not(path):not(circle):not(line):not([role="img"]):not(
+        button
+      ):not(a):not(input):not(textarea):not(select)
   ),
 html:not(.dark)
   .login-page
   :where(
-    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
-        textarea
-      ):not(select)
+    *:not(svg):not(path):not(circle):not(line):not([role="img"]):not(
+        button
+      ):not(a):not(input):not(textarea):not(select)
   ),
 html:not(.dark)
   .signup-page
   :where(
-    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
-        textarea
-      ):not(select)
+    *:not(svg):not(path):not(circle):not(line):not([role="img"]):not(
+        button
+      ):not(a):not(input):not(textarea):not(select)
   ) {
   color: #1a1a1a;
   -webkit-text-fill-color: #1a1a1a;
@@ -221,13 +221,13 @@ html:not(.dark) .text-mq-3xl {
 }
 
 /* Broad enforcement for common content tokens on Alabaster pages */
-html:not(.dark) .feed-page [class*='text-mq-content'],
-html:not(.dark) .map-page [class*='text-mq-content'],
-html:not(.dark) .home-page [class*='text-mq-content'],
-html:not(.dark) .calendar-page [class*='text-mq-content'],
-html:not(.dark) .settings-page [class*='text-mq-content'],
-html:not(.dark) .login-page [class*='text-mq-content'],
-html:not(.dark) .signup-page [class*='text-mq-content'],
+html:not(.dark) .feed-page [class*="text-mq-content"],
+html:not(.dark) .map-page [class*="text-mq-content"],
+html:not(.dark) .home-page [class*="text-mq-content"],
+html:not(.dark) .calendar-page [class*="text-mq-content"],
+html:not(.dark) .settings-page [class*="text-mq-content"],
+html:not(.dark) .login-page [class*="text-mq-content"],
+html:not(.dark) .signup-page [class*="text-mq-content"],
 html:not(.dark) .feed-page .mq-magic-card-content,
 html:not(.dark) .map-page .mq-magic-card-content,
 html:not(.dark) .home-page .mq-magic-card-content,
@@ -304,10 +304,10 @@ html:not(.dark) .home-page .bg-mq-info\/10 {
    ============================================ */
 
 /* Light-mode: unify button text color for non-primary variants */
-html:not(.dark) .feed-page .btn-premium:not([class*='bg-mq-primary']),
-html:not(.dark) .map-page .btn-premium:not([class*='bg-mq-primary']),
-html:not(.dark) .home-page .btn-premium:not([class*='bg-mq-primary']),
-html:not(.dark) .calendar-page .btn-premium:not([class*='bg-mq-primary']) {
+html:not(.dark) .feed-page .btn-premium:not([class*="bg-mq-primary"]),
+html:not(.dark) .map-page .btn-premium:not([class*="bg-mq-primary"]),
+html:not(.dark) .home-page .btn-premium:not([class*="bg-mq-primary"]),
+html:not(.dark) .calendar-page .btn-premium:not([class*="bg-mq-primary"]) {
   color: var(--mq-content) !important;
   -webkit-text-fill-color: var(--mq-content) !important;
 }
@@ -340,10 +340,22 @@ html:not(.dark) .home-page .bg-mq-background-secondary p {
 }
 
 /* Secondary text styling */
-html:not(.dark) .feed-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
-html:not(.dark) .map-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
-html:not(.dark) .calendar-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
-html:not(.dark) .home-page .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary {
+html:not(.dark)
+  .feed-page
+  .bg-mq-background-secondary
+  .text-mq-sm.text-mq-content-secondary,
+html:not(.dark)
+  .map-page
+  .bg-mq-background-secondary
+  .text-mq-sm.text-mq-content-secondary,
+html:not(.dark)
+  .calendar-page
+  .bg-mq-background-secondary
+  .text-mq-sm.text-mq-content-secondary,
+html:not(.dark)
+  .home-page
+  .bg-mq-background-secondary
+  .text-mq-sm.text-mq-content-secondary {
   color: #4a4a44 !important; /* Darker secondary for contrast */
 }
 
@@ -461,7 +473,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
-[role='button']:focus-visible,
+[role="button"]:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--mq-focus, #a6192e) !important;
   outline-offset: 2px !important;
@@ -479,7 +491,7 @@ textarea:focus-visible,
 .dark input:focus-visible,
 .dark select:focus-visible,
 .dark textarea:focus-visible,
-.dark [role='button']:focus-visible,
+.dark [role="button"]:focus-visible,
 .dark [tabindex]:focus-visible {
   outline: 2px solid #fff !important;
   outline-offset: 2px !important;

@@ -6,7 +6,7 @@
 
 /* eslint-disable no-console */
 
-type LogLevel = 'log' | 'warn' | 'error' | 'info' | 'debug';
+type LogLevel = "log" | "warn" | "error" | "info" | "debug";
 
 interface DevLogger {
   log: (message: string, data?: unknown) => void;
@@ -17,7 +17,7 @@ interface DevLogger {
 }
 
 const createLogger = (prefix: string): DevLogger => {
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = process.env.NODE_ENV === "development";
 
   const logWithLevel = (level: LogLevel, message: string, data?: unknown) => {
     if (!isDev) return;
@@ -33,30 +33,34 @@ const createLogger = (prefix: string): DevLogger => {
   };
 
   return {
-    log: (message, data) => logWithLevel('log', message, data),
-    warn: (message, data) => logWithLevel('warn', message, data),
-    error: (message, data) => logWithLevel('error', message, data),
-    info: (message, data) => logWithLevel('info', message, data),
-    debug: (message, data) => logWithLevel('debug', message, data),
+    log: (message, data) => logWithLevel("log", message, data),
+    warn: (message, data) => logWithLevel("warn", message, data),
+    error: (message, data) => logWithLevel("error", message, data),
+    info: (message, data) => logWithLevel("info", message, data),
+    debug: (message, data) => logWithLevel("debug", message, data),
   };
 };
 
 // Pre-configured loggers for common modules
 export const devLog = {
-  map: createLogger('Map'),
-  home: createLogger('Home'),
-  auth: createLogger('Auth'),
-  api: createLogger('API'),
-  store: createLogger('Store'),
-  ui: createLogger('UI'),
+  map: createLogger("Map"),
+  home: createLogger("Home"),
+  auth: createLogger("Auth"),
+  api: createLogger("API"),
+  store: createLogger("Store"),
+  ui: createLogger("UI"),
 };
 
 // Factory function for custom loggers
 export const createDevLogger = createLogger;
 
 // Simple one-liner for quick logging (backward compatible)
-export const devLogSimple = (prefix: string, message: string, data?: unknown) => {
-  if (process.env.NODE_ENV !== 'development') return;
+export const devLogSimple = (
+  prefix: string,
+  message: string,
+  data?: unknown,
+) => {
+  if (process.env.NODE_ENV !== "development") return;
 
   const formattedMessage = `[${prefix}] ${message}`;
   if (data !== undefined) {

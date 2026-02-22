@@ -1,13 +1,18 @@
-'use client';
+"use client";
 
-import { memo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/mq/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { Shield, Lock, Laptop } from 'lucide-react';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { MagicCard } from '@/components/ui/MagicCard';
-import { SessionsList } from '@/features/settings/components/privacy/SessionsList';
+import { memo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/mq/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/mq/card";
+import { Shield, Lock, Laptop } from "lucide-react";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { MagicCard } from "@/components/ui/MagicCard";
+import { SessionsList } from "@/features/settings/components/privacy/SessionsList";
 
 export const SecurityCard = memo(() => {
   const { t } = useTypedTranslation();
@@ -21,7 +26,7 @@ export const SecurityCard = memo(() => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-mq-primary" aria-hidden="true" />
-              <span>{t('security')}</span>
+              <span>{t("security")}</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -33,9 +38,11 @@ export const SecurityCard = memo(() => {
                     <Lock className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-mq-content">{t('changePassword')}</h3>
+                    <h3 className="font-semibold text-mq-content">
+                      {t("changePassword")}
+                    </h3>
                     <p className="text-mq-sm text-mq-content-secondary">
-                      {t('changePasswordDesc')}
+                      {t("changePasswordDesc")}
                     </p>
                   </div>
                 </div>
@@ -43,9 +50,9 @@ export const SecurityCard = memo(() => {
                   variant="ghost"
                   size="sm"
                   className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                  onClick={() => router.push('/reset-password?from=settings')}
+                  onClick={() => router.push("/reset-password?from=settings")}
                 >
-                  {t('changePassword')}
+                  {t("changePassword")}
                 </Button>
               </div>
             </div>
@@ -58,9 +65,11 @@ export const SecurityCard = memo(() => {
                     <Laptop className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-mq-content">{t('manageSessions')}</h3>
+                    <h3 className="font-semibold text-mq-content">
+                      {t("manageSessions")}
+                    </h3>
                     <p className="text-mq-sm text-mq-content-secondary">
-                      {t('manageSessionsDesc')}
+                      {t("manageSessionsDesc")}
                     </p>
                   </div>
                 </div>
@@ -70,7 +79,7 @@ export const SecurityCard = memo(() => {
                   className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
                   onClick={() => setShowSessionsDialog(true)}
                 >
-                  {t('manageSessions')}
+                  {t("manageSessions")}
                 </Button>
               </div>
             </div>
@@ -78,9 +87,13 @@ export const SecurityCard = memo(() => {
         </Card>
       </MagicCard>
 
-      <SessionsList open={showSessionsDialog} onOpenChange={setShowSessionsDialog} t={t} />
+      <SessionsList
+        open={showSessionsDialog}
+        onOpenChange={setShowSessionsDialog}
+        t={t}
+      />
     </>
   );
 });
 
-SecurityCard.displayName = 'SecurityCard';
+SecurityCard.displayName = "SecurityCard";

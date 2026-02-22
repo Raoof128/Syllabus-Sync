@@ -121,7 +121,10 @@ html:not(.dark) .mq-magic-card .mq-magic-card-content li {
 
 /* Very high-specificity catch for card surfaces */
 html:not(.dark) .mq-magic-card .mq-magic-card-content .text-mq-content,
-html:not(.dark) .mq-magic-card .mq-magic-card-content .text-mq-content-secondary,
+html:not(.dark)
+  .mq-magic-card
+  .mq-magic-card-content
+  .text-mq-content-secondary,
 html:not(.dark) .mq-magic-card .mq-magic-card-content h3,
 html:not(.dark) .mq-magic-card .mq-magic-card-content h4,
 html:not(.dark) .mq-magic-card .mq-magic-card-content p {
@@ -132,13 +135,18 @@ html:not(.dark) .mq-magic-card .mq-magic-card-content p {
 html:not(.dark) .mq-magic-card .bg-mq-background-secondary h4,
 html:not(.dark) .mq-magic-card .bg-mq-background-secondary p,
 html:not(.dark) .mq-magic-card .bg-mq-background-secondary span,
-html:not(.dark) .mq-magic-card .bg-mq-background-secondary .text-mq-content-secondary,
+html:not(.dark)
+  .mq-magic-card
+  .bg-mq-background-secondary
+  .text-mq-content-secondary,
 html:not(.dark) .bg-mq-background-secondary .text-mq-content-secondary {
   color: var(--mq-content) !important; /* broader enforcement for any nesting */
 }
 
 /* Force small secondary utility text inside bg-mq-background-secondary to best-contrast color */
-html:not(.dark) .bg-mq-background-secondary .text-mq-sm.text-mq-content-secondary,
+html:not(.dark)
+  .bg-mq-background-secondary
+  .text-mq-sm.text-mq-content-secondary,
 html:not(.dark) .mq-magic-card .text-mq-sm.text-mq-content-secondary {
   color: #1a1a1a !important;
   -webkit-text-fill-color: #1a1a1a !important;
@@ -226,13 +234,13 @@ html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary * {
 
 /* Active/selected state */
 .mq-subcard-item.active,
-.mq-subcard-item[data-active='true'] {
+.mq-subcard-item[data-active="true"] {
   background: rgba(166, 25, 46, 0.08);
   box-shadow: inset 0 0 0 1px rgba(166, 25, 46, 0.2);
 }
 
 .dark .mq-subcard-item.active,
-.dark .mq-subcard-item[data-active='true'] {
+.dark .mq-subcard-item[data-active="true"] {
   background: rgba(166, 25, 46, 0.12);
   box-shadow: inset 0 0 0 1px rgba(166, 25, 46, 0.25);
 }
@@ -273,11 +281,15 @@ html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary * {
    ============================================ */
 
 /* Links inside magic cards */
-.mq-magic-card a:not(.mq-magic-card-content):not([class*='btn']):not([class*='button']) {
+.mq-magic-card
+  a:not(.mq-magic-card-content):not([class*="btn"]):not([class*="button"]) {
   transition: all 0.3s ease;
 }
 
-.mq-magic-card a:not(.mq-magic-card-content):not([class*='btn']):not([class*='button']):hover {
+.mq-magic-card
+  a:not(.mq-magic-card-content):not([class*="btn"]):not(
+    [class*="button"]
+  ):hover {
   color: #a6192e;
 }
 
@@ -321,7 +333,7 @@ html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary * {
 .mouse-glow-card::before,
 .mouse-glow-card::after {
   border-radius: inherit;
-  content: '';
+  content: "";
   height: 100%;
   left: 0;
   opacity: 0;
@@ -422,7 +434,7 @@ html:not(.dark) .p-3.rounded-mq-lg.bg-mq-background-secondary * {
 
 .mouse-glow-subcard::before {
   border-radius: inherit;
-  content: '';
+  content: "";
   height: 100%;
   left: 0;
   opacity: 0;

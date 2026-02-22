@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { ChevronLeft, ChevronRight, Filter } from 'lucide-react';
-import { Button } from '@/components/ui/mq/button';
-import { cn } from '@/lib/utils';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { format } from 'date-fns';
+import React from "react";
+import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { Button } from "@/components/ui/mq/button";
+import { cn } from "@/lib/utils";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { format } from "date-fns";
 
-export type CalendarView = 'week' | 'day' | 'agenda';
+export type CalendarView = "week" | "day" | "agenda";
 
 interface CalendarHeaderProps {
   currentDate: Date;
@@ -33,7 +33,7 @@ export default function CalendarHeader({
   // Navigation handlers
   const handlePrev = () => {
     const newDate = new Date(currentDate);
-    if (view === 'week') {
+    if (view === "week") {
       newDate.setDate(newDate.getDate() - 7);
     } else {
       newDate.setDate(newDate.getDate() - 1);
@@ -43,7 +43,7 @@ export default function CalendarHeader({
 
   const handleNext = () => {
     const newDate = new Date(currentDate);
-    if (view === 'week') {
+    if (view === "week") {
       newDate.setDate(newDate.getDate() + 7);
     } else {
       newDate.setDate(newDate.getDate() + 1);
@@ -53,10 +53,10 @@ export default function CalendarHeader({
 
   // Date Label formatting
   const dateLabel = React.useMemo(() => {
-    if (view === 'week') {
-      return format(currentDate, 'MMMM yyyy');
+    if (view === "week") {
+      return format(currentDate, "MMMM yyyy");
     }
-    return format(currentDate, 'MMMM d, yyyy');
+    return format(currentDate, "MMMM d, yyyy");
   }, [currentDate, view]);
 
   return (
@@ -65,7 +65,12 @@ export default function CalendarHeader({
         {/* Left: Navigation & Date */}
         <div className="flex items-center gap-3">
           <div className="flex items-center bg-mq-surface rounded-md border border-mq-border p-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handlePrev}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={handlePrev}
+            >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
@@ -74,14 +79,21 @@ export default function CalendarHeader({
               className="px-3 h-7 text-xs font-semibold"
               onClick={onToday}
             >
-              {t('today')}
+              {t("today")}
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleNext}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={handleNext}
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
 
-          <h1 className="text-xl font-bold text-mq-content min-w-[200px]">{dateLabel}</h1>
+          <h1 className="text-xl font-bold text-mq-content min-w-[200px]">
+            {dateLabel}
+          </h1>
         </div>
 
         {/* Right: Controls */}
@@ -89,34 +101,34 @@ export default function CalendarHeader({
           {/* View Switcher */}
           <div className="flex items-center p-1 bg-mq-surface border border-mq-border rounded-lg mr-2">
             <button
-              onClick={() => onViewChange('week')}
+              onClick={() => onViewChange("week")}
               className={cn(
-                'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
-                view === 'week'
-                  ? 'bg-mq-background shadow-sm text-mq-content'
-                  : 'text-mq-content-secondary hover:text-mq-content',
+                "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
+                view === "week"
+                  ? "bg-mq-background shadow-sm text-mq-content"
+                  : "text-mq-content-secondary hover:text-mq-content",
               )}
             >
               Week
             </button>
             <button
-              onClick={() => onViewChange('day')}
+              onClick={() => onViewChange("day")}
               className={cn(
-                'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
-                view === 'day'
-                  ? 'bg-mq-background shadow-sm text-mq-content'
-                  : 'text-mq-content-secondary hover:text-mq-content',
+                "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
+                view === "day"
+                  ? "bg-mq-background shadow-sm text-mq-content"
+                  : "text-mq-content-secondary hover:text-mq-content",
               )}
             >
               Day
             </button>
             <button
-              onClick={() => onViewChange('agenda')}
+              onClick={() => onViewChange("agenda")}
               className={cn(
-                'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
-                view === 'agenda'
-                  ? 'bg-mq-background shadow-sm text-mq-content'
-                  : 'text-mq-content-secondary hover:text-mq-content',
+                "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
+                view === "agenda"
+                  ? "bg-mq-background shadow-sm text-mq-content"
+                  : "text-mq-content-secondary hover:text-mq-content",
               )}
             >
               Agenda
@@ -127,13 +139,13 @@ export default function CalendarHeader({
 
           {/* Filters button only - "Now" button removed per user request */}
           <Button
-            variant={isFiltersOpen ? 'secondary' : 'outline'}
+            variant={isFiltersOpen ? "secondary" : "outline"}
             size="sm"
             className="gap-2"
             onClick={onToggleFilters}
           >
             <Filter className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('filters')}</span>
+            <span className="hidden sm:inline">{t("filters")}</span>
           </Button>
         </div>
       </div>

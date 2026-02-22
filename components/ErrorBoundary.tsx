@@ -1,12 +1,12 @@
 // components/ErrorBoundary.tsx
-'use client';
+"use client";
 
-import { Component, ReactNode, ErrorInfo } from 'react';
-import Link from 'next/link';
-import { AlertTriangle, RefreshCcw, Home, Bug } from 'lucide-react';
-import { Button } from '@/components/ui/mq/button';
-import { errorHandler } from '@/lib/utils/errorHandling';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { Component, ReactNode, ErrorInfo } from "react";
+import Link from "next/link";
+import { AlertTriangle, RefreshCcw, Home, Bug } from "lucide-react";
+import { Button } from "@/components/ui/mq/button";
+import { errorHandler } from "@/lib/utils/errorHandling";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
 
 interface Props {
   children: ReactNode;
@@ -51,16 +51,20 @@ function ErrorBoundaryUI({
         </div>
 
         {/* Error Title */}
-        <h1 className="text-mq-3xl font-bold text-mq-content mb-3">{t('oops')}</h1>
+        <h1 className="text-mq-3xl font-bold text-mq-content mb-3">
+          {t("oops")}
+        </h1>
 
         {/* Error Description */}
-        <p className="text-mq-content-secondary mb-6 text-mq-medium">{t('boundaryErrorDesc')}</p>
+        <p className="text-mq-content-secondary mb-6 text-mq-medium">
+          {t("boundaryErrorDesc")}
+        </p>
 
         {/* Retry Counter */}
         {retryCount > 0 && (
           <div className="mb-4 p-3 bg-mq-warning/10 border border-mq-warning/20 rounded-mq-lg">
             <p className="text-mq-sm text-mq-warning">
-              {t('retryAttempt', { count: retryCount, max: maxRetries })}
+              {t("retryAttempt", { count: retryCount, max: maxRetries })}
             </p>
           </div>
         )}
@@ -70,55 +74,67 @@ function ErrorBoundaryUI({
           {canRetry ? (
             <Button onClick={onRetry} className="gap-2" size="lg">
               <RefreshCcw className="w-4 h-4" />
-              {t('tryAgain')}
+              {t("tryAgain")}
             </Button>
           ) : (
             <Button asChild className="gap-2" size="lg">
               <Link href="/home">
                 <Home className="w-4 h-4" />
-                {t('goHome')}
+                {t("goHome")}
               </Link>
             </Button>
           )}
 
-          <Button variant="outline" onClick={onReset} className="gap-2" size="lg">
+          <Button
+            variant="outline"
+            onClick={onReset}
+            className="gap-2"
+            size="lg"
+          >
             <Bug className="w-4 h-4" />
-            {t('reset')}
+            {t("reset")}
           </Button>
         </div>
 
         {/* Development Error Details */}
-        {(showErrorDetails || process.env.NODE_ENV === 'development') && error && (
-          <details className="mt-8 text-left bg-mq-background-secondary p-4 rounded-mq-lg border border-mq-border">
-            <summary className="cursor-pointer font-medium text-mq-content mb-2">
-              {t('errorDetailsDev')}
-            </summary>
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium text-mq-content mb-1">{t('errorMessage')}</h4>
-                <code className="text-mq-sm bg-mq-error/10 text-mq-error p-2 rounded-mq block">
-                  {error.message}
-                </code>
-              </div>
-
-              {errorInfo && (
+        {(showErrorDetails || process.env.NODE_ENV === "development") &&
+          error && (
+            <details className="mt-8 text-left bg-mq-background-secondary p-4 rounded-mq-lg border border-mq-border">
+              <summary className="cursor-pointer font-medium text-mq-content mb-2">
+                {t("errorDetailsDev")}
+              </summary>
+              <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium text-mq-content mb-1">{t('componentStack')}</h4>
-                  <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48 whitespace-pre-wrap">
-                    {errorInfo.componentStack}
+                  <h4 className="font-medium text-mq-content mb-1">
+                    {t("errorMessage")}
+                  </h4>
+                  <code className="text-mq-sm bg-mq-error/10 text-mq-error p-2 rounded-mq block">
+                    {error.message}
+                  </code>
+                </div>
+
+                {errorInfo && (
+                  <div>
+                    <h4 className="font-medium text-mq-content mb-1">
+                      {t("componentStack")}
+                    </h4>
+                    <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48 whitespace-pre-wrap">
+                      {errorInfo.componentStack}
+                    </pre>
+                  </div>
+                )}
+
+                <div>
+                  <h4 className="font-medium text-mq-content mb-1">
+                    {t("stackTrace")}
+                  </h4>
+                  <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48">
+                    {error.stack}
                   </pre>
                 </div>
-              )}
-
-              <div>
-                <h4 className="font-medium text-mq-content mb-1">{t('stackTrace')}</h4>
-                <pre className="text-mq-xs bg-mq-background-tertiary text-mq-content p-3 rounded-mq overflow-auto max-h-48">
-                  {error.stack}
-                </pre>
               </div>
-            </div>
-          </details>
-        )}
+            </details>
+          )}
       </div>
     </div>
   );
@@ -145,7 +161,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    errorHandler.logError(error, 'ErrorBoundary', 'high');
+    errorHandler.logError(error, "ErrorBoundary", "high");
 
     // Call optional error handler
     if (this.props.onError) {
@@ -167,7 +183,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   private reportError = (error: Error, errorInfo: ErrorInfo) => {
     // Placeholder for error reporting service
     // In a real app, this would send to services like Sentry, LogRocket, etc.
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return;
     }
     const errorReport = {
@@ -180,11 +196,16 @@ export default class ErrorBoundary extends Component<Props, State> {
     };
 
     // Store in localStorage for debugging (in development)
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       try {
-        const existingReports = JSON.parse(localStorage.getItem('errorReports') || '[]');
+        const existingReports = JSON.parse(
+          localStorage.getItem("errorReports") || "[]",
+        );
         existingReports.push(errorReport);
-        localStorage.setItem('errorReports', JSON.stringify(existingReports.slice(-10))); // Keep last 10
+        localStorage.setItem(
+          "errorReports",
+          JSON.stringify(existingReports.slice(-10)),
+        ); // Keep last 10
       } catch {
         // Swallow localStorage errors in development
       }
@@ -212,7 +233,7 @@ export default class ErrorBoundary extends Component<Props, State> {
       }, delay);
     } else {
       // Max retries reached, redirect to home
-      window.location.href = '/';
+      window.location.href = "/";
     }
   };
 

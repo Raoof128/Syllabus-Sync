@@ -1,22 +1,27 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import { Plus, FileText, CheckCircle2, Circle } from 'lucide-react';
-import { Button } from '@/components/ui/mq/button';
-import { Badge } from '@/components/ui/mq/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { MagicCard } from '@/components/ui/MagicCard';
-import { cn } from '@/lib/utils';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { PRIORITY_COLORS } from '@/lib/constants';
-import { getDeadlineColor } from '@/lib/calendar-utils';
-import dayjs from 'dayjs';
-import { Deadline } from '@/lib/types';
-import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
-import { formatLocalizedDate } from '@/lib/utils/locale';
+import React from "react";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { Plus, FileText, CheckCircle2, Circle } from "lucide-react";
+import { Button } from "@/components/ui/mq/button";
+import { Badge } from "@/components/ui/mq/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/mq/card";
+import { MagicCard } from "@/components/ui/MagicCard";
+import { cn } from "@/lib/utils";
+import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
+import { useUnitsStore } from "@/lib/store/unitsStore";
+import { PRIORITY_COLORS } from "@/lib/constants";
+import { getDeadlineColor } from "@/lib/calendar-utils";
+import dayjs from "dayjs";
+import { Deadline } from "@/lib/types";
+import ItemActionButtons from "@/features/calendar/components/ItemActionButtons";
+import { formatLocalizedDate } from "@/lib/utils/locale";
 
 interface AssignmentsWidgetProps {
   onAddAssignment: () => void;
@@ -40,21 +45,23 @@ export default function AssignmentsWidget({
   const { t, language } = useTypedTranslation();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
-  const toggleDeadlineNotification = useDeadlinesStore((state) => state.toggleNotification);
+  const toggleDeadlineNotification = useDeadlinesStore(
+    (state) => state.toggleNotification,
+  );
   const units = useUnitsStore((state) => state.units);
 
-  const assignments = deadlines.filter((d) => d.type === 'Assignment');
+  const assignments = deadlines.filter((d) => d.type === "Assignment");
 
   const formatMonthDayTime = (date: Date) =>
     formatLocalizedDate(date, language, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
     });
 
   const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       action();
     }
@@ -65,9 +72,10 @@ export default function AssignmentsWidget({
       isLiquidEnhanced
       className={
         highlightedDeadlineId &&
-        deadlines.find((d) => d.id === highlightedDeadlineId)?.type === 'Assignment'
-          ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
-          : ''
+        deadlines.find((d) => d.id === highlightedDeadlineId)?.type ===
+          "Assignment"
+          ? "ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all"
+          : ""
       }
     >
       <div
@@ -79,18 +87,19 @@ export default function AssignmentsWidget({
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm font-semibold">
                 <FileText className="h-4 w-4" />
-                {t('assignments')}
+                {t("assignments")}
               </span>
               <div className="flex items-center gap-2">
                 <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                  {assignments.filter((a) => !a.completed).length} {t('pending')}
+                  {assignments.filter((a) => !a.completed).length}{" "}
+                  {t("pending")}
                 </Badge>
                 <Button
                   size="icon"
                   variant="ghost"
                   className="h-6 w-6"
                   onClick={onAddAssignment}
-                  aria-label={t('addAssignment')}
+                  aria-label={t("addAssignment")}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -100,32 +109,43 @@ export default function AssignmentsWidget({
           <CardContent className="pt-0">
             {assignments.length === 0 ? (
               <div className="text-center py-6 text-mq-content-tertiary">
-                <p className="text-xs">{t('noAssignmentsYet')}</p>
+                <p className="text-xs">{t("noAssignmentsYet")}</p>
               </div>
             ) : (
               <div className="space-y-2 pr-1">
                 {assignments
-                  .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf())
+                  .sort(
+                    (a, b) =>
+                      dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf(),
+                  )
                   .map((assignment) => {
                     const due = dayjs(assignment.dueDate);
-                    const isOverdue = !assignment.completed && due.isBefore(dayjs());
+                    const isOverdue =
+                      !assignment.completed && due.isBefore(dayjs());
                     const isHighlighted =
-                      deadlineHighlightActive && highlightedDeadlineId === assignment.id;
+                      deadlineHighlightActive &&
+                      highlightedDeadlineId === assignment.id;
                     const deadlineColor = getDeadlineColor(assignment, units);
 
                     return (
                       <div
                         key={assignment.id}
                         className={cn(
-                          'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
-                          assignment.completed && 'opacity-60 grayscale',
-                          isOverdue && 'bg-red-500/5',
-                          isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
+                          "group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm",
+                          assignment.completed && "opacity-60 grayscale",
+                          isOverdue && "bg-red-500/5",
+                          isHighlighted &&
+                            "ring-2 ring-mq-primary ring-offset-1 animate-pulse",
                         )}
-                        style={{ borderLeftColor: deadlineColor, borderLeftWidth: '4px' }}
+                        style={{
+                          borderLeftColor: deadlineColor,
+                          borderLeftWidth: "4px",
+                        }}
                         onClick={() => onOpenAssignmentDetail(assignment)}
                         onKeyDown={(e) =>
-                          handleKeyDown(e, () => onOpenAssignmentDetail(assignment))
+                          handleKeyDown(e, () =>
+                            onOpenAssignmentDetail(assignment),
+                          )
                         }
                         role="button"
                         tabIndex={0}
@@ -136,8 +156,9 @@ export default function AssignmentsWidget({
                             toggleComplete(assignment.id);
                           }}
                           className={cn(
-                            'text-mq-content-secondary hover:text-mq-primary transition-colors',
-                            assignment.completed && 'text-green-600 dark:text-green-400',
+                            "text-mq-content-secondary hover:text-mq-primary transition-colors",
+                            assignment.completed &&
+                              "text-green-600 dark:text-green-400",
                           )}
                         >
                           {assignment.completed ? (
@@ -150,9 +171,9 @@ export default function AssignmentsWidget({
                           <div className="flex items-center justify-between">
                             <h4
                               className={cn(
-                                'font-medium text-sm truncate',
+                                "font-medium text-sm truncate",
                                 assignment.completed &&
-                                  'line-through decoration-mq-content-tertiary',
+                                  "line-through decoration-mq-content-tertiary",
                               )}
                             >
                               {assignment.title}
@@ -160,15 +181,18 @@ export default function AssignmentsWidget({
                             <Badge
                               className={cn(
                                 PRIORITY_COLORS[assignment.priority],
-                                'ml-2 text-[10px] h-4 px-1',
+                                "ml-2 text-[10px] h-4 px-1",
                               )}
                               variant="neutral"
                             >
-                              {t(`priority_${assignment.priority}` as TranslationKey)}
+                              {t(
+                                `priority_${assignment.priority}` as TranslationKey,
+                              )}
                             </Badge>
                           </div>
                           <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
-                            {assignment.unitCode} • {formatMonthDayTime(due.toDate())}
+                            {assignment.unitCode} •{" "}
+                            {formatMonthDayTime(due.toDate())}
                           </p>
                         </div>
                         <ItemActionButtons
@@ -180,7 +204,9 @@ export default function AssignmentsWidget({
                           notificationEnabled={assignment.notificationEnabled}
                           onEdit={() => onEditAssignment(assignment)}
                           onDelete={() => onDeleteAssignment(assignment)}
-                          onToggleNotification={() => toggleDeadlineNotification(assignment.id)}
+                          onToggleNotification={() =>
+                            toggleDeadlineNotification(assignment.id)
+                          }
                           variant="compact"
                           stopPropagation
                           className="opacity-0 group-hover:opacity-100 transition-opacity"

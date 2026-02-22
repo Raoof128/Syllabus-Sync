@@ -26,9 +26,9 @@
 // - GPU-accelerated via SVG filters
 // - Respects prefers-reduced-motion
 // ============================================================================
-'use client';
+"use client";
 
-import { memo, useMemo, useSyncExternalStore } from 'react';
+import { memo, useMemo, useSyncExternalStore } from "react";
 
 // ============================================================================
 // CONSTANTS
@@ -54,7 +54,7 @@ const DEFAULT_DISPLACEMENT_SCALE = 15; // Base displacement scale in pixels
 // flat interior (x=1). The derivative gives us the surface normal for
 // refraction calculations.
 
-type SurfaceType = 'squircle' | 'circle' | 'concave' | 'lip';
+type SurfaceType = "squircle" | "circle" | "concave" | "lip";
 
 /**
  * Convex Squircle - Apple's preferred surface
@@ -189,7 +189,8 @@ const calculateDisplacement = (
   const height = surfaceFn(distanceFromEdge) * thickness;
 
   // Displacement is the difference in x position after passing through glass
-  const displacement = height * (Math.tan(incidenceAngle) - Math.tan(refractionAngle));
+  const displacement =
+    height * (Math.tan(incidenceAngle) - Math.tan(refractionAngle));
 
   // Sign depends on which side of the normal we're on
   return displacement * Math.sign(normal.x);
@@ -212,18 +213,18 @@ interface DisplacementMapData {
  */
 const generateCircularDisplacementMap = (
   size: number,
-  surfaceType: SurfaceType = 'squircle',
+  surfaceType: SurfaceType = "squircle",
   bezelWidth: number = DEFAULT_BEZEL_WIDTH,
   thickness: number = DEFAULT_GLASS_THICKNESS,
 ): DisplacementMapData => {
   const surfaceFn = SURFACE_FUNCTIONS[surfaceType];
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   if (!ctx) {
-    return { dataUrl: '', maxDisplacement: 0, width: size, height: size };
+    return { dataUrl: "", maxDisplacement: 0, width: size, height: size };
   }
 
   const imageData = ctx.createImageData(size, size);
@@ -260,7 +261,8 @@ const generateCircularDisplacementMap = (
 
         // Get displacement magnitude from pre-calculated array
         const sampleIndex = Math.floor(bezelPosition * DISPLACEMENT_SAMPLES);
-        const displacement = displacements[Math.min(sampleIndex, DISPLACEMENT_SAMPLES)];
+        const displacement =
+          displacements[Math.min(sampleIndex, DISPLACEMENT_SAMPLES)];
 
         // Normalize and convert to direction
         const normalizedDisplacement = displacement / maxDisplacement;
@@ -291,7 +293,7 @@ const generateCircularDisplacementMap = (
   ctx.putImageData(imageData, 0, 0);
 
   return {
-    dataUrl: canvas.toDataURL('image/png'),
+    dataUrl: canvas.toDataURL("image/png"),
     maxDisplacement: maxDisplacement * bezelWidth * radius,
     width: size,
     height: size,
@@ -306,18 +308,18 @@ const generateRoundedRectDisplacementMap = (
   width: number,
   height: number,
   cornerRadius: number,
-  surfaceType: SurfaceType = 'squircle',
+  surfaceType: SurfaceType = "squircle",
   bezelWidth: number = DEFAULT_BEZEL_WIDTH,
   thickness: number = DEFAULT_GLASS_THICKNESS,
 ): DisplacementMapData => {
   const surfaceFn = SURFACE_FUNCTIONS[surfaceType];
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   if (!ctx) {
-    return { dataUrl: '', maxDisplacement: 0, width, height };
+    return { dataUrl: "", maxDisplacement: 0, width, height };
   }
 
   const imageData = ctx.createImageData(width, height);
@@ -352,7 +354,10 @@ const generateRoundedRectDisplacementMap = (
       const inTopCornerZone = y < cornerRadius;
       const inBottomCornerZone = y >= height - cornerRadius;
 
-      if ((inLeftCornerZone || inRightCornerZone) && (inTopCornerZone || inBottomCornerZone)) {
+      if (
+        (inLeftCornerZone || inRightCornerZone) &&
+        (inTopCornerZone || inBottomCornerZone)
+      ) {
         // Corner region - use circular distance
         const cornerX = inLeftCornerZone ? cornerRadius : width - cornerRadius;
         const cornerY = inTopCornerZone ? cornerRadius : height - cornerRadius;
@@ -367,7 +372,12 @@ const generateRoundedRectDisplacementMap = (
         }
       } else {
         // Edge region - use straight distance
-        const minDist = Math.min(distToLeft, distToRight, distToTop, distToBottom);
+        const minDist = Math.min(
+          distToLeft,
+          distToRight,
+          distToTop,
+          distToBottom,
+        );
         distanceFromEdge = minDist;
 
         if (minDist === distToLeft) {
@@ -391,7 +401,8 @@ const generateRoundedRectDisplacementMap = (
       if (distanceFromEdge >= 0 && distanceFromEdge < bezelPixels) {
         const bezelPosition = distanceFromEdge / bezelPixels;
         const sampleIndex = Math.floor(bezelPosition * DISPLACEMENT_SAMPLES);
-        const displacement = displacements[Math.min(sampleIndex, DISPLACEMENT_SAMPLES)];
+        const displacement =
+          displacements[Math.min(sampleIndex, DISPLACEMENT_SAMPLES)];
         const normalizedDisplacement = displacement / maxDisplacement;
 
         const dispX = dirX * normalizedDisplacement;
@@ -412,7 +423,7 @@ const generateRoundedRectDisplacementMap = (
   ctx.putImageData(imageData, 0, 0);
 
   return {
-    dataUrl: canvas.toDataURL('image/png'),
+    dataUrl: canvas.toDataURL("image/png"),
     maxDisplacement: maxDisplacement * bezelPixels,
     width,
     height,
@@ -429,18 +440,18 @@ const generateRoundedRectDisplacementMap = (
  */
 const generateSpecularMap = (
   size: number,
-  surfaceType: SurfaceType = 'squircle',
+  surfaceType: SurfaceType = "squircle",
   bezelWidth: number = DEFAULT_BEZEL_WIDTH,
   lightAngle: number = -45, // degrees from top
   intensity: number = 0.6,
 ): string => {
   const surfaceFn = SURFACE_FUNCTIONS[surfaceType];
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
-  if (!ctx) return '';
+  if (!ctx) return "";
 
   const imageData = ctx.createImageData(size, size);
   const data = imageData.data;
@@ -454,7 +465,9 @@ const generateSpecularMap = (
     y: -Math.cos(lightRad),
     z: 0.5, // Slight elevation
   };
-  const lightLen = Math.sqrt(lightDir.x ** 2 + lightDir.y ** 2 + lightDir.z ** 2);
+  const lightLen = Math.sqrt(
+    lightDir.x ** 2 + lightDir.y ** 2 + lightDir.z ** 2,
+  );
   lightDir.x /= lightLen;
   lightDir.y /= lightLen;
   lightDir.z /= lightLen;
@@ -487,7 +500,10 @@ const generateSpecularMap = (
           };
 
           // Calculate specular reflection
-          const dot = normal3D.x * lightDir.x + normal3D.y * lightDir.y + normal3D.z * lightDir.z;
+          const dot =
+            normal3D.x * lightDir.x +
+            normal3D.y * lightDir.y +
+            normal3D.z * lightDir.z;
           const specular = Math.pow(Math.max(0, dot), 30); // Shininess exponent
 
           // Rim light effect - stronger at edges
@@ -505,7 +521,7 @@ const generateSpecularMap = (
   }
 
   ctx.putImageData(imageData, 0, 0);
-  return canvas.toDataURL('image/png');
+  return canvas.toDataURL("image/png");
 };
 
 // ============================================================================
@@ -513,13 +529,13 @@ const generateSpecularMap = (
 // ============================================================================
 
 const subscribeToReducedMotion = (callback: () => void) => {
-  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  mediaQuery.addEventListener('change', callback);
-  return () => mediaQuery.removeEventListener('change', callback);
+  const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
 };
 
 const getReducedMotionSnapshot = () =>
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const getReducedMotionServerSnapshot = () => false;
 
@@ -559,29 +575,55 @@ const LiquidFilter = memo(
 
     // Generate displacement maps for each surface type
     const squircleMap = useMemo(() => {
-      if (typeof window === 'undefined') return null;
-      return generateCircularDisplacementMap(mapSize, 'squircle', bezelWidth, thickness);
+      if (typeof window === "undefined") return null;
+      return generateCircularDisplacementMap(
+        mapSize,
+        "squircle",
+        bezelWidth,
+        thickness,
+      );
     }, [mapSize, bezelWidth, thickness]);
 
     const circleMap = useMemo(() => {
-      if (typeof window === 'undefined') return null;
-      return generateCircularDisplacementMap(mapSize, 'circle', bezelWidth, thickness);
+      if (typeof window === "undefined") return null;
+      return generateCircularDisplacementMap(
+        mapSize,
+        "circle",
+        bezelWidth,
+        thickness,
+      );
     }, [mapSize, bezelWidth, thickness]);
 
     const concaveMap = useMemo(() => {
-      if (typeof window === 'undefined') return null;
-      return generateCircularDisplacementMap(mapSize, 'concave', bezelWidth, thickness);
+      if (typeof window === "undefined") return null;
+      return generateCircularDisplacementMap(
+        mapSize,
+        "concave",
+        bezelWidth,
+        thickness,
+      );
     }, [mapSize, bezelWidth, thickness]);
 
     const lipMap = useMemo(() => {
-      if (typeof window === 'undefined') return null;
-      return generateCircularDisplacementMap(mapSize, 'lip', bezelWidth, thickness);
+      if (typeof window === "undefined") return null;
+      return generateCircularDisplacementMap(
+        mapSize,
+        "lip",
+        bezelWidth,
+        thickness,
+      );
     }, [mapSize, bezelWidth, thickness]);
 
     // Generate specular highlight maps
     const specularMap = useMemo(() => {
-      if (typeof window === 'undefined') return null;
-      return generateSpecularMap(mapSize, 'squircle', bezelWidth, lightAngle, specularIntensity);
+      if (typeof window === "undefined") return null;
+      return generateSpecularMap(
+        mapSize,
+        "squircle",
+        bezelWidth,
+        lightAngle,
+        specularIntensity,
+      );
     }, [mapSize, bezelWidth, lightAngle, specularIntensity]);
 
     // Don't render complex filters for users who prefer reduced motion
@@ -591,35 +633,75 @@ const LiquidFilter = memo(
           className="liquid-filter-svg"
           aria-hidden="true"
           style={{
-            position: 'absolute',
+            position: "absolute",
             width: 0,
             height: 0,
-            overflow: 'hidden',
-            pointerEvents: 'none',
+            overflow: "hidden",
+            pointerEvents: "none",
           }}
         >
           <defs>
             {/* Simple blur fallback for reduced motion */}
-            <filter id="mq-liquid-glass" x="-10%" y="-10%" width="120%" height="120%">
+            <filter
+              id="mq-liquid-glass"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+            >
               <feGaussianBlur in="SourceGraphic" stdDeviation={2} />
             </filter>
-            <filter id="mq-liquid-squircle" x="-10%" y="-10%" width="120%" height="120%">
+            <filter
+              id="mq-liquid-squircle"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+            >
               <feGaussianBlur in="SourceGraphic" stdDeviation={2} />
             </filter>
-            <filter id="mq-liquid-circle" x="-10%" y="-10%" width="120%" height="120%">
+            <filter
+              id="mq-liquid-circle"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+            >
               <feGaussianBlur in="SourceGraphic" stdDeviation={2} />
             </filter>
-            <filter id="mq-liquid-concave" x="-10%" y="-10%" width="120%" height="120%">
+            <filter
+              id="mq-liquid-concave"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+            >
               <feGaussianBlur in="SourceGraphic" stdDeviation={2} />
             </filter>
-            <filter id="mq-liquid-lip" x="-10%" y="-10%" width="120%" height="120%">
+            <filter
+              id="mq-liquid-lip"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+            >
               <feGaussianBlur in="SourceGraphic" stdDeviation={2} />
             </filter>
-            <filter id="mq-liquid-subtle" x="-10%" y="-10%" width="120%" height="120%">
+            <filter
+              id="mq-liquid-subtle"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+            >
               <feGaussianBlur in="SourceGraphic" stdDeviation={1} />
             </filter>
             <filter id="mq-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation={4} result="blur" />
+              <feGaussianBlur
+                in="SourceGraphic"
+                stdDeviation={4}
+                result="blur"
+              />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -640,11 +722,11 @@ const LiquidFilter = memo(
         className="liquid-filter-svg"
         aria-hidden="true"
         style={{
-          position: 'absolute',
+          position: "absolute",
           width: 0,
           height: 0,
-          overflow: 'hidden',
-          pointerEvents: 'none',
+          overflow: "hidden",
+          pointerEvents: "none",
         }}
       >
         <defs>
@@ -695,7 +777,12 @@ const LiquidFilter = memo(
             />
 
             {/* Composite specular highlight on top */}
-            <feBlend in="specular_map" in2="refracted" mode="screen" result="with_highlight" />
+            <feBlend
+              in="specular_map"
+              in2="refracted"
+              mode="screen"
+              result="with_highlight"
+            />
           </filter>
 
           {/* Alias for backward compatibility */}
@@ -761,7 +848,10 @@ const LiquidFilter = memo(
             <feDisplacementMap
               in="SourceGraphic"
               in2="displacement_map"
-              scale={Math.min(circleMap.maxDisplacement, displacementScale * 1.2)}
+              scale={Math.min(
+                circleMap.maxDisplacement,
+                displacementScale * 1.2,
+              )}
               xChannelSelector="R"
               yChannelSelector="G"
             />
@@ -792,7 +882,10 @@ const LiquidFilter = memo(
             <feDisplacementMap
               in="SourceGraphic"
               in2="displacement_map"
-              scale={Math.min(concaveMap.maxDisplacement, displacementScale * 0.8)}
+              scale={Math.min(
+                concaveMap.maxDisplacement,
+                displacementScale * 0.8,
+              )}
               xChannelSelector="R"
               yChannelSelector="G"
             />
@@ -854,7 +947,10 @@ const LiquidFilter = memo(
             <feDisplacementMap
               in="SourceGraphic"
               in2="displacement_map"
-              scale={Math.min(squircleMap.maxDisplacement * 0.5, displacementScale * 0.4)}
+              scale={Math.min(
+                squircleMap.maxDisplacement * 0.5,
+                displacementScale * 0.4,
+              )}
               xChannelSelector="R"
               yChannelSelector="G"
             />
@@ -936,7 +1032,7 @@ const LiquidFilter = memo(
   },
 );
 
-LiquidFilter.displayName = 'LiquidFilter';
+LiquidFilter.displayName = "LiquidFilter";
 
 export default LiquidFilter;
 

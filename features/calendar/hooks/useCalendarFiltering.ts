@@ -1,8 +1,12 @@
-import { useState, useMemo } from 'react';
-import { CalendarFilters } from '@/features/calendar/components/FilterPanel';
-import { Unit, Deadline, Event } from '@/lib/types';
+import { useState, useMemo } from "react";
+import { CalendarFilters } from "@/features/calendar/components/FilterPanel";
+import { Unit, Deadline, Event } from "@/lib/types";
 
-export function useCalendarFiltering(units: Unit[], deadlines: Deadline[], events: Event[]) {
+export function useCalendarFiltering(
+  units: Unit[],
+  deadlines: Deadline[],
+  events: Event[],
+) {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<CalendarFilters>({
     showUnits: true,

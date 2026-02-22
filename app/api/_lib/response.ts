@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { ZodError } from 'zod';
-import { logger } from '@/lib/logger';
+import { NextResponse } from "next/server";
+import { ZodError } from "zod";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // API RESPONSE HELPERS
@@ -34,20 +34,20 @@ export interface ApiResponse<T = unknown> {
  */
 export const ERROR_CODES = {
   // Client Errors (4xx)
-  BAD_REQUEST: 'BAD_REQUEST',
-  UNAUTHORIZED: 'UNAUTHORIZED',
-  FORBIDDEN: 'FORBIDDEN',
-  NOT_FOUND: 'NOT_FOUND',
-  CONFLICT: 'CONFLICT',
-  VALIDATION_ERROR: 'VALIDATION_ERROR',
-  RATE_LIMITED: 'RATE_LIMITED',
+  BAD_REQUEST: "BAD_REQUEST",
+  UNAUTHORIZED: "UNAUTHORIZED",
+  FORBIDDEN: "FORBIDDEN",
+  NOT_FOUND: "NOT_FOUND",
+  CONFLICT: "CONFLICT",
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+  RATE_LIMITED: "RATE_LIMITED",
 
   // Server Errors (5xx)
-  INTERNAL_ERROR: 'INTERNAL_ERROR',
-  DATABASE_ERROR: 'DATABASE_ERROR',
-  EXTERNAL_SERVICE_ERROR: 'EXTERNAL_SERVICE_ERROR',
-  TIMEOUT: 'TIMEOUT',
-  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+  INTERNAL_ERROR: "INTERNAL_ERROR",
+  DATABASE_ERROR: "DATABASE_ERROR",
+  EXTERNAL_SERVICE_ERROR: "EXTERNAL_SERVICE_ERROR",
+  TIMEOUT: "TIMEOUT",
+  SERVICE_UNAVAILABLE: "SERVICE_UNAVAILABLE",
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
@@ -58,8 +58,8 @@ export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
 export const jsonSuccess = <T = unknown>(
   data: T,
   status: number = 200,
-  meta?: Partial<ApiResponse['meta']>,
-  init?: Omit<ResponseInit, 'status'>,
+  meta?: Partial<ApiResponse["meta"]>,
+  init?: Omit<ResponseInit, "status">,
 ): NextResponse<ApiResponse<T>> => {
   try {
     return NextResponse.json(
@@ -76,8 +76,12 @@ export const jsonSuccess = <T = unknown>(
   } catch (error) {
     // SECURITY: If data contains circular references, JSON.stringify (used by NextResponse.json) will fail.
     // Return a generic internal error instead of letting it crash the process.
-    logger.error('Response serialization error:', error);
-    return jsonError('Response serialization failed', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("Response serialization error:", error);
+    return jsonError(
+      "Response serialization failed",
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 };
 
@@ -111,10 +115,12 @@ export const jsonError = (
 /**
  * Handle Zod validation errors
  */
-export const handleValidationError = (error: ZodError): NextResponse<ApiResponse<never>> => {
+export const handleValidationError = (
+  error: ZodError,
+): NextResponse<ApiResponse<never>> => {
   const details = error.issues.reduce(
     (acc, err) => {
-      const field = err.path.join('.');
+      const field = err.path.join(".");
       if (!acc[field]) acc[field] = [];
       acc[field].push(err.message);
       return acc;
@@ -122,16 +128,25 @@ export const handleValidationError = (error: ZodError): NextResponse<ApiResponse
     {} as Record<string, string[]>,
   );
 
-  return jsonError('Validation failed', 400, ERROR_CODES.VALIDATION_ERROR, { fields: details });
+  return jsonError("Validation failed", 400, ERROR_CODES.VALIDATION_ERROR, {
+    fields: details,
+  });
 };
 
 /**
  * Handle database errors
  */
-export const handleDatabaseError = (error: unknown): NextResponse<ApiResponse<never>> => {
+export const handleDatabaseError = (
+  error: unknown,
+): NextResponse<ApiResponse<never>> => {
   // Log detailed error information server-side
-  const err = error as { code?: string; message?: string; details?: string; hint?: string };
-  logger.error('Database error:', {
+  const err = error as {
+    code?: string;
+    message?: string;
+    details?: string;
+    hint?: string;
+  };
+  logger.error("Database error:", {
     code: err.code,
     message: err.message,
     details: err.details,
@@ -143,15 +158,17 @@ export const handleDatabaseError = (error: unknown): NextResponse<ApiResponse<ne
   // SECURITY: Use VERCEL_ENV for reliable production detection
   // This prevents error detail exposure even if NODE_ENV is misconfigured
   const isRealProduction =
-    process.env.VERCEL_ENV === 'production' ||
-    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+    process.env.VERCEL_ENV === "production" ||
+    (process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV);
 
   return jsonError(
-    'A database error occurred',
+    "A database error occurred",
     500,
     ERROR_CODES.DATABASE_ERROR,
     !isRealProduction
-      ? { originalError: error instanceof Error ? error.message : String(error) }
+      ? {
+          originalError: error instanceof Error ? error.message : String(error),
+        }
       : undefined,
   );
 };
@@ -160,7 +177,7 @@ export const handleDatabaseError = (error: unknown): NextResponse<ApiResponse<ne
  * Handle authentication errors
  */
 export const jsonUnauthorized = (
-  message: string = 'Authentication required',
+  message: string = "Authentication required",
 ): NextResponse<ApiResponse<never>> => {
   return jsonError(message, 401, ERROR_CODES.UNAUTHORIZED);
 };
@@ -169,7 +186,7 @@ export const jsonUnauthorized = (
  * Handle forbidden access errors
  */
 export const jsonForbidden = (
-  message: string = 'Access denied',
+  message: string = "Access denied",
 ): NextResponse<ApiResponse<never>> => {
   return jsonError(message, 403, ERROR_CODES.FORBIDDEN);
 };
@@ -177,7 +194,9 @@ export const jsonForbidden = (
 /**
  * Handle not found errors
  */
-export const jsonNotFound = (resource: string = 'Resource'): NextResponse<ApiResponse<never>> => {
+export const jsonNotFound = (
+  resource: string = "Resource",
+): NextResponse<ApiResponse<never>> => {
   return jsonError(`${resource} not found`, 404, ERROR_CODES.NOT_FOUND);
 };
 
@@ -266,7 +285,7 @@ export function checkBodySize(
   request: Request,
   maxBytes: number = BODY_SIZE_LIMITS.DEFAULT,
 ): NextResponse<ApiResponse<never>> | null {
-  const contentLength = request.headers.get('content-length');
+  const contentLength = request.headers.get("content-length");
 
   if (contentLength) {
     const size = parseInt(contentLength, 10);
@@ -294,7 +313,10 @@ export function checkBodySize(
 export async function parseJsonBody<T = unknown>(
   request: Request,
   maxBytes: number = BODY_SIZE_LIMITS.DEFAULT,
-): Promise<{ data: T; error: null } | { data: null; error: NextResponse<ApiResponse<never>> }> {
+): Promise<
+  | { data: T; error: null }
+  | { data: null; error: NextResponse<ApiResponse<never>> }
+> {
   // Check Content-Length header first
   const sizeError = checkBodySize(request, maxBytes);
   if (sizeError) {
@@ -322,7 +344,7 @@ export async function parseJsonBody<T = unknown>(
   } catch {
     return {
       data: null,
-      error: jsonError('Invalid JSON body', 400, ERROR_CODES.BAD_REQUEST),
+      error: jsonError("Invalid JSON body", 400, ERROR_CODES.BAD_REQUEST),
     };
   }
 }

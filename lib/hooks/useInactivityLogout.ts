@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 type UseInactivityLogoutOptions = {
   enabled: boolean;
@@ -9,12 +9,12 @@ type UseInactivityLogoutOptions = {
 };
 
 const ACTIVITY_EVENTS: Array<keyof WindowEventMap> = [
-  'mousedown',
-  'mousemove',
-  'keydown',
-  'scroll',
-  'touchstart',
-  'pointerdown',
+  "mousedown",
+  "mousemove",
+  "keydown",
+  "scroll",
+  "touchstart",
+  "pointerdown",
 ];
 
 export function useInactivityLogout({
@@ -31,7 +31,7 @@ export function useInactivityLogout({
   }, [onTimeout]);
 
   useEffect(() => {
-    if (!enabled || typeof window === 'undefined') {
+    if (!enabled || typeof window === "undefined") {
       return;
     }
 
@@ -59,7 +59,7 @@ export function useInactivityLogout({
     };
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === "visible") {
         handleActivity();
       }
     };
@@ -69,12 +69,14 @@ export function useInactivityLogout({
     ACTIVITY_EVENTS.forEach((eventName) =>
       window.addEventListener(eventName, handleActivity, listenerOptions),
     );
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       clearTimer();
-      ACTIVITY_EVENTS.forEach((eventName) => window.removeEventListener(eventName, handleActivity));
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      ACTIVITY_EVENTS.forEach((eventName) =>
+        window.removeEventListener(eventName, handleActivity),
+      );
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [enabled, timeoutMs]);
 }

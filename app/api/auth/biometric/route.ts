@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { NextRequest } from "next/server";
+import { createServerClient } from "@/lib/supabase/server";
 import {
   jsonSuccess,
   jsonError,
@@ -7,9 +7,9 @@ import {
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
-} from '@/app/api/_lib/response';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+} from "@/app/api/_lib/response";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const biometricSchema = z.object({
   enabled: z.boolean(),
@@ -37,7 +37,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return jsonUnauthorized('Not authenticated');
+      return jsonUnauthorized("Not authenticated");
     }
 
     const metadata = (user.user_metadata || {}) as BiometricMetadata;
@@ -51,8 +51,8 @@ export async function GET() {
       updatedAt: metadata.biometric_updated_at ?? null,
     });
   } catch (error) {
-    logger.error('Biometric GET error:', error);
-    return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("Biometric GET error:", error);
+    return jsonError("Internal server error", 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }
 
@@ -65,22 +65,30 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return jsonUnauthorized('Not authenticated');
+      return jsonUnauthorized("Not authenticated");
     }
 
-    const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: parseError } = await parseJsonBody(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (parseError) return parseError;
 
     const parsed = biometricSchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError('Invalid biometric payload', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError(
+        "Invalid biometric payload",
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
     }
 
-    const { enabled, credentialId, publicKey, counter, transports } = parsed.data;
+    const { enabled, credentialId, publicKey, counter, transports } =
+      parsed.data;
 
     if (enabled && (!credentialId || !publicKey)) {
       return jsonError(
-        'Credential details are required to enable biometric login',
+        "Credential details are required to enable biometric login",
         400,
         ERROR_CODES.VALIDATION_ERROR,
       );
@@ -98,8 +106,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (updateError) {
-      logger.error('Biometric update failed:', updateError.message);
-      return jsonError('Failed to update biometric settings', 400, ERROR_CODES.BAD_REQUEST);
+      logger.error("Biometric update failed:", updateError.message);
+      return jsonError(
+        "Failed to update biometric settings",
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
 
     return jsonSuccess({
@@ -110,7 +122,7 @@ export async function POST(request: NextRequest) {
       transports: enabled ? (transports ?? null) : null,
     });
   } catch (error) {
-    logger.error('Biometric POST error:', error);
-    return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("Biometric POST error:", error);
+    return jsonError("Internal server error", 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

@@ -1,24 +1,31 @@
-'use client';
+"use client";
 
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { ProfileHeader } from './components/ProfileHeader';
-import { PersonalInfoCard } from './components/PersonalInfoCard';
-import { AcademicInfoCard } from './components/AcademicInfoCard';
-import { ReminderSettings } from './components/ReminderSettings';
-import { SecurityCard } from './components/SecurityCard';
-import { useProfileManager } from './hooks/useProfileManager';
-import { Button } from '@/components/ui/mq/button';
-import { Save, Loader2, User as UserIcon, ArrowLeft } from 'lucide-react'; // Renamed User to UserIcon to avoid conflict
-import Link from 'next/link';
-import { MagicCard } from '@/components/ui/MagicCard';
-import { useRouter } from 'next/navigation';
-import { ProfileSkeleton } from './components/ProfileSkeleton';
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { ProfileHeader } from "./components/ProfileHeader";
+import { PersonalInfoCard } from "./components/PersonalInfoCard";
+import { AcademicInfoCard } from "./components/AcademicInfoCard";
+import { ReminderSettings } from "./components/ReminderSettings";
+import { SecurityCard } from "./components/SecurityCard";
+import { useProfileManager } from "./hooks/useProfileManager";
+import { Button } from "@/components/ui/mq/button";
+import { Save, Loader2, User as UserIcon, ArrowLeft } from "lucide-react"; // Renamed User to UserIcon to avoid conflict
+import Link from "next/link";
+import { MagicCard } from "@/components/ui/MagicCard";
+import { useRouter } from "next/navigation";
+import { ProfileSkeleton } from "./components/ProfileSkeleton";
 
 export default function ManageProfilesPage() {
   const { t } = useTypedTranslation();
   const router = useRouter();
-  const { currentProfile, form, saveProfile, isSaving, isDirty, isValid, hasLoaded } =
-    useProfileManager();
+  const {
+    currentProfile,
+    form,
+    saveProfile,
+    isSaving,
+    isDirty,
+    isValid,
+    hasLoaded,
+  } = useProfileManager();
 
   // Show skeleton until the DB fetch completes — prevents stale localStorage data from flashing
   if (!hasLoaded) return <ProfileSkeleton />;
@@ -33,12 +40,14 @@ export default function ManageProfilesPage() {
                 <UserIcon className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4" />
               </div>
               <h2 className="text-mq-lg sm:text-mq-xl font-semibold text-mq-content mb-2">
-                {t('noProfilesYet')}
+                {t("noProfilesYet")}
               </h2>
               <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
-                {t('signInToManageProfile')}
+                {t("signInToManageProfile")}
               </p>
-              <Button onClick={() => router.push('/login')}>{t('signIn')}</Button>
+              <Button onClick={() => router.push("/login")}>
+                {t("signIn")}
+              </Button>
             </div>
           </div>
         </MagicCard>
@@ -55,7 +64,7 @@ export default function ManageProfilesPage() {
           className="inline-flex items-center gap-1.5 text-sm text-mq-content-secondary hover:text-mq-content transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t('settings')}
+          {t("settings")}
         </Link>
       </div>
 
@@ -63,7 +72,11 @@ export default function ManageProfilesPage() {
         <ProfileHeader profile={currentProfile} isSaving={isSaving} />
 
         {/* Pass the FORM object down to cards */}
-        <PersonalInfoCard form={form} email={currentProfile.email} disabled={isSaving} />
+        <PersonalInfoCard
+          form={form}
+          email={currentProfile.email}
+          disabled={isSaving}
+        />
 
         <AcademicInfoCard form={form} disabled={isSaving} />
 
@@ -83,7 +96,7 @@ export default function ManageProfilesPage() {
               className="w-full sm:w-auto shadow-lg flex items-center gap-2"
             >
               {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
-              {isSaving ? t('saving') : t('saveChanges')}
+              {isSaving ? t("saving") : t("saveChanges")}
             </Button>
           </div>
         )}

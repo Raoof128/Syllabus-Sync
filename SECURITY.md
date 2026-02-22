@@ -50,8 +50,8 @@ The application uses `VERCEL_ENV` for reliable production environment detection:
 
 ```typescript
 const isRealProduction =
-  process.env.VERCEL_ENV === 'production' ||
-  (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+  process.env.VERCEL_ENV === "production" ||
+  (process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV);
 ```
 
 This ensures security features (CSRF, rate limiting, dev bypasses) cannot be circumvented by manipulating `NODE_ENV` locally.

@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { SydneyRegion, WeatherData } from './types';
-import { SYDNEY_REGIONS, determineVibe } from './constants';
-import { WeatherResult } from '@/lib/weather/types';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { SydneyRegion, WeatherData } from "./types";
+import { SYDNEY_REGIONS, determineVibe } from "./constants";
+import { WeatherResult } from "@/lib/weather/types";
 
-const STORAGE_KEY = 'mq-weather-region';
-const LOC_STORAGE_KEY = 'mq-weather-location-cache';
-const CACHE_KEY_PREFIX = 'mq-weather-cache-';
+const STORAGE_KEY = "mq-weather-region";
+const LOC_STORAGE_KEY = "mq-weather-location-cache";
+const CACHE_KEY_PREFIX = "mq-weather-cache-";
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-export type LocationSource = 'gps' | 'saved' | 'approx';
+export type LocationSource = "gps" | "saved" | "approx";
 
 interface LocationCache {
   lat: number;
@@ -21,7 +21,9 @@ export const useWeather = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState<SydneyRegion>(SYDNEY_REGIONS[0]);
+  const [selectedRegion, setSelectedRegion] = useState<SydneyRegion>(
+    SYDNEY_REGIONS[0],
+  );
   const [useGps, setUseGps] = useState<boolean>(true);
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -48,15 +50,21 @@ export const useWeather = () => {
     type: LocationSource;
     name: string;
   }> => {
-    if (useGps && typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+    if (
+      useGps &&
+      typeof navigator !== "undefined" &&
+      "geolocation" in navigator
+    ) {
       try {
-        const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 7000,
-            maximumAge: 15 * 60 * 1000, // 15 mins
-          });
-        });
+        const pos = await new Promise<GeolocationPosition>(
+          (resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 7000,
+              maximumAge: 15 * 60 * 1000, // 15 mins
+            });
+          },
+        );
 
         // Cache this good location
         const locCache: LocationCache = {
@@ -70,8 +78,8 @@ export const useWeather = () => {
         return {
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
-          type: 'gps',
-          name: 'Current Location',
+          type: "gps",
+          name: "Current Location",
         };
       } catch {
         // Fallback to cache
@@ -87,8 +95,8 @@ export const useWeather = () => {
           return {
             lat: parsed.lat,
             lon: parsed.lon,
-            type: 'saved',
-            name: 'Last Known Location',
+            type: "saved",
+            name: "Last Known Location",
           };
         }
       } catch {
@@ -100,7 +108,7 @@ export const useWeather = () => {
     return {
       lat: selectedRegion.lat,
       lon: selectedRegion.lon,
-      type: 'approx',
+      type: "approx",
       name: selectedRegion.name,
     };
   }, [useGps, selectedRegion]);
@@ -127,7 +135,10 @@ export const useWeather = () => {
           try {
             const cached = localStorage.getItem(cacheKey);
             if (cached) {
-              const parsed = JSON.parse(cached) as { timestamp: number; data: WeatherData };
+              const parsed = JSON.parse(cached) as {
+                timestamp: number;
+                data: WeatherData;
+              };
               // 3.3 Stale detection
               if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
                 setWeatherData(parsed.data);
@@ -138,19 +149,26 @@ export const useWeather = () => {
           } catch {}
         }
 
-        const response = await fetch(`/api/weather?lat=${loc.lat}&lon=${loc.lon}`, {
-          signal: abortControllerRef.current.signal,
-        });
+        const response = await fetch(
+          `/api/weather?lat=${loc.lat}&lon=${loc.lon}`,
+          {
+            signal: abortControllerRef.current.signal,
+          },
+        );
 
         if (!response.ok) {
-          throw new Error('Weather service unreachable');
+          throw new Error("Weather service unreachable");
         }
 
         const apiResponse = await response.json();
         const rawData = apiResponse?.data as WeatherResult;
 
-        if (!rawData || !rawData.current || typeof rawData.current.temperature !== 'number') {
-          throw new Error('Invalid weather data');
+        if (
+          !rawData ||
+          !rawData.current ||
+          typeof rawData.current.temperature !== "number"
+        ) {
+          throw new Error("Invalid weather data");
         }
 
         const current = rawData.current;
@@ -172,12 +190,15 @@ export const useWeather = () => {
         setWeatherData(newData);
 
         try {
-          localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: newData }));
+          localStorage.setItem(
+            cacheKey,
+            JSON.stringify({ timestamp: Date.now(), data: newData }),
+          );
         } catch {}
       } catch (err: unknown) {
-        if (err instanceof Error && err.name === 'AbortError') return;
+        if (err instanceof Error && err.name === "AbortError") return;
 
-        setError(err instanceof Error ? err.message : 'Weather unavailable');
+        setError(err instanceof Error ? err.message : "Weather unavailable");
 
         // Keep showing old data if it fails but mark it explicitly
       } finally {

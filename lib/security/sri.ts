@@ -38,7 +38,7 @@ export const EXTERNAL_RESOURCES = {
 export interface SRIResource {
   url: string;
   hash: string;
-  crossOrigin?: 'anonymous' | 'use-credentials';
+  crossOrigin?: "anonymous" | "use-credentials";
 }
 
 export interface SRIScriptOptions extends SRIResource {
@@ -69,7 +69,7 @@ export function generateSRIHash(_content: string | Buffer): string {
 
   // Note: This is a build-time utility
   // In production, hashes should be pre-computed and stored
-  return 'sha384-PLACEHOLDER_USE_BUILD_SCRIPT';
+  return "sha384-PLACEHOLDER_USE_BUILD_SCRIPT";
 }
 
 /**
@@ -99,7 +99,14 @@ export function generateSRIHash(_content: string | Buffer): string {
  * @returns HTML script tag string
  */
 export function generateSRIScript(options: SRIScriptOptions): string {
-  const { url, hash, crossOrigin = 'anonymous', async = false, defer = false, type } = options;
+  const {
+    url,
+    hash,
+    crossOrigin = "anonymous",
+    async = false,
+    defer = false,
+    type,
+  } = options;
 
   const attributes: string[] = [
     `src="${escapeHtml(url)}"`,
@@ -107,11 +114,11 @@ export function generateSRIScript(options: SRIScriptOptions): string {
     `crossorigin="${crossOrigin}"`,
   ];
 
-  if (async) attributes.push('async');
-  if (defer) attributes.push('defer');
+  if (async) attributes.push("async");
+  if (defer) attributes.push("defer");
   if (type) attributes.push(`type="${escapeHtml(type)}"`);
 
-  return `<script ${attributes.join(' ')}></script>`;
+  return `<script ${attributes.join(" ")}></script>`;
 }
 
 /**
@@ -121,7 +128,7 @@ export function generateSRIScript(options: SRIScriptOptions): string {
  * @returns HTML link tag string
  */
 export function generateSRIStyle(options: SRIStyleOptions): string {
-  const { url, hash, crossOrigin = 'anonymous', media } = options;
+  const { url, hash, crossOrigin = "anonymous", media } = options;
 
   const attributes: string[] = [
     `rel="stylesheet"`,
@@ -132,7 +139,7 @@ export function generateSRIStyle(options: SRIStyleOptions): string {
 
   if (media) attributes.push(`media="${escapeHtml(media)}"`);
 
-  return `<link ${attributes.join(' ')} />`;
+  return `<link ${attributes.join(" ")} />`;
 }
 
 // ============================================================================
@@ -147,13 +154,15 @@ export function generateSRIStyle(options: SRIStyleOptions): string {
  */
 export function isValidSRIHash(hash: string): boolean {
   // SRI hashes must start with algorithm prefix
-  const validPrefixes = ['sha256-', 'sha384-', 'sha512-'];
-  const hasValidPrefix = validPrefixes.some((prefix) => hash.startsWith(prefix));
+  const validPrefixes = ["sha256-", "sha384-", "sha512-"];
+  const hasValidPrefix = validPrefixes.some((prefix) =>
+    hash.startsWith(prefix),
+  );
 
   if (!hasValidPrefix) return false;
 
   // Base64url encoded hash should be reasonable length
-  const hashPart = hash.split('-')[1];
+  const hashPart = hash.split("-")[1];
   if (!hashPart) return false;
 
   // Minimum length check (sha256 = 32 bytes = 44 base64 chars)
@@ -170,7 +179,9 @@ export function validateSREResources(): { valid: boolean; errors: string[] } {
   for (const [name, resource] of Object.entries(EXTERNAL_RESOURCES)) {
     const typedResource = resource as SRIResource;
     if (!isValidSRIHash(typedResource.hash)) {
-      errors.push(`Invalid SRI hash for resource "${name}": ${typedResource.hash}`);
+      errors.push(
+        `Invalid SRI hash for resource "${name}": ${typedResource.hash}`,
+      );
     }
   }
 
@@ -188,7 +199,8 @@ export function validateSREResources(): { valid: boolean; errors: string[] } {
  * Escape HTML special characters to prevent XSS
  */
 function escapeHtml(text: string): string {
-  const div = typeof document !== 'undefined' ? document.createElement('div') : null;
+  const div =
+    typeof document !== "undefined" ? document.createElement("div") : null;
   if (div) {
     div.textContent = text;
     return div.innerHTML;
@@ -196,11 +208,11 @@ function escapeHtml(text: string): string {
 
   // Server-side fallback
   return text
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
+    .replace(/&/g, "&")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
     .replace(/"/g, '"')
-    .replace(/'/g, '&#039;');
+    .replace(/'/g, "&#039;");
 }
 
 // ============================================================================
@@ -216,11 +228,11 @@ export function generateSRIMetadata(
   styles: SRIStyleOptions[],
 ): {
   other: {
-    'script:ld+json'?: string;
+    "script:ld+json"?: string;
   };
 } {
-  scripts.map(generateSRIScript).join('\n');
-  styles.map(generateSRIStyle).join('\n');
+  scripts.map(generateSRIScript).join("\n");
+  styles.map(generateSRIStyle).join("\n");
 
   return {
     other: {
@@ -239,7 +251,7 @@ export function getSRIScriptProps(options: SRIScriptOptions) {
   return {
     src: options.url,
     integrity: options.hash,
-    crossOrigin: options.crossOrigin || 'anonymous',
+    crossOrigin: options.crossOrigin || "anonymous",
     async: options.async,
     defer: options.defer,
   };

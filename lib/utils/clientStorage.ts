@@ -10,9 +10,9 @@
  * - Cross-user data contamination
  */
 
-'use client';
+"use client";
 
-import { devLog } from './devLog';
+import { devLog } from "./devLog";
 
 // ============================================================================
 // STORAGE KEYS
@@ -23,34 +23,37 @@ import { devLog } from './devLog';
  * Update this list when adding new persisted stores
  */
 const ZUSTAND_STORAGE_KEYS = [
-  'units-storage', // lib/store/unitsStore.ts
-  'deadlines-storage', // lib/store/deadlinesStore.ts
-  'events-storage', // lib/store/eventsStore.ts
-  'notifications-storage', // lib/store/notificationsStore.ts
-  'profiles-storage', // lib/store/profilesStore.ts
-  'syllabus-sync-gamification', // lib/store/gamificationStore.ts
-  'todos-storage', // lib/store/todosStore.ts
-  'notification-preferences-storage', // lib/store/notificationPreferencesStore.ts
+  "units-storage", // lib/store/unitsStore.ts
+  "deadlines-storage", // lib/store/deadlinesStore.ts
+  "events-storage", // lib/store/eventsStore.ts
+  "notifications-storage", // lib/store/notificationsStore.ts
+  "profiles-storage", // lib/store/profilesStore.ts
+  "syllabus-sync-gamification", // lib/store/gamificationStore.ts
+  "todos-storage", // lib/store/todosStore.ts
+  "notification-preferences-storage", // lib/store/notificationPreferencesStore.ts
 ] as const;
 
 /**
  * Other application localStorage keys that should be cleared on logout
  */
 const APP_STORAGE_KEYS = [
-  'syllabus-sync-theme', // Theme preference (optional - may want to keep)
-  'syllabus-sync-language', // Language preference (optional - may want to keep)
-  'syllabus-sync-onboarding', // Onboarding completion state
-  'syllabus-sync-last-sync', // Last sync timestamp
-  'units-seeded', // Sample units seeding flag
-  'deadlines-seeded', // Sample deadlines seeding flag
-  'seed-disabled', // Seeding disabled flag
+  "syllabus-sync-theme", // Theme preference (optional - may want to keep)
+  "syllabus-sync-language", // Language preference (optional - may want to keep)
+  "syllabus-sync-onboarding", // Onboarding completion state
+  "syllabus-sync-last-sync", // Last sync timestamp
+  "units-seeded", // Sample units seeding flag
+  "deadlines-seeded", // Sample deadlines seeding flag
+  "seed-disabled", // Seeding disabled flag
 ] as const;
 
 /**
  * Keys that should be preserved across logouts (user preferences)
  * These are non-sensitive settings that improve UX
  */
-const PRESERVED_KEYS = ['syllabus-sync-theme', 'syllabus-sync-language'] as const;
+const PRESERVED_KEYS = [
+  "syllabus-sync-theme",
+  "syllabus-sync-language",
+] as const;
 
 // ============================================================================
 // CLEAR FUNCTIONS
@@ -63,7 +66,7 @@ const PRESERVED_KEYS = ['syllabus-sync-theme', 'syllabus-sync-language'] as cons
  * @param preservePreferences - If true, keeps theme/language settings (default: true)
  */
 export function clearAllClientStorage(preservePreferences = true): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   try {
     // Clear Zustand persisted stores
@@ -73,7 +76,10 @@ export function clearAllClientStorage(preservePreferences = true): void {
 
     // Clear app-specific storage
     for (const key of APP_STORAGE_KEYS) {
-      if (preservePreferences && (PRESERVED_KEYS as readonly string[]).includes(key)) {
+      if (
+        preservePreferences &&
+        (PRESERVED_KEYS as readonly string[]).includes(key)
+      ) {
         continue;
       }
       localStorage.removeItem(key);
@@ -82,10 +88,10 @@ export function clearAllClientStorage(preservePreferences = true): void {
     // Clear sessionStorage completely (always cleared on logout)
     sessionStorage.clear();
 
-    devLog.auth.info('Client storage cleared on logout');
+    devLog.auth.info("Client storage cleared on logout");
   } catch (error) {
     // Storage might be unavailable (private browsing, etc.)
-    devLog.auth.warn('Failed to clear client storage', error);
+    devLog.auth.warn("Failed to clear client storage", error);
   }
 }
 
@@ -94,14 +100,14 @@ export function clearAllClientStorage(preservePreferences = true): void {
  * Useful for "soft reset" scenarios
  */
 export function clearStoreData(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   try {
     for (const key of ZUSTAND_STORAGE_KEYS) {
       localStorage.removeItem(key);
     }
   } catch (error) {
-    devLog.store.warn('Failed to clear store data', error);
+    devLog.store.warn("Failed to clear store data", error);
   }
 }
 
@@ -125,7 +131,7 @@ export function getAllStorageKeys(): string[] {
  * Checks if any user data exists in client storage
  */
 export function hasUserData(): boolean {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === "undefined") return false;
 
   for (const key of ZUSTAND_STORAGE_KEYS) {
     if (localStorage.getItem(key)) {
@@ -143,7 +149,7 @@ export function hasUserData(): boolean {
  * Note: This imports stores dynamically to avoid circular dependencies.
  */
 export async function resetAllStores(): Promise<void> {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   try {
     // Dynamic imports to avoid circular dependencies
@@ -157,14 +163,14 @@ export async function resetAllStores(): Promise<void> {
       { useTodosStore },
       { useNotificationPreferencesStore },
     ] = await Promise.all([
-      import('@/lib/store/unitsStore'),
-      import('@/lib/store/deadlinesStore'),
-      import('@/lib/store/eventsStore'),
-      import('@/lib/store/profilesStore'),
-      import('@/lib/store/notificationsStore'),
-      import('@/lib/store/gamificationStore'),
-      import('@/lib/store/todosStore'),
-      import('@/lib/store/notificationPreferencesStore'),
+      import("@/lib/store/unitsStore"),
+      import("@/lib/store/deadlinesStore"),
+      import("@/lib/store/eventsStore"),
+      import("@/lib/store/profilesStore"),
+      import("@/lib/store/notificationsStore"),
+      import("@/lib/store/gamificationStore"),
+      import("@/lib/store/todosStore"),
+      import("@/lib/store/notificationPreferencesStore"),
     ]);
 
     // Clear each store's state and reset hasLoaded flag
@@ -177,8 +183,8 @@ export async function resetAllStores(): Promise<void> {
     useTodosStore.getState().clearTodos();
     useNotificationPreferencesStore.getState().clearAllReminders();
 
-    devLog.auth.info('All stores reset on logout');
+    devLog.auth.info("All stores reset on logout");
   } catch (error) {
-    devLog.auth.warn('Failed to reset stores', error);
+    devLog.auth.warn("Failed to reset stores", error);
   }
 }

@@ -10,11 +10,11 @@
  * - All flows are anti-enumeration (same response whether a user exists or not)
  */
 
-import { randomBytes, createHash } from 'crypto';
-import { createRateLimiter } from '@/lib/services/rateLimitService';
-import { logger } from '@/lib/logger';
-import { sendPasswordResetEmail } from '@/lib/services/emailService';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { randomBytes, createHash } from "crypto";
+import { createRateLimiter } from "@/lib/services/rateLimitService";
+import { logger } from "@/lib/logger";
+import { sendPasswordResetEmail } from "@/lib/services/emailService";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 // ============================================================================
 // CONSTANTS
@@ -32,7 +32,7 @@ export const PASSWORD_RESET_MAX_SENDS_PER_HOUR = 5;
 
 /** Rate limiter for requesting password reset emails */
 export const passwordResetRequestLimiter = createRateLimiter({
-  prefix: 'password-reset-request',
+  prefix: "password-reset-request",
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: PASSWORD_RESET_MAX_SENDS_PER_HOUR,
   failClosed: true,
@@ -46,14 +46,14 @@ export const passwordResetRequestLimiter = createRateLimiter({
  * Generate a cryptographically secure reset token (hex).
  */
 export function generatePasswordResetToken(): string {
-  return randomBytes(32).toString('hex');
+  return randomBytes(32).toString("hex");
 }
 
 /**
  * Hash a token using SHA-256.
  */
 export function hashResetToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex');
+  return createHash("sha256").update(token).digest("hex");
 }
 
 /**
@@ -81,10 +81,10 @@ export async function createAndSendPasswordReset(
 ): Promise<{ success: boolean; error?: string }> {
   // 1. Invalidate previous active tokens for this user
   await adminClient
-    .from('password_resets')
+    .from("password_resets")
     .update({ used: true })
-    .eq('user_id', userId)
-    .eq('used', false);
+    .eq("user_id", userId)
+    .eq("used", false);
 
   // 2. Create token and store hash
   const rawToken = generatePasswordResetToken();
@@ -92,18 +92,21 @@ export async function createAndSendPasswordReset(
   const expiresAt = getResetTokenExpiry();
 
   const { data: inserted, error: insertError } = await adminClient
-    .from('password_resets')
+    .from("password_resets")
     .insert({
       user_id: userId,
       token_hash: tokenHash,
       expires_at: expiresAt.toISOString(),
     })
-    .select('id')
+    .select("id")
     .single();
 
   if (insertError) {
-    logger.error('Failed to store password reset token', { userId, error: insertError.message });
-    return { success: false, error: 'Failed to create password reset token' };
+    logger.error("Failed to store password reset token", {
+      userId,
+      error: insertError.message,
+    });
+    return { success: false, error: "Failed to create password reset token" };
   }
 
   // 3. Send email (raw token in URL, never logged)
@@ -112,13 +115,12 @@ export async function createAndSendPasswordReset(
   if (!result.success) {
     // Best-effort cleanup: don't leave a valid unused token if email never left.
     if (inserted?.id) {
-      await adminClient.from('password_resets').delete().eq('id', inserted.id);
+      await adminClient.from("password_resets").delete().eq("id", inserted.id);
     }
-    logger.error('Password reset email send failed', { userId });
-    return { success: false, error: 'Failed to send password reset email' };
+    logger.error("Password reset email send failed", { userId });
+    return { success: false, error: "Failed to send password reset email" };
   }
 
-  logger.info('Password reset email sent', { userId });
+  logger.info("Password reset email sent", { userId });
   return { success: true };
 }
-

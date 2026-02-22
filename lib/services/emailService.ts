@@ -8,8 +8,8 @@
  * - Do not treat email delivery as “best effort” in production for critical flows.
  */
 
-import { Resend } from 'resend';
-import { logger } from '@/lib/logger';
+import { Resend } from "resend";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // CONFIG
@@ -26,28 +26,33 @@ function isPlaceholder(value: string): boolean {
   const v = value.trim().toLowerCase();
   return (
     v.length === 0 ||
-    v.includes('your-') ||
-    v.includes('paste') ||
-    v.includes('example.com') ||
-    v === 'your-resend-api-key-here'
+    v.includes("your-") ||
+    v.includes("paste") ||
+    v.includes("example.com") ||
+    v === "your-resend-api-key-here"
   );
 }
 
 function getAppUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  if (explicit && !isPlaceholder(explicit)) return explicit.replace(/\/+$/, '');
+  if (explicit && !isPlaceholder(explicit)) return explicit.replace(/\/+$/, "");
 
   // Vercel provides deployment URLs without protocol.
   const vercelUrl = process.env.VERCEL_URL?.trim();
-  if (vercelUrl && !isPlaceholder(vercelUrl)) return `https://${vercelUrl.replace(/\/+$/, '')}`;
+  if (vercelUrl && !isPlaceholder(vercelUrl))
+    return `https://${vercelUrl.replace(/\/+$/, "")}`;
 
-  return 'http://localhost:3000';
+  return "http://localhost:3000";
 }
 
 function getEmailConfig(): EmailServiceConfig {
-  const resendApiKey = (process.env.RESEND_API_KEY ?? '').trim();
-  const fromAddress = (process.env.VERIFICATION_EMAIL_FROM ?? 'onboarding@resend.dev').trim();
-  const fromName = (process.env.VERIFICATION_EMAIL_NAME ?? 'Syllabus Sync').trim();
+  const resendApiKey = (process.env.RESEND_API_KEY ?? "").trim();
+  const fromAddress = (
+    process.env.VERIFICATION_EMAIL_FROM ?? "onboarding@resend.dev"
+  ).trim();
+  const fromName = (
+    process.env.VERIFICATION_EMAIL_NAME ?? "Syllabus Sync"
+  ).trim();
 
   return {
     resendApiKey,
@@ -64,14 +69,14 @@ function isValidEmailAddress(value: string): boolean {
 }
 
 function maskEmailForLogs(email: string): string {
-  const [localPart, domain] = email.toLowerCase().split('@');
-  if (!localPart || !domain) return 'invalid-email';
-  if (localPart.length <= 2) return `${localPart[0] ?? '*'}***@${domain}`;
+  const [localPart, domain] = email.toLowerCase().split("@");
+  if (!localPart || !domain) return "invalid-email";
+  if (localPart.length <= 2) return `${localPart[0] ?? "*"}***@${domain}`;
   return `${localPart.slice(0, 2)}***@${domain}`;
 }
 
 let cachedClient: Resend | null = null;
-let cachedKey = '';
+let cachedKey = "";
 
 function getResendClient(apiKey: string): Resend {
   if (!cachedClient || cachedKey !== apiKey) {
@@ -86,8 +91,10 @@ function getResendClient(apiKey: string): Resend {
  */
 export function isEmailServiceConfigured(): boolean {
   const cfg = getEmailConfig();
-  if (cfg.resendApiKey.length === 0 || isPlaceholder(cfg.resendApiKey)) return false;
-  if (!isValidEmailAddress(cfg.fromAddress) || isPlaceholder(cfg.fromAddress)) return false;
+  if (cfg.resendApiKey.length === 0 || isPlaceholder(cfg.resendApiKey))
+    return false;
+  if (!isValidEmailAddress(cfg.fromAddress) || isPlaceholder(cfg.fromAddress))
+    return false;
   if (cfg.fromName.trim().length === 0) return false;
   if (cfg.appUrl.trim().length === 0) return false;
   return true;
@@ -237,15 +244,15 @@ export async function sendEmail({
   const cfg = getEmailConfig();
 
   if (!isEmailServiceConfigured()) {
-    logger.warn('Email service not configured — skipping email');
-    return { success: false, error: 'Email service not configured' };
+    logger.warn("Email service not configured — skipping email");
+    return { success: false, error: "Email service not configured" };
   }
 
   if (!isValidEmailAddress(to)) {
-    logger.warn('Invalid email recipient — skipping email', {
+    logger.warn("Invalid email recipient — skipping email", {
       recipient_hint: maskEmailForLogs(to),
     });
-    return { success: false, error: 'Invalid email recipient' };
+    return { success: false, error: "Invalid email recipient" };
   }
 
   try {
@@ -259,15 +266,18 @@ export async function sendEmail({
     });
 
     if (error) {
-      logger.error('Resend send failed', { message: error.message });
-      return { success: false, error: 'Failed to send email' };
+      logger.error("Resend send failed", { message: error.message });
+      return { success: false, error: "Failed to send email" };
     }
 
-    logger.info('Email sent', { recipient_hint: maskEmailForLogs(to), subject });
+    logger.info("Email sent", {
+      recipient_hint: maskEmailForLogs(to),
+      subject,
+    });
     return { success: true };
   } catch (error) {
-    logger.error('Email send error', error);
-    return { success: false, error: 'Failed to send email' };
+    logger.error("Email send error", error);
+    return { success: false, error: "Failed to send email" };
   }
 }
 
@@ -284,15 +294,15 @@ export async function sendVerificationEmail({
   const cfg = getEmailConfig();
 
   if (!isEmailServiceConfigured()) {
-    logger.warn('Email service not configured — skipping verification email');
-    return { success: false, error: 'Email service not configured' };
+    logger.warn("Email service not configured — skipping verification email");
+    return { success: false, error: "Email service not configured" };
   }
 
   if (!isValidEmailAddress(to)) {
-    logger.warn('Invalid email recipient — skipping verification email', {
+    logger.warn("Invalid email recipient — skipping verification email", {
       recipient_hint: maskEmailForLogs(to),
     });
-    return { success: false, error: 'Invalid email recipient' };
+    return { success: false, error: "Invalid email recipient" };
   }
 
   const verifyUrl = `${cfg.appUrl}/verify?token=${token}`;
@@ -302,21 +312,25 @@ export async function sendVerificationEmail({
     const { error } = await resend.emails.send({
       from: `${cfg.fromName} <${cfg.fromAddress}>`,
       to: [to],
-      subject: 'Verify your email — Syllabus Sync',
+      subject: "Verify your email — Syllabus Sync",
       html: verificationEmailHtml(verifyUrl),
       text: `Verify your email address: ${verifyUrl}\n\nThis link expires in 20 minutes.`,
     });
 
     if (error) {
-      logger.error('Resend verification send failed', { message: error.message });
-      return { success: false, error: 'Failed to send verification email' };
+      logger.error("Resend verification send failed", {
+        message: error.message,
+      });
+      return { success: false, error: "Failed to send verification email" };
     }
 
-    logger.info('Verification email sent', { recipient_hint: maskEmailForLogs(to) });
+    logger.info("Verification email sent", {
+      recipient_hint: maskEmailForLogs(to),
+    });
     return { success: true };
   } catch (error) {
-    logger.error('Verification email send error', error);
-    return { success: false, error: 'Failed to send verification email' };
+    logger.error("Verification email send error", error);
+    return { success: false, error: "Failed to send verification email" };
   }
 }
 
@@ -329,19 +343,22 @@ export async function sendVerificationEmail({
 export async function sendPasswordResetEmail({
   to,
   token,
-}: SendPasswordResetEmailParams): Promise<{ success: boolean; error?: string }> {
+}: SendPasswordResetEmailParams): Promise<{
+  success: boolean;
+  error?: string;
+}> {
   const cfg = getEmailConfig();
 
   if (!isEmailServiceConfigured()) {
-    logger.warn('Email service not configured — skipping password reset email');
-    return { success: false, error: 'Email service not configured' };
+    logger.warn("Email service not configured — skipping password reset email");
+    return { success: false, error: "Email service not configured" };
   }
 
   if (!isValidEmailAddress(to)) {
-    logger.warn('Invalid email recipient — skipping password reset email', {
+    logger.warn("Invalid email recipient — skipping password reset email", {
       recipient_hint: maskEmailForLogs(to),
     });
-    return { success: false, error: 'Invalid email recipient' };
+    return { success: false, error: "Invalid email recipient" };
   }
 
   const resetUrl = `${cfg.appUrl}/reset-password?token=${token}`;
@@ -351,20 +368,24 @@ export async function sendPasswordResetEmail({
     const { error } = await resend.emails.send({
       from: `${cfg.fromName} <${cfg.fromAddress}>`,
       to: [to],
-      subject: 'Reset your password — Syllabus Sync',
+      subject: "Reset your password — Syllabus Sync",
       html: passwordResetEmailHtml(resetUrl),
       text: `Reset your password: ${resetUrl}\n\nThis link expires in 20 minutes.`,
     });
 
     if (error) {
-      logger.error('Resend password reset send failed', { message: error.message });
-      return { success: false, error: 'Failed to send password reset email' };
+      logger.error("Resend password reset send failed", {
+        message: error.message,
+      });
+      return { success: false, error: "Failed to send password reset email" };
     }
 
-    logger.info('Password reset email sent', { recipient_hint: maskEmailForLogs(to) });
+    logger.info("Password reset email sent", {
+      recipient_hint: maskEmailForLogs(to),
+    });
     return { success: true };
   } catch (error) {
-    logger.error('Password reset email send error', error);
-    return { success: false, error: 'Failed to send password reset email' };
+    logger.error("Password reset email send error", error);
+    return { success: false, error: "Failed to send password reset email" };
   }
 }

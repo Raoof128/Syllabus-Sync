@@ -6,39 +6,54 @@ import {
   useCallback,
   useImperativeHandle,
   forwardRef,
-} from 'react';
-import { Badge } from '@/components/ui/mq/badge';
-import { cn } from '@/lib/utils';
+} from "react";
+import { Badge } from "@/components/ui/mq/badge";
+import { cn } from "@/lib/utils";
 import {
   Building,
   BUILDING_CATEGORY_LABELS,
   getBuildingCrsCoords,
-} from '@/features/map/lib/buildings';
-import { formatDistance, formatDuration } from '@/features/map/lib/navigationHelpers';
-import { createMarkerIcon, createUserLocationIcon } from '@/features/map/lib/mapUtils';
+} from "@/features/map/lib/buildings";
+import {
+  formatDistance,
+  formatDuration,
+} from "@/features/map/lib/navigationHelpers";
+import {
+  createMarkerIcon,
+  createUserLocationIcon,
+} from "@/features/map/lib/mapUtils";
 import {
   generateNavigationText,
   formatETA,
   NavigationStateManager,
-} from '@/features/map/lib/realtimeNavigation';
-import { setHapticEnabledGetter } from '@/lib/utils/haptics';
-import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
-import { useLeafletLoader } from '@/features/map/hooks/useLeafletLoader';
-import { devLog } from '@/lib/utils/devLog';
-import type { MapOverlayId } from '@/features/map/lib/mapOverlays';
-import { useMapStore } from '@/lib/store/mapStore';
-import { CAMPUS_CENTER_PIXEL, PIXEL_BOUNDS, CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
-import { gpsToCrsSimple } from '@/features/map/lib/geospatialCalibration';
-import { useMapLocation } from '../hooks/useMapLocation';
-import { useMapNavigation } from '../hooks/useMapNavigation';
-import { MapOverlays } from './MapOverlays';
-import { MapController } from './MapController';
+} from "@/features/map/lib/realtimeNavigation";
+import { setHapticEnabledGetter } from "@/lib/utils/haptics";
+import { useSafeTranslation } from "@/lib/hooks/useSafeTranslation";
+import { useLeafletLoader } from "@/features/map/hooks/useLeafletLoader";
+import { devLog } from "@/lib/utils/devLog";
+import type { MapOverlayId } from "@/features/map/lib/mapOverlays";
+import { useMapStore } from "@/lib/store/mapStore";
+import {
+  CAMPUS_CENTER_PIXEL,
+  PIXEL_BOUNDS,
+  CAMPUS_IMAGE_URL,
+} from "@/features/map/lib/constants";
+import { gpsToCrsSimple } from "@/features/map/lib/geospatialCalibration";
+import { useMapLocation } from "../hooks/useMapLocation";
+import { useMapNavigation } from "../hooks/useMapNavigation";
+import { MapOverlays } from "./MapOverlays";
+import { MapController } from "./MapController";
 
 // Map-specific logger
 const mapLog = devLog.map;
 
 /** Location tracking status */
-export type LocationStatus = 'idle' | 'searching' | 'found' | 'denied' | 'error';
+export type LocationStatus =
+  | "idle"
+  | "searching"
+  | "found"
+  | "denied"
+  | "error";
 
 export interface CampusMapRef {
   startNavigation: () => void;
@@ -55,7 +70,13 @@ interface CampusMapProps {
   onNavStateChange?: (state: {
     isNavigating: boolean;
     remainingDistance?: number;
-    status?: 'idle' | 'navigating' | 'arrived' | 'off-route' | 'recalculating' | 'error';
+    status?:
+      | "idle"
+      | "navigating"
+      | "arrived"
+      | "off-route"
+      | "recalculating"
+      | "error";
   }) => void;
   /** Callback when map is fully ready (for smooth loading transitions) */
   onMapReady?: () => void;
@@ -63,7 +84,13 @@ interface CampusMapProps {
 
 const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
   (
-    { selectedBuilding, activeOverlays = [], onLocationStatusChange, onNavStateChange, onMapReady },
+    {
+      selectedBuilding,
+      activeOverlays = [],
+      onLocationStatusChange,
+      onNavStateChange,
+      onMapReady,
+    },
     ref,
   ) => {
     const { t, safeT } = useSafeTranslation();
@@ -78,13 +105,20 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     // ============================================
     // LEAFLET MODULE - Loaded dynamically
     // ============================================
-    const { leafletModule, reactLeafletModule, isClientReady, mapKey, isMountedRef } =
-      useLeafletLoader();
+    const {
+      leafletModule,
+      reactLeafletModule,
+      isClientReady,
+      mapKey,
+      isMountedRef,
+    } = useLeafletLoader();
 
     // ============================================
     // COMPONENT STATE
     // ============================================
-    const [mapInstance, setMapInstance] = useState<import('leaflet').Map | null>(null);
+    const [mapInstance, setMapInstance] = useState<
+      import("leaflet").Map | null
+    >(null);
     const [overlaysReady, setOverlaysReady] = useState(false);
     const [overlayUrl, setOverlayUrl] = useState<string | null>(null);
     const [showOffCampusWarning, setShowOffCampusWarning] = useState(false);
@@ -92,7 +126,9 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     const navManagerRef = useRef<NavigationStateManager | null>(null);
     const hasNotifiedReadyRef = useRef(false);
     const wasOffCampusRef = useRef(false);
-    const offCampusWarningTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const offCampusWarningTimeoutRef = useRef<ReturnType<
+      typeof setTimeout
+    > | null>(null);
 
     // Initialize Navigation Manager
     useEffect(() => {
@@ -109,7 +145,11 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     const getMarkerIcon = useCallback(
       (isSelected: boolean) => {
         if (!leafletModule) return undefined;
-        return createMarkerIcon(leafletModule, isSelected, 'animate-marker-drop-in');
+        return createMarkerIcon(
+          leafletModule,
+          isSelected,
+          "animate-marker-drop-in",
+        );
       },
       [leafletModule],
     );
@@ -124,7 +164,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     const selectedIndicatorIcon = useMemo(() => {
       if (!leafletModule) return null;
       return leafletModule.divIcon({
-        className: 'selected-building-indicator-wrapper',
+        className: "selected-building-indicator-wrapper",
         html: '<span class="selected-building-indicator"></span>',
         iconSize: [44, 44],
         iconAnchor: [22, 22],
@@ -132,7 +172,9 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     }, [leafletModule]);
 
     const isMapReady = useCallback(
-      (map: import('leaflet').Map | null | undefined): map is import('leaflet').Map => {
+      (
+        map: import("leaflet").Map | null | undefined,
+      ): map is import("leaflet").Map => {
         if (!map) return false;
         try {
           const container = map.getContainer();
@@ -147,22 +189,26 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     );
 
     // Get building coordinates helper (uses GCP-calibrated offset)
-    const getBuildingLatLng = useCallback((building: Building): { lat: number; lng: number } => {
-      return getBuildingCrsCoords(building);
-    }, []);
+    const getBuildingLatLng = useCallback(
+      (building: Building): { lat: number; lng: number } => {
+        return getBuildingCrsCoords(building);
+      },
+      [],
+    );
 
     // ============================================
     // HOOKS (Logic Extraction)
     // ============================================
 
     // 1. Location Logic
-    const { locationStatus, origin, isOffCampus, centerOnUser } = useMapLocation({
-      mapInstance,
-      leafletModule,
-      isMapReady,
-      userIcon,
-      navManagerRef,
-    });
+    const { locationStatus, origin, isOffCampus, centerOnUser } =
+      useMapLocation({
+        mapInstance,
+        leafletModule,
+        isMapReady,
+        userIcon,
+        navManagerRef,
+      });
 
     // 2. Navigation Logic
     const {
@@ -218,7 +264,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       }
       const timer = setTimeout(() => {
         if (isMountedRef.current && isMapReady(mapInstance)) {
-          mapLog.log('Map stable, enabling overlays');
+          mapLog.log("Map stable, enabling overlays");
           setOverlaysReady(true);
         }
       }, 100);
@@ -272,7 +318,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
 
       const fetchImage = async () => {
         try {
-          const response = await fetch(CAMPUS_IMAGE_URL, { cache: 'no-store' });
+          const response = await fetch(CAMPUS_IMAGE_URL, { cache: "no-store" });
           if (!active) return;
           if (!response.ok) return;
           const blob = await response.blob();
@@ -285,7 +331,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           await new Promise<void>((resolve, reject) => {
             const img = new globalThis.Image();
             img.onload = () => resolve();
-            img.onerror = () => reject(new Error('Image preload failed'));
+            img.onerror = () => reject(new Error("Image preload failed"));
             img.src = objectUrl;
           });
 
@@ -293,7 +339,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           setOverlayUrl(objectUrl);
         } catch (error) {
           if (!active) return;
-          mapLog.log('Campus image fetch failed:', error);
+          mapLog.log("Campus image fetch failed:", error);
         }
       };
 
@@ -312,39 +358,44 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         ref={mapContainerRef}
         className="relative w-full h-full"
         role="region"
-        aria-label={t('interactiveCampusMap')}
+        aria-label={t("interactiveCampusMap")}
       >
         {/* Screen Reader Announcements */}
         <div className="sr-only" aria-live="polite" aria-atomic="true">
           {preview && selectedBuilding && (
             <span>
-              {t('navigatingTo')}: {t(selectedBuilding.translationKey)}.{' '}
-              {formatDistance(preview.distanceMeters)}, {formatDuration(preview.durationSeconds)}.
+              {t("navigatingTo")}: {t(selectedBuilding.translationKey)}.{" "}
+              {formatDistance(preview.distanceMeters)},{" "}
+              {formatDuration(preview.durationSeconds)}.
             </span>
           )}
           {isNavigating && navState && (
             <span>
-              {t('navigationProgressAnnouncement', {
+              {t("navigationProgressAnnouncement", {
                 distance: formatDistance(navState.remainingDistance),
                 eta: formatETA(navState.eta),
               })}
             </span>
           )}
-          {navState?.status === 'arrived' && <span>{t('navigationArrived')}</span>}
+          {navState?.status === "arrived" && (
+            <span>{t("navigationArrived")}</span>
+          )}
           {isOffCampus && (
-            <span>{safeT('locationOutsideCampusTitle', 'Outside campus boundary')}</span>
+            <span>
+              {safeT("locationOutsideCampusTitle", "Outside campus boundary")}
+            </span>
           )}
         </div>
 
         {showOffCampusWarning && (
           <div className="absolute bottom-3 left-3 right-3 md:right-auto z-[1000] rounded-mq-lg bg-mq-warning px-4 py-3 text-sm text-white shadow flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-2">
             <span className="font-semibold">
-              {safeT('locationOutsideCampusTitle', 'Outside campus boundary')}
+              {safeT("locationOutsideCampusTitle", "Outside campus boundary")}
             </span>
             <span className="text-white/90">
               {safeT(
-                'locationOutsideCampusMessage',
-                'You appear to be outside campus bounds. Navigation is disabled until you return.',
+                "locationOutsideCampusMessage",
+                "You appear to be outside campus bounds. Navigation is disabled until you return.",
               )}
             </span>
           </div>
@@ -367,7 +418,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             inertia
             inertiaDeceleration={3000}
             maxBoundsViscosity={1.0}
-            style={{ height: '100%', width: '100%' }}
+            style={{ height: "100%", width: "100%" }}
           >
             <MapController
               selectedBuilding={selectedBuilding}
@@ -385,10 +436,13 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                 opacity={1}
                 eventHandlers={{
                   load: () => {
-                    mapLog.log('Campus map image loaded successfully');
+                    mapLog.log("Campus map image loaded successfully");
                   },
                   error: () => {
-                    mapLog.error('Campus map image failed to load:', CAMPUS_IMAGE_URL);
+                    mapLog.error(
+                      "Campus map image failed to load:",
+                      CAMPUS_IMAGE_URL,
+                    );
                   },
                 }}
               />
@@ -435,7 +489,9 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                           variant="secondary"
                           className="text-[10px] shrink-0 border border-mq-primary/30 text-mq-primary bg-mq-primary/10"
                         >
-                          {t(BUILDING_CATEGORY_LABELS[selectedBuilding.category])}
+                          {t(
+                            BUILDING_CATEGORY_LABELS[selectedBuilding.category],
+                          )}
                         </Badge>
                       )}
                     </div>
@@ -470,7 +526,9 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                           />
                         </svg>
-                        <span className="line-clamp-2">{selectedBuilding.address}</span>
+                        <span className="line-clamp-2">
+                          {selectedBuilding.address}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -491,7 +549,9 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           </reactLeafletModule.MapContainer>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-mq-background-secondary">
-            <span className="animate-pulse text-mq-content-secondary">{t('loadingMap')}</span>
+            <span className="animate-pulse text-mq-content-secondary">
+              {t("loadingMap")}
+            </span>
           </div>
         )}
 
@@ -499,15 +559,15 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         <button
           onClick={centerOnUser}
           className={cn(
-            'absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50',
+            "absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50",
             // Position above zoom controls (which are at bottom-right)
             // On mobile: above the selected building card if present
             // On desktop: always in bottom-right corner above zoom
             selectedBuilding
-              ? 'bottom-[280px] right-4 sm:bottom-[140px] sm:right-4'
-              : 'bottom-[140px] right-4',
+              ? "bottom-[280px] right-4 sm:bottom-[140px] sm:right-4"
+              : "bottom-[140px] right-4",
           )}
-          aria-label={safeT('centerOnLocation', 'Center on my location')}
+          aria-label={safeT("centerOnLocation", "Center on my location")}
         >
           <svg
             className="w-6 h-6"
@@ -516,7 +576,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             strokeWidth="2"
             viewBox="0 0 24 24"
           >
-            {locationStatus === 'searching' ? (
+            {locationStatus === "searching" ? (
               <circle
                 cx="12"
                 cy="12"
@@ -550,23 +610,33 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                   <div className="font-bold text-lg text-mq-content">
                     {navState.instructions.length > 0
                       ? generateNavigationText(
-                          navState.instructions[navState.currentInstructionIndex],
+                          navState.instructions[
+                            navState.currentInstructionIndex
+                          ],
                           navState.remainingDistance,
                         )
-                      : safeT('followRoute', 'Follow the route to your destination')}
+                      : safeT(
+                          "followRoute",
+                          "Follow the route to your destination",
+                        )}
                   </div>
                   <div className="text-sm text-mq-content-secondary">
-                    {t('next')}:{' '}
-                    {navState.instructions[navState.currentInstructionIndex + 1]?.text ||
-                      t('arrive')}
+                    {t("next")}:{" "}
+                    {navState.instructions[navState.currentInstructionIndex + 1]
+                      ?.text || t("arrive")}
                   </div>
                 </div>
                 <button
                   onClick={stopNavigation}
                   className="p-1 rounded-full hover:bg-mq-background-secondary text-mq-content-secondary"
-                  aria-label={t('stopNavigation')}
+                  aria-label={t("stopNavigation")}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -588,6 +658,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
   },
 );
 
-CampusMap.displayName = 'CampusMap';
+CampusMap.displayName = "CampusMap";
 
 export default CampusMap;

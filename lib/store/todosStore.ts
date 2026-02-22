@@ -1,18 +1,20 @@
-import { v4 as uuidv4 } from 'uuid';
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { Todo } from '@/lib/types';
-import { apiRequest } from '@/lib/utils/api';
-import { errorHandler } from '@/lib/utils/errorHandling';
-import { isSupabaseConfigured } from '@/lib/supabase/client';
-import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
+import { v4 as uuidv4 } from "uuid";
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { Todo } from "@/lib/types";
+import { apiRequest } from "@/lib/utils/api";
+import { errorHandler } from "@/lib/utils/errorHandling";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { getBrowserAuthSnapshot } from "@/lib/supabase/browserSession";
 
 interface TodosState {
   todos: Todo[];
   isLoading: boolean;
   hasLoaded: boolean;
   loadTodos: () => Promise<void>;
-  addTodo: (todo: Omit<Todo, 'id' | 'createdAt' | 'completed'>) => Promise<Todo | null>;
+  addTodo: (
+    todo: Omit<Todo, "id" | "createdAt" | "completed">,
+  ) => Promise<Todo | null>;
   removeTodo: (id: string) => Promise<void>;
   updateTodo: (id: string, todo: Partial<Todo>) => Promise<Todo | null>;
   toggleComplete: (id: string) => Promise<void>;
@@ -26,7 +28,8 @@ interface TodosState {
 
 const normalizeTodo = (todo: Todo): Todo => ({
   ...todo,
-  createdAt: todo.createdAt instanceof Date ? todo.createdAt : new Date(todo.createdAt),
+  createdAt:
+    todo.createdAt instanceof Date ? todo.createdAt : new Date(todo.createdAt),
   dueDate: todo.dueDate
     ? todo.dueDate instanceof Date
       ? todo.dueDate
@@ -41,7 +44,8 @@ const normalizeTodo = (todo: Todo): Todo => ({
 
 // Helper to validate UUIDs
 const isValidUUID = (id: string) => {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(id);
 };
 
@@ -66,7 +70,9 @@ export const useTodosStore = create<TodosState>()(
         if (get().hasLoaded) return;
         set({ isLoading: true });
         try {
-          const data = await apiRequest<Todo[]>('/api/todos', { noRetry: true });
+          const data = await apiRequest<Todo[]>("/api/todos", {
+            noRetry: true,
+          });
           const validData = data.map(normalizeTodo).filter((t) => {
             if (!isValidUUID(t.id)) {
               console.warn(`Filtered out invalid todo ID from API: ${t.id}`);
@@ -77,16 +83,17 @@ export const useTodosStore = create<TodosState>()(
 
           set({ todos: validData, hasLoaded: true });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           const isAuthError =
-            errorMessage.includes('401') ||
-            errorMessage.includes('authentication') ||
-            errorMessage.includes('Unauthorized');
+            errorMessage.includes("401") ||
+            errorMessage.includes("authentication") ||
+            errorMessage.includes("Unauthorized");
 
           const isTableMissing =
-            errorMessage.includes('schema cache') ||
-            errorMessage.includes('todos table') ||
-            errorMessage.includes('42P01');
+            errorMessage.includes("schema cache") ||
+            errorMessage.includes("todos table") ||
+            errorMessage.includes("42P01");
 
           if (isAuthError) {
             // Auth failure: clear persisted data to prevent showing stale user data
@@ -94,11 +101,11 @@ export const useTodosStore = create<TodosState>()(
           } else if (isTableMissing) {
             // Table missing: log helpful message but continue with local data
             console.warn(
-              'Todos table not found in database. To enable cloud sync, run: npx supabase db push',
+              "Todos table not found in database. To enable cloud sync, run: npx supabase db push",
             );
             set({ hasLoaded: true });
           } else {
-            console.warn('Failed to load todos from API:', error);
+            console.warn("Failed to load todos from API:", error);
             set({ hasLoaded: true });
           }
         } finally {
@@ -125,36 +132,39 @@ export const useTodosStore = create<TodosState>()(
             return normalized;
           }
 
-          const created = await apiRequest<Todo>('/api/todos', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+          const created = await apiRequest<Todo>("/api/todos", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(normalized),
           });
           const serverNormalized = normalizeTodo(created);
           set((state) => ({
-            todos: state.todos.map((t) => (t.id === normalized.id ? serverNormalized : t)),
+            todos: state.todos.map((t) =>
+              t.id === normalized.id ? serverNormalized : t,
+            ),
           }));
           return serverNormalized;
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           // Silently handle auth errors, CSRF errors, network issues, and missing table - local-first approach
           const isExpectedError =
-            errorMessage.includes('authentication') ||
-            errorMessage.includes('unauthorized') ||
-            errorMessage.includes('CSRF') ||
-            errorMessage.includes('403') ||
-            errorMessage.includes('401') ||
-            errorMessage.includes('NetworkError') ||
-            errorMessage.includes('Failed to fetch') ||
-            errorMessage.includes('schema cache') ||
-            errorMessage.includes('table') ||
-            errorMessage.includes('500');
+            errorMessage.includes("authentication") ||
+            errorMessage.includes("unauthorized") ||
+            errorMessage.includes("CSRF") ||
+            errorMessage.includes("403") ||
+            errorMessage.includes("401") ||
+            errorMessage.includes("NetworkError") ||
+            errorMessage.includes("Failed to fetch") ||
+            errorMessage.includes("schema cache") ||
+            errorMessage.includes("table") ||
+            errorMessage.includes("500");
 
           if (!isExpectedError) {
             errorHandler.logError(
-              error instanceof Error ? error : new Error('Failed to add todo'),
-              'TodosStore.addTodo',
-              'medium',
+              error instanceof Error ? error : new Error("Failed to add todo"),
+              "TodosStore.addTodo",
+              "medium",
             );
           }
           // Return the local todo - it's already saved locally
@@ -184,13 +194,19 @@ export const useTodosStore = create<TodosState>()(
             return;
           }
 
-          await apiRequest<{ id: string }>(`/api/todos/${id}`, { method: 'DELETE' });
+          await apiRequest<{ id: string }>(`/api/todos/${id}`, {
+            method: "DELETE",
+          });
           // SUCCESS: Delete persisted to DB
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
           // 404 means already deleted on server - that's fine, keep local deletion
-          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+          if (
+            errorMessage.includes("404") ||
+            errorMessage.includes("not found")
+          ) {
             return;
           }
 
@@ -199,9 +215,11 @@ export const useTodosStore = create<TodosState>()(
             set((state) => ({ todos: [...state.todos, todoToRemove] }));
           }
           errorHandler.logError(
-            error instanceof Error ? error : new Error(`Failed to remove todo ${id}`),
-            'TodosStore.removeTodo',
-            'high',
+            error instanceof Error
+              ? error
+              : new Error(`Failed to remove todo ${id}`),
+            "TodosStore.removeTodo",
+            "high",
           );
           // Rethrow so UI can show error feedback
           throw error;
@@ -233,8 +251,8 @@ export const useTodosStore = create<TodosState>()(
           }
 
           const updated = await apiRequest<Todo>(`/api/todos/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updatedTodo),
           });
           const normalized = normalizeTodo(updated);
@@ -243,11 +261,17 @@ export const useTodosStore = create<TodosState>()(
           }));
           return normalized;
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
           // 404: Todo doesn't exist on server, try to create it
-          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
-            console.warn(`Todo ${id} not found on server, attempting to create it...`);
+          if (
+            errorMessage.includes("404") ||
+            errorMessage.includes("not found")
+          ) {
+            console.warn(
+              `Todo ${id} not found on server, attempting to create it...`,
+            );
             const fullTodo = { ...currentTodo, ...updatedTodo };
             return get().addTodo(fullTodo);
           }
@@ -257,9 +281,11 @@ export const useTodosStore = create<TodosState>()(
             todos: state.todos.map((t) => (t.id === id ? currentTodo : t)),
           }));
           errorHandler.logError(
-            error instanceof Error ? error : new Error(`Failed to update todo ${id}`),
-            'TodosStore.updateTodo',
-            'high',
+            error instanceof Error
+              ? error
+              : new Error(`Failed to update todo ${id}`),
+            "TodosStore.updateTodo",
+            "high",
           );
           // Rethrow so UI can show error feedback
           throw error;
@@ -278,7 +304,9 @@ export const useTodosStore = create<TodosState>()(
       toggleNotification: async (id) => {
         const existing = get().todos.find((todo) => todo.id === id);
         if (!existing) return;
-        await get().updateTodo(id, { notificationEnabled: !existing.notificationEnabled });
+        await get().updateTodo(id, {
+          notificationEnabled: !existing.notificationEnabled,
+        });
       },
 
       reorderTodos: (todos) => {
@@ -312,7 +340,8 @@ export const useTodosStore = create<TodosState>()(
             if (a.dueDate && !b.dueDate) return -1;
             if (!a.dueDate && b.dueDate) return 1;
             if (a.dueDate && b.dueDate) {
-              const dateDiff = new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+              const dateDiff =
+                new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
               if (dateDiff !== 0) return dateDiff;
             }
 
@@ -323,7 +352,9 @@ export const useTodosStore = create<TodosState>()(
             }
 
             // Finally sort by creation date
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
           });
       },
 
@@ -335,7 +366,7 @@ export const useTodosStore = create<TodosState>()(
       },
     }),
     {
-      name: 'todos-storage',
+      name: "todos-storage",
       storage: createJSONStorage(() => localStorage),
       version: 1,
       // Only persist todos array, not loading state flags

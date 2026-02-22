@@ -7,13 +7,13 @@
 // - 5MB storage limit
 // - Synchronous API performance issues
 
-'use client';
+"use client";
 
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { get as idbGet, set as idbSet, del as idbDel } from 'idb-keyval';
-import { v4 as uuidv4 } from 'uuid';
-import { logger } from '@/lib/logger';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { get as idbGet, set as idbSet, del as idbDel } from "idb-keyval";
+import { v4 as uuidv4 } from "uuid";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // CUSTOM INDEXEDDB STORAGE ADAPTER FOR ZUSTAND
@@ -52,7 +52,7 @@ function createIDBStorage() {
 // TYPES
 // ============================================================================
 
-export type SyncActionType = 'CREATE' | 'UPDATE' | 'DELETE';
+export type SyncActionType = "CREATE" | "UPDATE" | "DELETE";
 
 export interface SyncAction {
   /** Unique ID for this sync action */
@@ -80,7 +80,7 @@ export interface SyncConflict {
   serverVersion: number;
   serverData: Record<string, unknown>;
   resolvedAt?: string;
-  resolution?: 'client' | 'server';
+  resolution?: "client" | "server";
 }
 
 interface SyncState {
@@ -102,7 +102,7 @@ interface SyncState {
     clientVersion?: number,
   ) => void;
   processQueue: () => Promise<void>;
-  resolveConflict: (actionId: string, resolution: 'client' | 'server') => void;
+  resolveConflict: (actionId: string, resolution: "client" | "server") => void;
   clearQueue: () => void;
   clearConflicts: () => void;
   reset: () => void;
@@ -113,7 +113,7 @@ interface SyncState {
 // ============================================================================
 
 const MAX_ATTEMPTS = 5;
-const SYNC_API_URL = '/api/sync';
+const SYNC_API_URL = "/api/sync";
 
 // ============================================================================
 // STORE
@@ -151,7 +151,7 @@ export const useSyncStore = create<SyncState>()(
             const existing = updated[existingIdx];
 
             // If existing is CREATE and new is UPDATE, keep as CREATE with merged data
-            if (existing.type === 'CREATE' && type === 'UPDATE') {
+            if (existing.type === "CREATE" && type === "UPDATE") {
               updated[existingIdx] = {
                 ...existing,
                 data: { ...existing.data, ...data },
@@ -161,10 +161,12 @@ export const useSyncStore = create<SyncState>()(
             }
 
             // If new action is DELETE, it supersedes everything
-            if (type === 'DELETE') {
+            if (type === "DELETE") {
               // If record was created offline and never synced, just remove from queue
-              if (existing.type === 'CREATE') {
-                return { queue: state.queue.filter((_, i) => i !== existingIdx) };
+              if (existing.type === "CREATE") {
+                return {
+                  queue: state.queue.filter((_, i) => i !== existingIdx),
+                };
               }
               updated[existingIdx] = action;
               return { queue: updated };
@@ -191,14 +193,17 @@ export const useSyncStore = create<SyncState>()(
         for (const action of queue) {
           if (action.attempts >= MAX_ATTEMPTS) {
             // Too many failures - move to dead letter
-            logger.error(`Sync action ${action.id} exceeded max attempts, dropping`, action);
+            logger.error(
+              `Sync action ${action.id} exceeded max attempts, dropping`,
+              action,
+            );
             continue;
           }
 
           try {
             const response = await fetch(SYNC_API_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 type: action.type,
                 table: action.table,
@@ -235,7 +240,8 @@ export const useSyncStore = create<SyncState>()(
             remainingActions.push({
               ...action,
               attempts: action.attempts + 1,
-              lastError: error instanceof Error ? error.message : 'Unknown error',
+              lastError:
+                error instanceof Error ? error.message : "Unknown error",
             });
           }
         }
@@ -259,12 +265,15 @@ export const useSyncStore = create<SyncState>()(
 
         // If user chose client version, re-enqueue the action with force flag
         const conflict = get().conflicts.find((c) => c.action.id === actionId);
-        if (conflict && resolution === 'client') {
+        if (conflict && resolution === "client") {
           get().enqueueAction(
             conflict.action.type,
             conflict.action.table,
             conflict.action.recordId,
-            { ...conflict.action.data, _forceVersion: true } as Record<string, unknown>,
+            { ...conflict.action.data, _forceVersion: true } as Record<
+              string,
+              unknown
+            >,
             conflict.serverVersion, // Use server's version so it passes the check
           );
         }
@@ -277,10 +286,11 @@ export const useSyncStore = create<SyncState>()(
 
       clearQueue: () => set({ queue: [] }),
       clearConflicts: () => set({ conflicts: [] }),
-      reset: () => set({ queue: [], conflicts: [], isSyncing: false, lastSyncAt: null }),
+      reset: () =>
+        set({ queue: [], conflicts: [], isSyncing: false, lastSyncAt: null }),
     }),
     {
-      name: 'syllabus-sync-queue',
+      name: "syllabus-sync-queue",
       storage: createIDBStorage(),
     },
   ),
@@ -290,8 +300,8 @@ export const useSyncStore = create<SyncState>()(
 // ONLINE/OFFLINE LISTENER - Auto-process queue when coming back online
 // ============================================================================
 
-if (typeof window !== 'undefined') {
-  window.addEventListener('online', () => {
+if (typeof window !== "undefined") {
+  window.addEventListener("online", () => {
     // Small delay to ensure network is stable
     setTimeout(() => {
       useSyncStore.getState().processQueue();

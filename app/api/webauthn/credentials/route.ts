@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { NextRequest } from "next/server";
+import { createServerClient } from "@/lib/supabase/server";
 import {
   jsonSuccess,
   jsonError,
@@ -7,15 +7,15 @@ import {
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
-} from '@/app/api/_lib/response';
+} from "@/app/api/_lib/response";
 import {
   getCredentialsForUser,
   deleteCredential,
   webauthnCredentialsLimiter,
-} from '@/lib/security/webauthn';
-import { getClientIP } from '@/lib/security/ip';
-import { logger } from '@/lib/logger';
-import { z } from 'zod';
+} from "@/lib/security/webauthn";
+import { getClientIP } from "@/lib/security/ip";
+import { logger } from "@/lib/logger";
+import { z } from "zod";
 
 /**
  * GET /api/webauthn/credentials
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return jsonUnauthorized('Authentication required');
+      return jsonUnauthorized("Authentication required");
     }
 
     const credentials = await getCredentialsForUser(user.id);
@@ -57,8 +57,12 @@ export async function GET(request: NextRequest) {
       count: credentials.length,
     });
   } catch (error) {
-    logger.error('List credentials error:', error);
-    return jsonError('Failed to list passkeys', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("List credentials error:", error);
+    return jsonError(
+      "Failed to list passkeys",
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 }
 
@@ -90,31 +94,42 @@ export async function DELETE(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return jsonUnauthorized('Authentication required');
+      return jsonUnauthorized("Authentication required");
     }
 
-    const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: parseError } = await parseJsonBody(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (parseError) return parseError;
 
     const parsed = deleteSchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError('Invalid request', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError("Invalid request", 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     const success = await deleteCredential(user.id, parsed.data.credentialDbId);
 
     if (!success) {
-      return jsonError('Failed to remove passkey', 400, ERROR_CODES.BAD_REQUEST);
+      return jsonError(
+        "Failed to remove passkey",
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
 
-    logger.info('WebAuthn credential deleted', {
+    logger.info("WebAuthn credential deleted", {
       userId: user.id,
       credentialDbId: parsed.data.credentialDbId,
     });
 
     return jsonSuccess({ removed: true });
   } catch (error) {
-    logger.error('Delete credential error:', error);
-    return jsonError('Failed to remove passkey', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("Delete credential error:", error);
+    return jsonError(
+      "Failed to remove passkey",
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 }

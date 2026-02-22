@@ -11,16 +11,15 @@
  * - Provides breach count for risk assessment
  */
 
-import crypto from 'crypto';
-import { logger } from '@/lib/logger';
-
+import crypto from "crypto";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-const HIBP_API_URL = 'https://api.pwnedpasswords.com/range/';
-const HIBP_USER_AGENT = 'Syllabus-Sync-Security-Check';
+const HIBP_API_URL = "https://api.pwnedpasswords.com/range/";
+const HIBP_USER_AGENT = "Syllabus-Sync-Security-Check";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 // ============================================================================
@@ -33,7 +32,7 @@ export interface BreachCheckResult {
   /** Number of times the password has been found in breaches */
   breachCount: number;
   /** Risk level based on breach count */
-  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  riskLevel: "low" | "medium" | "high" | "critical";
   /** Timestamp of the check */
   checkedAt: Date;
 }
@@ -53,7 +52,10 @@ export interface BreachCheckOptions {
  * In-memory cache for breach check results
  * In production, use Redis or database for distributed caching
  */
-const breachCache = new Map<string, { result: BreachCheckResult; expiresAt: number }>();
+const breachCache = new Map<
+  string,
+  { result: BreachCheckResult; expiresAt: number }
+>();
 
 /**
  * Get cached breach check result
@@ -111,7 +113,7 @@ export function clearBreachCache(): void {
  * @returns SHA-1 hash in uppercase hexadecimal
  */
 function hashPassword(password: string): string {
-  const hash = crypto.createHash('sha1').update(password, 'utf8').digest('hex');
+  const hash = crypto.createHash("sha1").update(password, "utf8").digest("hex");
   return hash.toUpperCase();
 }
 
@@ -143,13 +145,13 @@ function splitHash(passwordHash: string): { prefix: string; suffix: string } {
  */
 export async function checkPasswordBreach(
   password: string,
-  options: BreachCheckOptions = {}
+  options: BreachCheckOptions = {},
 ): Promise<BreachCheckResult> {
   const { useCache = true, apiUrl = HIBP_API_URL } = options;
 
   // Validate password
   if (!password || password.length === 0) {
-    throw new Error('Password cannot be empty');
+    throw new Error("Password cannot be empty");
   }
 
   // Hash the password
@@ -167,24 +169,26 @@ export async function checkPasswordBreach(
   try {
     // Fetch breach data from HIBP API
     const response = await fetch(`${apiUrl}${prefix}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'User-Agent': HIBP_USER_AGENT,
+        "User-Agent": HIBP_USER_AGENT,
       },
     });
 
     if (!response.ok) {
-      throw new Error(`HIBP API error: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `HIBP API error: ${response.status} ${response.statusText}`,
+      );
     }
 
     // Parse response (format: "SUFFIX:COUNT\nSUFFIX:COUNT\n...")
     const responseText = await response.text();
-    const lines = responseText.split('\n').filter((line) => line.trim() !== '');
+    const lines = responseText.split("\n").filter((line) => line.trim() !== "");
 
     // Find matching suffix
     let breachCount = 0;
     for (const line of lines) {
-      const [lineSuffix, countStr] = line.split(':');
+      const [lineSuffix, countStr] = line.split(":");
       if (lineSuffix === suffix) {
         breachCount = parseInt(countStr, 10);
         break;
@@ -209,12 +213,12 @@ export async function checkPasswordBreach(
 
     return result;
   } catch (error) {
-    logger.error('Password breach check error:', error);
+    logger.error("Password breach check error:", error);
     // Return safe default on error
     return {
       isBreached: false,
       breachCount: 0,
-      riskLevel: 'low',
+      riskLevel: "low",
       checkedAt: new Date(),
     };
   }
@@ -226,15 +230,17 @@ export async function checkPasswordBreach(
  * @param breachCount - Number of breaches
  * @returns Risk level
  */
-function getRiskLevel(breachCount: number): 'low' | 'medium' | 'high' | 'critical' {
+function getRiskLevel(
+  breachCount: number,
+): "low" | "medium" | "high" | "critical" {
   if (breachCount === 0) {
-    return 'low';
+    return "low";
   } else if (breachCount < 10) {
-    return 'medium';
+    return "medium";
   } else if (breachCount < 100) {
-    return 'high';
+    return "high";
   } else {
-    return 'critical';
+    return "critical";
   }
 }
 
@@ -252,7 +258,7 @@ function getRiskLevel(breachCount: number): 'low' | 'medium' | 'high' | 'critica
  */
 export async function validatePasswordSafety(
   password: string,
-  options: BreachCheckOptions = {}
+  options: BreachCheckOptions = {},
 ): Promise<{ safe: boolean; result: BreachCheckResult }> {
   const result = await checkPasswordBreach(password, options);
   return {
@@ -271,10 +277,10 @@ export async function validatePasswordSafety(
  */
 export async function checkMultiplePasswords(
   passwords: string[],
-  options: BreachCheckOptions = {}
+  options: BreachCheckOptions = {},
 ): Promise<BreachCheckResult[]> {
   const results = await Promise.all(
-    passwords.map((password) => checkPasswordBreach(password, options))
+    passwords.map((password) => checkPasswordBreach(password, options)),
   );
   return results;
 }
@@ -292,10 +298,10 @@ export async function checkMultiplePasswords(
  */
 export async function assessPasswordStrength(
   password: string,
-  options: BreachCheckOptions = {}
+  options: BreachCheckOptions = {},
 ): Promise<{
   score: number; // 0-4
-  strength: 'very weak' | 'weak' | 'fair' | 'strong' | 'very strong';
+  strength: "very weak" | "weak" | "fair" | "strong" | "very strong";
   breachResult: BreachCheckResult;
   suggestions: string[];
 }> {
@@ -348,7 +354,9 @@ function calculateBaseStrength(password: string): number {
   const hasNumber = /[0-9]/.test(password);
   const hasSpecial = /[^a-zA-Z0-9]/.test(password);
 
-  const varietyCount = [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
+  const varietyCount = [hasLower, hasUpper, hasNumber, hasSpecial].filter(
+    Boolean,
+  ).length;
   if (varietyCount >= 3) score++;
 
   // Normalize to 0-4
@@ -358,13 +366,15 @@ function calculateBaseStrength(password: string): number {
 /**
  * Get strength label from score
  */
-function getStrengthLabel(score: number): 'very weak' | 'weak' | 'fair' | 'strong' | 'very strong' {
-  const labels: ('very weak' | 'weak' | 'fair' | 'strong' | 'very strong')[] = [
-    'very weak',
-    'weak',
-    'fair',
-    'strong',
-    'very strong',
+function getStrengthLabel(
+  score: number,
+): "very weak" | "weak" | "fair" | "strong" | "very strong" {
+  const labels: ("very weak" | "weak" | "fair" | "strong" | "very strong")[] = [
+    "very weak",
+    "weak",
+    "fair",
+    "strong",
+    "very strong",
   ];
   return labels[Math.max(0, Math.min(4, score))];
 }
@@ -374,32 +384,34 @@ function getStrengthLabel(score: number): 'very weak' | 'weak' | 'fair' | 'stron
  */
 function generatePasswordSuggestions(
   password: string,
-  breachResult: BreachCheckResult
+  breachResult: BreachCheckResult,
 ): string[] {
   const suggestions: string[] = [];
 
   if (breachResult.isBreached) {
-    suggestions.push('This password has been exposed in data breaches. Choose a different password.');
+    suggestions.push(
+      "This password has been exposed in data breaches. Choose a different password.",
+    );
   }
 
   if (password.length < 12) {
-    suggestions.push('Use at least 12 characters for better security.');
+    suggestions.push("Use at least 12 characters for better security.");
   }
 
   if (!/[a-z]/.test(password) || !/[A-Z]/.test(password)) {
-    suggestions.push('Mix uppercase and lowercase letters.');
+    suggestions.push("Mix uppercase and lowercase letters.");
   }
 
   if (!/[0-9]/.test(password)) {
-    suggestions.push('Include numbers.');
+    suggestions.push("Include numbers.");
   }
 
   if (!/[^a-zA-Z0-9]/.test(password)) {
-    suggestions.push('Add special characters (!@#$%^&*).');
+    suggestions.push("Add special characters (!@#$%^&*).");
   }
 
   if (suggestions.length === 0) {
-    suggestions.push('Your password is strong!');
+    suggestions.push("Your password is strong!");
   }
 
   return suggestions;
@@ -413,15 +425,19 @@ function generatePasswordSuggestions(
  * API route handler for password breach checking
  * Use this in /api/security/check-password-breach
  */
-export async function handlePasswordBreachCheck(request: Request): Promise<Response> {
+export async function handlePasswordBreachCheck(
+  request: Request,
+): Promise<Response> {
   try {
     const body = await request.json();
     const { password } = body;
 
     if (!password) {
       return Response.json(
-        { error: { code: 'MISSING_PASSWORD', message: 'Password is required' } },
-        { status: 400 }
+        {
+          error: { code: "MISSING_PASSWORD", message: "Password is required" },
+        },
+        { status: 400 },
       );
     }
 
@@ -429,10 +445,12 @@ export async function handlePasswordBreachCheck(request: Request): Promise<Respo
 
     return Response.json({ result });
   } catch (error) {
-    logger.error('Password breach check error:', error);
+    logger.error("Password breach check error:", error);
     return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: 'Failed to check password' } },
-      { status: 500 }
+      {
+        error: { code: "INTERNAL_ERROR", message: "Failed to check password" },
+      },
+      { status: 500 },
     );
   }
 }

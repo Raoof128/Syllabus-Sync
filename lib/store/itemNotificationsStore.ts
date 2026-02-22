@@ -1,10 +1,10 @@
 // lib/store/itemNotificationsStore.ts
 // Simple toggle store for item-level notification preferences
 // This tracks which items have notifications enabled (bell icon state)
-'use client';
+"use client";
 
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 interface ItemNotificationsState {
   // Map of itemId -> enabled state
@@ -70,7 +70,7 @@ export const useItemNotificationsStore = create<ItemNotificationsState>()(
       },
     }),
     {
-      name: 'item-notifications',
+      name: "item-notifications",
       storage: createJSONStorage(() => localStorage),
     },
   ),

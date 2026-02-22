@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/mq/button';
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/mq/button";
 import {
   Dialog,
   DialogContent,
@@ -10,23 +10,23 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { AlertTriangle, Trash2, Loader2 } from 'lucide-react';
-import { toastUtils } from '@/lib/utils/toast';
-import { errorHandler } from '@/lib/utils/errorHandling';
-import { clearAllApplicationData } from '@/lib/utils/clientStorage';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useNotificationsStore } from '@/lib/store/notificationsStore';
-import { useThemeStore } from '@/lib/store/themeStore';
-import { useEventsStore } from '@/lib/store/eventsStore';
-import { useGamificationStore } from '@/lib/store/gamificationStore';
-import { useMapStore } from '@/lib/store/mapStore';
-import { useProfilesStore } from '@/lib/store/profilesStore';
-import { useTodosStore } from '@/lib/store/todosStore';
-import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
-import { useLanguageStore } from '@/lib/store/languageStore';
-import type { TranslationKey } from '@/lib/i18n/translations';
+} from "@/components/ui/dialog";
+import { AlertTriangle, Trash2, Loader2 } from "lucide-react";
+import { toastUtils } from "@/lib/utils/toast";
+import { errorHandler } from "@/lib/utils/errorHandling";
+import { clearAllApplicationData } from "@/lib/utils/clientStorage";
+import { useUnitsStore } from "@/lib/store/unitsStore";
+import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
+import { useNotificationsStore } from "@/lib/store/notificationsStore";
+import { useThemeStore } from "@/lib/store/themeStore";
+import { useEventsStore } from "@/lib/store/eventsStore";
+import { useGamificationStore } from "@/lib/store/gamificationStore";
+import { useMapStore } from "@/lib/store/mapStore";
+import { useProfilesStore } from "@/lib/store/profilesStore";
+import { useTodosStore } from "@/lib/store/todosStore";
+import { useNotificationPreferencesStore } from "@/lib/store/notificationPreferencesStore";
+import { useLanguageStore } from "@/lib/store/languageStore";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 type ClearDataDialogProps = {
   open: boolean;
@@ -45,11 +45,14 @@ function ClearDataInfo({
 
   return (
     <div className="flex items-start gap-3 p-3 bg-mq-error/10 border border-mq-error/20 rounded-mq-lg">
-      <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
+      <AlertTriangle
+        className="h-5 w-5 flex-shrink-0 mt-0.5"
+        aria-hidden="true"
+      />
       <div className="space-y-1">
-        <p className="text-mq-sm font-medium text-mq-error">{t('warning')}</p>
+        <p className="text-mq-sm font-medium text-mq-error">{t("warning")}</p>
         <p className="text-mq-sm text-mq-content-secondary">
-          {t('clearDataSummary', {
+          {t("clearDataSummary", {
             units: units.length,
             deadlines: deadlines.length,
           })}
@@ -59,9 +62,13 @@ function ClearDataInfo({
   );
 }
 
-export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps) {
+export function ClearDataDialog({
+  open,
+  onOpenChange,
+  t,
+}: ClearDataDialogProps) {
   const router = useRouter();
-  const [clearDataConfirmation, setClearDataConfirmation] = useState('');
+  const [clearDataConfirmation, setClearDataConfirmation] = useState("");
   const [isClearingData, setIsClearingData] = useState(false);
 
   const resetUnits = useUnitsStore((s) => s.reset);
@@ -77,8 +84,8 @@ export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps)
   const resetLanguage = useLanguageStore((s) => s.reset);
 
   const handleClearAllData = useCallback(async () => {
-    if (clearDataConfirmation !== t('clearConfirm')) {
-      toastUtils.error(t('settingsError'), t('clearDataConfirmRequired'));
+    if (clearDataConfirmation !== t("clearConfirm")) {
+      toastUtils.error(t("settingsError"), t("clearDataConfirmRequired"));
       return;
     }
 
@@ -90,8 +97,8 @@ export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps)
 
       // Close dialog and show success
       onOpenChange(false);
-      setClearDataConfirmation('');
-      toastUtils.success(t('clearAllData'), t('preferenceUpdated'));
+      setClearDataConfirmation("");
+      toastUtils.success(t("clearAllData"), t("preferenceUpdated"));
 
       // Soft Reset: Reset all stores to initial state
       resetUnits();
@@ -110,11 +117,11 @@ export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps)
       router.refresh();
     } catch (error) {
       errorHandler.logError(
-        error instanceof Error ? error : new Error('Failed to clear data'),
-        'Settings Clear Data',
-        'high',
+        error instanceof Error ? error : new Error("Failed to clear data"),
+        "Settings Clear Data",
+        "high",
       );
-      toastUtils.error(t('settingsError'), t('preferenceError'));
+      toastUtils.error(t("settingsError"), t("preferenceError"));
     } finally {
       setIsClearingData(false);
     }
@@ -139,7 +146,7 @@ export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps)
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       // Reset state when closing
-      setClearDataConfirmation('');
+      setClearDataConfirmation("");
     }
     onOpenChange(newOpen);
   };
@@ -150,9 +157,9 @@ export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps)
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-mq-error">
             <AlertTriangle className="h-5 w-5" aria-hidden="true" />
-            {t('clearAllDataTitle')}
+            {t("clearAllDataTitle")}
           </DialogTitle>
-          <DialogDescription>{t('clearAllDataDialogDesc')}</DialogDescription>
+          <DialogDescription>{t("clearAllDataDialogDesc")}</DialogDescription>
         </DialogHeader>
 
         {/* Warning about data loss - Subscribes to store only when rendered */}
@@ -160,16 +167,21 @@ export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps)
 
         {/* Confirmation input */}
         <div className="space-y-2">
-          <label htmlFor="clear-data-confirm" className="text-sm font-medium text-mq-content">
-            {t('clearDataConfirmPlaceholder')}
+          <label
+            htmlFor="clear-data-confirm"
+            className="text-sm font-medium text-mq-content"
+          >
+            {t("clearDataConfirmPlaceholder")}
           </label>
           <input
             id="clear-data-confirm"
             type="text"
             value={clearDataConfirmation}
-            onChange={(e) => setClearDataConfirmation(e.target.value.toUpperCase())}
+            onChange={(e) =>
+              setClearDataConfirmation(e.target.value.toUpperCase())
+            }
             className="w-full px-3 py-2 rounded-mq border border-mq-border bg-mq-background text-mq-content focus:outline-none focus:ring-2 focus:ring-mq-error"
-            placeholder={t('clearConfirm')}
+            placeholder={t("clearConfirm")}
             autoComplete="off"
             data-testid="clear-data-confirm-input"
           />
@@ -181,23 +193,28 @@ export function ClearDataDialog({ open, onOpenChange, t }: ClearDataDialogProps)
             onClick={() => handleOpenChange(false)}
             disabled={isClearingData}
           >
-            {t('cancel')}
+            {t("cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={handleClearAllData}
-            disabled={isClearingData || clearDataConfirmation !== t('clearConfirm')}
+            disabled={
+              isClearingData || clearDataConfirmation !== t("clearConfirm")
+            }
             data-testid="confirm-clear-data-button"
           >
             {isClearingData ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
-                {t('loading')}
+                <Loader2
+                  className="h-4 w-4 mr-2 animate-spin"
+                  aria-hidden="true"
+                />
+                {t("loading")}
               </>
             ) : (
               <>
                 <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
-                {t('clearData')}
+                {t("clearData")}
               </>
             )}
           </Button>

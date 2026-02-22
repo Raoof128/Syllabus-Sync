@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Select,
@@ -6,9 +6,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { getFaculties } from '@/lib/data/mq-courses';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+} from "@/components/ui/select";
+import { getFaculties } from "@/lib/data/mq-courses";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
 
 interface FacultySelectProps {
   value: string;
@@ -18,12 +18,16 @@ interface FacultySelectProps {
 
 const FACULTIES = getFaculties();
 
-export function FacultySelect({ value, onChange, placeholder }: FacultySelectProps) {
+export function FacultySelect({
+  value,
+  onChange,
+  placeholder,
+}: FacultySelectProps) {
   const { t } = useTypedTranslation();
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger className="w-full bg-mq-input-background border-mq-border focus:ring-[3px] focus:border-mq-focus focus:ring-mq-focus/40 h-9 text-sm">
-        <SelectValue placeholder={placeholder || t('selectFaculty')} />
+        <SelectValue placeholder={placeholder || t("selectFaculty")} />
       </SelectTrigger>
       <SelectContent className="bg-mq-card-background border-mq-border">
         {FACULTIES.map((faculty) => (

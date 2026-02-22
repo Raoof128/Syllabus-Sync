@@ -9,29 +9,29 @@
  *
  * @returns Object containing leaflet module, react-leaflet components, and loading state
  */
-'use client';
+"use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { errorHandler } from '@/lib/utils/errorHandling';
-import { devLog } from '@/lib/utils/devLog';
+import { useEffect, useState, useRef } from "react";
+import { errorHandler } from "@/lib/utils/errorHandling";
+import { devLog } from "@/lib/utils/devLog";
 
 const mapLog = devLog.map;
 
 // Type for react-leaflet components we use
 export interface ReactLeafletModule {
-  MapContainer: typeof import('react-leaflet').MapContainer;
-  Marker: typeof import('react-leaflet').Marker;
-  Popup: typeof import('react-leaflet').Popup;
-  Polyline: typeof import('react-leaflet').Polyline;
-  ImageOverlay: typeof import('react-leaflet').ImageOverlay;
-  Pane: typeof import('react-leaflet').Pane;
-  useMap: typeof import('react-leaflet').useMap;
-  useMapEvents: typeof import('react-leaflet').useMapEvents;
+  MapContainer: typeof import("react-leaflet").MapContainer;
+  Marker: typeof import("react-leaflet").Marker;
+  Popup: typeof import("react-leaflet").Popup;
+  Polyline: typeof import("react-leaflet").Polyline;
+  ImageOverlay: typeof import("react-leaflet").ImageOverlay;
+  Pane: typeof import("react-leaflet").Pane;
+  useMap: typeof import("react-leaflet").useMap;
+  useMapEvents: typeof import("react-leaflet").useMapEvents;
 }
 
 export interface UseLeafletLoaderResult {
   /** The Leaflet module (L) - null until loaded */
-  leafletModule: typeof import('leaflet') | null;
+  leafletModule: typeof import("leaflet") | null;
   /** React-Leaflet components - null until loaded */
   reactLeafletModule: ReactLeafletModule | null;
   /** True when all modules are loaded and ready */
@@ -43,8 +43,11 @@ export interface UseLeafletLoaderResult {
 }
 
 export function useLeafletLoader(): UseLeafletLoaderResult {
-  const [leafletModule, setLeafletModule] = useState<typeof import('leaflet') | null>(null);
-  const [reactLeafletModule, setReactLeafletModule] = useState<ReactLeafletModule | null>(null);
+  const [leafletModule, setLeafletModule] = useState<
+    typeof import("leaflet") | null
+  >(null);
+  const [reactLeafletModule, setReactLeafletModule] =
+    useState<ReactLeafletModule | null>(null);
   const [isClientReady, setIsClientReady] = useState(false);
   const [mapKey, setMapKey] = useState(0);
   const isMountedRef = useRef(true);
@@ -55,27 +58,30 @@ export function useLeafletLoader(): UseLeafletLoaderResult {
     const loadLeaflet = async () => {
       try {
         // Import CSS first (using dynamic import for CSS modules)
-        await import('leaflet/dist/leaflet.css');
-        await import('leaflet-routing-machine/dist/leaflet-routing-machine.css');
+        await import("leaflet/dist/leaflet.css");
+        await import("leaflet-routing-machine/dist/leaflet-routing-machine.css");
 
         // Import Leaflet
-        const L = await import('leaflet');
+        const L = await import("leaflet");
 
         // Import react-leaflet components
-        const RL = await import('react-leaflet');
+        const RL = await import("react-leaflet");
 
         if (!isMountedRef.current) return;
 
         // Fix default marker icons
-        delete (L.default.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })
-          ._getIconUrl;
+        delete (
+          L.default.Icon.Default.prototype as unknown as {
+            _getIconUrl?: unknown;
+          }
+        )._getIconUrl;
         L.default.Icon.Default.mergeOptions({
-          iconRetinaUrl: '/images/leaflet/marker-icon-2x.png',
-          iconUrl: '/images/leaflet/marker-icon.png',
-          shadowUrl: '/images/leaflet/marker-shadow.png',
+          iconRetinaUrl: "/images/leaflet/marker-icon-2x.png",
+          iconUrl: "/images/leaflet/marker-icon.png",
+          shadowUrl: "/images/leaflet/marker-shadow.png",
         });
 
-        setLeafletModule(L.default as unknown as typeof import('leaflet'));
+        setLeafletModule(L.default as unknown as typeof import("leaflet"));
         setReactLeafletModule({
           MapContainer: RL.MapContainer,
           Marker: RL.Marker,
@@ -97,11 +103,13 @@ export function useLeafletLoader(): UseLeafletLoaderResult {
           }
         }, 100);
       } catch (error) {
-        mapLog.log('Failed to load Leaflet modules:', error);
+        mapLog.log("Failed to load Leaflet modules:", error);
         errorHandler.logError(
-          error instanceof Error ? error : new Error('Failed to load map modules'),
-          'Map Loading',
-          'medium',
+          error instanceof Error
+            ? error
+            : new Error("Failed to load map modules"),
+          "Map Loading",
+          "medium",
         );
       }
     };
@@ -127,7 +135,9 @@ export function useLeafletLoader(): UseLeafletLoaderResult {
  * Helper to check if a Leaflet map instance is valid and ready
  * Useful for guarding operations on the map instance
  */
-export function isMapReady(map: import('leaflet').Map | null | undefined): boolean {
+export function isMapReady(
+  map: import("leaflet").Map | null | undefined,
+): boolean {
   if (!map) return false;
   try {
     if (!map.getContainer) return false;

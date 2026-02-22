@@ -7,16 +7,16 @@
  * - Other map-related utilities
  */
 
-import { BRAND_COLORS } from '@/lib/config';
+import { BRAND_COLORS } from "@/lib/config";
 
 // Marker icon colors
 export const MARKER_COLORS = {
   /** Default marker fill color (Macquarie Red) */
   base: BRAND_COLORS.primary,
   /** Brighter red for selected/active state */
-  selected: '#d6001c',
+  selected: "#d6001c",
   /** Center dot color (white) */
-  center: '#ffffff',
+  center: "#ffffff",
 } as const;
 
 // Marker icon dimensions
@@ -45,10 +45,15 @@ export function generateMarkerSvgDataUrl(options: {
   fillColor?: string;
   centerColor?: string;
 }): string {
-  const { isSelected = false, fillColor, centerColor = MARKER_COLORS.center } = options;
+  const {
+    isSelected = false,
+    fillColor,
+    centerColor = MARKER_COLORS.center,
+  } = options;
 
   // Determine fill color: custom > selected > base
-  const fill = fillColor ?? (isSelected ? MARKER_COLORS.selected : MARKER_COLORS.base);
+  const fill =
+    fillColor ?? (isSelected ? MARKER_COLORS.selected : MARKER_COLORS.base);
 
   const svg = `
     <svg width="${MARKER_DIMENSIONS.width}" height="${MARKER_DIMENSIONS.height}" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">
@@ -61,7 +66,7 @@ export function generateMarkerSvgDataUrl(options: {
 }
 
 // Cache for marker icons to prevent recreating them
-const iconCache = new Map<string, import('leaflet').Icon>();
+const iconCache = new Map<string, import("leaflet").Icon>();
 
 /**
  * Creates a Leaflet Icon instance for map markers
@@ -72,11 +77,11 @@ const iconCache = new Map<string, import('leaflet').Icon>();
  * @returns A Leaflet Icon instance
  */
 export function createMarkerIcon(
-  L: typeof import('leaflet'),
+  L: typeof import("leaflet"),
   isSelected: boolean,
   className?: string,
-): import('leaflet').Icon {
-  const cacheKey = `${isSelected}-${className || ''}`;
+): import("leaflet").Icon {
+  const cacheKey = `${isSelected}-${className || ""}`;
 
   if (iconCache.has(cacheKey)) {
     return iconCache.get(cacheKey)!;
@@ -86,8 +91,11 @@ export function createMarkerIcon(
     iconUrl: generateMarkerSvgDataUrl({ isSelected }),
     iconSize: [MARKER_DIMENSIONS.width, MARKER_DIMENSIONS.height],
     iconAnchor: [MARKER_DIMENSIONS.anchorX, MARKER_DIMENSIONS.anchorY],
-    popupAnchor: [MARKER_DIMENSIONS.popupAnchorX, MARKER_DIMENSIONS.popupAnchorY],
-    shadowUrl: '/images/leaflet/marker-shadow.png',
+    popupAnchor: [
+      MARKER_DIMENSIONS.popupAnchorX,
+      MARKER_DIMENSIONS.popupAnchorY,
+    ],
+    shadowUrl: "/images/leaflet/marker-shadow.png",
     shadowSize: [MARKER_DIMENSIONS.shadowWidth, MARKER_DIMENSIONS.shadowHeight],
     className: className,
   });
@@ -102,9 +110,11 @@ export function createMarkerIcon(
  * @param L - The Leaflet module
  * @returns A Leaflet DivIcon instance
  */
-export function createUserLocationIcon(L: typeof import('leaflet')): import('leaflet').DivIcon {
+export function createUserLocationIcon(
+  L: typeof import("leaflet"),
+): import("leaflet").DivIcon {
   return L.divIcon({
-    className: 'user-location-wrapper',
+    className: "user-location-wrapper",
     // Structure: Container -> Flash (stationary) + Dot (stationary) + Arrow (moving)
     html: `
       <div class="user-location-container">

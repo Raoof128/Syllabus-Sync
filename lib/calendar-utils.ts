@@ -1,5 +1,5 @@
-import { Event, Unit, Deadline } from '@/lib/types';
-import React from 'react';
+import { Event, Unit, Deadline } from "@/lib/types";
+import React from "react";
 
 // ... (existing constants)
 
@@ -7,7 +7,7 @@ import React from 'react';
 export function getDeadlineColor(deadline: Deadline, units: Unit[]): string {
   if (deadline.color) return deadline.color;
   const unit = units.find((u) => u.code === deadline.unitCode);
-  return unit?.color || 'var(--c-primary)';
+  return unit?.color || "var(--c-primary)";
 }
 
 // Hours to display (6 AM to 11 PM = 18 hours)
@@ -17,19 +17,50 @@ export const HOUR_HEIGHT = 48; // pixels per hour
 
 // Type colors for the calendar
 export const TYPE_COLORS = {
-  Assignment: { bg: 'bg-mq-info', border: 'border-mq-info', text: 'text-white' },
-  Exam: { bg: 'bg-mq-error', border: 'border-mq-error', text: 'text-white' },
-  Event: { bg: 'bg-mq-success', border: 'border-mq-success', text: 'text-white' },
-  Presentation: { bg: 'bg-mq-purple', border: 'border-mq-purple', text: 'text-white' },
-  Quiz: { bg: 'bg-mq-warning', border: 'border-mq-warning', text: 'text-black' },
+  Assignment: {
+    bg: "bg-mq-info",
+    border: "border-mq-info",
+    text: "text-white",
+  },
+  Exam: { bg: "bg-mq-error", border: "border-mq-error", text: "text-white" },
+  Event: {
+    bg: "bg-mq-success",
+    border: "border-mq-success",
+    text: "text-white",
+  },
+  Presentation: {
+    bg: "bg-mq-purple",
+    border: "border-mq-purple",
+    text: "text-white",
+  },
+  Quiz: {
+    bg: "bg-mq-warning",
+    border: "border-mq-warning",
+    text: "text-black",
+  },
 };
 
 // Category-specific colors for events
-export const EVENT_CATEGORY_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  Career: { bg: 'bg-indigo-500', border: 'border-indigo-600', text: 'text-white' },
-  Social: { bg: 'bg-pink-500', border: 'border-pink-600', text: 'text-white' },
-  Academic: { bg: 'bg-cyan-500', border: 'border-cyan-600', text: 'text-white' },
-  'Free Food': { bg: 'bg-orange-500', border: 'border-orange-600', text: 'text-white' },
+export const EVENT_CATEGORY_COLORS: Record<
+  string,
+  { bg: string; border: string; text: string }
+> = {
+  Career: {
+    bg: "bg-indigo-500",
+    border: "border-indigo-600",
+    text: "text-white",
+  },
+  Social: { bg: "bg-pink-500", border: "border-pink-600", text: "text-white" },
+  Academic: {
+    bg: "bg-cyan-500",
+    border: "border-cyan-600",
+    text: "text-white",
+  },
+  "Free Food": {
+    bg: "bg-orange-500",
+    border: "border-orange-600",
+    text: "text-white",
+  },
 };
 
 // Helper to get event colors based on custom color, category, or default
@@ -42,9 +73,9 @@ export function getEventColors(event: Event): {
   // Use custom color if provided
   if (event.color) {
     return {
-      bg: '',
-      border: '',
-      text: 'text-white',
+      bg: "",
+      border: "",
+      text: "text-white",
       style: { backgroundColor: event.color, borderColor: event.color },
     };
   }
@@ -61,7 +92,12 @@ export function getEventColors(event: Event): {
 // Parse time string like "2:00 PM" or "14:00" or "10:00 AM - 2:00 PM" or "09:00 - 11:00" to start/end hours
 export function parseTimeRange(
   timeStr: string,
-): { startHour: number; startMin: number; endHour: number; endMin: number } | null {
+): {
+  startHour: number;
+  startMin: number;
+  endHour: number;
+  endMin: number;
+} | null {
   if (!timeStr) return null;
 
   // Try parsing 24-hour range format "09:00 - 11:00" first (most common in our data)
@@ -89,10 +125,10 @@ export function parseTimeRange(
     const endMin = parseInt(rangeMatch[5], 10);
     const endPeriod = rangeMatch[6].toUpperCase();
 
-    if (startPeriod === 'PM' && startHour !== 12) startHour += 12;
-    if (startPeriod === 'AM' && startHour === 12) startHour = 0;
-    if (endPeriod === 'PM' && endHour !== 12) endHour += 12;
-    if (endPeriod === 'AM' && endHour === 12) endHour = 0;
+    if (startPeriod === "PM" && startHour !== 12) startHour += 12;
+    if (startPeriod === "AM" && startHour === 12) startHour = 0;
+    if (endPeriod === "PM" && endHour !== 12) endHour += 12;
+    if (endPeriod === "AM" && endHour === 12) endHour = 0;
 
     return { startHour, startMin, endHour, endMin };
   }
@@ -104,10 +140,15 @@ export function parseTimeRange(
     const minutes = parseInt(ampmMatch[2], 10);
     const period = ampmMatch[3].toUpperCase();
 
-    if (period === 'PM' && hours !== 12) hours += 12;
-    if (period === 'AM' && hours === 12) hours = 0;
+    if (period === "PM" && hours !== 12) hours += 12;
+    if (period === "AM" && hours === 12) hours = 0;
 
-    return { startHour: hours, startMin: minutes, endHour: hours + 1, endMin: minutes };
+    return {
+      startHour: hours,
+      startMin: minutes,
+      endHour: hours + 1,
+      endMin: minutes,
+    };
   }
 
   // Try parsing "14:00" format (single time, assume 1 hour duration)
@@ -115,7 +156,12 @@ export function parseTimeRange(
   if (militaryMatch) {
     const hours = parseInt(militaryMatch[1], 10);
     const minutes = parseInt(militaryMatch[2], 10);
-    return { startHour: hours, startMin: minutes, endHour: hours + 1, endMin: minutes };
+    return {
+      startHour: hours,
+      startMin: minutes,
+      endHour: hours + 1,
+      endMin: minutes,
+    };
   }
 
   return null;
@@ -134,8 +180,11 @@ export function getTimePositionAndHeight(
 
   if (effectiveStartHour >= 24) return null;
 
-  const top = (effectiveStartHour - START_HOUR) * HOUR_HEIGHT + (startMin / 60) * HOUR_HEIGHT;
-  const durationHours = effectiveEndHour - effectiveStartHour + (endMin - startMin) / 60;
+  const top =
+    (effectiveStartHour - START_HOUR) * HOUR_HEIGHT +
+    (startMin / 60) * HOUR_HEIGHT;
+  const durationHours =
+    effectiveEndHour - effectiveStartHour + (endMin - startMin) / 60;
   const height = Math.max(24, durationHours * HOUR_HEIGHT);
 
   return { top, height };
@@ -148,7 +197,7 @@ export interface CalendarItem {
   startMin: number;
   endHour: number;
   endMin: number;
-  type: 'unit' | 'deadline' | 'event';
+  type: "unit" | "deadline" | "event";
   data: unknown;
 }
 

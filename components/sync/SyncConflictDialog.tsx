@@ -6,13 +6,13 @@
 // compare their local (offline) changes with the server version and choose
 // which to keep. Reads directly from useSyncStore — no props needed.
 
-'use client';
+"use client";
 
-import { useCallback } from 'react';
-import { AlertTriangle, Cloud, Smartphone, X } from 'lucide-react';
-import { Button } from '@/components/ui/mq/button';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { useSyncStore, type SyncConflict } from '@/lib/store/offlineSyncStore';
+import { useCallback } from "react";
+import { AlertTriangle, Cloud, Smartphone, X } from "lucide-react";
+import { Button } from "@/components/ui/mq/button";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { useSyncStore, type SyncConflict } from "@/lib/store/offlineSyncStore";
 
 function ConflictCard({ conflict }: { conflict: SyncConflict }) {
   const { t } = useTypedTranslation();
@@ -24,14 +24,14 @@ function ConflictCard({ conflict }: { conflict: SyncConflict }) {
   // Get display-friendly field names (shared between client/server)
   const allKeys = Array.from(
     new Set([...Object.keys(clientData), ...Object.keys(serverData)]),
-  ).filter((k) => !k.startsWith('_')); // hide internal flags like _forceVersion
+  ).filter((k) => !k.startsWith("_")); // hide internal flags like _forceVersion
 
   const handleKeepClient = useCallback(() => {
-    resolveConflict(conflict.action.id, 'client');
+    resolveConflict(conflict.action.id, "client");
   }, [resolveConflict, conflict.action.id]);
 
   const handleKeepServer = useCallback(() => {
-    resolveConflict(conflict.action.id, 'server');
+    resolveConflict(conflict.action.id, "server");
   }, [resolveConflict, conflict.action.id]);
 
   return (
@@ -53,7 +53,7 @@ function ConflictCard({ conflict }: { conflict: SyncConflict }) {
         <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 p-3">
           <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-blue-700 dark:text-blue-400">
             <Smartphone className="h-3.5 w-3.5" />
-            {t('yourVersion')}
+            {t("yourVersion")}
           </div>
           <dl className="space-y-1.5">
             {allKeys.map((key) => (
@@ -63,9 +63,9 @@ function ConflictCard({ conflict }: { conflict: SyncConflict }) {
                 </dt>
                 <dd
                   className="text-xs text-mq-content truncate"
-                  title={String(clientData[key] ?? '—')}
+                  title={String(clientData[key] ?? "—")}
                 >
-                  {String(clientData[key] ?? '—')}
+                  {String(clientData[key] ?? "—")}
                 </dd>
               </div>
             ))}
@@ -76,7 +76,7 @@ function ConflictCard({ conflict }: { conflict: SyncConflict }) {
         <div className="rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/20 p-3">
           <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
             <Cloud className="h-3.5 w-3.5" />
-            {t('serverVersion')}
+            {t("serverVersion")}
           </div>
           <dl className="space-y-1.5">
             {allKeys.map((key) => (
@@ -86,9 +86,9 @@ function ConflictCard({ conflict }: { conflict: SyncConflict }) {
                 </dt>
                 <dd
                   className="text-xs text-mq-content truncate"
-                  title={String(serverData[key] ?? '—')}
+                  title={String(serverData[key] ?? "—")}
                 >
-                  {String(serverData[key] ?? '—')}
+                  {String(serverData[key] ?? "—")}
                 </dd>
               </div>
             ))}
@@ -98,9 +98,14 @@ function ConflictCard({ conflict }: { conflict: SyncConflict }) {
 
       {/* Resolution buttons */}
       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:justify-end">
-        <Button variant="outline" size="sm" onClick={handleKeepServer} className="gap-1.5">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleKeepServer}
+          className="gap-1.5"
+        >
           <Cloud className="h-3.5 w-3.5" />
-          {t('keepServerVersion')}
+          {t("keepServerVersion")}
         </Button>
         <Button
           size="sm"
@@ -108,7 +113,7 @@ function ConflictCard({ conflict }: { conflict: SyncConflict }) {
           className="gap-1.5 bg-mq-primary text-white hover:bg-mq-primary/90"
         >
           <Smartphone className="h-3.5 w-3.5" />
-          {t('keepMyChanges')}
+          {t("keepMyChanges")}
         </Button>
       </div>
     </div>
@@ -134,13 +139,17 @@ export default function SyncConflictDialog() {
             <AlertTriangle className="h-5 w-5 text-amber-600" />
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-semibold text-mq-content">{t('syncConflict')}</h2>
-            <p className="text-sm text-mq-content-secondary">{t('syncConflictDesc')}</p>
+            <h2 className="text-lg font-semibold text-mq-content">
+              {t("syncConflict")}
+            </h2>
+            <p className="text-sm text-mq-content-secondary">
+              {t("syncConflictDesc")}
+            </p>
           </div>
           <button
             onClick={clearConflicts}
             className="rounded-lg p-2 text-mq-content-secondary transition-colors hover:bg-mq-hover-background hover:text-mq-content"
-            aria-label={t('close')}
+            aria-label={t("close")}
           >
             <X className="h-5 w-5" />
           </button>

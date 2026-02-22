@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/mq/button';
-import { Input } from '@/components/ui/mq/input';
+import { useState, useCallback } from "react";
+import { Button } from "@/components/ui/mq/button";
+import { Input } from "@/components/ui/mq/input";
 import {
   Shield,
   ShieldCheck,
@@ -11,7 +11,7 @@ import {
   Copy,
   CheckCircle,
   AlertTriangle,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,12 +19,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import { toastUtils } from '@/lib/utils/toast';
-import { API_ROUTES } from '@/lib/constants/config';
-import type { MFAFactor } from '@/lib/security/mfa';
-import { ToggleControl } from '../ToggleControl';
+} from "@/components/ui/dialog";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { toastUtils } from "@/lib/utils/toast";
+import { API_ROUTES } from "@/lib/constants/config";
+import type { MFAFactor } from "@/lib/security/mfa";
+import { ToggleControl } from "../ToggleControl";
 
 interface TOTPSetupProps {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -32,21 +32,23 @@ interface TOTPSetupProps {
   onStatusChange: () => void;
 }
 
-type SetupStep = 'idle' | 'qr' | 'verify' | 'success';
+type SetupStep = "idle" | "qr" | "verify" | "success";
 
 export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
-  const [step, setStep] = useState<SetupStep>('idle');
+  const [step, setStep] = useState<SetupStep>("idle");
   const [isLoading, setIsLoading] = useState(false);
   const [factorId, setFactorId] = useState<string | null>(null);
-  const [qrCode, setQrCode] = useState<string>('');
-  const [secret, setSecret] = useState<string>('');
-  const [verifyCode, setVerifyCode] = useState('');
+  const [qrCode, setQrCode] = useState<string>("");
+  const [secret, setSecret] = useState<string>("");
+  const [verifyCode, setVerifyCode] = useState("");
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [showDisableDialog, setShowDisableDialog] = useState(false);
   const [secretCopied, setSecretCopied] = useState(false);
   const [disableFactorId, setDisableFactorId] = useState<string | null>(null);
 
-  const totpFactors = factors.filter((f) => f.type === 'totp' && f.status === 'verified');
+  const totpFactors = factors.filter(
+    (f) => f.type === "totp" && f.status === "verified",
+  );
   const isEnabled = totpFactors.length > 0;
 
   const handleStartSetup = useCallback(async () => {
@@ -55,22 +57,25 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
     try {
       // SECURITY: Fresh enrollment on every start to avoid stale factors
       const res = await fetch(API_ROUTES.AUTH.MFA_ENROLL, {
-        method: 'POST',
-        headers: { 'Cache-Control': 'no-cache' },
+        method: "POST",
+        headers: { "Cache-Control": "no-cache" },
       });
       const result = await res.json();
 
       if (!res.ok || !result?.data) {
-        toastUtils.error(t('error'), result?.error?.message || 'Failed to start setup. Please try again.');
+        toastUtils.error(
+          t("error"),
+          result?.error?.message || "Failed to start setup. Please try again.",
+        );
         return;
       }
 
       setFactorId(result.data.factorId);
       setQrCode(result.data.qrCode);
       setSecret(result.data.secret);
-      setStep('qr');
+      setStep("qr");
     } catch {
-      toastUtils.error(t('error'), t('tryAgainLater'));
+      toastUtils.error(t("error"), t("tryAgainLater"));
     } finally {
       setIsLoading(false);
     }
@@ -83,27 +88,32 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
     setVerifyError(null);
     try {
       const res = await fetch(API_ROUTES.AUTH.MFA_VERIFY, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ factorId, code: verifyCode }),
       });
       const result = await res.json();
 
       if (!res.ok) {
-        setVerifyError(result?.error?.message || 'Verification failed. Please check your code.');
+        setVerifyError(
+          result?.error?.message ||
+            "Verification failed. Please check your code.",
+        );
         return;
       }
 
       if (!result?.data?.verified) {
-        setVerifyError('Invalid code. Please try again.');
+        setVerifyError("Invalid code. Please try again.");
         return;
       }
 
-      setStep('success');
-      toastUtils.success(t('security'), 'Two-factor authentication enabled!');
+      setStep("success");
+      toastUtils.success(t("security"), "Two-factor authentication enabled!");
       onStatusChange();
     } catch {
-      setVerifyError('Network error. Please check your connection and try again.');
+      setVerifyError(
+        "Network error. Please check your connection and try again.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -115,23 +125,26 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
     setIsLoading(true);
     try {
       const res = await fetch(API_ROUTES.AUTH.MFA_UNENROLL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ factorId: disableFactorId }),
       });
       const result = await res.json();
 
       if (!res.ok) {
-        toastUtils.error(t('error'), result?.error?.message || 'Failed to disable 2FA');
+        toastUtils.error(
+          t("error"),
+          result?.error?.message || "Failed to disable 2FA",
+        );
         return;
       }
 
       setShowDisableDialog(false);
       setDisableFactorId(null);
-      toastUtils.success(t('security'), 'Two-factor authentication disabled.');
+      toastUtils.success(t("security"), "Two-factor authentication disabled.");
       onStatusChange();
     } catch {
-      toastUtils.error(t('error'), t('tryAgainLater'));
+      toastUtils.error(t("error"), t("tryAgainLater"));
     } finally {
       setIsLoading(false);
     }
@@ -144,26 +157,29 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
   }, [secret]);
 
   const resetSetup = useCallback(() => {
-    setStep('idle');
+    setStep("idle");
     setFactorId(null);
-    setQrCode('');
-    setSecret('');
-    setVerifyCode('');
+    setQrCode("");
+    setSecret("");
+    setVerifyCode("");
     setVerifyError(null);
   }, []);
 
-  const handleToggleAction = useCallback((e?: React.MouseEvent | React.KeyboardEvent) => {
-    // Prevent double triggering from the toggle control if it bubbles
-    if (e && 'stopPropagation' in e) e.stopPropagation();
+  const handleToggleAction = useCallback(
+    (e?: React.MouseEvent | React.KeyboardEvent) => {
+      // Prevent double triggering from the toggle control if it bubbles
+      if (e && "stopPropagation" in e) e.stopPropagation();
 
-    if (isLoading) return;
-    if (isEnabled) {
-      setDisableFactorId(totpFactors[0]?.id ?? null);
-      setShowDisableDialog(true);
-    } else {
-      handleStartSetup();
-    }
-  }, [isLoading, isEnabled, totpFactors, handleStartSetup]);
+      if (isLoading) return;
+      if (isEnabled) {
+        setDisableFactorId(totpFactors[0]?.id ?? null);
+        setShowDisableDialog(true);
+      } else {
+        handleStartSetup();
+      }
+    },
+    [isLoading, isEnabled, totpFactors, handleStartSetup],
+  );
 
   return (
     <>
@@ -172,7 +188,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
         tabIndex={0}
         onClick={handleToggleAction}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             handleToggleAction(e);
           }
@@ -183,12 +199,16 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           <div className="flex items-center gap-3 flex-1">
             <Shield className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <div className="flex-1 min-w-0">
-              <p className="text-mq-sm font-medium text-mq-content">{t('authenticatorApp')}</p>
+              <p className="text-mq-sm font-medium text-mq-content">
+                {t("authenticatorApp")}
+              </p>
               <p className="text-mq-xs text-mq-content-secondary mt-0.5">
                 Google Authenticator, Authy, or Microsoft Authenticator
               </p>
               <p className="text-[10px] text-mq-content-tertiary mt-2 leading-relaxed opacity-90 hidden sm:block max-w-[90%]">
-                For security, your 6-digit code acts as an active mathematical signature refreshing every 30 seconds. Once used, it becomes permanently invalidated to prevent replay attacks.
+                For security, your 6-digit code acts as an active mathematical
+                signature refreshing every 30 seconds. Once used, it becomes
+                permanently invalidated to prevent replay attacks.
               </p>
             </div>
           </div>
@@ -196,11 +216,11 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
             <ToggleControl
               checked={isEnabled}
               onToggle={handleToggleAction}
-              label={t('authenticatorApp')}
+              label={t("authenticatorApp")}
               testId="toggle-totp"
             />
             <span className="text-mq-xs text-mq-content-secondary">
-              {isEnabled ? t('enabled') : t('disabled')}
+              {isEnabled ? t("enabled") : t("disabled")}
             </span>
           </div>
         </div>
@@ -210,7 +230,9 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
             <div className="flex items-center gap-2 text-mq-sm text-mq-success">
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
               <span>
-                {t('activeSince', { date: new Date(totpFactors[0].createdAt).toLocaleDateString() })}
+                {t("activeSince", {
+                  date: new Date(totpFactors[0].createdAt).toLocaleDateString(),
+                })}
               </span>
             </div>
           </div>
@@ -219,7 +241,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
 
       {/* Setup Dialog - QR Code Step */}
       <Dialog
-        open={step === 'qr' || step === 'verify'}
+        open={step === "qr" || step === "verify"}
         onOpenChange={(open) => {
           if (!open) resetSetup();
         }}
@@ -228,14 +250,14 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              {step === 'qr' ? t('setUpAuthenticator') : t('verifySetup')}
+              {step === "qr" ? t("setUpAuthenticator") : t("verifySetup")}
             </DialogTitle>
             <DialogDescription>
-              {step === 'qr' ? t('scanQrCode') : t('enterTotpCode')}
+              {step === "qr" ? t("scanQrCode") : t("enterTotpCode")}
             </DialogDescription>
           </DialogHeader>
 
-          {step === 'qr' && (
+          {step === "qr" && (
             <div className="py-4 space-y-4">
               {/* QR Code */}
               <div className="flex justify-center">
@@ -243,7 +265,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={qrCode}
-                    alt={t('totpQrCodeAlt')}
+                    alt={t("totpQrCodeAlt")}
                     width={200}
                     height={200}
                     className="w-[200px] h-[200px]"
@@ -255,7 +277,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
               <div className="space-y-3 pt-2">
                 <div className="text-center space-y-1">
                   <p className="text-sm font-medium text-mq-content">
-                    {t('cantScanEnterManually')}
+                    {t("cantScanEnterManually")}
                   </p>
                   <p className="text-xs text-mq-content-secondary">
                     Type this code into your app to link it manually.
@@ -270,7 +292,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                     size="sm"
                     onClick={copySecret}
                     className="p-2 h-auto hover:bg-mq-primary/10"
-                    aria-label={t('copySecret')}
+                    aria-label={t("copySecret")}
                   >
                     {secretCopied ? (
                       <CheckCircle className="h-5 w-5 text-mq-success" />
@@ -283,7 +305,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
             </div>
           )}
 
-          {step === 'verify' && (
+          {step === "verify" && (
             <div className="py-4 space-y-4">
               <div className="space-y-2">
                 <Input
@@ -294,7 +316,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                   placeholder="000000"
                   value={verifyCode}
                   onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 6);
                     setVerifyCode(val);
                     setVerifyError(null);
                   }}
@@ -314,18 +336,23 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
 
           <DialogFooter>
             <Button variant="ghost" onClick={resetSetup} disabled={isLoading}>
-              {t('cancel')}
+              {t("cancel")}
             </Button>
-            {step === 'qr' && <Button onClick={() => setStep('verify')}>{t('continue')}</Button>}
-            {step === 'verify' && (
-              <Button onClick={handleVerify} disabled={isLoading || verifyCode.length !== 6}>
+            {step === "qr" && (
+              <Button onClick={() => setStep("verify")}>{t("continue")}</Button>
+            )}
+            {step === "verify" && (
+              <Button
+                onClick={handleVerify}
+                disabled={isLoading || verifyCode.length !== 6}
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    {t('verifying')}
+                    {t("verifying")}
                   </>
                 ) : (
-                  t('verifyAndEnable')
+                  t("verifyAndEnable")
                 )}
               </Button>
             )}
@@ -335,7 +362,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
 
       {/* Success Dialog */}
       <Dialog
-        open={step === 'success'}
+        open={step === "success"}
         onOpenChange={(open) => {
           if (!open) resetSetup();
         }}
@@ -344,14 +371,12 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-mq-success">
               <ShieldCheck className="h-5 w-5" />
-              {t('mfaEnabledTitle')}
+              {t("mfaEnabledTitle")}
             </DialogTitle>
-            <DialogDescription>
-              {t('mfaEnabledDesc')}
-            </DialogDescription>
+            <DialogDescription>{t("mfaEnabledDesc")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={resetSetup}>{t('done')}</Button>
+            <Button onClick={resetSetup}>{t("done")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -362,17 +387,15 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShieldOff className="h-5 w-5 text-red-500" />
-              {t('disableMfaTitle')}
+              {t("disableMfaTitle")}
             </DialogTitle>
-            <DialogDescription>
-              {t('disableMfaDesc')}
-            </DialogDescription>
+            <DialogDescription>{t("disableMfaDesc")}</DialogDescription>
           </DialogHeader>
           <div className="py-2">
             <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-mq-lg border border-red-500/20">
               <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
               <p className="text-mq-sm text-mq-content-secondary">
-                {t('mfaSecurityWarning')}
+                {t("mfaSecurityWarning")}
               </p>
             </div>
           </div>
@@ -382,16 +405,20 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
               onClick={() => setShowDisableDialog(false)}
               disabled={isLoading}
             >
-              {t('cancel')}
+              {t("cancel")}
             </Button>
-            <Button variant="destructive" onClick={handleDisable} disabled={isLoading}>
+            <Button
+              variant="destructive"
+              onClick={handleDisable}
+              disabled={isLoading}
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  {t('processing')}
+                  {t("processing")}
                 </>
               ) : (
-                t('disableMfaAction')
+                t("disableMfaAction")
               )}
             </Button>
           </DialogFooter>

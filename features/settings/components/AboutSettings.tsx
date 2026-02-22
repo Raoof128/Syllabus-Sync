@@ -1,14 +1,19 @@
-'use client';
+"use client";
 
-import { memo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/mq/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { ExternalLink, MessageSquare, BookOpen } from 'lucide-react';
-import { APP_CONFIG, EXTERNAL_LINKS } from '@/lib/config';
-import { toastUtils } from '@/lib/utils/toast';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import { MagicCard } from '@/components/ui/MagicCard';
+import { memo, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/mq/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/mq/card";
+import { ExternalLink, MessageSquare, BookOpen } from "lucide-react";
+import { APP_CONFIG, EXTERNAL_LINKS } from "@/lib/config";
+import { toastUtils } from "@/lib/utils/toast";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { MagicCard } from "@/components/ui/MagicCard";
 
 type AboutSettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -17,12 +22,12 @@ type AboutSettingsProps = {
 const AboutSettings = memo(({ t }: AboutSettingsProps) => {
   const router = useRouter();
   const handleViewDocumentation = useCallback(() => {
-    toastUtils.info(t('viewDocumentation'), t('documentationOpening'));
-    window.open(EXTERNAL_LINKS.documentation, '_blank', 'noopener,noreferrer');
+    toastUtils.info(t("viewDocumentation"), t("documentationOpening"));
+    window.open(EXTERNAL_LINKS.documentation, "_blank", "noopener,noreferrer");
   }, [t]);
 
   const handleSendFeedback = useCallback(() => {
-    toastUtils.info(t('feedback'), t('feedbackPreparing'));
+    toastUtils.info(t("feedback"), t("feedbackPreparing"));
     window.location.href = EXTERNAL_LINKS.feedback;
   }, [t]);
 
@@ -32,36 +37,50 @@ const AboutSettings = memo(({ t }: AboutSettingsProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5" aria-hidden="true" />
-            <span id="about-settings-heading">{t('settings_about')}</span>
+            <span id="about-settings-heading">{t("settings_about")}</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3" role="region" aria-labelledby="about-settings-heading">
+        <CardContent
+          className="space-y-3"
+          role="region"
+          aria-labelledby="about-settings-heading"
+        >
           {/* About */}
           <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-            <h3 className="font-semibold text-mq-content mb-1">{t('aboutTitle')}</h3>
+            <h3 className="font-semibold text-mq-content mb-1">
+              {t("aboutTitle")}
+            </h3>
             <p className="text-mq-sm text-mq-content-secondary">
-              {t('version')} {APP_CONFIG.version} - {t('aboutDesc')}
+              {t("version")} {APP_CONFIG.version} - {t("aboutDesc")}
             </p>
           </div>
 
           {/* Privacy Policy */}
           <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-            <h3 className="font-semibold text-mq-content mb-1">{t('privacyPolicy')}</h3>
-            <p className="text-mq-sm text-mq-content-secondary mb-2">{t('privacyPolicyDesc')}</p>
+            <h3 className="font-semibold text-mq-content mb-1">
+              {t("privacyPolicy")}
+            </h3>
+            <p className="text-mq-sm text-mq-content-secondary mb-2">
+              {t("privacyPolicyDesc")}
+            </p>
             <Button
               variant="ghost"
               size="sm"
               className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-              onClick={() => router.push('/privacy')}
+              onClick={() => router.push("/privacy")}
             >
-              {t('view')}
+              {t("view")}
             </Button>
           </div>
 
           {/* Need Help */}
           <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-            <h3 className="font-semibold text-mq-content mb-1">{t('needHelp')}</h3>
-            <p className="text-mq-sm text-mq-content-secondary mb-2">{t('helpDesc')}</p>
+            <h3 className="font-semibold text-mq-content mb-1">
+              {t("needHelp")}
+            </h3>
+            <p className="text-mq-sm text-mq-content-secondary mb-2">
+              {t("helpDesc")}
+            </p>
             <Button
               variant="ghost"
               size="sm"
@@ -70,14 +89,18 @@ const AboutSettings = memo(({ t }: AboutSettingsProps) => {
               data-testid="view-documentation-button"
             >
               <ExternalLink className="h-4 w-4 mr-2" aria-hidden="true" />
-              {t('viewDocumentation')}
+              {t("viewDocumentation")}
             </Button>
           </div>
 
           {/* Feedback */}
           <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-            <h3 className="font-semibold text-mq-content mb-1">{t('feedback')}</h3>
-            <p className="text-mq-sm text-mq-content-secondary mb-2">{t('feedbackDesc')}</p>
+            <h3 className="font-semibold text-mq-content mb-1">
+              {t("feedback")}
+            </h3>
+            <p className="text-mq-sm text-mq-content-secondary mb-2">
+              {t("feedbackDesc")}
+            </p>
             <Button
               variant="ghost"
               size="sm"
@@ -86,7 +109,7 @@ const AboutSettings = memo(({ t }: AboutSettingsProps) => {
               data-testid="send-feedback-button"
             >
               <MessageSquare className="h-4 w-4 mr-2" aria-hidden="true" />
-              {t('sendFeedback')}
+              {t("sendFeedback")}
             </Button>
           </div>
         </CardContent>
@@ -95,6 +118,6 @@ const AboutSettings = memo(({ t }: AboutSettingsProps) => {
   );
 });
 
-AboutSettings.displayName = 'AboutSettings';
+AboutSettings.displayName = "AboutSettings";
 
 export default AboutSettings;

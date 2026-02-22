@@ -18,20 +18,29 @@
 // - .sidebar-trigger         → Always-visible 48px strip with hamburger
 // - .sidebar-panel           → Sliding content panel
 // ============================================================================
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, useCallback, memo } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { Home, MapPin, Calendar, MessageSquare, Menu, X, Sparkles, Settings } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import SocialButtons from './SocialButtons';
-import { useGamificationStore } from '@/lib/store/gamificationStore';
-import { getLevelTitleKey } from '@/lib/utils/gamification';
+import { useState, useRef, useEffect, useCallback, memo } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import {
+  Home,
+  MapPin,
+  Calendar,
+  MessageSquare,
+  Menu,
+  X,
+  Sparkles,
+  Settings,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import SocialButtons from "./SocialButtons";
+import { useGamificationStore } from "@/lib/store/gamificationStore";
+import { getLevelTitleKey } from "@/lib/utils/gamification";
 
-import { TranslationKey } from '@/lib/i18n/translations';
+import { TranslationKey } from "@/lib/i18n/translations";
 
 // Navigation items configuration
 // Each item maps to a route and displays with an icon
@@ -40,11 +49,11 @@ const navigation: {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { name: 'home', href: '/home', icon: Home },
-  { name: 'calendar', href: '/calendar', icon: Calendar },
-  { name: 'navigation' as TranslationKey, href: '/map', icon: MapPin },
-  { name: 'feed', href: '/feed', icon: MessageSquare },
-  { name: 'settings', href: '/settings', icon: Settings },
+  { name: "home", href: "/home", icon: Home },
+  { name: "calendar", href: "/calendar", icon: Calendar },
+  { name: "navigation" as TranslationKey, href: "/map", icon: MapPin },
+  { name: "feed", href: "/feed", icon: MessageSquare },
+  { name: "settings", href: "/settings", icon: Settings },
 ];
 
 /**
@@ -84,17 +93,17 @@ const Sidebar = memo(() => {
     if (mobileMenuOpen) {
       // Save current scroll position and lock body
       const scrollY = window.scrollY;
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
       document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
+      document.body.style.width = "100%";
 
       return () => {
         // Restore body styles and scroll position
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
         window.scrollTo(0, scrollY);
       };
     }
@@ -126,14 +135,14 @@ const Sidebar = memo(() => {
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Close on Escape key
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setMobileMenuOpen(false);
         menuButtonRef.current?.focus(); // Return focus to trigger button
         return;
       }
 
       // Focus trap on Tab key
-      if (e.key === 'Tab') {
+      if (e.key === "Tab") {
         const focusable = getFocusableElements();
         if (focusable.length === 0) return;
 
@@ -153,8 +162,8 @@ const Sidebar = memo(() => {
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [mobileMenuOpen]);
 
   // ============================================================================
@@ -181,12 +190,12 @@ const Sidebar = memo(() => {
       }
     };
 
-    shell.addEventListener('focusin', handleFocusIn);
-    shell.addEventListener('focusout', handleFocusOut);
+    shell.addEventListener("focusin", handleFocusIn);
+    shell.addEventListener("focusout", handleFocusOut);
 
     return () => {
-      shell.removeEventListener('focusin', handleFocusIn);
-      shell.removeEventListener('focusout', handleFocusOut);
+      shell.removeEventListener("focusin", handleFocusIn);
+      shell.removeEventListener("focusout", handleFocusOut);
     };
   }, []);
 
@@ -217,11 +226,15 @@ const Sidebar = memo(() => {
           e.stopPropagation();
           toggleMobileMenu();
         }}
-        aria-label={mobileMenuOpen ? t('closeMenu') : t('openMenu')}
+        aria-label={mobileMenuOpen ? t("closeMenu") : t("openMenu")}
         aria-expanded={mobileMenuOpen}
         aria-controls="mobile-sidebar"
       >
-        {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {mobileMenuOpen ? (
+          <X className="h-5 w-5" />
+        ) : (
+          <Menu className="h-5 w-5" />
+        )}
       </button>
 
       {/* ========================================================================
@@ -248,12 +261,12 @@ const Sidebar = memo(() => {
       <div
         ref={sidebarRef}
         id="mobile-sidebar"
-        role={mobileMenuOpen ? 'dialog' : 'navigation'}
-        aria-modal={mobileMenuOpen ? 'true' : undefined}
-        aria-label={t('mainNavigation')}
+        role={mobileMenuOpen ? "dialog" : "navigation"}
+        aria-modal={mobileMenuOpen ? "true" : undefined}
+        aria-label={t("mainNavigation")}
         className={cn(
-          'md:hidden fixed left-0 top-0 w-64 h-screen p-4 pt-20 flex flex-col bg-mq-background border-r border-mq-border transition-transform duration-300 ease-out overflow-y-auto',
-          mobileMenuOpen ? 'z-[58] translate-x-0' : 'z-40 -translate-x-full',
+          "md:hidden fixed left-0 top-0 w-64 h-screen p-4 pt-20 flex flex-col bg-mq-background border-r border-mq-border transition-transform duration-300 ease-out overflow-y-auto",
+          mobileMenuOpen ? "z-[58] translate-x-0" : "z-40 -translate-x-full",
         )}
       >
         {/* Logo */}
@@ -266,14 +279,20 @@ const Sidebar = memo(() => {
           >
             <Image
               src="/MQ_Logo_Final.png"
-              alt={t('mqLogoAlt')}
+              alt={t("mqLogoAlt")}
               width={80}
               height={80}
               priority
               className="h-12 w-auto"
-              style={{ objectFit: 'contain', borderRadius: '8px', width: 'auto' }}
+              style={{
+                objectFit: "contain",
+                borderRadius: "8px",
+                width: "auto",
+              }}
             />
-            <span className="text-sm font-semibold text-mq-content">{t('appName')}</span>
+            <span className="text-sm font-semibold text-mq-content">
+              {t("appName")}
+            </span>
           </Link>
         </div>
 
@@ -283,7 +302,7 @@ const Sidebar = memo(() => {
             href="/settings"
             onClick={() => setMobileMenuOpen(false)}
             className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors"
-            title={`${t('level')} ${profile.level} - ${t(getLevelTitleKey(profile.level))} (${profile.xp.toLocaleString()} XP)`}
+            title={`${t("level")} ${profile.level} - ${t(getLevelTitleKey(profile.level))} (${profile.xp.toLocaleString()} XP)`}
           >
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-mq-primary text-white text-xs font-bold">
               {profile.level}
@@ -293,7 +312,10 @@ const Sidebar = memo(() => {
                 {t(getLevelTitleKey(profile.level))}
               </p>
               <div className="flex items-center gap-1">
-                <Sparkles className="h-3 w-3 text-mq-primary" aria-hidden="true" />
+                <Sparkles
+                  className="h-3 w-3 text-mq-primary"
+                  aria-hidden="true"
+                />
                 <span className="text-[10px] text-mq-content-secondary">
                   {profile.xp.toLocaleString()} XP
                 </span>
@@ -303,12 +325,16 @@ const Sidebar = memo(() => {
         )}
 
         {/* Navigation Links */}
-        <nav className="space-y-2 flex-1" role="navigation" aria-label={t('mainNavigation')}>
+        <nav
+          className="space-y-2 flex-1"
+          role="navigation"
+          aria-label={t("mainNavigation")}
+        >
           {navigation.map((item) => {
             // Use startsWith for settings to match sub-routes like /settings/general
             const isActive =
-              item.href === '/settings'
-                ? pathname?.startsWith('/settings')
+              item.href === "/settings"
+                ? pathname?.startsWith("/settings")
                 : pathname === item.href;
             const Icon = item.icon;
 
@@ -318,12 +344,12 @@ const Sidebar = memo(() => {
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-3 rounded-mq text-sm font-medium touch-manipulation min-h-11',
+                  "flex items-center gap-3 px-3 py-3 rounded-mq text-sm font-medium touch-manipulation min-h-11",
                   isActive
-                    ? 'bg-mq-primary text-white shadow-md'
-                    : 'text-mq-content-secondary hover:text-mq-content hover:bg-mq-background-secondary',
+                    ? "bg-mq-primary text-white shadow-md"
+                    : "text-mq-content-secondary hover:text-mq-content hover:bg-mq-background-secondary",
                 )}
-                aria-current={isActive ? 'page' : undefined}
+                aria-current={isActive ? "page" : undefined}
               >
                 <Icon className="h-5 w-5" aria-hidden="true" />
                 {t(item.name)}
@@ -348,8 +374,8 @@ const Sidebar = memo(() => {
       <aside
         ref={sidebarShellRef}
         className="hidden md:block sidebar-shell"
-        data-keyboard-open={keyboardOpen ? 'true' : undefined}
-        data-pinned={pinnedOpen ? 'true' : undefined}
+        data-keyboard-open={keyboardOpen ? "true" : undefined}
+        data-pinned={pinnedOpen ? "true" : undefined}
         onMouseLeave={() => {
           // Close keyboard-open state when mouse leaves (user switched to mouse navigation)
           if (!pinnedOpen) {
@@ -367,11 +393,11 @@ const Sidebar = memo(() => {
         <button
           type="button"
           className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger"
-          aria-label={pinnedOpen ? t('closeMenu') : t('openMenu')}
+          aria-label={pinnedOpen ? t("closeMenu") : t("openMenu")}
           aria-pressed={pinnedOpen}
           aria-expanded={pinnedOpen}
           onClick={() => setPinnedOpen((prev) => !prev)}
-          title={pinnedOpen ? t('closeMenu') : t('openMenu')}
+          title={pinnedOpen ? t("closeMenu") : t("openMenu")}
         >
           {/* Hamburger bars - animate on hover (expand outward) */}
           <span className="flex flex-col items-center gap-2 sidebar-bars">
@@ -390,7 +416,7 @@ const Sidebar = memo(() => {
         <div
           id="desktop-sidebar"
           role="navigation"
-          aria-label={t('mainNavigation')}
+          aria-label={t("mainNavigation")}
           className="fixed md:relative w-56 h-screen p-4 md:pl-12 flex flex-col sidebar-panel bg-mq-background border-r border-mq-border z-40 overflow-y-auto"
         >
           {/* Logo - bounces in with slight overshoot */}
@@ -398,16 +424,16 @@ const Sidebar = memo(() => {
             <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/MQ_Logo_Final.png"
-                alt={t('mqLogoAlt')}
+                alt={t("mqLogoAlt")}
                 width={128}
                 height={128}
                 priority
                 className="w-auto h-auto"
-                style={{ objectFit: 'contain', borderRadius: '8px' }}
+                style={{ objectFit: "contain", borderRadius: "8px" }}
                 onError={(e) => {
                   // Fallback for logo image
                   (e.target as HTMLImageElement).src =
-                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjN0EwQTIxIi8+Cjx0ZXh0IHg9IjY0IiB5PSI3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPk1RCjwvdGV4dD4KPC9zdmc+';
+                    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSIjN0EwQTIxIi8+Cjx0ZXh0IHg9IjY0IiB5PSI3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPk1RCjwvdGV4dD4KPC9zdmc+";
                 }}
               />
             </Link>
@@ -418,8 +444,8 @@ const Sidebar = memo(() => {
             <Link
               href="/settings"
               className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors sidebar-menu-item"
-              title={`${t('level')} ${profile.level} - ${t(getLevelTitleKey(profile.level))} (${profile.xp.toLocaleString()} XP)`}
-              aria-label={t('gamificationProgress', {
+              title={`${t("level")} ${profile.level} - ${t(getLevelTitleKey(profile.level))} (${profile.xp.toLocaleString()} XP)`}
+              aria-label={t("gamificationProgress", {
                 level: profile.level,
                 title: t(getLevelTitleKey(profile.level)),
                 xp: profile.xp.toLocaleString(),
@@ -433,7 +459,10 @@ const Sidebar = memo(() => {
                   {t(getLevelTitleKey(profile.level))}
                 </p>
                 <div className="flex items-center gap-1">
-                  <Sparkles className="h-3 w-3 text-mq-primary" aria-hidden="true" />
+                  <Sparkles
+                    className="h-3 w-3 text-mq-primary"
+                    aria-hidden="true"
+                  />
                   <span className="text-[10px] text-mq-content-secondary">
                     {profile.xp.toLocaleString()} XP
                   </span>
@@ -443,12 +472,16 @@ const Sidebar = memo(() => {
           )}
 
           {/* Navigation Links - staggered slide-in animation */}
-          <nav className="space-y-2" role="navigation" aria-label={t('mainNavigation')}>
+          <nav
+            className="space-y-2"
+            role="navigation"
+            aria-label={t("mainNavigation")}
+          >
             {navigation.map((item) => {
               // Use startsWith for settings to match sub-routes like /settings/general
               const isActive =
-                item.href === '/settings'
-                  ? pathname?.startsWith('/settings')
+                item.href === "/settings"
+                  ? pathname?.startsWith("/settings")
                   : pathname === item.href;
               const Icon = item.icon;
 
@@ -457,17 +490,17 @@ const Sidebar = memo(() => {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium sidebar-menu-item',
+                    "group flex items-center gap-3 px-3 py-3 rounded-mq text-mq-sm font-medium touch-manipulation min-h-[44px] btn-premium sidebar-menu-item",
                     isActive
-                      ? 'bg-mq-primary text-white shadow-mq-sm border border-white/10 border-l-4 border-white/80 pl-2 pr-3 font-semibold'
-                      : 'text-mq-content-secondary hover:text-white hover:bg-mq-primary hover:shadow-mq active:scale-[0.98] transition-colors duration-200',
+                      ? "bg-mq-primary text-white shadow-mq-sm border border-white/10 border-l-4 border-white/80 pl-2 pr-3 font-semibold"
+                      : "text-mq-content-secondary hover:text-white hover:bg-mq-primary hover:shadow-mq active:scale-[0.98] transition-colors duration-200",
                   )}
-                  aria-current={isActive ? 'page' : undefined}
+                  aria-current={isActive ? "page" : undefined}
                 >
                   <Icon
                     className={cn(
-                      'h-4 w-4 transition-transform duration-300 group-hover:scale-110 ease-mq-snap',
-                      isActive && 'animate-pulse-subtle',
+                      "h-4 w-4 transition-transform duration-300 group-hover:scale-110 ease-mq-snap",
+                      isActive && "animate-pulse-subtle",
                     )}
                     aria-hidden="true"
                   />
@@ -488,6 +521,6 @@ const Sidebar = memo(() => {
 });
 
 // Display name for React DevTools
-Sidebar.displayName = 'Sidebar';
+Sidebar.displayName = "Sidebar";
 
 export default Sidebar;

@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/mq/button';
-import { Badge } from '@/components/ui/mq/badge';
-import { Input } from '@/components/ui/mq/input';
+import { useState, useCallback } from "react";
+import { Button } from "@/components/ui/mq/button";
+import { Badge } from "@/components/ui/mq/badge";
+import { Input } from "@/components/ui/mq/input";
 import {
   Smartphone,
   Loader2,
   AlertTriangle,
   CheckCircle,
   Info,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,11 +18,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import { toastUtils } from '@/lib/utils/toast';
-import { API_ROUTES } from '@/lib/constants/config';
-import type { MFAFactor } from '@/lib/security/mfa';
+} from "@/components/ui/dialog";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { toastUtils } from "@/lib/utils/toast";
+import { API_ROUTES } from "@/lib/constants/config";
+import type { MFAFactor } from "@/lib/security/mfa";
 
 interface SMSSetupProps {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -30,34 +30,34 @@ interface SMSSetupProps {
   onStatusChange: () => void;
 }
 
-type SetupStep = 'idle' | 'phone' | 'verify' | 'success';
+type SetupStep = "idle" | "phone" | "verify" | "success";
 
 export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
-  const [step, setStep] = useState<SetupStep>('idle');
+  const [step, setStep] = useState<SetupStep>("idle");
   const [isLoading, setIsLoading] = useState(false);
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState("");
   const [factorId, setFactorId] = useState<string | null>(null);
   const [challengeId, setChallengeId] = useState<string | null>(null);
-  const [verifyCode, setVerifyCode] = useState('');
+  const [verifyCode, setVerifyCode] = useState("");
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [showDisableDialog, setShowDisableDialog] = useState(false);
   const [disableFactorId, setDisableFactorId] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const phoneFactors = factors.filter(
-    (f) => f.type === 'phone' && f.status === 'verified',
+    (f) => f.type === "phone" && f.status === "verified",
   );
   const isEnabled = phoneFactors.length > 0;
 
   const handleStartSetup = useCallback(() => {
-    setStep('phone');
-    setPhone('');
+    setStep("phone");
+    setPhone("");
     setVerifyError(null);
   }, []);
 
   const handleEnrollPhone = useCallback(async () => {
     if (!phone || !/^\+[1-9]\d{6,14}$/.test(phone.trim())) {
-      setVerifyError(t('invalidPhone'));
+      setVerifyError(t("invalidPhone"));
       return;
     }
 
@@ -65,20 +65,20 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
     setVerifyError(null);
     try {
       const res = await fetch(API_ROUTES.AUTH.MFA_SMS_ENROLL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: phone.trim() }),
       });
       const result = await res.json();
 
       if (!res.ok || !result?.data?.factorId || !result?.data?.challengeId) {
-        setVerifyError(result?.error?.message || t('failedToSendSms'));
+        setVerifyError(result?.error?.message || t("failedToSendSms"));
         return;
       }
 
       setFactorId(result.data.factorId);
       setChallengeId(result.data.challengeId);
-      setStep('verify');
+      setStep("verify");
 
       // Start resend cooldown
       setResendCooldown(60);
@@ -92,7 +92,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
         });
       }, 1000);
     } catch {
-      setVerifyError('Failed to send SMS');
+      setVerifyError("Failed to send SMS");
     } finally {
       setIsLoading(false);
     }
@@ -105,22 +105,22 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
     setVerifyError(null);
     try {
       const res = await fetch(API_ROUTES.AUTH.MFA_SMS_VERIFY, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ factorId, challengeId, code: verifyCode }),
       });
       const result = await res.json();
 
       if (!res.ok || !result?.data?.verified) {
-        setVerifyError(result?.error?.message || 'Invalid code');
+        setVerifyError(result?.error?.message || "Invalid code");
         return;
       }
 
-      setStep('success');
-      toastUtils.success(t('security'), t('smsEnabledTitle'));
+      setStep("success");
+      toastUtils.success(t("security"), t("smsEnabledTitle"));
       onStatusChange();
     } catch {
-      setVerifyError(t('verificationFailed'));
+      setVerifyError(t("verificationFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -132,17 +132,17 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
     setVerifyError(null);
     try {
       const res = await fetch(API_ROUTES.AUTH.MFA_CHALLENGE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ factorId }),
       });
       const result = await res.json();
       if (!res.ok || !result?.data?.challengeId) {
-        setVerifyError(result?.error?.message || 'Failed to resend code');
+        setVerifyError(result?.error?.message || "Failed to resend code");
         return;
       }
       setChallengeId(result.data.challengeId);
-      setVerifyCode('');
+      setVerifyCode("");
 
       setResendCooldown(60);
       const interval = setInterval(() => {
@@ -155,7 +155,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
         });
       }, 1000);
     } catch {
-      setVerifyError('Failed to resend code');
+      setVerifyError("Failed to resend code");
     } finally {
       setIsLoading(false);
     }
@@ -167,37 +167,40 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
     setIsLoading(true);
     try {
       const res = await fetch(API_ROUTES.AUTH.MFA_UNENROLL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ factorId: disableFactorId }),
       });
 
       if (!res.ok) {
         const result = await res.json();
         toastUtils.error(
-          t('error'),
-          result?.error?.message || 'Failed to disable SMS 2FA',
+          t("error"),
+          result?.error?.message || "Failed to disable SMS 2FA",
         );
         return;
       }
 
       setShowDisableDialog(false);
       setDisableFactorId(null);
-      toastUtils.success(t('security'), `${t('disableSmsAction')} ${t('disabled').toLowerCase()}.`);
+      toastUtils.success(
+        t("security"),
+        `${t("disableSmsAction")} ${t("disabled").toLowerCase()}.`,
+      );
       onStatusChange();
     } catch {
-      toastUtils.error(t('error'), t('tryAgainLater'));
+      toastUtils.error(t("error"), t("tryAgainLater"));
     } finally {
       setIsLoading(false);
     }
   }, [disableFactorId, t, onStatusChange]);
 
   const resetSetup = useCallback(() => {
-    setStep('idle');
-    setPhone('');
+    setStep("idle");
+    setPhone("");
     setFactorId(null);
     setChallengeId(null);
-    setVerifyCode('');
+    setVerifyCode("");
     setVerifyError(null);
   }, []);
 
@@ -212,20 +215,20 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-semibold text-mq-content">
-                  {t('smsVerification')}
+                  {t("smsVerification")}
                 </h3>
                 {isEnabled ? (
                   <Badge className="bg-mq-success/20 text-mq-success">
-                    {t('enabled')}
+                    {t("enabled")}
                   </Badge>
                 ) : (
                   <Badge className="bg-mq-content-secondary/20 text-mq-content-secondary">
-                    {t('disabled')}
+                    {t("disabled")}
                   </Badge>
                 )}
               </div>
               <p className="text-mq-sm text-mq-content-secondary">
-                {t('smsVerificationDesc')}
+                {t("smsVerificationDesc")}
               </p>
             </div>
           </div>
@@ -243,12 +246,12 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
             disabled={isLoading}
             className={`px-3 py-1 text-xs ${
               isEnabled
-                ? 'text-red-500 hover:bg-red-500/10'
-                : 'text-mq-primary hover:bg-mq-primary/10'
+                ? "text-red-500 hover:bg-red-500/10"
+                : "text-mq-primary hover:bg-mq-primary/10"
             }`}
             data-testid="toggle-sms"
           >
-            {isEnabled ? t('disable') : t('enable')}
+            {isEnabled ? t("disable") : t("enable")}
           </Button>
         </div>
 
@@ -257,7 +260,9 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
             <div className="flex items-center gap-2 text-mq-sm text-mq-content-secondary">
               <CheckCircle className="h-4 w-4 text-mq-success" />
               <span>
-                {t('phoneEndingIn', { last4: phoneFactors[0].phone?.slice(-4) ?? '****' })}
+                {t("phoneEndingIn", {
+                  last4: phoneFactors[0].phone?.slice(-4) ?? "****",
+                })}
               </span>
             </div>
           </div>
@@ -266,7 +271,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
 
       {/* Phone Entry Dialog */}
       <Dialog
-        open={step === 'phone' || step === 'verify'}
+        open={step === "phone" || step === "verify"}
         onOpenChange={(open) => {
           if (!open) resetSetup();
         }}
@@ -275,18 +280,14 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Smartphone className="h-5 w-5" />
-              {step === 'phone'
-                ? t('setUpSms')
-                : t('enterSmsCode')}
+              {step === "phone" ? t("setUpSms") : t("enterSmsCode")}
             </DialogTitle>
             <DialogDescription>
-              {step === 'phone'
-                ? t('enterPhoneDesc')
-                : t('enterSmsCodeDesc')}
+              {step === "phone" ? t("enterPhoneDesc") : t("enterSmsCodeDesc")}
             </DialogDescription>
           </DialogHeader>
 
-          {step === 'phone' && (
+          {step === "phone" && (
             <div className="py-4 space-y-4">
               <Input
                 type="tel"
@@ -308,13 +309,13 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
               <div className="flex items-start gap-2 p-3 bg-mq-info/10 rounded-lg">
                 <Info className="h-4 w-4 text-mq-info flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-mq-content-secondary">
-                  {t('smsRatesNotice')}
+                  {t("smsRatesNotice")}
                 </p>
               </div>
             </div>
           )}
 
-          {step === 'verify' && (
+          {step === "verify" && (
             <div className="py-4 space-y-4">
               <Input
                 type="text"
@@ -324,7 +325,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                 placeholder="000000"
                 value={verifyCode}
                 onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                  const val = e.target.value.replace(/\D/g, "").slice(0, 6);
                   setVerifyCode(val);
                   setVerifyError(null);
                 }}
@@ -347,22 +348,18 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                   className="text-xs"
                 >
                   {resendCooldown > 0
-                    ? t('resendIn', { seconds: resendCooldown })
-                    : t('resendCode')}
+                    ? t("resendIn", { seconds: resendCooldown })
+                    : t("resendCode")}
                 </Button>
               </div>
             </div>
           )}
 
           <DialogFooter>
-            <Button
-              variant="ghost"
-              onClick={resetSetup}
-              disabled={isLoading}
-            >
-              {t('cancel')}
+            <Button variant="ghost" onClick={resetSetup} disabled={isLoading}>
+              {t("cancel")}
             </Button>
-            {step === 'phone' && (
+            {step === "phone" && (
               <Button
                 onClick={handleEnrollPhone}
                 disabled={isLoading || !phone}
@@ -370,14 +367,14 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    {t('sending')}
+                    {t("sending")}
                   </>
                 ) : (
-                  t('resendCode')
+                  t("resendCode")
                 )}
               </Button>
             )}
-            {step === 'verify' && (
+            {step === "verify" && (
               <Button
                 onClick={handleVerify}
                 disabled={isLoading || !challengeId || verifyCode.length !== 6}
@@ -385,10 +382,10 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    {t('verifying')}
+                    {t("verifying")}
                   </>
                 ) : (
-                  t('verifyAndEnable')
+                  t("verifyAndEnable")
                 )}
               </Button>
             )}
@@ -398,7 +395,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
 
       {/* Success Dialog */}
       <Dialog
-        open={step === 'success'}
+        open={step === "success"}
         onOpenChange={(open) => {
           if (!open) resetSetup();
         }}
@@ -407,14 +404,12 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-mq-success">
               <CheckCircle className="h-5 w-5" />
-              {t('smsEnabledTitle')}
+              {t("smsEnabledTitle")}
             </DialogTitle>
-            <DialogDescription>
-              {t('smsEnabledDesc')}
-            </DialogDescription>
+            <DialogDescription>{t("smsEnabledDesc")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={resetSetup}>{t('done')}</Button>
+            <Button onClick={resetSetup}>{t("done")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -425,11 +420,9 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-red-500" />
-              {t('disableSmsTitle')}
+              {t("disableSmsTitle")}
             </DialogTitle>
-            <DialogDescription>
-              {t('disableSmsDesc')}
-            </DialogDescription>
+            <DialogDescription>{t("disableSmsDesc")}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
@@ -437,7 +430,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
               onClick={() => setShowDisableDialog(false)}
               disabled={isLoading}
             >
-              {t('cancel')}
+              {t("cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -447,10 +440,10 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  {t('processing')}
+                  {t("processing")}
                 </>
               ) : (
-                t('disableSmsAction')
+                t("disableSmsAction")
               )}
             </Button>
           </DialogFooter>

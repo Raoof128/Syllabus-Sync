@@ -12,14 +12,14 @@
  * @version 1.0.0
  */
 
-import { calculateDistance, formatDistance } from './navigationHelpers';
+import { calculateDistance, formatDistance } from "./navigationHelpers";
 import {
   hapticForTurn,
   hapticForArrival,
   hapticForOffRoute,
   hapticForRecalculating,
   hapticForWaypoint,
-} from '@/lib/utils/haptics';
+} from "@/lib/utils/haptics";
 
 // ============================================
 // TYPES & INTERFACES
@@ -48,14 +48,14 @@ export interface SmoothedPosition extends GpsPosition {
 
 export interface RouteInstruction {
   type:
-    | 'start'
-    | 'straight'
-    | 'left'
-    | 'right'
-    | 'slight-left'
-    | 'slight-right'
-    | 'u-turn'
-    | 'destination';
+    | "start"
+    | "straight"
+    | "left"
+    | "right"
+    | "slight-left"
+    | "slight-right"
+    | "u-turn"
+    | "destination";
   text: string;
   distance: number; // meters to this instruction
   duration: number; // seconds to this instruction
@@ -83,7 +83,7 @@ export interface NavigationState {
   /** Distance from route in meters */
   distanceFromRoute: number;
   /** Navigation status */
-  status: 'idle' | 'navigating' | 'arrived' | 'off-route' | 'recalculating';
+  status: "idle" | "navigating" | "arrived" | "off-route" | "recalculating";
 }
 
 // ============================================
@@ -163,7 +163,8 @@ class KalmanFilter1D {
       return { position: this.state.x, velocity: 0 };
     }
 
-    const dt = this.lastTimestamp > 0 ? (timestamp - this.lastTimestamp) / 1000 : 0.1;
+    const dt =
+      this.lastTimestamp > 0 ? (timestamp - this.lastTimestamp) / 1000 : 0.1;
     this.lastTimestamp = timestamp;
 
     // Clamp dt to reasonable bounds
@@ -178,7 +179,8 @@ class KalmanFilter1D {
 
     // Measurement noise
     const stationaryPenalty = qMultiplier < 0.1 ? 5.0 : 1.0;
-    const R = (KALMAN_R_BASE + accuracy * accuracy * 0.0001) * stationaryPenalty;
+    const R =
+      (KALMAN_R_BASE + accuracy * accuracy * 0.0001) * stationaryPenalty;
 
     // Update step
     const K = predictedP / (predictedP + R);
@@ -191,7 +193,10 @@ class KalmanFilter1D {
     this.state.pv = this.state.pv * 0.99;
 
     const maxVelocityDegrees = MAX_WALKING_SPEED / 111000;
-    this.state.v = Math.max(-maxVelocityDegrees, Math.min(maxVelocityDegrees, this.state.v));
+    this.state.v = Math.max(
+      -maxVelocityDegrees,
+      Math.min(maxVelocityDegrees, this.state.v),
+    );
 
     return {
       position: this.state.x,
@@ -269,11 +274,13 @@ export class GpsPositionSmoother {
 
     // Calculate confidence based on accuracy and filter state
     const accuracyConfidence = Math.max(0, 1 - position.accuracy / 100);
-    const filterConfidence = (this.latFilter.getConfidence() + this.lngFilter.getConfidence()) / 2;
+    const filterConfidence =
+      (this.latFilter.getConfidence() + this.lngFilter.getConfidence()) / 2;
     const confidence = accuracyConfidence * 0.4 + filterConfidence * 0.6;
 
     // Convert velocity from degrees/s to m/s (approximate)
-    const velocityX = lngResult.velocity * 111000 * Math.cos((position.lat * Math.PI) / 180);
+    const velocityX =
+      lngResult.velocity * 111000 * Math.cos((position.lat * Math.PI) / 180);
     const velocityY = latResult.velocity * 111000;
 
     return {
@@ -317,7 +324,9 @@ export class GpsPositionSmoother {
     const lat2 = (last.lat * Math.PI) / 180;
 
     const y = Math.sin(dLng) * Math.cos(lat2);
-    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+    const x =
+      Math.cos(lat1) * Math.sin(lat2) -
+      Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
 
     let heading = (Math.atan2(y, x) * 180) / Math.PI;
     heading = (heading + 360) % 360;
@@ -395,7 +404,14 @@ export function findClosestPointOnRoute(
     const [lng2, lat2] = routeCoordinates[i + 1];
 
     // Find closest point on segment
-    const result = closestPointOnSegment(userLat, userLng, lat1, lng1, lat2, lng2);
+    const result = closestPointOnSegment(
+      userLat,
+      userLng,
+      lat1,
+      lng1,
+      lat2,
+      lng2,
+    );
 
     if (result.distance < minDistance) {
       minDistance = result.distance;
@@ -405,7 +421,12 @@ export function findClosestPointOnRoute(
     }
   }
 
-  return { closestPoint, distance: minDistance, segmentIndex, progressAlongSegment };
+  return {
+    closestPoint,
+    distance: minDistance,
+    segmentIndex,
+    progressAlongSegment,
+  };
 }
 
 /**
@@ -430,7 +451,10 @@ function closestPointOnSegment(
 
   const closestLat = x1 + t * dx;
   const closestLng = y1 + t * dy;
-  const distance = calculateDistance({ lat: px, lng: py }, { lat: closestLat, lng: closestLng });
+  const distance = calculateDistance(
+    { lat: px, lng: py },
+    { lat: closestLat, lng: closestLng },
+  );
 
   return { lat: closestLat, lng: closestLng, distance, t };
 }
@@ -450,16 +474,23 @@ export function calculateRemainingDistance(
   // Distance from current point to end of current segment
   const [lng1, lat1] = routeCoordinates[currentSegmentIndex];
   const [lng2, lat2] =
-    routeCoordinates[currentSegmentIndex + 1] || routeCoordinates[currentSegmentIndex];
+    routeCoordinates[currentSegmentIndex + 1] ||
+    routeCoordinates[currentSegmentIndex];
 
-  const segmentLength = calculateDistance({ lat: lat1, lng: lng1 }, { lat: lat2, lng: lng2 });
+  const segmentLength = calculateDistance(
+    { lat: lat1, lng: lng1 },
+    { lat: lat2, lng: lng2 },
+  );
   remaining += segmentLength * (1 - progressAlongSegment);
 
   // Add remaining segments
   for (let i = currentSegmentIndex + 1; i < routeCoordinates.length - 1; i++) {
     const [sLng1, sLat1] = routeCoordinates[i];
     const [sLng2, sLat2] = routeCoordinates[i + 1];
-    remaining += calculateDistance({ lat: sLat1, lng: sLng1 }, { lat: sLat2, lng: sLng2 });
+    remaining += calculateDistance(
+      { lat: sLat1, lng: sLng1 },
+      { lat: sLat2, lng: sLng2 },
+    );
   }
 
   return remaining;
@@ -517,31 +548,33 @@ export function parseRouteInstructions(orsResponse: {
 /**
  * Map ORS step type to our instruction type
  */
-function mapOrsTypeToInstructionType(orsType: number): RouteInstruction['type'] {
+function mapOrsTypeToInstructionType(
+  orsType: number,
+): RouteInstruction["type"] {
   // ORS step types: https://giscience.github.io/openrouteservice/documentation/Instruction-Types.html
   switch (orsType) {
     case 0:
-      return 'left';
+      return "left";
     case 1:
-      return 'right';
+      return "right";
     case 2:
-      return 'slight-left';
+      return "slight-left";
     case 3:
-      return 'slight-right';
+      return "slight-right";
     case 4:
-      return 'straight';
+      return "straight";
     case 5:
-      return 'u-turn';
+      return "u-turn";
     case 6:
-      return 'u-turn';
+      return "u-turn";
     case 10:
-      return 'destination';
+      return "destination";
     case 11:
-      return 'start';
+      return "start";
     case 12:
-      return 'start';
+      return "start";
     default:
-      return 'straight';
+      return "straight";
   }
 }
 
@@ -553,7 +586,11 @@ export function getCurrentInstruction(
   userLat: number,
   userLng: number,
   currentIndex: number,
-): { instruction: RouteInstruction; index: number; distanceToNext: number } | null {
+): {
+  instruction: RouteInstruction;
+  index: number;
+  distanceToNext: number;
+} | null {
   if (instructions.length === 0) return null;
 
   // Find current instruction by checking distance to instruction points
@@ -603,17 +640,17 @@ export function generateNavigationText(
   if (isUpcoming && distanceToInstruction > 20) {
     // Upcoming instruction
     switch (instruction.type) {
-      case 'left':
-        return `In ${distanceText}, turn left${instruction.streetName ? ` onto ${instruction.streetName}` : ''}`;
-      case 'right':
-        return `In ${distanceText}, turn right${instruction.streetName ? ` onto ${instruction.streetName}` : ''}`;
-      case 'slight-left':
-        return `In ${distanceText}, bear left${instruction.streetName ? ` onto ${instruction.streetName}` : ''}`;
-      case 'slight-right':
-        return `In ${distanceText}, bear right${instruction.streetName ? ` onto ${instruction.streetName}` : ''}`;
-      case 'u-turn':
+      case "left":
+        return `In ${distanceText}, turn left${instruction.streetName ? ` onto ${instruction.streetName}` : ""}`;
+      case "right":
+        return `In ${distanceText}, turn right${instruction.streetName ? ` onto ${instruction.streetName}` : ""}`;
+      case "slight-left":
+        return `In ${distanceText}, bear left${instruction.streetName ? ` onto ${instruction.streetName}` : ""}`;
+      case "slight-right":
+        return `In ${distanceText}, bear right${instruction.streetName ? ` onto ${instruction.streetName}` : ""}`;
+      case "u-turn":
         return `In ${distanceText}, make a U-turn`;
-      case 'destination':
+      case "destination":
         return `Your destination is ${distanceText} ahead`;
       default:
         return `Continue for ${distanceText}`;
@@ -621,22 +658,22 @@ export function generateNavigationText(
   } else {
     // Immediate instruction
     switch (instruction.type) {
-      case 'start':
-        return `Head ${instruction.streetName ? `toward ${instruction.streetName}` : 'to the route'}`;
-      case 'left':
-        return `Turn left${instruction.streetName ? ` onto ${instruction.streetName}` : ''}`;
-      case 'right':
-        return `Turn right${instruction.streetName ? ` onto ${instruction.streetName}` : ''}`;
-      case 'slight-left':
-        return `Bear left${instruction.streetName ? ` onto ${instruction.streetName}` : ''}`;
-      case 'slight-right':
-        return `Bear right${instruction.streetName ? ` onto ${instruction.streetName}` : ''}`;
-      case 'u-turn':
-        return 'Make a U-turn';
-      case 'destination':
-        return 'You have arrived at your destination';
+      case "start":
+        return `Head ${instruction.streetName ? `toward ${instruction.streetName}` : "to the route"}`;
+      case "left":
+        return `Turn left${instruction.streetName ? ` onto ${instruction.streetName}` : ""}`;
+      case "right":
+        return `Turn right${instruction.streetName ? ` onto ${instruction.streetName}` : ""}`;
+      case "slight-left":
+        return `Bear left${instruction.streetName ? ` onto ${instruction.streetName}` : ""}`;
+      case "slight-right":
+        return `Bear right${instruction.streetName ? ` onto ${instruction.streetName}` : ""}`;
+      case "u-turn":
+        return "Make a U-turn";
+      case "destination":
+        return "You have arrived at your destination";
       default:
-        return 'Continue straight';
+        return "Continue straight";
     }
   }
 }
@@ -644,7 +681,10 @@ export function generateNavigationText(
 /**
  * Calculate ETA based on remaining distance and current speed
  */
-export function calculateETA(remainingDistance: number, currentSpeed: number): Date {
+export function calculateETA(
+  remainingDistance: number,
+  currentSpeed: number,
+): Date {
   // Use current speed if valid, otherwise use average walking speed
   const effectiveSpeed = currentSpeed > MIN_WALKING_SPEED ? currentSpeed : 1.4; // 5 km/h default
   const remainingSeconds = remainingDistance / effectiveSpeed;
@@ -661,7 +701,7 @@ export function formatETA(eta: Date): string {
   const diffMins = Math.round(diffMs / 60000);
 
   if (diffMins <= 0) {
-    return 'Arriving now';
+    return "Arriving now";
   } else if (diffMins < 60) {
     return `${diffMins} min`;
   } else {
@@ -698,7 +738,7 @@ export class NavigationStateManager {
       eta: new Date(),
       isOffRoute: false,
       distanceFromRoute: 0,
-      status: 'idle',
+      status: "idle",
     };
   }
 
@@ -733,7 +773,7 @@ export class NavigationStateManager {
       eta: calculateETA(totalDistance, 1.4),
       isOffRoute: false,
       distanceFromRoute: 0,
-      status: 'navigating',
+      status: "navigating",
     };
     this.positionSmoother.reset();
     this.lastRecalculationPosition = null;
@@ -744,7 +784,10 @@ export class NavigationStateManager {
   updatePosition(position: GpsPosition): SmoothedPosition {
     const smoothed = this.positionSmoother.update(position);
 
-    if (this.state.status === 'navigating' && this.state.routeCoordinates.length > 0) {
+    if (
+      this.state.status === "navigating" &&
+      this.state.routeCoordinates.length > 0
+    ) {
       this.updateNavigationState(smoothed);
     }
 
@@ -768,12 +811,12 @@ export class NavigationStateManager {
     this.state.isOffRoute = closest.distance > OFF_ROUTE_THRESHOLD;
 
     if (this.state.isOffRoute && !wasOffRoute) {
-      this.state.status = 'off-route';
+      this.state.status = "off-route";
       // Haptic feedback for off-route warning
       hapticForOffRoute();
       this.onOffRoute?.();
     } else if (!this.state.isOffRoute && wasOffRoute) {
-      this.state.status = 'navigating';
+      this.state.status = "navigating";
     }
 
     // Calculate remaining distance
@@ -785,7 +828,7 @@ export class NavigationStateManager {
 
     // Check for arrival
     if (this.state.remainingDistance < ARRIVAL_THRESHOLD) {
-      this.state.status = 'arrived';
+      this.state.status = "arrived";
       // Haptic feedback for arrival
       hapticForArrival();
       this.notifyStateChange();
@@ -810,7 +853,9 @@ export class NavigationStateManager {
         const instruction = instructions[currentInst.index];
         if (instruction) {
           // Trigger turn-specific haptic pattern
-          hapticForTurn(instruction.type as Parameters<typeof hapticForTurn>[0]);
+          hapticForTurn(
+            instruction.type as Parameters<typeof hapticForTurn>[0],
+          );
         }
       }
 
@@ -829,7 +874,7 @@ export class NavigationStateManager {
 
     // Check if we should trigger recalculation
     if (this.shouldRecalculate(position)) {
-      this.state.status = 'recalculating';
+      this.state.status = "recalculating";
       // Haptic feedback for recalculation
       hapticForRecalculating();
     }
@@ -868,7 +913,10 @@ export class NavigationStateManager {
   }
 
   /** Get current instruction with distance */
-  getCurrentInstruction(): { instruction: RouteInstruction; distanceToNext: number } | null {
+  getCurrentInstruction(): {
+    instruction: RouteInstruction;
+    distanceToNext: number;
+  } | null {
     const { instructions, currentInstructionIndex } = this.state;
     if (instructions.length === 0) return null;
 

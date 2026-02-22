@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { NextRequest } from "next/server";
+import { createServerClient } from "@/lib/supabase/server";
 import {
   jsonSuccess,
   jsonError,
@@ -7,14 +7,16 @@ import {
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
-} from '@/app/api/_lib/response';
-import { smsSendLimiter, isValidE164Phone } from '@/lib/security/mfa';
-import { getClientIP } from '@/lib/security/ip';
-import { logger } from '@/lib/logger';
-import { z } from 'zod';
+} from "@/app/api/_lib/response";
+import { smsSendLimiter, isValidE164Phone } from "@/lib/security/mfa";
+import { getClientIP } from "@/lib/security/ip";
+import { logger } from "@/lib/logger";
+import { z } from "zod";
 
 const smsEnrollSchema = z.object({
-  phone: z.string().regex(/^\+[1-9]\d{6,14}$/, 'Invalid phone number (E.164 format required)'),
+  phone: z
+    .string()
+    .regex(/^\+[1-9]\d{6,14}$/, "Invalid phone number (E.164 format required)"),
 });
 
 /**
@@ -42,16 +44,19 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return jsonUnauthorized('Authentication required');
+      return jsonUnauthorized("Authentication required");
     }
 
-    const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: parseError } = await parseJsonBody(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (parseError) return parseError;
 
     const parsed = smsEnrollSchema.safeParse(body);
     if (!parsed.success) {
       return jsonError(
-        'Invalid phone number. Use E.164 format (e.g., +61412345678).',
+        "Invalid phone number. Use E.164 format (e.g., +61412345678).",
         400,
         ERROR_CODES.VALIDATION_ERROR,
       );
@@ -60,51 +65,63 @@ export async function POST(request: NextRequest) {
     const { phone } = parsed.data;
 
     if (!isValidE164Phone(phone)) {
-      return jsonError('Invalid phone number format', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError(
+        "Invalid phone number format",
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
     }
 
     const { data, error } = await supabase.auth.mfa.enroll({
-      factorType: 'phone',
+      factorType: "phone",
       phone,
       friendlyName: `SMS (${phone.slice(-4)})`,
     });
 
     if (error) {
-      logger.error('SMS MFA enrollment error:', {
+      logger.error("SMS MFA enrollment error:", {
         userId: user.id,
         error: error.message,
       });
 
       // Check for specific error types
-      if (error.message?.includes('not enabled') || error.message?.includes('phone')) {
+      if (
+        error.message?.includes("not enabled") ||
+        error.message?.includes("phone")
+      ) {
         return jsonError(
-          'SMS verification is not configured for this project. Contact your administrator.',
+          "SMS verification is not configured for this project. Contact your administrator.",
           503,
           ERROR_CODES.EXTERNAL_SERVICE_ERROR,
         );
       }
 
-      return jsonError('Failed to start SMS verification', 400, ERROR_CODES.BAD_REQUEST);
+      return jsonError(
+        "Failed to start SMS verification",
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
 
-    logger.info('SMS MFA enrollment started', {
+    logger.info("SMS MFA enrollment started", {
       userId: user.id,
       factorId: data.id,
     });
 
     // Create initial challenge to trigger the SMS send.
-    const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({
-      factorId: data.id,
-    });
+    const { data: challenge, error: challengeError } =
+      await supabase.auth.mfa.challenge({
+        factorId: data.id,
+      });
 
     if (challengeError || !challenge) {
-      logger.error('SMS MFA challenge error:', {
+      logger.error("SMS MFA challenge error:", {
         userId: user.id,
         factorId: data.id,
         error: challengeError?.message,
       });
       return jsonError(
-        'Failed to send verification code. Please try again.',
+        "Failed to send verification code. Please try again.",
         503,
         ERROR_CODES.EXTERNAL_SERVICE_ERROR,
       );
@@ -117,7 +134,11 @@ export async function POST(request: NextRequest) {
       expiresAt: (challenge as { expires_at?: string }).expires_at,
     });
   } catch (error) {
-    logger.error('SMS enroll error:', error);
-    return jsonError('Failed to set up SMS verification', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("SMS enroll error:", error);
+    return jsonError(
+      "Failed to set up SMS verification",
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 }

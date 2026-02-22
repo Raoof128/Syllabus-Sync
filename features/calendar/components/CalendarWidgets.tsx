@@ -1,20 +1,16 @@
-'use client';
+"use client";
 
-import React, { useRef, useEffect, useState } from 'react';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import { useSearchParams } from 'next/navigation';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { useEventsStore } from '@/lib/store/eventsStore';
-import { Deadline, Event, Unit, Todo } from '@/lib/types';
+import React, { useRef, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
+import { Deadline, Event, Unit, Todo } from "@/lib/types";
 
 // Widgets
-import AssignmentsWidget from './widgets/AssignmentsWidget';
-import ExamsWidget from './widgets/ExamsWidget';
-import UnitsWidget from './widgets/UnitsWidget';
-import EventsWidget from './widgets/EventsWidget';
-import TodosWidget from './widgets/TodosWidget';
+import AssignmentsWidget from "./widgets/AssignmentsWidget";
+import ExamsWidget from "./widgets/ExamsWidget";
+import UnitsWidget from "./widgets/UnitsWidget";
+import EventsWidget from "./widgets/EventsWidget";
+import TodosWidget from "./widgets/TodosWidget";
 
 interface CalendarWidgetsProps {
   onAddAssignment: () => void;
@@ -67,8 +63,6 @@ export default function CalendarWidgets({
   unitsWidgetRef: externalUnitsRef,
   assignmentsWidgetRef: externalAssignmentsRef,
 }: CalendarWidgetsProps) {
-  const { t } = useTypedTranslation();
-
   const searchParams = useSearchParams();
 
   // Stores (needed for counts in mobile header and scrolling logic)
@@ -84,18 +78,18 @@ export default function CalendarWidgets({
   const todosWidgetRef = useRef<HTMLDivElement>(null);
 
   // URL Highlights
-  const highlightedDeadlineId = searchParams.get('highlightDeadline');
-  const highlightedUnitId = searchParams.get('highlightUnit');
-  const highlightedTodoId = searchParams.get('highlightTodo');
-  const highlightedEventId = searchParams.get('highlightEvent');
-  const highlightedWidget = searchParams.get('highlightWidget');
-  const highlightSection = searchParams.get('section');
-  const sectionHighlight = searchParams.get('highlight') === 'true';
+  const highlightedDeadlineId = searchParams.get("highlightDeadline");
+  const highlightedUnitId = searchParams.get("highlightUnit");
+  const highlightedTodoId = searchParams.get("highlightTodo");
+  const highlightedEventId = searchParams.get("highlightEvent");
+  const highlightedWidget = searchParams.get("highlightWidget");
+  const highlightSection = searchParams.get("section");
+  const sectionHighlight = searchParams.get("highlight") === "true";
 
   // State for section highlight that persists for 3 seconds
-  const [sectionHighlightActive, setSectionHighlightActive] = useState<'events' | 'todos' | null>(
-    null,
-  );
+  const [sectionHighlightActive, setSectionHighlightActive] = useState<
+    "events" | "todos" | null
+  >(null);
 
   // State for individual event highlight that auto-clears after 3 seconds
   const [eventHighlightDismissed, setEventHighlightDismissed] = useState(false);
@@ -104,28 +98,34 @@ export default function CalendarWidgets({
   const hasProcessedCurrentHighlight = useRef(false);
 
   const deadlineHighlightActive = Boolean(highlightedDeadlineId);
-  const todoHighlightActive = Boolean(highlightedTodoId) || sectionHighlightActive === 'todos';
+  const todoHighlightActive =
+    Boolean(highlightedTodoId) || sectionHighlightActive === "todos";
   const eventHighlightActive =
     (Boolean(highlightedEventId) && !eventHighlightDismissed) ||
-    sectionHighlightActive === 'events';
+    sectionHighlightActive === "events";
 
   // Helper function to check if element is visible in viewport
-  const isElementInViewport = React.useCallback((el: HTMLElement | null): boolean => {
-    if (!el) return false;
-    const rect = el.getBoundingClientRect();
-    return (
-      rect.top >= 0 &&
-      rect.left >= 0 &&
-      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-  }, []);
+  const isElementInViewport = React.useCallback(
+    (el: HTMLElement | null): boolean => {
+      if (!el) return false;
+      const rect = el.getBoundingClientRect();
+      return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <=
+        (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <=
+        (window.innerWidth || document.documentElement.clientWidth)
+      );
+    },
+    [],
+  );
 
   // Helper function to scroll only if element is not visible
   const scrollIfNotVisible = React.useCallback(
     (el: HTMLElement | null) => {
       if (el && !isElementInViewport(el)) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     },
     [isElementInViewport],
@@ -137,7 +137,7 @@ export default function CalendarWidgets({
       // Check if it's an exam or assignment to scroll to correct widget
       const deadline = deadlines.find((d) => d.id === highlightedDeadlineId);
       const targetRef =
-        deadline?.type === 'Exam' || deadline?.type === 'Quiz'
+        deadline?.type === "Exam" || deadline?.type === "Quiz"
           ? examsWidgetRef.current
           : assignmentsWidgetRef.current;
 
@@ -145,15 +145,28 @@ export default function CalendarWidgets({
         scrollIfNotVisible(targetRef);
       }, 100);
     }
-  }, [highlightedDeadlineId, deadlines, scrollIfNotVisible, assignmentsWidgetRef]);
+  }, [
+    highlightedDeadlineId,
+    deadlines,
+    scrollIfNotVisible,
+    assignmentsWidgetRef,
+  ]);
 
   useEffect(() => {
-    if ((highlightedUnitId || highlightedWidget === 'units') && unitsWidgetRef.current) {
+    if (
+      (highlightedUnitId || highlightedWidget === "units") &&
+      unitsWidgetRef.current
+    ) {
       setTimeout(() => {
         scrollIfNotVisible(unitsWidgetRef.current);
       }, 100);
     }
-  }, [highlightedUnitId, highlightedWidget, scrollIfNotVisible, unitsWidgetRef]);
+  }, [
+    highlightedUnitId,
+    highlightedWidget,
+    scrollIfNotVisible,
+    unitsWidgetRef,
+  ]);
 
   useEffect(() => {
     if (highlightedTodoId && todosWidgetRef.current) {
@@ -189,20 +202,30 @@ export default function CalendarWidgets({
 
   // Handle section scroll from home page "View All" links
   useEffect(() => {
-    if (highlightSection && sectionHighlight && !hasProcessedCurrentHighlight.current) {
+    if (
+      highlightSection &&
+      sectionHighlight &&
+      !hasProcessedCurrentHighlight.current
+    ) {
       // Mark as processed
       hasProcessedCurrentHighlight.current = true;
 
       // Activate highlight and scroll after a small delay (avoid synchronous setState in effect)
       const activateTimer = setTimeout(() => {
-        if (highlightSection === 'events' || highlightSection === 'todos') {
+        if (highlightSection === "events" || highlightSection === "todos") {
           setSectionHighlightActive(highlightSection);
         }
 
-        if (highlightSection === 'events' && eventsWidgetRef.current) {
-          eventsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else if (highlightSection === 'todos' && todosWidgetRef.current) {
-          todosWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (highlightSection === "events" && eventsWidgetRef.current) {
+          eventsWidgetRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        } else if (highlightSection === "todos" && todosWidgetRef.current) {
+          todosWidgetRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
         }
       }, 0);
 
@@ -264,10 +287,10 @@ export default function CalendarWidgets({
         />
 
         <TodosWidget
-          onAddTodo={onAddTodo || (() => {})}
+          onAddTodo={onAddTodo || (() => { })}
           onEditTodo={onEditTodo}
-          onOpenTodoDetail={onOpenTodoDetail || (() => {})}
-          onDeleteTodo={onDeleteTodo || (() => {})}
+          onOpenTodoDetail={onOpenTodoDetail || (() => { })}
+          onDeleteTodo={onDeleteTodo || (() => { })}
           highlightedTodoId={highlightedTodoId}
           widgetRef={todosWidgetRef}
           todoHighlightActive={todoHighlightActive}

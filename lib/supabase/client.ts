@@ -1,7 +1,7 @@
-import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr';
+import { createBrowserClient as createSupabaseBrowserClient } from "@supabase/ssr";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 
 // One-time warning flag to prevent console spam
 let browserWarningShown = false;
@@ -14,16 +14,16 @@ export function isSupabaseConfigured(): boolean {
   // Check URL is valid
   const hasValidUrl = !!(
     supabaseUrl &&
-    supabaseUrl.includes('supabase.co') &&
-    !supabaseUrl.includes('your-project-id')
+    supabaseUrl.includes("supabase.co") &&
+    !supabaseUrl.includes("your-project-id")
   );
 
   // Check key is valid - Supabase anon keys are JWT tokens starting with "eyJ" or publishable keys starting with "sb_"
   const hasValidKey = !!(
     supabaseAnonKey &&
-    (supabaseAnonKey.startsWith('eyJ') || supabaseAnonKey.startsWith('sb_')) &&
-    supabaseAnonKey !== 'your-anon-key-here' &&
-    !supabaseAnonKey.includes('PASTE')
+    (supabaseAnonKey.startsWith("eyJ") || supabaseAnonKey.startsWith("sb_")) &&
+    supabaseAnonKey !== "your-anon-key-here" &&
+    !supabaseAnonKey.includes("PASTE")
   );
 
   return hasValidUrl && hasValidKey;
@@ -31,16 +31,16 @@ export function isSupabaseConfigured(): boolean {
 
 export function createBrowserClient() {
   // Return existing singleton if available (browser only)
-  if (typeof window !== 'undefined' && browserClient) {
+  if (typeof window !== "undefined" && browserClient) {
     return browserClient;
   }
 
   if (!isSupabaseConfigured()) {
     if (!browserWarningShown) {
       console.warn(
-        '⚠️ Supabase not configured. Auth features disabled.\n' +
-          'To enable auth, update .env.local with your Supabase credentials from:\n' +
-          'https://supabase.com/dashboard/project/_/settings/api',
+        "⚠️ Supabase not configured. Auth features disabled.\n" +
+          "To enable auth, update .env.local with your Supabase credentials from:\n" +
+          "https://supabase.com/dashboard/project/_/settings/api",
       );
       browserWarningShown = true;
     }
@@ -51,14 +51,14 @@ export function createBrowserClient() {
           data: { user: null, session: null },
           error: {
             message:
-              'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.',
+              "Supabase not configured. Please set up your .env.local file with valid Supabase credentials.",
           },
         }),
         signInWithPassword: async () => ({
           data: { user: null, session: null },
           error: {
             message:
-              'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.',
+              "Supabase not configured. Please set up your .env.local file with valid Supabase credentials.",
           },
         }),
         signOut: async () => ({ error: null }),
@@ -68,20 +68,23 @@ export function createBrowserClient() {
           data: null,
           error: {
             message:
-              'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.',
+              "Supabase not configured. Please set up your .env.local file with valid Supabase credentials.",
           },
         }),
         updateUser: async () => ({
           data: { user: null },
           error: {
             message:
-              'Supabase not configured. Please set up your .env.local file with valid Supabase credentials.',
+              "Supabase not configured. Please set up your .env.local file with valid Supabase credentials.",
           },
         }),
-        onAuthStateChange: (_event: string, callback: (event: string, session: null) => void) => {
+        onAuthStateChange: (
+          _event: string,
+          callback: (event: string, session: null) => void,
+        ) => {
           // Immediately call with null session to indicate no user
-          if (typeof callback === 'function') {
-            setTimeout(() => callback('SIGNED_OUT', null), 0);
+          if (typeof callback === "function") {
+            setTimeout(() => callback("SIGNED_OUT", null), 0);
           }
           return { data: { subscription: { unsubscribe: () => {} } } };
         },
@@ -90,10 +93,19 @@ export function createBrowserClient() {
         // Create a chainable query builder mock
         const chainable = {
           select: () => chainable,
-          insert: () => ({ data: null, error: { message: 'Supabase not configured.' } }),
+          insert: () => ({
+            data: null,
+            error: { message: "Supabase not configured." },
+          }),
           update: () => chainable,
-          delete: () => ({ data: null, error: { message: 'Supabase not configured.' } }),
-          upsert: () => ({ data: null, error: { message: 'Supabase not configured.' } }),
+          delete: () => ({
+            data: null,
+            error: { message: "Supabase not configured." },
+          }),
+          upsert: () => ({
+            data: null,
+            error: { message: "Supabase not configured." },
+          }),
           is: () => chainable,
           eq: () => chainable,
           neq: () => chainable,
@@ -133,7 +145,7 @@ export function createBrowserClient() {
   const client = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey);
 
   // Store as singleton in browser environment
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     browserClient = client;
   }
 

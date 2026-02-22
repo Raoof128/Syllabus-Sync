@@ -11,9 +11,8 @@
  * - Anomaly detection
  */
 
-import crypto from 'crypto';
-import { logger } from '@/lib/logger';
-
+import crypto from "crypto";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // TYPES
@@ -74,8 +73,10 @@ export interface FingerprintStorage {
  * @returns Promise resolving to device fingerprint
  */
 export async function generateClientFingerprint(): Promise<DeviceFingerprint> {
-  if (typeof window === 'undefined') {
-    throw new Error('Device fingerprinting can only be performed in the browser');
+  if (typeof window === "undefined") {
+    throw new Error(
+      "Device fingerprinting can only be performed in the browser",
+    );
   }
 
   const fingerprint: Partial<DeviceFingerprint> = {
@@ -85,18 +86,21 @@ export async function generateClientFingerprint(): Promise<DeviceFingerprint> {
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     language: navigator.language,
     platform: navigator.platform,
-    touchSupport: 'ontouchstart' in window,
+    touchSupport: "ontouchstart" in window,
     createdAt: new Date(),
   };
 
   // Get WebGL renderer (if available)
   try {
-    const canvas = document.createElement('canvas');
-    const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+    const canvas = document.createElement("canvas");
+    const gl = (canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl")) as WebGLRenderingContext | null;
     if (gl) {
-      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
       if (debugInfo) {
-        fingerprint.webglRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        fingerprint.webglRenderer = gl.getParameter(
+          debugInfo.UNMASKED_RENDERER_WEBGL,
+        );
       }
     }
   } catch {
@@ -121,25 +125,25 @@ export async function generateClientFingerprint(): Promise<DeviceFingerprint> {
  * This is a simplified version for demonstration
  */
 function generateCanvasFingerprint(): string {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
   if (!ctx) {
-    return '';
+    return "";
   }
 
   // Draw some text
-  ctx.textBaseline = 'top';
-  ctx.font = '14px Arial';
-  ctx.fillStyle = '#f60';
+  ctx.textBaseline = "top";
+  ctx.font = "14px Arial";
+  ctx.fillStyle = "#f60";
   ctx.fillRect(125, 1, 62, 20);
-  ctx.fillStyle = '#069';
-  ctx.fillText('Syllabus Sync', 2, 15);
-  ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
-  ctx.fillText('Device Fingerprint', 4, 45);
+  ctx.fillStyle = "#069";
+  ctx.fillText("Syllabus Sync", 2, 15);
+  ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+  ctx.fillText("Device Fingerprint", 4, 45);
 
   // Get data URL and hash it
   const dataUrl = canvas.toDataURL();
-  return crypto.createHash('sha256').update(dataUrl).digest('hex');
+  return crypto.createHash("sha256").update(dataUrl).digest("hex");
 }
 
 /**
@@ -154,11 +158,11 @@ function generateFingerprintId(fingerprint: DeviceFingerprint): string {
     fingerprint.language,
     fingerprint.platform,
     fingerprint.touchSupport,
-    fingerprint.webglRenderer || '',
-    fingerprint.canvasFingerprint || '',
-  ].join('|');
+    fingerprint.webglRenderer || "",
+    fingerprint.canvasFingerprint || "",
+  ].join("|");
 
-  return crypto.createHash('sha256').update(data).digest('hex');
+  return crypto.createHash("sha256").update(data).digest("hex");
 }
 
 // ============================================================================
@@ -176,11 +180,11 @@ function generateFingerprintId(fingerprint: DeviceFingerprint): string {
 export function verifyFingerprint(
   userId: string,
   fingerprint: DeviceFingerprint,
-  storedFingerprints: FingerprintStorage[]
+  storedFingerprints: FingerprintStorage[],
 ): FingerprintVerificationResult {
   // Find matching fingerprint
   const matchingFingerprint = storedFingerprints.find(
-    (stored) => stored.fingerprintId === fingerprint.id
+    (stored) => stored.fingerprintId === fingerprint.id,
   );
 
   // If no match, this is a new device
@@ -188,7 +192,7 @@ export function verifyFingerprint(
     return {
       matches: false,
       confidence: 0,
-      differences: ['New device detected'],
+      differences: ["New device detected"],
       isNewDevice: true,
     };
   }
@@ -199,37 +203,37 @@ export function verifyFingerprint(
 
   // Compare user agent
   if (stored.userAgent !== fingerprint.userAgent) {
-    differences.push('User agent changed');
+    differences.push("User agent changed");
   }
 
   // Compare screen resolution
   if (stored.screenResolution !== fingerprint.screenResolution) {
-    differences.push('Screen resolution changed');
+    differences.push("Screen resolution changed");
   }
 
   // Compare color depth
   if (stored.colorDepth !== fingerprint.colorDepth) {
-    differences.push('Color depth changed');
+    differences.push("Color depth changed");
   }
 
   // Compare timezone
   if (stored.timezone !== fingerprint.timezone) {
-    differences.push('Timezone changed');
+    differences.push("Timezone changed");
   }
 
   // Compare language
   if (stored.language !== fingerprint.language) {
-    differences.push('Language changed');
+    differences.push("Language changed");
   }
 
   // Compare platform
   if (stored.platform !== fingerprint.platform) {
-    differences.push('Platform changed');
+    differences.push("Platform changed");
   }
 
   // Compare touch support
   if (stored.touchSupport !== fingerprint.touchSupport) {
-    differences.push('Touch support changed');
+    differences.push("Touch support changed");
   }
 
   // Calculate confidence score
@@ -254,9 +258,11 @@ export function verifyFingerprint(
  */
 export function isDeviceTrusted(
   fingerprintId: string,
-  storedFingerprints: FingerprintStorage[]
+  storedFingerprints: FingerprintStorage[],
 ): boolean {
-  const stored = storedFingerprints.find((fp) => fp.fingerprintId === fingerprintId);
+  const stored = storedFingerprints.find(
+    (fp) => fp.fingerprintId === fingerprintId,
+  );
   return stored?.isTrusted || false;
 }
 
@@ -271,7 +277,7 @@ export function isDeviceTrusted(
 export async function storeFingerprint(
   userId: string,
   fingerprint: DeviceFingerprint,
-  isTrusted: boolean = false
+  isTrusted: boolean = false,
 ): Promise<void> {
   // In a real implementation, this would store to a database
   // For now, we'll use in-memory storage
@@ -291,7 +297,7 @@ export async function storeFingerprint(
  * Get stored fingerprints for a user
  */
 export async function getStoredFingerprints(
-  _userId: string
+  _userId: string,
 ): Promise<FingerprintStorage[]> {
   // In a real implementation, this would fetch from a database
   // For now, return empty array
@@ -303,7 +309,7 @@ export async function getStoredFingerprints(
  */
 export async function markDeviceAsTrusted(
   _userId: string,
-  _fingerprintId: string
+  _fingerprintId: string,
 ): Promise<void> {
   // In a real implementation, this would update the database
   // await db.fingerprints.update({ userId, fingerprintId }, { isTrusted: true });
@@ -314,7 +320,7 @@ export async function markDeviceAsTrusted(
  */
 export async function removeFingerprint(
   _userId: string,
-  _fingerprintId: string
+  _fingerprintId: string,
 ): Promise<void> {
   // In a real implementation, this would delete from the database
   // await db.fingerprints.delete({ userId, fingerprintId });
@@ -329,31 +335,33 @@ export async function removeFingerprint(
  * Returns true if the fingerprint shows signs of tampering or suspicious activity
  */
 export function detectFingerprintAnomalies(
-  fingerprint: DeviceFingerprint
+  fingerprint: DeviceFingerprint,
 ): string[] {
   const anomalies: string[] = [];
 
   // Check for suspicious user agent
-  if (fingerprint.userAgent.includes('bot') ||
-      fingerprint.userAgent.includes('crawler') ||
-      fingerprint.userAgent.includes('spider')) {
-    anomalies.push('Suspicious user agent detected');
+  if (
+    fingerprint.userAgent.includes("bot") ||
+    fingerprint.userAgent.includes("crawler") ||
+    fingerprint.userAgent.includes("spider")
+  ) {
+    anomalies.push("Suspicious user agent detected");
   }
 
   // Check for inconsistent screen resolution
-  const [width, height] = fingerprint.screenResolution.split('x').map(Number);
+  const [width, height] = fingerprint.screenResolution.split("x").map(Number);
   if (width < 320 || height < 240) {
-    anomalies.push('Unusually small screen resolution');
+    anomalies.push("Unusually small screen resolution");
   }
 
   // Check for missing WebGL (common in headless browsers)
   if (!fingerprint.webglRenderer) {
-    anomalies.push('WebGL not available (possible headless browser)');
+    anomalies.push("WebGL not available (possible headless browser)");
   }
 
   // Check for missing canvas fingerprint
   if (!fingerprint.canvasFingerprint) {
-    anomalies.push('Canvas fingerprinting not available');
+    anomalies.push("Canvas fingerprinting not available");
   }
 
   return anomalies;
@@ -364,7 +372,7 @@ export function detectFingerprintAnomalies(
  */
 export function shouldFlagFingerprint(
   fingerprint: DeviceFingerprint,
-  storedFingerprints: FingerprintStorage[]
+  storedFingerprints: FingerprintStorage[],
 ): boolean {
   // Check for anomalies
   const anomalies = detectFingerprintAnomalies(fingerprint);
@@ -374,7 +382,7 @@ export function shouldFlagFingerprint(
 
   // Check if this is a new device
   const isNewDevice = !storedFingerprints.some(
-    (stored) => stored.fingerprintId === fingerprint.id
+    (stored) => stored.fingerprintId === fingerprint.id,
   );
 
   if (isNewDevice && storedFingerprints.length > 0) {
@@ -403,9 +411,9 @@ export async function getFingerprintForServer(): Promise<string> {
 export async function cacheFingerprintLocally(): Promise<void> {
   try {
     const fingerprint = await generateClientFingerprint();
-    localStorage.setItem('device-fingerprint', JSON.stringify(fingerprint));
+    localStorage.setItem("device-fingerprint", JSON.stringify(fingerprint));
   } catch (error) {
-    logger.error('Failed to cache fingerprint:', error);
+    logger.error("Failed to cache fingerprint:", error);
   }
 }
 
@@ -414,12 +422,12 @@ export async function cacheFingerprintLocally(): Promise<void> {
  */
 export function getCachedFingerprint(): DeviceFingerprint | null {
   try {
-    const cached = localStorage.getItem('device-fingerprint');
+    const cached = localStorage.getItem("device-fingerprint");
     if (cached) {
       return JSON.parse(cached);
     }
   } catch (error) {
-    logger.error('Failed to get cached fingerprint:', error);
+    logger.error("Failed to get cached fingerprint:", error);
   }
   return null;
 }

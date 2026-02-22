@@ -11,14 +11,13 @@
  * - Breach checking integration
  */
 
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Shield, AlertCircle, Check, X } from 'lucide-react';
-import { logger } from '@/lib/logger';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
-
+import React, { useState, useEffect, useCallback } from "react";
+import { Shield, AlertCircle, Check, X } from "lucide-react";
+import { logger } from "@/lib/logger";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 // ============================================================================
 // TYPES
@@ -26,11 +25,11 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 
 export interface PasswordStrengthResult {
   score: number; // 0-4
-  strength: 'very weak' | 'weak' | 'fair' | 'strong' | 'very strong';
+  strength: "very weak" | "weak" | "fair" | "strong" | "very strong";
   breachResult?: {
     isBreached: boolean;
     breachCount: number;
-    riskLevel: 'low' | 'medium' | 'high' | 'critical';
+    riskLevel: "low" | "medium" | "high" | "critical";
   };
   suggestions: string[];
 }
@@ -56,19 +55,19 @@ export interface PasswordStrengthIndicatorProps {
 
 const MIN_PASSWORD_LENGTH = 12;
 const STRENGTH_COLORS = {
-  'very weak': 'bg-red-500',
-  weak: 'bg-orange-500',
-  fair: 'bg-yellow-500',
-  strong: 'bg-green-500',
-  'very strong': 'bg-emerald-500',
+  "very weak": "bg-red-500",
+  weak: "bg-orange-500",
+  fair: "bg-yellow-500",
+  strong: "bg-green-500",
+  "very strong": "bg-emerald-500",
 };
 
 const STRENGTH_TEXT_COLORS = {
-  'very weak': 'text-red-500',
-  weak: 'text-orange-500',
-  fair: 'text-yellow-500',
-  strong: 'text-green-500',
-  'very strong': 'text-emerald-500',
+  "very weak": "text-red-500",
+  weak: "text-orange-500",
+  fair: "text-yellow-500",
+  strong: "text-green-500",
+  "very strong": "text-emerald-500",
 };
 
 // ============================================================================
@@ -80,116 +79,123 @@ export function PasswordStrengthIndicator({
   checkBreaches = false,
   showSuggestions = true,
   showRequirements = true,
-  className = '',
+  className = "",
   onStrengthChange,
 }: PasswordStrengthIndicatorProps) {
   const { t } = useTypedTranslation();
   const [strength, setStrength] = useState<PasswordStrengthResult>({
     score: 0,
-    strength: 'very weak',
+    strength: "very weak",
     suggestions: [],
   });
   const [isCheckingBreaches, setIsCheckingBreaches] = useState(false);
 
   // Calculate password strength
-  const calculateStrength = useCallback((pwd: string): PasswordStrengthResult => {
-    let score = 0;
-    const suggestions: string[] = [];
+  const calculateStrength = useCallback(
+    (pwd: string): PasswordStrengthResult => {
+      let score = 0;
+      const suggestions: string[] = [];
 
-    // Length check
-    if (pwd.length >= MIN_PASSWORD_LENGTH) {
-      score += 1;
-    } else {
-      suggestions.push(t('minLengthRequirement', { count: MIN_PASSWORD_LENGTH }));
-    }
+      // Length check
+      if (pwd.length >= MIN_PASSWORD_LENGTH) {
+        score += 1;
+      } else {
+        suggestions.push(
+          t("minLengthRequirement", { count: MIN_PASSWORD_LENGTH }),
+        );
+      }
 
-    if (pwd.length >= 16) {
-      score += 1;
-    }
+      if (pwd.length >= 16) {
+        score += 1;
+      }
 
-    // Complexity checks
-    const hasLower = /[a-z]/.test(pwd);
-    const hasUpper = /[A-Z]/.test(pwd);
-    const hasNumber = /[0-9]/.test(pwd);
-    const hasSpecial = /[^a-zA-Z0-9]/.test(pwd);
+      // Complexity checks
+      const hasLower = /[a-z]/.test(pwd);
+      const hasUpper = /[A-Z]/.test(pwd);
+      const hasNumber = /[0-9]/.test(pwd);
+      const hasSpecial = /[^a-zA-Z0-9]/.test(pwd);
 
-    if (hasLower) score += 1;
-    else suggestions.push(t('lowercaseRequirement'));
+      if (hasLower) score += 1;
+      else suggestions.push(t("lowercaseRequirement"));
 
-    if (hasUpper) score += 1;
-    else suggestions.push(t('uppercaseRequirement'));
+      if (hasUpper) score += 1;
+      else suggestions.push(t("uppercaseRequirement"));
 
-    if (hasNumber) score += 1;
-    else suggestions.push(t('numberRequirement'));
+      if (hasNumber) score += 1;
+      else suggestions.push(t("numberRequirement"));
 
-    if (hasSpecial) score += 1;
-    else suggestions.push(t('specialCharRequirement'));
+      if (hasSpecial) score += 1;
+      else suggestions.push(t("specialCharRequirement"));
 
-    // Variety bonus
-    const varietyCount = [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
-    if (varietyCount >= 3) {
-      score += 1;
-    }
+      // Variety bonus
+      const varietyCount = [hasLower, hasUpper, hasNumber, hasSpecial].filter(
+        Boolean,
+      ).length;
+      if (varietyCount >= 3) {
+        score += 1;
+      }
 
-    // Normalize to 0-4
-    const normalizedScore = Math.min(4, Math.floor(score / 2));
+      // Normalize to 0-4
+      const normalizedScore = Math.min(4, Math.floor(score / 2));
 
-    // Get strength label
-    const strengthLabels: ('very weak' | 'weak' | 'fair' | 'strong' | 'very strong')[] = [
-      'very weak',
-      'weak',
-      'fair',
-      'strong',
-      'very strong',
-    ];
+      // Get strength label
+      const strengthLabels: (
+        | "very weak"
+        | "weak"
+        | "fair"
+        | "strong"
+        | "very strong"
+      )[] = ["very weak", "weak", "fair", "strong", "very strong"];
 
-    return {
-      score: normalizedScore,
-      strength: strengthLabels[Math.max(0, Math.min(4, normalizedScore))],
-      suggestions,
-    };
-  }, [t]);
+      return {
+        score: normalizedScore,
+        strength: strengthLabels[Math.max(0, Math.min(4, normalizedScore))],
+        suggestions,
+      };
+    },
+    [t],
+  );
 
   // Check for password breaches
-  const performBreachCheck = useCallback(async (pwd: string) => {
-    if (!checkBreaches || pwd.length < 8) {
-      return;
-    }
-
-    setIsCheckingBreaches(true);
-    try {
-      const response = await fetch('/api/security/check-password-breach', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pwd }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.result?.isBreached) {
-          setStrength((prev) => ({
-            ...prev,
-            breachResult: data.result,
-            suggestions: [
-              t('passwordBreached'),
-              ...prev.suggestions,
-            ],
-          }));
-        }
+  const performBreachCheck = useCallback(
+    async (pwd: string) => {
+      if (!checkBreaches || pwd.length < 8) {
+        return;
       }
-    } catch (error) {
-      logger.error('Breach check error:', error);
-    } finally {
-      setIsCheckingBreaches(false);
-    }
-  }, [checkBreaches, t]);
+
+      setIsCheckingBreaches(true);
+      try {
+        const response = await fetch("/api/security/check-password-breach", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: pwd }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.result?.isBreached) {
+            setStrength((prev) => ({
+              ...prev,
+              breachResult: data.result,
+              suggestions: [t("passwordBreached"), ...prev.suggestions],
+            }));
+          }
+        }
+      } catch (error) {
+        logger.error("Breach check error:", error);
+      } finally {
+        setIsCheckingBreaches(false);
+      }
+    },
+    [checkBreaches, t],
+  );
 
   // Update strength when password changes
   useEffect(() => {
     if (!password) {
       setStrength({
         score: 0,
-        strength: 'very weak',
+        strength: "very weak",
         suggestions: [],
       });
       return;
@@ -213,11 +219,14 @@ export function PasswordStrengthIndicator({
 
   // Get requirements status
   const requirements = [
-    { label: t('minLengthRequirement', { count: MIN_PASSWORD_LENGTH }), met: password.length >= MIN_PASSWORD_LENGTH },
-    { label: t('lowercaseLabel'), met: /[a-z]/.test(password) },
-    { label: t('uppercaseLabel'), met: /[A-Z]/.test(password) },
-    { label: t('numberLabel'), met: /[0-9]/.test(password) },
-    { label: t('specialCharLabel'), met: /[^a-zA-Z0-9]/.test(password) },
+    {
+      label: t("minLengthRequirement", { count: MIN_PASSWORD_LENGTH }),
+      met: password.length >= MIN_PASSWORD_LENGTH,
+    },
+    { label: t("lowercaseLabel"), met: /[a-z]/.test(password) },
+    { label: t("uppercaseLabel"), met: /[A-Z]/.test(password) },
+    { label: t("numberLabel"), met: /[0-9]/.test(password) },
+    { label: t("specialCharLabel"), met: /[^a-zA-Z0-9]/.test(password) },
   ];
 
   const metRequirements = requirements.filter((r) => r.met).length;
@@ -228,12 +237,14 @@ export function PasswordStrengthIndicator({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t('passwordStrength')}
+            {t("passwordStrength")}
           </span>
           <span
             className={`text-sm font-semibold ${STRENGTH_TEXT_COLORS[strength.strength]}`}
           >
-            {t(`strength_${strength.strength.replace(' ', '')}` as TranslationKey)}
+            {t(
+              `strength_${strength.strength.replace(" ", "")}` as TranslationKey,
+            )}
           </span>
         </div>
 
@@ -254,8 +265,8 @@ export function PasswordStrengthIndicator({
           )}
           <span className="text-sm text-gray-600 dark:text-gray-400">
             {strength.score >= 3
-              ? t('strongPassword')
-              : t('makePasswordStronger')}
+              ? t("strongPassword")
+              : t("makePasswordStronger")}
           </span>
         </div>
       </div>
@@ -266,10 +277,12 @@ export function PasswordStrengthIndicator({
           <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800 dark:text-red-200">
-              {t('passwordBreached')}
+              {t("passwordBreached")}
             </p>
             <p className="text-xs text-red-600 dark:text-red-300 mt-1">
-              {t('passwordBreachCount', { count: strength.breachResult.breachCount })}
+              {t("passwordBreachCount", {
+                count: strength.breachResult.breachCount,
+              })}
             </p>
           </div>
         </div>
@@ -279,7 +292,7 @@ export function PasswordStrengthIndicator({
       {showRequirements && (
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t('requirements')}
+            {t("requirements")}
           </p>
           <div className="space-y-1">
             {requirements.map((req, index) => (
@@ -290,10 +303,11 @@ export function PasswordStrengthIndicator({
                   <X className="w-4 h-4 text-gray-400 flex-shrink-0" />
                 )}
                 <span
-                  className={`text-sm ${req.met
-                    ? 'text-green-700 dark:text-green-300'
-                    : 'text-gray-500 dark:text-gray-400'
-                    }`}
+                  className={`text-sm ${
+                    req.met
+                      ? "text-green-700 dark:text-green-300"
+                      : "text-gray-500 dark:text-gray-400"
+                  }`}
                 >
                   {req.label}
                 </span>
@@ -301,7 +315,10 @@ export function PasswordStrengthIndicator({
             ))}
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {t('requirementsMet', { met: metRequirements, total: requirements.length })}
+            {t("requirementsMet", {
+              met: metRequirements,
+              total: requirements.length,
+            })}
           </p>
         </div>
       )}
@@ -310,11 +327,14 @@ export function PasswordStrengthIndicator({
       {showSuggestions && strength.suggestions.length > 0 && (
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t('suggestions')}
+            {t("suggestions")}
           </p>
           <ul className="space-y-1">
             {strength.suggestions.map((suggestion, index) => (
-              <li key={index} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <li
+                key={index}
+                className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400"
+              >
                 <span className="text-blue-500 mt-0.5">•</span>
                 <span>{suggestion}</span>
               </li>
@@ -327,7 +347,7 @@ export function PasswordStrengthIndicator({
       {isCheckingBreaches && (
         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-          <span>{t('checkingDataBreaches')}</span>
+          <span>{t("checkingDataBreaches")}</span>
         </div>
       )}
     </div>

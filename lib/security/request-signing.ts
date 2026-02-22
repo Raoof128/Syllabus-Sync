@@ -11,18 +11,18 @@
  * - Signature verification middleware
  */
 
-import crypto from 'crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import crypto from "crypto";
+import { NextRequest, NextResponse } from "next/server";
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-const SIGNATURE_HEADER = 'x-signature';
-const TIMESTAMP_HEADER = 'x-timestamp';
-const NONCE_HEADER = 'x-nonce';
-const SIGNATURE_VERSION = 'v1';
-const SIGNATURE_ALGORITHM = 'sha256';
+const SIGNATURE_HEADER = "x-signature";
+const TIMESTAMP_HEADER = "x-timestamp";
+const NONCE_HEADER = "x-nonce";
+const SIGNATURE_VERSION = "v1";
+const SIGNATURE_ALGORITHM = "sha256";
 const TIMESTAMP_TOLERANCE_MS = 5 * 60 * 1000; // 5 minutes
 
 // ============================================================================
@@ -62,7 +62,14 @@ export interface SignatureVerificationResult {
  * @returns The signature string
  */
 export function generateSignature(options: SignedRequestOptions): string {
-  const { secretKey, body = '', method, path, query = {}, headers = {} } = options;
+  const {
+    secretKey,
+    body = "",
+    method,
+    path,
+    query = {},
+    headers = {},
+  } = options;
 
   // Build canonical string
   const canonicalString = buildCanonicalString({
@@ -76,7 +83,7 @@ export function generateSignature(options: SignedRequestOptions): string {
   // Generate HMAC-SHA256 signature
   const hmac = crypto.createHmac(SIGNATURE_ALGORITHM, secretKey);
   hmac.update(canonicalString);
-  const signature = hmac.digest('base64');
+  const signature = hmac.digest("base64");
 
   return `${SIGNATURE_VERSION}:${signature}`;
 }
@@ -98,19 +105,19 @@ function buildCanonicalString(options: {
   const normalizedMethod = method.toUpperCase();
 
   // Normalize path (remove trailing slash)
-  const normalizedPath = path.replace(/\/$/, '') || '/';
+  const normalizedPath = path.replace(/\/$/, "") || "/";
 
   // Sort query parameters
   const sortedQuery = Object.keys(query)
     .sort()
     .map((key) => `${key}=${encodeURIComponent(query[key])}`)
-    .join('&');
+    .join("&");
 
   // Sort headers (lowercase keys)
   const sortedHeaders = Object.keys(headers)
     .sort()
     .map((key) => `${key.toLowerCase()}:${headers[key]}`)
-    .join('\n');
+    .join("\n");
 
   // Build canonical string
   const parts = [
@@ -121,7 +128,7 @@ function buildCanonicalString(options: {
     body,
   ];
 
-  return parts.join('\n');
+  return parts.join("\n");
 }
 
 /**
@@ -130,7 +137,9 @@ function buildCanonicalString(options: {
  * @param options - Signing options
  * @returns Headers object with signature, timestamp, and nonce
  */
-export function generateSigningHeaders(options: SignedRequestOptions): Record<string, string> {
+export function generateSigningHeaders(
+  options: SignedRequestOptions,
+): Record<string, string> {
   const timestamp = Date.now();
   const nonce = generateNonce();
 
@@ -154,7 +163,7 @@ export function generateSigningHeaders(options: SignedRequestOptions): Record<st
  * Generate a cryptographically secure nonce
  */
 function generateNonce(): string {
-  return crypto.randomBytes(16).toString('hex');
+  return crypto.randomBytes(16).toString("hex");
 }
 
 // ============================================================================
@@ -170,7 +179,7 @@ function generateNonce(): string {
  */
 export async function verifySignature(
   request: NextRequest,
-  secretKey: string
+  secretKey: string,
 ): Promise<SignatureVerificationResult> {
   // Get signature headers
   const signatureHeader = request.headers.get(SIGNATURE_HEADER);
@@ -179,30 +188,33 @@ export async function verifySignature(
 
   // Check if signature is present
   if (!signatureHeader) {
-    return { valid: false, reason: 'Missing signature header' };
+    return { valid: false, reason: "Missing signature header" };
   }
 
   // Parse signature
-  const signatureParts = signatureHeader.split(':');
+  const signatureParts = signatureHeader.split(":");
   if (signatureParts.length !== 2) {
-    return { valid: false, reason: 'Invalid signature format' };
+    return { valid: false, reason: "Invalid signature format" };
   }
 
   const [version, signature] = signatureParts;
 
   // Check signature version
   if (version !== SIGNATURE_VERSION) {
-    return { valid: false, reason: `Unsupported signature version: ${version}` };
+    return {
+      valid: false,
+      reason: `Unsupported signature version: ${version}`,
+    };
   }
 
   // Check timestamp
   if (!timestampHeader) {
-    return { valid: false, reason: 'Missing timestamp header' };
+    return { valid: false, reason: "Missing timestamp header" };
   }
 
   const timestamp = parseInt(timestampHeader, 10);
   if (isNaN(timestamp)) {
-    return { valid: false, reason: 'Invalid timestamp format' };
+    return { valid: false, reason: "Invalid timestamp format" };
   }
 
   const now = Date.now();
@@ -249,13 +261,13 @@ export async function verifySignature(
   });
 
   // Compare signatures (constant-time comparison)
-  if (!constantTimeCompare(signature, expectedSignature.split(':')[1])) {
-    return { valid: false, reason: 'Signature mismatch' };
+  if (!constantTimeCompare(signature, expectedSignature.split(":")[1])) {
+    return { valid: false, reason: "Signature mismatch" };
   }
 
   // Check nonce after signature validation.
   if (nonceHeader && isNonceUsed(nonceHeader)) {
-    return { valid: false, reason: 'Replay detected: nonce already used' };
+    return { valid: false, reason: "Replay detected: nonce already used" };
   }
 
   return {
@@ -291,22 +303,22 @@ function constantTimeCompare(a: string, b: string): boolean {
  */
 export function withSignatureVerification(
   secretKey: string,
-  handler: (request: NextRequest) => Promise<NextResponse>
+  handler: (request: NextRequest) => Promise<NextResponse>,
 ): (request: NextRequest) => Promise<NextResponse> {
   return async (request: NextRequest) => {
     // Verify signature
     const result = await verifySignature(request, secretKey);
 
     if (!result.valid) {
-      console.warn('Signature verification failed:', result.reason);
+      console.warn("Signature verification failed:", result.reason);
       return NextResponse.json(
         {
           error: {
-            code: 'SIGNATURE_INVALID',
-            message: result.reason || 'Invalid signature',
+            code: "SIGNATURE_INVALID",
+            message: result.reason || "Invalid signature",
           },
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -320,23 +332,23 @@ export function withSignatureVerification(
  * Text-based requests are signed as plain text; binary payloads are signed as base64.
  */
 async function getCanonicalBody(request: NextRequest): Promise<string> {
-  if (request.method === 'GET' || request.method === 'HEAD') {
-    return '';
+  if (request.method === "GET" || request.method === "HEAD") {
+    return "";
   }
 
   const requestClone = request.clone();
-  const contentType = requestClone.headers.get('content-type') ?? '';
+  const contentType = requestClone.headers.get("content-type") ?? "";
 
   if (
-    contentType.includes('application/json') ||
-    contentType.startsWith('text/') ||
-    contentType.includes('application/x-www-form-urlencoded')
+    contentType.includes("application/json") ||
+    contentType.startsWith("text/") ||
+    contentType.includes("application/x-www-form-urlencoded")
   ) {
     return requestClone.text();
   }
 
   const rawBody = await requestClone.arrayBuffer();
-  return Buffer.from(rawBody).toString('base64');
+  return Buffer.from(rawBody).toString("base64");
 }
 
 // ============================================================================
@@ -355,18 +367,18 @@ async function getCanonicalBody(request: NextRequest): Promise<string> {
 export async function signFetchRequest(
   url: string,
   options: RequestInit = {},
-  secretKey: string
+  secretKey: string,
 ): Promise<RequestInit> {
   const urlObj = new URL(url);
-  const method = options.method || 'GET';
+  const method = options.method || "GET";
   const body =
-    typeof options.body === 'string'
+    typeof options.body === "string"
       ? options.body
       : options.body instanceof URLSearchParams
         ? options.body.toString()
         : options.body
           ? JSON.stringify(options.body)
-          : '';
+          : "";
 
   // Build query parameters
   const query: Record<string, string> = {};
@@ -404,7 +416,7 @@ export async function signFetchRequest(
   const finalHeaders = new Headers({
     ...headers,
     ...signingHeaders,
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   });
 
   return {

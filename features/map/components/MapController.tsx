@@ -1,16 +1,19 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useReducedMotion } from 'framer-motion';
-import { getBuildingCrsCoords, type Building } from '@/features/map/lib/buildings';
-import { PIXEL_BOUNDS } from '@/features/map/lib/constants';
-import { devLog } from '@/lib/utils/devLog';
-import type { ReactLeafletModule } from '@/features/map/hooks/useLeafletLoader';
-import type { LeafletModule } from '@/features/map/lib/leafletTypes';
+import { useEffect, useState, useCallback } from "react";
+import { useReducedMotion } from "framer-motion";
+import {
+  getBuildingCrsCoords,
+  type Building,
+} from "@/features/map/lib/buildings";
+import { PIXEL_BOUNDS } from "@/features/map/lib/constants";
+import { devLog } from "@/lib/utils/devLog";
+import type { ReactLeafletModule } from "@/features/map/hooks/useLeafletLoader";
+import type { LeafletModule } from "@/features/map/lib/leafletTypes";
 
 const mapLog = devLog.map;
 
 interface MapControllerProps {
   selectedBuilding?: Building;
-  setMapInstance: (map: import('leaflet').Map) => void;
+  setMapInstance: (map: import("leaflet").Map) => void;
   reactLeafletModule: ReactLeafletModule;
   leafletModule: LeafletModule;
 }
@@ -31,7 +34,9 @@ export function MapController({
   const [isReady, setIsReady] = useState(false);
 
   const isMapReady = useCallback(
-    (m: import('leaflet').Map | null | undefined): m is import('leaflet').Map => {
+    (
+      m: import("leaflet").Map | null | undefined,
+    ): m is import("leaflet").Map => {
       if (!m) return false;
       try {
         const container = m.getContainer();
@@ -55,9 +60,9 @@ export function MapController({
       }
     };
     checkReady();
-    map.once('load', checkReady);
+    map.once("load", checkReady);
     return () => {
-      map.off('load', checkReady);
+      map.off("load", checkReady);
     };
   }, [map, setMapInstance, isMapReady]);
 
@@ -65,7 +70,7 @@ export function MapController({
   useEffect(() => {
     if (!isReady || !isMapReady(map)) return;
     try {
-      map.zoomControl.setPosition('bottomright');
+      map.zoomControl.setPosition("bottomright");
       map.setMaxBounds(PIXEL_BOUNDS);
       map.setMaxZoom(3);
       map.fitBounds(PIXEL_BOUNDS, { padding: [20, 20] });
@@ -73,7 +78,7 @@ export function MapController({
       // can see the full campus with some surrounding space.
       map.setMinZoom(map.getZoom() - 1.5);
     } catch (error) {
-      mapLog.log('Map setup error:', error);
+      mapLog.log("Map setup error:", error);
     }
   }, [map, isReady, isMapReady]);
 
@@ -91,7 +96,7 @@ export function MapController({
         paddingTopLeft: [0, 0],
         paddingBottomRight: [0, 0],
         animate: shouldAnimate,
-      } as import('leaflet').ZoomPanOptions);
+      } as import("leaflet").ZoomPanOptions);
 
       const openPopupForBuilding = () => {
         try {
@@ -114,12 +119,19 @@ export function MapController({
 
       popupTimeout = setTimeout(openPopupForBuilding, shouldAnimate ? 800 : 0);
     } catch (error) {
-      mapLog.log('Building nav error:', error);
+      mapLog.log("Building nav error:", error);
     }
     return () => {
       if (popupTimeout) clearTimeout(popupTimeout);
     };
-  }, [selectedBuilding, map, isReady, prefersReducedMotion, leafletModule, isMapReady]);
+  }, [
+    selectedBuilding,
+    map,
+    isReady,
+    prefersReducedMotion,
+    leafletModule,
+    isMapReady,
+  ]);
 
   return null;
 }

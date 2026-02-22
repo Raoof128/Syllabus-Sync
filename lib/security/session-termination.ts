@@ -11,10 +11,9 @@
  * - Audit logging for security events
  */
 
-import { createServerClient } from '@/lib/supabase/server';
-import { logAuditServer } from '@/lib/security/audit';
-import { logger } from '@/lib/logger';
-
+import { createServerClient } from "@/lib/supabase/server";
+import { logAuditServer } from "@/lib/security/audit";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // TYPES
@@ -62,21 +61,21 @@ export interface SessionTerminationResult {
  */
 export async function terminateAllOtherSessions(
   userId: string,
-  currentSessionId?: string
+  currentSessionId?: string,
 ): Promise<SessionTerminationResult> {
   try {
     const supabase = await createServerClient();
 
     // Get all sessions for the user
     const { data: sessions, error: fetchError } = await supabase
-      .from('user_sessions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .from("user_sessions")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
     if (fetchError) {
-      logger.error('Failed to fetch sessions:', fetchError);
-      throw new Error('Failed to fetch sessions');
+      logger.error("Failed to fetch sessions:", fetchError);
+      throw new Error("Failed to fetch sessions");
     }
 
     if (!sessions || sessions.length === 0) {
@@ -88,16 +87,18 @@ export async function terminateAllOtherSessions(
 
     // Filter out current session
     const sessionsToTerminate = currentSessionId
-      ? sessions.filter((session: SessionInfo) => session.id !== currentSessionId)
+      ? sessions.filter(
+          (session: SessionInfo) => session.id !== currentSessionId,
+        )
       : sessions;
 
     // Terminate sessions
     let terminatedCount = 0;
     for (const session of sessionsToTerminate) {
       const { error: deleteError } = await supabase
-        .from('user_sessions')
+        .from("user_sessions")
         .delete()
-        .eq('id', session.id);
+        .eq("id", session.id);
 
       if (!deleteError) {
         terminatedCount++;
@@ -106,11 +107,11 @@ export async function terminateAllOtherSessions(
 
     // Log audit event
     const auditLogId = await logAuditServer(userId, {
-      action: 'SESSION_TERMINATED',
-      severity: 'warning',
+      action: "SESSION_TERMINATED",
+      severity: "warning",
       metadata: {
         terminatedCount,
-        reason: 'Password changed',
+        reason: "Password changed",
         currentSessionId,
       },
     });
@@ -121,7 +122,7 @@ export async function terminateAllOtherSessions(
       auditLogId,
     };
   } catch (error) {
-    logger.error('Session termination error:', error);
+    logger.error("Session termination error:", error);
     throw error;
   }
 }
@@ -135,39 +136,39 @@ export async function terminateAllOtherSessions(
  */
 export async function terminateSession(
   userId: string,
-  sessionId: string
+  sessionId: string,
 ): Promise<boolean> {
   try {
     const supabase = await createServerClient();
 
     // Verify session belongs to user
     const { data: session, error: fetchError } = await supabase
-      .from('user_sessions')
-      .select('*')
-      .eq('id', sessionId)
-      .eq('user_id', userId)
+      .from("user_sessions")
+      .select("*")
+      .eq("id", sessionId)
+      .eq("user_id", userId)
       .single();
 
     if (fetchError || !session) {
-      logger.error('Session not found or access denied');
+      logger.error("Session not found or access denied");
       return false;
     }
 
     // Delete session
     const { error: deleteError } = await supabase
-      .from('user_sessions')
+      .from("user_sessions")
       .delete()
-      .eq('id', sessionId);
+      .eq("id", sessionId);
 
     if (deleteError) {
-      logger.error('Failed to terminate session:', deleteError);
+      logger.error("Failed to terminate session:", deleteError);
       return false;
     }
 
     // Log audit event
     await logAuditServer(userId, {
-      action: 'SESSION_TERMINATED',
-      severity: 'info',
+      action: "SESSION_TERMINATED",
+      severity: "info",
       metadata: {
         sessionId,
         deviceInfo: session.device_info,
@@ -177,7 +178,7 @@ export async function terminateSession(
 
     return true;
   } catch (error) {
-    logger.error('Session termination error:', error);
+    logger.error("Session termination error:", error);
     return false;
   }
 }
@@ -190,42 +191,42 @@ export async function terminateSession(
  * @returns Promise resolving to termination result
  */
 export async function terminateAllSessions(
-  userId: string
+  userId: string,
 ): Promise<SessionTerminationResult> {
   try {
     const supabase = await createServerClient();
 
     // Get all sessions for the user
     const { data: sessions, error: fetchError } = await supabase
-      .from('user_sessions')
-      .select('*')
-      .eq('user_id', userId);
+      .from("user_sessions")
+      .select("*")
+      .eq("user_id", userId);
 
     if (fetchError) {
-      logger.error('Failed to fetch sessions:', fetchError);
-      throw new Error('Failed to fetch sessions');
+      logger.error("Failed to fetch sessions:", fetchError);
+      throw new Error("Failed to fetch sessions");
     }
 
     const terminatedCount = sessions?.length || 0;
 
     // Delete all sessions
     const { error: deleteError } = await supabase
-      .from('user_sessions')
+      .from("user_sessions")
       .delete()
-      .eq('user_id', userId);
+      .eq("user_id", userId);
 
     if (deleteError) {
-      logger.error('Failed to terminate sessions:', deleteError);
-      throw new Error('Failed to terminate sessions');
+      logger.error("Failed to terminate sessions:", deleteError);
+      throw new Error("Failed to terminate sessions");
     }
 
     // Log audit event
     const auditLogId = await logAuditServer(userId, {
-      action: 'SESSION_TERMINATED',
-      severity: 'critical',
+      action: "SESSION_TERMINATED",
+      severity: "critical",
       metadata: {
         terminatedCount,
-        reason: 'All sessions terminated (security event)',
+        reason: "All sessions terminated (security event)",
       },
     });
 
@@ -235,7 +236,7 @@ export async function terminateAllSessions(
       auditLogId,
     };
   } catch (error) {
-    logger.error('Session termination error:', error);
+    logger.error("Session termination error:", error);
     throw error;
   }
 }
@@ -250,20 +251,18 @@ export async function terminateAllSessions(
  * @param userId - The user ID
  * @returns Promise resolving to array of sessions
  */
-export async function getUserSessions(
-  userId: string
-): Promise<SessionInfo[]> {
+export async function getUserSessions(userId: string): Promise<SessionInfo[]> {
   try {
     const supabase = await createServerClient();
 
     const { data: sessions, error } = await supabase
-      .from('user_sessions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('last_activity_at', { ascending: false });
+      .from("user_sessions")
+      .select("*")
+      .eq("user_id", userId)
+      .order("last_activity_at", { ascending: false });
 
     if (error) {
-      logger.error('Failed to fetch sessions:', error);
+      logger.error("Failed to fetch sessions:", error);
       return [];
     }
 
@@ -288,7 +287,7 @@ export async function getUserSessions(
       isCurrent: false, // Would need to compare with current session
     }));
   } catch (error) {
-    logger.error('Get sessions error:', error);
+    logger.error("Get sessions error:", error);
     return [];
   }
 }
@@ -301,7 +300,7 @@ export async function getUserSessions(
  * @returns Promise resolving to number of sessions cleaned up
  */
 export async function cleanupExpiredSessions(
-  maxAgeDays: number = 30
+  maxAgeDays: number = 30,
 ): Promise<number> {
   try {
     const supabase = await createServerClient();
@@ -310,19 +309,19 @@ export async function cleanupExpiredSessions(
     cutoffDate.setDate(cutoffDate.getDate() - maxAgeDays);
 
     const { data, error } = await supabase
-      .from('user_sessions')
+      .from("user_sessions")
       .delete()
-      .lt('last_activity_at', cutoffDate.toISOString())
-      .select('id');
+      .lt("last_activity_at", cutoffDate.toISOString())
+      .select("id");
 
     if (error) {
-      logger.error('Failed to cleanup expired sessions:', error);
+      logger.error("Failed to cleanup expired sessions:", error);
       return 0;
     }
 
     return data?.length || 0;
   } catch (error) {
-    logger.error('Session cleanup error:', error);
+    logger.error("Session cleanup error:", error);
     return 0;
   }
 }
@@ -341,7 +340,7 @@ export async function cleanupExpiredSessions(
  */
 export async function handlePasswordChange(
   userId: string,
-  currentSessionId?: string
+  currentSessionId?: string,
 ): Promise<SessionTerminationResult> {
   try {
     // Terminate all other sessions
@@ -349,8 +348,8 @@ export async function handlePasswordChange(
 
     // Log password change event
     await logAuditServer(userId, {
-      action: 'PASSWORD_CHANGE',
-      severity: 'warning',
+      action: "PASSWORD_CHANGE",
+      severity: "warning",
       metadata: {
         sessionsTerminated: result.terminatedCount,
       },
@@ -358,7 +357,7 @@ export async function handlePasswordChange(
 
     return result;
   } catch (error) {
-    logger.error('Password change handling error:', error);
+    logger.error("Password change handling error:", error);
     throw error;
   }
 }
@@ -373,7 +372,7 @@ export async function handlePasswordChange(
  */
 export async function handleSessionTermination(
   request: Request,
-  userId: string
+  userId: string,
 ): Promise<Response> {
   try {
     const body = await request.json();
@@ -391,19 +390,29 @@ export async function handleSessionTermination(
       const success = await terminateSession(userId, sessionId);
       return Response.json({
         success,
-        message: success ? 'Session terminated' : 'Failed to terminate session',
+        message: success ? "Session terminated" : "Failed to terminate session",
       });
     } else {
       return Response.json(
-        { error: { code: 'INVALID_REQUEST', message: 'sessionId or terminateAll required' } },
-        { status: 400 }
+        {
+          error: {
+            code: "INVALID_REQUEST",
+            message: "sessionId or terminateAll required",
+          },
+        },
+        { status: 400 },
       );
     }
   } catch (error) {
-    logger.error('Session termination API error:', error);
+    logger.error("Session termination API error:", error);
     return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: 'Failed to terminate session' } },
-      { status: 500 }
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to terminate session",
+        },
+      },
+      { status: 500 },
     );
   }
 }
@@ -414,7 +423,7 @@ export async function handleSessionTermination(
  */
 export async function handleGetSessions(
   request: Request,
-  userId: string
+  userId: string,
 ): Promise<Response> {
   try {
     const sessions = await getUserSessions(userId);
@@ -423,10 +432,12 @@ export async function handleGetSessions(
       count: sessions.length,
     });
   } catch (error) {
-    logger.error('Get sessions API error:', error);
+    logger.error("Get sessions API error:", error);
     return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch sessions' } },
-      { status: 500 }
+      {
+        error: { code: "INTERNAL_ERROR", message: "Failed to fetch sessions" },
+      },
+      { status: 500 },
     );
   }
 }

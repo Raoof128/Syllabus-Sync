@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+import { logger } from "@/lib/logger";
 /**
  * Request Logging Utility
  *
@@ -21,7 +21,7 @@ export interface LoggerOptions {
   /** Enable logging (default: true in production) */
   enabled?: boolean;
   /** Log level threshold */
-  level?: 'debug' | 'info' | 'warn' | 'error';
+  level?: "debug" | "info" | "warn" | "error";
   /** Include request body in logs (use with caution - may contain sensitive data) */
   includeBody?: boolean;
 }
@@ -41,8 +41,8 @@ export class RequestLogger {
 
   constructor(options: LoggerOptions = {}) {
     this.options = {
-      enabled: options.enabled ?? process.env.NODE_ENV === 'production',
-      level: options.level ?? 'info',
+      enabled: options.enabled ?? process.env.NODE_ENV === "production",
+      level: options.level ?? "info",
       includeBody: options.includeBody ?? false,
     };
   }
@@ -53,22 +53,23 @@ export class RequestLogger {
   log(data: RequestLogData): void {
     if (!this.options.enabled) return;
 
-    const level = data.status >= 500 ? 'error' : data.status >= 400 ? 'warn' : 'info';
+    const level =
+      data.status >= 500 ? "error" : data.status >= 400 ? "warn" : "info";
 
     if (LOG_LEVELS[level] < LOG_LEVELS[this.options.level]) return;
 
     const logEntry = {
       timestamp: new Date().toISOString(),
-      type: 'api_request',
+      type: "api_request",
       ...data,
     };
 
     // Use appropriate console method based on level
     switch (level) {
-      case 'error':
+      case "error":
         logger.error(JSON.stringify(logEntry));
         break;
-      case 'warn':
+      case "warn":
         console.warn(JSON.stringify(logEntry));
         break;
       default:
@@ -81,14 +82,16 @@ export class RequestLogger {
   /**
    * Log a successful request
    */
-  success(data: Omit<RequestLogData, 'status'> & { status?: number }): void {
+  success(data: Omit<RequestLogData, "status"> & { status?: number }): void {
     this.log({ ...data, status: data.status ?? 200 });
   }
 
   /**
    * Log a failed request
    */
-  error(data: Omit<RequestLogData, 'status'> & { status?: number; error?: string }): void {
+  error(
+    data: Omit<RequestLogData, "status"> & { status?: number; error?: string },
+  ): void {
     this.log({ ...data, status: data.status ?? 500 });
   }
 
@@ -110,28 +113,28 @@ export const requestLogger = new RequestLogger();
  */
 export function extractClientIP(headers: Headers): string {
   // Vercel's verified header
-  const vercelIp = headers.get('x-vercel-forwarded-for');
-  if (vercelIp) return vercelIp.split(',')[0].trim();
+  const vercelIp = headers.get("x-vercel-forwarded-for");
+  if (vercelIp) return vercelIp.split(",")[0].trim();
 
   // Cloudflare's verified header
-  const cfIp = headers.get('cf-connecting-ip');
+  const cfIp = headers.get("cf-connecting-ip");
   if (cfIp) return cfIp;
 
   // Standard forwarded header (be careful in production)
-  const forwarded = headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0].trim();
+  const forwarded = headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
 
-  const realIp = headers.get('x-real-ip');
+  const realIp = headers.get("x-real-ip");
   if (realIp) return realIp;
 
-  return 'unknown';
+  return "unknown";
 }
 
 /**
  * Sanitize user agent for logging (truncate if too long)
  */
 export function sanitizeUserAgent(userAgent: string | null): string {
-  if (!userAgent) return 'unknown';
+  if (!userAgent) return "unknown";
   // Truncate to prevent log injection or excessive log size
   return userAgent.substring(0, 200);
 }
@@ -156,7 +159,7 @@ export function withRequestLogging(
         status: response.status,
         duration,
         ip: extractClientIP(request.headers),
-        userAgent: sanitizeUserAgent(request.headers.get('user-agent')),
+        userAgent: sanitizeUserAgent(request.headers.get("user-agent")),
       });
 
       return response;
@@ -169,8 +172,8 @@ export function withRequestLogging(
         status: 500,
         duration,
         ip: extractClientIP(request.headers),
-        userAgent: sanitizeUserAgent(request.headers.get('user-agent')),
-        error: error instanceof Error ? error.message : 'Unknown error',
+        userAgent: sanitizeUserAgent(request.headers.get("user-agent")),
+        error: error instanceof Error ? error.message : "Unknown error",
       });
 
       throw error;

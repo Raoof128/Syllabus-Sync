@@ -1,2 +1,2 @@
-import './config/sentry/sentry.client.config';
+import "./config/sentry/sentry.client.config";
 export {};

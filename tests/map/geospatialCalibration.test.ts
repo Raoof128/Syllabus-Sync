@@ -1,20 +1,22 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 import {
   getAffineCoefficients,
   gpsToPixelCalibrated,
   getCalibrationDiagnostics,
   GROUND_CONTROL_POINTS,
   computeAffineCoefficients,
-} from '@/features/map/lib/geospatialCalibration';
+} from "@/features/map/lib/geospatialCalibration";
 
-describe('Geospatial Calibration', () => {
-  it('should have a low RMSE', () => {
+describe("Geospatial Calibration", () => {
+  it("should have a low RMSE", () => {
     const diagnostics = getCalibrationDiagnostics();
     console.log(`Current RMSE: ${diagnostics.rmsePixels.toFixed(2)} px`);
 
     // Print residuals to identify outliers
-    const sortedResiduals = [...diagnostics.gcpResiduals].sort((a, b) => b.error - a.error);
-    console.log('Top 5 Worst GCPs:');
+    const sortedResiduals = [...diagnostics.gcpResiduals].sort(
+      (a, b) => b.error - a.error,
+    );
+    console.log("Top 5 Worst GCPs:");
     sortedResiduals.slice(0, 5).forEach((r) => {
       console.log(
         `- ${r.id}: error=${r.error.toFixed(1)}px (dx=${r.dx.toFixed(1)}, dy=${r.dy.toFixed(1)})`,
@@ -27,7 +29,7 @@ describe('Geospatial Calibration', () => {
     expect(diagnostics.rmsePixels).toBeLessThan(150);
   });
 
-  it('should map GCPs back to their pixel coordinates roughly', () => {
+  it("should map GCPs back to their pixel coordinates roughly", () => {
     GROUND_CONTROL_POINTS.forEach((gcp) => {
       const result = gpsToPixelCalibrated(gcp.gps.lat, gcp.gps.lng);
 

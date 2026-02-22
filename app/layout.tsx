@@ -1,11 +1,11 @@
 // app/layout.tsx
-import type { Metadata, Viewport } from 'next';
-import './globals.css';
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
 // mq-tokens.css is already imported via globals.css — do not import again here
-import ClientLayout from './client-layout';
-import QueryProvider from '@/components/providers/QueryProvider';
-import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
-import { THEME_SCRIPT, RTL_SCRIPT } from '@/lib/security/csp';
+import ClientLayout from "./client-layout";
+import QueryProvider from "@/components/providers/QueryProvider";
+import { APP_CONFIG, UNIVERSITY_CONFIG } from "@/lib/config";
+import { THEME_SCRIPT, RTL_SCRIPT } from "@/lib/security/csp";
 
 export const metadata: Metadata = {
   title: {
@@ -16,49 +16,53 @@ export const metadata: Metadata = {
   applicationName: APP_CONFIG.name,
   metadataBase: new URL(UNIVERSITY_CONFIG.website),
   alternates: {
-    canonical: '/',
+    canonical: "/",
   },
-  manifest: '/manifest.webmanifest',
+  manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     title: APP_CONFIG.name,
-    statusBarStyle: 'default',
+    statusBarStyle: "default",
   },
   openGraph: {
     title: `${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
     description: APP_CONFIG.fullDescription,
-    type: 'website',
+    type: "website",
     images: [
       {
-        url: '/MQ_Logo_Final.png',
+        url: "/MQ_Logo_Final.png",
         alt: `${APP_CONFIG.name} logo`,
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    images: ['/MQ_Logo_Final.png'],
+    card: "summary_large_image",
+    images: ["/MQ_Logo_Final.png"],
   },
   icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'var(--mq-background)' },
-    { media: '(prefers-color-scheme: dark)', color: 'var(--mq-background)' },
+    { media: "(prefers-color-scheme: light)", color: "var(--mq-background)" },
+    { media: "(prefers-color-scheme: dark)", color: "var(--mq-background)" },
   ],
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const organizationSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
+    "@context": "https://schema.org",
+    "@type": "Organization",
     name: APP_CONFIG.name,
     url: UNIVERSITY_CONFIG.website,
-    logo: new URL('/MQ_Logo_Final.png', UNIVERSITY_CONFIG.website).toString(),
+    logo: new URL("/MQ_Logo_Final.png", UNIVERSITY_CONFIG.website).toString(),
   };
 
   return (
@@ -67,8 +71,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Theme and RTL scripts - minified and hash-validated by CSP */}
         {/* SECURITY: These scripts are validated via SHA-256 hashes in the CSP header */}
         {/* If you modify these scripts, update lib/security/csp.ts with new hashes */}
-        <script key="theme-script" dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        <script key="rtl-script" dangerouslySetInnerHTML={{ __html: RTL_SCRIPT }} />
+        <script
+          key="theme-script"
+          dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
+        />
+        <script
+          key="rtl-script"
+          dangerouslySetInnerHTML={{ __html: RTL_SCRIPT }}
+        />
       </head>
       <body className="font-sans" suppressHydrationWarning>
         {/* ================================================================
@@ -78,7 +88,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
         />
         <QueryProvider>
           <ClientLayout>{children}</ClientLayout>

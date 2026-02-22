@@ -1,7 +1,12 @@
 // lib/utils/errorHandling.ts
-import { AppError, ValidationError, FormErrors, ErrorSeverity } from '@/lib/types';
-import { withRetry, RetryError, type RetryOptions } from './retry';
-import { logger } from '@/lib/logger';
+import {
+  AppError,
+  ValidationError,
+  FormErrors,
+  ErrorSeverity,
+} from "@/lib/types";
+import { withRetry, RetryError, type RetryOptions } from "./retry";
+import { logger } from "@/lib/logger";
 
 export class AppErrorHandler {
   private static instance: AppErrorHandler;
@@ -19,7 +24,7 @@ export class AppErrorHandler {
   logError(
     error: Error | string | AppError,
     context?: string,
-    severity: ErrorSeverity = 'medium',
+    severity: ErrorSeverity = "medium",
   ): void {
     let appError: AppError;
 
@@ -31,7 +36,7 @@ export class AppErrorHandler {
         timestamp: new Date(),
         context,
       };
-    } else if (typeof error === 'string') {
+    } else if (typeof error === "string") {
       appError = {
         code: this.generateErrorCode(severity),
         message: error,
@@ -51,8 +56,12 @@ export class AppErrorHandler {
     }
 
     // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      logger.error(`[${severity.toUpperCase()}] ${context || 'App'}:`, appError.message, appError);
+    if (process.env.NODE_ENV === "development") {
+      logger.error(
+        `[${severity.toUpperCase()}] ${context || "App"}:`,
+        appError.message,
+        appError,
+      );
     }
 
     // Send to error tracking service (Sentry is configured in next.config.ts)
@@ -76,32 +85,32 @@ export class AppErrorHandler {
   handleApiError(error: unknown, endpoint: string): AppError {
     const errorObj = error as Record<string, unknown> | undefined;
     const appError: AppError = {
-      code: 'API_ERROR',
-      message: (errorObj?.message as string) || 'An API error occurred',
+      code: "API_ERROR",
+      message: (errorObj?.message as string) || "An API error occurred",
       details: {
         endpoint,
         status: errorObj?.status,
         response: errorObj?.response,
       },
       timestamp: new Date(),
-      context: 'API',
+      context: "API",
     };
 
-    this.logError(appError, 'API', 'high');
+    this.logError(appError, "API", "high");
     return appError;
   }
 
   // Handle network errors
   handleNetworkError(error: Error): AppError {
     const appError: AppError = {
-      code: 'NETWORK_ERROR',
-      message: 'Network connection failed',
+      code: "NETWORK_ERROR",
+      message: "Network connection failed",
       details: { originalError: error.message },
       timestamp: new Date(),
-      context: 'Network',
+      context: "Network",
     };
 
-    this.logError(appError, 'Network', 'high');
+    this.logError(appError, "Network", "high");
     return appError;
   }
 
@@ -122,18 +131,18 @@ export class AppErrorHandler {
   }
 
   private reportToService(error: AppError, severity: ErrorSeverity): void {
-    const isProduction = process.env.NODE_ENV === 'production';
-    const isBrowser = typeof window !== 'undefined';
+    const isProduction = process.env.NODE_ENV === "production";
+    const isBrowser = typeof window !== "undefined";
 
     // Report to Sentry if available (dynamically imported to avoid build issues)
-    if (isProduction || process.env.NEXT_PUBLIC_SENTRY_ENABLED === 'true') {
+    if (isProduction || process.env.NEXT_PUBLIC_SENTRY_ENABLED === "true") {
       this.reportToSentry(error, severity);
     }
 
     // In production, log high-severity errors to console (picked up by Vercel logs)
-    if (isProduction && severity === 'high') {
+    if (isProduction && severity === "high") {
       logger.error(
-        '[ERROR_REPORT]',
+        "[ERROR_REPORT]",
         JSON.stringify({
           code: error.code,
           message: error.message,
@@ -147,7 +156,9 @@ export class AppErrorHandler {
     // In development, store errors locally for debugging
     if (!isProduction && isBrowser) {
       try {
-        const existingErrors = JSON.parse(localStorage.getItem('appErrors') || '[]');
+        const existingErrors = JSON.parse(
+          localStorage.getItem("appErrors") || "[]",
+        );
         existingErrors.unshift({
           ...error,
           severity,
@@ -156,7 +167,10 @@ export class AppErrorHandler {
         });
 
         // Keep only last 20 errors
-        localStorage.setItem('appErrors', JSON.stringify(existingErrors.slice(0, 20)));
+        localStorage.setItem(
+          "appErrors",
+          JSON.stringify(existingErrors.slice(0, 20)),
+        );
       } catch {
         // Ignore localStorage errors
       }
@@ -168,15 +182,19 @@ export class AppErrorHandler {
    */
   private reportToSentry(error: AppError, severity: ErrorSeverity): void {
     // Dynamic import to avoid issues when Sentry is not configured
-    import('@sentry/nextjs')
+    import("@sentry/nextjs")
       .then((Sentry) => {
         const sentryLevel =
-          severity === 'high' ? 'error' : severity === 'medium' ? 'warning' : 'info';
+          severity === "high"
+            ? "error"
+            : severity === "medium"
+              ? "warning"
+              : "info";
 
         Sentry.captureException(new Error(error.message), {
           level: sentryLevel,
           tags: {
-            context: error.context || 'unknown',
+            context: error.context || "unknown",
             errorCode: error.code,
           },
           extra: {
@@ -206,9 +224,9 @@ export class AppErrorHandler {
         retryCondition: (error) => {
           // Retry on network errors and certain server errors
           return (
-            error.name === 'NetworkError' ||
-            error.name === 'TimeoutError' ||
-            error.message.includes('fetch')
+            error.name === "NetworkError" ||
+            error.name === "TimeoutError" ||
+            error.message.includes("fetch")
           );
         },
         ...options,
@@ -218,10 +236,10 @@ export class AppErrorHandler {
         this.logError(
           error.lastError,
           `${context} (failed after ${error.attempts} attempts)`,
-          'high',
+          "high",
         );
       } else {
-        this.logError(error as Error, context, 'high');
+        this.logError(error as Error, context, "high");
       }
       throw error;
     }
@@ -230,7 +248,10 @@ export class AppErrorHandler {
   /**
    * Execute a critical operation with aggressive retry
    */
-  async executeCritical<T>(operation: () => Promise<T>, context: string): Promise<T> {
+  async executeCritical<T>(
+    operation: () => Promise<T>,
+    context: string,
+  ): Promise<T> {
     return this.executeWithRetry(operation, context, {
       maxAttempts: 5,
       delayMs: 500,
@@ -246,7 +267,7 @@ export const errorHandler = AppErrorHandler.getInstance();
 // Utility functions for common error handling patterns
 export const handleAsyncError = async <T>(
   asyncFn: () => Promise<T>,
-  context: string = 'AsyncOperation',
+  context: string = "AsyncOperation",
 ): Promise<T | null> => {
   try {
     return await asyncFn();
@@ -254,13 +275,15 @@ export const handleAsyncError = async <T>(
     errorHandler.logError(
       error instanceof Error ? error : new Error(String(error)),
       context,
-      'high',
+      "high",
     );
     return null;
   }
 };
 
-export const createFormValidator = (rules: Record<string, (value: unknown) => string | null>) => {
+export const createFormValidator = (
+  rules: Record<string, (value: unknown) => string | null>,
+) => {
   return (data: Record<string, unknown>): ValidationError[] => {
     const errors: ValidationError[] = [];
 
@@ -282,13 +305,17 @@ export const createFormValidator = (rules: Record<string, (value: unknown) => st
 // Common validation rules
 export const validationRules = {
   required: (fieldName: string) => (value: unknown) =>
-    !value || (typeof value === 'string' && value.trim() === '')
+    !value || (typeof value === "string" && value.trim() === "")
       ? `${fieldName} is required`
       : null,
 
   numeric: (fieldName: string) => (value: unknown) =>
-    value && Number.isNaN(Number(value)) ? `${fieldName} must be a number` : null,
+    value && Number.isNaN(Number(value))
+      ? `${fieldName} must be a number`
+      : null,
 
   positive: (fieldName: string) => (value: unknown) =>
-    value && Number(value) <= 0 ? `${fieldName} must be a positive number` : null,
+    value && Number(value) <= 0
+      ? `${fieldName} must be a positive number`
+      : null,
 };

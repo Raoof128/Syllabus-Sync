@@ -12,7 +12,7 @@
    SETTINGS PAGE STYLES
    ============================================ */
 
-.settings-page [data-slot='button'],
+.settings-page [data-slot="button"],
 .settings-page button {
   transition:
     background-color 0.15s ease,
@@ -20,7 +20,7 @@
     box-shadow 0.15s ease;
 }
 
-.settings-page [data-slot='button']:focus-visible,
+.settings-page [data-slot="button"]:focus-visible,
 .settings-page button:focus-visible {
   outline: 2px solid var(--c-primary, #a6192e);
   outline-offset: 2px;

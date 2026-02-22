@@ -5,11 +5,11 @@
  */
 
 const DEFAULT_SUPABASE_FETCH_TIMEOUT_MS =
-  process.env.NODE_ENV === 'development' ? 20_000 : 15_000;
+  process.env.NODE_ENV === "development" ? 20_000 : 15_000;
 
 function toAbortError(reason: string): Error {
   const error = new Error(reason);
-  error.name = 'AbortError';
+  error.name = "AbortError";
   return error;
 }
 
@@ -28,8 +28,8 @@ function combineSignals(
     return controller.signal;
   }
 
-  primary.addEventListener('abort', abort, { once: true });
-  secondary.addEventListener('abort', abort, { once: true });
+  primary.addEventListener("abort", abort, { once: true });
+  secondary.addEventListener("abort", abort, { once: true });
   return controller.signal;
 }
 
@@ -40,7 +40,9 @@ export async function fetchWithTimeout(
 ): Promise<Response> {
   const timeoutController = new AbortController();
   const timeoutId = setTimeout(() => {
-    timeoutController.abort(toAbortError(`Supabase request timeout after ${timeoutMs}ms`));
+    timeoutController.abort(
+      toAbortError(`Supabase request timeout after ${timeoutMs}ms`),
+    );
   }, timeoutMs);
 
   try {

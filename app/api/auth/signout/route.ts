@@ -1,7 +1,7 @@
 // import { NextRequest } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
-import { jsonSuccess, jsonError } from '@/app/api/_lib/response';
-import { logger } from '@/lib/logger';
+import { createServerClient } from "@/lib/supabase/server";
+import { jsonSuccess, jsonError } from "@/app/api/_lib/response";
+import { logger } from "@/lib/logger";
 
 export async function POST() {
   try {
@@ -12,9 +12,9 @@ export async function POST() {
       return jsonError(error.message, 400);
     }
 
-    return jsonSuccess({ message: 'Signout successful' });
+    return jsonSuccess({ message: "Signout successful" });
   } catch (error) {
-    logger.error('Signout error:', error);
-    return jsonError('Internal server error', 500);
+    logger.error("Signout error:", error);
+    return jsonError("Internal server error", 500);
   }
 }

@@ -1,25 +1,34 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react';
+import * as React from "react";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
-function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
+function DropdownMenu({
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
   return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
 
 function DropdownMenuPortal({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
-  return <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />;
+  return (
+    <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />
+  );
 }
 
 function DropdownMenuTrigger({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
-  return <DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />;
+  return (
+    <DropdownMenuPrimitive.Trigger
+      data-slot="dropdown-menu-trigger"
+      {...props}
+    />
+  );
 }
 
 function DropdownMenuContent({
@@ -27,9 +36,9 @@ function DropdownMenuContent({
   sideOffset = 4,
   collisionPadding = 16,
   avoidCollisions = true,
-  align = 'end',
+  align = "end",
   alignOffset,
-  side = 'bottom',
+  side = "bottom",
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   const resolvedAlignOffset = alignOffset ?? 0;
@@ -46,15 +55,15 @@ function DropdownMenuContent({
         side={side}
         className={cn(
           // z-index must be high enough to appear above sticky header
-          'z-[9999]',
+          "z-[9999]",
           // Animation and transitions
-          'shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+          "shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           // Size and overflow constraints
-          'max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-32 origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-mq p-1',
+          "max-h-[var(--radix-dropdown-menu-content-available-height)] min-w-32 origin-[var(--radix-dropdown-menu-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-mq p-1",
           // Use theme-aware CSS variables for background and text
-          'bg-mq-card-background text-mq-content border border-mq-border',
+          "bg-mq-card-background text-mq-content border border-mq-border",
           // Ensure dropdown stays within viewport boundaries - critical for mobile
-          'max-w-[calc(100vw-2rem)]',
+          "max-w-[calc(100vw-2rem)]",
           className,
         )}
         {...props}
@@ -63,18 +72,22 @@ function DropdownMenuContent({
   );
 }
 
-function DropdownMenuGroup({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
-  return <DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />;
+function DropdownMenuGroup({
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
+  return (
+    <DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
+  );
 }
 
 function DropdownMenuItem({
   className,
   inset,
-  variant = 'default',
+  variant = "default",
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
   inset?: boolean;
-  variant?: 'default' | 'destructive';
+  variant?: "default" | "destructive";
 }) {
   return (
     <DropdownMenuPrimitive.Item
@@ -87,9 +100,9 @@ function DropdownMenuItem({
         // Use theme-aware colors
         "text-mq-content [&_svg:not([class*='text-'])]:text-mq-content-secondary",
         // Hover/focus states using theme variables
-        'focus:bg-mq-hover-background focus:text-mq-content',
+        "focus:bg-mq-hover-background focus:text-mq-content",
         // Destructive variant
-        'data-[variant=destructive]:text-mq-error data-[variant=destructive]:focus:bg-mq-error/10 data-[variant=destructive]:focus:text-mq-error data-[variant=destructive]:*:[svg]:text-mq-error!',
+        "data-[variant=destructive]:text-mq-error data-[variant=destructive]:focus:bg-mq-error/10 data-[variant=destructive]:focus:text-mq-error data-[variant=destructive]:*:[svg]:text-mq-error!",
         className,
       )}
       {...props}
@@ -126,7 +139,12 @@ function DropdownMenuCheckboxItem({
 function DropdownMenuRadioGroup({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>) {
-  return <DropdownMenuPrimitive.RadioGroup data-slot="dropdown-menu-radio-group" {...props} />;
+  return (
+    <DropdownMenuPrimitive.RadioGroup
+      data-slot="dropdown-menu-radio-group"
+      {...props}
+    />
+  );
 }
 
 function DropdownMenuRadioItem({
@@ -164,7 +182,10 @@ function DropdownMenuLabel({
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
       data-inset={inset}
-      className={cn('px-2 py-1.5 text-sm font-medium data-inset:pl-8', className)}
+      className={cn(
+        "px-2 py-1.5 text-sm font-medium data-inset:pl-8",
+        className,
+      )}
       {...props}
     />
   );
@@ -177,23 +198,31 @@ function DropdownMenuSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={cn('bg-mq-border -mx-1 my-1 h-px', className)}
+      className={cn("bg-mq-border -mx-1 my-1 h-px", className)}
       {...props}
     />
   );
 }
 
-function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<'span'>) {
+function DropdownMenuShortcut({
+  className,
+  ...props
+}: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="dropdown-menu-shortcut"
-      className={cn('text-mq-content-tertiary ml-auto text-xs tracking-widest', className)}
+      className={cn(
+        "text-mq-content-tertiary ml-auto text-xs tracking-widest",
+        className,
+      )}
       {...props}
     />
   );
 }
 
-function DropdownMenuSub({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
+function DropdownMenuSub({
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
   return <DropdownMenuPrimitive.Sub data-slot="dropdown-menu-sub" {...props} />;
 }
 
@@ -230,10 +259,10 @@ function DropdownMenuSubContent({
       data-slot="dropdown-menu-sub-content"
       className={cn(
         // Position fixed for proper scroll behavior
-        'fixed shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-mq p-1',
+        "fixed shadow-mq-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-mq p-1",
         // Light mode: white bg + dark text, Dark mode: charcoal bg + light text
-        'bg-white text-[#1a1a1a] border border-[#d4d4d4]',
-        'dark:bg-[#373a36] dark:text-[#edeade] dark:border-[#71736b]',
+        "bg-white text-[#1a1a1a] border border-[#d4d4d4]",
+        "dark:bg-[#373a36] dark:text-[#edeade] dark:border-[#71736b]",
         className,
       )}
       {...props}

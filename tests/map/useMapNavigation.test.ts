@@ -1,16 +1,16 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { useMapNavigation } from '@/features/map/hooks/useMapNavigation';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { NavigationStateManager } from '@/features/map/lib/realtimeNavigation';
-import * as orsService from '@/lib/services/ors';
-import { toastUtils } from '@/lib/utils/toast';
+import { renderHook, act, waitFor } from "@testing-library/react";
+import { useMapNavigation } from "@/features/map/hooks/useMapNavigation";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { NavigationStateManager } from "@/features/map/lib/realtimeNavigation";
+import * as orsService from "@/lib/services/ors";
+import { toastUtils } from "@/lib/utils/toast";
 
 // Mock dependencies
-vi.mock('@/lib/hooks/useTypedTranslation', () => ({
+vi.mock("@/lib/hooks/useTypedTranslation", () => ({
   useTypedTranslation: () => ({ t: (key: string) => key }),
 }));
 
-vi.mock('@/lib/utils/toast', () => ({
+vi.mock("@/lib/utils/toast", () => ({
   toastUtils: {
     warning: vi.fn(),
     success: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock('@/lib/utils/toast', () => ({
   },
 }));
 
-vi.mock('@/lib/services/ors', () => ({
+vi.mock("@/lib/services/ors", () => ({
   fetchORSRoute: vi.fn(),
 }));
 
@@ -32,7 +32,7 @@ const mockNavManager = {
   setMotionState: vi.fn(),
 } as unknown as NavigationStateManager;
 
-describe('useMapNavigation', () => {
+describe("useMapNavigation", () => {
   const mockNavManagerRef = { current: mockNavManager };
   const mockGpsToCrsSimple = vi.fn((lat, lng) => ({ lat, lng }));
   const mockGetBuildingLatLng = vi.fn(() => ({ lat: 10, lng: 10 }));
@@ -55,7 +55,7 @@ describe('useMapNavigation', () => {
     vi.useRealTimers();
   });
 
-  it('should return initial state', () => {
+  it("should return initial state", () => {
     const { result } = renderHook(() => useMapNavigation(defaultProps));
 
     expect(result.current.isNavigating).toBe(false);
@@ -64,7 +64,7 @@ describe('useMapNavigation', () => {
     expect(result.current.routeError).toBeNull();
   });
 
-  it('should fetch route when origin and selectedBuilding are present', async () => {
+  it("should fetch route when origin and selectedBuilding are present", async () => {
     const mockRouteData = {
       coordinates: [
         [0, 0],
@@ -82,9 +82,9 @@ describe('useMapNavigation', () => {
       ...defaultProps,
       origin: { lat: 0, lng: 0 },
       selectedBuilding: {
-        id: 'b1',
-        name: 'Building 1',
-        type: 'academic',
+        id: "b1",
+        name: "Building 1",
+        type: "academic",
         location: { lat: 1, lng: 1 },
       } as any,
     };
@@ -110,7 +110,7 @@ describe('useMapNavigation', () => {
     expect(result.current.routeCoords.length).toBeGreaterThan(0);
   });
 
-  it('should prevent navigation if off-campus', () => {
+  it("should prevent navigation if off-campus", () => {
     const props = {
       ...defaultProps,
       isOffCampus: true,
@@ -124,12 +124,12 @@ describe('useMapNavigation', () => {
 
     expect(result.current.isNavigating).toBe(false);
     expect(toastUtils.warning).toHaveBeenCalledWith(
-      'Outside campus boundary',
-      'Navigation is disabled while you are outside campus.',
+      "Outside campus boundary",
+      "Navigation is disabled while you are outside campus.",
     );
   });
 
-  it('should start navigation when conditions are met', async () => {
+  it("should start navigation when conditions are met", async () => {
     const mockRouteData = {
       coordinates: [
         [0, 0],
@@ -139,15 +139,15 @@ describe('useMapNavigation', () => {
       error: null,
     };
     // @ts-ignore
-    vi.spyOn(orsService, 'fetchORSRoute').mockResolvedValue(mockRouteData);
+    vi.spyOn(orsService, "fetchORSRoute").mockResolvedValue(mockRouteData);
 
     const props = {
       ...defaultProps,
       origin: { lat: 0, lng: 0 },
       selectedBuilding: {
-        id: 'b1',
-        name: 'Building 1',
-        type: 'academic',
+        id: "b1",
+        name: "Building 1",
+        type: "academic",
         location: { lat: 1, lng: 1 },
       } as any,
     };

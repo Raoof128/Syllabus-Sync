@@ -1,7 +1,7 @@
-import { NextRequest } from 'next/server';
-import { generateRegistrationOptions } from '@simplewebauthn/server';
-import { createServerClient } from '@/lib/supabase/server';
-import { APP_CONFIG } from '@/lib/config';
+import { NextRequest } from "next/server";
+import { generateRegistrationOptions } from "@simplewebauthn/server";
+import { createServerClient } from "@/lib/supabase/server";
+import { APP_CONFIG } from "@/lib/config";
 import {
   jsonSuccess,
   jsonError,
@@ -9,20 +9,20 @@ import {
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
-} from '@/app/api/_lib/response';
+} from "@/app/api/_lib/response";
 import {
   storeChallenge,
   getCredentialsForUser,
   getRelyingPartyId,
   webauthnRegisterLimiter,
   MAX_PASSKEYS_PER_USER,
-} from '@/lib/security/webauthn';
-import { getClientIP } from '@/lib/security/ip';
-import { logger } from '@/lib/logger';
-import { z } from 'zod';
+} from "@/lib/security/webauthn";
+import { getClientIP } from "@/lib/security/ip";
+import { logger } from "@/lib/logger";
+import { z } from "zod";
 
 const optionsSchema = z.object({
-  deviceName: z.string().max(100).optional().default('Passkey'),
+  deviceName: z.string().max(100).optional().default("Passkey"),
 });
 
 /**
@@ -50,15 +50,18 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return jsonUnauthorized('Authentication required');
+      return jsonUnauthorized("Authentication required");
     }
 
-    const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: parseError } = await parseJsonBody(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (parseError) return parseError;
 
     const parsed = optionsSchema.safeParse(body ?? {});
     if (!parsed.success) {
-      return jsonError('Invalid request', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError("Invalid request", 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     // Check existing credentials
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const host = request.headers.get('host') ?? new URL(request.url).hostname;
+    const host = request.headers.get("host") ?? new URL(request.url).hostname;
     const rpId = getRelyingPartyId(host);
 
     // Convert user ID to buffer
@@ -83,10 +86,10 @@ export async function POST(request: NextRequest) {
       rpID: rpId,
       userID: userIdBuffer,
       userName: user.email ?? user.id,
-      attestationType: 'none',
+      attestationType: "none",
       authenticatorSelection: {
-        residentKey: 'preferred',
-        userVerification: 'required',
+        residentKey: "preferred",
+        userVerification: "required",
       },
       excludeCredentials: existingCredentials.map((c) => ({
         id: c.credentialId,
@@ -95,11 +98,15 @@ export async function POST(request: NextRequest) {
     });
 
     // Store challenge in DB (not cookies) for security
-    await storeChallenge(options.challenge, 'registration', user.id);
+    await storeChallenge(options.challenge, "registration", user.id);
 
     return jsonSuccess({ options });
   } catch (error) {
-    logger.error('WebAuthn register options error:', error);
-    return jsonError('Failed to create registration options', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("WebAuthn register options error:", error);
+    return jsonError(
+      "Failed to create registration options",
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 }

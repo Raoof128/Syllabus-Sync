@@ -1,14 +1,18 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { apiRequest } from '@/lib/utils/api';
-import type { GamificationProfile, XPEvent, GamificationSettings } from '@/lib/types';
-import { DEFAULT_GAMIFICATION_SETTINGS } from '@/lib/types';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { apiRequest } from "@/lib/utils/api";
+import type {
+  GamificationProfile,
+  XPEvent,
+  GamificationSettings,
+} from "@/lib/types";
+import { DEFAULT_GAMIFICATION_SETTINGS } from "@/lib/types";
 
 // ============================================================================
 // TYPES (Re-export from centralized types)
 // ============================================================================
 
-export type { GamificationProfile, XPEvent } from '@/lib/types';
+export type { GamificationProfile, XPEvent } from "@/lib/types";
 
 interface GamificationState {
   profile: GamificationProfile | null;
@@ -38,28 +42,28 @@ interface GamificationState {
 // ============================================================================
 
 const LEVEL_TITLES: Record<number, string> = {
-  1: 'Freshman',
-  2: 'Eager Learner',
-  3: 'Rising Star',
-  4: 'Dedicated Scholar',
-  5: 'Academic Achiever',
-  6: 'Knowledge Seeker',
-  7: 'Study Champion',
+  1: "Freshman",
+  2: "Eager Learner",
+  3: "Rising Star",
+  4: "Dedicated Scholar",
+  5: "Academic Achiever",
+  6: "Knowledge Seeker",
+  7: "Study Champion",
   8: "Dean's Lister",
-  9: 'Academic Elite',
-  10: 'Scholarly Master',
+  9: "Academic Elite",
+  10: "Scholarly Master",
   // 11+ use formula-based titles
 };
 
 function getLevelTitleForLevel(level: number): string {
   if (level <= 10) {
-    return LEVEL_TITLES[level] || 'Student';
+    return LEVEL_TITLES[level] || "Student";
   }
-  if (level <= 20) return 'Academic Veteran';
-  if (level <= 30) return 'Knowledge Expert';
-  if (level <= 50) return 'Scholarly Legend';
-  if (level <= 75) return 'Academic Titan';
-  return 'Grand Scholar';
+  if (level <= 20) return "Academic Veteran";
+  if (level <= 30) return "Knowledge Expert";
+  if (level <= 50) return "Scholarly Legend";
+  if (level <= 75) return "Academic Titan";
+  return "Grand Scholar";
 }
 
 // ============================================================================
@@ -67,13 +71,13 @@ function getLevelTitleForLevel(level: number): string {
 // ============================================================================
 
 function getStreakEmojiForDays(days: number): string {
-  if (days === 0) return '';
-  if (days < 3) return '🔥';
-  if (days < 7) return '🔥🔥';
-  if (days < 14) return '🔥🔥🔥';
-  if (days < 30) return '⚡🔥';
-  if (days < 60) return '💎🔥';
-  return '👑🔥';
+  if (days === 0) return "";
+  if (days < 3) return "🔥";
+  if (days < 7) return "🔥🔥";
+  if (days < 14) return "🔥🔥🔥";
+  if (days < 30) return "⚡🔥";
+  if (days < 60) return "💎🔥";
+  return "👑🔥";
 }
 
 // ============================================================================
@@ -115,8 +119,8 @@ export const useGamificationStore = create<GamificationState>()(
         try {
           const params = new URLSearchParams();
           if (includeEvents) {
-            params.set('events', 'true');
-            params.set('limit', '10');
+            params.set("events", "true");
+            params.set("limit", "10");
           }
 
           const response = await apiRequest<{
@@ -133,7 +137,7 @@ export const useGamificationStore = create<GamificationState>()(
             isLoading: false,
           });
         } catch (error) {
-          console.warn('Failed to load gamification profile:', error);
+          console.warn("Failed to load gamification profile:", error);
           // Fall back to default profile
           set({
             profile: DEFAULT_PROFILE,
@@ -141,7 +145,8 @@ export const useGamificationStore = create<GamificationState>()(
             isDemo: true,
             hasLoaded: true,
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to load profile',
+            error:
+              error instanceof Error ? error.message : "Failed to load profile",
           });
         }
       },
@@ -154,8 +159,8 @@ export const useGamificationStore = create<GamificationState>()(
           const response = await apiRequest<{
             message: string;
             profile: GamificationProfile;
-          }>('/api/gamification', {
-            method: 'POST',
+          }>("/api/gamification", {
+            method: "POST",
           });
 
           set({
@@ -163,7 +168,7 @@ export const useGamificationStore = create<GamificationState>()(
           });
         } catch (error) {
           // Silently fail - streak tracking is not critical
-          console.warn('Failed to record activity:', error);
+          console.warn("Failed to record activity:", error);
         }
       },
 
@@ -213,18 +218,18 @@ export const useGamificationStore = create<GamificationState>()(
 
       getLevelTitle: () => {
         const profile = get().profile;
-        if (!profile) return 'Student';
+        if (!profile) return "Student";
         return getLevelTitleForLevel(profile.level);
       },
 
       getStreakEmoji: () => {
         const profile = get().profile;
-        if (!profile) return '';
+        if (!profile) return "";
         return getStreakEmojiForDays(profile.streakDays);
       },
     }),
     {
-      name: 'syllabus-sync-gamification',
+      name: "syllabus-sync-gamification",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         // Only persist profile and events, not loading/error state
@@ -290,7 +295,7 @@ export function useStreak() {
     return {
       days: 0,
       longest: 0,
-      emoji: '',
+      emoji: "",
       isActive: false,
     };
   }

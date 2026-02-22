@@ -11,10 +11,9 @@
  * - Risk scoring and alerting
  */
 
-import { NextRequest } from 'next/server';
-import { getClientIP } from '@/lib/security/ip';
-import { logger } from '@/lib/logger';
-
+import { NextRequest } from "next/server";
+import { getClientIP } from "@/lib/security/ip";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // TYPES
@@ -49,7 +48,7 @@ export interface IPAnomalyResult {
   /** Risk score (0-100) */
   riskScore: number;
   /** Risk level */
-  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  riskLevel: "low" | "medium" | "high" | "critical";
   /** Reasons for anomaly */
   reasons: string[];
   /** Distance from previous location (km) */
@@ -82,22 +81,24 @@ export async function getIPGeolocation(ip: string): Promise<IPInfo> {
     if (isPrivateIP(ip)) {
       return {
         ip,
-        country: 'LOCAL',
-        city: 'Localhost',
+        country: "LOCAL",
+        city: "Localhost",
         timestamp: new Date(),
       };
     }
 
     // Use ip-api.com (free, no API key required)
-    const response = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,countryCode,city,region,lat,lon,isp,proxy,hosting,query`);
-    
+    const response = await fetch(
+      `http://ip-api.com/json/${ip}?fields=status,country,countryCode,city,region,lat,lon,isp,proxy,hosting,query`,
+    );
+
     if (!response.ok) {
       throw new Error(`IP geolocation API error: ${response.status}`);
     }
 
     const data = await response.json();
 
-    if (data.status !== 'success') {
+    if (data.status !== "success") {
       throw new Error(`IP geolocation failed: ${data.message}`);
     }
 
@@ -113,7 +114,7 @@ export async function getIPGeolocation(ip: string): Promise<IPInfo> {
       timestamp: new Date(),
     };
   } catch (error) {
-    logger.error('IP geolocation error:', error);
+    logger.error("IP geolocation error:", error);
     // Return minimal info on error
     return {
       ip,
@@ -152,7 +153,7 @@ function isPrivateIP(ip: string): boolean {
  */
 export async function detectIPAnomaly(
   currentIP: string,
-  ipHistory: IPInfo[]
+  ipHistory: IPInfo[],
 ): Promise<IPAnomalyResult> {
   const reasons: string[] = [];
   let riskScore = 0;
@@ -162,53 +163,70 @@ export async function detectIPAnomaly(
 
   // Check if this is a new IP
   const previousIPs = ipHistory.filter((ip) => ip.ip !== currentIP);
-  const isNewIP = previousIPs.length === 0 || !previousIPs.some((ip) => ip.ip === currentIP);
+  const isNewIP =
+    previousIPs.length === 0 || !previousIPs.some((ip) => ip.ip === currentIP);
 
   if (isNewIP && previousIPs.length > 0) {
-    reasons.push('New IP address detected');
+    reasons.push("New IP address detected");
     riskScore += 20;
   }
 
   // Check for VPN/Proxy
   if (currentIPInfo.isProxy) {
-    reasons.push('VPN or proxy detected');
+    reasons.push("VPN or proxy detected");
     riskScore += 30;
   }
 
   // Check for Tor exit node
   if (currentIPInfo.isTor) {
-    reasons.push('Tor exit node detected');
+    reasons.push("Tor exit node detected");
     riskScore += 40;
   }
 
   // Check for country change
   if (previousIPs.length > 0) {
     const lastIP = previousIPs[0];
-    if (lastIP.country && currentIPInfo.country && lastIP.country !== currentIPInfo.country) {
-      reasons.push(`Country changed from ${lastIP.country} to ${currentIPInfo.country}`);
+    if (
+      lastIP.country &&
+      currentIPInfo.country &&
+      lastIP.country !== currentIPInfo.country
+    ) {
+      reasons.push(
+        `Country changed from ${lastIP.country} to ${currentIPInfo.country}`,
+      );
       riskScore += 25;
     }
 
     // Calculate distance and time
-    if (lastIP.latitude && lastIP.longitude &&
-        currentIPInfo.latitude && currentIPInfo.longitude) {
+    if (
+      lastIP.latitude &&
+      lastIP.longitude &&
+      currentIPInfo.latitude &&
+      currentIPInfo.longitude
+    ) {
       const distance = calculateDistance(
         lastIP.latitude,
         lastIP.longitude,
         currentIPInfo.latitude,
-        currentIPInfo.longitude
+        currentIPInfo.longitude,
       );
 
-      const timeDiff = (currentIPInfo.timestamp.getTime() - lastIP.timestamp.getTime()) / (1000 * 60 * 60); // hours
+      const timeDiff =
+        (currentIPInfo.timestamp.getTime() - lastIP.timestamp.getTime()) /
+        (1000 * 60 * 60); // hours
 
       // Check for impossible travel (velocity anomaly)
       if (distance > 1000 && timeDiff < 2) {
         // More than 1000km in less than 2 hours
-        reasons.push(`Impossible travel detected: ${Math.round(distance)}km in ${Math.round(timeDiff)}h`);
+        reasons.push(
+          `Impossible travel detected: ${Math.round(distance)}km in ${Math.round(timeDiff)}h`,
+        );
         riskScore += 50;
       } else if (distance > 500 && timeDiff < 4) {
         // More than 500km in less than 4 hours
-        reasons.push(`Rapid travel detected: ${Math.round(distance)}km in ${Math.round(timeDiff)}h`);
+        reasons.push(
+          `Rapid travel detected: ${Math.round(distance)}km in ${Math.round(timeDiff)}h`,
+        );
         riskScore += 30;
       }
     }
@@ -232,7 +250,7 @@ function calculateDistance(
   lat1: number,
   lon1: number,
   lat2: number,
-  lon2: number
+  lon2: number,
 ): number {
   const R = 6371; // Earth's radius in km
   const dLat = toRadians(lat2 - lat1);
@@ -256,11 +274,11 @@ function toRadians(degrees: number): number {
 /**
  * Get risk level from score
  */
-function getRiskLevel(score: number): 'low' | 'medium' | 'high' | 'critical' {
-  if (score < 20) return 'low';
-  if (score < 40) return 'medium';
-  if (score < 60) return 'high';
-  return 'critical';
+function getRiskLevel(score: number): "low" | "medium" | "high" | "critical" {
+  if (score < 20) return "low";
+  if (score < 40) return "medium";
+  if (score < 60) return "high";
+  return "critical";
 }
 
 // ============================================================================
@@ -283,7 +301,7 @@ export async function getIPHistory(_userId: string): Promise<IPInfo[]> {
  */
 export async function addIPToHistory(
   _userId: string,
-  _ipInfo: IPInfo
+  _ipInfo: IPInfo,
 ): Promise<void> {
   // In a real implementation, this would store to a database
   // await db.ipHistory.upsert({ userId, ...ipInfo });
@@ -295,7 +313,7 @@ export async function addIPToHistory(
  */
 export async function cleanupIPHistory(
   _userId: string,
-  _maxEntries: number = 50
+  _maxEntries: number = 50,
 ): Promise<void> {
   // In a real implementation, this would clean up the database
   // await db.ipHistory.deleteMany({ userId }, { orderBy: { timestamp: 'desc' }, skip: maxEntries });
@@ -315,7 +333,7 @@ export async function cleanupIPHistory(
  */
 export async function analyzeRequestForAnomaly(
   request: NextRequest,
-  userId?: string
+  userId?: string,
 ): Promise<IPAnomalyResult> {
   const ip = getClientIP(request);
 
@@ -325,17 +343,17 @@ export async function analyzeRequestForAnomaly(
     const reasons: string[] = [];
 
     if (ipInfo.isProxy) {
-      reasons.push('VPN or proxy detected');
+      reasons.push("VPN or proxy detected");
     }
 
     if (ipInfo.isTor) {
-      reasons.push('Tor exit node detected');
+      reasons.push("Tor exit node detected");
     }
 
     return {
       isAnomalous: reasons.length > 0,
       riskScore: reasons.length > 0 ? 30 : 0,
-      riskLevel: reasons.length > 0 ? 'medium' : 'low',
+      riskLevel: reasons.length > 0 ? "medium" : "low",
       reasons,
     };
   }
@@ -365,37 +383,37 @@ export async function analyzeRequestForAnomaly(
  */
 export function assessRisk(result: IPAnomalyResult): {
   requiresVerification: boolean;
-  verificationMethod: 'none' | 'email' | '2fa' | 'block';
+  verificationMethod: "none" | "email" | "2fa" | "block";
   message: string;
 } {
-  if (result.riskLevel === 'critical') {
+  if (result.riskLevel === "critical") {
     return {
       requiresVerification: true,
-      verificationMethod: 'block',
-      message: 'Suspicious activity detected. Please contact support.',
+      verificationMethod: "block",
+      message: "Suspicious activity detected. Please contact support.",
     };
   }
 
-  if (result.riskLevel === 'high') {
+  if (result.riskLevel === "high") {
     return {
       requiresVerification: true,
-      verificationMethod: '2fa',
-      message: 'Unusual login detected. Please verify your identity with 2FA.',
+      verificationMethod: "2fa",
+      message: "Unusual login detected. Please verify your identity with 2FA.",
     };
   }
 
-  if (result.riskLevel === 'medium') {
+  if (result.riskLevel === "medium") {
     return {
       requiresVerification: true,
-      verificationMethod: 'email',
-      message: 'New location detected. Please verify your email.',
+      verificationMethod: "email",
+      message: "New location detected. Please verify your email.",
     };
   }
 
   return {
     requiresVerification: false,
-    verificationMethod: 'none',
-    message: '',
+    verificationMethod: "none",
+    message: "",
   };
 }
 
@@ -409,7 +427,7 @@ export function assessRisk(result: IPAnomalyResult): {
  */
 export async function handleIPAnomalyCheck(
   request: Request,
-  userId?: string
+  userId?: string,
 ): Promise<Response> {
   try {
     const body = await request.json();
@@ -417,8 +435,8 @@ export async function handleIPAnomalyCheck(
 
     if (!ip) {
       return Response.json(
-        { error: { code: 'MISSING_IP', message: 'IP address is required' } },
-        { status: 400 }
+        { error: { code: "MISSING_IP", message: "IP address is required" } },
+        { status: 400 },
       );
     }
 
@@ -432,10 +450,15 @@ export async function handleIPAnomalyCheck(
       riskAssessment,
     });
   } catch (error) {
-    logger.error('IP anomaly check error:', error);
+    logger.error("IP anomaly check error:", error);
     return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: 'Failed to check IP anomaly' } },
-      { status: 500 }
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to check IP anomaly",
+        },
+      },
+      { status: 500 },
     );
   }
 }

@@ -6,10 +6,10 @@
  * (not user_metadata). Supports multiple passkeys per user.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
-import { createServerClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
-import { createRateLimiter } from '@/lib/services/rateLimitService';
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createServerClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
+import { createRateLimiter } from "@/lib/services/rateLimitService";
 
 // ============================================================================
 // CONSTANTS
@@ -26,21 +26,21 @@ export const MAX_PASSKEYS_PER_USER = 10;
 // ============================================================================
 
 export const webauthnRegisterLimiter = createRateLimiter({
-  prefix: 'webauthn-register',
+  prefix: "webauthn-register",
   windowMs: 60 * 60 * 1000,
   maxRequests: 10,
   failClosed: true,
 });
 
 export const webauthnAuthLimiter = createRateLimiter({
-  prefix: 'webauthn-auth',
+  prefix: "webauthn-auth",
   windowMs: 15 * 60 * 1000,
   maxRequests: 10,
   failClosed: true,
 });
 
 export const webauthnCredentialsLimiter = createRateLimiter({
-  prefix: 'webauthn-creds',
+  prefix: "webauthn-creds",
   windowMs: 15 * 60 * 1000,
   maxRequests: 20,
   failClosed: true,
@@ -65,7 +65,7 @@ export interface WebAuthnCredential {
 export interface WebAuthnChallenge {
   id: string;
   challenge: string;
-  type: 'registration' | 'authentication';
+  type: "registration" | "authentication";
   userId: string | null;
   expiresAt: string;
 }
@@ -79,28 +79,26 @@ export interface WebAuthnChallenge {
  */
 export async function storeChallenge(
   challenge: string,
-  type: 'registration' | 'authentication',
+  type: "registration" | "authentication",
   userId: string | null,
 ): Promise<void> {
   const admin = createAdminClient();
-  if (!admin) throw new Error('Admin client not configured');
+  if (!admin) throw new Error("Admin client not configured");
 
   const expiresAt = new Date(
     Date.now() + CHALLENGE_EXPIRY_MINUTES * 60 * 1000,
   ).toISOString();
 
-  const { error } = await admin
-    .from('webauthn_challenges')
-    .insert({
-      challenge,
-      type,
-      user_id: userId,
-      expires_at: expiresAt,
-    });
+  const { error } = await admin.from("webauthn_challenges").insert({
+    challenge,
+    type,
+    user_id: userId,
+    expires_at: expiresAt,
+  });
 
   if (error) {
-    logger.error('Failed to store WebAuthn challenge:', error);
-    throw new Error('Failed to store challenge');
+    logger.error("Failed to store WebAuthn challenge:", error);
+    throw new Error("Failed to store challenge");
   }
 }
 
@@ -109,27 +107,24 @@ export async function storeChallenge(
  */
 export async function consumeChallenge(
   challenge: string,
-  type: 'registration' | 'authentication',
+  type: "registration" | "authentication",
 ): Promise<WebAuthnChallenge | null> {
   const admin = createAdminClient();
   if (!admin) return null;
 
   const { data, error } = await admin
-    .from('webauthn_challenges')
-    .select('*')
-    .eq('challenge', challenge)
-    .eq('type', type)
-    .gt('expires_at', new Date().toISOString())
+    .from("webauthn_challenges")
+    .select("*")
+    .eq("challenge", challenge)
+    .eq("type", type)
+    .gt("expires_at", new Date().toISOString())
     .limit(1)
     .single();
 
   if (error || !data) return null;
 
   // Delete the challenge (one-time use)
-  await admin
-    .from('webauthn_challenges')
-    .delete()
-    .eq('id', data.id);
+  await admin.from("webauthn_challenges").delete().eq("id", data.id);
 
   return {
     id: data.id,
@@ -159,28 +154,26 @@ export async function storeCredential(params: {
 
   // Check max passkeys limit
   const { count } = await supabase
-    .from('webauthn_credentials')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', params.userId);
+    .from("webauthn_credentials")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", params.userId);
 
   if (count !== null && count >= MAX_PASSKEYS_PER_USER) {
     throw new Error(`Maximum of ${MAX_PASSKEYS_PER_USER} passkeys reached`);
   }
 
-  const { error } = await supabase
-    .from('webauthn_credentials')
-    .insert({
-      user_id: params.userId,
-      credential_id: params.credentialId,
-      public_key: params.publicKey,
-      counter: params.counter,
-      transports: params.transports,
-      device_name: params.deviceName,
-    });
+  const { error } = await supabase.from("webauthn_credentials").insert({
+    user_id: params.userId,
+    credential_id: params.credentialId,
+    public_key: params.publicKey,
+    counter: params.counter,
+    transports: params.transports,
+    device_name: params.deviceName,
+  });
 
   if (error) {
-    logger.error('Failed to store WebAuthn credential:', error);
-    throw new Error('Failed to save passkey');
+    logger.error("Failed to store WebAuthn credential:", error);
+    throw new Error("Failed to save passkey");
   }
 }
 
@@ -194,10 +187,10 @@ export async function getCredentialsForUser(
   if (!admin) return [];
 
   const { data, error } = await admin
-    .from('webauthn_credentials')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+    .from("webauthn_credentials")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
 
   if (error || !data) return [];
 
@@ -214,9 +207,9 @@ export async function getCredentialById(
   if (!admin) return null;
 
   const { data, error } = await admin
-    .from('webauthn_credentials')
-    .select('*')
-    .eq('credential_id', credentialId)
+    .from("webauthn_credentials")
+    .select("*")
+    .eq("credential_id", credentialId)
     .limit(1)
     .single();
 
@@ -236,15 +229,15 @@ export async function updateCredentialCounter(
   if (!admin) return;
 
   const { error } = await admin
-    .from('webauthn_credentials')
+    .from("webauthn_credentials")
     .update({
       counter: newCounter,
       last_used_at: new Date().toISOString(),
     })
-    .eq('credential_id', credentialId);
+    .eq("credential_id", credentialId);
 
   if (error) {
-    logger.error('Failed to update credential counter:', error);
+    logger.error("Failed to update credential counter:", error);
   }
 }
 
@@ -258,13 +251,13 @@ export async function deleteCredential(
   const supabase = await createServerClient();
 
   const { error } = await supabase
-    .from('webauthn_credentials')
+    .from("webauthn_credentials")
     .delete()
-    .eq('id', credentialDbId)
-    .eq('user_id', userId);
+    .eq("id", credentialDbId)
+    .eq("user_id", userId);
 
   if (error) {
-    logger.error('Failed to delete credential:', error);
+    logger.error("Failed to delete credential:", error);
     return false;
   }
 
@@ -283,7 +276,7 @@ function mapDbCredential(data: Record<string, unknown>): WebAuthnCredential {
     publicKey: data.public_key as string,
     counter: Number(data.counter ?? 0),
     transports: (data.transports as string[]) ?? [],
-    deviceName: (data.device_name as string) ?? 'Passkey',
+    deviceName: (data.device_name as string) ?? "Passkey",
     createdAt: data.created_at as string,
     lastUsedAt: (data.last_used_at as string) ?? null,
   };
@@ -298,7 +291,7 @@ export function getRelyingPartyId(host: string): string {
   if (envRpId) return envRpId;
 
   // Extract hostname without port
-  return host.split(':')[0];
+  return host.split(":")[0];
 }
 
 /**

@@ -1,18 +1,18 @@
-import { NextRequest } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { NextRequest } from "next/server";
+import { createServerClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   jsonSuccess,
   jsonError,
   ERROR_CODES,
   parseJsonBody,
   BODY_SIZE_LIMITS,
-} from '@/app/api/_lib/response';
-import { loginLimiter } from '@/lib/services/rateLimitService';
-import { getClientIP } from '@/lib/security/ip';
-import { emailKeyPrefix } from '@/lib/security/identifiers';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+} from "@/app/api/_lib/response";
+import { loginLimiter } from "@/lib/services/rateLimitService";
+import { getClientIP } from "@/lib/security/ip";
+import { emailKeyPrefix } from "@/lib/security/identifiers";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const signinSchema = z.object({
   email: z.string().email(),
@@ -22,7 +22,7 @@ const signinSchema = z.object({
 // Developer emails that can bypass email confirmation in development
 // SECURITY: Load from environment variable to avoid exposing emails in source code
 const DEV_EMAILS = process.env.DEV_BYPASS_EMAILS
-  ? process.env.DEV_BYPASS_EMAILS.split(',').map((e) => e.trim().toLowerCase())
+  ? process.env.DEV_BYPASS_EMAILS.split(",").map((e) => e.trim().toLowerCase())
   : [];
 
 // SECURITY: Stricter production detection
@@ -30,23 +30,27 @@ const DEV_EMAILS = process.env.DEV_BYPASS_EMAILS
 // - NODE_ENV alone can be manipulated in local environments
 // This ensures dev features are NEVER enabled on Vercel production
 const isRealProduction =
-  process.env.VERCEL_ENV === 'production' ||
-  (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
-const isDevelopment = process.env.NODE_ENV === 'development' && !isRealProduction;
+  process.env.VERCEL_ENV === "production" ||
+  (process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV);
+const isDevelopment =
+  process.env.NODE_ENV === "development" && !isRealProduction;
 
 function isDevEmail(email: string): boolean {
   return DEV_EMAILS.some((devEmail) => email.toLowerCase() === devEmail);
 }
 
 // Generic error message to prevent account enumeration
-const GENERIC_AUTH_ERROR = 'Invalid email or password';
+const GENERIC_AUTH_ERROR = "Invalid email or password";
 
 export async function POST(request: NextRequest) {
   const clientIP = getClientIP(request);
 
   try {
     // SECURITY: Enforce body size limit for auth endpoints (10KB max)
-    const { data: body, error: bodyError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: bodyError } = await parseJsonBody(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (bodyError) return bodyError;
 
     const parsed = signinSchema.safeParse(body);
@@ -83,7 +87,7 @@ export async function POST(request: NextRequest) {
     // Requires SUPABASE_SERVICE_ROLE_KEY to be configured
     if (
       error &&
-      error.message.includes('Email not confirmed') &&
+      error.message.includes("Email not confirmed") &&
       isDevelopment &&
       isDevEmail(email)
     ) {
@@ -96,9 +100,9 @@ export async function POST(request: NextRequest) {
         // This is more efficient than listUsers() which fetches ALL users
         // The service role key bypasses RLS and can query auth.users
         const { data: authUsers, error: queryError } = await adminClient
-          .from('auth.users')
-          .select('id')
-          .eq('email', email)
+          .from("auth.users")
+          .select("id")
+          .eq("email", email)
           .limit(1)
           .single();
 
@@ -111,13 +115,15 @@ export async function POST(request: NextRequest) {
           // Fallback to listUsers but with pagination (perPage: 1) if email filter supported
           // Note: listUsers() doesn't support email filter, so we need to search
           // This is a known limitation - for development only, acceptable tradeoff
-          const { data: users, error: listError } = await adminClient.auth.admin.listUsers({
-            perPage: 100, // Limit to reduce memory usage
-          });
+          const { data: users, error: listError } =
+            await adminClient.auth.admin.listUsers({
+              perPage: 100, // Limit to reduce memory usage
+            });
 
           if (!listError && users) {
             const user = users.users.find(
-              (u: { email?: string }) => u.email?.toLowerCase() === email.toLowerCase(),
+              (u: { email?: string }) =>
+                u.email?.toLowerCase() === email.toLowerCase(),
             );
             if (user) {
               userId = user.id;
@@ -127,9 +133,10 @@ export async function POST(request: NextRequest) {
 
         if (userId) {
           // Confirm the email using admin client
-          const { error: confirmError } = await adminClient.auth.admin.updateUserById(userId, {
-            email_confirm: true,
-          });
+          const { error: confirmError } =
+            await adminClient.auth.admin.updateUserById(userId, {
+              email_confirm: true,
+            });
 
           if (!confirmError) {
             // Try signin again with regular client
@@ -143,13 +150,13 @@ export async function POST(request: NextRequest) {
               error = null;
             }
           } else {
-            console.warn('Auto-confirmation failed:', confirmError.message);
+            console.warn("Auto-confirmation failed:", confirmError.message);
           }
         }
       } else {
         console.warn(
-          'Dev email auto-confirm skipped: SUPABASE_SERVICE_ROLE_KEY not configured.\n' +
-            'Add the service role key to .env.local for auto-confirmation to work.',
+          "Dev email auto-confirm skipped: SUPABASE_SERVICE_ROLE_KEY not configured.\n" +
+            "Add the service role key to .env.local for auto-confirmation to work.",
         );
       }
     }
@@ -157,24 +164,28 @@ export async function POST(request: NextRequest) {
     if (error) {
       // SECURITY: Return generic error to prevent account enumeration
       // Log the actual error server-side for debugging
-      console.warn('Signin failed:', {
+      console.warn("Signin failed:", {
         email: `${email.substring(0, 3)}***`,
         error: error.message,
       });
-      const response = jsonError(GENERIC_AUTH_ERROR, 401, ERROR_CODES.UNAUTHORIZED);
-      response.headers.set('X-RateLimit-Remaining', remaining.toString());
+      const response = jsonError(
+        GENERIC_AUTH_ERROR,
+        401,
+        ERROR_CODES.UNAUTHORIZED,
+      );
+      response.headers.set("X-RateLimit-Remaining", remaining.toString());
       return response;
     }
 
     const response = jsonSuccess({
       user: data.user,
       session: data.session,
-      message: 'Signin successful',
+      message: "Signin successful",
     });
-    response.headers.set('X-RateLimit-Remaining', remaining.toString());
+    response.headers.set("X-RateLimit-Remaining", remaining.toString());
     return response;
   } catch (error) {
-    logger.error('Signin error:', error);
-    return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("Signin error:", error);
+    return jsonError("Internal server error", 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

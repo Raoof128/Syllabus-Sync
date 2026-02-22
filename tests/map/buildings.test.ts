@@ -1,25 +1,29 @@
-import { describe, it, expect } from 'vitest';
-import { buildings, getBuildingById, searchBuildings } from '@/features/map/lib/buildings';
+import { describe, it, expect } from "vitest";
+import {
+  buildings,
+  getBuildingById,
+  searchBuildings,
+} from "@/features/map/lib/buildings";
 
-describe('buildings data', () => {
-  it('should have buildings defined', () => {
+describe("buildings data", () => {
+  it("should have buildings defined", () => {
     expect(buildings).toBeDefined();
     expect(Array.isArray(buildings)).toBe(true);
     expect(buildings.length).toBeGreaterThan(0);
   });
 
-  it('should have unique building IDs', () => {
+  it("should have unique building IDs", () => {
     const ids = buildings.map((b) => b.id);
     const uniqueIds = new Set(ids);
     expect(ids.length).toBe(uniqueIds.size);
   });
 
-  it('should have required fields for each building', () => {
+  it("should have required fields for each building", () => {
     buildings.forEach((building) => {
       expect(building.id).toBeDefined();
-      expect(typeof building.id).toBe('string');
+      expect(typeof building.id).toBe("string");
       expect(building.name).toBeDefined();
-      expect(typeof building.name).toBe('string');
+      expect(typeof building.name).toBe("string");
       expect(building.position).toBeDefined();
       expect(Array.isArray(building.position)).toBe(true);
       expect(building.position.length).toBe(2);
@@ -28,17 +32,17 @@ describe('buildings data', () => {
     });
   });
 
-  it('should have valid position coordinates', () => {
+  it("should have valid position coordinates", () => {
     buildings.forEach((building) => {
       const [x, y] = building.position;
-      expect(typeof x).toBe('number');
-      expect(typeof y).toBe('number');
+      expect(typeof x).toBe("number");
+      expect(typeof y).toBe("number");
       expect(x).toBeGreaterThan(0);
       expect(y).toBeGreaterThan(0);
     });
   });
 
-  it('should allow buildings at same position (same location)', () => {
+  it("should allow buildings at same position (same location)", () => {
     // Multiple buildings can share positions when they're at the same physical location
     // (e.g., different services in the same building complex)
     const positions = buildings.map((b) => `${b.position[0]},${b.position[1]}`);
@@ -49,77 +53,79 @@ describe('buildings data', () => {
   });
 });
 
-describe('getBuildingById', () => {
-  it('should return a building when given a valid ID', () => {
+describe("getBuildingById", () => {
+  it("should return a building when given a valid ID", () => {
     // Using 'LIB' (Library) which exists in the current buildings data
-    const building = getBuildingById('LIB');
+    const building = getBuildingById("LIB");
     expect(building).toBeDefined();
-    expect(building?.id).toBe('LIB');
-    expect(building?.name).toContain('Library');
+    expect(building?.id).toBe("LIB");
+    expect(building?.name).toContain("Library");
   });
 
-  it('should return undefined for invalid ID', () => {
-    const building = getBuildingById('INVALID_ID');
+  it("should return undefined for invalid ID", () => {
+    const building = getBuildingById("INVALID_ID");
     expect(building).toBeUndefined();
   });
 
-  it('should be case-insensitive', () => {
-    const building = getBuildingById('lib');
+  it("should be case-insensitive", () => {
+    const building = getBuildingById("lib");
     expect(building).toBeDefined();
-    expect(building?.id).toBe('LIB');
+    expect(building?.id).toBe("LIB");
   });
 });
 
-describe('searchBuildings', () => {
-  it('should find buildings by name', () => {
-    const results = searchBuildings('Library');
+describe("searchBuildings", () => {
+  it("should find buildings by name", () => {
+    const results = searchBuildings("Library");
     expect(results.length).toBeGreaterThan(0);
-    expect(results.some((b) => b.name.toLowerCase().includes('library'))).toBe(true);
+    expect(results.some((b) => b.name.toLowerCase().includes("library"))).toBe(
+      true,
+    );
   });
 
-  it('should find buildings by ID', () => {
-    const results = searchBuildings('LIB');
+  it("should find buildings by ID", () => {
+    const results = searchBuildings("LIB");
     // LIB matches both 'LIB' (Library) and 'LIBCAFE' (Library Cafe)
     expect(results.length).toBeGreaterThanOrEqual(1);
-    expect(results.some((b) => b.id === 'LIB')).toBe(true);
+    expect(results.some((b) => b.id === "LIB")).toBe(true);
   });
 
-  it('should find buildings by tag', () => {
-    const results = searchBuildings('academic');
+  it("should find buildings by tag", () => {
+    const results = searchBuildings("academic");
     expect(results.length).toBeGreaterThan(0);
     results.forEach((building) => {
-      expect(building.tags?.includes('academic')).toBe(true);
+      expect(building.tags?.includes("academic")).toBe(true);
     });
   });
 
-  it('should find buildings by description', () => {
+  it("should find buildings by description", () => {
     // Search for 'security' which is in the SEC building description
-    const results = searchBuildings('security');
+    const results = searchBuildings("security");
     expect(results.length).toBeGreaterThan(0);
   });
 
-  it('should be case-insensitive', () => {
-    const resultsLower = searchBuildings('library');
-    const resultsUpper = searchBuildings('LIBRARY');
-    const resultsMixed = searchBuildings('LiBrArY');
+  it("should be case-insensitive", () => {
+    const resultsLower = searchBuildings("library");
+    const resultsUpper = searchBuildings("LIBRARY");
+    const resultsMixed = searchBuildings("LiBrArY");
 
     expect(resultsLower.length).toBe(resultsUpper.length);
     expect(resultsLower.length).toBe(resultsMixed.length);
   });
 
-  it('should return empty array for no matches', () => {
-    const results = searchBuildings('xyznonexistent');
+  it("should return empty array for no matches", () => {
+    const results = searchBuildings("xyznonexistent");
     expect(results).toEqual([]);
   });
 
-  it('should return all buildings for empty query', () => {
-    const results = searchBuildings('');
+  it("should return all buildings for empty query", () => {
+    const results = searchBuildings("");
     // Empty string matches everything since it's a substring of all strings
     expect(results.length).toBe(buildings.length);
   });
 
-  it('should handle whitespace-only query', () => {
-    const results = searchBuildings('   ');
+  it("should handle whitespace-only query", () => {
+    const results = searchBuildings("   ");
     // Should match nothing or return all buildings depending on implementation
     expect(Array.isArray(results)).toBe(true);
   });

@@ -9,23 +9,25 @@ Version: 0.5.42
 
 ## 📋 Tab/Feature Ownership Summary
 
-| Tab/Feature | Owner | Status |
-|-------------|-------|--------|
-| **Home Tab** | Pouya | 🚧 In Progress |
-| **Calendar Tab** | Pouya | 🚧 In Progress |
-| **Feed Tab** | Pouya (50%) + Raouf (50%) | 🚧 Shared |
-| **Map Tab** | Raouf | 🚧 In Progress |
-| **Settings Tab** | Raouf | 🚧 In Progress |
-| **AI Integration** | Kit | 🔜 Demo Feature |
+| Tab/Feature        | Owner                     | Status          |
+| ------------------ | ------------------------- | --------------- |
+| **Home Tab**       | Pouya                     | 🚧 In Progress  |
+| **Calendar Tab**   | Pouya                     | 🚧 In Progress  |
+| **Feed Tab**       | Pouya (50%) + Raouf (50%) | 🚧 Shared       |
+| **Map Tab**        | Raouf                     | 🚧 In Progress  |
+| **Settings Tab**   | Raouf                     | 🚧 In Progress  |
+| **AI Integration** | Kit                       | 🔜 Demo Feature |
 
 ---
 
 ## 👤 POUYA - Frontend Developer
 
 ### Role Overview
+
 Responsible for Home tab, Calendar tab, and half of Feed tab. Focus on user-facing features, UI/UX, and client-side functionality.
 
 ### Primary Responsibilities
+
 - ✅ **Home Tab Development**: Dashboard, units management, today's schedule, deadlines widget
 - ✅ **Calendar Tab Development**: Calendar view, deadline management, scheduling
 - ✅ **Feed Tab (Frontend)**: Events display, UI components, user interactions (50%)
@@ -38,9 +40,11 @@ Responsible for Home tab, Calendar tab, and half of Feed tab. Focus on user-faci
 ## 🚀 RAOUF - Full-Stack Developer & Project Lead
 
 ### Role Overview
+
 Responsible for Map tab, Settings tab, half of Feed tab, backend architecture, system design, performance optimization, testing, and deployment.
 
 ### Primary Responsibilities
+
 - ✅ **Map Tab Development**: Interactive campus map, building navigation, search functionality
 - ✅ **Settings Tab Development**: User preferences, theme settings, data management
 - ✅ **Feed Tab (Backend)**: Events API, data architecture, filtering logic (50%)
@@ -55,6 +59,7 @@ Responsible for Map tab, Settings tab, half of Feed tab, backend architecture, s
 ### 📂 Files Pouya Works On (Frontend)
 
 #### **Pages (App Router)**
+
 ```
 app/
 ├── page.tsx                    # Root redirect
@@ -70,6 +75,7 @@ app/
 ```
 
 #### **Home Dashboard Components**
+
 ```
 components/home/
 ├── EventsFeed.tsx             # ⭐ Events widget + Map navigation
@@ -79,6 +85,7 @@ components/home/
 ```
 
 #### **Layout Components**
+
 ```
 components/layout/
 ├── Header.tsx                 # ⭐ Header + Notifications dropdown
@@ -86,6 +93,7 @@ components/layout/
 ```
 
 #### **Unit Management Components**
+
 ```
 components/units/
 ├── UnitCard.tsx               # ⭐ Unit display card
@@ -93,12 +101,14 @@ components/units/
 ```
 
 #### **Deadline Management Components**
+
 ```
 components/deadlines/
 └── DeadlineForm.tsx           # ⭐ Add/Edit deadline dialog
 ```
 
 #### **UI Components (Shadcn)**
+
 ```
 components/ui/
 ├── badge.tsx                  # Badge component
@@ -114,6 +124,7 @@ components/ui/
 ```
 
 #### **State Management**
+
 ```
 lib/store/
 ├── unitsStore.ts              # ⭐ Units state (CRUD, selectors)
@@ -122,6 +133,7 @@ lib/store/
 ```
 
 #### **Custom Hooks**
+
 ```
 lib/hooks/
 ├── index.ts                   # Hook exports
@@ -132,6 +144,7 @@ lib/hooks/
 ```
 
 #### **Testing**
+
 ```
 tests/
 ├── setup.ts                   # Test setup
@@ -144,173 +157,202 @@ tests/
 ```
 
 #### **Configuration Files**
+
 ```
 config/tailwind/tailwind.config.ts             # Tailwind configuration
 config/postcss/postcss.config.mjs             # PostCSS config
 config/vitest/vitest.config.ts               # Test configuration
 ```
+
 app/
-├── page.tsx                    # Root redirect
-├── layout.tsx                  # Main layout structure
-├── loading.tsx                 # Loading states
-├── error.tsx                   # Error boundaries
-├── not-found.tsx               # 404 page
-├── globals.css                 # Global styles
+├── page.tsx # Root redirect
+├── layout.tsx # Main layout structure
+├── loading.tsx # Loading states
+├── error.tsx # Error boundaries
+├── not-found.tsx # 404 page
+├── globals.css # Global styles
 ├── home/
-│   └── page.tsx                # ⭐ Home dashboard (includes Units)
+│ └── page.tsx # ⭐ Home dashboard (includes Units)
 └── calendar/
-    └── page.tsx                # ⭐ Calendar page (includes Deadlines)
+└── page.tsx # ⭐ Calendar page (includes Deadlines)
+
 ```
 
 #### **Home Dashboard Components**
 ```
+
 components/home/
-├── EventsFeed.tsx             # ⭐ Events widget + Map navigation
-├── NextDeadline.tsx           # ⭐ Deadline tracker + Calendar link
-├── QuickActions.tsx           # ⭐ Navigation buttons
-└── TodaySchedule.tsx          # ⭐ Today's classes widget
+├── EventsFeed.tsx # ⭐ Events widget + Map navigation
+├── NextDeadline.tsx # ⭐ Deadline tracker + Calendar link
+├── QuickActions.tsx # ⭐ Navigation buttons
+└── TodaySchedule.tsx # ⭐ Today's classes widget
+
 ```
 
 #### **Layout Components**
 ```
+
 components/layout/
-├── Header.tsx                 # ⭐ Header + Notifications dropdown
-└── Sidebar.tsx                # ⭐ Side navigation (mobile responsive)
+├── Header.tsx # ⭐ Header + Notifications dropdown
+└── Sidebar.tsx # ⭐ Side navigation (mobile responsive)
+
 ```
 
 #### **Error Handling & Theme**
 ```
+
 components/
-├── ErrorBoundary.tsx          # ⭐ Comprehensive error boundary
+├── ErrorBoundary.tsx # ⭐ Comprehensive error boundary
 └── theme/
-    └── ThemeProvider.tsx      # ⭐ Dark mode theme provider
+└── ThemeProvider.tsx # ⭐ Dark mode theme provider
+
 ```
 
 #### **Unit Management Components**
 ```
+
 components/units/
-├── UnitCard.tsx               # ⭐ Unit display card
-└── UnitForm.tsx               # ⭐ Add/Edit unit dialog
+├── UnitCard.tsx # ⭐ Unit display card
+└── UnitForm.tsx # ⭐ Add/Edit unit dialog
+
 ```
 
 #### **Deadline Management Components**
 ```
+
 components/deadlines/
-└── DeadlineForm.tsx           # ⭐ Add/Edit deadline dialog
+└── DeadlineForm.tsx # ⭐ Add/Edit deadline dialog
+
 ```
 
 #### **UI Components (Shadcn + Custom)**
 ```
+
 components/ui/
-├── badge.tsx                  # Badge component
-├── button.tsx                 # Button component
-├── card.tsx                   # Card component
-├── dialog.tsx                 # Modal/Dialog
-├── dropdown-menu.tsx          # Dropdown menu
-├── input.tsx                  # Input field
-├── label.tsx                  # Form label
-├── select.tsx                 # Select dropdown
-├── toast.tsx                  # ⭐ Toast notification components
-└── toaster.tsx                # ⭐ Toast provider & viewport
+├── badge.tsx # Badge component
+├── button.tsx # Button component
+├── card.tsx # Card component
+├── dialog.tsx # Modal/Dialog
+├── dropdown-menu.tsx # Dropdown menu
+├── input.tsx # Input field
+├── label.tsx # Form label
+├── select.tsx # Select dropdown
+├── toast.tsx # ⭐ Toast notification components
+└── toaster.tsx # ⭐ Toast provider & viewport
+
 ```
 
 #### **State Management**
 ```
+
 lib/store/
-├── unitsStore.ts              # ⭐ Units state (CRUD, selectors)
-├── deadlinesStore.ts          # ⭐ Deadlines state (CRUD, stress level)
-└── notificationsStore.ts      # ⭐ Notifications state (NEW)
+├── unitsStore.ts # ⭐ Units state (CRUD, selectors)
+├── deadlinesStore.ts # ⭐ Deadlines state (CRUD, stress level)
+└── notificationsStore.ts # ⭐ Notifications state (NEW)
+
 ```
 
 #### **Custom Hooks**
 ```
+
 lib/hooks/
-├── index.ts                   # Hook exports
-├── useHydration.ts            # Hydration helper
-├── useLocalStorage.ts         # localStorage hook
-├── use-toast.ts               # ⭐ Toast notification system
-└── use-retry.ts               # ⭐ Automatic retry logic
+├── index.ts # Hook exports
+├── useHydration.ts # Hydration helper
+├── useLocalStorage.ts # localStorage hook
+├── use-toast.ts # ⭐ Toast notification system
+└── use-retry.ts # ⭐ Automatic retry logic
+
 ```
 
 #### **Testing**
 ```
+
 tests/
-├── setup.ts                   # Test setup
-├── EventsFeed.spec.tsx        # ⭐ EventsFeed tests
-├── NextDeadline.test.tsx      # ⭐ NextDeadline tests
-├── TodaySchedule.test.tsx     # ⭐ TodaySchedule tests
-├── UnitForm.test.tsx          # ⭐ UnitForm tests
-├── UnitCard.test.tsx          # ⭐ UnitCard tests
-└── stores.test.ts             # ⭐ Store tests
+├── setup.ts # Test setup
+├── EventsFeed.spec.tsx # ⭐ EventsFeed tests
+├── NextDeadline.test.tsx # ⭐ NextDeadline tests
+├── TodaySchedule.test.tsx # ⭐ TodaySchedule tests
+├── UnitForm.test.tsx # ⭐ UnitForm tests
+├── UnitCard.test.tsx # ⭐ UnitCard tests
+└── stores.test.ts # ⭐ Store tests
+
 ```
 
 #### **Core Components**
 ```
+
 components/
-├── ErrorBoundary.tsx           # ⭐ Comprehensive error boundary system
-├── theme/ThemeProvider.tsx     # ⭐ Dark mode theme provider
+├── ErrorBoundary.tsx # ⭐ Comprehensive error boundary system
+├── theme/ThemeProvider.tsx # ⭐ Dark mode theme provider
 ├── home/
-│   ├── TodaySchedule.tsx       # ⭐ Today's classes widget
-│   ├── NextDeadline.tsx        # ⭐ Deadline tracker with navigation
-│   ├── EventsFeed.tsx          # ⭐ Events feed with filtering
-│   └── QuickActions.tsx        # ⭐ Navigation shortcuts
+│ ├── TodaySchedule.tsx # ⭐ Today's classes widget
+│ ├── NextDeadline.tsx # ⭐ Deadline tracker with navigation
+│ ├── EventsFeed.tsx # ⭐ Events feed with filtering
+│ └── QuickActions.tsx # ⭐ Navigation shortcuts
 ├── layout/
-│   ├── Header.tsx              # ⭐ App header with notifications
-│   └── Sidebar.tsx             # ⭐ Responsive navigation sidebar
+│ ├── Header.tsx # ⭐ App header with notifications
+│ └── Sidebar.tsx # ⭐ Responsive navigation sidebar
 ├── units/
-│   ├── UnitCard.tsx            # ⭐ Unit display component
-│   └── UnitForm.tsx            # ⭐ Unit creation/editing form
+│ ├── UnitCard.tsx # ⭐ Unit display component
+│ └── UnitForm.tsx # ⭐ Unit creation/editing form
 ├── deadlines/
-│   └── DeadlineForm.tsx        # ⭐ Deadline management form
-└── ui/                         # ⭐ Complete UI component library
-    ├── toast.tsx               # Toast notification system
-    ├── toaster.tsx             # Toast provider
-    └── [other Shadcn components]
+│ └── DeadlineForm.tsx # ⭐ Deadline management form
+└── ui/ # ⭐ Complete UI component library
+├── toast.tsx # Toast notification system
+├── toaster.tsx # Toast provider
+└── [other Shadcn components]
+
 ```
 
 #### **Backend Systems & Utilities**
 ```
+
 lib/
-├── config.ts                   # ⭐ App configuration & branding
-├── constants.ts                # ⭐ Type-safe constants & enums
-├── utils.ts                    # ⭐ General utility functions
-├── errorHandling.ts            # ⭐ Enterprise error handling system
-├── retry.ts                    # ⭐ Automatic retry mechanisms
-├── serviceWorker.ts            # ⭐ Offline support & caching
-├── types/index.ts              # ⭐ Complete TypeScript definitions
-├── store/                      # ⭐ State management
-│   ├── unitsStore.ts           # Units state with CRUD operations
-│   ├── deadlinesStore.ts       # Deadlines with stress calculations
-│   ├── notificationsStore.ts   # Notification management
-│   └── themeStore.ts           # Dark mode state management
-└── hooks/                      # ⭐ Custom React hooks
-    ├── use-toast.ts            # Toast notification hook
-    ├── use-retry.ts            # Retry logic hook
-    ├── useHydration.ts         # Hydration state helper
-    └── useLocalStorage.ts      # localStorage persistence
+├── config.ts # ⭐ App configuration & branding
+├── constants.ts # ⭐ Type-safe constants & enums
+├── utils.ts # ⭐ General utility functions
+├── errorHandling.ts # ⭐ Enterprise error handling system
+├── retry.ts # ⭐ Automatic retry mechanisms
+├── serviceWorker.ts # ⭐ Offline support & caching
+├── types/index.ts # ⭐ Complete TypeScript definitions
+├── store/ # ⭐ State management
+│ ├── unitsStore.ts # Units state with CRUD operations
+│ ├── deadlinesStore.ts # Deadlines with stress calculations
+│ ├── notificationsStore.ts # Notification management
+│ └── themeStore.ts # Dark mode state management
+└── hooks/ # ⭐ Custom React hooks
+├── use-toast.ts # Toast notification hook
+├── use-retry.ts # Retry logic hook
+├── useHydration.ts # Hydration state helper
+└── useLocalStorage.ts # localStorage persistence
+
 ```
 
 #### **Build System & Configuration**
 ```
-├── config/next/next.config.ts              # ⭐ Next.js optimization & features
-├── config/eslint/eslint.config.mjs           # ⭐ ESLint rules (0 errors, 0 warnings)
-├── config/tailwind/tailwind.config.ts          # ⭐ Tailwind with dark mode support
-├── config/vitest/vitest.config.ts            # ⭐ Test configuration (36/36 tests)
-├── config/postcss/postcss.config.mjs          # ⭐ PostCSS processing
-└── package.json                # ⭐ Dependencies & scripts (v0.5.0)
+
+├── config/next/next.config.ts # ⭐ Next.js optimization & features
+├── config/eslint/eslint.config.mjs # ⭐ ESLint rules (0 errors, 0 warnings)
+├── config/tailwind/tailwind.config.ts # ⭐ Tailwind with dark mode support
+├── config/vitest/vitest.config.ts # ⭐ Test configuration (36/36 tests)
+├── config/postcss/postcss.config.mjs # ⭐ PostCSS processing
+└── package.json # ⭐ Dependencies & scripts (v0.5.0)
+
 ```
 
 #### **Data & Testing**
 ```
-data/                           # ⭐ Sample data for development
-├── sampleUnits.ts             # Sample academic units
-├── sampleEvents.ts            # Campus events with locations
-└── sampleNotifications.ts     # Notification examples
 
-tests/                          # ⭐ Comprehensive test suite
-├── setup.ts                   # Test configuration
-├── *.test.tsx                 # Component tests (36/36 passing)
-└── *.spec.tsx                # Integration tests
+data/ # ⭐ Sample data for development
+├── sampleUnits.ts # Sample academic units
+├── sampleEvents.ts # Campus events with locations
+└── sampleNotifications.ts # Notification examples
+
+tests/ # ⭐ Comprehensive test suite
+├── setup.ts # Test configuration
+├── _.test.tsx # Component tests (36/36 passing)
+└── _.spec.tsx # Integration tests
+
 ```
 
 ---
@@ -332,75 +374,89 @@ Responsible for data architecture, database design, API development, configurati
 
 #### **Configuration & Build System**
 ```
-├── config/next/next.config.ts              # ⭐ Next.js with bundle optimization & features
-├── config/eslint/eslint.config.mjs           # ⭐ ESLint (0 errors, 0 warnings)
-├── config/tailwind/tailwind.config.ts          # ⭐ Tailwind with dark mode & custom theme
-├── config/vitest/vitest.config.ts            # ⭐ Test configuration (36/36 tests)
-├── config/postcss/postcss.config.mjs          # ⭐ PostCSS configuration
-└── package.json                # ⭐ Dependencies & scripts (v0.5.0)
+
+├── config/next/next.config.ts # ⭐ Next.js with bundle optimization & features
+├── config/eslint/eslint.config.mjs # ⭐ ESLint (0 errors, 0 warnings)
+├── config/tailwind/tailwind.config.ts # ⭐ Tailwind with dark mode & custom theme
+├── config/vitest/vitest.config.ts # ⭐ Test configuration (36/36 tests)
+├── config/postcss/postcss.config.mjs # ⭐ PostCSS configuration
+└── package.json # ⭐ Dependencies & scripts (v0.5.0)
+
 ```
 
 #### **Core Utilities & Systems**
 ```
+
 lib/
-├── config.ts                   # ⭐ App configuration & branding
-├── constants.ts                # ⭐ Constants & enums
-├── utils.ts                    # ⭐ Utility functions
-├── errorHandling.ts            # ⭐ Enterprise error handling system
-├── retry.ts                    # ⭐ Automatic retry mechanisms
-└── serviceWorker.ts            # ⭐ Offline support & caching
+├── config.ts # ⭐ App configuration & branding
+├── constants.ts # ⭐ Constants & enums
+├── utils.ts # ⭐ Utility functions
+├── errorHandling.ts # ⭐ Enterprise error handling system
+├── retry.ts # ⭐ Automatic retry mechanisms
+└── serviceWorker.ts # ⭐ Offline support & caching
+
 ```
 
 #### **State Management (Extended)**
 ```
+
 lib/store/
-├── unitsStore.ts               # ⭐ Units state with error handling
-├── deadlinesStore.ts           # ⭐ Deadlines state with stress calculation
-├── notificationsStore.ts       # ⭐ Notifications state
-└── themeStore.ts               # ⭐ Dark mode & theme management
+├── unitsStore.ts # ⭐ Units state with error handling
+├── deadlinesStore.ts # ⭐ Deadlines state with stress calculation
+├── notificationsStore.ts # ⭐ Notifications state
+└── themeStore.ts # ⭐ Dark mode & theme management
+
 ```
 
 #### **Type Definitions**
 ```
+
 lib/types/
-└── index.ts                   # ⭐ Complete TypeScript definitions
+└── index.ts # ⭐ Complete TypeScript definitions
+
 ```
 
 #### **Sample Data**
 ```
+
 data/
-├── sampleUnits.ts             # ⭐ Sample units & deadlines
-├── sampleEvents.ts            # ⭐ Sample campus events (with building info)
-└── sampleNotifications.ts     # ⭐ Sample notifications
+├── sampleUnits.ts # ⭐ Sample units & deadlines
+├── sampleEvents.ts # ⭐ Sample campus events (with building info)
+└── sampleNotifications.ts # ⭐ Sample notifications
+
 ```
 
 #### **Pages (Backend Logic)**
 ```
+
 app/
 ├── map/
-│   └── page.tsx               # ⭐ Campus map (with ?building param)
+│ └── page.tsx # ⭐ Campus map (with ?building param)
 ├── settings/
-│   └── page.tsx               # ⭐ Settings page (clear data, info)
+│ └── page.tsx # ⭐ Settings page (clear data, info)
 └── feed/
-    └── page.tsx               # Events feed (with map navigation)
+└── page.tsx # Events feed (with map navigation)
+
 ```
 
 #### **Future Backend Files (Phase 2+)**
 ```
+
 lib/supabase/
-├── client.ts                  # 🔨 Supabase client setup
-├── schema.sql                 # 🔨 Database schema
-└── migrations/                # 🔨 Database migrations
+├── client.ts # 🔨 Supabase client setup
+├── schema.sql # 🔨 Database schema
+└── migrations/ # 🔨 Database migrations
 
 app/api/
 ├── units/
-│   └── route.ts               # 🔨 Units API
+│ └── route.ts # 🔨 Units API
 ├── deadlines/
-│   └── route.ts               # 🔨 Deadlines API
+│ └── route.ts # 🔨 Deadlines API
 ├── events/
-│   └── route.ts               # 🔨 Events API
+│ └── route.ts # 🔨 Events API
 └── notifications/
-    └── route.ts               # 🔨 Notifications API
+└── route.ts # 🔨 Notifications API
+
 ```
 
 ---
@@ -430,75 +486,89 @@ Responsible for Home tab, Calendar tab, half of Feed tab (frontend), all user-fa
 
 #### **Build System & Configuration**
 ```
-├── config/next/next.config.ts              # ⭐ Next.js with bundle optimization & features
-├── config/eslint/eslint.config.mjs           # ⭐ ESLint (0 errors, 0 warnings)
-├── config/tailwind/tailwind.config.ts          # ⭐ Tailwind with dark mode & custom theme
-├── config/vitest/vitest.config.ts            # ⭐ Test configuration (36/36 tests)
-├── config/postcss/postcss.config.mjs          # ⭐ PostCSS configuration
-└── package.json                # ⭐ Dependencies & scripts (v0.5.0)
+
+├── config/next/next.config.ts # ⭐ Next.js with bundle optimization & features
+├── config/eslint/eslint.config.mjs # ⭐ ESLint (0 errors, 0 warnings)
+├── config/tailwind/tailwind.config.ts # ⭐ Tailwind with dark mode & custom theme
+├── config/vitest/vitest.config.ts # ⭐ Test configuration (36/36 tests)
+├── config/postcss/postcss.config.mjs # ⭐ PostCSS configuration
+└── package.json # ⭐ Dependencies & scripts (v0.5.0)
+
 ```
 
 #### **Core Utilities & Systems**
 ```
+
 lib/
-├── config.ts                   # ⭐ App & university configuration
-├── constants.ts                # ⭐ Constants & enums
-├── utils.ts                    # ⭐ Utility functions
-├── errorHandling.ts            # ⭐ Enterprise error handling system
-├── retry.ts                    # ⭐ Automatic retry mechanisms
-└── serviceWorker.ts            # ⭐ Offline support & caching
+├── config.ts # ⭐ App & university configuration
+├── constants.ts # ⭐ Constants & enums
+├── utils.ts # ⭐ Utility functions
+├── errorHandling.ts # ⭐ Enterprise error handling system
+├── retry.ts # ⭐ Automatic retry mechanisms
+└── serviceWorker.ts # ⭐ Offline support & caching
+
 ```
 
 #### **State Management (Extended)**
 ```
+
 lib/store/
-├── unitsStore.ts               # ⭐ Units state with error handling
-├── deadlinesStore.ts           # ⭐ Deadlines state with stress calculation
-├── notificationsStore.ts       # ⭐ Notifications state
-└── themeStore.ts               # ⭐ Dark mode & theme management
+├── unitsStore.ts # ⭐ Units state with error handling
+├── deadlinesStore.ts # ⭐ Deadlines state with stress calculation
+├── notificationsStore.ts # ⭐ Notifications state
+└── themeStore.ts # ⭐ Dark mode & theme management
+
 ```
 
 #### **Type Definitions**
 ```
+
 lib/types/
-└── index.ts                   # ⭐ TypeScript interfaces (Unit, Deadline, Event, Notification)
+└── index.ts # ⭐ TypeScript interfaces (Unit, Deadline, Event, Notification)
+
 ```
 
 #### **Sample Data**
 ```
+
 data/
-├── sampleUnits.ts             # ⭐ Sample units & deadlines
-├── sampleEvents.ts            # ⭐ Sample campus events (with building info)
-└── sampleNotifications.ts     # ⭐ Sample notifications (NEW)
+├── sampleUnits.ts # ⭐ Sample units & deadlines
+├── sampleEvents.ts # ⭐ Sample campus events (with building info)
+└── sampleNotifications.ts # ⭐ Sample notifications (NEW)
+
 ```
 
 #### **Pages (Backend Logic)**
 ```
+
 app/
 ├── map/
-│   └── page.tsx               # ⭐ Campus map (with ?building param)
+│ └── page.tsx # ⭐ Campus map (with ?building param)
 ├── settings/
-│   └── page.tsx               # ⭐ Settings page (clear data, info)
+│ └── page.tsx # ⭐ Settings page (clear data, info)
 └── feed/
-    └── page.tsx               # Events feed (with map navigation)
+└── page.tsx # Events feed (with map navigation)
+
 ```
 
 #### **Future Backend Files (Phase 2+)**
 ```
+
 lib/supabase/
-├── client.ts                  # 🔨 Supabase client setup
-├── schema.sql                 # 🔨 Database schema
-└── migrations/                # 🔨 Database migrations
+├── client.ts # 🔨 Supabase client setup
+├── schema.sql # 🔨 Database schema
+└── migrations/ # 🔨 Database migrations
 
 app/api/
 ├── units/
-│   └── route.ts               # 🔨 Units API
+│ └── route.ts # 🔨 Units API
 ├── deadlines/
-│   └── route.ts               # 🔨 Deadlines API
+│ └── route.ts # 🔨 Deadlines API
 ├── events/
-│   └── route.ts               # 🔨 Events API
+│ └── route.ts # 🔨 Events API
 └── notifications/
-    └── route.ts               # 🔨 Notifications API
+└── route.ts # 🔨 Notifications API
+
 ```
 
 ---
@@ -779,3 +849,4 @@ Responsible for adding AI capabilities to the web application for the demo prese
 **Version:** 0.5.41
 **Status:** Phase 1 & Phase 2 Complete ✅ - Ready for Phase 3 (API Integration)
 
+```

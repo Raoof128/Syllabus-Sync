@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from './button';
+import React from "react";
+import { Button } from "./button";
 
 interface HeroProps {
   title: string;
@@ -14,7 +14,12 @@ interface HeroProps {
   };
 }
 
-export const Hero: React.FC<HeroProps> = ({ title, subtitle, primaryAction, secondaryAction }) => {
+export const Hero: React.FC<HeroProps> = ({
+  title,
+  subtitle,
+  primaryAction,
+  secondaryAction,
+}) => {
   return (
     <section className="bg-mq-background py-12 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -39,7 +44,12 @@ export const Hero: React.FC<HeroProps> = ({ title, subtitle, primaryAction, seco
               </Button>
             )}
             {secondaryAction && (
-              <Button variant="secondary" size="lg" asChild className="w-full sm:w-auto">
+              <Button
+                variant="secondary"
+                size="lg"
+                asChild
+                className="w-full sm:w-auto"
+              >
                 <a href={secondaryAction.href}>{secondaryAction.label}</a>
               </Button>
             )}

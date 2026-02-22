@@ -1,17 +1,17 @@
 // app/home/page.tsx
-import { Metadata } from 'next';
-import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
-import HomeClient from './HomeClient';
+import { Metadata } from "next";
+import { APP_CONFIG, UNIVERSITY_CONFIG } from "@/lib/config";
+import HomeClient from "./HomeClient";
 
 export const metadata: Metadata = {
-  title: 'Dashboard',
+  title: "Dashboard",
   description:
-    'Your personalized academic dashboard for Macquarie University. Track classes, deadlines, events, and manage your university schedule in one place.',
+    "Your personalized academic dashboard for Macquarie University. Track classes, deadlines, events, and manage your university schedule in one place.",
   openGraph: {
     title: `Dashboard | ${APP_CONFIG.name} - ${UNIVERSITY_CONFIG.name}`,
     description:
-      'Your personalized academic dashboard for Macquarie University. Track classes, deadlines, events, and manage your university schedule in one place.',
-    type: 'website',
+      "Your personalized academic dashboard for Macquarie University. Track classes, deadlines, events, and manage your university schedule in one place.",
+    type: "website",
     images: [
       {
         url: `${UNIVERSITY_CONFIG.website}/MQ_Logo_Final.png`,
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: "summary_large_image",
     images: [`${UNIVERSITY_CONFIG.website}/MQ_Logo_Final.png`],
   },
 };

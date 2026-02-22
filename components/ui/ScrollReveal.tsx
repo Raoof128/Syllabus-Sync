@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { LazyMotion, m, domAnimation, useReducedMotion } from 'framer-motion';
+import React from "react";
+import { LazyMotion, m, domAnimation, useReducedMotion } from "framer-motion";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -19,7 +19,7 @@ export function ScrollReveal({
   duration = 0.6,
   yOffset = 30,
 
-  className = '',
+  className = "",
   staggerChildren = 0,
 }: ScrollRevealProps) {
   // Respect user's reduced motion preference
@@ -63,7 +63,7 @@ export function ScrollReveal({
       <m.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: '-50px' }}
+        viewport={{ once: true, margin: "-50px" }}
         variants={variants}
         className={className}
       >

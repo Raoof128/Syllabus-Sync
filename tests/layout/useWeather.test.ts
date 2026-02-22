@@ -1,7 +1,7 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useWeather } from '../../components/layout/weather/useWeather';
-import { SYDNEY_REGIONS } from '../../components/layout/weather/constants';
+import { renderHook, act, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { useWeather } from "../../components/layout/weather/useWeather";
+import { SYDNEY_REGIONS } from "../../components/layout/weather/constants";
 
 // Mock fetch
 const fetchMock = vi.fn();
@@ -14,7 +14,7 @@ let localStorageMock: {
   removeItem: ReturnType<typeof vi.fn>;
 };
 
-describe('useWeather Hook', () => {
+describe("useWeather Hook", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -34,8 +34,8 @@ describe('useWeather Hook', () => {
     };
 
     // Only set up mocks if window exists (jsdom environment)
-    if (typeof window !== 'undefined') {
-      Object.defineProperty(window, 'localStorage', {
+    if (typeof window !== "undefined") {
+      Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
         configurable: true,
         writable: true,
@@ -57,14 +57,14 @@ describe('useWeather Hook', () => {
             windSpeed: 10,
             weatherCode: 0,
             isDay: true,
-            condition: 'Clear sky',
+            condition: "Clear sky",
           },
         },
       }),
     });
   });
 
-  it('should initialize with default region and loading state', async () => {
+  it("should initialize with default region and loading state", async () => {
     const { result } = renderHook(() => useWeather());
 
     expect(result.current.loading).toBe(true);
@@ -76,7 +76,7 @@ describe('useWeather Hook', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
   });
 
-  it('should fetch and set weather data successfully', async () => {
+  it("should fetch and set weather data successfully", async () => {
     const { result } = renderHook(() => useWeather());
 
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -86,17 +86,17 @@ describe('useWeather Hook', () => {
       apparentTemp: 25,
       precipProb: 0,
       windSpeed: 10,
-      condition: 'Clear sky',
-      location: 'Macquarie Uni',
-      locationType: 'approx',
-      vibe: 'sunny',
+      condition: "Clear sky",
+      location: "Macquarie Uni",
+      locationType: "approx",
+      vibe: "sunny",
       isDay: true,
       timestamp: expect.any(Number),
     });
     expect(result.current.error).toBeNull();
   });
 
-  it('should handle fetch errors', async () => {
+  it("should handle fetch errors", async () => {
     fetchMock.mockResolvedValueOnce({
       ok: false,
     });
@@ -105,11 +105,11 @@ describe('useWeather Hook', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.error).toBe('Weather service unreachable');
+    expect(result.current.error).toBe("Weather service unreachable");
     expect(result.current.weatherData).toBeNull();
   });
 
-  it('should handle invalid data from API', async () => {
+  it("should handle invalid data from API", async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -121,7 +121,7 @@ describe('useWeather Hook', () => {
             windSpeed: 10,
             weatherCode: 0,
             isDay: true,
-            condition: 'Clear sky',
+            condition: "Clear sky",
           },
         },
       }),
@@ -131,10 +131,10 @@ describe('useWeather Hook', () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(result.current.error).toBe('Invalid weather data');
+    expect(result.current.error).toBe("Invalid weather data");
   });
 
-  it('should load selected region from localStorage on mount', async () => {
+  it("should load selected region from localStorage on mount", async () => {
     const savedRegion = SYDNEY_REGIONS[1]; // Sydney CBD
     localStorageMock.getItem.mockReturnValue(savedRegion.id);
 
@@ -146,7 +146,7 @@ describe('useWeather Hook', () => {
     });
   });
 
-  it('should update selected region and trigger new fetch', async () => {
+  it("should update selected region and trigger new fetch", async () => {
     const { result } = renderHook(() => useWeather());
 
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -161,7 +161,10 @@ describe('useWeather Hook', () => {
     expect(result.current.selectedRegion).toEqual(newRegion);
 
     // Should verify localStorage update
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('mq-weather-region', newRegion.id);
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(
+      "mq-weather-region",
+      newRegion.id,
+    );
 
     // Wait for fetch to complete (which means loading becomes false again)
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -172,17 +175,17 @@ describe('useWeather Hook', () => {
     expect(fetchMock).toHaveBeenCalled();
   });
 
-  it('should use cached data if available and fresh', async () => {
+  it("should use cached data if available and fresh", async () => {
     const region = SYDNEY_REGIONS[0];
     const cachedData = {
       temp: 20,
       apparentTemp: 20,
       precipProb: 0,
       windSpeed: 10,
-      condition: 'Cloudy',
+      condition: "Cloudy",
       location: region.name,
-      locationType: 'approx',
-      vibe: 'cloudy',
+      locationType: "approx",
+      vibe: "cloudy",
       isDay: true,
       timestamp: Date.now(), // Fresh
     };
@@ -204,24 +207,27 @@ describe('useWeather Hook', () => {
     expect(fetchMock).not.toHaveBeenCalled(); // Should not fetch if cache is valid
   });
 
-  it('should ignore expired cache', async () => {
+  it("should ignore expired cache", async () => {
     const region = SYDNEY_REGIONS[0];
     const expiredData = {
       temp: 20,
       apparentTemp: 20,
       precipProb: 0,
       windSpeed: 10,
-      condition: 'Cloudy',
+      condition: "Cloudy",
       location: region.name,
-      locationType: 'approx',
-      vibe: 'cloudy',
+      locationType: "approx",
+      vibe: "cloudy",
       isDay: true,
       timestamp: Date.now() - 6 * 60 * 1000, // 6 minutes ago (expired)
     };
 
     localStorageMock.getItem.mockImplementation((key) => {
       if (key === `mq-weather-cache-${region.id}`) {
-        return JSON.stringify({ timestamp: expiredData.timestamp, data: expiredData });
+        return JSON.stringify({
+          timestamp: expiredData.timestamp,
+          data: expiredData,
+        });
       }
       return null;
     });

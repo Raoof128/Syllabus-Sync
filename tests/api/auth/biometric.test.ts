@@ -1,22 +1,24 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NextRequest } from 'next/server';
-import { GET, POST } from '@/app/api/auth/biometric/route';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { NextRequest } from "next/server";
+import { GET, POST } from "@/app/api/auth/biometric/route";
 
 const createServerClientMock = vi.fn();
 
-vi.mock('@/lib/supabase/server', () => ({
+vi.mock("@/lib/supabase/server", () => ({
   createServerClient: () => createServerClientMock(),
 }));
 
-describe('auth biometric API', () => {
+describe("auth biometric API", () => {
   beforeEach(() => {
     createServerClientMock.mockReset();
   });
 
-  it('returns 401 when unauthenticated', async () => {
+  it("returns 401 when unauthenticated", async () => {
     createServerClientMock.mockResolvedValue({
       auth: {
-        getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+        getUser: vi
+          .fn()
+          .mockResolvedValue({ data: { user: null }, error: null }),
       },
     });
 
@@ -24,21 +26,21 @@ describe('auth biometric API', () => {
     expect(response.status).toBe(401);
   });
 
-  it('clears biometric metadata when disabling', async () => {
+  it("clears biometric metadata when disabling", async () => {
     const updateUser = vi.fn().mockResolvedValue({ error: null });
     createServerClientMock.mockResolvedValue({
       auth: {
         getUser: vi.fn().mockResolvedValue({
-          data: { user: { id: 'user-1', user_metadata: {} } },
+          data: { user: { id: "user-1", user_metadata: {} } },
           error: null,
         }),
         updateUser,
       },
     });
 
-    const request = new NextRequest('http://localhost/api/auth/biometric', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'content-length': '16' },
+    const request = new NextRequest("http://localhost/api/auth/biometric", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "content-length": "16" },
       body: JSON.stringify({ enabled: false }),
     });
 

@@ -3,9 +3,9 @@
 // NOTE: This file renders outside the normal Next.js context (when root layout fails)
 // so we cannot use <Link> component here - must use plain <a> tags
 /* eslint-disable @next/next/no-html-link-for-pages */
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 export default function GlobalError({
   error,
@@ -23,25 +23,25 @@ export default function GlobalError({
       <body>
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-            padding: '1rem',
-            fontFamily: 'system-ui, sans-serif',
-            backgroundColor: '#f8f9fa',
-            color: '#333',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "100vh",
+            padding: "1rem",
+            fontFamily: "system-ui, sans-serif",
+            backgroundColor: "#f8f9fa",
+            color: "#333",
           }}
         >
-          <div style={{ textAlign: 'center', maxWidth: '500px' }}>
+          <div style={{ textAlign: "center", maxWidth: "500px" }}>
             <svg
               viewBox="0 0 24 24"
               style={{
-                width: '64px',
-                height: '64px',
-                margin: '0 auto 1rem',
-                color: '#dc3545',
+                width: "64px",
+                height: "64px",
+                margin: "0 auto 1rem",
+                color: "#dc3545",
               }}
               fill="none"
               stroke="currentColor"
@@ -52,24 +52,26 @@ export default function GlobalError({
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
 
-            <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Something went wrong!</h1>
+            <h1 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>
+              Something went wrong!
+            </h1>
 
-            <p style={{ color: '#666', marginBottom: '1.5rem' }}>
-              We&apos;re sorry, but something unexpected happened. Our team has been notified and is
-              working on a fix.
+            <p style={{ color: "#666", marginBottom: "1.5rem" }}>
+              We&apos;re sorry, but something unexpected happened. Our team has
+              been notified and is working on a fix.
             </p>
 
             <button
               onClick={reset}
               style={{
-                padding: '0.75rem 1.5rem',
-                fontSize: '1rem',
-                backgroundColor: '#A6192E',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.5rem',
-                cursor: 'pointer',
-                marginRight: '0.5rem',
+                padding: "0.75rem 1.5rem",
+                fontSize: "1rem",
+                backgroundColor: "#A6192E",
+                color: "white",
+                border: "none",
+                borderRadius: "0.5rem",
+                cursor: "pointer",
+                marginRight: "0.5rem",
               }}
             >
               Try Again
@@ -78,20 +80,26 @@ export default function GlobalError({
             <a
               href="/"
               style={{
-                display: 'inline-block',
-                padding: '0.75rem 1.5rem',
-                fontSize: '1rem',
-                backgroundColor: '#6c757d',
-                color: 'white',
-                textDecoration: 'none',
-                borderRadius: '0.5rem',
+                display: "inline-block",
+                padding: "0.75rem 1.5rem",
+                fontSize: "1rem",
+                backgroundColor: "#6c757d",
+                color: "white",
+                textDecoration: "none",
+                borderRadius: "0.5rem",
               }}
             >
               Go Home
             </a>
 
             {error.digest && (
-              <p style={{ marginTop: '1.5rem', fontSize: '0.875rem', color: '#999' }}>
+              <p
+                style={{
+                  marginTop: "1.5rem",
+                  fontSize: "0.875rem",
+                  color: "#999",
+                }}
+              >
                 Error ID: {error.digest}
               </p>
             )}

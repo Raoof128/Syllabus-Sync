@@ -5,25 +5,28 @@
 // Captures the browser's beforeinstallprompt event and exposes a function
 // to trigger the install dialog programmatically.
 
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
-const DISMISS_KEY = 'pwa-install-dismissed';
+const DISMISS_KEY = "pwa-install-dismissed";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
 export function useInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [isDismissed, setIsDismissed] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return sessionStorage.getItem(DISMISS_KEY) === 'true';
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem(DISMISS_KEY) === "true";
   });
   const [isInstalled, setIsInstalled] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches,
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(display-mode: standalone)").matches,
   );
 
   useEffect(() => {
@@ -41,12 +44,12 @@ export function useInstallPrompt() {
       setDeferredPrompt(null);
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-    window.addEventListener('appinstalled', handleAppInstalled);
+    window.addEventListener("beforeinstallprompt", handleBeforeInstall);
+    window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
-      window.removeEventListener('appinstalled', handleAppInstalled);
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, [isInstalled]);
 
@@ -57,14 +60,14 @@ export function useInstallPrompt() {
     const { outcome } = await deferredPrompt.userChoice;
     setDeferredPrompt(null);
 
-    return outcome === 'accepted';
+    return outcome === "accepted";
   }, [deferredPrompt]);
 
   const dismissPrompt = useCallback(() => {
     setDeferredPrompt(null);
     setIsDismissed(true);
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem(DISMISS_KEY, 'true');
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(DISMISS_KEY, "true");
     }
   }, []);
 

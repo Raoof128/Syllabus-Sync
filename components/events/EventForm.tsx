@@ -1,12 +1,12 @@
 // components/events/EventForm.tsx
-'use client';
+"use client";
 
-import { useEffect, useReducer, useCallback } from 'react';
-import { useEventsStore } from '@/lib/store/eventsStore';
-import { Event } from '@/lib/types';
-import { v4 as uuidv4 } from 'uuid';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
+import { useEffect, useReducer, useCallback } from "react";
+import { useEventsStore } from "@/lib/store/eventsStore";
+import { Event } from "@/lib/types";
+import { v4 as uuidv4 } from "uuid";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 import {
   Dialog,
   DialogContent,
@@ -14,23 +14,26 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/mq/button';
-import { Input } from '@/components/ui/mq/input';
-import { toastUtils } from '@/lib/utils/toast';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/mq/button";
+import { Input } from "@/components/ui/mq/input";
+import { toastUtils } from "@/lib/utils/toast";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { format, isValid } from 'date-fns';
-import { UNIT_COLORS } from '@/lib/config';
-import { validateBuildingStrict, BUILDING_VALIDATION_ERROR } from '@/lib/utils/buildingValidation';
-import { cn } from '@/lib/utils';
-import BuildingAutocomplete from '@/components/ui/BuildingAutocomplete';
+} from "@/components/ui/select";
+import { format, isValid } from "date-fns";
+import { UNIT_COLORS } from "@/lib/config";
+import {
+  validateBuildingStrict,
+  BUILDING_VALIDATION_ERROR,
+} from "@/lib/utils/buildingValidation";
+import { cn } from "@/lib/utils";
+import BuildingAutocomplete from "@/components/ui/BuildingAutocomplete";
 
 interface EventFormProps {
   open: boolean;
@@ -38,7 +41,12 @@ interface EventFormProps {
   editEvent?: Event | null;
 }
 
-const EVENT_CATEGORIES: Event['category'][] = ['Academic', 'Career', 'Social', 'Free Food'];
+const EVENT_CATEGORIES: Event["category"][] = [
+  "Academic",
+  "Career",
+  "Social",
+  "Free Food",
+];
 
 // Form state type
 interface FormState {
@@ -48,7 +56,7 @@ interface FormState {
   time: string;
   building: string;
   room: string; // Optional room field
-  category: Event['category'];
+  category: Event["category"];
   color: string;
   errors: { [key: string]: string };
   showDeleteConfirm: boolean;
@@ -58,18 +66,21 @@ interface FormState {
 // Form actions
 type FormAction =
   | {
-      type: 'SET_FIELD';
-      field: keyof Omit<FormState, 'errors' | 'showDeleteConfirm' | 'isSaving'>;
-      value: string | Event['category'];
+      type: "SET_FIELD";
+      field: keyof Omit<FormState, "errors" | "showDeleteConfirm" | "isSaving">;
+      value: string | Event["category"];
     }
-  | { type: 'SET_ERRORS'; errors: { [key: string]: string } }
-  | { type: 'SET_DELETE_CONFIRM'; value: boolean }
-  | { type: 'SET_SAVING'; value: boolean }
-  | { type: 'RESET'; values: Omit<FormState, 'errors' | 'showDeleteConfirm' | 'isSaving'> };
+  | { type: "SET_ERRORS"; errors: { [key: string]: string } }
+  | { type: "SET_DELETE_CONFIRM"; value: boolean }
+  | { type: "SET_SAVING"; value: boolean }
+  | {
+      type: "RESET";
+      values: Omit<FormState, "errors" | "showDeleteConfirm" | "isSaving">;
+    };
 
 // Helper to convert time string to HH:MM format for native time input
 function convertTo24HourFormat(timeStr: string | undefined): string {
-  if (!timeStr) return '';
+  if (!timeStr) return "";
 
   // If already in HH:MM format (24-hour), return as is
   const time24Match = timeStr.match(/^(\d{2}):(\d{2})$/);
@@ -84,47 +95,47 @@ function convertTo24HourFormat(timeStr: string | undefined): string {
     const minutes = time12Match[2];
     const meridiem = time12Match[3].toUpperCase();
 
-    if (meridiem === 'PM' && hours < 12) hours += 12;
-    if (meridiem === 'AM' && hours === 12) hours = 0;
+    if (meridiem === "PM" && hours < 12) hours += 12;
+    if (meridiem === "AM" && hours === 12) hours = 0;
 
-    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+    return `${hours.toString().padStart(2, "0")}:${minutes}`;
   }
 
   // Try parsing from startAt date if available
-  return '';
+  return "";
 }
 
 // Helper to get initial form values
 function getInitialValues(
   editEvent?: Event | null,
-): Omit<FormState, 'errors' | 'showDeleteConfirm' | 'isSaving'> {
+): Omit<FormState, "errors" | "showDeleteConfirm" | "isSaving"> {
   if (editEvent) {
     const parsedDate = new Date(editEvent.startAt);
     // Convert time to HH:MM format for native time input
     let timeValue = convertTo24HourFormat(editEvent.time);
     // If time couldn't be parsed from string, try to get it from startAt
     if (!timeValue && isValid(parsedDate)) {
-      timeValue = format(parsedDate, 'HH:mm');
+      timeValue = format(parsedDate, "HH:mm");
     }
     return {
       title: editEvent.title,
       description: editEvent.description,
-      date: isValid(parsedDate) ? format(parsedDate, 'yyyy-MM-dd') : '',
+      date: isValid(parsedDate) ? format(parsedDate, "yyyy-MM-dd") : "",
       time: timeValue,
-      building: editEvent.building || '',
-      room: editEvent.room || '', // Load optional room
+      building: editEvent.building || "",
+      room: editEvent.room || "", // Load optional room
       category: editEvent.category,
       color: editEvent.color || UNIT_COLORS[0].value,
     };
   }
   return {
-    title: '',
-    description: '',
-    date: '',
-    time: '',
-    building: '',
-    room: '',
-    category: 'Academic' as Event['category'],
+    title: "",
+    description: "",
+    date: "",
+    time: "",
+    building: "",
+    room: "",
+    category: "Academic" as Event["category"],
     color: UNIT_COLORS[0].value,
   };
 }
@@ -132,22 +143,31 @@ function getInitialValues(
 // Form reducer to batch state updates and avoid cascading renders
 function formReducer(state: FormState, action: FormAction): FormState {
   switch (action.type) {
-    case 'SET_FIELD':
+    case "SET_FIELD":
       return { ...state, [action.field]: action.value };
-    case 'SET_ERRORS':
+    case "SET_ERRORS":
       return { ...state, errors: action.errors };
-    case 'SET_DELETE_CONFIRM':
+    case "SET_DELETE_CONFIRM":
       return { ...state, showDeleteConfirm: action.value };
-    case 'SET_SAVING':
+    case "SET_SAVING":
       return { ...state, isSaving: action.value };
-    case 'RESET':
-      return { ...action.values, errors: {}, showDeleteConfirm: false, isSaving: false };
+    case "RESET":
+      return {
+        ...action.values,
+        errors: {},
+        showDeleteConfirm: false,
+        isSaving: false,
+      };
     default:
       return state;
   }
 }
 
-export default function EventForm({ open, onOpenChange, editEvent }: EventFormProps) {
+export default function EventForm({
+  open,
+  onOpenChange,
+  editEvent,
+}: EventFormProps) {
   const { t } = useTypedTranslation();
   const addEvent = useEventsStore((state) => state.addEvent);
   const updateEvent = useEventsStore((state) => state.updateEvent);
@@ -176,76 +196,80 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
   } = formState;
 
   // Reset form when editEvent changes - use key prop pattern instead of useEffect
-  const formKey = editEvent?.id ?? 'new';
+  const formKey = editEvent?.id ?? "new";
 
   // Effect to reset form when dialog opens or editEvent changes
   // Using dispatch with RESET action batches all updates into a single render
   useEffect(() => {
     if (open) {
-      dispatch({ type: 'RESET', values: getInitialValues(editEvent) });
+      dispatch({ type: "RESET", values: getInitialValues(editEvent) });
     }
   }, [open, editEvent]);
 
   // Field setters using dispatch
   const setTitle = useCallback(
-    (value: string) => dispatch({ type: 'SET_FIELD', field: 'title', value }),
+    (value: string) => dispatch({ type: "SET_FIELD", field: "title", value }),
     [],
   );
   const setDescription = useCallback(
-    (value: string) => dispatch({ type: 'SET_FIELD', field: 'description', value }),
+    (value: string) =>
+      dispatch({ type: "SET_FIELD", field: "description", value }),
     [],
   );
   const setDate = useCallback(
-    (value: string) => dispatch({ type: 'SET_FIELD', field: 'date', value }),
+    (value: string) => dispatch({ type: "SET_FIELD", field: "date", value }),
     [],
   );
   const setTime = useCallback(
-    (value: string) => dispatch({ type: 'SET_FIELD', field: 'time', value }),
+    (value: string) => dispatch({ type: "SET_FIELD", field: "time", value }),
     [],
   );
   const setBuilding = useCallback(
-    (value: string) => dispatch({ type: 'SET_FIELD', field: 'building', value }),
+    (value: string) =>
+      dispatch({ type: "SET_FIELD", field: "building", value }),
     [],
   );
   const setRoom = useCallback(
-    (value: string) => dispatch({ type: 'SET_FIELD', field: 'room', value }),
+    (value: string) => dispatch({ type: "SET_FIELD", field: "room", value }),
     [],
   );
   const setCategory = useCallback(
-    (value: Event['category']) => dispatch({ type: 'SET_FIELD', field: 'category', value }),
+    (value: Event["category"]) =>
+      dispatch({ type: "SET_FIELD", field: "category", value }),
     [],
   );
   const setColor = useCallback(
-    (value: string) => dispatch({ type: 'SET_FIELD', field: 'color', value }),
+    (value: string) => dispatch({ type: "SET_FIELD", field: "color", value }),
     [],
   );
   const setErrors = useCallback(
-    (errors: { [key: string]: string }) => dispatch({ type: 'SET_ERRORS', errors }),
+    (errors: { [key: string]: string }) =>
+      dispatch({ type: "SET_ERRORS", errors }),
     [],
   );
   const setShowDeleteConfirm = useCallback(
-    (value: boolean) => dispatch({ type: 'SET_DELETE_CONFIRM', value }),
+    (value: boolean) => dispatch({ type: "SET_DELETE_CONFIRM", value }),
     [],
   );
 
   const resetForm = useCallback(() => {
-    dispatch({ type: 'RESET', values: getInitialValues(editEvent) });
+    dispatch({ type: "RESET", values: getInitialValues(editEvent) });
   }, [editEvent]);
 
   const validateForm = (): boolean => {
     const formErrors: { [key: string]: string } = {};
 
     if (!title.trim()) {
-      formErrors.title = t('fieldRequired');
+      formErrors.title = t("fieldRequired");
     }
     if (!date) {
-      formErrors.date = t('fieldRequired');
+      formErrors.date = t("fieldRequired");
     }
     if (!time.trim()) {
-      formErrors.time = t('fieldRequired');
+      formErrors.time = t("fieldRequired");
     }
     if (!building.trim()) {
-      formErrors.building = t('fieldRequired');
+      formErrors.building = t("fieldRequired");
     } else {
       // Validate building strictly against map data - exact match only
       const validatedBuilding = validateBuildingStrict(building);
@@ -261,9 +285,9 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
   const handleSave = async () => {
     if (!validateForm()) return;
 
-    dispatch({ type: 'SET_SAVING', value: true });
+    dispatch({ type: "SET_SAVING", value: true });
 
-    const [year, month, day] = date.split('-').map(Number);
+    const [year, month, day] = date.split("-").map(Number);
     const dateObj = new Date(year, month - 1, day);
 
     // Parse time to create startAt timestamp
@@ -280,8 +304,8 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
         const minutes = parseInt(timeMatch[2], 10);
         const meridiem = timeMatch[3]?.toUpperCase();
 
-        if (meridiem === 'PM' && hours < 12) hours += 12;
-        if (meridiem === 'AM' && hours === 12) hours = 0;
+        if (meridiem === "PM" && hours < 12) hours += 12;
+        if (meridiem === "AM" && hours === 12) hours = 0;
 
         startAt = new Date(year, month - 1, day, hours, minutes);
       }
@@ -300,7 +324,9 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
       time: timeStr, // Keep original time string for display
       building: building.trim(),
       room: room.trim() || undefined, // Optional room field
-      location: room.trim() ? `${building.trim()} ${room.trim()}` : building.trim(), // Legacy field
+      location: room.trim()
+        ? `${building.trim()} ${room.trim()}`
+        : building.trim(), // Legacy field
       category,
       color,
     };
@@ -308,21 +334,21 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     try {
       if (editEvent) {
         await updateEvent(editEvent.id, eventData);
-        toastUtils.success(t('eventUpdated'), t('eventUpdatedMsg'));
+        toastUtils.success(t("eventUpdated"), t("eventUpdatedMsg"));
       } else {
         await addEvent(eventData);
-        toastUtils.success(t('eventCreated'), t('eventCreatedMsg'));
+        toastUtils.success(t("eventCreated"), t("eventCreatedMsg"));
       }
       onOpenChange(false);
     } finally {
-      dispatch({ type: 'SET_SAVING', value: false });
+      dispatch({ type: "SET_SAVING", value: false });
     }
   };
 
   const handleDelete = () => {
     if (editEvent) {
       removeEvent(editEvent.id);
-      toastUtils.success(t('eventDeleted'), t('eventDeletedMsg'));
+      toastUtils.success(t("eventDeleted"), t("eventDeletedMsg"));
       setShowDeleteConfirm(false);
       onOpenChange(false);
     }
@@ -340,9 +366,11 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md" key={formKey}>
         <DialogHeader>
-          <DialogTitle>{editEvent ? t('editEvent') : t('addEvent')}</DialogTitle>
+          <DialogTitle>
+            {editEvent ? t("editEvent") : t("addEvent")}
+          </DialogTitle>
           <DialogDescription>
-            {editEvent ? t('editEventDesc') : t('addEventDesc')}
+            {editEvent ? t("editEventDesc") : t("addEventDesc")}
           </DialogDescription>
         </DialogHeader>
 
@@ -350,20 +378,24 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="event-title">
-              {t('title')} <span className="text-mq-error">*</span>
+              {t("title")} <span className="text-mq-error">*</span>
             </Label>
             <Input
               id="event-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder={t('enterEventTitle')}
+              placeholder={t("enterEventTitle")}
               aria-invalid={Boolean(errors.title)}
               aria-required="true"
-              aria-describedby={errors.title ? 'event-title-error' : undefined}
-              className={errors.title ? 'border-mq-error' : ''}
+              aria-describedby={errors.title ? "event-title-error" : undefined}
+              className={errors.title ? "border-mq-error" : ""}
             />
             {errors.title && (
-              <p id="event-title-error" className="text-xs text-mq-error" role="alert">
+              <p
+                id="event-title-error"
+                className="text-xs text-mq-error"
+                role="alert"
+              >
                 {errors.title}
               </p>
             )}
@@ -371,12 +403,12 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="event-description">{t('description')}</Label>
+            <Label htmlFor="event-description">{t("description")}</Label>
             <Input
               id="event-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={t('enterEventDescription')}
+              placeholder={t("enterEventDescription")}
             />
           </div>
 
@@ -384,7 +416,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="event-date">
-                {t('date')} <span className="text-mq-error">*</span>
+                {t("date")} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="event-date"
@@ -393,18 +425,22 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 onChange={(e) => setDate(e.target.value)}
                 aria-invalid={Boolean(errors.date)}
                 aria-required="true"
-                aria-describedby={errors.date ? 'event-date-error' : undefined}
-                className={errors.date ? 'border-mq-error' : ''}
+                aria-describedby={errors.date ? "event-date-error" : undefined}
+                className={errors.date ? "border-mq-error" : ""}
               />
               {errors.date && (
-                <p id="event-date-error" className="text-xs text-mq-error" role="alert">
+                <p
+                  id="event-date-error"
+                  className="text-xs text-mq-error"
+                  role="alert"
+                >
                   {errors.date}
                 </p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="event-time">
-                {t('time')} <span className="text-mq-error">*</span>
+                {t("time")} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="event-time"
@@ -413,11 +449,15 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                 onChange={(e) => setTime(e.target.value)}
                 aria-invalid={Boolean(errors.time)}
                 aria-required="true"
-                aria-describedby={errors.time ? 'event-time-error' : undefined}
-                className={errors.time ? 'border-mq-error' : ''}
+                aria-describedby={errors.time ? "event-time-error" : undefined}
+                className={errors.time ? "border-mq-error" : ""}
               />
               {errors.time && (
-                <p id="event-time-error" className="text-xs text-mq-error" role="alert">
+                <p
+                  id="event-time-error"
+                  className="text-xs text-mq-error"
+                  role="alert"
+                >
                   {errors.time}
                 </p>
               )}
@@ -428,39 +468,44 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="event-building">
-                {t('building')} <span className="text-mq-error">*</span>
+                {t("building")} <span className="text-mq-error">*</span>
               </Label>
               <BuildingAutocomplete
                 value={building}
                 onChange={setBuilding}
                 error={errors.building}
                 required
-                placeholder={t('buildingPlaceholder')}
+                placeholder={t("buildingPlaceholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="event-room">{t('room')}</Label>
+              <Label htmlFor="event-room">{t("room")}</Label>
               <Input
                 id="event-room"
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
-                placeholder={t('roomPlaceholder')}
+                placeholder={t("roomPlaceholder")}
               />
-              <p className="text-xs text-mq-content-tertiary">{t('optional')}</p>
+              <p className="text-xs text-mq-content-tertiary">
+                {t("optional")}
+              </p>
             </div>
           </div>
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="event-category">{t('category')}</Label>
-            <Select value={category} onValueChange={(v) => setCategory(v as Event['category'])}>
+            <Label htmlFor="event-category">{t("category")}</Label>
+            <Select
+              value={category}
+              onValueChange={(v) => setCategory(v as Event["category"])}
+            >
               <SelectTrigger id="event-category">
-                <SelectValue placeholder={t('selectCategory')} />
+                <SelectValue placeholder={t("selectCategory")} />
               </SelectTrigger>
               <SelectContent className="max-h-[200px] overflow-y-auto">
                 {EVENT_CATEGORIES.map((cat) => (
                   <SelectItem key={cat} value={cat}>
-                    {t(`category_${cat.replace(/ /g, '')}` as TranslationKey)}
+                    {t(`category_${cat.replace(/ /g, "")}` as TranslationKey)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -469,7 +514,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
 
           {/* Color Selection - Scrollable horizontal buttons */}
           <div className="space-y-2">
-            <Label>{t('color')}</Label>
+            <Label>{t("color")}</Label>
             <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
               {UNIT_COLORS.map((colorOption) => (
                 <button
@@ -477,10 +522,10 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                   type="button"
                   onClick={() => setColor(colorOption.value)}
                   className={cn(
-                    'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                    "w-8 h-8 rounded-full border-2 shrink-0 transition-all",
                     color === colorOption.value
-                      ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
-                      : 'border-transparent hover:border-mq-border',
+                      ? "border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset"
+                      : "border-transparent hover:border-mq-border",
                   )}
                   style={{ backgroundColor: colorOption.value }}
                   title={t(colorOption.translationKey as TranslationKey)}
@@ -498,29 +543,39 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
               onClick={() => setShowDeleteConfirm(true)}
               className="mr-auto"
             >
-              {t('delete')}
+              {t("delete")}
             </Button>
           )}
           {showDeleteConfirm && (
             <div className="mr-auto flex flex-wrap items-center gap-2">
-              <span className="text-sm text-mq-error">{t('confirmDelete')}</span>
+              <span className="text-sm text-mq-error">
+                {t("confirmDelete")}
+              </span>
               <Button variant="destructive" size="sm" onClick={handleDelete}>
-                {t('yes')}
+                {t("yes")}
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(false)}>
-                {t('no')}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                {t("no")}
               </Button>
             </div>
           )}
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSaving}>
-            {t('cancel')}
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSaving}
+          >
+            {t("cancel")}
           </Button>
           <Button onClick={handleSave} disabled={isSaving}>
             {isSaving
-              ? t('savingChanges' as TranslationKey) || 'Saving...'
+              ? t("savingChanges" as TranslationKey) || "Saving..."
               : editEvent
-                ? t('save')
-                : t('addEvent')}
+                ? t("save")
+                : t("addEvent")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,15 +1,18 @@
-'use client';
+"use client";
 
-import { useMemo, useCallback, useState } from 'react';
-import Link from 'next/link';
-import { Navigation, Edit2, Trash2, Bell } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import ReminderModal from '@/components/ui/ReminderModal';
-import { useRemindersStore, ReminderItemType } from '@/lib/store/remindersStore';
+import { useMemo, useCallback, useState } from "react";
+import Link from "next/link";
+import { Navigation, Edit2, Trash2, Bell } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import ReminderModal from "@/components/ui/ReminderModal";
+import {
+  useRemindersStore,
+  ReminderItemType,
+} from "@/lib/store/remindersStore";
 
-export type ItemType = 'assignment' | 'exam' | 'event' | 'unit' | 'todo';
+export type ItemType = "assignment" | "exam" | "event" | "unit" | "todo";
 
 interface ItemActionButtonsProps {
   /** Type of item for context-aware behavior */
@@ -39,7 +42,7 @@ interface ItemActionButtonsProps {
   /** Callback when notification toggle is clicked - receives new state */
   onToggleNotification?: (enabled: boolean) => void;
   /** Visual variant - 'compact' for list cards, 'detail' for detail panels */
-  variant?: 'compact' | 'detail';
+  variant?: "compact" | "detail";
   /** Additional class names */
   className?: string;
   /** Stop event propagation on clicks (useful in clickable parent containers) */
@@ -59,7 +62,7 @@ export default function ItemActionButtons({
   onEdit,
   onDelete,
   onToggleNotification: _onToggleNotification,
-  variant = 'compact',
+  variant = "compact",
   className,
   stopPropagation = true,
 }: ItemActionButtonsProps) {
@@ -88,9 +91,9 @@ export default function ItemActionButtons({
   const navigationUrl = useMemo(() => {
     if (!building) return null;
     const params = new URLSearchParams();
-    params.set('building', building.toLowerCase());
-    if (room) params.set('room', room);
-    params.set('autonav', 'true');
+    params.set("building", building.toLowerCase());
+    if (room) params.set("room", room);
+    params.set("autonav", "true");
     return `/map?${params.toString()}`;
   }, [building, room]);
 
@@ -127,18 +130,18 @@ export default function ItemActionButtons({
   );
 
   // Button size classes based on variant
-  const buttonSizeClass = variant === 'detail' ? 'h-9 w-9' : 'h-8 w-8';
-  const iconSizeClass = variant === 'detail' ? 'h-4.5 w-4.5' : 'h-4 w-4';
+  const buttonSizeClass = variant === "detail" ? "h-9 w-9" : "h-8 w-8";
+  const iconSizeClass = variant === "detail" ? "h-4.5 w-4.5" : "h-4 w-4";
 
   const baseButtonClass = cn(
-    'p-0 inline-flex items-center justify-center rounded-lg transition-all duration-200',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
-    'text-mq-content-secondary hover:text-mq-content',
+    "p-0 inline-flex items-center justify-center rounded-lg transition-all duration-200",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background",
+    "text-mq-content-secondary hover:text-mq-content",
     buttonSizeClass,
   );
 
   return (
-    <div className={cn('flex items-center gap-1', className)}>
+    <div className={cn("flex items-center gap-1", className)}>
       {/* Navigate Button - only shown when building is set */}
       {building && navigationUrl && (
         <Link
@@ -146,11 +149,13 @@ export default function ItemActionButtons({
           onClick={handleNavLinkClick}
           className={cn(
             baseButtonClass,
-            'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400',
+            "hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400",
           )}
-          aria-label={t('navigateToBuildingAria', { building: building || '' }) as string}
+          aria-label={
+            t("navigateToBuildingAria", { building: building || "" }) as string
+          }
           title={
-            t('navigateTo' as TranslationKey, { location: building || '' }) ||
+            t("navigateTo" as TranslationKey, { location: building || "" }) ||
             `Navigate to ${building}`
           }
         >
@@ -165,10 +170,10 @@ export default function ItemActionButtons({
           onClick={handleEditClick}
           className={cn(
             baseButtonClass,
-            'hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400',
+            "hover:bg-blue-100 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400",
           )}
-          title={t('calendarEditItem', { title: itemTitle }) as string}
-          aria-label={t('calendarEditItem', { title: itemTitle }) as string}
+          title={t("calendarEditItem", { title: itemTitle }) as string}
+          aria-label={t("calendarEditItem", { title: itemTitle }) as string}
         >
           <Edit2 className={iconSizeClass} aria-hidden="true" />
         </button>
@@ -181,10 +186,10 @@ export default function ItemActionButtons({
           onClick={handleDeleteClick}
           className={cn(
             baseButtonClass,
-            'hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400',
+            "hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400",
           )}
-          title={t('calendarDeleteItem', { title: itemTitle }) as string}
-          aria-label={t('calendarDeleteItem', { title: itemTitle }) as string}
+          title={t("calendarDeleteItem", { title: itemTitle }) as string}
+          aria-label={t("calendarDeleteItem", { title: itemTitle }) as string}
         >
           <Trash2 className={iconSizeClass} aria-hidden="true" />
         </button>
@@ -197,22 +202,25 @@ export default function ItemActionButtons({
         className={cn(
           baseButtonClass,
           isNotificationActive
-            ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800/40'
-            : 'hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-400',
+            ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-800/40"
+            : "hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-400",
         )}
         title={
           isNotificationActive
-            ? t('editReminder' as TranslationKey) || 'Edit reminder'
-            : t('setReminder' as TranslationKey) || 'Set reminder'
+            ? t("editReminder" as TranslationKey) || "Edit reminder"
+            : t("setReminder" as TranslationKey) || "Set reminder"
         }
         aria-label={
           isNotificationActive
-            ? t('editReminder' as TranslationKey) || 'Edit reminder'
-            : t('setReminder' as TranslationKey) || 'Set reminder'
+            ? t("editReminder" as TranslationKey) || "Edit reminder"
+            : t("setReminder" as TranslationKey) || "Set reminder"
         }
       >
         {isNotificationActive ? (
-          <Bell className={cn(iconSizeClass, 'fill-current')} aria-hidden="true" />
+          <Bell
+            className={cn(iconSizeClass, "fill-current")}
+            aria-hidden="true"
+          />
         ) : (
           <Bell className={iconSizeClass} aria-hidden="true" />
         )}
@@ -225,7 +233,7 @@ export default function ItemActionButtons({
           if (stopPropagation) e.stopPropagation();
         }}
         onKeyDown={(e) => {
-          if (stopPropagation && (e.key === 'Enter' || e.key === ' ')) {
+          if (stopPropagation && (e.key === "Enter" || e.key === " ")) {
             e.stopPropagation();
           }
         }}

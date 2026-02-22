@@ -16,14 +16,17 @@ export class RetryError extends Error {
     public readonly lastError: Error,
   ) {
     super(message);
-    this.name = 'RetryError';
+    this.name = "RetryError";
   }
 }
 
 /**
  * Executes a function with retry logic
  */
-export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  options: RetryOptions = {},
+): Promise<T> {
   const {
     maxAttempts = 3,
     delayMs = 1000,
@@ -42,7 +45,11 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions =
 
       // Don't retry on last attempt or if condition fails
       if (attempt === maxAttempts || !retryCondition(lastError)) {
-        throw new RetryError(`Operation failed after ${attempt} attempts`, attempt, lastError);
+        throw new RetryError(
+          `Operation failed after ${attempt} attempts`,
+          attempt,
+          lastError,
+        );
       }
 
       // Wait before retrying
@@ -52,7 +59,11 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions =
   }
 
   // This should never be reached, but TypeScript requires it
-  throw new RetryError(`Operation failed after ${maxAttempts} attempts`, maxAttempts, lastError!);
+  throw new RetryError(
+    `Operation failed after ${maxAttempts} attempts`,
+    maxAttempts,
+    lastError!,
+  );
 }
 
 /**
@@ -61,21 +72,21 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions =
 export const retryConditions = {
   // Retry on network errors
   networkError: (error: Error) => {
-    const networkErrors = ['NetworkError', 'TimeoutError', 'AbortError'];
+    const networkErrors = ["NetworkError", "TimeoutError", "AbortError"];
     return (
       networkErrors.some((type) => error.name.includes(type)) ||
-      error.message.toLowerCase().includes('network') ||
-      error.message.toLowerCase().includes('fetch')
+      error.message.toLowerCase().includes("network") ||
+      error.message.toLowerCase().includes("fetch")
     );
   },
 
   // Retry on server errors (5xx)
   serverError: (error: Error) => {
     return (
-      error.message.includes('500') ||
-      error.message.includes('502') ||
-      error.message.includes('503') ||
-      error.message.includes('504')
+      error.message.includes("500") ||
+      error.message.includes("502") ||
+      error.message.includes("503") ||
+      error.message.includes("504")
     );
   },
 

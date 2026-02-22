@@ -131,14 +131,14 @@ interface ButtonProps {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
-  'aria-label'?: string;
+  "aria-label"?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
   disabled = false,
-  'aria-label': ariaLabel,
+  "aria-label": ariaLabel,
 }) => {
   return (
     <button
@@ -213,24 +213,24 @@ describe('Button Component', () => {
 
 ```typescript
 // ✅ Good - Accessibility and functionality
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Authentication Flow', () => {
-  test('user can login with valid credentials', async ({ page }) => {
-    await page.goto('/login');
+test.describe("Authentication Flow", () => {
+  test("user can login with valid credentials", async ({ page }) => {
+    await page.goto("/login");
 
     // Fill login form
-    await page.fill('[data-testid="email-input"]', 'user@example.com');
-    await page.fill('[data-testid="password-input"]', 'password');
+    await page.fill('[data-testid="email-input"]', "user@example.com");
+    await page.fill('[data-testid="password-input"]', "password");
     await page.click('[data-testid="login-button"]');
 
     // Verify successful login
-    await expect(page).toHaveURL('/home');
+    await expect(page).toHaveURL("/home");
     await expect(page.locator('[data-testid="user-avatar"]')).toBeVisible();
   });
 
-  test('login form is accessible', async ({ page }) => {
-    await page.goto('/login');
+  test("login form is accessible", async ({ page }) => {
+    await page.goto("/login");
     await expect(page).toHaveAccessibleName();
   });
 });
@@ -242,12 +242,15 @@ test.describe('Authentication Flow', () => {
 
 ```typescript
 // ✅ Good - Zod schema validation
-import { z } from 'zod';
+import { z } from "zod";
 
 const CreateUserSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  fullName: z.string().min(1, 'Full name is required').max(100, 'Name too long'),
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  fullName: z
+    .string()
+    .min(1, "Full name is required")
+    .max(100, "Name too long"),
 });
 
 type CreateUserInput = z.infer<typeof CreateUserSchema>;
@@ -257,24 +260,24 @@ type CreateUserInput = z.infer<typeof CreateUserSchema>;
 
 ```typescript
 // ✅ Good - CSRF protection and rate limiting
-import { NextRequest, NextResponse } from 'next/server';
-import { validateCSRF } from '@/lib/security/csrf';
-import { rateLimit } from '@/lib/security/rateLimit';
+import { NextRequest, NextResponse } from "next/server";
+import { validateCSRF } from "@/lib/security/csrf";
+import { rateLimit } from "@/lib/security/rateLimit";
 
 export async function POST(request: NextRequest) {
   // Validate CSRF token
   if (!validateCSRF(request)) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
 
   // Apply rate limiting
   const rateLimitResult = await rateLimit(request);
   if (!rateLimitResult.success) {
     return NextResponse.json(
-      { error: 'Too many requests' },
+      { error: "Too many requests" },
       {
         status: 429,
-        headers: { 'Retry-After': rateLimitResult.retryAfter },
+        headers: { "Retry-After": rateLimitResult.retryAfter },
       },
     );
   }
@@ -343,7 +346,7 @@ const App = () => (
 
 ```tsx
 // ✅ Good - Next.js Image optimization
-import Image from 'next/image';
+import Image from "next/image";
 
 const Avatar = ({ src, alt, size = 40 }) => (
   <Image
@@ -363,8 +366,8 @@ const Avatar = ({ src, alt, size = 40 }) => (
 
 ```tsx
 // ✅ Good - Using design tokens and proper theming
-import { MagicCard } from '@/components/ui/MagicCard';
-import { Button } from '@/components/ui/Button';
+import { MagicCard } from "@/components/ui/MagicCard";
+import { Button } from "@/components/ui/Button";
 
 const FeatureCard = ({ title, description, actionLabel }) => (
   <MagicCard className="p-6 border-mq-border">

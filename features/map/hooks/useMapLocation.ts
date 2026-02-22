@@ -1,18 +1,18 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { toastUtils } from '@/lib/utils/toast';
-import { devLog } from '@/lib/utils/devLog';
-import { errorHandler } from '@/lib/utils/errorHandling';
-import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
-import { GPS_CAMPUS_BOUNDS } from '@/features/map/lib/constants';
-import { gpsToCrsSimple } from '@/features/map/lib/geospatialCalibration';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { toastUtils } from "@/lib/utils/toast";
+import { devLog } from "@/lib/utils/devLog";
+import { errorHandler } from "@/lib/utils/errorHandling";
+import { useSafeTranslation } from "@/lib/hooks/useSafeTranslation";
+import { GPS_CAMPUS_BOUNDS } from "@/features/map/lib/constants";
+import { gpsToCrsSimple } from "@/features/map/lib/geospatialCalibration";
 import {
   GpsPositionSmoother,
   type SmoothedPosition,
   NavigationStateManager,
-} from '@/features/map/lib/realtimeNavigation';
-import type { LocationStatus } from '../components/CampusMap';
-import type { Map as LeafletMap, Marker, Circle, Icon } from 'leaflet';
-import { logger } from '@/lib/logger';
+} from "@/features/map/lib/realtimeNavigation";
+import type { LocationStatus } from "../components/CampusMap";
+import type { Map as LeafletMap, Marker, Circle, Icon } from "leaflet";
+import { logger } from "@/lib/logger";
 
 // Constants
 const LOCATION_TIMEOUT = 15000;
@@ -23,14 +23,15 @@ const MOVEMENT_THRESHOLD = 0.2; // m/s
 // Logger
 const mapLog = devLog.map;
 
-const NAVIGATION_ACTIVE_STATUSES: Array<ReturnType<NavigationStateManager['getState']>['status']> =
-  ['navigating', 'off-route', 'recalculating'];
+const NAVIGATION_ACTIVE_STATUSES: Array<
+  ReturnType<NavigationStateManager["getState"]>["status"]
+> = ["navigating", "off-route", "recalculating"];
 
 interface UseMapLocationProps {
   mapInstance: LeafletMap | null;
-  leafletModule: typeof import('leaflet') | null;
+  leafletModule: typeof import("leaflet") | null;
   isMapReady: (map: LeafletMap | null) => boolean;
-  userIcon: Icon | import('leaflet').DivIcon | null;
+  userIcon: Icon | import("leaflet").DivIcon | null;
   navManagerRef: React.MutableRefObject<NavigationStateManager | null>;
 }
 
@@ -44,15 +45,22 @@ export function useMapLocation({
   const { safeT } = useSafeTranslation();
 
   // State
-  const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
-  const [smoothedPosition, setSmoothedPosition] = useState<SmoothedPosition | null>(null);
-  const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationStatus, setLocationStatus] = useState<LocationStatus>("idle");
+  const [smoothedPosition, setSmoothedPosition] =
+    useState<SmoothedPosition | null>(null);
+  const [origin, setOrigin] = useState<{ lat: number; lng: number } | null>(
+    null,
+  );
   const [isOffCampus, setIsOffCampus] = useState(false);
 
   // Refs
   const userMarkerRef = useRef<Marker | null>(null);
   const accuracyCircleRef = useRef<Circle | null>(null);
-  const lastPositionRef = useRef<{ lat: number; lng: number; time: number } | null>(null);
+  const lastPositionRef = useRef<{
+    lat: number;
+    lng: number;
+    time: number;
+  } | null>(null);
   const positionSmootherRef = useRef<GpsPositionSmoother | null>(null);
   const offCampusToastShown = useRef(false);
   const safeTRef = useRef(safeT);
@@ -91,7 +99,7 @@ export function useMapLocation({
 
   // Motion Detection (Sensor Fusion)
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.DeviceMotionEvent) return;
+    if (typeof window === "undefined" || !window.DeviceMotionEvent) return;
 
     let motionTimeout: ReturnType<typeof setTimeout>;
     let cleanedUp = false;
@@ -101,7 +109,9 @@ export function useMapLocation({
       if (!acceleration || acceleration.x === null) return;
 
       const mag = Math.sqrt(
-        (acceleration.x || 0) ** 2 + (acceleration.y || 0) ** 2 + (acceleration.z || 0) ** 2,
+        (acceleration.x || 0) ** 2 +
+          (acceleration.y || 0) ** 2 +
+          (acceleration.z || 0) ** 2,
       );
 
       // Threshold for significant movement (walking vibration)
@@ -120,20 +130,20 @@ export function useMapLocation({
 
     const addMotionListener = () => {
       if (cleanedUp) return;
-      window.addEventListener('devicemotion', handleMotion, { passive: true });
+      window.addEventListener("devicemotion", handleMotion, { passive: true });
     };
 
     // iOS 13+ requires explicit permission request for DeviceMotionEvent
     const DME = DeviceMotionEvent as unknown as {
-      requestPermission?: () => Promise<'granted' | 'denied'>;
+      requestPermission?: () => Promise<"granted" | "denied">;
     };
-    if (typeof DME.requestPermission === 'function') {
+    if (typeof DME.requestPermission === "function") {
       DME.requestPermission()
         .then((permission) => {
-          if (permission === 'granted') {
+          if (permission === "granted") {
             addMotionListener();
           } else {
-            mapLog.log('DeviceMotion permission denied');
+            mapLog.log("DeviceMotion permission denied");
           }
         })
         .catch(() => {
@@ -147,24 +157,29 @@ export function useMapLocation({
 
     return () => {
       cleanedUp = true;
-      window.removeEventListener('devicemotion', handleMotion);
+      window.removeEventListener("devicemotion", handleMotion);
       clearTimeout(motionTimeout);
     };
   }, [navManagerRef]);
 
   // Geolocation Effect
   useEffect(() => {
-    if (!mapInstance || !isMapReady(mapInstance) || !leafletModule || !navigator.geolocation) {
-      if (typeof navigator !== 'undefined' && !navigator.geolocation) {
-        mapLog.log('Geolocation API not available');
+    if (
+      !mapInstance ||
+      !isMapReady(mapInstance) ||
+      !leafletModule ||
+      !navigator.geolocation
+    ) {
+      if (typeof navigator !== "undefined" && !navigator.geolocation) {
+        mapLog.log("Geolocation API not available");
         // Avoid synchronous state update in effect
-        setTimeout(() => setLocationStatus('error'), 0);
+        setTimeout(() => setLocationStatus("error"), 0);
       }
       return;
     }
 
-    mapLog.log('Starting geolocation watch...');
-    setTimeout(() => setLocationStatus('searching'), 0);
+    mapLog.log("Starting geolocation watch...");
+    setTimeout(() => setLocationStatus("searching"), 0);
 
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
@@ -203,7 +218,11 @@ export function useMapLocation({
           }
         }
 
-        lastPositionRef.current = { lat: gpsLat, lng: gpsLng, time: currentTime };
+        lastPositionRef.current = {
+          lat: gpsLat,
+          lng: gpsLng,
+          time: currentTime,
+        };
 
         // Kalman Smoothing
         let smoothedLat = gpsLat;
@@ -245,28 +264,36 @@ export function useMapLocation({
           }
         }
 
-        setLocationStatus('found');
+        setLocationStatus("found");
         setOrigin((prev) => {
           if (!prev) return { lat: gpsLat, lng: gpsLng };
           const dx = prev.lat - gpsLat;
           const dy = prev.lng - gpsLng;
           // Throttle origin updates (used for route fetching) to ~20-25m threshold
-          if (dx * dx + dy * dy > 0.00000004) return { lat: gpsLat, lng: gpsLng };
+          if (dx * dx + dy * dy > 0.00000004)
+            return { lat: gpsLat, lng: gpsLng };
           return prev;
         });
 
         // Campus Bounds Check
         const { south, north, west, east } = GPS_CAMPUS_BOUNDS;
-        const isInBounds = gpsLat >= south && gpsLat <= north && gpsLng >= west && gpsLng <= east;
+        const isInBounds =
+          gpsLat >= south &&
+          gpsLat <= north &&
+          gpsLng >= west &&
+          gpsLng <= east;
         setIsOffCampus(!isInBounds);
 
         if (!isInBounds && !offCampusToastShown.current) {
           offCampusToastShown.current = true;
           toastUtils.warning(
-            safeTRef.current('locationOutsideCampusTitle', 'Outside campus boundary'),
             safeTRef.current(
-              'locationOutsideCampusMessage',
-              'You appear to be outside campus bounds. Navigation is disabled until you return to campus.',
+              "locationOutsideCampusTitle",
+              "Outside campus boundary",
+            ),
+            safeTRef.current(
+              "locationOutsideCampusMessage",
+              "You appear to be outside campus bounds. Navigation is disabled until you return to campus.",
             ),
           );
         } else if (isInBounds) {
@@ -295,31 +322,36 @@ export function useMapLocation({
             if (userMarkerRef.current) {
               const iconElement = userMarkerRef.current.getElement();
               if (iconElement) {
-                const isMoving = gpsSpeed !== null && gpsSpeed > MOVEMENT_THRESHOLD;
+                const isMoving =
+                  gpsSpeed !== null && gpsSpeed > MOVEMENT_THRESHOLD;
 
                 // Motion Arrow
-                if (isMoving && typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
-                  iconElement.classList.add('is-moving');
+                if (
+                  isMoving &&
+                  typeof gpsHeading === "number" &&
+                  !isNaN(gpsHeading)
+                ) {
+                  iconElement.classList.add("is-moving");
                   const arrowElement = iconElement.querySelector(
-                    '.user-motion-arrow',
+                    ".user-motion-arrow",
                   ) as HTMLElement;
                   if (arrowElement) {
                     arrowElement.style.transform = `translate(-50%, -50%) rotate(${gpsHeading - 45}deg)`;
                   }
                 } else {
-                  iconElement.classList.remove('is-moving');
+                  iconElement.classList.remove("is-moving");
                 }
 
                 // Heading Flash
                 const flashElement = iconElement.querySelector(
-                  '.user-heading-flash',
+                  ".user-heading-flash",
                 ) as HTMLElement;
                 if (flashElement) {
-                  if (typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
+                  if (typeof gpsHeading === "number" && !isNaN(gpsHeading)) {
                     flashElement.style.transform = `rotate(${gpsHeading}deg)`;
-                    flashElement.style.opacity = '1';
+                    flashElement.style.opacity = "1";
                   } else {
-                    flashElement.style.opacity = '0';
+                    flashElement.style.opacity = "0";
                   }
                 }
               }
@@ -332,7 +364,7 @@ export function useMapLocation({
               accuracyCircleRef.current = leafletModule
                 .circle([crsPos.lat, crsPos.lng], {
                   radius: pixelAccuracy,
-                  color: 'var(--mq-primary, #1a73e8)',
+                  color: "var(--mq-primary, #1a73e8)",
                   weight: 1,
                   opacity: 0.4,
                   fillOpacity: 0.1,
@@ -354,27 +386,30 @@ export function useMapLocation({
             }
           }
         } catch (error) {
-          mapLog.log('Error updating markers:', error);
+          mapLog.log("Error updating markers:", error);
         }
       },
       (err) => {
-        mapLog.log('Geolocation error:', err);
+        mapLog.log("Geolocation error:", err);
         const isPermissionDenied = err.code === 1;
         const isTimeout = err.code === 3;
 
         if (!isPermissionDenied && !isTimeout) {
           errorHandler.logError(
             new Error(`Location failed: ${err.message}`),
-            'MapGeolocation',
-            'low',
+            "MapGeolocation",
+            "low",
           );
         }
 
         if (isPermissionDenied) {
-          setLocationStatus('denied');
+          setLocationStatus("denied");
           toastUtils.warning(
-            safeTRef.current('locationAccessDenied', 'Location Denied'),
-            safeTRef.current('locationDeniedDesc', 'Please enable location access.'),
+            safeTRef.current("locationAccessDenied", "Location Denied"),
+            safeTRef.current(
+              "locationDeniedDesc",
+              "Please enable location access.",
+            ),
           );
         } else if (isTimeout) {
           // Retry automatically? For now just log
@@ -398,18 +433,21 @@ export function useMapLocation({
       userMarkerRef.current &&
       mapInstance &&
       isMapReady(mapInstance) &&
-      locationStatus === 'found'
+      locationStatus === "found"
     ) {
       const latLng = userMarkerRef.current.getLatLng();
       mapInstance.flyTo(latLng, 2, {
         animate: true,
         duration: 1.5,
       });
-      mapLog.log('Centering map on user location');
+      mapLog.log("Centering map on user location");
     } else {
       toastUtils.info(
-        safeTRef.current('locationNotAvailable', 'Location Not Available'),
-        safeTRef.current('waitLocation', 'Please wait for your location to be found.'),
+        safeTRef.current("locationNotAvailable", "Location Not Available"),
+        safeTRef.current(
+          "waitLocation",
+          "Please wait for your location to be found.",
+        ),
       );
     }
   }, [mapInstance, isMapReady, locationStatus]);
@@ -419,7 +457,7 @@ export function useMapLocation({
    */
   const simulatePosition = useCallback(
     (lat: number, lng: number, heading: number = 0, speed: number = 1.4) => {
-      if (process.env.NODE_ENV === 'production') return;
+      if (process.env.NODE_ENV === "production") return;
       if (!isMapReady(mapInstance) || !leafletModule) return;
 
       const timestamp = Date.now();
@@ -455,7 +493,7 @@ export function useMapLocation({
         }
       }
 
-      setLocationStatus('found');
+      setLocationStatus("found");
       setOrigin({ lat, lng });
 
       // Update Markers
@@ -476,8 +514,10 @@ export function useMapLocation({
             // Force "moving" visual state
             const iconElement = userMarkerRef.current.getElement();
             if (iconElement) {
-              iconElement.classList.add('is-moving');
-              const arrowElement = iconElement.querySelector('.user-motion-arrow') as HTMLElement;
+              iconElement.classList.add("is-moving");
+              const arrowElement = iconElement.querySelector(
+                ".user-motion-arrow",
+              ) as HTMLElement;
               if (arrowElement) {
                 arrowElement.style.transform = `translate(-50%, -50%) rotate(${heading - 45}deg)`;
               }
@@ -490,7 +530,7 @@ export function useMapLocation({
               accuracyCircleRef.current = leafletModule
                 .circle([crsPos.lat, crsPos.lng], {
                   radius: 10, // Small radius for sim
-                  color: 'var(--mq-primary, #1a73e8)',
+                  color: "var(--mq-primary, #1a73e8)",
                   weight: 1,
                   opacity: 0.4,
                   fillOpacity: 0.1,
@@ -502,7 +542,7 @@ export function useMapLocation({
           }
         }
       } catch (error) {
-        logger.error('Simulation error:', error);
+        logger.error("Simulation error:", error);
       }
     },
     [mapInstance, leafletModule, isMapReady, userIcon, navManagerRef],

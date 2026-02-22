@@ -40,7 +40,7 @@ export interface UserProfile {
 }
 
 export interface UserPreferences {
-  theme: 'light' | 'dark' | 'system';
+  theme: "light" | "dark" | "system";
   notifications_enabled: boolean;
   email_notifications: boolean;
   push_notifications: boolean;
@@ -66,7 +66,14 @@ export interface Unit {
 export interface ClassTime {
   id: string;
   unit_id: string;
-  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  day:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
   start_time: string; // "09:00" format
   end_time: string; // "11:00" format
   created_at: string;
@@ -80,8 +87,8 @@ export interface Deadline {
   unit_code: string;
   unit_id?: string;
   due_date: string; // ISO string
-  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
-  type: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
+  priority: "Low" | "Medium" | "High" | "Urgent";
+  type: "Assignment" | "Exam" | "Quiz" | "Presentation";
   completed: boolean;
   created_at: string;
   updated_at: string;
@@ -98,7 +105,7 @@ export interface Event {
   all_day: boolean;
   location: string;
   building?: string;
-  category: 'Career' | 'Social' | 'Academic' | 'Free Food';
+  category: "Career" | "Social" | "Academic" | "Free Food";
   image_url?: string;
   created_at: string;
   updated_at: string;
@@ -121,16 +128,16 @@ export interface XPEvent {
   id: string;
   user_id: string;
   event_type:
-    | 'deadline_completed'
-    | 'deadline_early'
-    | 'daily_login'
-    | 'streak_bonus'
-    | 'unit_added'
-    | 'event_attended'
-    | 'profile_completed'
-    | 'first_deadline'
-    | 'weekly_goal'
-    | 'level_up_bonus';
+    | "deadline_completed"
+    | "deadline_early"
+    | "daily_login"
+    | "streak_bonus"
+    | "unit_added"
+    | "event_attended"
+    | "profile_completed"
+    | "first_deadline"
+    | "weekly_goal"
+    | "level_up_bonus";
   xp_amount: number;
   reference_id?: string;
   metadata: Record<string, unknown>;
@@ -153,7 +160,7 @@ export interface Notification {
   user_id: string;
   title: string;
   message: string;
-  type: 'deadline' | 'event' | 'class' | 'system';
+  type: "deadline" | "event" | "class" | "system";
   read: boolean;
   link?: string;
   related_id?: string;
@@ -190,8 +197,8 @@ export interface CreateDeadlineRequest {
   unit_code: string;
   unit_id?: string;
   due_date: string; // ISO string
-  priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
-  type?: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
+  priority?: "Low" | "Medium" | "High" | "Urgent";
+  type?: "Assignment" | "Exam" | "Quiz" | "Presentation";
 }
 
 export interface UpdateDeadlineRequest {
@@ -200,8 +207,8 @@ export interface UpdateDeadlineRequest {
   unit_code?: string;
   unit_id?: string;
   due_date?: string; // ISO string
-  priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
-  type?: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
+  priority?: "Low" | "Medium" | "High" | "Urgent";
+  type?: "Assignment" | "Exam" | "Quiz" | "Presentation";
   completed?: boolean;
 }
 
@@ -213,7 +220,7 @@ export interface CreateEventRequest {
   all_day?: boolean;
   location: string;
   building?: string;
-  category?: 'Career' | 'Social' | 'Academic' | 'Free Food';
+  category?: "Career" | "Social" | "Academic" | "Free Food";
   image_url?: string;
 }
 
@@ -225,7 +232,7 @@ export interface UpdateEventRequest {
   all_day?: boolean;
   location?: string;
   building?: string;
-  category?: 'Career' | 'Social' | 'Academic' | 'Free Food';
+  category?: "Career" | "Social" | "Academic" | "Free Food";
   image_url?: string;
 }
 
@@ -248,11 +255,12 @@ export interface FilterParams {
 
 export interface SortParams {
   sort_by?: string;
-  sort_order?: 'asc' | 'desc';
+  sort_order?: "asc" | "desc";
 }
 
 // Combined query parameters
-export interface ApiQueryParams extends PaginationParams, FilterParams, SortParams {}
+export interface ApiQueryParams
+  extends PaginationParams, FilterParams, SortParams {}
 
 // Validation error types
 export interface ValidationError {

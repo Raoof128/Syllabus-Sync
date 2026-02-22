@@ -1,3 +1,22 @@
+### Raouf: Map UI Polish & Interactive Tweaks — 2026-02-22
+
+**Scope:** Map UI Interactivity & Lint Fixes
+**Type:** Bug Fix & Polish
+
+#### Changes
+
+1. **Auto-Collapse Map Panel:**
+   - Modified `features/map/components/CampusMapHUD.tsx` injecting an automatic collapse hook tracking `setIsPlacesPanelExpanded(false)` upon individual building select events, minimizing occlusion when engaging new routes.
+2. **Responsive Find-Me Controls:**
+   - Altered `features/map/components/GoogleMapEmbed.tsx` updating native Google frame HUD padding elements avoiding overlap masking on smaller active displays. Transitioned standard offset classes shifting bounds from `bottom-[140px]` directly safely down handling the `isGoogleMode` state actively without cutting controls out.
+3. **Cross-Component Lint Rectification:**
+   - Removed legacy `Card` imports within `MapClient.tsx` carrying over from the previous edge-layout commit. Eliminated unreferenced `TranslationKey`, `useUnitsStore`, and `useEventsStore` from strict typing inside `CalendarWidgets.tsx`. Remapped typescript warnings globally inside `LoginClient.tsx` overriding explicit any handling with safe `@ts-expect-error` definitions.
+
+#### Verification
+- `npm run check` confirms compilation successfully without isolated eslint conflicts. All 482 test scripts execute reliably maintaining zero regressions.
+
+---
+
 ### Raouf: Map Navigation Enhancements & UI Redesign — 2026-02-22
 
 **Scope:** Map UI Layout / Feature Enhancements
@@ -15,6 +34,7 @@
    - Targeted `components/layout/Sidebar.tsx` effectively erasing the `custom-scrollbar` abstractions previously overriding OS-native device feedback mechanics. Releasing touch interfaces directly down to reliable hardware layout definitions handling `overflow-y-auto` ensures 100% interactive scroll thresholds.
 
 #### Verification
+
 - `npm run check` test suite evaluation finalized cleanly 0 lint and 482 passing test scripts locally executed prior to final distribution deployment processing.
 - Build deployment shipped safely via `npm run vercel:deploy:prod` alias linking precisely bound assets instantly to edge cache configurations.
 

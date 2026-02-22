@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useTransition } from "react";
 import {
   translations,
   loadTranslations,
   isLanguageLoaded,
   TranslationKey,
   Language,
-} from '@/lib/i18n/translations';
-import { useLanguageStore } from '@/lib/store/languageStore';
+} from "@/lib/i18n/translations";
+import { useLanguageStore } from "@/lib/store/languageStore";
 
 // Import English for fallback
-import en from '@/locales/en/translations.json';
+import en from "@/locales/en/translations.json";
 
 // Trigger hydration once on client mount
 let hydrationTriggered = false;
@@ -20,7 +20,7 @@ export function useTranslation() {
   const { language, setLanguage, isRTL, _hasHydrated } = useLanguageStore();
   // Use React 18+ useTransition for non-blocking loading state
   const [isPending, startTransition] = useTransition();
-  const loadedRef = useRef<Set<Language>>(new Set(['en']));
+  const loadedRef = useRef<Set<Language>>(new Set(["en"]));
 
   // Trigger hydration on first client render
   useEffect(() => {
@@ -45,11 +45,14 @@ export function useTranslation() {
     (key: TranslationKey, vars?: Record<string, string | number>): string => {
       // Get translation from current language, fallback to English
       const langTranslations = translations[language];
-      let text = (langTranslations as Record<string, string> | undefined)?.[key] || en[key] || key;
+      let text =
+        (langTranslations as Record<string, string> | undefined)?.[key] ||
+        en[key] ||
+        key;
 
       if (vars) {
         Object.entries(vars).forEach(([k, v]) => {
-          text = text.replace(new RegExp(`{{${k}}}`, 'g'), String(v));
+          text = text.replace(new RegExp(`{{${k}}}`, "g"), String(v));
         });
       }
       return text;

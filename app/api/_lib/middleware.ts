@@ -1,20 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
-import { jsonUnauthorized, jsonError, ERROR_CODES } from './response';
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@/lib/supabase/server";
+import { jsonUnauthorized, jsonError, ERROR_CODES } from "./response";
 import {
   checkRateLimit,
   type RateLimitConfig,
   mutationLimiter,
-} from '@/lib/services/rateLimitService';
-import { validateOrigin } from '@/lib/security/csrf';
-import { logger } from '@/lib/logger';
+} from "@/lib/services/rateLimitService";
+import { validateOrigin } from "@/lib/security/csrf";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // AUTHENTICATION MIDDLEWARE
 // ============================================================================
 
 // HTTP methods that modify state and require CSRF protection
-const MUTATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
+const MUTATION_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
 let lastTransientAuthLogAt = 0;
 const TRANSIENT_AUTH_LOG_INTERVAL_MS = 60_000;
 
@@ -22,10 +22,10 @@ function isTransientAuthNetworkError(err: unknown): boolean {
   if (!(err instanceof Error)) return false;
   const message = err.message.toLowerCase();
   return (
-    err.name === 'AbortError' ||
-    message.includes('fetch failed') ||
-    message.includes('econnreset') ||
-    message.includes('network')
+    err.name === "AbortError" ||
+    message.includes("fetch failed") ||
+    message.includes("econnreset") ||
+    message.includes("network")
   );
 }
 
@@ -38,13 +38,16 @@ function shouldLogTransientAuthError(): boolean {
   return true;
 }
 
-function isRefreshTokenMissingError(error: { message?: string; code?: string | null }): boolean {
-  const message = (error.message || '').toLowerCase();
-  const code = (error.code || '').toLowerCase();
+function isRefreshTokenMissingError(error: {
+  message?: string;
+  code?: string | null;
+}): boolean {
+  const message = (error.message || "").toLowerCase();
+  const code = (error.code || "").toLowerCase();
   return (
-    code === 'refresh_token_not_found' ||
-    message.includes('refresh token not found') ||
-    message.includes('invalid refresh token')
+    code === "refresh_token_not_found" ||
+    message.includes("refresh token not found") ||
+    message.includes("invalid refresh token")
   );
 }
 
@@ -61,8 +64,8 @@ export const requireAuth = async (
     if (MUTATION_METHODS.includes(request.method)) {
       const originResult = validateOrigin(request as unknown as NextRequest);
       if (!originResult.valid) {
-        console.warn('CSRF origin validation failed:', originResult.reason);
-        return jsonError('Invalid request origin', 403, ERROR_CODES.FORBIDDEN);
+        console.warn("CSRF origin validation failed:", originResult.reason);
+        return jsonError("Invalid request origin", 403, ERROR_CODES.FORBIDDEN);
       }
     }
 
@@ -79,22 +82,24 @@ export const requireAuth = async (
       if (error && !isRefreshError) {
         if (isTransientAuthNetworkError(new Error(error.message))) {
           if (shouldLogTransientAuthError()) {
-            console.warn('API auth status: transient upstream issue; treating as unauthenticated');
+            console.warn(
+              "API auth status: transient upstream issue; treating as unauthenticated",
+            );
           }
         } else {
-          console.warn('API auth error:', error.message);
+          console.warn("API auth error:", error.message);
         }
       }
-      return jsonUnauthorized('Valid authentication token required');
+      return jsonUnauthorized("Valid authentication token required");
     }
 
     return await handler(user.id);
   } catch (error) {
     logger.error(
-      'Authentication middleware error:',
-      error instanceof Error ? error.message : 'Unknown error',
+      "Authentication middleware error:",
+      error instanceof Error ? error.message : "Unknown error",
     );
-    return jsonError('Authentication failed', 500, ERROR_CODES.INTERNAL_ERROR);
+    return jsonError("Authentication failed", 500, ERROR_CODES.INTERNAL_ERROR);
   }
 };
 
@@ -119,11 +124,11 @@ export const optionalAuth = async (
         if (isTransientAuthNetworkError(new Error(error.message))) {
           if (shouldLogTransientAuthError()) {
             console.warn(
-              'Optional auth status: transient upstream issue; continuing without user context',
+              "Optional auth status: transient upstream issue; continuing without user context",
             );
           }
         } else {
-          console.warn('Optional auth status:', error.message);
+          console.warn("Optional auth status:", error.message);
         }
       }
     }
@@ -131,20 +136,21 @@ export const optionalAuth = async (
     return await handler(user?.id);
   } catch (error) {
     const isRefreshError =
-      error instanceof Error && error.message.includes('Refresh Token Not Found');
+      error instanceof Error &&
+      error.message.includes("Refresh Token Not Found");
     const isTransient = isTransientAuthNetworkError(
       error instanceof Error ? error : new Error(String(error)),
     );
     if (isTransient) {
       if (shouldLogTransientAuthError()) {
         console.warn(
-          'Optional auth status: transient upstream failure; continuing unauthenticated',
+          "Optional auth status: transient upstream failure; continuing unauthenticated",
         );
       }
     } else if (!isRefreshError) {
       logger.error(
-        'Optional auth middleware error:',
-        error instanceof Error ? error.message : 'Unknown error',
+        "Optional auth middleware error:",
+        error instanceof Error ? error.message : "Unknown error",
       );
     }
     // Continue without authentication
@@ -175,8 +181,8 @@ export const requireAuthWithRateLimit = async (
     if (MUTATION_METHODS.includes(request.method)) {
       const originResult = validateOrigin(request as unknown as NextRequest);
       if (!originResult.valid) {
-        console.warn('CSRF origin validation failed:', originResult.reason);
-        return jsonError('Invalid request origin', 403, ERROR_CODES.FORBIDDEN);
+        console.warn("CSRF origin validation failed:", originResult.reason);
+        return jsonError("Invalid request origin", 403, ERROR_CODES.FORBIDDEN);
       }
     }
 
@@ -193,13 +199,15 @@ export const requireAuthWithRateLimit = async (
       if (error && !isRefreshError) {
         if (isTransientAuthNetworkError(new Error(error.message))) {
           if (shouldLogTransientAuthError()) {
-            console.warn('API auth status: transient upstream issue; treating as unauthenticated');
+            console.warn(
+              "API auth status: transient upstream issue; treating as unauthenticated",
+            );
           }
         } else {
-          console.warn('API auth error:', error.message);
+          console.warn("API auth error:", error.message);
         }
       }
-      return jsonUnauthorized('Valid authentication token required');
+      return jsonUnauthorized("Valid authentication token required");
     }
 
     // Apply rate limiting using user ID for authenticated requests
@@ -223,17 +231,30 @@ export const requireAuthWithRateLimit = async (
 
     // Add rate limit headers to response
     const newResponse = new NextResponse(response.body, response);
-    newResponse.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString());
-    newResponse.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
-    newResponse.headers.set('X-RateLimit-Reset', rateLimitResult.resetIn.toString());
+    newResponse.headers.set(
+      "X-RateLimit-Limit",
+      rateLimitResult.limit.toString(),
+    );
+    newResponse.headers.set(
+      "X-RateLimit-Remaining",
+      rateLimitResult.remaining.toString(),
+    );
+    newResponse.headers.set(
+      "X-RateLimit-Reset",
+      rateLimitResult.resetIn.toString(),
+    );
 
     return newResponse;
   } catch (error) {
     logger.error(
-      'Auth/RateLimit middleware error:',
-      error instanceof Error ? error.message : 'Unknown error',
+      "Auth/RateLimit middleware error:",
+      error instanceof Error ? error.message : "Unknown error",
     );
-    return jsonError('Request processing failed', 500, ERROR_CODES.INTERNAL_ERROR);
+    return jsonError(
+      "Request processing failed",
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 };
 
@@ -258,37 +279,37 @@ function isValidIP(ip: string): boolean {
  * SECURITY: Only trust verified proxy headers in production
  */
 function getClientIP(request: NextRequest): string {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isProduction = process.env.NODE_ENV === "production";
 
   // In production, prefer verified proxy headers that cannot be spoofed
   if (isProduction) {
     // Vercel's verified header (highest trust)
-    const vercelIp = request.headers.get('x-vercel-forwarded-for');
+    const vercelIp = request.headers.get("x-vercel-forwarded-for");
     if (vercelIp) {
-      const firstIp = vercelIp.split(',')[0].trim();
+      const firstIp = vercelIp.split(",")[0].trim();
       if (firstIp && isValidIP(firstIp)) return firstIp;
     }
 
     // Cloudflare's verified header
-    const cfIp = request.headers.get('cf-connecting-ip');
+    const cfIp = request.headers.get("cf-connecting-ip");
     if (cfIp && isValidIP(cfIp)) return cfIp;
   }
 
   // In development or as fallback, use standard headers
   // SECURITY: Be careful with x-forwarded-for in production if not behind a trusted proxy
-  const forwarded = request.headers.get('x-forwarded-for');
+  const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) {
-    const firstIp = forwarded.split(',')[0].trim();
+    const firstIp = forwarded.split(",")[0].trim();
     if (firstIp && isValidIP(firstIp)) return firstIp;
   }
 
-  const realIp = request.headers.get('x-real-ip');
+  const realIp = request.headers.get("x-real-ip");
   if (realIp && isValidIP(realIp)) return realIp;
 
-  const clientIp = request.headers.get('x-client-ip');
+  const clientIp = request.headers.get("x-client-ip");
   if (clientIp && isValidIP(clientIp)) return clientIp;
 
-  return 'unknown';
+  return "unknown";
 }
 
 /**
@@ -308,7 +329,7 @@ export const rateLimit = (
     // Check rate limit using distributed store
     const { allowed, remaining, resetIn, limit } = await checkRateLimit(key, {
       ...config,
-      prefix: config.prefix || 'api',
+      prefix: config.prefix || "api",
     });
 
     if (!allowed) {
@@ -325,9 +346,9 @@ export const rateLimit = (
 
       // Add rate limit headers to response
       const newResponse = new NextResponse(response.body, response);
-      newResponse.headers.set('X-RateLimit-Limit', limit.toString());
-      newResponse.headers.set('X-RateLimit-Remaining', remaining.toString());
-      newResponse.headers.set('X-RateLimit-Reset', resetIn.toString());
+      newResponse.headers.set("X-RateLimit-Limit", limit.toString());
+      newResponse.headers.set("X-RateLimit-Remaining", remaining.toString());
+      newResponse.headers.set("X-RateLimit-Reset", resetIn.toString());
 
       return newResponse;
     } catch (error) {
@@ -362,20 +383,20 @@ export const cors = (config: CorsConfig = {}) => {
   // Parse CORS_ALLOWED_ORIGINS from environment variable if available
   // Format: comma-separated URLs, e.g., "http://localhost:3000,https://myapp.com"
   const defaultOrigins = process.env.CORS_ALLOWED_ORIGINS
-    ? process.env.CORS_ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+    ? process.env.CORS_ALLOWED_ORIGINS.split(",").map((origin) => origin.trim())
     : [
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'http://localhost:3002',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:3001',
-        'http://127.0.0.1:3002',
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
       ];
 
   const {
     allowedOrigins = defaultOrigins,
-    allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders = ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedMethods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders = ["Content-Type", "Authorization", "X-Requested-With"],
     exposedHeaders = [],
     credentials = true,
     maxAge = 86400, // 24 hours
@@ -384,10 +405,10 @@ export const cors = (config: CorsConfig = {}) => {
   // SECURITY: Disallow wildcard origin with credentials
   // This is a browser security requirement - warn developers
   const sanitizedOrigins = allowedOrigins.filter((origin) => {
-    if (origin === '*' && credentials) {
+    if (origin === "*" && credentials) {
       console.warn(
-        'SECURITY WARNING: CORS wildcard (*) origin is not allowed with credentials=true. ' +
-          'Removing wildcard from allowed origins.',
+        "SECURITY WARNING: CORS wildcard (*) origin is not allowed with credentials=true. " +
+          "Removing wildcard from allowed origins.",
       );
       return false;
     }
@@ -395,31 +416,32 @@ export const cors = (config: CorsConfig = {}) => {
   });
 
   // SECURITY: If no valid origins remain after sanitization, use defaults
-  const finalOrigins = sanitizedOrigins.length > 0 ? sanitizedOrigins : defaultOrigins;
+  const finalOrigins =
+    sanitizedOrigins.length > 0 ? sanitizedOrigins : defaultOrigins;
 
   return async (
     request: NextRequest,
     handler: () => Promise<NextResponse>,
   ): Promise<NextResponse> => {
-    const origin = request.headers.get('origin');
+    const origin = request.headers.get("origin");
 
     // SECURITY: Validate origin against allowlist
     const isAllowedOrigin = !origin || finalOrigins.includes(origin);
 
     // Handle preflight requests
-    if (request.method === 'OPTIONS') {
+    if (request.method === "OPTIONS") {
       if (!isAllowedOrigin) {
-        return jsonError('Origin not allowed', 403, ERROR_CODES.FORBIDDEN);
+        return jsonError("Origin not allowed", 403, ERROR_CODES.FORBIDDEN);
       }
 
       return new NextResponse(null, {
         status: 200,
         headers: {
-          'Access-Control-Allow-Origin': origin || finalOrigins[0],
-          'Access-Control-Allow-Methods': allowedMethods.join(', '),
-          'Access-Control-Allow-Headers': allowedHeaders.join(', '),
-          'Access-Control-Allow-Credentials': credentials.toString(),
-          'Access-Control-Max-Age': maxAge.toString(),
+          "Access-Control-Allow-Origin": origin || finalOrigins[0],
+          "Access-Control-Allow-Methods": allowedMethods.join(", "),
+          "Access-Control-Allow-Headers": allowedHeaders.join(", "),
+          "Access-Control-Allow-Credentials": credentials.toString(),
+          "Access-Control-Max-Age": maxAge.toString(),
         },
       });
     }
@@ -429,14 +451,15 @@ export const cors = (config: CorsConfig = {}) => {
     // Add CORS headers to actual response only if origin is allowed
     if (isAllowedOrigin && origin) {
       const corsHeaders: Record<string, string> = {
-        'Access-Control-Allow-Origin': origin,
-        'Access-Control-Allow-Methods': allowedMethods.join(', '),
-        'Access-Control-Allow-Headers': allowedHeaders.join(', '),
-        'Access-Control-Allow-Credentials': credentials.toString(),
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": allowedMethods.join(", "),
+        "Access-Control-Allow-Headers": allowedHeaders.join(", "),
+        "Access-Control-Allow-Credentials": credentials.toString(),
       };
 
       if (exposedHeaders.length > 0) {
-        corsHeaders['Access-Control-Expose-Headers'] = exposedHeaders.join(', ');
+        corsHeaders["Access-Control-Expose-Headers"] =
+          exposedHeaders.join(", ");
       }
 
       // Create new response with CORS headers
@@ -469,7 +492,7 @@ export async function parseJsonBody<T = unknown>(
 ): Promise<{ success: true; data: T } | { success: false; error: string }> {
   try {
     // Check Content-Length header first (fast rejection)
-    const contentLength = request.headers.get('content-length');
+    const contentLength = request.headers.get("content-length");
     if (contentLength && parseInt(contentLength, 10) > maxSize) {
       return {
         success: false,
@@ -488,7 +511,7 @@ export async function parseJsonBody<T = unknown>(
     }
 
     // Parse JSON
-    if (!body || body.trim() === '') {
+    if (!body || body.trim() === "") {
       return { success: true, data: {} as T };
     }
 
@@ -496,9 +519,9 @@ export async function parseJsonBody<T = unknown>(
     return { success: true, data };
   } catch (error) {
     if (error instanceof SyntaxError) {
-      return { success: false, error: 'Invalid JSON in request body' };
+      return { success: false, error: "Invalid JSON in request body" };
     }
-    return { success: false, error: 'Failed to parse request body' };
+    return { success: false, error: "Failed to parse request body" };
   }
 }
 
@@ -507,7 +530,11 @@ export async function parseJsonBody<T = unknown>(
  */
 export const validateRequest = <T>(
   schema: {
-    safeParse: (data: unknown) => { success: boolean; data?: T; error?: unknown };
+    safeParse: (data: unknown) => {
+      success: boolean;
+      data?: T;
+      error?: unknown;
+    };
   },
   maxBodySize: number = DEFAULT_MAX_BODY_SIZE,
 ) => {
@@ -527,17 +554,32 @@ export const validateRequest = <T>(
       if (!result.success) {
         const zodError = result.error as { errors?: unknown[] };
         // Log validation errors server-side for debugging
-        logger.error('Validation failed:', JSON.stringify(zodError.errors ?? [], null, 2));
-        logger.error('Request body was:', JSON.stringify(bodyResult.data, null, 2));
-        return jsonError('Request validation failed', 400, ERROR_CODES.VALIDATION_ERROR, {
-          errors: zodError.errors ?? [],
-        });
+        logger.error(
+          "Validation failed:",
+          JSON.stringify(zodError.errors ?? [], null, 2),
+        );
+        logger.error(
+          "Request body was:",
+          JSON.stringify(bodyResult.data, null, 2),
+        );
+        return jsonError(
+          "Request validation failed",
+          400,
+          ERROR_CODES.VALIDATION_ERROR,
+          {
+            errors: zodError.errors ?? [],
+          },
+        );
       }
 
       return await handler(result.data!);
     } catch (error) {
-      logger.error('Validation middleware error:', error);
-      return jsonError('Request processing failed', 400, ERROR_CODES.BAD_REQUEST);
+      logger.error("Validation middleware error:", error);
+      return jsonError(
+        "Request processing failed",
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
     }
   };
 };
@@ -549,7 +591,7 @@ export const validateRequest = <T>(
 /**
  * Request logging middleware
  */
-export const logRequest = (level: 'warn' | 'error' = 'warn') => {
+export const logRequest = (level: "warn" | "error" = "warn") => {
   return async (
     request: NextRequest,
     handler: () => Promise<NextResponse>,
@@ -557,12 +599,12 @@ export const logRequest = (level: 'warn' | 'error' = 'warn') => {
     const startTime = Date.now();
     const method = request.method;
     const url = request.nextUrl.pathname;
-    const userAgent = request.headers.get('user-agent') || 'Unknown';
+    const userAgent = request.headers.get("user-agent") || "Unknown";
     const ip =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      request.headers.get('x-client-ip') ||
-      'Unknown';
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      request.headers.get("x-client-ip") ||
+      "Unknown";
 
     // eslint-disable-next-line no-console
     console[level](`[${method}] ${url} - IP: ${ip} - User-Agent: ${userAgent}`);

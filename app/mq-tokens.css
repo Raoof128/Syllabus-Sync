@@ -94,8 +94,8 @@
   --ring: 222.2 84% 4.9%;
 
   /* Typography - --f-[family] format */
-  --f-primary: 'Work Sans', sans-serif;
-  --f-secondary: 'Source Serif Pro', serif;
+  --f-primary: "Work Sans", sans-serif;
+  --f-secondary: "Source Serif Pro", serif;
   /* Tailwind uses these next/font-compatible variables (see tailwind.config.ts). */
   --font-work-sans: var(--f-primary);
   --font-source-serif-pro: var(--f-secondary);
@@ -187,7 +187,8 @@
   /* Shadows */
   --c-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --c-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-  --c-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --c-shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --mq-shadow-md: var(--c-shadow-md);
 }
 

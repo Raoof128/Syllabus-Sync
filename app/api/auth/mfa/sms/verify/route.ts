@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { NextRequest } from "next/server";
+import { createServerClient } from "@/lib/supabase/server";
 import {
   jsonSuccess,
   jsonError,
@@ -7,11 +7,11 @@ import {
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
-} from '@/app/api/_lib/response';
-import { mfaVerifyLimiter } from '@/lib/security/mfa';
-import { getClientIP } from '@/lib/security/ip';
-import { logger } from '@/lib/logger';
-import { z } from 'zod';
+} from "@/app/api/_lib/response";
+import { mfaVerifyLimiter } from "@/lib/security/mfa";
+import { getClientIP } from "@/lib/security/ip";
+import { logger } from "@/lib/logger";
+import { z } from "zod";
 
 const smsVerifySchema = z.object({
   factorId: z.string().uuid(),
@@ -48,15 +48,22 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return jsonUnauthorized('Authentication required');
+      return jsonUnauthorized("Authentication required");
     }
 
-    const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: parseError } = await parseJsonBody(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (parseError) return parseError;
 
     const parsed = smsVerifySchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError('Invalid verification code', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError(
+        "Invalid verification code",
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
     }
 
     const { factorId, code } = parsed.data;
@@ -69,15 +76,19 @@ export async function POST(request: NextRequest) {
     });
 
     if (verifyError) {
-      logger.warn('SMS verification failed:', {
+      logger.warn("SMS verification failed:", {
         userId: user.id,
         factorId,
         error: verifyError.message,
       });
-      return jsonError('Invalid verification code', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError(
+        "Invalid verification code",
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+      );
     }
 
-    logger.info('SMS MFA verified', {
+    logger.info("SMS MFA verified", {
       userId: user.id,
       factorId,
     });
@@ -87,7 +98,7 @@ export async function POST(request: NextRequest) {
       factorId,
     });
   } catch (error) {
-    logger.error('SMS verify error:', error);
-    return jsonError('Verification failed', 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error("SMS verify error:", error);
+    return jsonError("Verification failed", 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

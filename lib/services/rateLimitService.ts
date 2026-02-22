@@ -1,5 +1,5 @@
-import { logger } from '@/lib/logger';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { logger } from "@/lib/logger";
+import { createAdminClient } from "@/lib/supabase/admin";
 /**
  * Distributed Rate Limiting Service
  *
@@ -51,8 +51,15 @@ export interface RateLimitResult {
 
 interface RateLimitStore {
   get(key: string): Promise<{ count: number; resetTime: number } | null>;
-  set(key: string, data: { count: number; resetTime: number }, ttlMs: number): Promise<void>;
-  increment(key: string, windowMs: number): Promise<{ count: number; resetTime: number }>;
+  set(
+    key: string,
+    data: { count: number; resetTime: number },
+    ttlMs: number,
+  ): Promise<void>;
+  increment(
+    key: string,
+    windowMs: number,
+  ): Promise<{ count: number; resetTime: number }>;
 }
 
 /**
@@ -70,7 +77,11 @@ class MemoryStore implements RateLimitStore {
     return data;
   }
 
-  async set(key: string, data: { count: number; resetTime: number }, _ttlMs: number) {
+  async set(
+    key: string,
+    data: { count: number; resetTime: number },
+    _ttlMs: number,
+  ) {
     this.store.set(key, data);
     // Clean up expired entries periodically
     if (Math.random() < 0.1) {
@@ -112,10 +123,10 @@ class UpstashRedisStore implements RateLimitStore {
 
   private async command<T>(...args: (string | number)[]): Promise<T> {
     const response = await fetch(`${this.baseUrl}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${this.token}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(args),
     });
@@ -130,7 +141,7 @@ class UpstashRedisStore implements RateLimitStore {
 
   async get(key: string) {
     try {
-      const data = await this.command<string | null>('GET', key);
+      const data = await this.command<string | null>("GET", key);
       if (!data) return null;
       return JSON.parse(data) as { count: number; resetTime: number };
     } catch {
@@ -138,9 +149,13 @@ class UpstashRedisStore implements RateLimitStore {
     }
   }
 
-  async set(key: string, data: { count: number; resetTime: number }, ttlMs: number) {
+  async set(
+    key: string,
+    data: { count: number; resetTime: number },
+    ttlMs: number,
+  ) {
     const ttlSeconds = Math.ceil(ttlMs / 1000);
-    await this.command('SET', key, JSON.stringify(data), 'EX', ttlSeconds);
+    await this.command("SET", key, JSON.stringify(data), "EX", ttlSeconds);
   }
 
   async increment(key: string, windowMs: number) {
@@ -172,18 +187,24 @@ class SupabasePostgresStore implements RateLimitStore {
   constructor() {
     const admin = createAdminClient();
     if (!admin) {
-      throw new Error('supabase admin client not configured');
+      throw new Error("supabase admin client not configured");
     }
     this.admin = admin;
   }
 
   async get(key: string) {
     try {
-      const { data, error } = await this.admin.rpc('ratelimit_get', { rl_key: key });
+      const { data, error } = await this.admin.rpc("ratelimit_get", {
+        rl_key: key,
+      });
       if (error) return null;
 
       const row = Array.isArray(data) ? data[0] : data;
-      if (!row || typeof row.count !== 'number' || typeof row.reset_time_ms !== 'number')
+      if (
+        !row ||
+        typeof row.count !== "number" ||
+        typeof row.reset_time_ms !== "number"
+      )
         return null;
 
       return { count: row.count, resetTime: row.reset_time_ms };
@@ -192,9 +213,13 @@ class SupabasePostgresStore implements RateLimitStore {
     }
   }
 
-  async set(key: string, data: { count: number; resetTime: number }, ttlMs: number) {
+  async set(
+    key: string,
+    data: { count: number; resetTime: number },
+    ttlMs: number,
+  ) {
     try {
-      await this.admin.rpc('ratelimit_set', {
+      await this.admin.rpc("ratelimit_set", {
         rl_key: key,
         rl_count: data.count,
         rl_reset_time_ms: data.resetTime,
@@ -206,18 +231,22 @@ class SupabasePostgresStore implements RateLimitStore {
   }
 
   async increment(key: string, windowMs: number) {
-    const { data, error } = await this.admin.rpc('ratelimit_increment', {
+    const { data, error } = await this.admin.rpc("ratelimit_increment", {
       rl_key: key,
       rl_window_ms: windowMs,
     });
 
     if (error) {
-      throw new Error(error.message || 'ratelimit_increment failed');
+      throw new Error(error.message || "ratelimit_increment failed");
     }
 
     const row = Array.isArray(data) ? data[0] : data;
-    if (!row || typeof row.count !== 'number' || typeof row.reset_time_ms !== 'number') {
-      throw new Error('ratelimit_increment returned invalid data');
+    if (
+      !row ||
+      typeof row.count !== "number" ||
+      typeof row.reset_time_ms !== "number"
+    ) {
+      throw new Error("ratelimit_increment returned invalid data");
     }
 
     return { count: row.count, resetTime: row.reset_time_ms };
@@ -259,32 +288,34 @@ function getStore(): RateLimitStore {
   // Memory store is useless in serverless environments (each instance has its own memory)
   // Use VERCEL_ENV for more reliable production detection
   const isRealProduction =
-    process.env.VERCEL_ENV === 'production' ||
-    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+    process.env.VERCEL_ENV === "production" ||
+    (process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV);
 
   // SECURITY: Check for explicit override to allow memory store in production
   // This should only be used for testing/demo deployments
-  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
+  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === "true";
 
   if (isRealProduction && !allowMemoryStore) {
     logger.error(
-      '🚨 CRITICAL SECURITY WARNING: No distributed rate limiting configured in production!\n' +
-        'In-memory rate limiting does NOT work across serverless instances.\n' +
-        'Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN (recommended) or KV_REST_API_URL/KV_REST_API_TOKEN.\n' +
-        'Alternatively, configure SUPABASE_SERVICE_ROLE_KEY to use the Postgres rate limit store.\n' +
-        'Security-critical endpoints (login, signup, password reset) will fail-closed.\n' +
-        'For testing/demo only, set ALLOW_MEMORY_RATE_LIMIT=true to bypass this check.',
+      "🚨 CRITICAL SECURITY WARNING: No distributed rate limiting configured in production!\n" +
+        "In-memory rate limiting does NOT work across serverless instances.\n" +
+        "Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN (recommended) or KV_REST_API_URL/KV_REST_API_TOKEN.\n" +
+        "Alternatively, configure SUPABASE_SERVICE_ROLE_KEY to use the Postgres rate limit store.\n" +
+        "Security-critical endpoints (login, signup, password reset) will fail-closed.\n" +
+        "For testing/demo only, set ALLOW_MEMORY_RATE_LIMIT=true to bypass this check.",
     );
   }
 
   // Fall back to memory store with clear warnings
   if (isRealProduction && allowMemoryStore) {
     console.warn(
-      '⚠️ PRODUCTION WARNING: Using in-memory rate limiting by explicit override.\n' +
-        'This provides NO real protection in serverless environments. Use only for testing.',
+      "⚠️ PRODUCTION WARNING: Using in-memory rate limiting by explicit override.\n" +
+        "This provides NO real protection in serverless environments. Use only for testing.",
     );
   } else {
-    console.warn('⚠️ DEV MODE: Using in-memory rate limiting. This is fine for local development.');
+    console.warn(
+      "⚠️ DEV MODE: Using in-memory rate limiting. This is fine for local development.",
+    );
   }
 
   return new MemoryStore();
@@ -319,10 +350,10 @@ export async function checkRateLimit(
   const now = Date.now();
   // SECURITY: Use VERCEL_ENV for reliable production detection
   const isProduction =
-    process.env.VERCEL_ENV === 'production' ||
-    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+    process.env.VERCEL_ENV === "production" ||
+    (process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV);
   const isMemoryStore = store instanceof MemoryStore;
-  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
+  const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === "true";
 
   // SECURITY: In production with memory store, fail-closed for security-critical endpoints
   // This prevents bypass attacks when Redis is not configured
@@ -348,9 +379,9 @@ export async function checkRateLimit(
     // Explicit operator override: allow memory rate limiting in production for demos/testing.
     // This is NOT a security boundary in serverless environments.
     logger.warn(
-      'SECURITY WARNING: ALLOW_MEMORY_RATE_LIMIT=true in production. ' +
-        'In-memory rate limiting does not protect across serverless instances; use Redis/KV for real protection.',
-      { prefix: config.prefix ?? 'unknown' },
+      "SECURITY WARNING: ALLOW_MEMORY_RATE_LIMIT=true in production. " +
+        "In-memory rate limiting does not protect across serverless instances; use Redis/KV for real protection.",
+      { prefix: config.prefix ?? "unknown" },
     );
     memoryOverrideWarningShown = true;
   }
@@ -370,11 +401,13 @@ export async function checkRateLimit(
     };
   } catch (error) {
     // SECURITY: Behavior on store failure depends on endpoint criticality
-    logger.error('Rate limit store error:', error);
+    logger.error("Rate limit store error:", error);
 
     if (config.failClosed) {
       // For security-critical endpoints, deny the request when we can't verify the rate limit
-      console.warn('Rate limit store unavailable - denying request (fail-closed mode)');
+      console.warn(
+        "Rate limit store unavailable - denying request (fail-closed mode)",
+      );
       return {
         allowed: false,
         remaining: 0,
@@ -406,7 +439,7 @@ export function createRateLimiter(config: RateLimitConfig) {
 
 /** Rate limiter for signup endpoint - strict limits, fail-closed for security */
 export const signupLimiter = createRateLimiter({
-  prefix: 'signup',
+  prefix: "signup",
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: 20, // Max 20 signups per hour per IP (increased for testing)
   failClosed: true, // SECURITY: Deny on store failure
@@ -414,7 +447,7 @@ export const signupLimiter = createRateLimiter({
 
 /** Rate limiter for login endpoint - fail-closed to prevent brute force */
 export const loginLimiter = createRateLimiter({
-  prefix: 'login',
+  prefix: "login",
   windowMs: 15 * 60 * 1000, // 15 minutes
   maxRequests: 50, // Max 50 attempts per 15 min (increased for testing)
   failClosed: true, // SECURITY: Deny on store failure
@@ -422,7 +455,7 @@ export const loginLimiter = createRateLimiter({
 
 /** Rate limiter for general API endpoints - fail-open for availability */
 export const apiLimiter = createRateLimiter({
-  prefix: 'api',
+  prefix: "api",
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 200, // Max 200 requests per minute
   failClosed: false, // Prioritize availability for general API
@@ -430,7 +463,7 @@ export const apiLimiter = createRateLimiter({
 
 /** Rate limiter for password reset - fail-closed for security */
 export const passwordResetLimiter = createRateLimiter({
-  prefix: 'reset',
+  prefix: "reset",
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: 10, // Max 10 reset requests per hour
   failClosed: true, // SECURITY: Deny on store failure
@@ -438,7 +471,7 @@ export const passwordResetLimiter = createRateLimiter({
 
 /** Rate limiter for mutation endpoints (POST, PUT, DELETE) - moderate limits */
 export const mutationLimiter = createRateLimiter({
-  prefix: 'mutation',
+  prefix: "mutation",
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 60, // Max 60 mutations per minute per user/IP
   failClosed: false, // Prioritize availability
@@ -446,7 +479,7 @@ export const mutationLimiter = createRateLimiter({
 
 /** Rate limiter for bulk operations - stricter limits */
 export const bulkOperationLimiter = createRateLimiter({
-  prefix: 'bulk',
+  prefix: "bulk",
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 10, // Max 10 bulk operations per minute
   failClosed: false,
@@ -454,7 +487,7 @@ export const bulkOperationLimiter = createRateLimiter({
 
 /** Rate limiter for password breach lookups */
 export const passwordBreachLimiter = createRateLimiter({
-  prefix: 'password_breach',
+  prefix: "password_breach",
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 50, // Max 50 checks per minute per IP
   failClosed: true,
@@ -462,7 +495,7 @@ export const passwordBreachLimiter = createRateLimiter({
 
 /** Rate limiter for security header scans */
 export const securityScanLimiter = createRateLimiter({
-  prefix: 'security_scan',
+  prefix: "security_scan",
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 20, // Max 20 scans per minute per user/IP
   failClosed: true,
@@ -470,7 +503,7 @@ export const securityScanLimiter = createRateLimiter({
 
 /** Rate limiter for passkey status checks - more permissive than login since it's read-only */
 export const passkeyStatusLimiter = createRateLimiter({
-  prefix: 'passkey_status',
+  prefix: "passkey_status",
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 100, // Max 100 status checks per minute (allows for email typing/autocomplete)
   failClosed: false, // Prioritize UX - status check is not security-critical
@@ -478,7 +511,7 @@ export const passkeyStatusLimiter = createRateLimiter({
 
 /** Rate limiter for passkey authentication (options + verify) - slightly more permissive than login */
 export const passkeyAuthLimiter = createRateLimiter({
-  prefix: 'passkey_auth',
+  prefix: "passkey_auth",
   windowMs: 15 * 60 * 1000, // 15 minutes
   maxRequests: 50, // Max 50 passkey auth attempts per 15 min (increased for testing)
   failClosed: true, // SECURITY: Deny on store failure

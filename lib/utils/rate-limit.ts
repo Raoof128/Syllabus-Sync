@@ -1,12 +1,15 @@
-import { headers } from 'next/headers';
-import { checkRateLimit as checkDistributedRateLimit } from '@/lib/services/rateLimitService';
-import { getClientIPFromHeaders } from '@/lib/security/ip';
+import { headers } from "next/headers";
+import { checkRateLimit as checkDistributedRateLimit } from "@/lib/services/rateLimitService";
+import { getClientIPFromHeaders } from "@/lib/security/ip";
 
-export async function checkRateLimit(limit: number = 10, windowMs: number = 60 * 1000) {
+export async function checkRateLimit(
+  limit: number = 10,
+  windowMs: number = 60 * 1000,
+) {
   const headersList = await headers();
   const clientIp = getClientIPFromHeaders(headersList);
   const result = await checkDistributedRateLimit(clientIp, {
-    prefix: 'server_action',
+    prefix: "server_action",
     windowMs,
     maxRequests: limit,
     failClosed: false,

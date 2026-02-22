@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import type { User } from '@supabase/supabase-js';
-import { createBrowserClient, isSupabaseConfigured } from './client';
+import type { User } from "@supabase/supabase-js";
+import { createBrowserClient, isSupabaseConfigured } from "./client";
 
 export type BrowserAuthSnapshot = {
   session: null;
   user: User | null;
-  resolution: 'resolved' | 'unknown';
+  resolution: "resolved" | "unknown";
 };
 
 /**
@@ -15,15 +15,15 @@ export type BrowserAuthSnapshot = {
  */
 export async function getBrowserAuthSnapshot(): Promise<BrowserAuthSnapshot> {
   if (!isSupabaseConfigured()) {
-    return { session: null, user: null, resolution: 'resolved' };
+    return { session: null, user: null, resolution: "resolved" };
   }
 
   const supabase = createBrowserClient();
   const { data, error } = await supabase.auth.getUser();
 
   if (error) {
-    return { session: null, user: null, resolution: 'unknown' };
+    return { session: null, user: null, resolution: "unknown" };
   }
 
-  return { session: null, user: data.user ?? null, resolution: 'resolved' };
+  return { session: null, user: data.user ?? null, resolution: "resolved" };
 }

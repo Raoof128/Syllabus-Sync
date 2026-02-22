@@ -4,7 +4,10 @@
 
 export default function Template({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full h-full animate-fade-in" style={{ animationDuration: '0.15s' }}>
+    <div
+      className="w-full h-full animate-fade-in"
+      style={{ animationDuration: "0.15s" }}
+    >
       {children}
     </div>
   );

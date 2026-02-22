@@ -1,84 +1,98 @@
 Raouf: 2026-02-16 (Australia/Sydney)
 Scope: Full Performance Audit & Fix — Site Load Speed + Supabase Timeout Resolution
 Summary: Fixed 10 critical/high performance issues. Supabase timeout 8s→15s/20s, proxy auth race deadline, eliminated client-layout auth waterfall (optimistic rendering), removed duplicate CSS import, replaced framer-motion template with CSS, re-enabled webpack chunk splitting, enabled DNS prefetch, fixed CORP header, removed 12MB SW precache, lazy-loaded login bg image.
+
 - **Files:** `lib/supabase/fetch.ts`, `lib/proxy.ts`, `app/client-layout.tsx`, `app/layout.tsx`, `app/template.tsx`, `config/next/next.config.ts`, `public/sw.js`, `app/login/LoginClient.tsx`, `features/feed/hooks/useFeedLogic.ts`.
 - **Verification:** `npm run typecheck` ✅, `npm run lint` ✅, `npm run test` ✅ (443/443 pass).
 
 Raouf: 2026-02-16 (Australia/Sydney)
 Scope: Privacy Policy (APP-Compliant) — Full Policy Page, Collection Notices, Legal Links
 Summary: Created `/privacy` page (14-section APP-compliant policy), added APP 5 collection notice to signup, added privacy/terms links to login footer, internal link routing for privacy/terms.
+
 - **Files:** Created `app/privacy/page.tsx`. Modified `app/signup/SignupClient.tsx`, `app/login/LoginClient.tsx`, `lib/config.ts`.
 - **Verification:** `npm run lint` ✅, `npx tsc --noEmit` ✅.
 
 Raouf: 2026-02-16 (Australia/Sydney)
 Scope: PWA Hardening — Proper Icon Set, Manifest Fixes, Offline Page, Layout Metadata
 Summary: Improved PWA installability and Lighthouse compliance. Generated proper square icon set, fixed manifest (split any+maskable, start_url to /home), added appleWebApp + applicationName metadata, created /offline route, bumped SW cache to v4.
+
 - **Files:** Created `public/icons/*`, `public/apple-touch-icon.png`, `app/offline/page.tsx`. Modified `public/manifest.webmanifest`, `app/layout.tsx`, `public/sw.js`.
 - **Verification:** `npm run lint` ✅, `npx tsc --noEmit` ✅.
 
 Raouf: 2026-02-14 (Australia/Sydney)
 Scope: Repository Documentation Audit & Full System Check
 Summary: Full repo audit — updated README (test badge 425→443, added email verification/gamification/responsive features, expanded directory tree), synced all AGENT.md and CHANGELOG.md files across docs/project and docs/project/team_plan with root entries through Feb 14. Ran `npm run check` pipeline.
+
 - **Files:** `README.md`, `AGENT.md`, `CHANGELOG.md`, `docs/project/AGENT.md`, `docs/project/team_plan/AGENT.md`, `docs/project/team_plan/CHANGELOG.md`.
 - **Verification:** `npm run check` ✅ (443/443 tests pass, build successful).
 
 Raouf: 2026-02-14 (Australia/Sydney)
 Scope: Supabase CLI Recovery + Full Remote Migration Push
 Summary: Fixed Supabase CLI auth, resolved non-idempotent constraints and duplicate version collisions, pushed all migrations to remote, added recovery migrations for missing objects.
+
 - **Files:** Modified/renamed multiple migration files; added recovery migrations.
 - **Verification:** `supabase db push --dry-run --include-all` ✅ (remote up to date).
 
 Raouf: 2026-02-14 (Australia/Sydney)
 Scope: Supabase CLI Alignment Audit (Tables/RPC vs Code)
 Summary: Static code-to-schema audit found two gaps (missing `user_sessions` table and `get_my_audit_logs` RPC). Added alignment migration.
+
 - **Files:** Added `supabase/migrations/20260214001000_align_code_db_objects.sql`.
 - **Verification:** No missing tables/functions; `npm run typecheck` ✅.
 
 Raouf: 2026-02-14 (Australia/Sydney)
 Scope: Gamification Logic and Security Production Audit
 Summary: Full gamification audit — XP math fix, store reset hardening, API validation/CSRF, DB RPC security lockdown (cross-user guards, search_path, execute grants).
+
 - **Files:** Modified gamification store/components/API routes; added hardening migration.
 - **Verification:** `npm run test -- tests/gamification` ✅ (96/96), `npm run typecheck` ✅.
 
 Raouf: 2026-02-14 (Australia/Sydney)
 Scope: Responsive Breakpoint Passes (Calendar, Map, Settings, Login, Manage-Profiles)
 Summary: Mobile-first responsive passes for all major pages (360px-2560px). Fixed rigid grids, overflow, dialog sizing, HUD behavior, off-campus warning placement.
+
 - **Files:** Modified 30+ component files across app and features directories.
 - **Verification:** `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅ (443/443 tests pass).
 
 Raouf: 2026-02-14 (Australia/Sydney)
 Scope: Service Worker + HMR WebSocket + Map UX Fixes
 Summary: Fixed sw.js uncaught fetch errors offline, HMR WebSocket proxy exclusion, off-campus warning 3s popup timing, and mobile Places button visibility.
+
 - **Files:** Modified `public/sw.js`, `proxy.ts`, `tools/proxy/proxy.ts`, map components.
 - **Verification:** `npm run lint` ✅, `npm run typecheck` ✅, `npm run test -- tests/map` ✅ (64/64).
 
 Raouf: 2026-02-13 (Australia/Sydney)
 Scope: Custom Email Verification System (Resend)
 Summary: Production-ready custom email verification replacing Supabase email. SHA-256 token hashing, 20-min expiry, rate limiting (3/hour), Resend API integration, verify landing page, daily cleanup cron via Vercel.
+
 - **Files:** Created migration, token module, email service, 3 API routes, verify page. Modified config/env.
 - **Verification:** `npm run test` ✅ (442/442 tests pass).
 
 Raouf: 2026-02-13 (Australia/Sydney)
 Scope: Security Settings Integration + Login Page Wiring
 Summary: Integrated all MFA/security options into Privacy settings tab. Fixed passkey status API bug. Added security method indicators (biometric/2FA badges) to login page. Standardized all security toggle components to ToggleControl pattern.
+
 - **Files:** Modified privacy settings, passkey routes, login client, security toggle components, tests.
 - **Verification:** `npm run test` ✅ (442/442 tests pass).
 
 Raouf: 2026-02-13 (Australia/Sydney)
 Scope: Feed UX + Select Dropdown + Notification Bug Fixes
 Summary: Announcement cards open in dialog, stats/category bars clickable with event details dialog, event highlight 3s auto-clear (React Strict Mode compatible), Select dropdown scroll fix, notification bulk DELETE endpoint.
+
 - **Files:** Modified feed components, calendar widgets, select.tsx, notifications route.
 - **Verification:** `npm run test` ✅ (442/442 tests pass).
 
 Raouf: 2026-02-12 (Australia/Sydney)
 Scope: Settings Refactor + Calendar Refactor + System Integrity Checks
 Summary: Extracted ToggleControl/NotificationRow/GamificationToggleRow components. Calendar accessibility refactor with i18n fixes. Multiple full system checks with test ID regression fix.
+
 - **Files:** Modified/created settings and calendar components, translations.
 - **Verification:** `npm run check` ✅ (428/428 tests pass, build successful).
 
 Raouf: 2026-02-12 (Australia/Sydney)
 Scope: Weather Widget Audit & Refactor
 Summary: Conducted a full audit of the weather widget, removed dead code (`useWeather.ts` hook), refactored the widget to use a new modular custom hook (`components/layout/weather/useWeather.ts`), and added comprehensive unit tests. Fixed logic duplication and improved maintainability.
+
 - **Files:** `components/layout/WeatherWidget.tsx`, `components/layout/weather/*` (created), `lib/hooks/useWeather.ts` (deleted), `tests/layout/WeatherWidget.test.tsx` (created), `tests/layout/useWeather.test.ts` (created).
 - **Verification:** `npx vitest run tests/layout/` passed (14 tests passed).
 - **Follow-ups:** None.
@@ -86,6 +100,7 @@ Summary: Conducted a full audit of the weather widget, removed dead code (`useWe
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Optional Paths Removal Batch
 Summary: Removed requested optional paths (`.devcontainer`, `docker`, `k8s`, `scripts`, `docs`, `security`, `COMPLETION-SUMMARY.md`, `opencode.jsonc`). Updated `package.json` script commands that referenced removed files/dirs with placeholders, and fixed `tests/maskToken.test.ts` by inlining helper logic after removing script import dependency.
+
 - **Files:** Deleted listed paths; modified `package.json`, `tests/maskToken.test.ts`.
 - **Verification:** `npm run check` ✅ (425 tests + lint/typecheck/build all pass).
 - **Follow-ups:** Optional re-add of strict secret scanning outside removed `scripts/` directory.
@@ -93,6 +108,7 @@ Summary: Removed requested optional paths (`.devcontainer`, `docker`, `k8s`, `sc
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Root File Cleanup
 Summary: Audited requested root files and removed only redundant ones: `.eslintrc.json` (legacy/unused) and `LICENSE.md` (duplicate of `LICENSE`). Kept the rest as active project/config/compliance assets.
+
 - **Files:** `.eslintrc.json` deleted, `LICENSE.md` deleted.
 - **Verification:** `npm run check` ✅ (425 tests + lint/typecheck/build green).
 - **Follow-ups:** None.
@@ -100,6 +116,7 @@ Summary: Audited requested root files and removed only redundant ones: `.eslintr
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Rollback - Restore Sketch Directory
 Summary: Restored `Sketch/` files only per user request. Other previously removed directories/files remain deleted.
+
 - **Files:** `Sketch/*` restored.
 - **Verification:** Git status confirms no `Sketch/` deletions remain.
 - **Follow-ups:** None.
@@ -107,6 +124,7 @@ Summary: Restored `Sketch/` files only per user request. Other previously remove
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Extended Directory Audit Cleanup
 Summary: Audited additional user-listed directories and removed non-essential tracked artifacts: `Sketch/` (design snapshots), `team-opencode-config/` (assistant-specific prompts/config), and tracked logs audit file. Kept core runtime, infra, and process directories including `.devcontainer`, `.github`, and `Team_Plan`.
+
 - **Files:** Deleted `Sketch/*`, `team-opencode-config/*`, `logs/.83a0b694db25174a747134b328fc30f239dc5c76-audit.json`.
 - **Verification:** `npm run check` ✅ (425 tests passed + build/lint/typecheck green).
 - **Follow-ups:** Optional future `docs/archive/` for non-runtime design artifacts.
@@ -114,6 +132,7 @@ Summary: Audited additional user-listed directories and removed non-essential tr
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Directory Audit + Artifact Cleanup
 Summary: Audited requested root directories and removed non-runtime tracked artifacts: `.codex`, `.gemini`, `.idea`, `.playwright-mcp`. Kept `.github` (CI/templates) and `.devcontainer` (dev env). This also removed tracked plaintext SSH credential content from `.gemini/settings.json`.
+
 - **Files:** Deleted tracked files under `.codex/`, `.gemini/`, `.idea/`, `.playwright-mcp/`.
 - **Verification:** `npm run check` ✅ (425 tests passed, lint/typecheck/build green).
 - **Follow-ups:** Rotate exposed credentials previously stored in deleted `.gemini` config.
@@ -121,6 +140,7 @@ Summary: Audited requested root directories and removed non-runtime tracked arti
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Documentation Suite Refresh (README + Docs)
 Summary: Refreshed documentation to match current repo state. Updated README test counts and architecture/test tree examples, fixed broken relative links across docs, replaced stale script references (`test:lighthouse`), updated onboarding stack/check pipeline notes, and added a new `docs/i18n.md` localization guide. Internal markdown link check now reports zero broken links.
+
 - **Files:** `README.md`, `docs/onboarding.md`, `docs/performance.md`, `docs/monitoring.md`, `docs/unit-testing.md`, `docs/integration-testing.md`, `docs/i18n.md`.
 - **Verification:** `npm run check` ✅ (425 tests passed). Internal markdown link audit: `BROKEN_COUNT 0`.
 - **Follow-ups:** Optional modernization pass for long template-heavy ops docs.
@@ -128,6 +148,7 @@ Summary: Refreshed documentation to match current repo state. Updated README tes
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Settings Link Integrity + Repo Cleanup
 Summary: Completed settings links audit and hygiene pass. Added automated route-integrity tests for settings section routes and quick actions, removed redundant client redirect effect from settings layout, deleted unused AccountSettings component/export, updated broken documentation URL constant, and cleaned local `.DS_Store`/stale puppeteer logs.
+
 - **Files:** `app/settings/layout.tsx`, `app/settings/components/QuickActions.tsx`, `app/settings/components/index.ts`, `lib/config.ts`, `tests/settings/SettingsRoutesIntegrity.test.ts`, `app/settings/components/AccountSettings.tsx` (deleted).
 - **Verification:** `npm run check` ✅ (425 tests passed).
 - **Follow-ups:** Optional CI split for settings-only checks on settings-path changes.
@@ -135,6 +156,7 @@ Summary: Completed settings links audit and hygiene pass. Added automated route-
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Settings Page Audit + Redirect/Test Hardening
 Summary: Audited settings route behavior and testing reliability. Replaced `/settings` null placeholder page with a server redirect to `/settings/general` for deterministic navigation and no blank interim render. Updated privacy settings test to await password-strength UI stabilization to avoid React `act(...)` warnings.
+
 - **Files:** `app/settings/page.tsx`, `tests/settings/PrivacySettings.test.tsx`.
 - **Verification:** `npm run check` ✅.
 - **Follow-ups:** None.
@@ -142,6 +164,7 @@ Summary: Audited settings route behavior and testing reliability. Replaced `/set
 Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Selected-pin indicator, map search polish, zoom controls
 Summary: Added an explicit selected-building pulse indicator on the map, improved search behavior by matching normalized translated building names and related metadata, polished search input usability in dark mode (clear button, better field contrast, accurate result count), and enabled/repositioned zoom controls to bottom-right.
+
 - **Files:** `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/leaflet.css`.
 - **Verification:** `npm run check` ✅.
 - **Follow-ups:** None.
@@ -149,6 +172,7 @@ Summary: Added an explicit selected-building pulse indicator on the map, improve
 Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map pin stability + responsive light/dark polish
 Summary: Strengthened map marker behavior (selected marker z-index/rise handling), removed marker hover/active scale transforms that can conflict with Leaflet positioning, improved mobile responsiveness with `svh`-based map/HUD sizing and safer sidebar text constraints, and enlarged Leaflet zoom controls for touch usage in both light and dark mode.
+
 - **Files:** `app/map/CampusMap.tsx`, `app/map/CampusMapHUD.tsx`, `app/map/MapClient.tsx`, `app/styles/animations.css`, `app/styles/leaflet.css`.
 - **Verification:** `npm run check` ✅.
 - **Follow-ups:** None.
@@ -156,6 +180,7 @@ Summary: Strengthened map marker behavior (selected marker z-index/rise handling
 Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map dark/light mode polish, pin rendering fix, responsive improvements
 Summary: Fixed red pins not rendering (CSS animation transform conflicting with Leaflet positioning). Unified dark/light mode across map components (center-on-user button, popup backgrounds, zoom controls). Improved mobile responsive sidebar height. `npm run check` all passed.
+
 - **Files:** `app/styles/animations.css`, `app/map/CampusMap.tsx`, `app/styles/leaflet.css`, `app/map/CampusMapHUD.tsx`.
 - **Verification:** `npm run check` ✅.
 - **Follow-ups:** None.
@@ -163,6 +188,7 @@ Summary: Fixed red pins not rendering (CSS animation transform conflicting with 
 Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map pin alignment fix, navigation audit, API verification
 Summary: Fixed 110px X-axis misalignment between building positions and GCP-calibrated map image. Added `BUILDING_PIXEL_OFFSET_X` constant, updated `getBuildingCrsCoords()` to apply offset, refactored CampusMap.tsx to use it. Audited navigation pipeline (ORS routing, Kalman smoothing, off-route detection). Verified `/api/navigate` and `/api/health` endpoints.
+
 - **Files:** `lib/map/buildings.ts`, `app/map/CampusMap.tsx`.
 - **Verification:** `npm run check` ✅, 52/52 map tests passed.
 - **Follow-ups:** None.
@@ -170,6 +196,7 @@ Summary: Fixed 110px X-axis misalignment between building positions and GCP-cali
 Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map page cleanup — debug overlay removal, red pin markers, live-location verification
 Summary: Removed debug image-failed overlay and MapImageLoadTimeout from CampusMap.tsx (including Image import, 4 state vars, fetch-status tracking). Added red pin markers for all buildings with popups. Verified live-location pipeline (geolocation watch → Kalman → gpsToCrsSimple → marker). Ran `npm run check` — all passed.
+
 - **Files:** `app/map/CampusMap.tsx`.
 - **Verification:** `npm run check` ✅.
 - **Follow-ups:** None.
@@ -177,6 +204,7 @@ Summary: Removed debug image-failed overlay and MapImageLoadTimeout from CampusM
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Check pipeline formatting fix
 Summary: Fixed `prettier --check` failure by formatting `PublicFeedClient.tsx`.
+
 - **Files:** `components/feed/PublicFeedClient.tsx`.
 - **Verification:** Pending full `npm run check` rerun.
 - **Follow-ups:** None.
@@ -184,6 +212,7 @@ Summary: Fixed `prettier --check` failure by formatting `PublicFeedClient.tsx`.
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Lint warning cleanup
 Summary: Cleared remaining lint warnings by using arrow callbacks in memoized feed components and replacing debug `console.log` calls with `console.warn` in units store.
+
 - **Files:** `components/feed/PublicEventCard.tsx`, `components/feed/QuickStats.tsx`, `lib/store/unitsStore.ts`.
 - **Verification:** Pending full `npm run check` rerun.
 - **Follow-ups:** None.
@@ -191,6 +220,7 @@ Summary: Cleared remaining lint warnings by using arrow callbacks in memoized fe
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: PublicEventCard syntax correction
 Summary: Corrected memo callback arrow syntax in `PublicEventCard` after lint-cleanup refactor.
+
 - **Files:** `components/feed/PublicEventCard.tsx`.
 - **Verification:** Pending full `npm run check` rerun.
 - **Follow-ups:** None.
@@ -198,6 +228,7 @@ Summary: Corrected memo callback arrow syntax in `PublicEventCard` after lint-cl
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: PublicEventCard formatting
 Summary: Ran Prettier on `PublicEventCard.tsx` after syntax correction to pass repository format checks.
+
 - **Files:** `components/feed/PublicEventCard.tsx`.
 - **Verification:** Pending full `npm run check` rerun.
 - **Follow-ups:** None.
@@ -205,6 +236,7 @@ Summary: Ran Prettier on `PublicEventCard.tsx` after syntax correction to pass r
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Memo displayName lint fix
 Summary: Added explicit `displayName` fields for memoized feed components to resolve `react/display-name` lint errors.
+
 - **Files:** `components/feed/PublicEventCard.tsx`, `components/feed/QuickStats.tsx`.
 - **Verification:** Pending full `npm run check` rerun.
 - **Follow-ups:** None.
@@ -212,6 +244,7 @@ Summary: Added explicit `displayName` fields for memoized feed components to res
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Public feed i18n formatting follow-up
 Summary: Applied formatting-only cleanup in `handleAddToCalendar` to keep nested i18n toast branches readable after translation refactor.
+
 - **Files:** `components/feed/PublicFeedClient.tsx`.
 - **Verification:** `npm run typecheck` ✅.
 - **Follow-ups:** None.
@@ -219,6 +252,7 @@ Summary: Applied formatting-only cleanup in `handleAddToCalendar` to keep nested
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Position editor attribute i18n cleanup
 Summary: Replaced remaining hardcoded `title` attributes in position editor controls with translation keys and synchronized those keys to every locale.
+
 - **Files:** `app/map/position-editor/PositionEditorClient.tsx`, `locales/*/translations.json`.
 - **Verification:** `npm run check:i18n` ✅; `npm run typecheck` ✅.
 - **Follow-ups:** None.
@@ -226,6 +260,7 @@ Summary: Replaced remaining hardcoded `title` attributes in position editor cont
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Repository-wide i18n parity + hardcoded text cleanup
 Summary: Performed full locale audit using English as canonical source, filled missing keys in all non-English locales, fixed placeholder mismatches, and removed hardcoded user-facing feed/map aria strings in favor of i18n keys.
+
 - **Files:** `locales/ar/translations.json`, `locales/bn/translations.json`, `locales/es/translations.json`, `locales/fa/translations.json`, `locales/fr/translations.json`, `locales/he/translations.json`, `locales/hi/translations.json`, `locales/id/translations.json`, `locales/it/translations.json`, `locales/ja/translations.json`, `locales/ko/translations.json`, `locales/ms/translations.json`, `locales/ru/translations.json`, `locales/ta/translations.json`, `locales/th/translations.json`, `locales/ur/translations.json`, `locales/vi/translations.json`, `locales/zh/translations.json`, `locales/en/translations.json`, `components/feed/PublicFeedClient.tsx`, `app/map/MapClient.tsx`, `app/map/components/DebugControls.tsx`.
 - **Verification:** Locale parity script (keys/empties/placeholders) reports zero missing keys and zero placeholder mismatches for every locale.
 - **Follow-ups:** Optional deeper pass on position-editor-only copy if it becomes part of non-admin user flow.
@@ -233,6 +268,7 @@ Summary: Performed full locale audit using English as canonical source, filled m
 Raouf: 2026-02-07 (Australia/Sydney)
 Scope: Map Page Full Audit + Supabase Connectivity Verification
 Summary: File-by-file audit of all 17 map module files. Verified TypeScript (0 errors), ESLint (0 errors), 52/52 tests pass. Linked Supabase CLI, verified REST API, Auth, and Storage endpoints. Data flows end-to-end (queried `public_events` successfully). No code changes needed.
+
 - **Files:** None modified (audit-only).
 - **Verification:** `npm run typecheck` ✅; `npx eslint app/map/` ✅; `npx vitest run tests/map` ✅ (52/52); Supabase REST ✅; Supabase Auth ✅; Supabase Storage ✅; `supabase migration list` ✅.
 - **Follow-ups:** (1) Run `supabase db push` to sync migration drift. (2) Docker needed for `supabase status` locally.
@@ -240,6 +276,7 @@ Summary: File-by-file audit of all 17 map module files. Verified TypeScript (0 e
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Audit - Verification Pass
 Summary: Completed verification for the map audit fixes. Typecheck, lint, map test suite, and production build (webpack mode) all pass.
+
 - **Verification:** `npm run typecheck` ✅; `npm run lint` ✅ (only pre-existing non-map warnings remain); `npx vitest run tests/map` ✅ (52/52); `npx next build --webpack` ✅.
 - **Note:** Turbopack `next build` in this environment remained non-diagnostic/stalled, so webpack build was used as the release-safety signal.
 - **Files:** `app/map/*`, `app/layout.tsx`, `app/mq-tokens.css`, `locales/en/translations.json`, `tests/map/useMapNavigation.test.ts`.
@@ -248,6 +285,7 @@ Summary: Completed verification for the map audit fixes. Typecheck, lint, map te
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: i18n - Remove Duplicate Translation Key
 Summary: Removed duplicate `buildingsFound` entry from English locale to keep translation keys single-source and deterministic.
+
 - **Quality:** Eliminated duplicate key shadowing in `locales/en/translations.json`.
 - **Files:** `locales/en/translations.json`.
 - **Verification:** Not run yet (pending full map audit).
@@ -256,6 +294,7 @@ Summary: Removed duplicate `buildingsFound` entry from English locale to keep tr
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Overlays - Lint-Safe Cleanup Refs
 Summary: Resolved hook cleanup warnings by capturing overlay ref maps outside cleanup closures in both overlay lifecycle implementations.
+
 - **Quality:** Removed map overlay hook cleanup warnings from lint.
 - **Files:** `app/map/components/MapOverlays.tsx`, `app/map/hooks/useMapOverlays.ts`.
 - **Verification:** Not run yet (pending full map audit).
@@ -264,6 +303,7 @@ Summary: Resolved hook cleanup warnings by capturing overlay ref maps outside cl
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Position Editor - Keyboard/Timer Robustness
 Summary: Added `R` shortcut support for resetting selected building positions, prevented timer leaks by tracking/clearing copy/save timers, and improved input focus guards for keyboard shortcuts.
+
 - **UX:** Keyboard help text and behavior are now aligned (`R` reset works).
 - **Stability:** Pending timers are now cleared on unmount to avoid setState-after-unmount.
 - **Files:** `app/map/position-editor/PositionEditorClient.tsx`.
@@ -273,6 +313,7 @@ Summary: Added `R` shortcut support for resetting selected building positions, p
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Hooks - Overlay Lifecycle Stability
 Summary: Fixed overlay lifecycle churn by avoiding full teardown on every dependency change and restricting full cleanup to readiness changes/unmount.
+
 - **Stability:** Overlay toggles no longer trigger unnecessary full remove/re-add cycles.
 - **Files:** `app/map/components/MapOverlays.tsx`, `app/map/hooks/useMapOverlays.ts`.
 - **Verification:** Not run yet (pending full map audit).
@@ -281,6 +322,7 @@ Summary: Fixed overlay lifecycle churn by avoiding full teardown on every depend
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Simulation + Debug Controls - Runtime Leaks
 Summary: Fixed simulation state tracking to use React state (not stale refs) and corrected requestAnimationFrame cleanup in debug FPS monitor to prevent animation-frame leaks.
+
 - **State Correctness:** `useMapSimulation` now exposes live `isSimulating` state.
 - **Performance:** Debug FPS loop now cancels the active frame ID on cleanup.
 - **Files:** `app/map/hooks/useMapSimulation.ts`, `app/map/components/DebugControls.tsx`.
@@ -290,6 +332,7 @@ Summary: Fixed simulation state tracking to use React state (not stale refs) and
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Build - Remove Google Fonts Build Fetch
 Summary: Removed `next/font/google` usage (build-time network dependency) and defined the required `--font-*` variables via MQ tokens so builds succeed in offline/locked-down environments.
+
 - **Build Stability:** `next build` no longer attempts to fetch Google Fonts at build time.
 - **Typography:** Tailwind `font-sans`/`font-serif` variables remain defined via `mq-tokens.css`.
 - **Files:** `app/layout.tsx`, `app/mq-tokens.css`.
@@ -299,6 +342,7 @@ Summary: Removed `next/font/google` usage (build-time network dependency) and de
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Tests - Align Toast Expectations
 Summary: Updated `useMapNavigation` unit test to assert the user-facing fallback strings emitted by `safeT`, instead of raw translation keys.
+
 - **Testing:** Kept tests aligned with the new safe translation behavior.
 - **Files:** `tests/map/useMapNavigation.test.ts`.
 - **Verification:** Not run yet (pending full map audit).
@@ -307,6 +351,7 @@ Summary: Updated `useMapNavigation` unit test to assert the user-facing fallback
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map - Hook Dependency Cleanup
 Summary: Resolved a `react-hooks/exhaustive-deps` warning by removing unnecessary outer-scope dependencies from the MapController effect dependency list.
+
 - **Quality:** Map module no longer emits the MapController dependency warning during lint.
 - **Files:** `app/map/CampusMap.tsx`.
 - **Verification:** Not run yet (pending full map audit).
@@ -315,6 +360,7 @@ Summary: Resolved a `react-hooks/exhaustive-deps` warning by removing unnecessar
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Client - i18n Pan/Zoom Hint
 Summary: Replaced hard-coded pan/zoom hint copy with `mapPanZoomHint` translation key.
+
 - **i18n:** Pan/zoom hint text now uses `mapPanZoomHint`.
 - **Files:** `app/map/MapClient.tsx`, `locales/en/translations.json`.
 - **Verification:** Not run yet (pending full map audit).
@@ -323,6 +369,7 @@ Summary: Replaced hard-coded pan/zoom hint copy with `mapPanZoomHint` translatio
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map - i18n Navigation Announcements
 Summary: Localized navigation progress and arrival announcements (and the in-map “Next” label) using translation keys instead of hard-coded English.
+
 - **A11y/i18n:** Screen reader navigation progress announcements and arrival copy now go through translations.
 - **UX:** In-map navigation overlay uses translated “Next” and “Arrive”.
 - **Files:** `app/map/CampusMap.tsx`, `locales/en/translations.json`.
@@ -332,6 +379,7 @@ Summary: Localized navigation progress and arrival announcements (and the in-map
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map - i18n Loading Fallback
 Summary: Removed hard-coded “Loading Map...” fallback copy and reused existing `loadingMap` translation key.
+
 - **i18n:** Loading fallback now reuses `loadingMap`.
 - **Files:** `app/map/CampusMap.tsx`.
 - **Verification:** Not run yet (pending full map audit).
@@ -340,6 +388,7 @@ Summary: Removed hard-coded “Loading Map...” fallback copy and reused existi
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Skeleton - i18n Loading Copy
 Summary: Removed hard-coded loading strings in the map skeleton components and reused existing translation keys for visible and screen-reader text.
+
 - **A11y/i18n:** Skeleton loading copy now comes from `loadingMap`, `loadingBuildings`, and `loadingFilters`.
 - **Files:** `app/map/MapSkeleton.tsx`.
 - **Verification:** Not run yet (pending full map audit).
@@ -348,6 +397,7 @@ Summary: Removed hard-coded loading strings in the map skeleton components and r
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Navigation - Safe Toast Copy
 Summary: Prevented user-facing toasts from showing raw translation keys by switching `useMapNavigation` to `useSafeTranslation` and `safeT` fallbacks.
+
 - **UX/i18n:** Navigation toasts now display readable fallback strings when translation keys are missing.
 - **Files:** `app/map/hooks/useMapNavigation.ts`.
 - **Verification:** Not run yet (pending full map audit).
@@ -356,6 +406,7 @@ Summary: Prevented user-facing toasts from showing raw translation keys by switc
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Client - Reduced Motion Respect
 Summary: Disabled non-essential overlay toggle animations (hover/tap/ripple/icon wiggle) when `prefers-reduced-motion` is enabled.
+
 - **A11y:** Reduced motion users no longer get hover/tap scaling or ripple animations for overlay toggles.
 - **Files:** `app/map/MapClient.tsx`.
 - **Verification:** Not run yet (pending full map audit).
@@ -364,6 +415,7 @@ Summary: Disabled non-essential overlay toggle animations (hover/tap/ripple/icon
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map - A11y Container Role
 Summary: Replaced `role=\"application\"` with `role=\"region\"` on the campus map container to avoid screen reader mode hijacking and reduce accessibility audit flags.
+
 - **A11y:** Map container no longer forces screen readers into application mode.
 - **Files:** `app/map/CampusMap.tsx`.
 - **Verification:** Not run yet (pending full map audit).
@@ -372,6 +424,7 @@ Summary: Replaced `role=\"application\"` with `role=\"region\"` on the campus ma
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map - Cleanup Marker Popup Delay
 Summary: Prevented stale timers by adding cleanup for delayed marker popup opening after `flyTo`, avoiding incorrect popups during rapid building selection changes.
+
 - **Stability:** Delayed popup open is now cleaned up on dependency changes/unmount.
 - **Files:** `app/map/CampusMap.tsx`.
 - **Verification:** Not run yet (pending full map audit).
@@ -380,6 +433,7 @@ Summary: Prevented stale timers by adding cleanup for delayed marker popup openi
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map Client - Safe Preload Side Effect
 Summary: Moved `ReactDOM.preload(CAMPUS_IMAGE_URL)` into a one-time `useEffect` to avoid render-time side effects and repeated preload calls.
+
 - **Performance/Correctness:** Preload is now a progressive enhancement performed once after mount (not on every render).
 - **Files:** `app/map/MapClient.tsx`.
 - **Verification:** Not run yet (pending full map audit).
@@ -388,6 +442,7 @@ Summary: Moved `ReactDOM.preload(CAMPUS_IMAGE_URL)` into a one-time `useEffect` 
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map HUD - i18n Search Result Announcement
 Summary: Localized the screen-reader search result count announcement (removed hard-coded English) using new `buildingsFound` translation key with `{{count}}` interpolation.
+
 - **A11y/i18n:** Search result count announcements now go through the translation system instead of a hard-coded English string.
 - **Files:** `app/map/CampusMapHUD.tsx`, `locales/en/translations.json`.
 - **Verification:** Not run yet (pending full map audit).
@@ -396,6 +451,7 @@ Summary: Localized the screen-reader search result count announcement (removed h
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map HUD - Preserve Overlay Query Param
 Summary: Preserved the active `layers` query param when selecting/deselecting buildings so overlay state remains shareable and stable across Map HUD navigation.
+
 - **UX:** Building selection links now preserve active overlay state in the URL (layers param), improving shareability and consistency.
 - **Files:** `app/map/CampusMapHUD.tsx`.
 - **Verification:** Not run yet (pending full map audit).
@@ -404,6 +460,7 @@ Summary: Preserved the active `layers` query param when selecting/deselecting bu
 Raouf: 2026-02-06 (Australia/Sydney)
 Scope: Map - Navigation Live Updates + i18n Cleanup
 Summary: Fixed live navigation state not updating by ensuring geolocation feeds NavigationStateManager when navigation is active; removed the `@ts-expect-error` translation hack in `useMapLocation` by switching to `useSafeTranslation`.
+
 - **Navigation:** Geolocation updates now drive NavigationStateManager when its internal status is active (navigating/off-route/recalculating), avoiding reliance on a missing `isNavigating` prop.
 - **i18n/Type Safety:** Removed the dynamic-key `@ts-expect-error` workaround and standardized on `useSafeTranslation`.
 - **Files:** `app/map/hooks/useMapLocation.ts`.
@@ -413,6 +470,7 @@ Summary: Fixed live navigation state not updating by ensuring geolocation feeds 
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Audit Fixes (Navigation, UX, Cleanup)
 Summary: Fixed navigation instructions, aligned geofence bounds, improved overlay panel accessibility, enabled export, adjusted search behavior and map hint, reduced debug noise, and removed unused map controller variants.
+
 - **Navigation:** Wired ORS instructions parsing and corrected coordinate order for navigation routes.
 - **Security/Consistency:** Centralized geofence bounds via shared GPS constants.
 - **Accessibility:** Added Escape handling and focus return for overlay panel.
@@ -426,6 +484,7 @@ Summary: Fixed navigation instructions, aligned geofence bounds, improved overla
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Campus Image Load Reliability
 Summary: Reworked campus image overlay to use React-Leaflet `ImageOverlay` for more reliable loading and built-in lifecycle handling.
+
 - **Fix:** Removed manual Leaflet overlay effect and rendered base layer via `ImageOverlay` with load/error handlers.
 - **Files:** `app/map/CampusMap.tsx`.
 - **Verification:** Not run (not requested).
@@ -434,6 +493,7 @@ Summary: Reworked campus image overlay to use React-Leaflet `ImageOverlay` for m
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Image Load Diagnostics
 Summary: Added readiness fallback and image-load failure overlay to help diagnose blank map screens.
+
 - **Fix:** Ensured `onMapReady` fires when map instance becomes ready (not tied to overlays).
 - **Fix:** Added 2.5s readiness fallback to avoid perpetual opacity-0 map.
 - **Fix:** Displayed in-map diagnostic when base image fails to load.
@@ -444,6 +504,7 @@ Summary: Added readiness fallback and image-load failure overlay to help diagnos
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Cache Busting for Campus Image
 Summary: Versioned campus map image URL to bypass stale caches and aligned position editor with shared map constant.
+
 - **Fix:** Added `MAP_ASSET_VERSION` and versioned `CAMPUS_IMAGE_URL`.
 - **Fix:** Updated position editor to use shared `CAMPUS_IMAGE_URL`.
 - **Fix:** Precached versioned campus image in service worker.
@@ -454,6 +515,7 @@ Summary: Versioned campus map image URL to bypass stale caches and aligned posit
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Image Load Timeout Diagnostics
 Summary: Added a timeout fallback to surface when the base map image never fires a load/error event.
+
 - **Fix:** Added a 3.5s timeout to mark image load failure and surface diagnostics.
 - **Files:** `app/map/CampusMap.tsx`.
 - **Verification:** Not run (not requested).
@@ -462,6 +524,7 @@ Summary: Added a timeout fallback to surface when the base map image never fires
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Image Fetch Diagnostic + Blob Fallback
 Summary: Added a no-store fetch for campus image and fallback to blob URL when load failures occur; surfaced HTTP status in diagnostics.
+
 - **Fix:** Fetch campus image with `cache: 'no-store'` and use object URL for overlay.
 - **Fix:** Display fetch status in image failure overlay.
 - **Files:** `app/map/CampusMap.tsx`.
@@ -471,6 +534,7 @@ Summary: Added a no-store fetch for campus image and fallback to blob URL when l
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Image Diagnostics (Content-Type + Preview)
 Summary: Added content-type/size diagnostics and an inline image preview to determine if Leaflet or the asset pipeline is failing.
+
 - **Fix:** Displayed response content-type and size for the campus image fetch.
 - **Fix:** Rendered a debug `<img>` preview using the fetched blob URL when load fails.
 - **Files:** `app/map/CampusMap.tsx`.
@@ -480,6 +544,7 @@ Summary: Added content-type/size diagnostics and an inline image preview to dete
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Image Overlay Mount Fix
 Summary: Ensured Leaflet `ImageOverlay` only renders after blob URL is ready and remounts on URL change.
+
 - **Fix:** Deferred overlay rendering until blob URL exists and forced remount on URL changes.
 - **Files:** `app/map/CampusMap.tsx`.
 - **Verification:** Not run (not requested).
@@ -488,6 +553,7 @@ Summary: Ensured Leaflet `ImageOverlay` only renders after blob URL is ready and
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Initial Zoom Fit
 Summary: Fit campus image bounds to the viewport on initial load to prevent a tiny overlay.
+
 - **Fix:** `fitBounds(PIXEL_BOUNDS)` on load and lock `minZoom` to the fitted zoom.
 - **Files:** `app/map/CampusMap.tsx`.
 - **Verification:** Not run (not requested).
@@ -496,6 +562,7 @@ Summary: Fit campus image bounds to the viewport on initial load to prevent a ti
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map - Campus Image Bounds Fix (Verified)
 Summary: Fixed campus map image not displaying (blank screen issue). Verified PIXEL_BOUNDS are correctly mapped between image coordinates and CRS.Simple coordinate system. Browser testing confirmed image overlay now displays properly.
+
 - **Fix:** Verified `PIXEL_BOUNDS` in `lib/map/constants.ts` correctly maps image to CRS.Simple: SW=[0, 0], NE=[height, width].
 - **Fix:** Updated comments to clarify coordinate transformation logic for future maintainers.
 - **Enhancement:** Added image load error handling in `CampusMap.tsx` with 'error' and 'load' event listeners for debugging.
@@ -506,6 +573,7 @@ Summary: Fixed campus map image not displaying (blank screen issue). Verified PI
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: QA - Lint Cleanup
 Summary: Resolved a linting warning in `ItemActionButtons.tsx` regarding an unused variable.
+
 - **Fix:** Prefixed unused `itemType` prop with an underscore to satisfy the `@typescript-eslint/no-unused-vars` rule while maintaining the API.
 - **Verification:** `npm run lint` now returns "Lint OK". All 367 tests passing.
 - **Files:** `components/calendar/ItemActionButtons.tsx`.
@@ -514,6 +582,7 @@ Summary: Resolved a linting warning in `ItemActionButtons.tsx` regarding an unus
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Level 5 Blueprint - Testing & Validation
 Summary: Implemented comprehensive testing for Map module stability and accessibility. Added unit tests for geospatial calibration logic and screen reader announcements.
+
 - **Testing:** Created `tests/map/geospatialCalibration.test.ts` to validate affine transformation accuracy and monitor RMSE.
 - **Testing:** Created `tests/map/RouteAnnouncer.test.tsx` to verify ARIA live region updates and throttling logic.
 - **Verification:** Confirmed RMSE dropped to ~145px and accessibility components render correct ARIA attributes.
@@ -523,6 +592,7 @@ Summary: Implemented comprehensive testing for Map module stability and accessib
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Map Stability - Fixes & Calibrations
 Summary: Addressed critical stability issues including geospatial calibration accuracy, font loading security, and asset loading reliability.
+
 - **Geospatial Calibration:** Applied +110px offset to all Ground Control Points (GCPs) in `geospatialCalibration.ts` to reduce RMSE from 182px to acceptable levels.
 - **Security:** Updated `csp.ts` to allow `apps.rokt.com` font source, resolving preload warning.
 - **Assets:** Fixed Leaflet marker icon paths in `useLeafletLoader.ts` to correctly point to `public/images/leaflet/`, resolving broken image issues.
@@ -533,6 +603,7 @@ Summary: Addressed critical stability issues including geospatial calibration ac
 Raouf: 2026-02-02 (Australia/Sydney)
 Scope: Level 4 Blueprint - Advanced Accessibility
 Summary: Implemented Level 4 of the Map Architecture Blueprint focusing on advanced accessibility features. Added focus management for overlays, screen reader announcements for search results, and high contrast mode support.
+
 - **Focus Management:** Implemented focus trap and auto-focus for the Map Layers panel in `MapClient.tsx`. Added proper `aria-expanded` and `aria-controls` attributes.
 - **Screen Readers:** Added `aria-live` status announcement for search results in `CampusMapHUD.tsx`.
 - **High Contrast:** Added `contrast-more` overrides to `LayeredCard.tsx` to ensure solid backgrounds and borders in high contrast mode.
@@ -541,6 +612,7 @@ Summary: Implemented Level 4 of the Map Architecture Blueprint focusing on advan
 - **Follow-ups:** Level 5 Blueprint (Testing & Validation).
 
 ### Raouf: 2026-02-02 (Australia/Sydney) - Level 3 Blueprint - Accessibility (A11y) & UX Polish
+
 - **Status:** ✅ Complete
 - **Scope:** Level 3 Blueprint - Accessibility (A11y) & UX Polish
 - **Summary:** Implemented Level 3 of the Map Architecture Blueprint focusing on accessibility features and UX polish. Made the map usable for everyone including screen reader users and keyboard power users.
@@ -557,6 +629,7 @@ Summary: Implemented Level 4 of the Map Architecture Blueprint focusing on advan
 - **Follow-ups:** Level 4 Blueprint (Advanced accessibility: focus management, high contrast mode, screen reader testing).
 
 ### Raouf: 2026-02-02 (Australia/Sydney) - Map Stability & Security Fixes
+
 - **Status:** ✅ Complete - Resolved security violations, deprecation warnings, and performance issues.
 - **Scope:** Security, Performance, Maintenance.
 - **Summary:** addressed several critical stability and security issues in the Map module. Fixed Content Security Policy (CSP) font violation, resolved Framer Motion deprecation warnings, fixed CSS variable animation issues, and optimized geolocation hook to prevent duplicate watch calls and stale closures.
@@ -574,6 +647,7 @@ Summary: Implemented Level 4 of the Map Architecture Blueprint focusing on advan
 Raouf: 2026-02-01 (Australia/Sydney)
 Scope: Level 2 Blueprint - Component Implementation & Type Safety
 Summary: Implemented Level 2 of the Map Architecture Blueprint focusing on type safety, hook extraction, and code quality. Eliminated `@ts-expect-error` hacks and isolated Leaflet side-effects.
+
 - **Type Safety:** Created `lib/hooks/useSafeTranslation.ts` - type-safe translation hook with fallback support that eliminates `@ts-expect-error` hacks in CampusMap.tsx.
 - **Hook Extraction:** Created `app/map/hooks/useMapController.ts` - extracted all map view logic (initialization, bounds, flyTo transitions) from UI components into a reusable hook.
 - **Hook Extraction:** Created `app/map/hooks/useMapOverlays.ts` - extracted overlay layer management (add/remove parking, water, accessibility layers) into a dedicated hook with imperative API.
@@ -582,14 +656,15 @@ Summary: Implemented Level 2 of the Map Architecture Blueprint focusing on type 
 - **Code Quality:** Updated `app/map/hooks/index.ts` barrel exports to include new hooks.
 - **Code Quality:** Updated `lib/hooks/useLeafletLoader.ts` to export `ImageOverlay` component.
 - **Verification:** `npm run check` passed (361 tests, typecheck clean, lint OK, build successful). No `@ts-expect-error` directives remain in map module.
-Files: lib/hooks/useSafeTranslation.ts; app/map/hooks/useMapController.ts; app/map/hooks/useMapOverlays.ts; app/map/components/MapCore.tsx; app/map/CampusMap.tsx; app/map/hooks/index.ts; lib/hooks/useLeafletLoader.ts.
-Follow-ups: Level 3 Blueprint (Performance optimizations: memoization, virtualization, bundle analysis).
+  Files: lib/hooks/useSafeTranslation.ts; app/map/hooks/useMapController.ts; app/map/hooks/useMapOverlays.ts; app/map/components/MapCore.tsx; app/map/CampusMap.tsx; app/map/hooks/index.ts; lib/hooks/useLeafletLoader.ts.
+  Follow-ups: Level 3 Blueprint (Performance optimizations: memoization, virtualization, bundle analysis).
 
 ---
 
 Raouf: 2026-02-01 (Australia/Sydney)
 Scope: Level 1 Blueprint - Map Architecture Refactor
 Summary: Migrated Map module from "God Component" to Modular Composition architecture. Extracted simulation logic, view controller, and core map rendering into separate components/hooks.
+
 - **Architecture:** Created `useMapSimulation.ts` hook - dev-only GPS simulation logic (tree-shaken in production).
 - **Architecture:** Created `MapController.tsx` - handles map view, zoom, bounds, and building fly-to transitions.
 - **Architecture:** Created `MapCore.tsx` - pure Leaflet wrapper component following "dumb component" pattern.
@@ -598,44 +673,47 @@ Summary: Migrated Map module from "God Component" to Modular Composition archite
 - **Refactor:** Updated `CampusMap.tsx` to use new `useMapSimulation` hook instead of inline simulation logic.
 - **Bundle:** Simulation logic is now conditionally included only in development builds.
 - **Verification:** `npm run check` passed (361 tests, typecheck clean, lint OK, build successful). All map functionality preserved.
-Files: app/map/hooks/useMapSimulation.ts; app/map/components/MapController.tsx; app/map/components/MapCore.tsx; app/map/hooks/index.ts; app/map/MapClient.tsx; app/map/CampusMap.tsx.
-Follow-ups: Level 2 Blueprint (Server Actions for map features if needed).
+  Files: app/map/hooks/useMapSimulation.ts; app/map/components/MapController.tsx; app/map/components/MapCore.tsx; app/map/hooks/index.ts; app/map/MapClient.tsx; app/map/CampusMap.tsx.
+  Follow-ups: Level 2 Blueprint (Server Actions for map features if needed).
 
 ---
 
 Raouf: 2026-01-31 (Australia/Sydney)
 Scope: QA - Final Lint Cleanup
 Summary: Resolved remaining lint warnings in `client-layout.tsx` and `BuildingAutocomplete.tsx`.
+
 - **Fix:** Refined `no-console` suppresses in `client-layout.tsx` to target only restricted methods.
 - **Fix:** Corrected placement of `jsx-a11y` ignores in `BuildingAutocomplete.tsx`.
 - **Verification:** `npm run lint` now returns "Lint OK".
-Files: app/client-layout.tsx; components/ui/BuildingAutocomplete.tsx.
-Follow-ups: None.
+  Files: app/client-layout.tsx; components/ui/BuildingAutocomplete.tsx.
+  Follow-ups: None.
 
 ---
 
 Raouf: 2026-01-31 (Australia/Sydney)
 Scope: Map - Tier 4 (Animations), Tier 5 (Polish), & Tier 6 (Layout)
 Summary: Implemented major UX enhancements for the Map module including cinematic transitions, visual system upgrades, and responsive layout improvements.
+
 - **Feature (Tier 4):** Added `flyTo` camera transitions and enhanced `MapSkeleton` with shimmering effects.
 - **Feature (Tier 5):** Defined semantic Icon System in `globals.css` and improved `Badge` typography.
 - **Feature (Tier 6):** Created responsive HUD with mobile bottom-sheet behavior and elastic drag.
 - **Fix:** Resolved missing `AnimatePresence` and added `focus-ring` accessibility styles.
 - **Verification:** Verified visually and via `npm run check`.
-Files: app/map/CampusMap.tsx; app/map/MapSkeleton.tsx; app/styles/animations.css; app/globals.css; components/ui/mq/badge.tsx; app/map/CampusMapHUD.tsx.
-Follow-ups: None.
+  Files: app/map/CampusMap.tsx; app/map/MapSkeleton.tsx; app/styles/animations.css; app/globals.css; components/ui/mq/badge.tsx; app/map/CampusMapHUD.tsx.
+  Follow-ups: None.
 
 ---
 
 Raouf: 2026-01-31 (Australia/Sydney)
 Scope: Performance - Tier 7 Optimizations
 Summary: Applied performance and accessibility tweaks to the Map module.
+
 - **Perf:** Implemented marker icon caching in `mapUtils.ts` to reduce object creation.
 - **A11y:** Added `prefers-reduced-motion` support to disable camera flying and simplify HUD animations.
 - **Perf:** Confirmed use of GPU-accelerated `transform` properties for smooth 60fps animations.
-Verification: `npm run check` passed.
-Files: lib/map/mapUtils.ts; app/map/CampusMap.tsx; app/map/CampusMapHUD.tsx.
-Follow-ups: None.
+  Verification: `npm run check` passed.
+  Files: lib/map/mapUtils.ts; app/map/CampusMap.tsx; app/map/CampusMapHUD.tsx.
+  Follow-ups: None.
 
 ---
 
@@ -646,11 +724,13 @@ Summary: Cleaned up workspace artifacts and resolved final lint warnings.
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Team Plan folder relocation
 Summary: Moved `Team_Plan` to `docs/project/team_plan` as part of the repository feature-first reorganization and docs consolidation.
+
 - **Verification:** `npm run check` ✅.
 
 Raouf: 2026-02-10 (Australia/Sydney)
 Scope: Post-restructure references cleanup
 Summary: Updated stale references after migration to `features/` and `docs/project/*`; validated with full `npm run check`.
+
 - **Verification:** `npm run check` ✅.
 
 Raouf: 2026-02-10 (Australia/Sydney)

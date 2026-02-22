@@ -1,8 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from "vitest";
 
 const sendVerificationEmailMock = vi.fn();
 
-vi.mock('@/lib/services/emailService', () => ({
+vi.mock("@/lib/services/emailService", () => ({
   sendVerificationEmail: sendVerificationEmailMock,
 }));
 
@@ -27,7 +27,10 @@ function makeEmailVerificationsBuilder(state: {
 
   const insertChain = {
     select: vi.fn(() => insertChain),
-    single: vi.fn(async () => ({ data: { id: state.insertedId }, error: null })),
+    single: vi.fn(async () => ({
+      data: { id: state.insertedId },
+      error: null,
+    })),
   };
 
   const deleteChain = {
@@ -47,50 +50,66 @@ function makeEmailVerificationsBuilder(state: {
   return builder as FromBuilder;
 }
 
-describe('createAndSendVerification', () => {
+describe("createAndSendVerification", () => {
   beforeEach(() => {
     vi.resetModules();
     sendVerificationEmailMock.mockReset();
   });
 
-  it('deletes the inserted token record when email send fails', async () => {
-    sendVerificationEmailMock.mockResolvedValue({ success: false, error: 'fail' });
+  it("deletes the inserted token record when email send fails", async () => {
+    sendVerificationEmailMock.mockResolvedValue({
+      success: false,
+      error: "fail",
+    });
 
-    const state = { insertedId: 'token_1', deleteCalls: [] as Array<{ field: string; value: string }> };
+    const state = {
+      insertedId: "token_1",
+      deleteCalls: [] as Array<{ field: string; value: string }>,
+    };
     const emailVerifications = makeEmailVerificationsBuilder(state);
 
     const adminClient = {
       from: (table: string) => {
-        if (table === 'email_verifications') return emailVerifications;
+        if (table === "email_verifications") return emailVerifications;
         throw new Error(`unexpected table: ${table}`);
       },
     } as any;
 
-    const mod = await import('@/lib/security/emailVerification');
-    const res = await mod.createAndSendVerification(adminClient, 'user_1', 'user@example.com');
+    const mod = await import("@/lib/security/emailVerification");
+    const res = await mod.createAndSendVerification(
+      adminClient,
+      "user_1",
+      "user@example.com",
+    );
 
     expect(res.success).toBe(false);
-    expect(state.deleteCalls).toEqual([{ field: 'id', value: 'token_1' }]);
+    expect(state.deleteCalls).toEqual([{ field: "id", value: "token_1" }]);
   });
 
-  it('does not delete the inserted token record when email send succeeds', async () => {
+  it("does not delete the inserted token record when email send succeeds", async () => {
     sendVerificationEmailMock.mockResolvedValue({ success: true });
 
-    const state = { insertedId: 'token_2', deleteCalls: [] as Array<{ field: string; value: string }> };
+    const state = {
+      insertedId: "token_2",
+      deleteCalls: [] as Array<{ field: string; value: string }>,
+    };
     const emailVerifications = makeEmailVerificationsBuilder(state);
 
     const adminClient = {
       from: (table: string) => {
-        if (table === 'email_verifications') return emailVerifications;
+        if (table === "email_verifications") return emailVerifications;
         throw new Error(`unexpected table: ${table}`);
       },
     } as any;
 
-    const mod = await import('@/lib/security/emailVerification');
-    const res = await mod.createAndSendVerification(adminClient, 'user_2', 'user@example.com');
+    const mod = await import("@/lib/security/emailVerification");
+    const res = await mod.createAndSendVerification(
+      adminClient,
+      "user_2",
+      "user@example.com",
+    );
 
     expect(res.success).toBe(true);
     expect(state.deleteCalls).toEqual([]);
   });
 });
-

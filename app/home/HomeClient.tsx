@@ -1,26 +1,29 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import TodaySchedule from '@/features/home/components/TodaySchedule';
-import UpcomingDeadlines from '@/features/home/components/UpcomingDeadlines';
-import TodosWidget from '@/features/home/components/TodosWidget';
-import UserEventsWidget from '@/features/home/components/UserEventsWidget';
-import { WelcomeHeader } from '@/features/home/components/WelcomeHeader';
-import UnitCard from '@/components/units/UnitCard';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
-import { LazyMotion, m, domAnimation } from 'framer-motion';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import TodaySchedule from "@/features/home/components/TodaySchedule";
+import UpcomingDeadlines from "@/features/home/components/UpcomingDeadlines";
+import TodosWidget from "@/features/home/components/TodosWidget";
+import UserEventsWidget from "@/features/home/components/UserEventsWidget";
+import { WelcomeHeader } from "@/features/home/components/WelcomeHeader";
+import UnitCard from "@/components/units/UnitCard";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import {
+  ScrollReveal,
+  revealChildVariants,
+} from "@/components/ui/ScrollReveal";
+import { LazyMotion, m, domAnimation } from "framer-motion";
 
-import { DEMO_USER } from '@/lib/config';
-import { Info, Plus, BookOpen, Eye, Pencil } from 'lucide-react';
-import { Button } from '@/components/ui/mq/button';
-import { Badge } from '@/components/ui/mq/badge';
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import Link from 'next/link';
-import { CardSolid } from '@/features/home/components/HomeCard';
-import HomeKpiStrip from '@/features/home/components/HomeKpiStrip';
-import WeekHeatStrip from '@/features/home/components/WeekHeatStrip';
+import { DEMO_USER } from "@/lib/config";
+import { Info, Plus, BookOpen, Eye, Pencil } from "lucide-react";
+import { Button } from "@/components/ui/mq/button";
+import { Badge } from "@/components/ui/mq/badge";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/mq/card";
+import Link from "next/link";
+import { CardSolid } from "@/features/home/components/HomeCard";
+import HomeKpiStrip from "@/features/home/components/HomeKpiStrip";
+import WeekHeatStrip from "@/features/home/components/WeekHeatStrip";
 
 import {
   useHomeUser,
@@ -28,8 +31,8 @@ import {
   useHomeData,
   useHomeEventListeners,
   useHomeErrorBoundary,
-} from '@/features/home/hooks';
-import { AuthUser } from '@/features/home/types';
+} from "@/features/home/hooks";
+import { AuthUser } from "@/features/home/types";
 
 interface HomeClientProps {
   initialUser?: AuthUser | null;
@@ -40,7 +43,8 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   const router = useRouter();
 
   // -- HOOKS --
-  const { hasError, errorMessage, handleErrorRecovery } = useHomeErrorBoundary();
+  const { hasError, errorMessage, handleErrorRecovery } =
+    useHomeErrorBoundary();
   const { displayName, hasHydrated } = useHomeUser(initialUser);
   useSampleSeeding();
   const { units, hasUnits, unitStats } = useHomeData();
@@ -55,16 +59,21 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
       <div className="container mx-auto p-6 max-w-7xl home-page">
         <div className="text-center py-12">
           <div className="text-6xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold text-mq-content mb-4">{t('somethingWentWrong')}</h1>
+          <h1 className="text-2xl font-bold text-mq-content mb-4">
+            {t("somethingWentWrong")}
+          </h1>
           <p className="text-mq-content-secondary mb-6 max-w-md mx-auto">
-            {errorMessage || t('unexpectedError')}
+            {errorMessage || t("unexpectedError")}
           </p>
           <div className="space-y-3">
             <Button onClick={handleErrorRecovery} className="mr-3">
-              {t('tryAgain')}
+              {t("tryAgain")}
             </Button>
-            <Button variant="secondary" onClick={() => (window.location.href = '/')}>
-              {t('goHome')}
+            <Button
+              variant="secondary"
+              onClick={() => (window.location.href = "/")}
+            >
+              {t("goHome")}
             </Button>
           </div>
         </div>
@@ -76,7 +85,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
     <LazyMotion features={domAnimation}>
       <section
         className="home-page overflow-x-hidden container mx-auto p-4 sm:p-6 max-w-7xl"
-        aria-label={t('dashboardOverviewLabel')}
+        aria-label={t("dashboardOverviewLabel")}
       >
         {/* Header */}
         <ScrollReveal>
@@ -89,7 +98,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                 >
                   <Link href="/calendar?action=add-deadline">
                     <Plus className="h-4 w-4" />
-                    <span>{t('addTask')}</span>
+                    <span>{t("addTask")}</span>
                   </Link>
                 </Button>
               )}
@@ -114,13 +123,16 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
               className="mb-6 p-4 bg-mq-info/10 border border-mq-info/20 rounded-mq-lg flex items-start gap-3"
               aria-labelledby="get-started-heading"
             >
-              <Info className="h-5 w-5 text-mq-info shrink-0 mt-0.5" aria-hidden="true" />
+              <Info
+                className="h-5 w-5 text-mq-info shrink-0 mt-0.5"
+                aria-hidden="true"
+              />
               <div className="flex-1">
                 <h2 id="get-started-heading" className="sr-only">
-                  {t('gettingStartedGuide')}
+                  {t("gettingStartedGuide")}
                 </h2>
                 <p className="text-mq-sm text-mq-info">
-                  <strong>{t('getStarted')}</strong> {t('addUnitsToSync')}
+                  <strong>{t("getStarted")}</strong> {t("addUnitsToSync")}
                 </p>
               </div>
             </section>
@@ -130,7 +142,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         {/* Main Dashboard Grid - Today's Classes and Deadlines */}
         <section
           className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 2xl:max-w-[1600px] 2xl:mx-auto"
-          aria-label={t('dashboardOverview')}
+          aria-label={t("dashboardOverview")}
         >
           <ScrollReveal delay={0.1}>
             <TodaySchedule />
@@ -145,9 +157,12 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
           <section aria-labelledby="units-section-heading" className="mb-6">
             <CardSolid>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle id="units-section-heading" className="flex items-center gap-2">
+                <CardTitle
+                  id="units-section-heading"
+                  className="flex items-center gap-2"
+                >
                   <BookOpen className="h-5 w-5" aria-hidden="true" />
-                  {t('myUnits')}
+                  {t("myUnits")}
                   {/* View Only Badge - makes read-only state obvious */}
                   {hasHydrated && units.length > 0 && (
                     <Badge
@@ -155,17 +170,17 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                       className="ml-2 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 flex items-center gap-1"
                     >
                       <Eye className="h-3 w-3" aria-hidden="true" />
-                      {t('viewOnly')}
+                      {t("viewOnly")}
                     </Badge>
                   )}
                 </CardTitle>
                 <Button size="sm" variant="outline" className="gap-1.5" asChild>
                   <Link
                     href="/calendar?highlightWidget=units"
-                    aria-label={`${t('manageInCalendar')} ${t('myUnits')}`}
+                    aria-label={`${t("manageInCalendar")} ${t("myUnits")}`}
                   >
                     <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>{t('manageInCalendar')}</span>
+                    <span>{t("manageInCalendar")}</span>
                   </Link>
                 </Button>
               </CardHeader>
@@ -181,15 +196,15 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                   <div className="text-center py-12">
                     <BookOpen className="h-12 w-12 mx-auto mb-4" />
                     <h3 className="text-mq-lg font-semibold text-mq-content mb-2">
-                      {t('noUnitsYet')}
+                      {t("noUnitsYet")}
                     </h3>
                     <p className="text-mq-content-secondary mb-4 max-w-md mx-auto">
-                      {t('addFirstUnitDesc')}
+                      {t("addFirstUnitDesc")}
                     </p>
                     <Button asChild className="gap-2">
                       <Link href="/calendar">
                         <Plus className="h-4 w-4" />
-                        {t('addYourFirstUnit')}
+                        {t("addYourFirstUnit")}
                       </Link>
                     </Button>
                   </div>
@@ -201,34 +216,40 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                         <p className="text-mq-2xl font-bold text-mq-content">
                           {unitStats.unitCount}
                         </p>
-                        <p className="text-mq-xs text-mq-content-secondary">{t('units')}</p>
+                        <p className="text-mq-xs text-mq-content-secondary">
+                          {t("units")}
+                        </p>
                       </div>
                       <div className="text-center">
                         <p className="text-mq-2xl font-bold text-mq-content">
                           {unitStats.totalClasses}
                         </p>
                         <p className="text-mq-xs text-mq-content-secondary">
-                          {t('classesPerWeek')}
+                          {t("classesPerWeek")}
                         </p>
                       </div>
                       <div className="text-center">
                         <p className="text-mq-2xl font-bold text-mq-content">
                           {unitStats.studyHours}h
                         </p>
-                        <p className="text-mq-xs text-mq-content-secondary">{t('studyHours')}</p>
+                        <p className="text-mq-xs text-mq-content-secondary">
+                          {t("studyHours")}
+                        </p>
                       </div>
                     </div>
 
                     {/* View-only hint */}
                     <p className="text-mq-xs text-mq-content-tertiary mb-3 flex items-center gap-1.5">
                       <Info className="h-3 w-3" aria-hidden="true" />
-                      {t('homeViewOnlyHint')}
+                      {t("homeViewOnlyHint")}
                     </p>
 
                     {/* Units Grid - READ ONLY (no edit/delete) */}
                     <m.div
                       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
-                      variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+                      variants={{
+                        visible: { transition: { staggerChildren: 0.1 } },
+                      }}
                     >
                       {units.map((unit) => (
                         <m.div
@@ -240,7 +261,9 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                             unit={unit}
                             showActions={false}
                             onClick={(clickedUnit) => {
-                              const today = new Date().toISOString().split('T')[0];
+                              const today = new Date()
+                                .toISOString()
+                                .split("T")[0];
                               router.push(
                                 `/calendar?date=${today}&highlightUnit=${encodeURIComponent(clickedUnit.id)}`,
                               );
@@ -259,7 +282,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         {/* Events and Todo Grid */}
         <section
           className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 2xl:max-w-[1600px] 2xl:mx-auto"
-          aria-label={t('dashboardOverview')}
+          aria-label={t("dashboardOverview")}
         >
           <ScrollReveal delay={0.35}>
             <UserEventsWidget />
@@ -285,24 +308,24 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                   variant="secondary"
                   className="shadow-lg flex items-center gap-2 whitespace-nowrap"
                   onClick={() => {
-                    router.push('/calendar?action=add-unit');
+                    router.push("/calendar?action=add-unit");
                     setFabOpen(false);
                   }}
                 >
                   <BookOpen className="h-4 w-4" />
-                  {t('addUnit')}
+                  {t("addUnit")}
                 </Button>
                 <Button
                   size="sm"
                   variant="secondary"
                   className="shadow-lg flex items-center gap-2 whitespace-nowrap"
                   onClick={() => {
-                    router.push('/calendar?action=add-deadline');
+                    router.push("/calendar?action=add-deadline");
                     setFabOpen(false);
                   }}
                 >
                   <Plus className="h-4 w-4" />
-                  {t('addDeadline')}
+                  {t("addDeadline")}
                 </Button>
               </m.div>
             )}
@@ -313,9 +336,12 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
               className="h-14 w-14 rounded-full shadow-lg p-0"
               onClick={() => setFabOpen(!fabOpen)}
               aria-expanded={fabOpen}
-              aria-label={t('quickActions')}
+              aria-label={t("quickActions")}
             >
-              <m.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
+              <m.div
+                animate={{ rotate: fabOpen ? 45 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
                 <Plus className="h-6 w-6" />
               </m.div>
             </Button>

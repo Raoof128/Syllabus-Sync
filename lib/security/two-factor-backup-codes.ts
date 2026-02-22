@@ -11,11 +11,10 @@
  * - Audit logging
  */
 
-import crypto from 'crypto';
-import { createServerClient } from '@/lib/supabase/server';
-import { logAuditServer } from '@/lib/security/audit';
-import { logger } from '@/lib/logger';
-
+import crypto from "crypto";
+import { createServerClient } from "@/lib/supabase/server";
+import { logAuditServer } from "@/lib/security/audit";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // CONSTANTS
@@ -23,7 +22,7 @@ import { logger } from '@/lib/logger';
 
 const BACKUP_CODE_LENGTH = 8;
 const BACKUP_CODE_COUNT = 10;
-const BACKUP_CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // No ambiguous characters
+const BACKUP_CODE_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // No ambiguous characters
 
 // ============================================================================
 // TYPES
@@ -72,7 +71,7 @@ export interface BackupCodeValidationResult {
  * @returns The generated code
  */
 function generateBackupCode(): string {
-  let code = '';
+  let code = "";
   for (let i = 0; i < BACKUP_CODE_LENGTH; i++) {
     const randomIndex = crypto.randomInt(0, BACKUP_CODE_ALPHABET.length);
     code += BACKUP_CODE_ALPHABET[randomIndex];
@@ -87,7 +86,7 @@ function generateBackupCode(): string {
  * @returns Promise resolving to generation result
  */
 export async function generateBackupCodes(
-  userId: string
+  userId: string,
 ): Promise<BackupCodeGenerationResult> {
   try {
     const supabase = await createServerClient();
@@ -103,7 +102,7 @@ export async function generateBackupCodes(
     for (const code of codes) {
       const hashedCode = hashBackupCode(code);
       const { data, error } = await supabase
-        .from('backup_codes')
+        .from("backup_codes")
         .insert({
           user_id: userId,
           code: hashedCode,
@@ -113,8 +112,8 @@ export async function generateBackupCodes(
         .single();
 
       if (error) {
-        logger.error('Failed to store backup code:', error);
-        throw new Error('Failed to generate backup codes');
+        logger.error("Failed to store backup code:", error);
+        throw new Error("Failed to generate backup codes");
       }
 
       storedCodes.push(data as BackupCode);
@@ -122,8 +121,8 @@ export async function generateBackupCodes(
 
     // Log audit event
     await logAuditServer(userId, {
-      action: 'MFA_BACKUP_CODE_GENERATED',
-      severity: 'info',
+      action: "MFA_BACKUP_CODE_GENERATED",
+      severity: "info",
       metadata: {
         codeCount: codes.length,
       },
@@ -135,7 +134,7 @@ export async function generateBackupCodes(
       generatedAt: new Date(),
     };
   } catch (error) {
-    logger.error('Backup code generation error:', error);
+    logger.error("Backup code generation error:", error);
     throw error;
   }
 }
@@ -147,7 +146,7 @@ export async function generateBackupCodes(
  * @returns Hashed code
  */
 function hashBackupCode(code: string): string {
-  return crypto.createHash('sha256').update(code).digest('hex');
+  return crypto.createHash("sha256").update(code).digest("hex");
 }
 
 // ============================================================================
@@ -163,7 +162,7 @@ function hashBackupCode(code: string): string {
  */
 export async function validateBackupCode(
   userId: string,
-  code: string
+  code: string,
 ): Promise<BackupCodeValidationResult> {
   try {
     const supabase = await createServerClient();
@@ -173,10 +172,10 @@ export async function validateBackupCode(
 
     // Find matching code
     const { data: backupCode, error } = await supabase
-      .from('backup_codes')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('code', hashedCode)
+      .from("backup_codes")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("code", hashedCode)
       .single();
 
     if (error || !backupCode) {
@@ -200,7 +199,7 @@ export async function validateBackupCode(
       codeId: backupCode.id,
     };
   } catch (error) {
-    logger.error('Backup code validation error:', error);
+    logger.error("Backup code validation error:", error);
     return {
       valid: false,
       alreadyUsed: false,
@@ -217,31 +216,31 @@ export async function validateBackupCode(
  */
 export async function consumeBackupCode(
   userId: string,
-  codeId: string
+  codeId: string,
 ): Promise<boolean> {
   try {
     const supabase = await createServerClient();
 
     // Mark code as used
     const { error } = await supabase
-      .from('backup_codes')
+      .from("backup_codes")
       .update({
         used: true,
         used_at: new Date().toISOString(),
       })
-      .eq('id', codeId)
-      .eq('user_id', userId)
-      .eq('used', false);
+      .eq("id", codeId)
+      .eq("user_id", userId)
+      .eq("used", false);
 
     if (error) {
-      logger.error('Failed to consume backup code:', error);
+      logger.error("Failed to consume backup code:", error);
       return false;
     }
 
     // Log audit event
     await logAuditServer(userId, {
-      action: 'MFA_BACKUP_CODE_USED',
-      severity: 'warning',
+      action: "MFA_BACKUP_CODE_USED",
+      severity: "warning",
       metadata: {
         codeId,
       },
@@ -249,7 +248,7 @@ export async function consumeBackupCode(
 
     return true;
   } catch (error) {
-    logger.error('Backup code consumption error:', error);
+    logger.error("Backup code consumption error:", error);
     return false;
   }
 }
@@ -264,21 +263,19 @@ export async function consumeBackupCode(
  * @param userId - The user ID
  * @returns Promise resolving to array of backup codes
  */
-export async function getBackupCodes(
-  userId: string
-): Promise<BackupCode[]> {
+export async function getBackupCodes(userId: string): Promise<BackupCode[]> {
   try {
     const supabase = await createServerClient();
 
     const { data, error } = await supabase
-      .from('backup_codes')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('used', false)
-      .order('created_at', { ascending: false });
+      .from("backup_codes")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("used", false)
+      .order("created_at", { ascending: false });
 
     if (error) {
-      logger.error('Failed to fetch backup codes:', error);
+      logger.error("Failed to fetch backup codes:", error);
       return [];
     }
 
@@ -300,7 +297,7 @@ export async function getBackupCodes(
       createdAt: new Date(code.created_at),
     }));
   } catch (error) {
-    logger.error('Get backup codes error:', error);
+    logger.error("Get backup codes error:", error);
     return [];
   }
 }
@@ -316,19 +313,19 @@ export async function getBackupCodeCount(userId: string): Promise<number> {
     const supabase = await createServerClient();
 
     const { count, error } = await supabase
-      .from('backup_codes')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('used', false);
+      .from("backup_codes")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("used", false);
 
     if (error) {
-      logger.error('Failed to count backup codes:', error);
+      logger.error("Failed to count backup codes:", error);
       return 0;
     }
 
     return count || 0;
   } catch (error) {
-    logger.error('Count backup codes error:', error);
+    logger.error("Count backup codes error:", error);
     return 0;
   }
 }
@@ -341,26 +338,26 @@ export async function getBackupCodeCount(userId: string): Promise<number> {
  * @returns Promise resolving to generation result
  */
 export async function regenerateBackupCodes(
-  userId: string
+  userId: string,
 ): Promise<BackupCodeGenerationResult> {
   try {
     const supabase = await createServerClient();
 
     // Delete all existing codes
     const { error: deleteError } = await supabase
-      .from('backup_codes')
+      .from("backup_codes")
       .delete()
-      .eq('user_id', userId);
+      .eq("user_id", userId);
 
     if (deleteError) {
-      logger.error('Failed to delete old backup codes:', deleteError);
-      throw new Error('Failed to regenerate backup codes');
+      logger.error("Failed to delete old backup codes:", deleteError);
+      throw new Error("Failed to regenerate backup codes");
     }
 
     // Generate new codes
     return await generateBackupCodes(userId);
   } catch (error) {
-    logger.error('Backup code regeneration error:', error);
+    logger.error("Backup code regeneration error:", error);
     throw error;
   }
 }
@@ -376,25 +373,25 @@ export async function deleteBackupCodes(userId: string): Promise<boolean> {
     const supabase = await createServerClient();
 
     const { error } = await supabase
-      .from('backup_codes')
+      .from("backup_codes")
       .delete()
-      .eq('user_id', userId);
+      .eq("user_id", userId);
 
     if (error) {
-      logger.error('Failed to delete backup codes:', error);
+      logger.error("Failed to delete backup codes:", error);
       return false;
     }
 
     // Log audit event
     await logAuditServer(userId, {
-      action: 'MFA_BACKUP_CODE_DELETED',
-      severity: 'warning',
+      action: "MFA_BACKUP_CODE_DELETED",
+      severity: "warning",
       metadata: {},
     });
 
     return true;
   } catch (error) {
-    logger.error('Delete backup codes error:', error);
+    logger.error("Delete backup codes error:", error);
     return false;
   }
 }
@@ -409,7 +406,7 @@ export async function deleteBackupCodes(userId: string): Promise<boolean> {
  */
 export async function handleGenerateBackupCodes(
   request: Request,
-  userId: string
+  userId: string,
 ): Promise<Response> {
   try {
     const result = await generateBackupCodes(userId);
@@ -421,10 +418,15 @@ export async function handleGenerateBackupCodes(
       generatedAt: result.generatedAt,
     });
   } catch (error) {
-    logger.error('Generate backup codes error:', error);
+    logger.error("Generate backup codes error:", error);
     return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: 'Failed to generate backup codes' } },
-      { status: 500 }
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to generate backup codes",
+        },
+      },
+      { status: 500 },
     );
   }
 }
@@ -435,7 +437,7 @@ export async function handleGenerateBackupCodes(
  */
 export async function handleValidateBackupCode(
   request: Request,
-  userId: string
+  userId: string,
 ): Promise<Response> {
   try {
     const body = await request.json();
@@ -443,8 +445,8 @@ export async function handleValidateBackupCode(
 
     if (!code) {
       return Response.json(
-        { error: { code: 'MISSING_CODE', message: 'Backup code is required' } },
-        { status: 400 }
+        { error: { code: "MISSING_CODE", message: "Backup code is required" } },
+        { status: 400 },
       );
     }
 
@@ -455,8 +457,8 @@ export async function handleValidateBackupCode(
         success: false,
         alreadyUsed: result.alreadyUsed,
         message: result.alreadyUsed
-          ? 'This backup code has already been used'
-          : 'Invalid backup code',
+          ? "This backup code has already been used"
+          : "Invalid backup code",
       });
     }
 
@@ -467,13 +469,18 @@ export async function handleValidateBackupCode(
 
     return Response.json({
       success: true,
-      message: 'Backup code validated successfully',
+      message: "Backup code validated successfully",
     });
   } catch (error) {
-    logger.error('Validate backup code error:', error);
+    logger.error("Validate backup code error:", error);
     return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: 'Failed to validate backup code' } },
-      { status: 500 }
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to validate backup code",
+        },
+      },
+      { status: 500 },
     );
   }
 }
@@ -484,7 +491,7 @@ export async function handleValidateBackupCode(
  */
 export async function handleGetBackupCodes(
   request: Request,
-  userId: string
+  userId: string,
 ): Promise<Response> {
   try {
     const codes = await getBackupCodes(userId);
@@ -500,10 +507,15 @@ export async function handleGetBackupCodes(
       remaining: count,
     });
   } catch (error) {
-    logger.error('Get backup codes error:', error);
+    logger.error("Get backup codes error:", error);
     return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch backup codes' } },
-      { status: 500 }
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to fetch backup codes",
+        },
+      },
+      { status: 500 },
     );
   }
 }
@@ -514,7 +526,7 @@ export async function handleGetBackupCodes(
  */
 export async function handleRegenerateBackupCodes(
   request: Request,
-  userId: string
+  userId: string,
 ): Promise<Response> {
   try {
     const result = await regenerateBackupCodes(userId);
@@ -524,13 +536,18 @@ export async function handleRegenerateBackupCodes(
       codes: result.codes,
       count: result.count,
       generatedAt: result.generatedAt,
-      message: 'Backup codes regenerated successfully',
+      message: "Backup codes regenerated successfully",
     });
   } catch (error) {
-    logger.error('Regenerate backup codes error:', error);
+    logger.error("Regenerate backup codes error:", error);
     return Response.json(
-      { error: { code: 'INTERNAL_ERROR', message: 'Failed to regenerate backup codes' } },
-      { status: 500 }
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to regenerate backup codes",
+        },
+      },
+      { status: 500 },
     );
   }
 }

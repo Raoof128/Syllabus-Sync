@@ -1,18 +1,23 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import { Plus, PartyPopper } from 'lucide-react';
-import { Button } from '@/components/ui/mq/button';
-import { Badge } from '@/components/ui/mq/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
-import { MagicCard } from '@/components/ui/MagicCard';
-import { cn } from '@/lib/utils';
-import { useEventsStore } from '@/lib/store/eventsStore';
-import { Event } from '@/lib/types';
-import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
-import { formatLocalizedDate } from '@/lib/utils/locale';
+import React from "react";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { Plus, PartyPopper } from "lucide-react";
+import { Button } from "@/components/ui/mq/button";
+import { Badge } from "@/components/ui/mq/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/mq/card";
+import { MagicCard } from "@/components/ui/MagicCard";
+import { cn } from "@/lib/utils";
+import { useEventsStore } from "@/lib/store/eventsStore";
+import { Event } from "@/lib/types";
+import ItemActionButtons from "@/features/calendar/components/ItemActionButtons";
+import { formatLocalizedDate } from "@/lib/utils/locale";
 
 interface EventsWidgetProps {
   onAddEvent: () => void;
@@ -35,7 +40,9 @@ export default function EventsWidget({
 }: EventsWidgetProps) {
   const { t, language } = useTypedTranslation();
   const events = useEventsStore((state) => state.events);
-  const toggleEventNotification = useEventsStore((state) => state.toggleNotification);
+  const toggleEventNotification = useEventsStore(
+    (state) => state.toggleNotification,
+  );
 
   const tOr = (key: TranslationKey | string, fallback: string) => {
     const value = t(key as TranslationKey);
@@ -44,14 +51,14 @@ export default function EventsWidget({
 
   const formatMonthDayTime = (date: Date) =>
     formatLocalizedDate(date, language, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
     });
 
   const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       action();
     }
@@ -62,8 +69,8 @@ export default function EventsWidget({
       isLiquidEnhanced
       className={
         eventHighlightActive
-          ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all duration-300 animate-pulse'
-          : 'transition-all duration-300'
+          ? "ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all duration-300 animate-pulse"
+          : "transition-all duration-300"
       }
     >
       <div
@@ -78,19 +85,21 @@ export default function EventsWidget({
             <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm font-semibold">
                 <PartyPopper className="h-4 w-4" />
-                {t('events')}
+                {t("events")}
               </span>
               <div className="flex items-center gap-2">
                 <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                  {events.length}{' '}
-                  {events.length === 1 ? tOr('event', 'event') : tOr('eventsLabel', 'events')}
+                  {events.length}{" "}
+                  {events.length === 1
+                    ? tOr("event", "event")
+                    : tOr("eventsLabel", "events")}
                 </Badge>
                 <Button
                   size="icon"
                   variant="ghost"
                   className="h-6 w-6"
                   onClick={onAddEvent}
-                  aria-label={t('addEvent')}
+                  aria-label={t("addEvent")}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -101,38 +110,50 @@ export default function EventsWidget({
             <div className="space-y-2 pr-1">
               {events.length === 0 ? (
                 <div className="text-center py-6 text-mq-content-tertiary">
-                  <p className="text-xs">{t('noEventsYet' as TranslationKey)}</p>
+                  <p className="text-xs">
+                    {t("noEventsYet" as TranslationKey)}
+                  </p>
                 </div>
               ) : (
                 events.slice(0, 5).map((event) => {
                   // Get category color
                   const categoryColors: Record<string, string> = {
-                    Career: '#3B82F6',
-                    Social: '#8B5CF6',
-                    Academic: '#10B981',
-                    'Free Food': '#F59E0B',
+                    Career: "#3B82F6",
+                    Social: "#8B5CF6",
+                    Academic: "#10B981",
+                    "Free Food": "#F59E0B",
                   };
-                  const eventColor = event.color || categoryColors[event.category] || '#A6192E';
+                  const eventColor =
+                    event.color || categoryColors[event.category] || "#A6192E";
 
                   // Events from public feed (have sourcePublicEventId) can be deleted but not edited
                   const isFromPublicFeed = Boolean(event.sourcePublicEventId);
-                  const isHighlighted = eventHighlightActive && highlightedEventId === event.id;
+                  const isHighlighted =
+                    eventHighlightActive && highlightedEventId === event.id;
 
                   return (
                     <div
                       key={event.id}
                       className={cn(
-                        'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
-                        isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
+                        "group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm",
+                        isHighlighted &&
+                          "ring-2 ring-mq-primary ring-offset-1 animate-pulse",
                       )}
-                      style={{ borderLeftColor: eventColor, borderLeftWidth: '4px' }}
+                      style={{
+                        borderLeftColor: eventColor,
+                        borderLeftWidth: "4px",
+                      }}
                       onClick={() => onOpenEventDetail(event)}
-                      onKeyDown={(e) => handleKeyDown(e, () => onOpenEventDetail(event))}
+                      onKeyDown={(e) =>
+                        handleKeyDown(e, () => onOpenEventDetail(event))
+                      }
                       role="button"
                       tabIndex={0}
                     >
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{event.title}</h4>
+                        <h4 className="font-medium text-sm truncate">
+                          {event.title}
+                        </h4>
                         <p className="text-[11px] text-mq-content-secondary truncate">
                           {event.startAt
                             ? formatMonthDayTime(
@@ -140,7 +161,7 @@ export default function EventsWidget({
                                   ? event.startAt
                                   : new Date(event.startAt),
                               )
-                            : event.time}{' '}
+                            : event.time}{" "}
                           • {event.location}
                         </p>
                       </div>
@@ -152,9 +173,15 @@ export default function EventsWidget({
                         room={event.room}
                         dateTime={event.startAt || event.date}
                         notificationEnabled={event.notificationEnabled}
-                        onEdit={isFromPublicFeed ? undefined : () => onEditEvent(event)}
+                        onEdit={
+                          isFromPublicFeed
+                            ? undefined
+                            : () => onEditEvent(event)
+                        }
                         onDelete={() => onDeleteEvent(event)}
-                        onToggleNotification={() => toggleEventNotification(event.id)}
+                        onToggleNotification={() =>
+                          toggleEventNotification(event.id)
+                        }
                         variant="compact"
                         stopPropagation
                         className="opacity-0 group-hover:opacity-100 transition-opacity"

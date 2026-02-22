@@ -1,19 +1,22 @@
-'use server';
+"use server";
 
-import { profileSchema, ProfileFormValues } from './schema';
-import { revalidatePath } from 'next/cache';
-import { logger } from '@/lib/logger';
-import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { profileSchema, ProfileFormValues } from "./schema";
+import { revalidatePath } from "next/cache";
+import { logger } from "@/lib/logger";
+import { checkRateLimit } from "@/lib/utils/rate-limit";
 
 // Mock DB delay - remove this in production
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-export async function updateProfileAction(profileId: string, data: ProfileFormValues) {
+export async function updateProfileAction(
+  profileId: string,
+  data: ProfileFormValues,
+) {
   // 0. SECURITY: Rate Limiting
   const limit = await checkRateLimit(20, 60 * 1000);
 
   if (!limit.success) {
-    return { success: false, error: 'Too many requests. Chill out, hacker.' };
+    return { success: false, error: "Too many requests. Chill out, hacker." };
   }
 
   // 1. SECURITY: Validate inputs on the server again
@@ -28,14 +31,14 @@ export async function updateProfileAction(profileId: string, data: ProfileFormVa
     // await prisma.userProfile.update({ where: { id: profileId }, data: parsed.data });
 
     await delay(500); // Fake delay
-    logger.info('Server saving:', parsed.data);
+    logger.info("Server saving:", parsed.data);
 
     // 3. CACHE: Refresh the page data
-    revalidatePath('/manage-profiles');
+    revalidatePath("/manage-profiles");
 
-    return { success: true, message: 'Profile updated successfully' };
+    return { success: true, message: "Profile updated successfully" };
   } catch (error) {
-    logger.error('Database update failed:', error);
-    return { success: false, message: 'Database connection failed' };
+    logger.error("Database update failed:", error);
+    return { success: false, message: "Database connection failed" };
   }
 }

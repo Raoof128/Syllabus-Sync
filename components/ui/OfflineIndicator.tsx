@@ -1,11 +1,11 @@
 // components/ui/OfflineIndicator.tsx
-'use client';
+"use client";
 
-import { useState, useSyncExternalStore, useRef } from 'react';
-import { WifiOff, Wifi } from 'lucide-react';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { useHydration } from '@/lib/hooks';
-import { cn } from '@/lib/utils';
+import { useState, useSyncExternalStore, useRef } from "react";
+import { WifiOff, Wifi } from "lucide-react";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { useHydration } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 
 /**
  * Custom hook to track online/offline status with transition notifications.
@@ -38,12 +38,12 @@ function useNetworkStatus() {
     // Initialize previous state
     previousOnlineRef.current = navigator.onLine;
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   };
@@ -51,7 +51,11 @@ function useNetworkStatus() {
   const getSnapshot = () => navigator.onLine;
   const getServerSnapshot = () => true; // Assume online during SSR
 
-  const isOnline = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const isOnline = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
   return { isOnline, showOnlineMessage };
 }
@@ -78,22 +82,22 @@ export function OfflineIndicator() {
       aria-live="polite"
       aria-atomic="true"
       className={cn(
-        'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-mq-lg shadow-mq-lg border flex items-center gap-3 transition-all duration-300 ease-mq-ease mq-liquid-glass',
-        'animate-in slide-in-from-bottom-4 fade-in',
+        "fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-mq-lg shadow-mq-lg border flex items-center gap-3 transition-all duration-300 ease-mq-ease mq-liquid-glass",
+        "animate-in slide-in-from-bottom-4 fade-in",
         isOnline
-          ? 'bg-mq-success/10 border-mq-success text-mq-success'
-          : 'bg-mq-error/10 border-mq-error text-mq-error',
+          ? "bg-mq-success/10 border-mq-success text-mq-success"
+          : "bg-mq-error/10 border-mq-error text-mq-error",
       )}
     >
       {isOnline ? (
         <>
           <Wifi className="w-5 h-5" aria-hidden="true" />
-          <span className="text-sm font-medium">{t('backOnline')}</span>
+          <span className="text-sm font-medium">{t("backOnline")}</span>
         </>
       ) : (
         <>
           <WifiOff className="w-5 h-5" aria-hidden="true" />
-          <span className="text-sm font-medium">{t('youAreOffline')}</span>
+          <span className="text-sm font-medium">{t("youAreOffline")}</span>
         </>
       )}
     </div>

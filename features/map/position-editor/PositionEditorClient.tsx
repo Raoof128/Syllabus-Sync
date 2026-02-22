@@ -1,8 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { MapContainer, ImageOverlay, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import {
+  MapContainer,
+  ImageOverlay,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+import L from "leaflet";
 import {
   Search,
   Download,
@@ -20,13 +27,17 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
-} from 'lucide-react';
+} from "lucide-react";
 
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
 
-import { buildings, type Building, MAP_CONFIG } from '@/features/map/lib/buildings';
-import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import {
+  buildings,
+  type Building,
+  MAP_CONFIG,
+} from "@/features/map/lib/buildings";
+import { CAMPUS_IMAGE_URL } from "@/features/map/lib/constants";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
 
 // ============================================================================
 // Types
@@ -47,7 +58,10 @@ const PIXEL_BOUNDS: L.LatLngBoundsExpression = [
   [0, 0],
   [MAP_DIMS.height, MAP_DIMS.width],
 ];
-const CAMPUS_CENTER: L.LatLngExpression = [MAP_DIMS.height / 2, MAP_DIMS.width / 2];
+const CAMPUS_CENTER: L.LatLngExpression = [
+  MAP_DIMS.height / 2,
+  MAP_DIMS.width / 2,
+];
 
 // ============================================================================
 // Helpers
@@ -65,11 +79,11 @@ const latLngToPixel = (lat: number, lng: number): [number, number] => {
 
 // Create marker icon
 const createMarkerIcon = (isSelected: boolean, hasChanges: boolean) => {
-  const color = isSelected ? '#dc2626' : hasChanges ? '#f59e0b' : '#3b82f6';
+  const color = isSelected ? "#dc2626" : hasChanges ? "#f59e0b" : "#3b82f6";
   const size = isSelected ? 32 : 24;
 
   return L.divIcon({
-    className: 'custom-marker',
+    className: "custom-marker",
     html: `
       <div style="
         width: ${size}px;
@@ -79,7 +93,7 @@ const createMarkerIcon = (isSelected: boolean, hasChanges: boolean) => {
         border-radius: 50% 50% 50% 0;
         transform: rotate(-45deg);
         box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-        ${isSelected ? 'z-index: 1000;' : ''}
+        ${isSelected ? "z-index: 1000;" : ""}
       "></div>
     `,
     iconSize: [size, size],
@@ -160,7 +174,13 @@ function DraggableMarker({
   const icon = createMarkerIcon(isSelected, hasChanges);
 
   return (
-    <Marker ref={markerRef} position={latLng} icon={icon} draggable eventHandlers={eventHandlers}>
+    <Marker
+      ref={markerRef}
+      position={latLng}
+      icon={icon}
+      draggable
+      eventHandlers={eventHandlers}
+    >
       <Popup>
         <div className="text-sm">
           <strong>{building.name}</strong>
@@ -183,16 +203,24 @@ function DraggableMarker({
 export default function PositionEditorClient() {
   const { t } = useTypedTranslation();
   // State
-  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
-  const [positionChanges, setPositionChanges] = useState<Map<string, PositionChange>>(new Map());
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(
+    null,
+  );
+  const [positionChanges, setPositionChanges] = useState<
+    Map<string, PositionChange>
+  >(new Map());
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
   const [copied, setCopied] = useState(false);
   const [showOnlyChanged, setShowOnlyChanged] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
-  const [saveMessage, setSaveMessage] = useState<string>('');
+  const [saveStatus, setSaveStatus] = useState<
+    "idle" | "saving" | "success" | "error"
+  >("idle");
+  const [saveMessage, setSaveMessage] = useState<string>("");
   const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const saveStatusResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveStatusResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   // Get current position for a building (changed or original)
   const getCurrentPosition = useCallback(
@@ -204,24 +232,30 @@ export default function PositionEditorClient() {
   );
 
   // Handle position change
-  const handlePositionChange = useCallback((building: Building, newPosition: [number, number]) => {
-    setPositionChanges((prev) => {
-      const next = new Map(prev);
-      const existing = next.get(building.id);
+  const handlePositionChange = useCallback(
+    (building: Building, newPosition: [number, number]) => {
+      setPositionChanges((prev) => {
+        const next = new Map(prev);
+        const existing = next.get(building.id);
 
-      // If position is back to original, remove the change
-      if (newPosition[0] === building.position[0] && newPosition[1] === building.position[1]) {
-        next.delete(building.id);
-      } else {
-        next.set(building.id, {
-          buildingId: building.id,
-          originalPosition: existing?.originalPosition || building.position,
-          newPosition,
-        });
-      }
-      return next;
-    });
-  }, []);
+        // If position is back to original, remove the change
+        if (
+          newPosition[0] === building.position[0] &&
+          newPosition[1] === building.position[1]
+        ) {
+          next.delete(building.id);
+        } else {
+          next.set(building.id, {
+            buildingId: building.id,
+            originalPosition: existing?.originalPosition || building.position,
+            newPosition,
+          });
+        }
+        return next;
+      });
+    },
+    [],
+  );
 
   // Reset a single building
   const resetBuilding = useCallback((buildingId: string) => {
@@ -265,7 +299,7 @@ export default function PositionEditorClient() {
     }
 
     // Filter by category
-    if (filterCategory !== 'all') {
+    if (filterCategory !== "all") {
       result = result.filter((b) => b.category === filterCategory);
     }
 
@@ -280,22 +314,25 @@ export default function PositionEditorClient() {
   // Get unique categories
   const categories = useMemo(() => {
     const cats = new Set(buildings.map((b) => b.category).filter(Boolean));
-    return ['all', ...Array.from(cats)] as string[];
+    return ["all", ...Array.from(cats)] as string[];
   }, []);
 
   // Navigate between buildings
   const navigateBuilding = useCallback(
-    (direction: 'prev' | 'next') => {
+    (direction: "prev" | "next") => {
       if (!selectedBuilding) {
         setSelectedBuilding(filteredBuildings[0] || null);
         return;
       }
 
-      const currentIndex = filteredBuildings.findIndex((b) => b.id === selectedBuilding.id);
+      const currentIndex = filteredBuildings.findIndex(
+        (b) => b.id === selectedBuilding.id,
+      );
       const newIndex =
-        direction === 'next'
+        direction === "next"
           ? (currentIndex + 1) % filteredBuildings.length
-          : (currentIndex - 1 + filteredBuildings.length) % filteredBuildings.length;
+          : (currentIndex - 1 + filteredBuildings.length) %
+            filteredBuildings.length;
 
       setSelectedBuilding(filteredBuildings[newIndex] || null);
     },
@@ -304,47 +341,47 @@ export default function PositionEditorClient() {
 
   // Generate export code
   const generateExportCode = useCallback(() => {
-    if (positionChanges.size === 0) return '// No changes to export';
+    if (positionChanges.size === 0) return "// No changes to export";
 
     const lines: string[] = [
-      '// Updated building positions',
-      '// Copy these changes to features/map/lib/buildings.ts',
-      '',
-      '// Changes summary:',
+      "// Updated building positions",
+      "// Copy these changes to features/map/lib/buildings.ts",
+      "",
+      "// Changes summary:",
     ];
 
     positionChanges.forEach((change) => {
       const building = buildings.find((b) => b.id === change.buildingId);
       lines.push(
-        `// ${building?.name || change.buildingId}: [${change.originalPosition.join(', ')}] -> [${change.newPosition.join(', ')}]`,
+        `// ${building?.name || change.buildingId}: [${change.originalPosition.join(", ")}] -> [${change.newPosition.join(", ")}]`,
       );
     });
 
-    lines.push('');
-    lines.push('// Find and replace these positions in buildings.ts:');
-    lines.push('');
+    lines.push("");
+    lines.push("// Find and replace these positions in buildings.ts:");
+    lines.push("");
 
     positionChanges.forEach((change) => {
       const building = buildings.find((b) => b.id === change.buildingId);
       lines.push(`// ${building?.name || change.buildingId}`);
-      lines.push(`// Old: position: [${change.originalPosition.join(', ')}],`);
-      lines.push(`// New: position: [${change.newPosition.join(', ')}],`);
-      lines.push('');
+      lines.push(`// Old: position: [${change.originalPosition.join(", ")}],`);
+      lines.push(`// New: position: [${change.newPosition.join(", ")}],`);
+      lines.push("");
     });
 
     // Generate a JSON array for bulk updates
-    lines.push('// ============================================');
-    lines.push('// JSON format for bulk processing:');
-    lines.push('// ============================================');
-    lines.push('/*');
+    lines.push("// ============================================");
+    lines.push("// JSON format for bulk processing:");
+    lines.push("// ============================================");
+    lines.push("/*");
     const jsonChanges = Array.from(positionChanges.values()).map((c) => ({
       id: c.buildingId,
       position: c.newPosition,
     }));
     lines.push(JSON.stringify(jsonChanges, null, 2));
-    lines.push('*/');
+    lines.push("*/");
 
-    return lines.join('\n');
+    return lines.join("\n");
   }, [positionChanges]);
 
   // Copy to clipboard
@@ -359,19 +396,21 @@ export default function PositionEditorClient() {
         copyResetTimerRef.current = null;
       }, 2000);
     } catch (error) {
-      setSaveStatus('error');
-      setSaveMessage(error instanceof Error ? error.message : 'Failed to copy changes');
+      setSaveStatus("error");
+      setSaveMessage(
+        error instanceof Error ? error.message : "Failed to copy changes",
+      );
     }
   }, [generateExportCode]);
 
   // Download as file
   const downloadChanges = useCallback(() => {
     const code = generateExportCode();
-    const blob = new Blob([code], { type: 'text/plain' });
+    const blob = new Blob([code], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `building-positions-${new Date().toISOString().split('T')[0]}.txt`;
+    a.download = `building-positions-${new Date().toISOString().split("T")[0]}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   }, [generateExportCode]);
@@ -380,8 +419,8 @@ export default function PositionEditorClient() {
   const saveToFile = useCallback(async () => {
     if (positionChanges.size === 0) return;
 
-    setSaveStatus('saving');
-    setSaveMessage('');
+    setSaveStatus("saving");
+    setSaveMessage("");
 
     try {
       // Prepare the changes for the API
@@ -390,19 +429,19 @@ export default function PositionEditorClient() {
         position: c.newPosition,
       }));
 
-      const response = await fetch('/api/admin/update-building-positions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/admin/update-building-positions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ changes }),
       });
 
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error?.message || 'Failed to save changes');
+        throw new Error(result.error?.message || "Failed to save changes");
       }
 
-      setSaveStatus('success');
+      setSaveStatus("success");
       setSaveMessage(result.data.message);
 
       // Clear changes after successful save (positions are now updated in the file)
@@ -410,21 +449,25 @@ export default function PositionEditorClient() {
       setPositionChanges(new Map());
 
       // Auto-reset status after 5 seconds
-      if (saveStatusResetTimerRef.current) clearTimeout(saveStatusResetTimerRef.current);
+      if (saveStatusResetTimerRef.current)
+        clearTimeout(saveStatusResetTimerRef.current);
       saveStatusResetTimerRef.current = setTimeout(() => {
-        setSaveStatus('idle');
-        setSaveMessage('');
+        setSaveStatus("idle");
+        setSaveMessage("");
         saveStatusResetTimerRef.current = null;
       }, 5000);
     } catch (error) {
-      setSaveStatus('error');
-      setSaveMessage(error instanceof Error ? error.message : 'Failed to save changes');
+      setSaveStatus("error");
+      setSaveMessage(
+        error instanceof Error ? error.message : "Failed to save changes",
+      );
 
       // Auto-reset error status after 10 seconds
-      if (saveStatusResetTimerRef.current) clearTimeout(saveStatusResetTimerRef.current);
+      if (saveStatusResetTimerRef.current)
+        clearTimeout(saveStatusResetTimerRef.current);
       saveStatusResetTimerRef.current = setTimeout(() => {
-        setSaveStatus('idle');
-        setSaveMessage('');
+        setSaveStatus("idle");
+        setSaveMessage("");
         saveStatusResetTimerRef.current = null;
       }, 10000);
     }
@@ -441,17 +484,17 @@ export default function PositionEditorClient() {
         return;
 
       switch (e.key) {
-        case 'ArrowLeft':
-          navigateBuilding('prev');
+        case "ArrowLeft":
+          navigateBuilding("prev");
           break;
-        case 'ArrowRight':
-          navigateBuilding('next');
+        case "ArrowRight":
+          navigateBuilding("next");
           break;
-        case 'Escape':
+        case "Escape":
           setSelectedBuilding(null);
           break;
-        case 'r':
-        case 'R':
+        case "r":
+        case "R":
           if (selectedBuilding) {
             resetBuilding(selectedBuilding.id);
           }
@@ -459,8 +502,8 @@ export default function PositionEditorClient() {
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigateBuilding, selectedBuilding, resetBuilding]);
 
   // Cleanup pending timers
@@ -485,9 +528,11 @@ export default function PositionEditorClient() {
         <div className="border-b border-gray-200 p-4 dark:border-gray-700">
           <h1 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <MapPin className="h-5 w-5 text-red-600" />
-            {t('positionEditor')}
+            {t("positionEditor")}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{t('dragMarkersToCorrect')}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {t("dragMarkersToCorrect")}
+          </p>
         </div>
 
         {/* Search & Filter */}
@@ -496,7 +541,7 @@ export default function PositionEditorClient() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder={t('searchBuildingsPlaceholder')}
+              placeholder={t("searchBuildingsPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
@@ -511,7 +556,7 @@ export default function PositionEditorClient() {
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat === 'all' ? t('allCategories') : cat}
+                  {cat === "all" ? t("allCategories") : cat}
                 </option>
               ))}
             </select>
@@ -520,10 +565,10 @@ export default function PositionEditorClient() {
               onClick={() => setShowOnlyChanged(!showOnlyChanged)}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                 showOnlyChanged
-                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300'
-                  : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300"
+                  : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
               }`}
-              title={t('showOnlyChangedBuildingsTitle')}
+              title={t("showOnlyChangedBuildingsTitle")}
             >
               <Filter className="h-4 w-4" />
             </button>
@@ -533,10 +578,10 @@ export default function PositionEditorClient() {
         {/* Stats */}
         <div className="border-b border-gray-200 px-4 py-2 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 flex justify-between">
           <span>
-            {filteredBuildings.length} {t('buildingsLabel')}
+            {filteredBuildings.length} {t("buildingsLabel")}
           </span>
           <span className="text-amber-600 dark:text-amber-400">
-            {positionChanges.size} {t('changedLabel')}
+            {positionChanges.size} {t("changedLabel")}
           </span>
         </div>
 
@@ -551,7 +596,7 @@ export default function PositionEditorClient() {
                 key={building.id}
                 onClick={() => setSelectedBuilding(building)}
                 className={`w-full px-4 py-3 text-left border-b border-gray-100 dark:border-gray-800 transition hover:bg-gray-50 dark:hover:bg-gray-800 ${
-                  isSelected ? 'bg-red-50 dark:bg-red-900/20' : ''
+                  isSelected ? "bg-red-50 dark:bg-red-900/20" : ""
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -560,8 +605,8 @@ export default function PositionEditorClient() {
                       <span
                         className={`text-sm font-medium truncate ${
                           isSelected
-                            ? 'text-red-700 dark:text-red-400'
-                            : 'text-gray-900 dark:text-white'
+                            ? "text-red-700 dark:text-red-400"
+                            : "text-gray-900 dark:text-white"
                         }`}
                       >
                         {building.name}
@@ -571,7 +616,8 @@ export default function PositionEditorClient() {
                       )}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {building.id} &bull; [{getCurrentPosition(building).join(', ')}]
+                      {building.id} &bull; [
+                      {getCurrentPosition(building).join(", ")}]
                     </div>
                   </div>
                   <Building2 className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -585,17 +631,17 @@ export default function PositionEditorClient() {
         <div className="border-t border-gray-200 p-3 dark:border-gray-700 space-y-2">
           <div className="flex gap-2">
             <button
-              onClick={() => navigateBuilding('prev')}
+              onClick={() => navigateBuilding("prev")}
               className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               <ChevronLeft className="h-4 w-4" />
-              {t('prev')}
+              {t("prev")}
             </button>
             <button
-              onClick={() => navigateBuilding('next')}
+              onClick={() => navigateBuilding("next")}
               className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             >
-              {t('next')}
+              {t("next")}
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
@@ -606,7 +652,7 @@ export default function PositionEditorClient() {
             className="w-full flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             <RotateCcw className="h-4 w-4" />
-            {t('resetAllChanges')}
+            {t("resetAllChanges")}
           </button>
         </div>
       </div>
@@ -625,13 +671,16 @@ export default function PositionEditorClient() {
           ]}
           maxBoundsViscosity={0.8}
           className="h-full w-full"
-          style={{ background: '#1a1a2e' }}
+          style={{ background: "#1a1a2e" }}
         >
           {/* Campus Map Image */}
           <ImageOverlay url={CAMPUS_IMAGE_URL} bounds={PIXEL_BOUNDS} />
 
           {/* Map Controller */}
-          <MapController selectedBuilding={selectedBuilding} onMapClick={handleMapClick} />
+          <MapController
+            selectedBuilding={selectedBuilding}
+            onMapClick={handleMapClick}
+          />
 
           {/* Building Markers */}
           {filteredBuildings.map((building) => (
@@ -652,9 +701,11 @@ export default function PositionEditorClient() {
           <div className="absolute top-4 left-4 z-[1000] bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 w-80">
             <div className="flex items-start justify-between mb-3">
               <div>
-                <h3 className="font-bold text-gray-900 dark:text-white">{selectedBuilding.name}</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white">
+                  {selectedBuilding.name}
+                </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t('id')}: {selectedBuilding.id}
+                  {t("id")}: {selectedBuilding.id}
                 </p>
               </div>
               <button
@@ -667,29 +718,40 @@ export default function PositionEditorClient() {
 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500 dark:text-gray-400">{t('original')}</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {t("original")}
+                </span>
                 <span className="font-mono text-gray-900 dark:text-white">
-                  [{selectedBuilding.position.join(', ')}]
+                  [{selectedBuilding.position.join(", ")}]
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 dark:text-gray-400">{t('current')}:</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {t("current")}:
+                </span>
                 <span
                   className={`font-mono ${
                     positionChanges.has(selectedBuilding.id)
-                      ? 'text-amber-600 dark:text-amber-400'
-                      : 'text-gray-900 dark:text-white'
+                      ? "text-amber-600 dark:text-amber-400"
+                      : "text-gray-900 dark:text-white"
                   }`}
                 >
-                  [{getCurrentPosition(selectedBuilding).join(', ')}]
+                  [{getCurrentPosition(selectedBuilding).join(", ")}]
                 </span>
               </div>
               {positionChanges.has(selectedBuilding.id) && (
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">{t('delta')}</span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {t("delta")}
+                  </span>
                   <span className="font-mono text-blue-600 dark:text-blue-400">
-                    [{getCurrentPosition(selectedBuilding)[0] - selectedBuilding.position[0]},{' '}
-                    {getCurrentPosition(selectedBuilding)[1] - selectedBuilding.position[1]}]
+                    [
+                    {getCurrentPosition(selectedBuilding)[0] -
+                      selectedBuilding.position[0]}
+                    ,{" "}
+                    {getCurrentPosition(selectedBuilding)[1] -
+                      selectedBuilding.position[1]}
+                    ]
                   </span>
                 </div>
               )}
@@ -702,11 +764,13 @@ export default function PositionEditorClient() {
                 className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               >
                 <RotateCcw className="h-4 w-4" />
-                {t('reset')}
+                {t("reset")}
               </button>
             </div>
 
-            <p className="mt-3 text-xs text-gray-400 dark:text-gray-500">{t('dragToMoveHint')}</p>
+            <p className="mt-3 text-xs text-gray-400 dark:text-gray-500">
+              {t("dragToMoveHint")}
+            </p>
           </div>
         )}
 
@@ -719,47 +783,53 @@ export default function PositionEditorClient() {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white">
-                  {positionChanges.size} {t('changes')}
+                  {positionChanges.size} {t("changes")}
                 </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{t('readyToSave')}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {t("readyToSave")}
+                </p>
               </div>
             </div>
 
             {/* Save Status Message */}
-            {saveStatus !== 'idle' && (
+            {saveStatus !== "idle" && (
               <div
                 className={`mb-3 flex items-start gap-2 rounded-lg p-2 text-xs ${
-                  saveStatus === 'success'
-                    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                    : saveStatus === 'error'
-                      ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                      : 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                  saveStatus === "success"
+                    ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : saveStatus === "error"
+                      ? "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                      : "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
                 }`}
               >
-                {saveStatus === 'success' && <CheckCircle2 className="h-4 w-4 flex-shrink-0" />}
-                {saveStatus === 'error' && <AlertCircle className="h-4 w-4 flex-shrink-0" />}
-                {saveStatus === 'saving' && (
+                {saveStatus === "success" && (
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+                )}
+                {saveStatus === "error" && (
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                )}
+                {saveStatus === "saving" && (
                   <Loader2 className="h-4 w-4 flex-shrink-0 animate-spin" />
                 )}
-                <span>{saveMessage || t('savingChangesEllipsis')}</span>
+                <span>{saveMessage || t("savingChangesEllipsis")}</span>
               </div>
             )}
 
             {/* Primary Action: Save to File */}
             <button
               onClick={saveToFile}
-              disabled={saveStatus === 'saving'}
+              disabled={saveStatus === "saving"}
               className="w-full flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed mb-2"
             >
-              {saveStatus === 'saving' ? (
+              {saveStatus === "saving" ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  {t('saving')}
+                  {t("saving")}
                 </>
               ) : (
                 <>
                   <Upload className="h-4 w-4" />
-                  {t('saveToBuildingsFile')}
+                  {t("saveToBuildingsFile")}
                 </>
               )}
             </button>
@@ -773,19 +843,19 @@ export default function PositionEditorClient() {
                 {copied ? (
                   <>
                     <Check className="h-4 w-4" />
-                    {t('copied')}
+                    {t("copied")}
                   </>
                 ) : (
                   <>
                     <Copy className="h-4 w-4" />
-                    {t('copy')}
+                    {t("copy")}
                   </>
                 )}
               </button>
               <button
                 onClick={downloadChanges}
                 className="flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                title={t('downloadAsFileTitle')}
+                title={t("downloadAsFileTitle")}
               >
                 <Download className="h-4 w-4" />
               </button>
@@ -794,11 +864,11 @@ export default function PositionEditorClient() {
         )}
 
         {/* Success Toast (after save) */}
-        {saveStatus === 'success' && positionChanges.size === 0 && (
+        {saveStatus === "success" && positionChanges.size === 0 && (
           <div className="absolute bottom-4 right-4 z-[1000] bg-green-600 text-white rounded-xl shadow-xl p-4 flex items-center gap-3">
             <CheckCircle2 className="h-6 w-6" />
             <div>
-              <div className="font-bold">{t('changesSaved')}</div>
+              <div className="font-bold">{t("changesSaved")}</div>
               <div className="text-sm text-green-100">{saveMessage}</div>
             </div>
           </div>
@@ -806,10 +876,10 @@ export default function PositionEditorClient() {
 
         {/* Help Panel */}
         <div className="absolute top-4 right-4 z-[1000] bg-white dark:bg-gray-800 rounded-lg px-3 py-2 text-xs text-gray-600 dark:text-gray-400">
-          <div className="font-medium mb-1">{t('keyboardShortcutsTitle')}</div>
-          <div>{t('navigateBuildings')}</div>
-          <div>{t('resetSelected')}</div>
-          <div>{t('deselect')}</div>
+          <div className="font-medium mb-1">{t("keyboardShortcutsTitle")}</div>
+          <div>{t("navigateBuildings")}</div>
+          <div>{t("resetSelected")}</div>
+          <div>{t("deselect")}</div>
         </div>
       </div>
     </div>

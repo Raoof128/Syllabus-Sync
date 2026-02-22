@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/mq/button';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { PublicEvent } from '@/lib/types/publicEvents';
-import { MagicCard } from '@/components/ui/MagicCard';
+import { useState, useCallback } from "react";
+import { Button } from "@/components/ui/mq/button";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { PublicEvent } from "@/lib/types/publicEvents";
+import { MagicCard } from "@/components/ui/MagicCard";
 
 // Components
-import { FeaturedEventsBanner } from './FeaturedEventsBanner';
-import { PublicEventCard } from './PublicEventCard';
-import { EventDetailModal } from './EventDetailModal';
-import { AnnouncementsSection } from './AnnouncementsSection';
-import { QuickStats } from './QuickStats';
-import { FeedSkeletons } from './FeedSkeletons';
-import { PublicFeedFilters } from './PublicFeedFilters';
+import { FeaturedEventsBanner } from "./FeaturedEventsBanner";
+import { PublicEventCard } from "./PublicEventCard";
+import { EventDetailModal } from "./EventDetailModal";
+import { AnnouncementsSection } from "./AnnouncementsSection";
+import { QuickStats } from "./QuickStats";
+import { FeedSkeletons } from "./FeedSkeletons";
+import { PublicFeedFilters } from "./PublicFeedFilters";
 
 // Hooks
-import { usePublicFeed } from '../hooks/usePublicFeed';
+import { usePublicFeed } from "../hooks/usePublicFeed";
 
 export default function PublicFeedClient() {
   const { t, language } = useTypedTranslation();
-  const locale = language === 'en' ? 'en-AU' : language;
+  const locale = language === "en" ? "en-AU" : language;
 
   // Custom hook for feed logic
   const {
@@ -66,8 +66,12 @@ export default function PublicFeedClient() {
         {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-mq-content">{t('eventFeed')}</h1>
-            <p className="text-mq-content-secondary mt-1">{t('feedDescription')}</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-mq-content">
+              {t("eventFeed")}
+            </h1>
+            <p className="text-mq-content-secondary mt-1">
+              {t("feedDescription")}
+            </p>
           </div>
         </div>
 
@@ -82,7 +86,9 @@ export default function PublicFeedClient() {
             {error && !isLoading && (
               <MagicCard className="p-8 text-center">
                 <p className="text-mq-error mb-4">{error}</p>
-                <Button onClick={() => fetchPublicEvents()}>{t('tryAgain')}</Button>
+                <Button onClick={() => fetchPublicEvents()}>
+                  {t("tryAgain")}
+                </Button>
               </MagicCard>
             )}
 
@@ -91,7 +97,10 @@ export default function PublicFeedClient() {
               <>
                 {/* Featured Events Banner */}
                 {featuredEvents.length > 0 && (
-                  <FeaturedEventsBanner events={featuredEvents} onEventClick={handleEventClick} />
+                  <FeaturedEventsBanner
+                    events={featuredEvents}
+                    onEventClick={handleEventClick}
+                  />
                 )}
 
                 {/* Search and Filters */}
@@ -126,9 +135,11 @@ export default function PublicFeedClient() {
                   <MagicCard className="p-12 text-center">
                     <div className="text-4xl mb-4">🔍</div>
                     <h3 className="text-lg font-semibold text-mq-content mb-2">
-                      {t('noEventsFound')}
+                      {t("noEventsFound")}
                     </h3>
-                    <p className="text-mq-content-secondary">{t('tryDifferentFilters')}</p>
+                    <p className="text-mq-content-secondary">
+                      {t("tryDifferentFilters")}
+                    </p>
                   </MagicCard>
                 )}
               </>
@@ -158,9 +169,15 @@ export default function PublicFeedClient() {
           event={selectedEvent}
           isOpen={isModalOpen}
           onClose={handleModalClose}
-          isAdded={selectedEvent ? addedToCalendar.has(selectedEvent.id) : false}
-          isAdding={selectedEvent ? isAddingToCalendar.has(selectedEvent.id) : false}
-          onAddToCalendar={() => selectedEvent && handleAddToCalendar(selectedEvent.id)}
+          isAdded={
+            selectedEvent ? addedToCalendar.has(selectedEvent.id) : false
+          }
+          isAdding={
+            selectedEvent ? isAddingToCalendar.has(selectedEvent.id) : false
+          }
+          onAddToCalendar={() =>
+            selectedEvent && handleAddToCalendar(selectedEvent.id)
+          }
           locale={locale}
         />
       </div>

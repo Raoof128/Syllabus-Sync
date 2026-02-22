@@ -51,7 +51,7 @@
 .dark .feed-page header,
 .dark .map-page header,
 .dark main header,
-.dark header[role='banner']:not(.h-16) {
+.dark header[role="banner"]:not(.h-16) {
   background-color: transparent;
   background: transparent;
 }

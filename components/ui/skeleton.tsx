@@ -1,11 +1,17 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
-function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function Skeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('animate-pulse rounded-mq bg-mq-background-tertiary', className)}
+      className={cn(
+        "animate-pulse rounded-mq bg-mq-background-tertiary",
+        className,
+      )}
       {...props}
     />
   );

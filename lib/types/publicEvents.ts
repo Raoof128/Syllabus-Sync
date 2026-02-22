@@ -18,7 +18,7 @@ export interface PublicEvent {
   building?: string;
   room?: string;
   // Metadata
-  category: 'Career' | 'Social' | 'Academic' | 'Free Food';
+  category: "Career" | "Social" | "Academic" | "Free Food";
   imageUrl?: string;
   // Featured/priority
   isFeatured: boolean;
@@ -60,7 +60,7 @@ export function transformPublicEvent(row: PublicEventFromDB): PublicEvent {
     location: row.location,
     building: row.building ?? undefined,
     room: row.room ?? undefined,
-    category: row.category as PublicEvent['category'],
+    category: row.category as PublicEvent["category"],
     imageUrl: row.image_url ?? undefined,
     isFeatured: row.is_featured,
     priority: row.priority,

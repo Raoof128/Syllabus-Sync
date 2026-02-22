@@ -5,7 +5,7 @@
  * Used by all entity forms (Assignments, Exams, Units, Events, Todos).
  */
 
-import { buildings, type Building } from '@/features/map/lib/buildings';
+import { buildings, type Building } from "@/features/map/lib/buildings";
 
 // Cache the building lookup map for performance
 let buildingMap: Map<string, Building> | null = null;
@@ -44,7 +44,11 @@ export function getAllBuildings(): Building[] {
 /**
  * Get building options formatted for select/autocomplete components
  */
-export function getBuildingOptions(): { value: string; label: string; description?: string }[] {
+export function getBuildingOptions(): {
+  value: string;
+  label: string;
+  description?: string;
+}[] {
   return buildings.map((b) => ({
     value: b.id,
     label: b.name,
@@ -59,8 +63,10 @@ export function getBuildingOptions(): { value: string; label: string; descriptio
  * @param building - Building ID or name to validate
  * @returns The validated Building object, or null if not found
  */
-export function validateBuilding(building: string | null | undefined): Building | null {
-  if (!building || building.trim() === '') {
+export function validateBuilding(
+  building: string | null | undefined,
+): Building | null {
+  if (!building || building.trim() === "") {
     return null;
   }
 
@@ -109,8 +115,10 @@ export function validateBuilding(building: string | null | undefined): Building 
  * @param building - Building ID or name to validate
  * @returns The validated Building object, or null if not found
  */
-export function validateBuildingStrict(building: string | null | undefined): Building | null {
-  if (!building || building.trim() === '') {
+export function validateBuildingStrict(
+  building: string | null | undefined,
+): Building | null {
+  if (!building || building.trim() === "") {
     return null;
   }
 
@@ -149,7 +157,9 @@ export function isValidBuilding(building: string | null | undefined): boolean {
  * @param building - Building ID or name input
  * @returns Canonical building ID or null
  */
-export function normalizeBuildingId(building: string | null | undefined): string | null {
+export function normalizeBuildingId(
+  building: string | null | undefined,
+): string | null {
   const validated = validateBuilding(building);
   return validated ? validated.id : null;
 }
@@ -162,7 +172,7 @@ export function normalizeBuildingId(building: string | null | undefined): string
  * @returns Array of matching buildings
  */
 export function searchBuildings(query: string, limit: number = 10): Building[] {
-  if (!query || query.trim() === '') {
+  if (!query || query.trim() === "") {
     return buildings.slice(0, limit);
   }
 
@@ -198,7 +208,9 @@ export function searchBuildings(query: string, limit: number = 10): Building[] {
       score = 50;
     }
     // Tags contain query
-    else if (building.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery))) {
+    else if (
+      building.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery))
+    ) {
       score = 40;
     }
     // Description contains query
@@ -224,7 +236,7 @@ export function searchBuildings(query: string, limit: number = 10): Building[] {
  * Validation error message for invalid buildings
  */
 export const BUILDING_VALIDATION_ERROR =
-  'Building not found in the campus list. Please select a valid building.';
+  "Building not found in the campus list. Please select a valid building.";
 
 /**
  * Type guard for building validation in forms
@@ -239,8 +251,8 @@ export type BuildingValidationResult =
 export function validateBuildingWithResult(
   building: string | null | undefined,
 ): BuildingValidationResult {
-  if (!building || building.trim() === '') {
-    return { valid: false, error: 'Building is required' };
+  if (!building || building.trim() === "") {
+    return { valid: false, error: "Building is required" };
   }
 
   const validated = validateBuilding(building);

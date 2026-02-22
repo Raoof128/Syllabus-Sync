@@ -1,40 +1,49 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
-import { toastUtils } from '@/lib/utils/toast';
-import { useGamificationStore, showXPEarnedNotification } from '@/features/gamification/components';
-import { useNotificationsStore } from '@/lib/store/notificationsStore';
-import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
-import { useEventsStore } from '@/lib/store/eventsStore';
-import { apiRequest } from '@/lib/utils/api';
-import { Event } from '@/lib/types';
-import { TimeRange, SortMode, CategoryFilter } from '@/features/feed/components/FeedFilters';
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { toastUtils } from "@/lib/utils/toast";
+import {
+  useGamificationStore,
+  showXPEarnedNotification,
+} from "@/features/gamification/components";
+import { useNotificationsStore } from "@/lib/store/notificationsStore";
+import { useNotificationPreferencesStore } from "@/lib/store/notificationPreferencesStore";
+import { useEventsStore } from "@/lib/store/eventsStore";
+import { apiRequest } from "@/lib/utils/api";
+import { Event } from "@/lib/types";
+import {
+  TimeRange,
+  SortMode,
+  CategoryFilter,
+} from "@/features/feed/components/FeedFilters";
 
 const REMINDER_TIMING_OPTIONS: { labelKey: TranslationKey; value: number }[] = [
-  { labelKey: 'timing15min', value: 15 },
-  { labelKey: 'timing30min', value: 30 },
-  { labelKey: 'timing1hour', value: 60 },
-  { labelKey: 'timing2hours', value: 120 },
-  { labelKey: 'timing1day', value: 1440 },
-  { labelKey: 'timing2days', value: 2880 },
+  { labelKey: "timing15min", value: 15 },
+  { labelKey: "timing30min", value: 30 },
+  { labelKey: "timing1hour", value: 60 },
+  { labelKey: "timing2hours", value: 120 },
+  { labelKey: "timing1day", value: 1440 },
+  { labelKey: "timing2days", value: 2880 },
 ];
 
 export function useFeedLogic() {
   const { t, language } = useTypedTranslation();
   const searchParams = useSearchParams();
-  const highlightEventId = searchParams.get('highlight');
+  const highlightEventId = searchParams.get("highlight");
 
   // Filters State
-  const [activeFilter, setActiveFilter] = useState<CategoryFilter>('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [timeRange, setTimeRange] = useState<TimeRange>('upcoming');
-  const [sortMode, setSortMode] = useState<SortMode>('soonest');
+  const [activeFilter, setActiveFilter] = useState<CategoryFilter>("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [timeRange, setTimeRange] = useState<TimeRange>("upcoming");
+  const [sortMode, setSortMode] = useState<SortMode>("soonest");
 
   // Interactive State
   const [remindedEvents, setRemindedEvents] = useState<Set<string>>(new Set());
   const [loadingEvents, setLoadingEvents] = useState<Set<string>>(new Set());
-  const [highlightedEvent, setHighlightedEvent] = useState<string | null>(highlightEventId);
+  const [highlightedEvent, setHighlightedEvent] = useState<string | null>(
+    highlightEventId,
+  );
 
   // Event form state
   const [eventFormOpen, setEventFormOpen] = useState(false);
@@ -67,31 +76,45 @@ export function useFeedLogic() {
   const settings = useGamificationStore((state) => state.settings);
 
   // Notifications store
-  const addNotification = useNotificationsStore((state) => state.addNotification);
+  const addNotification = useNotificationsStore(
+    (state) => state.addNotification,
+  );
 
   // Notification preferences store - use individual selectors to prevent infinite re-renders
-  const eventReminderTiming = useNotificationPreferencesStore((state) => state.eventReminderTiming);
-  const eventsEnabled = useNotificationPreferencesStore((state) => state.eventsEnabled);
-  const permissionStatus = useNotificationPreferencesStore((state) => state.permissionStatus);
-  const pushEnabled = useNotificationPreferencesStore((state) => state.pushEnabled);
-  const requestPermission = useNotificationPreferencesStore((state) => state.requestPermission);
+  const eventReminderTiming = useNotificationPreferencesStore(
+    (state) => state.eventReminderTiming,
+  );
+  const eventsEnabled = useNotificationPreferencesStore(
+    (state) => state.eventsEnabled,
+  );
+  const permissionStatus = useNotificationPreferencesStore(
+    (state) => state.permissionStatus,
+  );
+  const pushEnabled = useNotificationPreferencesStore(
+    (state) => state.pushEnabled,
+  );
+  const requestPermission = useNotificationPreferencesStore(
+    (state) => state.requestPermission,
+  );
   const scheduleEventReminder = useNotificationPreferencesStore(
     (state) => state.scheduleEventReminder,
   );
-  const cancelReminder = useNotificationPreferencesStore((state) => state.cancelReminder);
+  const cancelReminder = useNotificationPreferencesStore(
+    (state) => state.cancelReminder,
+  );
 
   // Scroll to and highlight the event when component mounts or highlight changes
   useEffect(() => {
     if (highlightEventId) {
       setHighlightedEvent(highlightEventId);
-      setTimeRange('upcoming'); // Ensure we can see it if it's upcoming (or maybe 'all'?)
+      setTimeRange("upcoming"); // Ensure we can see it if it's upcoming (or maybe 'all'?)
 
       highlightAttemptsRef.current = 0;
 
       const scrollToHighlight = () => {
         const eventElement = eventRefs.current.get(highlightEventId);
         if (eventElement) {
-          eventElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          eventElement.scrollIntoView({ behavior: "smooth", block: "center" });
           setTimeout(() => {
             setHighlightedEvent(null);
           }, 5000);
@@ -110,7 +133,12 @@ export function useFeedLogic() {
 
   // Handle "Remind Me" button click
   const handleRemindMe = useCallback(
-    async (eventId: string, eventTitle: string, eventStartAt: Date, eventLocation: string) => {
+    async (
+      eventId: string,
+      eventTitle: string,
+      eventStartAt: Date,
+      eventLocation: string,
+    ) => {
       const isAlreadyReminded = remindedEvents.has(eventId);
 
       // Toggle off if already reminded
@@ -135,19 +163,27 @@ export function useFeedLogic() {
 
       // Already reminded for this event
       if (remindedEvents.has(eventId)) {
-        toastUtils.info(t('eventReminderAlreadyTitle'), t('eventReminderAlreadyMsg'));
+        toastUtils.info(
+          t("eventReminderAlreadyTitle"),
+          t("eventReminderAlreadyMsg"),
+        );
         return;
       }
 
       if (!pushEnabled || !eventsEnabled) {
-        toastUtils.info(t('eventRemindersDisabledTitle'), t('eventRemindersDisabledMsg'));
+        toastUtils.info(
+          t("eventRemindersDisabledTitle"),
+          t("eventRemindersDisabledMsg"),
+        );
         return;
       }
 
       const resolvedPermission =
-        permissionStatus === 'default' ? await requestPermission() : permissionStatus;
-      if (resolvedPermission !== 'granted') {
-        toastUtils.error(t('permissionDenied'), t('permissionDeniedMsg'));
+        permissionStatus === "default"
+          ? await requestPermission()
+          : permissionStatus;
+      if (resolvedPermission !== "granted") {
+        toastUtils.error(t("permissionDenied"), t("permissionDeniedMsg"));
         return;
       }
 
@@ -156,7 +192,7 @@ export function useFeedLogic() {
       );
       const timingLabel = timingOption
         ? t(timingOption.labelKey)
-        : t('timingMinutes', { minutes: eventReminderTiming });
+        : t("timingMinutes", { minutes: eventReminderTiming });
 
       // Mark as loading
       setLoadingEvents((prev) => new Set(prev).add(eventId));
@@ -167,19 +203,20 @@ export function useFeedLogic() {
         // Create notification - don't provide id (let API generate UUID)
         // Convert relative link to absolute URL for validation (schema requires full URL)
         const notificationLink =
-          typeof window !== 'undefined'
+          typeof window !== "undefined"
             ? `${window.location.origin}/feed?highlight=${encodeURIComponent(eventId)}`
             : undefined;
 
         // Only include relatedId if eventId is a valid UUID format (sample events use 'event-1' format)
-        const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-          eventId,
-        );
+        const isValidUUID =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            eventId,
+          );
 
         await addNotification({
-          title: t('reminderTimingUpdated'),
-          message: t('reminderTimingUpdatedMsg', { timing: timingLabel }),
-          type: 'event',
+          title: t("reminderTimingUpdated"),
+          message: t("reminderTimingUpdatedMsg", { timing: timingLabel }),
+          type: "event",
           read: false,
           ...(notificationLink && { link: notificationLink }),
           ...(isValidUUID && { relatedId: eventId }),
@@ -191,11 +228,15 @@ export function useFeedLogic() {
           try {
             const response = await apiRequest<{
               message: string;
-              result: { xpAwarded: number; leveledUp: boolean; newLevel: number };
-            }>('/api/gamification/award-xp', {
-              method: 'POST',
+              result: {
+                xpAwarded: number;
+                leveledUp: boolean;
+                newLevel: number;
+              };
+            }>("/api/gamification/award-xp", {
+              method: "POST",
               body: JSON.stringify({
-                eventType: 'event_attended',
+                eventType: "event_attended",
                 referenceId: eventId,
                 metadata: { eventId, title: eventTitle },
               }),
@@ -205,7 +246,7 @@ export function useFeedLogic() {
             if (settings.showXPNotifications) {
               showXPEarnedNotification(
                 response.result.xpAwarded,
-                t('eventReminderSetTitle'),
+                t("eventReminderSetTitle"),
                 language,
               );
             }
@@ -220,16 +261,25 @@ export function useFeedLogic() {
         // Mark event as reminded (works for both demo and authenticated users)
         setRemindedEvents((prev) => new Set(prev).add(eventId));
         toastUtils.success(
-          t('reminderTimingUpdated'),
-          t('reminderTimingUpdatedMsg', { timing: timingLabel }),
+          t("reminderTimingUpdated"),
+          t("reminderTimingUpdatedMsg", { timing: timingLabel }),
         );
       } catch (error) {
         // Check if it's a "already awarded" error (409 conflict)
-        if (error instanceof Error && error.message.includes('already awarded')) {
+        if (
+          error instanceof Error &&
+          error.message.includes("already awarded")
+        ) {
           setRemindedEvents((prev) => new Set(prev).add(eventId));
-          toastUtils.info(t('eventReminderAlreadyTitle'), t('eventReminderAlreadyMsg'));
+          toastUtils.info(
+            t("eventReminderAlreadyTitle"),
+            t("eventReminderAlreadyMsg"),
+          );
         } else {
-          toastUtils.error(t('eventReminderFailedTitle'), t('eventReminderFailedMsg'));
+          toastUtils.error(
+            t("eventReminderFailedTitle"),
+            t("eventReminderFailedMsg"),
+          );
         }
       } finally {
         setLoadingEvents((prev) => {
@@ -260,16 +310,16 @@ export function useFeedLogic() {
   // Get locale string for date formatting
   const getLocaleString = useMemo(() => {
     const localeMap: Record<string, string> = {
-      en: 'en-AU',
-      es: 'es-ES',
-      fa: 'fa-IR',
-      zh: 'zh-CN',
-      ar: 'ar-SA',
-      hi: 'hi-IN',
-      ko: 'ko-KR',
-      ja: 'ja-JP',
+      en: "en-AU",
+      es: "es-ES",
+      fa: "fa-IR",
+      zh: "zh-CN",
+      ar: "ar-SA",
+      hi: "hi-IN",
+      ko: "ko-KR",
+      ja: "ja-JP",
     };
-    return localeMap[language] || 'en-AU';
+    return localeMap[language] || "en-AU";
   }, [language]);
 
   // Filter & Sort Logic
@@ -278,23 +328,23 @@ export function useFeedLogic() {
     const now = new Date();
 
     // 1. Time Range
-    if (timeRange === 'today') {
+    if (timeRange === "today") {
       result = result.filter((e) => {
         const d = new Date(e.date);
         return d.toDateString() === now.toDateString();
       });
-    } else if (timeRange === 'week') {
+    } else if (timeRange === "week") {
       const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
       result = result.filter((e) => {
         const d = new Date(e.date);
         return d >= now && d <= weekFromNow;
       });
-    } else if (timeRange === 'upcoming') {
+    } else if (timeRange === "upcoming") {
       result = result.filter((e) => new Date(e.date) >= now);
     }
 
     // 2. Category
-    if (activeFilter !== 'All') {
+    if (activeFilter !== "All") {
       result = result.filter((event) => event.category === activeFilter);
     }
 
@@ -315,8 +365,8 @@ export function useFeedLogic() {
       const dateA = new Date(a.date).getTime();
       const dateB = new Date(b.date).getTime();
 
-      if (sortMode === 'soonest') return dateA - dateB;
-      if (sortMode === 'newest') return dateB - dateA; // Approximation, using event date. Ideally "created_at"
+      if (sortMode === "soonest") return dateA - dateB;
+      if (sortMode === "newest") return dateB - dateA; // Approximation, using event date. Ideally "created_at"
       // if (sortMode === 'popular') ... future
       return 0;
     });
@@ -331,16 +381,17 @@ export function useFeedLogic() {
       Academic: 0,
       Career: 0,
       Social: 0,
-      'Free Food': 0,
+      "Free Food": 0,
     };
 
     // Calculate counts based on current timeRange (but ignoring category filter)
     const timeFiltered = storeEvents.filter((e) => {
       const now = new Date();
       const d = new Date(e.date);
-      if (timeRange === 'today') return d.toDateString() === now.toDateString();
-      if (timeRange === 'week') return d >= now && d <= new Date(now.getTime() + 7 * 86400000);
-      if (timeRange === 'upcoming') return d >= now;
+      if (timeRange === "today") return d.toDateString() === now.toDateString();
+      if (timeRange === "week")
+        return d >= now && d <= new Date(now.getTime() + 7 * 86400000);
+      if (timeRange === "upcoming") return d >= now;
       return true;
     });
 
@@ -364,7 +415,9 @@ export function useFeedLogic() {
       return eventDate >= now && eventDate <= weekFromNow;
     });
 
-    const freeFoodEvents = storeEvents.filter((event) => event.category === 'Free Food');
+    const freeFoodEvents = storeEvents.filter(
+      (event) => event.category === "Free Food",
+    );
 
     return {
       total: storeEvents.length,
@@ -379,7 +432,7 @@ export function useFeedLogic() {
       Academic: 0,
       Career: 0,
       Social: 0,
-      'Free Food': 0,
+      "Free Food": 0,
     };
 
     storeEvents.forEach((event) => {

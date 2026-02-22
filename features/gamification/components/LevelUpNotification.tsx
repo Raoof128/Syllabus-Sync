@@ -1,63 +1,63 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useCallback } from 'react';
-import { useGamificationStore } from '@/lib/store/gamificationStore';
-import { toastUtils } from '@/lib/utils/toast';
-import { getLevelTier } from '@/lib/types';
+import React, { useEffect, useRef, useCallback } from "react";
+import { useGamificationStore } from "@/lib/store/gamificationStore";
+import { toastUtils } from "@/lib/utils/toast";
+import { getLevelTier } from "@/lib/types";
 
 // Translations for level-up messages
 const LEVEL_UP_MESSAGES: Record<string, string> = {
-  en: 'You reached Level',
-  es: 'Alcanzaste el Nivel',
-  ar: 'وصلت إلى المستوى',
-  zh: '你达到了等级',
-  fa: 'به سطح رسیدید',
-  hi: 'आपने स्तर प्राप्त किया',
-  ja: 'レベルに到達しました',
-  ko: '레벨에 도달했습니다',
-  ur: 'آپ نے سطح حاصل کی',
-  th: 'คุณถึงระดับ',
-  vi: 'Bạn đã đạt Cấp độ',
-  ru: 'Вы достигли Уровня',
-  ta: 'நீங்கள் நிலை அடைந்தீர்கள்',
-  bn: 'আপনি স্তরে পৌঁছেছেন',
-  id: 'Anda mencapai Level',
-  ms: 'Anda mencapai Tahap',
-  it: 'Hai raggiunto il Livello',
-  fr: 'Vous avez atteint le Niveau',
-  he: 'הגעת לרמה',
+  en: "You reached Level",
+  es: "Alcanzaste el Nivel",
+  ar: "وصلت إلى المستوى",
+  zh: "你达到了等级",
+  fa: "به سطح رسیدید",
+  hi: "आपने स्तर प्राप्त किया",
+  ja: "レベルに到達しました",
+  ko: "레벨에 도달했습니다",
+  ur: "آپ نے سطح حاصل کی",
+  th: "คุณถึงระดับ",
+  vi: "Bạn đã đạt Cấp độ",
+  ru: "Вы достигли Уровня",
+  ta: "நீங்கள் நிலை அடைந்தீர்கள்",
+  bn: "আপনি স্তরে পৌঁছেছেন",
+  id: "Anda mencapai Level",
+  ms: "Anda mencapai Tahap",
+  it: "Hai raggiunto il Livello",
+  fr: "Vous avez atteint le Niveau",
+  he: "הגעת לרמה",
 };
 
 const CONGRATULATIONS: Record<string, string> = {
-  en: 'Congratulations!',
-  es: '¡Felicitaciones!',
-  ar: 'تهانينا!',
-  zh: '恭喜！',
-  fa: 'تبریک!',
-  hi: 'बधाई हो!',
-  ja: 'おめでとうございます！',
-  ko: '축하합니다!',
-  ur: 'مبارک ہو!',
-  th: 'ยินดีด้วย!',
-  vi: 'Chúc mừng!',
-  ru: 'Поздравляем!',
-  ta: 'வாழ்த்துக்கள்!',
-  bn: 'অভিনন্দন!',
-  id: 'Selamat!',
-  ms: 'Tahniah!',
-  it: 'Congratulazioni!',
-  fr: 'Félicitations!',
-  he: 'מזל טוב!',
+  en: "Congratulations!",
+  es: "¡Felicitaciones!",
+  ar: "تهانينا!",
+  zh: "恭喜！",
+  fa: "تبریک!",
+  hi: "बधाई हो!",
+  ja: "おめでとうございます！",
+  ko: "축하합니다!",
+  ur: "مبارک ہو!",
+  th: "ยินดีด้วย!",
+  vi: "Chúc mừng!",
+  ru: "Поздравляем!",
+  ta: "வாழ்த்துக்கள்!",
+  bn: "অভিনন্দন!",
+  id: "Selamat!",
+  ms: "Tahniah!",
+  it: "Congratulazioni!",
+  fr: "Félicitations!",
+  he: "מזל טוב!",
 };
 
 // Tier-specific celebration emojis
 const TIER_EMOJIS: Record<string, string> = {
-  bronze: '🥉',
-  silver: '🥈',
-  gold: '🥇',
-  platinum: '💎',
-  diamond: '👑',
-  master: '🏆',
+  bronze: "🥉",
+  silver: "🥈",
+  gold: "🥇",
+  platinum: "💎",
+  diamond: "👑",
+  master: "🏆",
 };
 
 interface LevelUpNotificationProviderProps {
@@ -76,7 +76,7 @@ interface LevelUpNotificationProviderProps {
  */
 export function LevelUpNotificationProvider({
   children,
-  locale = 'en',
+  locale = "en",
 }: LevelUpNotificationProviderProps) {
   const profile = useGamificationStore((state) => state.profile);
   const settings = useGamificationStore((state) => state.settings);
@@ -89,14 +89,17 @@ export function LevelUpNotificationProvider({
   const showLevelUpNotification = useCallback(
     (newLevel: number) => {
       const tier = getLevelTier(newLevel);
-      const emoji = TIER_EMOJIS[tier] || '🎉';
+      const emoji = TIER_EMOJIS[tier] || "🎉";
       const title = getLevelTitle();
 
       // Get localized messages
       const congratsMsg = CONGRATULATIONS[locale] || CONGRATULATIONS.en;
       const levelMsg = LEVEL_UP_MESSAGES[locale] || LEVEL_UP_MESSAGES.en;
 
-      toastUtils.success(`${emoji} ${congratsMsg}`, `${levelMsg} ${newLevel}! ${title}`);
+      toastUtils.success(
+        `${emoji} ${congratsMsg}`,
+        `${levelMsg} ${newLevel}! ${title}`,
+      );
     },
     [locale, getLevelTitle],
   );
@@ -121,7 +124,12 @@ export function LevelUpNotificationProvider({
     }
 
     prevLevelRef.current = currentLevel;
-  }, [profile?.level, settings.showLevelUpNotifications, showLevelUpNotification, profile]);
+  }, [
+    profile?.level,
+    settings.showLevelUpNotifications,
+    showLevelUpNotification,
+    profile,
+  ]);
 
   return children as React.ReactElement;
 }
@@ -135,19 +143,22 @@ export function useLevelUpNotification() {
   const settings = useGamificationStore((state) => state.settings);
 
   const showNotification = useCallback(
-    (level: number, locale = 'en') => {
+    (level: number, locale = "en") => {
       if (!settings.showLevelUpNotifications) {
         return;
       }
 
       const tier = getLevelTier(level);
-      const emoji = TIER_EMOJIS[tier] || '🎉';
+      const emoji = TIER_EMOJIS[tier] || "🎉";
       const title = getLevelTitle();
 
       const congratsMsg = CONGRATULATIONS[locale] || CONGRATULATIONS.en;
       const levelMsg = LEVEL_UP_MESSAGES[locale] || LEVEL_UP_MESSAGES.en;
 
-      toastUtils.success(`${emoji} ${congratsMsg}`, `${levelMsg} ${level}! ${title}`);
+      toastUtils.success(
+        `${emoji} ${congratsMsg}`,
+        `${levelMsg} ${level}! ${title}`,
+      );
     },
     [getLevelTitle, settings.showLevelUpNotifications],
   );
@@ -162,7 +173,7 @@ export function useLevelUpNotification() {
 export function showXPEarnedNotification(
   xpAmount: number,
   reason: string,
-  locale = 'en',
+  locale = "en",
   enabled = true,
 ) {
   if (!enabled) return;

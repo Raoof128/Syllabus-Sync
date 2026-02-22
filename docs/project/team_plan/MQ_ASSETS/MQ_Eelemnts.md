@@ -38,15 +38,15 @@ Neutrals (Grey/Sand/Navy)
 
 **Specific Mappings**
 
-* **Background:** \--c-background (White), \--c-background-invert (Charcoal 900\)  
-* **Content:** \--c-content (Charcoal), \--c-content-faded (Charcoal 600\)  
-* **mq-dark:** Overrides brand colors to mq-dark-red, mq-dark-purple, etc.
+- **Background:** \--c-background (White), \--c-background-invert (Charcoal 900\)
+- **Content:** \--c-content (Charcoal), \--c-content-faded (Charcoal 600\)
+- **mq-dark:** Overrides brand colors to mq-dark-red, mq-dark-purple, etc.
 
 ---
 
-### 
+###
 
-### 
+###
 
 ### **✍️ Typography**
 
@@ -54,17 +54,17 @@ Found two distinct font families and a standard scale.
 
 **Font Families**
 
-* **Primary:** \--f-primary: "Work Sans", sans-serif  
-* **Secondary:** \--f-secondary: "Source Serif Pro", serif
+- **Primary:** \--f-primary: "Work Sans", sans-serif
+- **Secondary:** \--f-secondary: "Source Serif Pro", serif
 
 **Weights & Styles**
 
-* **Primary:** Regular (400), Medium (500), Semi-Bold (600), Bold (700)  
-* **Secondary:** Light (300), Regular (400), Semi-Bold (600)
+- **Primary:** Regular (400), Medium (500), Semi-Bold (600), Bold (700)
+- **Secondary:** Light (300), Regular (400), Semi-Bold (600)
 
 **Scale (fs)**
 
-* \--fs-small (.875rem) → \--fs-regular (1rem) ... up to \--fs-x-mega (3rem)
+- \--fs-small (.875rem) → \--fs-regular (1rem) ... up to \--fs-x-mega (3rem)
 
 ---
 
@@ -72,12 +72,11 @@ Found two distinct font families and a standard scale.
 
 Animations use a custom prefix \--t- (likely "transition" or "time").
 
-| Variable | Time | Bezier Curve |
-| :---- | :---- | :---- |
-| \--t-ease-slow | .6s | cubic-bezier(.5, .5, 0, 1\) |
-| \--t-ease-fast | .3s | cubic-bezier(.5, .5, 0, 1\) |
-| \--t-snap-slow | .3s | cubic-bezier(0, 0, 0, 1\) |
-| \--t-snap-fast | .15s | cubic-bezier(0, 0, 0, 1\) |
+| Variable       | Time | Bezier Curve                |
+| :------------- | :--- | :-------------------------- |
+| \--t-ease-slow | .6s  | cubic-bezier(.5, .5, 0, 1\) |
+| \--t-ease-fast | .3s  | cubic-bezier(.5, .5, 0, 1\) |
+| \--t-snap-slow | .3s  | cubic-bezier(0, 0, 0, 1\)   |
+| \--t-snap-fast | .15s | cubic-bezier(0, 0, 0, 1\)   |
 
 ---
-

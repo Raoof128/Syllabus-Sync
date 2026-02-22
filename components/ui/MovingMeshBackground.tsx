@@ -21,11 +21,11 @@
 // @version 1.1.0
 // @see liquid-glass.css for mesh gradient styles
 // ============================================================================
-'use client';
+"use client";
 
-import { memo, useEffect, useState } from 'react';
-import { LazyMotion, m, domAnimation, useReducedMotion } from 'framer-motion';
-import { useHydration } from '@/lib/hooks/useHydration';
+import { memo, useEffect, useState } from "react";
+import { LazyMotion, m, domAnimation, useReducedMotion } from "framer-motion";
+import { useHydration } from "@/lib/hooks/useHydration";
 
 // ============================================================================
 // BLOB CONFIGURATIONS
@@ -51,30 +51,30 @@ interface BlobConfig {
 }
 
 // MQ Brand Colors - Light Mode
-const MQ_NAVY = '#002A45';
-const MQ_NAVY_LIGHT = 'rgba(0, 42, 69, 0.6)';
-const MQ_RED = 'rgba(166, 25, 46, 0.5)';
-const MQ_RED_LIGHT = 'rgba(166, 25, 46, 0.3)';
-const CHARCOAL = 'rgba(26, 26, 26, 0.25)';
-const GOLD = 'rgba(212, 175, 55, 0.2)';
+const MQ_NAVY = "#002A45";
+const MQ_NAVY_LIGHT = "rgba(0, 42, 69, 0.6)";
+const MQ_RED = "rgba(166, 25, 46, 0.5)";
+const MQ_RED_LIGHT = "rgba(166, 25, 46, 0.3)";
+const CHARCOAL = "rgba(26, 26, 26, 0.25)";
+const GOLD = "rgba(212, 175, 55, 0.2)";
 
 // MQ Brand Colors - Dark Mode (brighter for screen blend mode)
-const MQ_NAVY_DARK_MODE = 'rgba(0, 61, 102, 0.4)';
-const MQ_NAVY_LIGHT_DARK_MODE = 'rgba(0, 80, 130, 0.35)';
-const MQ_RED_DARK_MODE = 'rgba(200, 50, 70, 0.35)';
-const MQ_RED_LIGHT_DARK_MODE = 'rgba(200, 50, 70, 0.25)';
-const CHARCOAL_DARK_MODE = 'rgba(80, 80, 80, 0.2)';
-const GOLD_DARK_MODE = 'rgba(212, 175, 55, 0.15)';
+const MQ_NAVY_DARK_MODE = "rgba(0, 61, 102, 0.4)";
+const MQ_NAVY_LIGHT_DARK_MODE = "rgba(0, 80, 130, 0.35)";
+const MQ_RED_DARK_MODE = "rgba(200, 50, 70, 0.35)";
+const MQ_RED_LIGHT_DARK_MODE = "rgba(200, 50, 70, 0.25)";
+const CHARCOAL_DARK_MODE = "rgba(80, 80, 80, 0.2)";
+const GOLD_DARK_MODE = "rgba(212, 175, 55, 0.15)";
 
 const BLOB_CONFIGS: BlobConfig[] = [
   // ========================================
   // LAYER 1: Far background (slowest)
   // ========================================
   {
-    id: 'navy-far',
+    id: "navy-far",
     color: MQ_NAVY,
-    position: { top: '-20%', left: '-15%' },
-    size: { width: '60vw', height: '60vh' },
+    position: { top: "-20%", left: "-15%" },
+    size: { width: "60vw", height: "60vh" },
     opacity: 0.5,
     blur: 120,
     duration: 90, // Slowest - far background
@@ -88,10 +88,10 @@ const BLOB_CONFIGS: BlobConfig[] = [
   // LAYER 2: Mid-far background
   // ========================================
   {
-    id: 'red-mid-far',
+    id: "red-mid-far",
     color: MQ_RED,
-    position: { bottom: '-15%', right: '-10%' },
-    size: { width: '55vw', height: '55vh' },
+    position: { bottom: "-15%", right: "-10%" },
+    size: { width: "55vw", height: "55vh" },
     opacity: 0.45,
     blur: 100,
     duration: 70,
@@ -101,10 +101,10 @@ const BLOB_CONFIGS: BlobConfig[] = [
     zIndex: -14,
   },
   {
-    id: 'charcoal-mid-far',
+    id: "charcoal-mid-far",
     color: CHARCOAL,
-    position: { top: '35%', left: '25%' },
-    size: { width: '45vw', height: '45vh' },
+    position: { top: "35%", left: "25%" },
+    size: { width: "45vw", height: "45vh" },
     opacity: 0.35,
     blur: 110,
     duration: 80,
@@ -118,10 +118,10 @@ const BLOB_CONFIGS: BlobConfig[] = [
   // LAYER 3: Mid background
   // ========================================
   {
-    id: 'navy-mid',
+    id: "navy-mid",
     color: MQ_NAVY_LIGHT,
-    position: { top: '50%', right: '20%' },
-    size: { width: '40vw', height: '40vh' },
+    position: { top: "50%", right: "20%" },
+    size: { width: "40vw", height: "40vh" },
     opacity: 0.4,
     blur: 80,
     duration: 55,
@@ -131,10 +131,10 @@ const BLOB_CONFIGS: BlobConfig[] = [
     zIndex: -12,
   },
   {
-    id: 'red-mid',
+    id: "red-mid",
     color: MQ_RED_LIGHT,
-    position: { top: '10%', right: '30%' },
-    size: { width: '35vw', height: '35vh' },
+    position: { top: "10%", right: "30%" },
+    size: { width: "35vw", height: "35vh" },
     opacity: 0.35,
     blur: 85,
     duration: 60,
@@ -148,10 +148,10 @@ const BLOB_CONFIGS: BlobConfig[] = [
   // LAYER 4: Near-mid background (faster)
   // ========================================
   {
-    id: 'gold-accent',
+    id: "gold-accent",
     color: GOLD,
-    position: { bottom: '25%', left: '15%' },
-    size: { width: '30vw', height: '30vh' },
+    position: { bottom: "25%", left: "15%" },
+    size: { width: "30vw", height: "30vh" },
     opacity: 0.25,
     blur: 70,
     duration: 45,
@@ -161,10 +161,10 @@ const BLOB_CONFIGS: BlobConfig[] = [
     zIndex: -10,
   },
   {
-    id: 'navy-near',
+    id: "navy-near",
     color: MQ_NAVY_LIGHT,
-    position: { bottom: '40%', right: '5%' },
-    size: { width: '25vw', height: '25vh' },
+    position: { bottom: "40%", right: "5%" },
+    size: { width: "25vw", height: "25vh" },
     opacity: 0.3,
     blur: 60,
     duration: 40,
@@ -178,10 +178,10 @@ const BLOB_CONFIGS: BlobConfig[] = [
   // LAYER 5: Foreground accents (fastest)
   // ========================================
   {
-    id: 'red-near',
+    id: "red-near",
     color: MQ_RED_LIGHT,
-    position: { top: '60%', left: '60%' },
-    size: { width: '20vw', height: '20vh' },
+    position: { top: "60%", left: "60%" },
+    size: { width: "20vw", height: "20vh" },
     opacity: 0.2,
     blur: 50,
     duration: 35, // Fastest - nearest layer
@@ -215,21 +215,23 @@ const getDarkModeColor = (lightColor: string): string => {
 
 const Blob = memo(({ config, prefersReducedMotion, isDarkMode }: BlobProps) => {
   const color = isDarkMode ? getDarkModeColor(config.color) : config.color;
-  const blendMode = isDarkMode ? 'screen' : 'multiply';
+  const blendMode = isDarkMode ? "screen" : "multiply";
   // Increase opacity slightly in dark mode for visibility
-  const opacity = isDarkMode ? Math.min(config.opacity * 1.3, 0.6) : config.opacity;
+  const opacity = isDarkMode
+    ? Math.min(config.opacity * 1.3, 0.6)
+    : config.opacity;
 
   const baseStyle: React.CSSProperties = {
-    position: 'absolute',
+    position: "absolute",
     ...config.position,
     width: config.size.width,
     height: config.size.height,
     background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
-    borderRadius: '50%',
+    borderRadius: "50%",
     filter: `blur(${config.blur}px)`,
     opacity: opacity,
     zIndex: config.zIndex,
-    willChange: prefersReducedMotion ? 'auto' : 'transform',
+    willChange: prefersReducedMotion ? "auto" : "transform",
     mixBlendMode: blendMode,
   };
 
@@ -251,14 +253,14 @@ const Blob = memo(({ config, prefersReducedMotion, isDarkMode }: BlobProps) => {
       transition={{
         duration: config.duration,
         repeat: Infinity,
-        ease: 'easeInOut',
+        ease: "easeInOut",
         times: [0, 0.25, 0.5, 0.75, 1],
       }}
     />
   );
 });
 
-Blob.displayName = 'Blob';
+Blob.displayName = "Blob";
 
 // ============================================================================
 // MOVING MESH BACKGROUND COMPONENT
@@ -288,7 +290,11 @@ interface MovingMeshBackgroundProps {
  * 5. Foreground (35s) - Red accent (fastest, most parallax)
  */
 const MovingMeshBackground = memo(
-  ({ className, customBlobs, forceStatic = false }: MovingMeshBackgroundProps) => {
+  ({
+    className,
+    customBlobs,
+    forceStatic = false,
+  }: MovingMeshBackgroundProps) => {
     // Framer Motion's built-in reduced motion detection
     const prefersReducedMotion = useReducedMotion();
 
@@ -299,18 +305,18 @@ const MovingMeshBackground = memo(
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     useEffect(() => {
-      if (typeof window === 'undefined') return;
+      if (typeof window === "undefined") return;
 
       // Initial check
       const checkDarkMode = () => {
-        setIsDarkMode(document.documentElement.classList.contains('dark'));
+        setIsDarkMode(document.documentElement.classList.contains("dark"));
       };
       checkDarkMode();
 
       // Watch for theme changes via class mutation
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-          if (mutation.attributeName === 'class') {
+          if (mutation.attributeName === "class") {
             checkDarkMode();
           }
         });
@@ -326,14 +332,14 @@ const MovingMeshBackground = memo(
     return (
       <LazyMotion features={domAnimation}>
         <div
-          className={`moving-mesh-background ${className || ''}`}
+          className={`moving-mesh-background ${className || ""}`}
           style={{
-            position: 'fixed',
+            position: "fixed",
             inset: 0,
             zIndex: -20,
-            overflow: 'hidden',
-            pointerEvents: 'none',
-            background: 'var(--c-background, #edeade)',
+            overflow: "hidden",
+            pointerEvents: "none",
+            background: "var(--c-background, #edeade)",
           }}
           aria-hidden="true"
         >
@@ -349,12 +355,12 @@ const MovingMeshBackground = memo(
           {/* Subtle noise overlay for texture */}
           <div
             style={{
-              position: 'absolute',
+              position: "absolute",
               inset: 0,
               background: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
               opacity: 0.03,
-              mixBlendMode: 'overlay',
-              pointerEvents: 'none',
+              mixBlendMode: "overlay",
+              pointerEvents: "none",
             }}
             aria-hidden="true"
           />
@@ -364,7 +370,7 @@ const MovingMeshBackground = memo(
   },
 );
 
-MovingMeshBackground.displayName = 'MovingMeshBackground';
+MovingMeshBackground.displayName = "MovingMeshBackground";
 
 export default MovingMeshBackground;
 

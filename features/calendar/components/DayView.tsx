@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import dayjs from 'dayjs';
+import React from "react";
+import dayjs from "dayjs";
 import {
   HOURS,
   HOUR_HEIGHT,
@@ -12,14 +12,18 @@ import {
   getTimePositionAndHeight,
   calculateOverlapGroups,
   CalendarItem,
-} from '@/lib/calendar-utils';
-import { Unit, Deadline, Event, ClassTime } from '@/lib/types';
-import { cn } from '@/lib/utils';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { TranslationKey } from '@/lib/i18n/translations';
-import { formatLocation, formatScheduleTime } from '@/lib/utils/locale';
-import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_STYLES } from '@/data/mqKeyDates';
-import { CalendarClock } from 'lucide-react';
+} from "@/lib/calendar-utils";
+import { Unit, Deadline, Event, ClassTime } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { TranslationKey } from "@/lib/i18n/translations";
+import { formatLocation, formatScheduleTime } from "@/lib/utils/locale";
+import {
+  getMQKeyDatesForDay,
+  MQ_DATE_COLORS,
+  PROGRAM_STYLES,
+} from "@/data/mqKeyDates";
+import { CalendarClock } from "lucide-react";
 
 interface DayViewProps {
   date: Date;
@@ -44,12 +48,12 @@ export default function DayView({
 }: DayViewProps) {
   const { t } = useTypedTranslation();
   const dayDate = dayjs(date);
-  const isToday = dayDate.isSame(dayjs(), 'day');
+  const isToday = dayDate.isSame(dayjs(), "day");
 
   // helper to check if a unit's schedule matches this day
   const getItemsForDay = () => {
     // 1. Units
-    const dayName = dayDate.format('dddd'); // "Monday", "Tuesday"...
+    const dayName = dayDate.format("dddd"); // "Monday", "Tuesday"...
     const dayUnits = units.flatMap((u) => {
       if (!u.schedule || u.schedule.length === 0) return [];
       // Find all schedule entries for this day
@@ -59,13 +63,15 @@ export default function DayView({
     });
 
     // 2. Deadlines
-    const dayDeadlines = deadlines.filter((d) => dayjs(d.dueDate).isSame(dayDate, 'day'));
+    const dayDeadlines = deadlines.filter((d) =>
+      dayjs(d.dueDate).isSame(dayDate, "day"),
+    );
 
     // 3. Events
     const dayEvents = events.filter((e) => {
       const start = e.startAt ? dayjs(e.startAt) : null;
-      if (start) return start.isSame(dayDate, 'day');
-      return dayjs(e.date).isSame(dayDate, 'day');
+      if (start) return start.isSame(dayDate, "day");
+      return dayjs(e.date).isSame(dayDate, "day");
     });
 
     return { dayUnits, dayDeadlines, dayEvents };
@@ -78,7 +84,9 @@ export default function DayView({
 
   // Add units
   dayUnits.forEach(({ unit, schedule }) => {
-    const timeInfo = parseTimeRange(`${schedule.startTime} - ${schedule.endTime}`);
+    const timeInfo = parseTimeRange(
+      `${schedule.startTime} - ${schedule.endTime}`,
+    );
     if (timeInfo) {
       calendarItems.push({
         id: `unit-${unit.id}-${schedule.day}-${schedule.startTime}`,
@@ -86,7 +94,7 @@ export default function DayView({
         startMin: timeInfo.startMin,
         endHour: timeInfo.endHour,
         endMin: timeInfo.endMin,
-        type: 'unit',
+        type: "unit",
         data: { unit, schedule },
       });
     }
@@ -104,7 +112,7 @@ export default function DayView({
         startMin: minutes,
         endHour: hours + 1,
         endMin: minutes,
-        type: 'deadline',
+        type: "deadline",
         data: deadline,
       });
     }
@@ -120,14 +128,16 @@ export default function DayView({
         startMin: timeInfo.startMin,
         endHour: timeInfo.endHour,
         endMin: timeInfo.endMin,
-        type: 'event',
+        type: "event",
         data: event,
       });
     }
   });
 
   const overlapInfo = calculateOverlapGroups(calendarItems);
-  const mqKeyDates = getMQKeyDatesForDay(date).filter((d) => d.category !== 'classes');
+  const mqKeyDates = getMQKeyDatesForDay(date).filter(
+    (d) => d.category !== "classes",
+  );
 
   // Calculate current time position for the red line
   const now = new Date();
@@ -135,9 +145,14 @@ export default function DayView({
   const currentMinute = now.getMinutes();
   let currentTimePosition: number | null = null;
 
-  if (isToday && currentHour >= START_HOUR && currentHour < START_HOUR + HOURS.length) {
+  if (
+    isToday &&
+    currentHour >= START_HOUR &&
+    currentHour < START_HOUR + HOURS.length
+  ) {
     currentTimePosition =
-      (currentHour - START_HOUR) * HOUR_HEIGHT + (currentMinute / 60) * HOUR_HEIGHT;
+      (currentHour - START_HOUR) * HOUR_HEIGHT +
+      (currentMinute / 60) * HOUR_HEIGHT;
   }
 
   return (
@@ -152,19 +167,19 @@ export default function DayView({
                 const programStyle = PROGRAM_STYLES[mqDate.program];
                 const categoryLabel =
                   {
-                    exams: 'Exam',
-                    admin: 'Admin',
-                    results: 'Results',
-                    payment: 'Payment',
-                    enrollment: 'Enroll',
-                    recess: 'Break',
-                    classes: 'Class',
+                    exams: "Exam",
+                    admin: "Admin",
+                    results: "Results",
+                    payment: "Payment",
+                    enrollment: "Enroll",
+                    recess: "Break",
+                    classes: "Class",
                   }[mqDate.category] || mqDate.category;
                 return (
                   <div
                     key={mqDate.id}
                     className={cn(
-                      'px-2 py-1.5 rounded-md text-xs font-semibold shadow-sm border-l-4 flex flex-col',
+                      "px-2 py-1.5 rounded-md text-xs font-semibold shadow-sm border-l-4 flex flex-col",
                       programStyle.bgLight,
                       programStyle.border,
                       programStyle.pattern,
@@ -181,7 +196,7 @@ export default function DayView({
                       </span>
                       <span
                         className={cn(
-                          'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
+                          "text-[8px] font-bold uppercase px-1 py-0.5 rounded",
                           categoryColors.bg,
                           categoryColors.text,
                         )}
@@ -189,8 +204,12 @@ export default function DayView({
                         {categoryLabel}
                       </span>
                     </div>
-                    <span className={cn('line-clamp-1', programStyle.text)}>{mqDate.event}</span>
-                    <span className={cn('text-[9px] opacity-70', programStyle.text)}>
+                    <span className={cn("line-clamp-1", programStyle.text)}>
+                      {mqDate.event}
+                    </span>
+                    <span
+                      className={cn("text-[9px] opacity-70", programStyle.text)}
+                    >
                       {mqDate.term}
                     </span>
                   </div>
@@ -207,12 +226,15 @@ export default function DayView({
             className="w-full px-3 py-2 bg-mq-primary/10 border-b border-mq-primary/20 hover:bg-mq-primary/20 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-mq-primary"
           >
             <CalendarClock className="h-4 w-4" />
-            <span>{t('backToToday')}</span>
+            <span>{t("backToToday")}</span>
           </button>
         )}
 
         {/* Time Grid */}
-        <div className="relative" style={{ height: HOURS.length * HOUR_HEIGHT + 24 }}>
+        <div
+          className="relative"
+          style={{ height: HOURS.length * HOUR_HEIGHT + 24 }}
+        >
           {/* Hour Lines */}
           {HOURS.map((hour, index) => (
             <div
@@ -221,10 +243,17 @@ export default function DayView({
               style={{ top: index * HOUR_HEIGHT + 24 }}
             >
               <div className="w-16 text-xs text-mq-content-secondary text-right pr-4 -mt-2 border-r border-mq-border flex-shrink-0 font-medium">
-                {hour === 12 ? '12 PM' : hour > 12 ? `${hour - 12} PM` : `${hour} AM`}
+                {hour === 12
+                  ? "12 PM"
+                  : hour > 12
+                    ? `${hour - 12} PM`
+                    : `${hour} AM`}
               </div>
               <div
-                className={cn('flex-1 border-t border-mq-border/50', isToday && 'bg-mq-primary/5')}
+                className={cn(
+                  "flex-1 border-t border-mq-border/50",
+                  isToday && "bg-mq-primary/5",
+                )}
                 style={{ height: HOUR_HEIGHT }}
               />
             </div>
@@ -245,7 +274,9 @@ export default function DayView({
           <div className="absolute left-[64px] right-2 top-[24px] bottom-0">
             {/* Units */}
             {dayUnits.map(({ unit, schedule }) => {
-              const timeInfo = parseTimeRange(`${schedule.startTime} - ${schedule.endTime}`);
+              const timeInfo = parseTimeRange(
+                `${schedule.startTime} - ${schedule.endTime}`,
+              );
               if (!timeInfo) return null;
 
               const posInfo = getTimePositionAndHeight(
@@ -257,7 +288,10 @@ export default function DayView({
               if (!posInfo) return null;
 
               const itemId = `unit-${unit.id}-${schedule.day}-${schedule.startTime}`;
-              const overlap = overlapInfo.get(itemId) || { column: 0, totalColumns: 1 };
+              const overlap = overlapInfo.get(itemId) || {
+                column: 0,
+                totalColumns: 1,
+              };
               const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
               const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
 
@@ -280,14 +314,14 @@ export default function DayView({
                       {unit.code}
                     </span>
                     <span className="text-[10px] text-mq-content-secondary block">
-                      {formatScheduleTime(schedule.startTime, 'en')} -{' '}
-                      {formatScheduleTime(schedule.endTime, 'en')}
+                      {formatScheduleTime(schedule.startTime, "en")} -{" "}
+                      {formatScheduleTime(schedule.endTime, "en")}
                     </span>
                     <span className="text-[10px] text-mq-content-tertiary block truncate mt-0.5">
                       {formatLocation(
                         unit.location.building,
                         unit.location.room,
-                        t('room' as TranslationKey),
+                        t("room" as TranslationKey),
                       )}
                     </span>
                   </div>
@@ -300,14 +334,22 @@ export default function DayView({
               const dueDayjs = dayjs(deadline.dueDate);
               const hours = dueDayjs.hour();
               const minutes = dueDayjs.minute();
-              const posInfo = getTimePositionAndHeight(hours, minutes, hours + 1, minutes);
+              const posInfo = getTimePositionAndHeight(
+                hours,
+                minutes,
+                hours + 1,
+                minutes,
+              );
 
               if (!posInfo || hours < START_HOUR) return null;
 
               const deadlineColor = getDeadlineColor(deadline, units);
 
               const itemId = `deadline-${deadline.id}`;
-              const overlap = overlapInfo.get(itemId) || { column: 0, totalColumns: 1 };
+              const overlap = overlapInfo.get(itemId) || {
+                column: 0,
+                totalColumns: 1,
+              };
               const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
               const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
 
@@ -317,8 +359,8 @@ export default function DayView({
                   type="button"
                   onClick={() => onDeadlineClick(deadline)}
                   className={cn(
-                    'absolute text-left px-2 py-1 rounded-md shadow-sm text-xs font-medium z-10 border-l-4 transition-all hover:brightness-95 text-white',
-                    deadline.completed && 'opacity-60 line-through',
+                    "absolute text-left px-2 py-1 rounded-md shadow-sm text-xs font-medium z-10 border-l-4 transition-all hover:brightness-95 text-white",
+                    deadline.completed && "opacity-60 line-through",
                   )}
                   style={{
                     top: posInfo.top,
@@ -333,7 +375,7 @@ export default function DayView({
                     {deadline.unitCode} – {deadline.title}
                   </div>
                   <div className="text-[10px] opacity-90 mt-0.5">
-                    {dayjs(deadline.dueDate).format('h:mm A')}
+                    {dayjs(deadline.dueDate).format("h:mm A")}
                   </div>
                 </button>
               );
@@ -353,7 +395,10 @@ export default function DayView({
 
               const colors = getEventColors(event);
               const itemId = `event-${event.id}`;
-              const overlap = overlapInfo.get(itemId) || { column: 0, totalColumns: 1 };
+              const overlap = overlapInfo.get(itemId) || {
+                column: 0,
+                totalColumns: 1,
+              };
               const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
               const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
 
@@ -363,10 +408,10 @@ export default function DayView({
                   type="button"
                   onClick={() => onEventClick(event)}
                   className={cn(
-                    'absolute text-left px-2 py-1 rounded-md shadow-sm text-xs font-medium z-10 transition-all hover:brightness-95',
+                    "absolute text-left px-2 py-1 rounded-md shadow-sm text-xs font-medium z-10 transition-all hover:brightness-95",
                     colors.bg,
                     colors.text,
-                    colors.border && 'border border-l-4',
+                    colors.border && "border border-l-4",
                   )}
                   style={{
                     top: posInfo.top,
@@ -374,11 +419,15 @@ export default function DayView({
                     left,
                     width,
                     ...colors.style,
-                    ...(colors.border ? { borderLeftColor: colors.style?.borderColor } : {}),
+                    ...(colors.border
+                      ? { borderLeftColor: colors.style?.borderColor }
+                      : {}),
                   }}
                 >
                   <div className="font-bold truncate">{event.title}</div>
-                  <div className="text-[10px] opacity-90 truncate">{event.location}</div>
+                  <div className="text-[10px] opacity-90 truncate">
+                    {event.location}
+                  </div>
                 </button>
               );
             })}

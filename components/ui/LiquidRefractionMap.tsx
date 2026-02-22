@@ -29,23 +29,24 @@
 // @version 1.1.0
 // @see liquid-glass.css for complementary CSS
 // ============================================================================
-'use client';
+"use client";
 
-import { memo, useSyncExternalStore, useMemo } from 'react';
+import { memo, useSyncExternalStore, useMemo } from "react";
 
 // ============================================================================
 // REDUCED MOTION DETECTION
 // ============================================================================
 
 const subscribeToReducedMotion = (callback: () => void) => {
-  if (typeof window === 'undefined') return () => {};
-  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  mediaQuery.addEventListener('change', callback);
-  return () => mediaQuery.removeEventListener('change', callback);
+  if (typeof window === "undefined") return () => {};
+  const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
 };
 
 const getReducedMotionSnapshot = () =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const getReducedMotionServerSnapshot = () => false;
 
@@ -54,14 +55,15 @@ const getReducedMotionServerSnapshot = () => false;
 // ============================================================================
 
 const subscribeToHighContrast = (callback: () => void) => {
-  if (typeof window === 'undefined') return () => {};
-  const mediaQuery = window.matchMedia('(prefers-contrast: more)');
-  mediaQuery.addEventListener('change', callback);
-  return () => mediaQuery.removeEventListener('change', callback);
+  if (typeof window === "undefined") return () => {};
+  const mediaQuery = window.matchMedia("(prefers-contrast: more)");
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
 };
 
 const getHighContrastSnapshot = () =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-contrast: more)').matches;
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-contrast: more)").matches;
 
 const getHighContrastServerSnapshot = () => false;
 
@@ -117,7 +119,10 @@ const HEAVY_CONFIG: FilterConfig = {
  * At intensity 0, displacement is minimal
  * At intensity 100, displacement is at full config values
  */
-const scaleConfigByIntensity = (config: FilterConfig, intensity: number): FilterConfig => {
+const scaleConfigByIntensity = (
+  config: FilterConfig,
+  intensity: number,
+): FilterConfig => {
   const factor = Math.max(0, Math.min(100, intensity)) / 100;
   return {
     ...config,
@@ -206,7 +211,14 @@ const LiquidRefractionMap = memo(
       config: FilterConfig,
       includeSpecularHighlight: boolean = false,
     ) => (
-      <filter id={id} x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+      <filter
+        id={id}
+        x="-20%"
+        y="-20%"
+        width="140%"
+        height="140%"
+        colorInterpolationFilters="sRGB"
+      >
         {shouldDisableFilters ? (
           // Fallback: Simple pass-through for accessibility
           <feOffset in="SourceGraphic" result="output" />
@@ -243,14 +255,30 @@ const LiquidRefractionMap = memo(
             {includeSpecularHighlight && (
               <>
                 {/* Create subtle highlight gradient */}
-                <feFlood floodColor="white" floodOpacity="0.08" result="highlight" />
-                <feComposite in="highlight" in2="softened" operator="atop" result="withHighlight" />
-                <feBlend in="withHighlight" in2="softened" mode="screen" result="output" />
+                <feFlood
+                  floodColor="white"
+                  floodOpacity="0.08"
+                  result="highlight"
+                />
+                <feComposite
+                  in="highlight"
+                  in2="softened"
+                  operator="atop"
+                  result="withHighlight"
+                />
+                <feBlend
+                  in="withHighlight"
+                  in2="softened"
+                  mode="screen"
+                  result="output"
+                />
               </>
             )}
 
             {/* Final output */}
-            {!includeSpecularHighlight && <feOffset in="softened" result="output" />}
+            {!includeSpecularHighlight && (
+              <feOffset in="softened" result="output" />
+            )}
           </>
         )}
       </filter>
@@ -261,11 +289,11 @@ const LiquidRefractionMap = memo(
         className="liquid-refraction-map-svg"
         aria-hidden="true"
         style={{
-          position: 'absolute',
+          position: "absolute",
           width: 0,
           height: 0,
-          overflow: 'hidden',
-          pointerEvents: 'none',
+          overflow: "hidden",
+          pointerEvents: "none",
         }}
       >
         <defs>
@@ -276,7 +304,11 @@ const LiquidRefractionMap = memo(
               Uses moderate displacement for visible but not overwhelming effect.
               Intensity-scaled based on props/CSS variable.
               ================================================================ */}
-          {renderRefractionFilter('mq-liquid-refraction', scaledDefaultConfig, true)}
+          {renderRefractionFilter(
+            "mq-liquid-refraction",
+            scaledDefaultConfig,
+            true,
+          )}
 
           {/* ================================================================
               SUBTLE VARIANT
@@ -285,7 +317,11 @@ const LiquidRefractionMap = memo(
               Gentler displacement to maintain readability.
               ================================================================ */}
           {includeSubtle &&
-            renderRefractionFilter('mq-liquid-refraction-subtle', scaledSubtleConfig, false)}
+            renderRefractionFilter(
+              "mq-liquid-refraction-subtle",
+              scaledSubtleConfig,
+              false,
+            )}
 
           {/* ================================================================
               HEAVY VARIANT
@@ -294,7 +330,11 @@ const LiquidRefractionMap = memo(
               More dramatic warping effect.
               ================================================================ */}
           {includeHeavy &&
-            renderRefractionFilter('mq-liquid-refraction-heavy', scaledHeavyConfig, true)}
+            renderRefractionFilter(
+              "mq-liquid-refraction-heavy",
+              scaledHeavyConfig,
+              true,
+            )}
 
           {/* ================================================================
               SPECULAR HIGHLIGHT FILTER
@@ -302,16 +342,40 @@ const LiquidRefractionMap = memo(
               Standalone filter for adding rim light effects to elements.
               ================================================================ */}
           {includeSpecular && (
-            <filter id="mq-specular-highlight" x="-10%" y="-10%" width="120%" height="120%">
+            <filter
+              id="mq-specular-highlight"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+            >
               {shouldDisableFilters ? (
                 <feOffset in="SourceGraphic" result="output" />
               ) : (
                 <>
                   {/* Create edge detection for rim lighting */}
-                  <feMorphology in="SourceAlpha" operator="dilate" radius="1" result="dilated" />
-                  <feGaussianBlur in="dilated" stdDeviation="2" result="blurred" />
-                  <feFlood floodColor="white" floodOpacity="0.15" result="white" />
-                  <feComposite in="white" in2="blurred" operator="in" result="rim" />
+                  <feMorphology
+                    in="SourceAlpha"
+                    operator="dilate"
+                    radius="1"
+                    result="dilated"
+                  />
+                  <feGaussianBlur
+                    in="dilated"
+                    stdDeviation="2"
+                    result="blurred"
+                  />
+                  <feFlood
+                    floodColor="white"
+                    floodOpacity="0.15"
+                    result="white"
+                  />
+                  <feComposite
+                    in="white"
+                    in2="blurred"
+                    operator="in"
+                    result="rim"
+                  />
                   {/* Composite rim light with original */}
                   <feMerge>
                     <feMergeNode in="SourceGraphic" />
@@ -328,12 +392,22 @@ const LiquidRefractionMap = memo(
               MQ Red glow effect for interactive/hover states.
               ================================================================ */}
           {includeGlow && (
-            <filter id="mq-liquid-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <filter
+              id="mq-liquid-glow"
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+            >
               {shouldDisableFilters ? (
                 <feOffset in="SourceGraphic" result="output" />
               ) : (
                 <>
-                  <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+                  <feGaussianBlur
+                    in="SourceGraphic"
+                    stdDeviation="6"
+                    result="blur"
+                  />
                   {/* Tint with MQ Red */}
                   <feColorMatrix
                     in="blur"
@@ -359,7 +433,13 @@ const LiquidRefractionMap = memo(
               Filter to enhance backdrop-filter blur with slight distortion.
               Use with: backdrop-filter: blur(25px) url(#mq-backdrop-enhance)
               ================================================================ */}
-          <filter id="mq-backdrop-enhance" x="-10%" y="-10%" width="120%" height="120%">
+          <filter
+            id="mq-backdrop-enhance"
+            x="-10%"
+            y="-10%"
+            width="120%"
+            height="120%"
+          >
             {shouldDisableFilters ? (
               <feOffset in="SourceGraphic" result="output" />
             ) : (
@@ -379,7 +459,11 @@ const LiquidRefractionMap = memo(
                   yChannelSelector="G"
                   result="displaced"
                 />
-                <feGaussianBlur in="displaced" stdDeviation="0.5" result="output" />
+                <feGaussianBlur
+                  in="displaced"
+                  stdDeviation="0.5"
+                  result="output"
+                />
               </>
             )}
           </filter>
@@ -389,12 +473,22 @@ const LiquidRefractionMap = memo(
               ================================================================
               Combines blur with subtle noise for frosted glass effect.
               ================================================================ */}
-          <filter id="mq-frosted-glass" x="-10%" y="-10%" width="120%" height="120%">
+          <filter
+            id="mq-frosted-glass"
+            x="-10%"
+            y="-10%"
+            width="120%"
+            height="120%"
+          >
             {shouldDisableFilters ? (
               <feOffset in="SourceGraphic" result="output" />
             ) : (
               <>
-                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+                <feGaussianBlur
+                  in="SourceGraphic"
+                  stdDeviation="8"
+                  result="blur"
+                />
                 <feTurbulence
                   type="fractalNoise"
                   baseFrequency="0.8"
@@ -420,7 +514,7 @@ const LiquidRefractionMap = memo(
   },
 );
 
-LiquidRefractionMap.displayName = 'LiquidRefractionMap';
+LiquidRefractionMap.displayName = "LiquidRefractionMap";
 
 export default LiquidRefractionMap;
 

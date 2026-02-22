@@ -1,13 +1,13 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import fs from "node:fs/promises";
+import path from "node:path";
 
-const LOCALES_DIR = 'locales';
-const BASE_LOCALE = 'en';
-const TRANSLATION_FILE = 'translations.json';
+const LOCALES_DIR = "locales";
+const BASE_LOCALE = "en";
+const TRANSLATION_FILE = "translations.json";
 
 async function main() {
   const baseFilePath = path.join(LOCALES_DIR, BASE_LOCALE, TRANSLATION_FILE);
-  const baseContent = await fs.readFile(baseFilePath, 'utf8');
+  const baseContent = await fs.readFile(baseFilePath, "utf8");
   const baseJson = JSON.parse(baseContent);
 
   const localeEntries = await fs.readdir(LOCALES_DIR, { withFileTypes: true });
@@ -17,7 +17,7 @@ async function main() {
 
   for (const locale of locales) {
     const localeFilePath = path.join(LOCALES_DIR, locale, TRANSLATION_FILE);
-    const content = await fs.readFile(localeFilePath, 'utf8');
+    const content = await fs.readFile(localeFilePath, "utf8");
     const json = JSON.parse(content);
 
     let changed = false;

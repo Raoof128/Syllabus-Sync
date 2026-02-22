@@ -10,7 +10,7 @@
  * - Audit logging for security events
  */
 
-import { createRateLimiter } from '@/lib/services/rateLimitService';
+import { createRateLimiter } from "@/lib/services/rateLimitService";
 
 // ============================================================================
 // CONSTANTS
@@ -37,7 +37,7 @@ export const MFA_LOCKOUT_DURATION_MS = 30 * 60 * 1000;
 
 /** Rate limiter for MFA verification attempts */
 export const mfaVerifyLimiter = createRateLimiter({
-  prefix: 'mfa-verify',
+  prefix: "mfa-verify",
   windowMs: MFA_VERIFY_WINDOW_MS,
   maxRequests: MFA_MAX_VERIFY_ATTEMPTS,
   failClosed: true,
@@ -45,7 +45,7 @@ export const mfaVerifyLimiter = createRateLimiter({
 
 /** Rate limiter for SMS sends */
 export const smsSendLimiter = createRateLimiter({
-  prefix: 'sms-send',
+  prefix: "sms-send",
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: SMS_MAX_SENDS_PER_HOUR,
   failClosed: true,
@@ -53,7 +53,7 @@ export const smsSendLimiter = createRateLimiter({
 
 /** Rate limiter for MFA enrollment */
 export const mfaEnrollLimiter = createRateLimiter({
-  prefix: 'mfa-enroll',
+  prefix: "mfa-enroll",
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: 30, // Increased for testing
   failClosed: true,
@@ -61,7 +61,7 @@ export const mfaEnrollLimiter = createRateLimiter({
 
 /** Rate limiter for MFA unenrollment */
 export const mfaUnenrollLimiter = createRateLimiter({
-  prefix: 'mfa-unenroll',
+  prefix: "mfa-unenroll",
   windowMs: 60 * 60 * 1000,
   maxRequests: 5,
   failClosed: true,
@@ -73,9 +73,9 @@ export const mfaUnenrollLimiter = createRateLimiter({
 
 export interface MFAFactor {
   id: string;
-  type: 'totp' | 'phone';
+  type: "totp" | "phone";
   friendlyName?: string;
-  status: 'verified' | 'unverified';
+  status: "verified" | "unverified";
   phone?: string;
   createdAt: string;
   updatedAt: string;
@@ -83,8 +83,8 @@ export interface MFAFactor {
 
 export interface MFAStatus {
   enabled: boolean;
-  currentLevel: 'aal1' | 'aal2';
-  nextLevel: 'aal1' | 'aal2';
+  currentLevel: "aal1" | "aal2";
+  nextLevel: "aal1" | "aal2";
   factors: MFAFactor[];
   totpEnabled: boolean;
   phoneEnabled: boolean;
@@ -104,7 +104,7 @@ export interface MFAChallengeResult {
  * Sanitize phone number for display (mask middle digits)
  */
 export function maskPhoneNumber(phone: string): string {
-  if (!phone || phone.length < 6) return '***';
+  if (!phone || phone.length < 6) return "***";
   const last4 = phone.slice(-4);
   const countryCode = phone.slice(0, phone.length - 8);
   return `${countryCode}****${last4}`;
@@ -138,9 +138,9 @@ export function mapSupabaseFactor(factor: {
 }): MFAFactor {
   return {
     id: factor.id,
-    type: factor.factor_type as 'totp' | 'phone',
+    type: factor.factor_type as "totp" | "phone",
     friendlyName: factor.friendly_name,
-    status: factor.status as 'verified' | 'unverified',
+    status: factor.status as "verified" | "unverified",
     phone: factor.phone,
     createdAt: factor.created_at,
     updatedAt: factor.updated_at,

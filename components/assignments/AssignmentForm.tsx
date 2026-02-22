@@ -1,13 +1,13 @@
 // components/assignments/AssignmentForm.tsx
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
-import { useUnitsStore } from '@/lib/store/unitsStore';
-import { Deadline } from '@/lib/types';
-import { v4 as uuidv4 } from 'uuid';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
+import { useUnitsStore } from "@/lib/store/unitsStore";
+import { Deadline } from "@/lib/types";
+import { v4 as uuidv4 } from "uuid";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 import {
   Dialog,
   DialogContent,
@@ -15,24 +15,28 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/mq/button';
-import { Input } from '@/components/ui/mq/input';
-import { toastUtils } from '@/lib/utils/toast';
-import { useRetry } from '@/lib/hooks/use-retry';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/mq/button";
+import { Input } from "@/components/ui/mq/input";
+import { toastUtils } from "@/lib/utils/toast";
+import { useRetry } from "@/lib/hooks/use-retry";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { PRIORITY_LEVELS } from '@/lib/constants';
-import { format, isValid } from 'date-fns';
-import { errorHandler, createFormValidator, validationRules } from '@/lib/utils/errorHandling';
-import { UNIT_COLORS } from '@/lib/config';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { PRIORITY_LEVELS } from "@/lib/constants";
+import { format, isValid } from "date-fns";
+import {
+  errorHandler,
+  createFormValidator,
+  validationRules,
+} from "@/lib/utils/errorHandling";
+import { UNIT_COLORS } from "@/lib/config";
+import { cn } from "@/lib/utils";
 
 interface AssignmentFormProps {
   open: boolean;
@@ -49,13 +53,13 @@ export default function AssignmentForm({
   const { addDeadline, updateDeadline, removeDeadline } = useDeadlinesStore();
   const units = useUnitsStore((state) => state.units);
 
-  const [title, setTitle] = useState('');
-  const [unitCode, setUnitCode] = useState('');
-  const [color, setColor] = useState<string>(''); // Empty means inherit from unit
+  const [title, setTitle] = useState("");
+  const [unitCode, setUnitCode] = useState("");
+  const [color, setColor] = useState<string>(""); // Empty means inherit from unit
   const [useCustomColor, setUseCustomColor] = useState(false);
-  const [dueDate, setDueDate] = useState('');
-  const [dueTime, setDueTime] = useState('23:59');
-  const [priority, setPriority] = useState<Deadline['priority']>('Medium');
+  const [dueDate, setDueDate] = useState("");
+  const [dueTime, setDueTime] = useState("23:59");
+  const [priority, setPriority] = useState<Deadline["priority"]>("Medium");
   const [completed, setCompleted] = useState(false);
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -88,17 +92,17 @@ export default function AssignmentForm({
   const { execute: saveWithRetry } = useRetry(performSave, {
     maxAttempts: 3,
     showToastOnError: false,
-    errorMessage: t('failedToSaveDeadline'),
+    errorMessage: t("failedToSaveDeadline"),
   });
 
   const resetForm = () => {
-    setTitle('');
-    setUnitCode('');
-    setColor('');
+    setTitle("");
+    setUnitCode("");
+    setColor("");
     setUseCustomColor(false);
-    setDueDate('');
-    setDueTime('23:59');
-    setPriority('Medium');
+    setDueDate("");
+    setDueTime("23:59");
+    setPriority("Medium");
     setCompleted(false);
     setErrors({});
   };
@@ -112,16 +116,16 @@ export default function AssignmentForm({
         setColor(editAssignment.color);
         setUseCustomColor(true);
       } else {
-        setColor('');
+        setColor("");
         setUseCustomColor(false);
       }
       const parsedDate = new Date(editAssignment.dueDate);
       if (isValid(parsedDate)) {
-        setDueDate(format(parsedDate, 'yyyy-MM-dd'));
-        setDueTime(format(parsedDate, 'HH:mm'));
+        setDueDate(format(parsedDate, "yyyy-MM-dd"));
+        setDueTime(format(parsedDate, "HH:mm"));
       } else {
-        setDueDate('');
-        setDueTime('23:59');
+        setDueDate("");
+        setDueTime("23:59");
       }
       setPriority(editAssignment.priority);
       setCompleted(editAssignment.completed);
@@ -133,9 +137,9 @@ export default function AssignmentForm({
 
   const validateForm = (): boolean => {
     const validator = createFormValidator({
-      title: validationRules.required(t('title')),
-      unitCode: validationRules.required(t('unit')),
-      dueDate: validationRules.required(t('dueDate')),
+      title: validationRules.required(t("title")),
+      unitCode: validationRules.required(t("unit")),
+      dueDate: validationRules.required(t("dueDate")),
     });
 
     const validationErrors = validator({ title, unitCode, dueDate });
@@ -150,12 +154,14 @@ export default function AssignmentForm({
 
     setIsSaving(true);
 
-    const [year, month, day] = dueDate.split('-').map(Number);
-    const timeParts = dueTime ? dueTime.split(':') : [];
+    const [year, month, day] = dueDate.split("-").map(Number);
+    const timeParts = dueTime ? dueTime.split(":") : [];
     const parsedHours = Number(timeParts[0]);
     const parsedMinutes = Number(timeParts[1]);
     const hasValidTime =
-      timeParts.length === 2 && !Number.isNaN(parsedHours) && !Number.isNaN(parsedMinutes);
+      timeParts.length === 2 &&
+      !Number.isNaN(parsedHours) &&
+      !Number.isNaN(parsedMinutes);
     const dueDateObj = new Date(
       year,
       month - 1,
@@ -172,7 +178,7 @@ export default function AssignmentForm({
       color: useCustomColor ? color : undefined, // Only save custom color
       dueDate: dueDateObj,
       priority,
-      type: 'Assignment', // Fixed type for assignments
+      type: "Assignment", // Fixed type for assignments
       completed,
       createdAt: editAssignment?.createdAt || new Date(),
     };
@@ -182,12 +188,12 @@ export default function AssignmentForm({
       if (result !== null) {
         if (editAssignment) {
           toastUtils.success(
-            t('assignmentUpdated' as TranslationKey) || 'Assignment Updated',
+            t("assignmentUpdated" as TranslationKey) || "Assignment Updated",
             `"${assignmentData.title}" has been updated successfully.`,
           );
         } else {
           toastUtils.success(
-            t('assignmentAdded' as TranslationKey) || 'Assignment Added',
+            t("assignmentAdded" as TranslationKey) || "Assignment Added",
             `"${assignmentData.title}" has been added successfully.`,
           );
         }
@@ -209,8 +215,8 @@ export default function AssignmentForm({
     if (editAssignment) {
       removeDeadline(editAssignment.id);
       toastUtils.success(
-        t('assignmentDeleted' as TranslationKey) || 'Assignment Deleted',
-        `"${editAssignment.title}" ${t('deletedMsg')}`,
+        t("assignmentDeleted" as TranslationKey) || "Assignment Deleted",
+        `"${editAssignment.title}" ${t("deletedMsg")}`,
       );
       onOpenChange(false);
       resetForm();
@@ -230,15 +236,15 @@ export default function AssignmentForm({
           <DialogHeader className="mb-4">
             <DialogTitle>
               {editAssignment
-                ? t('editAssignment' as TranslationKey) || 'Edit Assignment'
-                : t('addAssignment' as TranslationKey) || 'Add Assignment'}
+                ? t("editAssignment" as TranslationKey) || "Edit Assignment"
+                : t("addAssignment" as TranslationKey) || "Add Assignment"}
             </DialogTitle>
             <DialogDescription>
               {editAssignment
-                ? t('updateAssignmentDetails' as TranslationKey) ||
-                  'Update the assignment details below.'
-                : t('fillAssignmentDetails' as TranslationKey) ||
-                  'Fill in the assignment details below.'}
+                ? t("updateAssignmentDetails" as TranslationKey) ||
+                  "Update the assignment details below."
+                : t("fillAssignmentDetails" as TranslationKey) ||
+                  "Fill in the assignment details below."}
             </DialogDescription>
           </DialogHeader>
 
@@ -246,23 +252,29 @@ export default function AssignmentForm({
             {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="assignment-title">
-                {t('title')} <span className="text-mq-error">*</span>
+                {t("title")} <span className="text-mq-error">*</span>
               </Label>
               <Input
                 id="assignment-title"
                 placeholder={
-                  t('assignmentTitlePlaceholder' as TranslationKey) ||
-                  'e.g., Essay on Climate Change'
+                  t("assignmentTitlePlaceholder" as TranslationKey) ||
+                  "e.g., Essay on Climate Change"
                 }
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={Boolean(errors.title)}
                 aria-required="true"
-                aria-describedby={errors.title ? 'assignment-title-error' : undefined}
-                className={errors.title ? 'border-mq-error' : ''}
+                aria-describedby={
+                  errors.title ? "assignment-title-error" : undefined
+                }
+                className={errors.title ? "border-mq-error" : ""}
               />
               {errors.title && (
-                <p id="assignment-title-error" className="text-sm text-mq-error" role="alert">
+                <p
+                  id="assignment-title-error"
+                  className="text-sm text-mq-error"
+                  role="alert"
+                >
                   {errors.title}
                 </p>
               )}
@@ -271,17 +283,19 @@ export default function AssignmentForm({
             {/* Unit */}
             <div className="space-y-2">
               <Label htmlFor="assignment-unit">
-                {t('unitCode')} <span className="text-mq-error">*</span>
+                {t("unitCode")} <span className="text-mq-error">*</span>
               </Label>
               <Select value={unitCode} onValueChange={setUnitCode}>
                 <SelectTrigger
                   id="assignment-unit"
-                  className={errors.unitCode ? 'border-mq-error' : ''}
+                  className={errors.unitCode ? "border-mq-error" : ""}
                   aria-invalid={Boolean(errors.unitCode)}
                   aria-required="true"
-                  aria-describedby={errors.unitCode ? 'assignment-unit-error' : undefined}
+                  aria-describedby={
+                    errors.unitCode ? "assignment-unit-error" : undefined
+                  }
                 >
-                  <SelectValue placeholder={t('selectUnit')} />
+                  <SelectValue placeholder={t("selectUnit")} />
                 </SelectTrigger>
                 <SelectContent>
                   {units.map((unit) => (
@@ -292,7 +306,11 @@ export default function AssignmentForm({
                 </SelectContent>
               </Select>
               {errors.unitCode && (
-                <p id="assignment-unit-error" className="text-sm text-mq-error" role="alert">
+                <p
+                  id="assignment-unit-error"
+                  className="text-sm text-mq-error"
+                  role="alert"
+                >
                   {errors.unitCode}
                 </p>
               )}
@@ -302,7 +320,7 @@ export default function AssignmentForm({
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="assignment-date">
-                  {t('dueDate')} <span className="text-mq-error">*</span>
+                  {t("dueDate")} <span className="text-mq-error">*</span>
                 </Label>
                 <Input
                   id="assignment-date"
@@ -311,17 +329,23 @@ export default function AssignmentForm({
                   onChange={(e) => setDueDate(e.target.value)}
                   aria-invalid={Boolean(errors.dueDate)}
                   aria-required="true"
-                  aria-describedby={errors.dueDate ? 'assignment-date-error' : undefined}
-                  className={errors.dueDate ? 'border-mq-error' : ''}
+                  aria-describedby={
+                    errors.dueDate ? "assignment-date-error" : undefined
+                  }
+                  className={errors.dueDate ? "border-mq-error" : ""}
                 />
                 {errors.dueDate && (
-                  <p id="assignment-date-error" className="text-sm text-mq-error" role="alert">
+                  <p
+                    id="assignment-date-error"
+                    className="text-sm text-mq-error"
+                    role="alert"
+                  >
                     {errors.dueDate}
                   </p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="assignment-time">{t('dueTime')}</Label>
+                <Label htmlFor="assignment-time">{t("dueTime")}</Label>
                 <Input
                   id="assignment-time"
                   type="time"
@@ -333,13 +357,13 @@ export default function AssignmentForm({
 
             {/* Priority */}
             <div className="space-y-2">
-              <Label htmlFor="assignment-priority">{t('priority')}</Label>
+              <Label htmlFor="assignment-priority">{t("priority")}</Label>
               <Select
                 value={priority}
-                onValueChange={(v) => setPriority(v as Deadline['priority'])}
+                onValueChange={(v) => setPriority(v as Deadline["priority"])}
               >
                 <SelectTrigger id="assignment-priority">
-                  <SelectValue placeholder={t('selectPriority')} />
+                  <SelectValue placeholder={t("selectPriority")} />
                 </SelectTrigger>
                 <SelectContent>
                   {PRIORITY_LEVELS.map((p) => (
@@ -353,7 +377,7 @@ export default function AssignmentForm({
 
             {/* Color Selection */}
             <div className="space-y-2">
-              <Label>{t('color' as TranslationKey) || 'Color'}</Label>
+              <Label>{t("color" as TranslationKey) || "Color"}</Label>
 
               {/* Unit Color Inheritance Toggle */}
               <div className="flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-surface/50">
@@ -363,14 +387,15 @@ export default function AssignmentForm({
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-mq-content">
-                    {useCustomColor ? 'Custom Color' : 'Inherits Unit Color'}
+                    {useCustomColor ? "Custom Color" : "Inherits Unit Color"}
                   </p>
                   <p className="text-xs text-mq-content-secondary truncate">
                     {useCustomColor
-                      ? UNIT_COLORS.find((c) => c.value === color)?.name || color
+                      ? UNIT_COLORS.find((c) => c.value === color)?.name ||
+                        color
                       : selectedUnit
                         ? `From ${selectedUnit.code}`
-                        : 'Select a unit first'}
+                        : "Select a unit first"}
                   </p>
                 </div>
                 <button
@@ -383,7 +408,7 @@ export default function AssignmentForm({
                   }}
                   className="text-xs px-2 py-1 rounded border border-mq-border hover:bg-mq-hover-background transition-colors"
                 >
-                  {useCustomColor ? 'Use Unit Color' : 'Customize'}
+                  {useCustomColor ? "Use Unit Color" : "Customize"}
                 </button>
               </div>
 
@@ -396,10 +421,10 @@ export default function AssignmentForm({
                       type="button"
                       onClick={() => setColor(c.value)}
                       className={cn(
-                        'w-8 h-8 rounded-full border-2 shrink-0 transition-all',
+                        "w-8 h-8 rounded-full border-2 shrink-0 transition-all",
                         color === c.value
-                          ? 'border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset'
-                          : 'border-transparent hover:border-mq-border',
+                          ? "border-mq-content ring-2 ring-offset-2 ring-mq-primary ring-inset"
+                          : "border-transparent hover:border-mq-border",
                       )}
                       style={{ backgroundColor: c.value }}
                       title={t(c.translationKey as TranslationKey)}
@@ -414,19 +439,26 @@ export default function AssignmentForm({
           <DialogFooter className="flex gap-2">
             {editAssignment && (
               <Button variant="destructive" onClick={handleDelete}>
-                {t('delete')}
+                {t("delete")}
               </Button>
             )}
             <div className="flex-1" />
-            <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
-              {t('cancel')}
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isSaving}
+            >
+              {t("cancel")}
             </Button>
-            <Button onClick={handleSave} disabled={units.length === 0 || isSaving}>
+            <Button
+              onClick={handleSave}
+              disabled={units.length === 0 || isSaving}
+            >
               {isSaving
-                ? t('savingChanges' as TranslationKey) || 'Saving...'
+                ? t("savingChanges" as TranslationKey) || "Saving..."
                 : editAssignment
-                  ? t('saveChanges')
-                  : t('addAssignment' as TranslationKey) || 'Add Assignment'}
+                  ? t("saveChanges")
+                  : t("addAssignment" as TranslationKey) || "Add Assignment"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -437,19 +469,22 @@ export default function AssignmentForm({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {t('deleteAssignment' as TranslationKey) || 'Delete Assignment'}
+              {t("deleteAssignment" as TranslationKey) || "Delete Assignment"}
             </DialogTitle>
             <DialogDescription>
-              {t('deleteAssignmentConfirm' as TranslationKey) ||
-                'Are you sure you want to delete this assignment? This action cannot be undone.'}
+              {t("deleteAssignmentConfirm" as TranslationKey) ||
+                "Are you sure you want to delete this assignment? This action cannot be undone."}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
-              {t('cancel')}
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              {t("cancel")}
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              {t('delete')}
+              {t("delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

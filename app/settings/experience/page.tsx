@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { GamificationSettings } from '@/features/settings/components';
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { GamificationSettings } from "@/features/settings/components";
 
 export default function ExperienceSettingsPage() {
   const { t } = useTypedTranslation();

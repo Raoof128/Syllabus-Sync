@@ -20,13 +20,13 @@
 // - ARIA labels and roles for screen readers
 // - Respects prefers-reduced-motion
 // ============================================================================
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState, memo } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import React, { useEffect, useRef, useState, memo } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
 import {
   Bell,
   Check,
@@ -39,23 +39,29 @@ import {
   Moon,
   Sun,
   X,
-} from 'lucide-react';
-import { APP_CONFIG, BRAND_COLORS, UNIVERSITY_CONFIG } from '@/lib/config';
-import { useNotificationsStore } from '@/lib/store/notificationsStore';
-import { useThemeStore } from '@/lib/store/themeStore';
-import { useProfilesStore } from '@/lib/store/profilesStore';
-import { apiRequest } from '@/lib/utils/api';
-import { formatDistanceToNow } from 'date-fns';
-import { getLocaleString } from '@/lib/utils/locale';
-import { clearAllClientStorage, resetAllStores } from '@/lib/utils/clientStorage';
+} from "lucide-react";
+import { APP_CONFIG, BRAND_COLORS, UNIVERSITY_CONFIG } from "@/lib/config";
+import { useNotificationsStore } from "@/lib/store/notificationsStore";
+import { useThemeStore } from "@/lib/store/themeStore";
+import { useProfilesStore } from "@/lib/store/profilesStore";
+import { apiRequest } from "@/lib/utils/api";
+import { formatDistanceToNow } from "date-fns";
+import { getLocaleString } from "@/lib/utils/locale";
+import {
+  clearAllClientStorage,
+  resetAllStores,
+} from "@/lib/utils/clientStorage";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
-import WeatherWidget from './WeatherWidget';
+} from "@/components/ui/dropdown-menu";
+import {
+  createBrowserClient,
+  isSupabaseConfigured,
+} from "@/lib/supabase/client";
+import WeatherWidget from "./WeatherWidget";
 
 const notificationIcons = {
   deadline: Clock,
@@ -75,10 +81,14 @@ const Header = memo(() => {
   } | null>(null);
 
   const notifications = useNotificationsStore((state) => state.notifications);
-  const loadNotifications = useNotificationsStore((state) => state.loadNotifications);
+  const loadNotifications = useNotificationsStore(
+    (state) => state.loadNotifications,
+  );
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
-  const removeNotification = useNotificationsStore((state) => state.removeNotification);
+  const removeNotification = useNotificationsStore(
+    (state) => state.removeNotification,
+  );
 
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -96,7 +106,9 @@ const Header = memo(() => {
   }, [isClient, loadNotifications]);
 
   // Error boundary for notifications
-  const [notificationError, setNotificationError] = useState<Error | null>(null);
+  const [notificationError, setNotificationError] = useState<Error | null>(
+    null,
+  );
   const [avatarError, setAvatarError] = useState(false);
 
   useEffect(() => {
@@ -104,9 +116,15 @@ const Header = memo(() => {
       setNotificationError(event.detail as Error);
     };
 
-    window.addEventListener('notification-error', handleNotificationError as EventListener);
+    window.addEventListener(
+      "notification-error",
+      handleNotificationError as EventListener,
+    );
     return () => {
-      window.removeEventListener('notification-error', handleNotificationError as EventListener);
+      window.removeEventListener(
+        "notification-error",
+        handleNotificationError as EventListener,
+      );
     };
   }, []);
 
@@ -153,11 +171,11 @@ const Header = memo(() => {
       loadNotifications();
     };
 
-    window.addEventListener('focus', handleFocus);
+    window.addEventListener("focus", handleFocus);
 
     return () => {
       isActive = false;
-      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener("focus", handleFocus);
       subscription?.unsubscribe();
     };
   }, [loadNotifications]);
@@ -166,15 +184,16 @@ const Header = memo(() => {
   useEffect(() => {
     if (!user || hasSeeded) return;
 
-    const notificationsSeededKey = 'notifications-seeded';
+    const notificationsSeededKey = "notifications-seeded";
 
     try {
-      const notificationsSeeded = localStorage.getItem(notificationsSeededKey) === 'true';
+      const notificationsSeeded =
+        localStorage.getItem(notificationsSeededKey) === "true";
 
       if (!notificationsSeeded) {
         // Note: For now, we'll rely on API data
         // In future, we might seed some demo notifications
-        localStorage.setItem(notificationsSeededKey, 'true');
+        localStorage.setItem(notificationsSeededKey, "true");
       }
     } catch {
       // Ignore localStorage errors
@@ -198,7 +217,9 @@ const Header = memo(() => {
   }, [currentProfile?.avatar]);
 
   // Only calculate notifications on client to avoid hydration mismatch
-  const unreadNotifications = isClient ? notifications.filter((n) => !n.read) : [];
+  const unreadNotifications = isClient
+    ? notifications.filter((n) => !n.read)
+    : [];
   const unreadCount = unreadNotifications.length;
   // Show all recent notifications in dropdown (both read and unread)
   const recentNotifications = isClient ? notifications.slice(0, 10) : [];
@@ -213,13 +234,14 @@ const Header = memo(() => {
         if (user?.user_metadata?.name) return user.user_metadata.name;
         // Extract name from email prefix and capitalize it
         if (user?.email) {
-          const emailPrefix = user.email.split('@')[0];
+          const emailPrefix = user.email.split("@")[0];
           // Remove numbers from the end of the email prefix (e.g., "pouyaalavi1378" -> "pouyaalavi")
-          const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
+          const nameWithoutNumbers = emailPrefix.replace(/\d+$/, "");
           // Capitalize first letter
           if (nameWithoutNumbers.length > 0) {
             return (
-              nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase()
+              nameWithoutNumbers.charAt(0).toUpperCase() +
+              nameWithoutNumbers.slice(1).toLowerCase()
             );
           }
         }
@@ -234,15 +256,18 @@ const Header = memo(() => {
     >
       {/* Top row on mobile / Left side on desktop - Logo, title, date, weather */}
       <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink-0">
+        <Link
+          href="/"
+          className="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink-0"
+        >
           <Image
             src="/MQ_Logo_Final.png"
-            alt={t('mqLogoAlt')}
+            alt={t("mqLogoAlt")}
             width={80}
             height={80}
             priority
             className="h-8 sm:h-10 md:h-12 w-auto shrink-0"
-            style={{ width: 'auto' }}
+            style={{ width: "auto" }}
           />
           <div className="min-w-0">
             <span className="text-xs sm:text-sm md:text-base font-semibold text-mq-content block truncate leading-tight">
@@ -259,31 +284,34 @@ const Header = memo(() => {
           <div className="flex items-center gap-2 ml-auto sm:ml-4 sm:pl-4 sm:border-l sm:border-mq-border/50">
             <time
               className="text-[10px] sm:text-xs md:text-sm font-medium text-mq-content-secondary sm:text-mq-content whitespace-nowrap"
-              dateTime={new Date().toISOString().split('T')[0]}
+              dateTime={new Date().toISOString().split("T")[0]}
             >
               <span className="sm:hidden">
                 {new Date().toLocaleDateString(getLocaleString(language), {
-                  day: 'numeric',
-                  month: 'short',
+                  day: "numeric",
+                  month: "short",
                 })}
               </span>
               <span className="hidden sm:inline md:hidden">
                 {new Date().toLocaleDateString(getLocaleString(language), {
-                  weekday: 'short',
-                  day: 'numeric',
-                  month: 'short',
+                  weekday: "short",
+                  day: "numeric",
+                  month: "short",
                 })}
               </span>
               <span className="hidden md:inline">
                 {new Date().toLocaleDateString(getLocaleString(language), {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
                 })}
               </span>
             </time>
-            <div className="hidden sm:block w-px h-5 bg-mq-border/50" aria-hidden="true" />
+            <div
+              className="hidden sm:block w-px h-5 bg-mq-border/50"
+              aria-hidden="true"
+            />
             <WeatherWidget />
           </div>
         )}
@@ -296,17 +324,21 @@ const Header = memo(() => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className={`group p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background ${unreadCount > 0 ? 'animate-pulse-subtle' : ''}`}
+                className={`group p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background ${unreadCount > 0 ? "animate-pulse-subtle" : ""}`}
                 aria-label={
                   unreadCount > 0
-                    ? t('viewUnreadNotifications', { count: unreadCount })
-                    : t('notifications')
+                    ? t("viewUnreadNotifications", { count: unreadCount })
+                    : t("notifications")
                 }
                 aria-haspopup="menu"
-                title={unreadCount > 0 ? t('notificationsBellHint') : t('notifications')}
+                title={
+                  unreadCount > 0
+                    ? t("notificationsBellHint")
+                    : t("notifications")
+                }
               >
                 <Bell
-                  className={`w-4 h-4 sm:w-5 sm:h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95 ${unreadCount > 0 ? 'animate-wiggle' : ''}`}
+                  className={`w-4 h-4 sm:w-5 sm:h-5 text-mq-content-secondary transition-transform duration-300 group-hover:scale-110 group-active:scale-95 ${unreadCount > 0 ? "animate-wiggle" : ""}`}
                   aria-hidden="true"
                 />
                 {unreadCount > 0 && (
@@ -314,7 +346,7 @@ const Header = memo(() => {
                     className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-mq-error rounded-full text-[9px] sm:text-[10px] text-white flex items-center justify-center font-medium animate-bounce-subtle"
                     aria-hidden="true"
                   >
-                    {unreadCount > 9 ? '9+' : unreadCount}
+                    {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
               </button>
@@ -324,10 +356,12 @@ const Header = memo(() => {
               sideOffset={4}
               className="w-80 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border border-mq-border shadow-lg"
               role="menu"
-              aria-label={t('notifications')}
+              aria-label={t("notifications")}
             >
               <div className="p-3 border-b border-mq-border flex items-center justify-between">
-                <h3 className="font-semibold text-mq-content">{t('notifications')}</h3>
+                <h3 className="font-semibold text-mq-content">
+                  {t("notifications")}
+                </h3>
                 <DropdownMenuItem
                   disabled={unreadCount === 0}
                   onSelect={(event) => {
@@ -337,14 +371,14 @@ const Header = memo(() => {
                   }}
                   className="text-xs text-mq-info hover:text-mq-info/80 focus:text-mq-info focus:bg-transparent disabled:opacity-50 cursor-pointer"
                 >
-                  {t('markAllRead')}
+                  {t("markAllRead")}
                 </DropdownMenuItem>
               </div>
               <div className="max-h-[min(20rem,calc(100vh-10rem))] overflow-y-auto">
                 {notificationError ? (
                   <div className="p-4 text-center">
                     <p className="text-mq-error text-sm font-medium">
-                      {t('notificationLoadError')}
+                      {t("notificationLoadError")}
                     </p>
                     <button
                       onClick={() => {
@@ -353,16 +387,16 @@ const Header = memo(() => {
                       }}
                       className="text-xs text-mq-info hover:underline mt-2"
                     >
-                      {t('retry')}
+                      {t("retry")}
                     </button>
                   </div>
                 ) : recentNotifications.length === 0 ? (
                   <div className="p-4 text-center">
                     <p className="text-mq-content-tertiary text-sm font-medium">
-                      {t('noNotificationsYet')}
+                      {t("noNotificationsYet")}
                     </p>
                     <p className="text-mq-content-tertiary/70 text-xs mt-1">
-                      {t('noNotificationsYetDesc')}
+                      {t("noNotificationsYetDesc")}
                     </p>
                   </div>
                 ) : (
@@ -372,12 +406,12 @@ const Header = memo(() => {
                       <DropdownMenuItem
                         key={notification.id}
                         className={`p-0 border-b border-mq-border last:border-0 ${
-                          !notification.read ? 'bg-mq-info/10' : ''
+                          !notification.read ? "bg-mq-info/10" : ""
                         }`}
                       >
                         <div className="flex w-full items-start gap-1">
                           <Link
-                            href={notification.link || '#'}
+                            href={notification.link || "#"}
                             onClick={() => {
                               if (!notification.read) {
                                 markAsRead(notification.id);
@@ -388,31 +422,31 @@ const Header = memo(() => {
                             <div className="flex gap-3">
                               <div
                                 className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                                  notification.type === 'deadline'
-                                    ? 'bg-mq-warning/20'
-                                    : notification.type === 'event'
-                                      ? 'bg-mq-purple/20'
-                                      : notification.type === 'class'
-                                        ? 'bg-mq-info/20'
-                                        : 'bg-mq-background-secondary'
+                                  notification.type === "deadline"
+                                    ? "bg-mq-warning/20"
+                                    : notification.type === "event"
+                                      ? "bg-mq-purple/20"
+                                      : notification.type === "class"
+                                        ? "bg-mq-info/20"
+                                        : "bg-mq-background-secondary"
                                 }`}
                                 aria-hidden="true"
                               >
                                 <Icon
                                   className={`w-4 h-4 ${
-                                    notification.type === 'deadline'
-                                      ? 'text-mq-warning'
-                                      : notification.type === 'event'
-                                        ? 'text-mq-purple'
-                                        : notification.type === 'class'
-                                          ? 'text-mq-info'
-                                          : 'text-mq-content-secondary'
+                                    notification.type === "deadline"
+                                      ? "text-mq-warning"
+                                      : notification.type === "event"
+                                        ? "text-mq-purple"
+                                        : notification.type === "class"
+                                          ? "text-mq-info"
+                                          : "text-mq-content-secondary"
                                   }`}
                                 />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p
-                                  className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-mq-content truncate`}
+                                  className={`text-sm ${!notification.read ? "font-semibold" : "font-medium"} text-mq-content truncate`}
                                 >
                                   {notification.title}
                                 </p>
@@ -420,15 +454,18 @@ const Header = memo(() => {
                                   {notification.message}
                                 </p>
                                 <p className="text-xs text-mq-content-tertiary mt-1">
-                                  {formatDistanceToNow(new Date(notification.createdAt), {
-                                    addSuffix: true,
-                                  })}
+                                  {formatDistanceToNow(
+                                    new Date(notification.createdAt),
+                                    {
+                                      addSuffix: true,
+                                    },
+                                  )}
                                 </p>
                               </div>
                               {!notification.read && (
                                 <div
                                   className="w-2 h-2 bg-mq-info rounded-full shrink-0 mt-2"
-                                  aria-label={t('unread')}
+                                  aria-label={t("unread")}
                                 />
                               )}
                             </div>
@@ -445,8 +482,8 @@ const Header = memo(() => {
                                   markAsRead(notification.id);
                                 }}
                                 className="flex h-7 w-7 items-center justify-center rounded-full text-mq-info transition-colors hover:bg-mq-info/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                                aria-label={t('markAsRead')}
-                                title={t('markAsRead')}
+                                aria-label={t("markAsRead")}
+                                title={t("markAsRead")}
                               >
                                 <Check className="h-4 w-4" aria-hidden="true" />
                               </button>
@@ -460,8 +497,8 @@ const Header = memo(() => {
                                   removeNotification(notification.id);
                                 }}
                                 className="flex h-7 w-7 items-center justify-center rounded-full text-mq-content-tertiary transition-colors hover:bg-mq-error/10 hover:text-mq-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                                aria-label={t('deleteNotification')}
-                                title={t('deleteNotification')}
+                                aria-label={t("deleteNotification")}
+                                title={t("deleteNotification")}
                               >
                                 <X className="h-4 w-4" aria-hidden="true" />
                               </button>
@@ -483,20 +520,30 @@ const Header = memo(() => {
           <button
             onClick={toggleTheme}
             className="group relative p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11"
-            aria-label={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
-            aria-pressed={resolvedTheme === 'dark'}
-            title={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
+            aria-label={t(
+              resolvedTheme === "dark" ? "switchToLight" : "switchToDark",
+            )}
+            aria-pressed={resolvedTheme === "dark"}
+            title={t(
+              resolvedTheme === "dark" ? "switchToLight" : "switchToDark",
+            )}
           >
             <div className="relative w-4 h-4 sm:w-5 sm:h-5">
               <Sun
-                className={`absolute inset-0 w-4 h-4 sm:w-5 sm:h-5 text-mq-warning transition-all duration-500 group-hover:rotate-45 ${resolvedTheme === 'dark' ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'}`}
+                className={`absolute inset-0 w-4 h-4 sm:w-5 sm:h-5 text-mq-warning transition-all duration-500 group-hover:rotate-45 ${resolvedTheme === "dark" ? "opacity-0 rotate-90 scale-0" : "opacity-100 rotate-0 scale-100"}`}
               />
               <Moon
-                className={`absolute inset-0 w-4 h-4 sm:w-5 sm:h-5 text-mq-info transition-all duration-500 group-hover:-rotate-12 ${resolvedTheme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'}`}
+                className={`absolute inset-0 w-4 h-4 sm:w-5 sm:h-5 text-mq-info transition-all duration-500 group-hover:-rotate-12 ${resolvedTheme === "dark" ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-0"}`}
                 style={
-                  resolvedTheme === 'dark'
-                    ? { transform: 'translate(0.5px, 0.5px) scale(1) rotate(0deg)' }
-                    : { transform: 'translate(0.5px, 0.5px) scale(0) rotate(-90deg)' }
+                  resolvedTheme === "dark"
+                    ? {
+                        transform:
+                          "translate(0.5px, 0.5px) scale(1) rotate(0deg)",
+                      }
+                    : {
+                        transform:
+                          "translate(0.5px, 0.5px) scale(0) rotate(-90deg)",
+                      }
                 }
               />
             </div>
@@ -508,7 +555,7 @@ const Header = memo(() => {
             <DropdownMenuTrigger asChild>
               <button
                 className="group flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background min-h-10 sm:min-h-11 hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-95"
-                aria-label={t('openProfileMenu')}
+                aria-label={t("openProfileMenu")}
               >
                 <div
                   className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-110 group-active:scale-95 shadow-sm group-hover:shadow-md shrink-0"
@@ -519,8 +566,8 @@ const Header = memo(() => {
                       src={currentProfile.avatar}
                       alt={
                         currentProfile.name
-                          ? t('userAvatar', { name: currentProfile.name })
-                          : t('profileAvatar')
+                          ? t("userAvatar", { name: currentProfile.name })
+                          : t("profileAvatar")
                       }
                       width={32}
                       height={32}
@@ -538,9 +585,9 @@ const Header = memo(() => {
                 </div>
                 <div
                   className="text-xs sm:text-sm font-medium text-mq-content-secondary hidden md:inline max-w-[80px] lg:max-w-[120px] truncate"
-                  title={displayName || t('guest')}
+                  title={displayName || t("guest")}
                 >
-                  {displayName || t('guest')}
+                  {displayName || t("guest")}
                 </div>
               </button>
             </DropdownMenuTrigger>
@@ -550,9 +597,12 @@ const Header = memo(() => {
               className="w-48 max-w-[calc(100vw-2rem)] bg-mq-card-background rounded-mq-lg border-mq-border shadow-mq-lg"
             >
               <DropdownMenuItem asChild>
-                <Link href="/manage-profiles" className="flex items-center gap-2 text-mq-content">
+                <Link
+                  href="/manage-profiles"
+                  className="flex items-center gap-2 text-mq-content"
+                >
                   <User className="w-4 h-4" />
-                  {t('manageProfiles')}
+                  {t("manageProfiles")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -560,17 +610,20 @@ const Header = memo(() => {
                   try {
                     await resetAllStores();
                     await clearAllClientStorage();
-                    await apiRequest('/api/auth/signout', { method: 'POST', noRetry: true });
+                    await apiRequest("/api/auth/signout", {
+                      method: "POST",
+                      noRetry: true,
+                    });
                     setUser(null);
-                    router.push('/login');
+                    router.push("/login");
                   } catch {
-                    router.push('/login');
+                    router.push("/login");
                   }
                 }}
                 className="flex items-center gap-2 text-mq-content hover:text-mq-content cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
-                {t('signOut')}
+                {t("signOut")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -580,6 +633,6 @@ const Header = memo(() => {
   );
 });
 
-Header.displayName = 'Header';
+Header.displayName = "Header";
 
 export default Header;

@@ -6,42 +6,41 @@
  * This module is for logging client-side actions that don't trigger DB operations.
  */
 
-import { createServerClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
-
+import { createServerClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
 export type AuditAction =
-  | 'CREATE'
-  | 'READ'
-  | 'UPDATE'
-  | 'DELETE'
-  | 'LOGIN'
-  | 'LOGOUT'
-  | 'PASSWORD_CHANGE'
-  | 'PASSWORD_RESET'
-  | 'EMAIL_CHANGE'
-  | 'MFA_ENABLE'
-  | 'MFA_DISABLE'
-  | 'MFA_BACKUP_CODE_GENERATED'
-  | 'MFA_BACKUP_CODE_USED'
-  | 'MFA_BACKUP_CODE_DELETED'
-  | 'API_KEY_CREATE'
-  | 'API_KEY_REVOKE'
-  | 'SETTINGS_CHANGE'
-  | 'EXPORT'
-  | 'IMPORT'
-  | 'SESSION_TERMINATED'
-  | 'SECURITY_EVENT'
-  | 'RATE_LIMIT_EXCEEDED'
-  | 'IP_ANOMALY_DETECTED'
-  | 'DEVICE_FINGERPRINT_CHANGED'
-  | 'SUSPICIOUS_ACTIVITY';
+  | "CREATE"
+  | "READ"
+  | "UPDATE"
+  | "DELETE"
+  | "LOGIN"
+  | "LOGOUT"
+  | "PASSWORD_CHANGE"
+  | "PASSWORD_RESET"
+  | "EMAIL_CHANGE"
+  | "MFA_ENABLE"
+  | "MFA_DISABLE"
+  | "MFA_BACKUP_CODE_GENERATED"
+  | "MFA_BACKUP_CODE_USED"
+  | "MFA_BACKUP_CODE_DELETED"
+  | "API_KEY_CREATE"
+  | "API_KEY_REVOKE"
+  | "SETTINGS_CHANGE"
+  | "EXPORT"
+  | "IMPORT"
+  | "SESSION_TERMINATED"
+  | "SECURITY_EVENT"
+  | "RATE_LIMIT_EXCEEDED"
+  | "IP_ANOMALY_DETECTED"
+  | "DEVICE_FINGERPRINT_CHANGED"
+  | "SUSPICIOUS_ACTIVITY";
 
-export type AuditSeverity = 'info' | 'warning' | 'critical';
+export type AuditSeverity = "info" | "warning" | "critical";
 
 export interface AuditLogEntry {
   action: AuditAction;
@@ -68,10 +67,10 @@ export interface AuditLogEntry {
  */
 export async function logAudit(entry: AuditLogEntry): Promise<string | null> {
   try {
-    const response = await fetch('/api/audit/log', {
-      method: 'POST',
+    const response = await fetch("/api/audit/log", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         action: entry.action,
@@ -79,24 +78,25 @@ export async function logAudit(entry: AuditLogEntry): Promise<string | null> {
         recordId: entry.recordId,
         oldData: entry.oldData,
         newData: entry.newData,
-        severity: entry.severity || 'info',
+        severity: entry.severity || "info",
         metadata: {
           ...entry.metadata,
-          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+          userAgent:
+            typeof navigator !== "undefined" ? navigator.userAgent : undefined,
           timestamp: new Date().toISOString(),
         },
       }),
     });
 
     if (!response.ok) {
-      logger.error('Failed to log audit event:', await response.text());
+      logger.error("Failed to log audit event:", await response.text());
       return null;
     }
 
     const data = await response.json();
     return data.logId || null;
   } catch (error) {
-    logger.error('Audit logging error:', error);
+    logger.error("Audit logging error:", error);
     return null;
   }
 }
@@ -105,15 +105,15 @@ export async function logAudit(entry: AuditLogEntry): Promise<string | null> {
  * Log authentication events
  */
 export async function logAuthEvent(
-  action: 'LOGIN' | 'LOGOUT' | 'PASSWORD_CHANGE' | 'MFA_ENABLE' | 'MFA_DISABLE',
-  metadata?: Record<string, unknown>
+  action: "LOGIN" | "LOGOUT" | "PASSWORD_CHANGE" | "MFA_ENABLE" | "MFA_DISABLE",
+  metadata?: Record<string, unknown>,
 ): Promise<void> {
   await logAudit({
     action,
-    severity: action === 'LOGIN' || action === 'LOGOUT' ? 'info' : 'warning',
+    severity: action === "LOGIN" || action === "LOGOUT" ? "info" : "warning",
     metadata: {
       ...metadata,
-      category: 'auth',
+      category: "auth",
     },
   });
 }
@@ -124,16 +124,16 @@ export async function logAuthEvent(
 export async function logExportEvent(
   dataType: string,
   recordCount: number,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): Promise<void> {
   await logAudit({
-    action: 'EXPORT',
-    severity: 'info',
+    action: "EXPORT",
+    severity: "info",
     metadata: {
       ...metadata,
       dataType,
       recordCount,
-      category: 'data',
+      category: "data",
     },
   });
 }
@@ -145,15 +145,15 @@ export async function logSettingsChange(
   settingName: string,
   oldValue: unknown,
   newValue: unknown,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): Promise<void> {
   await logAudit({
-    action: 'SETTINGS_CHANGE',
-    severity: 'info',
+    action: "SETTINGS_CHANGE",
+    severity: "info",
     metadata: {
       ...metadata,
       settingName,
-      category: 'settings',
+      category: "settings",
     },
     oldData: { value: sanitizeForAudit(oldValue) },
     newData: { value: sanitizeForAudit(newValue) },
@@ -176,7 +176,7 @@ function sanitizeForAudit(data: unknown): unknown {
     return data;
   }
 
-  if (typeof data !== 'object') {
+  if (typeof data !== "object") {
     return data;
   }
 
@@ -185,26 +185,26 @@ function sanitizeForAudit(data: unknown): unknown {
   }
 
   const sensitiveFields = [
-    'password',
-    'token',
-    'secret',
-    'apiKey',
-    'api_key',
-    'creditCard',
-    'credit_card',
-    'ssn',
-    'sin',
-    'passport',
+    "password",
+    "token",
+    "secret",
+    "apiKey",
+    "api_key",
+    "creditCard",
+    "credit_card",
+    "ssn",
+    "sin",
+    "passport",
   ];
 
   const sanitized: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(data)) {
     const lowerKey = key.toLowerCase();
-    
+
     if (sensitiveFields.some((field) => lowerKey.includes(field))) {
-      sanitized[key] = '[REDACTED]';
-    } else if (typeof value === 'object' && value !== null) {
+      sanitized[key] = "[REDACTED]";
+    } else if (typeof value === "object" && value !== null) {
       sanitized[key] = sanitizeForAudit(value);
     } else {
       sanitized[key] = value;
@@ -227,29 +227,29 @@ function sanitizeForAudit(data: unknown): unknown {
  */
 export async function logAuditServer(
   userId: string,
-  entry: AuditLogEntry
+  entry: AuditLogEntry,
 ): Promise<string | null> {
   try {
     const supabase = await createServerClient();
-    
-    const { data, error } = await supabase.rpc('log_audit', {
+
+    const { data, error } = await supabase.rpc("log_audit", {
       p_action: entry.action,
       p_table_name: entry.tableName,
       p_record_id: entry.recordId,
       p_old_data: entry.oldData ? JSON.stringify(entry.oldData) : null,
       p_new_data: entry.newData ? JSON.stringify(entry.newData) : null,
-      p_severity: entry.severity || 'info',
-      p_metadata: entry.metadata ? JSON.stringify(entry.metadata) : '{}',
+      p_severity: entry.severity || "info",
+      p_metadata: entry.metadata ? JSON.stringify(entry.metadata) : "{}",
     });
 
     if (error) {
-      logger.error('Server audit logging error:', error);
+      logger.error("Server audit logging error:", error);
       return null;
     }
 
     return data;
   } catch (error) {
-    logger.error('Server audit logging exception:', error);
+    logger.error("Server audit logging exception:", error);
     return null;
   }
 }
@@ -264,35 +264,38 @@ export async function logAuditServer(
  * @param options - Query options
  * @returns Array of audit log entries
  */
-export async function fetchAuditLogs(options: {
-  limit?: number;
-  offset?: number;
-  action?: AuditAction;
-  severity?: AuditSeverity;
-  startDate?: Date;
-  endDate?: Date;
-} = {}): Promise<unknown[]> {
+export async function fetchAuditLogs(
+  options: {
+    limit?: number;
+    offset?: number;
+    action?: AuditAction;
+    severity?: AuditSeverity;
+    startDate?: Date;
+    endDate?: Date;
+  } = {},
+): Promise<unknown[]> {
   try {
     const params = new URLSearchParams();
-    
-    if (options.limit) params.set('limit', options.limit.toString());
-    if (options.offset) params.set('offset', options.offset.toString());
-    if (options.action) params.set('action', options.action);
-    if (options.severity) params.set('severity', options.severity);
-    if (options.startDate) params.set('startDate', options.startDate.toISOString());
-    if (options.endDate) params.set('endDate', options.endDate.toISOString());
+
+    if (options.limit) params.set("limit", options.limit.toString());
+    if (options.offset) params.set("offset", options.offset.toString());
+    if (options.action) params.set("action", options.action);
+    if (options.severity) params.set("severity", options.severity);
+    if (options.startDate)
+      params.set("startDate", options.startDate.toISOString());
+    if (options.endDate) params.set("endDate", options.endDate.toISOString());
 
     const response = await fetch(`/api/audit/logs?${params.toString()}`);
 
     if (!response.ok) {
-      logger.error('Failed to fetch audit logs:', await response.text());
+      logger.error("Failed to fetch audit logs:", await response.text());
       return [];
     }
 
     const data = await response.json();
     return data.logs || [];
   } catch (error) {
-    logger.error('Fetch audit logs error:', error);
+    logger.error("Fetch audit logs error:", error);
     return [];
   }
 }
@@ -303,6 +306,6 @@ export async function fetchAuditLogs(options: {
 export async function fetchSecurityEvents(limit = 10): Promise<unknown[]> {
   return fetchAuditLogs({
     limit,
-    severity: 'warning',
+    severity: "warning",
   });
 }

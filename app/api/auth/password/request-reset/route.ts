@@ -1,16 +1,16 @@
-import { NextRequest } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { NextRequest } from "next/server";
+import { createServerClient } from "@/lib/supabase/server";
 import {
   jsonSuccess,
   jsonError,
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
-} from '@/app/api/_lib/response';
-import { getClientIP } from '@/lib/security/ip';
-import { logger } from '@/lib/logger';
-import { z } from 'zod';
-import { passwordResetRequestLimiter } from '@/lib/security/passwordReset';
+} from "@/app/api/_lib/response";
+import { getClientIP } from "@/lib/security/ip";
+import { logger } from "@/lib/logger";
+import { z } from "zod";
+import { passwordResetRequestLimiter } from "@/lib/security/passwordReset";
 
 const requestSchema = z.object({
   email: z
@@ -22,7 +22,8 @@ const requestSchema = z.object({
 // SECURITY: Anti-enumeration. Always return the same success response.
 const GENERIC_SUCCESS = {
   sent: true,
-  message: 'If an account exists for this email, you will receive a reset link shortly.',
+  message:
+    "If an account exists for this email, you will receive a reset link shortly.",
 };
 
 /**
@@ -33,22 +34,31 @@ const GENERIC_SUCCESS = {
  */
 export async function POST(request: NextRequest) {
   const clientIP = getClientIP(request);
-  const { allowed, remaining, resetIn } = await passwordResetRequestLimiter(clientIP);
+  const { allowed, remaining, resetIn } =
+    await passwordResetRequestLimiter(clientIP);
 
   if (!allowed) {
-    return jsonError('Too many requests. Please try again later.', 429, ERROR_CODES.RATE_LIMITED, {
-      retryAfter: resetIn,
-      remaining,
-    });
+    return jsonError(
+      "Too many requests. Please try again later.",
+      429,
+      ERROR_CODES.RATE_LIMITED,
+      {
+        retryAfter: resetIn,
+        remaining,
+      },
+    );
   }
 
   try {
-    const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: parseError } = await parseJsonBody(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (parseError) return parseError;
 
     const parsed = requestSchema.safeParse(body);
     if (!parsed.success) {
-      return jsonError('Invalid request', 400, ERROR_CODES.VALIDATION_ERROR);
+      return jsonError("Invalid request", 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     const { email } = parsed.data;
@@ -56,7 +66,7 @@ export async function POST(request: NextRequest) {
     // Use Supabase's native resetPasswordForEmail
     // This sends email via the SMTP configured in Supabase dashboard
     const supabase = await createServerClient();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     // Use a DEDICATED recovery callback path so the server knows this is a
     // password reset without relying on query params (GoTrue strips them).
@@ -68,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       // Log error but return generic success for anti-enumeration
-      logger.warn('Password reset request error', {
+      logger.warn("Password reset request error", {
         message: error.message,
         email_hint: `${email.substring(0, 3)}***`,
       });
@@ -76,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     return jsonSuccess(GENERIC_SUCCESS);
   } catch (error) {
-    logger.error('Password reset request error', error);
+    logger.error("Password reset request error", error);
     return jsonSuccess(GENERIC_SUCCESS);
   }
 }

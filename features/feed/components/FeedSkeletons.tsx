@@ -1,63 +1,65 @@
-'use client';
+"use client";
 
-import { memo } from 'react';
-import { cn } from '@/lib/utils';
+import { memo } from "react";
+import { cn } from "@/lib/utils";
 
 interface EventCardSkeletonProps {
   className?: string;
 }
 
-export const EventCardSkeleton = memo(({ className }: EventCardSkeletonProps) => {
-  return (
-    <div
-      className={cn(
-        'flex flex-col h-full bg-mq-card-background rounded-2xl border border-mq-border overflow-hidden',
-        className,
-      )}
-    >
-      {/* Category Strip */}
-      <div className="h-1.5 bg-mq-background-secondary animate-pulse" />
+export const EventCardSkeleton = memo(
+  ({ className }: EventCardSkeletonProps) => {
+    return (
+      <div
+        className={cn(
+          "flex flex-col h-full bg-mq-card-background rounded-2xl border border-mq-border overflow-hidden",
+          className,
+        )}
+      >
+        {/* Category Strip */}
+        <div className="h-1.5 bg-mq-background-secondary animate-pulse" />
 
-      {/* Content */}
-      <div className="p-5 flex-1 flex flex-col">
-        {/* Category Badge */}
-        <div className="h-6 w-20 bg-mq-background-secondary rounded-lg animate-pulse mb-3" />
+        {/* Content */}
+        <div className="p-5 flex-1 flex flex-col">
+          {/* Category Badge */}
+          <div className="h-6 w-20 bg-mq-background-secondary rounded-lg animate-pulse mb-3" />
 
-        {/* Title */}
-        <div className="h-6 w-3/4 bg-mq-background-secondary rounded-lg animate-pulse mb-2" />
+          {/* Title */}
+          <div className="h-6 w-3/4 bg-mq-background-secondary rounded-lg animate-pulse mb-2" />
 
-        {/* Description */}
-        <div className="space-y-2 mb-4 flex-1">
-          <div className="h-4 bg-mq-background-secondary rounded animate-pulse" />
-          <div className="h-4 w-2/3 bg-mq-background-secondary rounded animate-pulse" />
+          {/* Description */}
+          <div className="space-y-2 mb-4 flex-1">
+            <div className="h-4 bg-mq-background-secondary rounded animate-pulse" />
+            <div className="h-4 w-2/3 bg-mq-background-secondary rounded animate-pulse" />
+          </div>
+
+          {/* Metadata */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 bg-mq-background-secondary rounded animate-pulse" />
+              <div className="h-4 w-24 bg-mq-background-secondary rounded animate-pulse" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 bg-mq-background-secondary rounded animate-pulse" />
+              <div className="h-4 w-20 bg-mq-background-secondary rounded animate-pulse" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 bg-mq-background-secondary rounded animate-pulse" />
+              <div className="h-4 w-32 bg-mq-background-secondary rounded animate-pulse" />
+            </div>
+          </div>
         </div>
 
-        {/* Metadata */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="h-4 w-4 bg-mq-background-secondary rounded animate-pulse" />
-            <div className="h-4 w-24 bg-mq-background-secondary rounded animate-pulse" />
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="h-4 w-4 bg-mq-background-secondary rounded animate-pulse" />
-            <div className="h-4 w-20 bg-mq-background-secondary rounded animate-pulse" />
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="h-4 w-4 bg-mq-background-secondary rounded animate-pulse" />
-            <div className="h-4 w-32 bg-mq-background-secondary rounded animate-pulse" />
-          </div>
+        {/* Actions */}
+        <div className="p-4 border-t border-mq-border bg-mq-background-secondary/30">
+          <div className="h-9 bg-mq-background-secondary rounded-lg animate-pulse" />
         </div>
       </div>
+    );
+  },
+);
 
-      {/* Actions */}
-      <div className="p-4 border-t border-mq-border bg-mq-background-secondary/30">
-        <div className="h-9 bg-mq-background-secondary rounded-lg animate-pulse" />
-      </div>
-    </div>
-  );
-});
-
-EventCardSkeleton.displayName = 'EventCardSkeleton';
+EventCardSkeleton.displayName = "EventCardSkeleton";
 
 export const FeaturedBannerSkeleton = memo(() => {
   return (
@@ -99,7 +101,7 @@ export const FeaturedBannerSkeleton = memo(() => {
   );
 });
 
-FeaturedBannerSkeleton.displayName = 'FeaturedBannerSkeleton';
+FeaturedBannerSkeleton.displayName = "FeaturedBannerSkeleton";
 
 export const FeedSkeletons = memo(() => {
   return (
@@ -114,4 +116,4 @@ export const FeedSkeletons = memo(() => {
   );
 });
 
-FeedSkeletons.displayName = 'FeedSkeletons';
+FeedSkeletons.displayName = "FeedSkeletons";
