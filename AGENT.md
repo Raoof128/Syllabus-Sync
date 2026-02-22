@@ -1,4 +1,12 @@
 Raouf: 2026-02-22 (Australia/Sydney)
+Scope: Map Navigation Realtime Throttler
+Summary: Resolved API thrashing in `useMapLocation.ts` and `useMapNavigation.ts` by throttling the `setOrigin` hook update to 20m thresholds and preventing `updateRoute` fetching during active navigation.
+Files Changed:
+- /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapLocation.ts
+- /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapNavigation.ts
+Verification: Map tests passing cleanly, zero lint errors, no UI freezing on coordinates.
+
+Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Map Navigation Integration
 Summary: Enabled Realtime Location tracking explicitly inside `GoogleMapEmbed.tsx`. Set up a distance thresholder using `navigator.geolocation.watchPosition` to feed raw coordinates, preventing the iframe from flickering too often, increasing navigation accuracy.
 Files Changed:

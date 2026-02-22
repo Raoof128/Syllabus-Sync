@@ -1,3 +1,16 @@
+### Raouf: CampusMap Realtime Stability Fix — 2026-02-22
+**Scope:** Map Navigation Enhancement
+**Type:** Bugfix / Refactor
+
+#### Changes
+1. **Campus Map Location Throttler:**
+   - Modified `useMapLocation.ts` to implement a rigid distance threshold for setting React `origin` state. Previously, the Kalman-smoothed GPS coordinates spawned a new object reference every ~1000ms (`watchPosition` tick), which forced its parent (`useMapNavigation.ts`) to fetch identical routes from the ORS API constantly.
+   - Fixed by applying a spatial bound: `dx*dx + dy*dy > 0.00000004` (approx. 20m movement) ensuring the OpenRouteService API is only legitimately queried when the user physically progresses far enough to warrant a new map path.
+   - Refined `useMapNavigation.ts` so `updateRoute()` immediately breaks if `isNavigatingRef.current` is true, delegating all subsequent routing entirely securely to `realtimeNavigation` recalculations instead of blind re-fetches.
+
+#### Verification
+- `npm run lint` and `npm run test -- tests/map/` passed successfully. Real-time testing confirms map stabilization and fixes API thrashing.
+
 ### Raouf: GoogleMapEmbed Realtime Location — 2026-02-22
 **Scope:** Map Navigation Feature Enhancement
 **Type:** Refactor

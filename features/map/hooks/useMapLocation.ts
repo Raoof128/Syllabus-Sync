@@ -246,7 +246,14 @@ export function useMapLocation({
         }
 
         setLocationStatus('found');
-        setOrigin({ lat: gpsLat, lng: gpsLng });
+        setOrigin((prev) => {
+          if (!prev) return { lat: gpsLat, lng: gpsLng };
+          const dx = prev.lat - gpsLat;
+          const dy = prev.lng - gpsLng;
+          // Throttle origin updates (used for route fetching) to ~20-25m threshold
+          if (dx * dx + dy * dy > 0.00000004) return { lat: gpsLat, lng: gpsLng };
+          return prev;
+        });
 
         // Campus Bounds Check
         const { south, north, west, east } = GPS_CAMPUS_BOUNDS;

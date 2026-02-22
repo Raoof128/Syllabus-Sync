@@ -50,7 +50,7 @@ export function useMapNavigation({
   const isNavigatingRef = useRef(isNavigating);
   const selectedBuildingRef = useRef(selectedBuilding);
   const originRef = useRef(origin);
-  const stopNavigationRef = useRef<() => void>(() => {});
+  const stopNavigationRef = useRef<() => void>(() => { });
   const rerouteCountRef = useRef(0);
   const MAX_REROUTES = 3;
 
@@ -208,6 +208,7 @@ export function useMapNavigation({
     const controller = new AbortController();
 
     async function updateRoute() {
+      if (isNavigatingRef.current) return;
       if (!selectedBuilding || !origin) {
         setPreview(null);
         setRouteCoords([]);
