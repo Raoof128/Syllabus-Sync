@@ -115,7 +115,7 @@ export default function CampusMapHUD({
         <div
           className={cn(
             'absolute left-3 pointer-events-auto sm:hidden',
-            isGoogleMode ? 'top-14' : 'top-3',
+            isGoogleMode ? 'top-20' : 'top-3',
           )}
         >
           <Button
@@ -137,7 +137,7 @@ export default function CampusMapHUD({
 
       {/* Top-right actions - Floating Toolbar */}
       <div
-        className={cn('absolute right-3 pointer-events-auto', isGoogleMode ? 'top-14' : 'top-3')}
+        className={cn('absolute right-3 pointer-events-auto', isGoogleMode ? 'top-20' : 'top-3')}
       >
         <LayeredCard interactive={false} className="flex items-center gap-1 p-1.5 rounded-full">
           <Button
@@ -169,7 +169,7 @@ export default function CampusMapHUD({
       <div
         className={cn(
           'absolute left-3 w-[min(240px,calc(100vw-24px))] sm:w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[40svh] sm:max-h-[500px]',
-          isGoogleMode ? 'top-14' : 'top-3',
+          isGoogleMode ? 'top-20' : 'top-3',
           !isPlacesPanelExpanded && 'hidden sm:flex',
         )}
       >

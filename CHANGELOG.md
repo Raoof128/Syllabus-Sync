@@ -1,3 +1,25 @@
+### Raouf: Map Navigation Enhancements & UI Redesign — 2026-02-22
+
+**Scope:** Map UI Layout / Feature Enhancements
+**Type:** Refactor & Polish
+
+#### Changes
+
+1. **Map Size & Card De-Scoping:**
+   - Modified `features/map/components/MapClient.tsx` actively withdrawing the decorative `MagicCard` constraints around the actual visual map block logic. Expanded boundaries dramatically by discarding rigid padding profiles, effectively elevating the native viewport interaction footprint (`min-h-[400px]`, tracking closer against `svh` properties fully bleeding edge-to-edge with the screen without strict internal borders constraining visibility).
+
+2. **Google Maps UI Collision Fix:**
+   - Evaluated `features/map/components/CampusMapHUD.tsx` addressing spatial conflicts against Google native rendering menus (Satellite/3D modes). Increased `top-14` mapping behaviors directly to `top-20` for nested UI hooks.
+
+3. **Native Sidebar Scrollability Optimization:**
+   - Targeted `components/layout/Sidebar.tsx` effectively erasing the `custom-scrollbar` abstractions previously overriding OS-native device feedback mechanics. Releasing touch interfaces directly down to reliable hardware layout definitions handling `overflow-y-auto` ensures 100% interactive scroll thresholds.
+
+#### Verification
+- `npm run check` test suite evaluation finalized cleanly 0 lint and 482 passing test scripts locally executed prior to final distribution deployment processing.
+- Build deployment shipped safely via `npm run vercel:deploy:prod` alias linking precisely bound assets instantly to edge cache configurations.
+
+---
+
 ### Raouf: Calendar UI Refinement & Cleanup — 2026-02-22
 
 **Scope:** Calendar UI Refinement & Cleanup

@@ -515,102 +515,94 @@ export default function MapClient() {
         )}
 
         {/* Combined Map Wrapper */}
-        <MagicCard isLiquidEnhanced className="mb-6">
-          <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-            <Card className="border border-mq-border bg-mq-card-background">
-              <CardHeader>
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                  <div className="w-full sm:w-auto">
-                    <MapViewToggle activeView={mapView} onViewChange={handleMapViewChange} />
-                  </div>
-                  <p className="text-xs text-mq-content-tertiary hidden md:block">
-                    {t('mapPanZoomHint')}
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div
-                  ref={mapContainerRef}
-                  className="relative h-[50svh] min-h-[340px] sm:h-[60svh] md:h-[clamp(420px,55vh,600px)] lg:h-[clamp(500px,60vh,720px)] landscape:h-[60svh] landscape:min-h-[280px] rounded-mq-lg overflow-hidden border border-mq-border bg-mq-background-secondary"
-                >
-                  {mapView === 'campus' ? (
-                    <>
-                      {/* Real Map (with smooth fade-in when ready) */}
-                      <div
-                        className={`absolute inset-0 transition-opacity duration-500 ${isMapReady ? 'opacity-100' : 'opacity-0'}`}
-                      >
-                        <TranslatedMapErrorBoundary>
-                          <Suspense fallback={null}>
-                            <CampusMap
-                              ref={campusMapRef}
-                              selectedBuilding={selectedBuilding}
-                              activeOverlays={activeOverlays}
-                              onLocationStatusChange={setLocationStatus}
-                              onNavStateChange={setNavState}
-                              onMapReady={() => setIsMapReady(true)}
-                            />
-                          </Suspense>
-                        </TranslatedMapErrorBoundary>
-                      </div>
-
-                      {/* Skeleton Overlay (fades out when map is ready) */}
-                      <AnimatePresence>
-                        {!isMapReady && (
-                          <m.div
-                            initial={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className="absolute inset-0 z-10"
-                          >
-                            <MapLoadingSkeleton />
-                          </m.div>
-                        )}
-                      </AnimatePresence>
-
-                      {mapLoadTimedOut && (
-                        <div className="absolute bottom-3 left-3 right-3 z-20 text-center">
-                          <p className="text-xs text-mq-content-tertiary bg-mq-card-background/80 rounded-mq px-3 py-1.5 inline-block">
-                            {t('mapLoadSlow')}
-                          </p>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="absolute inset-0 z-[50]">
-                      <GoogleMapEmbed
-                        ref={googleMapRef}
-                        selectedBuilding={selectedBuilding}
-                        destinationLabel={
-                          selectedBuilding
-                            ? t(selectedBuilding.translationKey)
-                            : UNIVERSITY_CONFIG.name
-                        }
-                        onNavStateChange={setNavState}
-                      />
-                    </div>
-                  )}
-
-                  {/* HUD overlays - loaded immediately, sits on top */}
-                  <CampusMapHUD
-                    selectedBuilding={selectedBuilding}
-                    buildings={sidebarBuildings}
-                    buildingSearch={buildingSearch}
-                    setBuildingSearch={setBuildingSearch}
-                    onCopyShare={copyShareableURL}
-                    onExport={mapView === 'campus' ? handleExport : undefined}
-                    onStartNavigation={
-                      mapView === 'campus'
-                        ? () => campusMapRef.current?.startNavigation()
-                        : () => googleMapRef.current?.startNavigation()
-                    }
-                    isNavigating={navState?.isNavigating || false}
-                    isGoogleMode={mapView === 'google'}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+        {/* Combined Map Wrapper */}
+        <div className="mb-6 w-full max-w-none">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-3 px-1">
+            <div className="w-full sm:w-auto">
+              <MapViewToggle activeView={mapView} onViewChange={handleMapViewChange} />
+            </div>
+            <p className="text-xs text-mq-content-tertiary hidden md:block">
+              {t('mapPanZoomHint')}
+            </p>
           </div>
-        </MagicCard>
+
+          <div
+            ref={mapContainerRef}
+            className="relative h-[65svh] min-h-[400px] sm:h-[75svh] md:h-[clamp(500px,70vh,800px)] lg:h-[clamp(600px,80vh,900px)] landscape:h-[75svh] landscape:min-h-[350px] w-full bg-mq-background-secondary overflow-hidden"
+          >
+            {mapView === 'campus' ? (
+              <>
+                {/* Real Map (with smooth fade-in when ready) */}
+                <div
+                  className={`absolute inset-0 transition-opacity duration-500 ${isMapReady ? 'opacity-100' : 'opacity-0'}`}
+                >
+                  <TranslatedMapErrorBoundary>
+                    <Suspense fallback={null}>
+                      <CampusMap
+                        ref={campusMapRef}
+                        selectedBuilding={selectedBuilding}
+                        activeOverlays={activeOverlays}
+                        onLocationStatusChange={setLocationStatus}
+                        onNavStateChange={setNavState}
+                        onMapReady={() => setIsMapReady(true)}
+                      />
+                    </Suspense>
+                  </TranslatedMapErrorBoundary>
+                </div>
+
+                {/* Skeleton Overlay (fades out when map is ready) */}
+                <AnimatePresence>
+                  {!isMapReady && (
+                    <m.div
+                      initial={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute inset-0 z-10"
+                    >
+                      <MapLoadingSkeleton />
+                    </m.div>
+                  )}
+                </AnimatePresence>
+
+                {mapLoadTimedOut && (
+                  <div className="absolute bottom-3 left-3 right-3 z-20 text-center">
+                    <p className="text-xs text-mq-content-tertiary bg-mq-card-background/80 rounded-mq px-3 py-1.5 inline-block">
+                      {t('mapLoadSlow')}
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="absolute inset-0 z-[50]">
+                <GoogleMapEmbed
+                  ref={googleMapRef}
+                  selectedBuilding={selectedBuilding}
+                  destinationLabel={
+                    selectedBuilding ? t(selectedBuilding.translationKey) : UNIVERSITY_CONFIG.name
+                  }
+                  onNavStateChange={setNavState}
+                />
+              </div>
+            )}
+
+            {/* HUD overlays - loaded immediately, sits on top */}
+            <CampusMapHUD
+              selectedBuilding={selectedBuilding}
+              buildings={sidebarBuildings}
+              buildingSearch={buildingSearch}
+              setBuildingSearch={setBuildingSearch}
+              onCopyShare={copyShareableURL}
+              onExport={mapView === 'campus' ? handleExport : undefined}
+              onStartNavigation={
+                mapView === 'campus'
+                  ? () => campusMapRef.current?.startNavigation()
+                  : () => googleMapRef.current?.startNavigation()
+              }
+              isNavigating={navState?.isNavigating || false}
+              isGoogleMode={mapView === 'google'}
+            />
+          </div>
+        </div>
       </section>
     </LazyMotion>
   );

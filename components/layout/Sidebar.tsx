@@ -252,7 +252,7 @@ const Sidebar = memo(() => {
         aria-modal={mobileMenuOpen ? 'true' : undefined}
         aria-label={t('mainNavigation')}
         className={cn(
-          'md:hidden fixed left-0 top-0 w-64 h-screen p-4 pt-20 flex flex-col bg-mq-background border-r border-mq-border transition-transform duration-300 ease-out overflow-y-auto custom-scrollbar',
+          'md:hidden fixed left-0 top-0 w-64 h-screen p-4 pt-20 flex flex-col bg-mq-background border-r border-mq-border transition-transform duration-300 ease-out overflow-y-auto',
           mobileMenuOpen ? 'z-[58] translate-x-0' : 'z-40 -translate-x-full',
         )}
       >
@@ -391,7 +391,7 @@ const Sidebar = memo(() => {
           id="desktop-sidebar"
           role="navigation"
           aria-label={t('mainNavigation')}
-          className="fixed md:relative w-56 h-screen p-4 md:pl-12 flex flex-col sidebar-panel bg-mq-background border-r border-mq-border z-40 overflow-y-auto custom-scrollbar"
+          className="fixed md:relative w-56 h-screen p-4 md:pl-12 flex flex-col sidebar-panel bg-mq-background border-r border-mq-border z-40 overflow-y-auto"
         >
           {/* Logo - bounces in with slight overshoot */}
           <div className="mb-4 sidebar-logo">

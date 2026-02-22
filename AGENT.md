@@ -1,10 +1,21 @@
 Raouf: 2026-02-22 (Australia/Sydney)
-Scope: Calendar UI Refinement & Cleanup
-Summary: Removed the 'Quick Access' mobile section header from the CalendarWidgets component to streamline the responsive view. Cleaned up associated unused variables to pass strict linting rules. 
+Scope: Map Navigation Enhancements & UI Redesign
+Summary: Upgraded the Map navigation to a fully responsive, borderless, and full-bleed layout. Eliminated redundant `MagicCard` constraints in `MapClient.tsx`. Down-shifted the floating Places widget during Google Maps embedded routing mode to prevent spatial collision with top UI controls. Eliminated `custom-scrollbar` abstractions from `Sidebar.tsx` effectively dropping users back to robust native scroll rails for reliable navigation on touch devices.
 Files Changed:
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/calendar/components/CalendarWidgets.tsx`
-Verification: Full `npm run check` pipeline passes cleanly natively with 0 linting errors or compilation failures. Successfully redeployed to Vercel via `npm run vercel:deploy:prod` alias.
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/MapClient.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/CampusMapHUD.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/components/layout/Sidebar.tsx`
+Verification: Full `npm run check` pipeline passes cleanly natively with 0 linting errors or compilation failures. Deployed straight into production flawlessly via Vercel CLI.
 Follow-ups: None.
+
+Raouf: 2026-02-22 (Australia/Sydney)
+Scope: Calendar UI Refinement & Cleanup
+Summary: Removed the 'Quick Access' mobile section header from the CalendarWidgets component to streamline the responsive view. Cleaned up associated unused variables to pass strict linting rules.
+Files Changed:
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/calendar/components/CalendarWidgets.tsx`
+  Verification: Full `npm run check` pipeline passes cleanly natively with 0 linting errors or compilation failures. Successfully redeployed to Vercel via `npm run vercel:deploy:prod` alias.
+  Follow-ups: None.
 
 Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Responsive Map UX Fixes & Polish
