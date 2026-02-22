@@ -1,3 +1,22 @@
+### Raouf: Calendar UI Refinement & Cleanup — 2026-02-22
+
+**Scope:** Calendar UI Refinement & Cleanup
+**Type:** Refactor / UI Cleanup
+
+#### Changes
+
+1. **Removed 'Quick Access' Header**
+   - Modified `features/calendar/components/CalendarWidgets.tsx` to delete the mobile viewport section header "Quick Access" and its dynamic item count indicators representing the length of loaded units, events, deadlines and quizzes.
+   - Cleaned up obsolete localized store assignments linking these data variables.
+
+#### Verification
+
+- Evaluated formatting, typings, and lint boundaries via `npm run check`.
+- Rebuilt app and executed unit test suite passing perfectly cleanly without broken refs.
+- Verified live deployment logs output complete successfully using `npm run vercel:deploy:prod`.
+
+---
+
 ### Raouf: Responsive Map UX Fixes & Polish — 2026-02-22
 
 **Scope:** Responsive Map UX Fixes & Polish

@@ -1,4 +1,12 @@
 Raouf: 2026-02-22 (Australia/Sydney)
+Scope: Calendar UI Refinement & Cleanup
+Summary: Removed the 'Quick Access' mobile section header from the CalendarWidgets component to streamline the responsive view. Cleaned up associated unused variables to pass strict linting rules. 
+Files Changed:
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/calendar/components/CalendarWidgets.tsx`
+Verification: Full `npm run check` pipeline passes cleanly natively with 0 linting errors or compilation failures. Successfully redeployed to Vercel via `npm run vercel:deploy:prod` alias.
+Follow-ups: None.
+
+Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Responsive Map UX Fixes & Polish
 Summary: Fixed map navigation blocks in responsive mode by properly obscuring the building card and collapsing the Places panel when navigation is active. Restored text labels to 'Campus Map' and 'Google Map' buttons on responsive devices. Added missing scroll-wrap boundaries to the structural sidebar for mobile screens.
 Files Changed:

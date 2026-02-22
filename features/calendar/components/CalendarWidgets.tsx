@@ -68,20 +68,11 @@ export default function CalendarWidgets({
   assignmentsWidgetRef: externalAssignmentsRef,
 }: CalendarWidgetsProps) {
   const { t } = useTypedTranslation();
-  const tOr = (key: TranslationKey | string, fallback: string) => {
-    const value = t(key as TranslationKey);
-    return value === key ? fallback : value;
-  };
+
   const searchParams = useSearchParams();
 
   // Stores (needed for counts in mobile header and scrolling logic)
   const deadlines = useDeadlinesStore((state) => state.deadlines);
-  const units = useUnitsStore((state) => state.units);
-  const events = useEventsStore((state) => state.events);
-
-  // Derived Data for mobile header count
-  const assignmentsCount = deadlines.filter((d) => d.type === 'Assignment').length;
-  const examsCount = deadlines.filter((d) => d.type === 'Exam' || d.type === 'Quiz').length;
 
   // Highlight Refs
   const internalUnitsRef = useRef<HTMLDivElement>(null);
@@ -231,17 +222,6 @@ export default function CalendarWidgets({
 
   return (
     <div className="space-y-4 lg:space-y-6">
-      {/* Mobile section header - only visible on smaller screens */}
-      <div className="lg:hidden flex items-center gap-2 pb-2 border-b border-mq-border">
-        <h2 className="text-lg font-semibold text-mq-content">
-          {tOr('calendarWidgets' as TranslationKey, 'Quick Access')}
-        </h2>
-        <span className="text-xs text-mq-content-tertiary">
-          ({assignmentsCount + examsCount + units.length + events.length}{' '}
-          {tOr('items' as TranslationKey, 'items')})
-        </span>
-      </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
         <AssignmentsWidget
           onAddAssignment={onAddAssignment}
