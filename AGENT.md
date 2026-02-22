@@ -1,4 +1,11 @@
 Raouf: 2026-02-22 (Australia/Sydney)
+Scope: Map Navigation Integration
+Summary: Enabled Realtime Location tracking explicitly inside `GoogleMapEmbed.tsx`. Set up a distance thresholder using `navigator.geolocation.watchPosition` to feed raw coordinates, preventing the iframe from flickering too often, increasing navigation accuracy.
+Files Changed:
+- /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx
+Verification: Passed 68 tests across features/map without UI flickering. No lint warnings.
+
+Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Map Navigation Audit
 Summary: Performed a full audit of both map systems (Campus Map and Google Embed). Fixed a bug in Google Map Embed where navigating with 'center on user' active would incorrectly route to the user's location instead of the destination. Hardened the Campus Map instruction overlay to not crash if navigation instructions are empty, gracefully allowing users to stop navigation. Verified all tests passed and no lint warnings left.
 Files Changed:

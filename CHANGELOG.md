@@ -1,3 +1,15 @@
+### Raouf: GoogleMapEmbed Realtime Location — 2026-02-22
+**Scope:** Map Navigation Feature Enhancement
+**Type:** Refactor
+
+#### Changes
+1. **Google Map Embed Location Tracking:**
+   - Improved `GoogleMapEmbed.tsx` real-time tracking accuracy per 2026 docs usage requirements. Replaced implicit `My+Location` (which doesn't dynamically track location in iframe after initialization unless manually refreshed by Maps) with a `navigator.geolocation.watchPosition` hook tracking explicit GPS bounds.
+   - Throttled the updates to ~20-25m boundaries (`distSq < 0.00000004`) to prevent uncomfortable iframe flickering.
+
+#### Verification
+- `npm run lint` and `npm run test -- tests/map/` passed without errors.
+
 ### Raouf: Map Navigation Audit — 2026-02-22
 
 **Scope:** Map Navigation Audit

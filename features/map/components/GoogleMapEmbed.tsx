@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react';
 import { Navigation, ArrowLeft, MapPin } from 'lucide-react';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
@@ -18,8 +18,9 @@ const buildViewUrl = (query: string) => {
   return `https://www.google.com/maps?q=${query}&z=17&ie=UTF8&iwloc=&output=embed`;
 };
 
-const buildDirectionsUrl = (destination: string) => {
-  return `https://www.google.com/maps?saddr=My+Location&daddr=${destination}&dirflg=w&z=16&ie=UTF8&output=embed`;
+const buildDirectionsUrl = (destination: string, origin?: { lat: number, lng: number } | null) => {
+  const originStr = origin ? `${origin.lat},${origin.lng}` : 'My+Location';
+  return `https://www.google.com/maps?saddr=${originStr}&daddr=${destination}&dirflg=w&z=16&ie=UTF8&output=embed`;
 };
 
 type MapMode = 'view' | 'directions';
@@ -41,10 +42,41 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
     const { t, safeT } = useSafeTranslation();
     const [mode, setMode] = useState<MapMode>('view');
     const [forceCenter, setForceCenter] = useState<boolean>(false);
+    const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null);
+    const lastLocRef = useRef<{ lat: number; lng: number } | null>(null);
+
+    useEffect(() => {
+      let watchId: number;
+      if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+        watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const newLat = pos.coords.latitude;
+            const newLng = pos.coords.longitude;
+            const last = lastLocRef.current;
+            if (last) {
+              const dx = newLat - last.lat;
+              const dy = newLng - last.lng;
+              const distSq = dx * dx + dy * dy;
+              // Throttle iframe updates to ~20-25m threshold to prevent constant flashing
+              if (distSq < 0.00000004) return;
+            }
+            lastLocRef.current = { lat: newLat, lng: newLng };
+            setUserLoc({ lat: newLat, lng: newLng });
+          },
+          (err) => console.warn('GoogleMapEmbed geolocation error:', err),
+          { enableHighAccuracy: true, maximumAge: 5000, timeout: 5000 }
+        );
+      }
+      return () => {
+        if (watchId && typeof navigator !== 'undefined') {
+          navigator.geolocation.clearWatch(watchId);
+        }
+      };
+    }, []);
 
     // If we've explicitly requested centering on user, override the building or campus query
     const destinationQuery = forceCenter
-      ? 'My+Location'
+      ? userLoc ? `${userLoc.lat},${userLoc.lng}` : 'My+Location'
       : selectedBuilding?.location
         ? `${selectedBuilding.location.lat},${selectedBuilding.location.lng}`
         : MQ_COORDS;
@@ -121,7 +153,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
           src={
             mode === 'view'
               ? buildViewUrl(destinationQuery)
-              : buildDirectionsUrl(destinationQuery)
+              : buildDirectionsUrl(destinationQuery, userLoc)
           }
           className="h-full w-full flex-1 border-0"
           loading="lazy"
