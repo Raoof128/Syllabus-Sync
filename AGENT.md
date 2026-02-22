@@ -1,10 +1,54 @@
 Raouf: 2026-02-22 (Australia/Sydney)
+Scope: Responsive Map UX Fixes & Polish
+Summary: Fixed map navigation blocks in responsive mode by properly obscuring the building card and collapsing the Places panel when navigation is active. Restored text labels to 'Campus Map' and 'Google Map' buttons on responsive devices. Added missing scroll-wrap boundaries to the structural sidebar for mobile screens.
+Files Changed:
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/CampusMapHUD.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/MapViewToggle.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/components/layout/Sidebar.tsx`
+  Verification: Full `npm run check` pipeline passes cleanly natively with 0 linting errors or compilation failures.
+  Follow-ups: None.
+
+Roauf Abedini: 2026-02-22 (Australia/Sydney)
+Scope: Professional PDF Generation
+Summary: Generated a finalized `.pdf` version of the presentation document (`Syllabus_Sync_Presentation_Docs.pdf`) upon user request. Used `@mermaid-js/mermaid-cli` to perfectly render the system architecture graph and `md-to-pdf` via Chromium to produce a beautifully formatted PDF suitable for academic presentation.
+Files Changed:
+
+- `/Users/raoof.r12/Desktop/Syllabus_Sync_Presentation_Docs.pdf`
+  Verification: Verified `md-to-pdf` produced the document cleanly via terminal output and file exists on Desktop.
+  Follow-ups: None.
+
+Roauf Abedini: 2026-02-22 (Australia/Sydney)
+Scope: Professional Documentation Refinement & Condensation
+Summary: Injected the core Mermaid System Architecture diagram into the final presentation markdown. Changed backend engineer credit to "Roauf Abedini" globally across `README.md`, `TEAM_ROADMAP.md`, and the presentation output. Rebuilt final `Syllabus_Sync_Presentation_Docs.docx`.
+Files Changed:
+
+- `/Users/raoof.r12/Desktop/Syllabus_Sync_Presentation_Docs.docx`
+- `/Users/raoof.r12/Desktop/Syllabus_Sync_Final_Presentation_Docs.md`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/README.md`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/docs/project/team_plan/TEAM_ROADMAP.md`
+  Verification: DOCX successfully re-compiled using Pandoc containing the Mermaid code and updated name. Markdown files confirmed replaced seamlessly without error.
+  Follow-ups: None.
+
+Raouf: 2026-02-22 (Australia/Sydney)
+Scope: Professional Documentation Refinement & Condensation
+Summary: Re-drafted the presentation documentation into a shorter, high-quality, summarized format that focuses directly on Executive Summary, Architecture, Features, and Team composition. Excluded mentions of the AI Assistant 'Kit' across all project roadmaps and READMEs per user request. Re-compiled the final `Syllabus_Sync_Presentation_Docs.docx` to the Desktop.
+Files Changed:
+
+- `/Users/raoof.r12/Desktop/Syllabus_Sync_Presentation_Docs.docx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/README.md`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/docs/project/team_plan/TEAM_ROADMAP.md`
+  Verification: DOCX successfully re-compiled using Pandoc. Markdown files confirmed free of 'Kit' references using strict replacement.
+  Follow-ups: None.
+
+Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Professional Documentation Generation
 Summary: Generated a presentation-ready `.docx` documentation bundle combining the project's Core README, Team Roadmap, Security implementation details, Privacy Policy, and Deployment Checklist to present to the professor.
-Files Changed: 
+Files Changed:
+
 - Generated: `/Users/raoof.r12/Desktop/Syllabus_Sync_Presentation_Docs.docx`
-Verification: DOCX successfully assembled using python script and Pandoc. Output is available on Desktop.
-Follow-ups: None.
+  Verification: DOCX successfully assembled using python script and Pandoc. Output is available on Desktop.
+  Follow-ups: None.
 
 Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Map Navigation Realtime Throttler

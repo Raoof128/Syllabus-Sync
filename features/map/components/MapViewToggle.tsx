@@ -37,7 +37,7 @@ export function MapViewToggle({ activeView, onViewChange }: MapViewToggleProps) 
           }`}
         >
           {view.icon}
-          <span className="hidden sm:inline">{view.label}</span>
+          <span>{view.label}</span>
         </button>
       ))}
     </div>

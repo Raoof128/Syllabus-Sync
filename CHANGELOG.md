@@ -1,3 +1,79 @@
+### Raouf: Responsive Map UX Fixes & Polish — 2026-02-22
+
+**Scope:** Responsive Map UX Fixes & Polish
+**Type:** Bugfix / Polish
+
+#### Changes
+
+1. **Map Navigation Interface Blockage Fix:**
+   - Modified `features/map/components/CampusMapHUD.tsx` to conditionally hide the `selectedBuilding` overview card natively during `isNavigating` in 'campus' map layout.
+   - Tied `setIsPlacesPanelExpanded(false)` directly to the `isNavigating` effect hook, ensuring the left Places slide-out menu collapses automatically whenever navigation mode begins.
+   - Prevents the navigation routing instruction overlay from stacking awkwardly with destination cards, which previously blocked the entire viewport on mobile screens.
+
+2. **Map Buttons & Sidebar Touch Scrolling:**
+   - Modified `features/map/components/MapViewToggle.tsx` releasing the `hidden sm:inline` class on the text labels, allowing 'Campus Map' and 'Google Maps' labels to cleanly render beside their respective icons on responsive viewports.
+   - Modified `components/layout/Sidebar.tsx` injecting `overflow-y-auto custom-scrollbar` classes onto both mobile and desktop internal navigation wrappers. Enables touch and pointer scrolling for lengthy option menus extending beyond maximum height.
+
+#### Verification
+
+- `npm run check` pipeline passes cleanly natively with 0 linting errors or compilation failures.
+
+---
+
+### Roauf Abedini: Professional PDF Generation — 2026-02-22
+
+**Scope:** Professional PDF Generation
+**Type:** Chore
+
+#### Changes
+
+1. **PDF Compilation:**
+   - Generated a beautifully formatted `.pdf` document package from the final combined Markdown bundle.
+   - Utilized headless Chromium parsing via `md-to-pdf` and `mermaid-cli` to perfectly render the system architecture mermaid graph inside the native file.
+
+#### Verification
+
+- Checked NPM command outputs reporting successful creation of `Syllabus_Sync_Presentation_Docs.pdf` on the Desktop. Rendered correctly spanning the architecture visual.
+
+---
+
+### Roauf Abedini: Professional Documentation Refinement — 2026-02-22
+
+**Scope:** Professional Documentation Refinement & Condensation
+**Type:** Chore
+
+#### Changes
+
+1. **System Architecture Integration:**
+   - Injected the complete Mermaid graph visual representation mapping the platform's Technical System Architecture directly into the finalized documentation bundle.
+2. **Name Identity Adjustments:**
+   - Swapped out all instances of backend engineering authorship from "Raouf" to "Roauf Abedini" throughout the main `README.md`, `TEAM_ROADMAP.md` tracking lines, and generated documentation artifacts.
+
+#### Verification
+
+- Reran `pandoc` to output the final updated bundle tracking correctly format headers, Mermaid scripts, and correctly matched updated entity titles. No markdown rendering issues.
+
+---
+
+### Raouf: Professional Documentation Refinement — 2026-02-22
+
+**Scope:** Professional Documentation Refinement & Condensation
+**Type:** Chore
+
+#### Changes
+
+1. **Academic Documentation Condensation:**
+   - Greatly condensed the presentation `.docx` bundle on the Desktop to focus on high-impact insights (Executive Summary, Technical Architecture, Core Features, API and Security parameters).
+   - Achieved a more professional read without excessive verbose logging.
+2. **AI Component Scrubbing:**
+   - Removed all references to "Kit" (AI Assistant/Integration Lead) from the `README.md` and `TEAM_ROADMAP.md` files within the repository.
+
+#### Verification
+
+- Run `pandoc` to assemble the new, shorter DOCX. Confirmed final package successfully compiled with correct headers and clean layout.
+
+---
+
 ### Raouf: Professional Documentation Generation — 2026-02-22
 
 **Scope:** Professional Documentation Generation

@@ -196,7 +196,7 @@ Version: 0.5.9 | Last Updated: January 06, 2026
 #### 🔐 Biometric Login (Passkeys / FaceID / TouchID)
 **Objective:** Upgrade perceived security and modernity with enterprise-grade authentication.
 
-**Backend Implementation (Raouf):**
+**Backend Implementation (Roauf Abedini):**
 - Enable Supabase Passkeys (WebAuthn) for passwordless authentication
 - Maintain email/password fallback for compatibility
 - No biometric data stored by application (handled by device secure enclave)
@@ -307,12 +307,11 @@ Version: 0.5.9 | Last Updated: January 06, 2026
 |-------------|-------|--------|
 | **Home Tab** | Pouya | 🚧 In Progress |
 | **Calendar Tab** | Pouya | 🚧 In Progress |
-| **Feed Tab** | Pouya (50%) + Raouf (50%) | 🚧 Shared |
-| **Map Tab** | Raouf | 🚧 In Progress |
-| **Settings Tab** | Raouf | 🚧 In Progress |
-| **AI Integration** | Kit | 🔜 Demo Feature |
+| **Feed Tab** | Pouya (50%) + Roauf Abedini (50%) | 🚧 Shared |
+| **Map Tab** | Roauf Abedini | 🚧 In Progress |
+| **Settings Tab** | Roauf Abedini | 🚧 In Progress |
 
-### 👨‍💻 Raouf - Backend Lead & Map/Settings Owner
+### 👨‍💻 Roauf Abedini - Backend Lead & Map/Settings Owner
 **Primary Focus:** Map Tab, Settings Tab, Feed Tab (Backend), Database, API, Authentication, Infrastructure
 
 **Tab Responsibilities:**
@@ -354,21 +353,6 @@ Version: 0.5.9 | Last Updated: January 06, 2026
 - ♿ Accessibility enhancements and compliance
 - 🎯 User experience optimization and testing
 - 🎪 Demo preparation and presentation materials
-
-### 🤖 Kit - AI Integration Specialist
-**Primary Focus:** AI Features, Demo AI Integration, Smart Recommendations
-
-**AI Responsibilities:**
-- 🤖 **AI Integration**: Implement AI features for demo presentation
-- 🧠 **Smart Recommendations**: AI-powered suggestions and predictions
-- 💬 **Natural Language Processing**: Potential chatbot or assistant features
-- 🎪 **Demo AI Features**: Showcase AI capabilities to university administration
-
-**Planned Work:**
-- 🤖 AI feature implementation for demo
-- 🧠 Smart deadline predictions and reminders
-- 💬 AI assistant or chatbot integration
-- 🎯 AI-powered user experience enhancements
 
 ---
 
@@ -493,6 +477,5 @@ Version: 0.5.9 | Last Updated: January 06, 2026
 ---
 
 **Questions?** Contact team leads:
-- **Raouf**: Map Tab, Settings Tab, Backend, Database, API, Infrastructure
+- **Roauf Abedini**: Map Tab, Settings Tab, Backend, Database, API, Infrastructure
 - **Pouya**: Home Tab, Calendar Tab, Frontend, UI/UX, Components, User Experience
-- **Kit**: AI Integration, Demo AI Features

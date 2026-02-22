@@ -370,11 +370,7 @@ Our platform maintains a defense-in-depth security architecture:
 ### **Leadership**
 
 - **Pouya Alavi** - _Frontend Architect_ (UI/UX Design, Component Architecture, State Management)
-- **Raouf** - _Backend Engineer_ (API Development, Database Design, Security & Infrastructure)
-
-### **AI & Automation**
-
-- **Kit (AI Assistant)** - _Code Generation & Testing_ (Automated development workflows, test generation)
+- **Roauf Abedini** - _Backend Engineer_ (API Development, Database Design, Security & Infrastructure)
 
 ### **Contributors**
 

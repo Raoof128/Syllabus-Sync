@@ -67,6 +67,14 @@ export default function CampusMapHUD({
     return () => mediaQuery.removeEventListener('change', syncExpandedState);
   }, []);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    if (isNavigating) {
+      setIsPlacesPanelExpanded(false);
+    }
+  }, [isNavigating]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
   const buildMapHref = (buildingId?: string) => {
     const params = new URLSearchParams();
     if (layersParam) params.set('layers', layersParam);
@@ -323,7 +331,7 @@ export default function CampusMapHUD({
 
       {/* Bottom-right card (Selected Building) */}
       <AnimatePresence>
-        {selectedBuilding && (
+        {selectedBuilding && (!isNavigating || isGoogleMode) && (
           <m.div
             className="absolute bottom-20 sm:bottom-6 right-3 w-[calc(100vw-24px)] sm:w-[300px] pointer-events-auto"
             initial={{ y: prefersReducedMotion ? 0 : 20, opacity: 0 }}
