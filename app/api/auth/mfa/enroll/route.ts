@@ -38,13 +38,13 @@ export async function POST(request: NextRequest) {
       if (listResult.error) {
         logger.warn('MFA enroll: Failed to list factors', {
           userId: user.id,
-          error: listResult.error.message
+          error: listResult.error.message,
         });
       }
     } catch (listError) {
       logger.warn('MFA enroll: Exception listing factors', {
         userId: user.id,
-        error: listError instanceof Error ? listError.message : 'Unknown error'
+        error: listError instanceof Error ? listError.message : 'Unknown error',
       });
     }
 
@@ -54,12 +54,15 @@ export async function POST(request: NextRequest) {
       for (const factor of factorsData.totp) {
         if (factor.status === 'unverified') {
           try {
-            logger.info('Cleaning up unverified TOTP factor:', { factorId: factor.id, userId: user.id });
+            logger.info('Cleaning up unverified TOTP factor:', {
+              factorId: factor.id,
+              userId: user.id,
+            });
             await supabase.auth.mfa.unenroll({ factorId: factor.id });
           } catch (unenrollError) {
             logger.warn('Failed to clean up unverified factor:', {
               factorId: factor.id,
-              error: unenrollError instanceof Error ? unenrollError.message : 'Unknown error'
+              error: unenrollError instanceof Error ? unenrollError.message : 'Unknown error',
             });
             // Continue anyway - the enroll might still work
           }
@@ -84,7 +87,8 @@ export async function POST(request: NextRequest) {
       // Provide more specific error messages
       let errorMessage = 'Failed to start authenticator setup';
       if (error.message?.includes('already exists') || error.message?.includes('duplicate')) {
-        errorMessage = 'A TOTP authenticator is already set up. Please disable it first before setting up a new one.';
+        errorMessage =
+          'A TOTP authenticator is already set up. Please disable it first before setting up a new one.';
       } else if (error.message?.includes('rate limit')) {
         errorMessage = 'Too many attempts. Please wait a few minutes and try again.';
       } else if (error.message?.includes('session')) {
@@ -96,7 +100,11 @@ export async function POST(request: NextRequest) {
 
     if (!data || !data.totp) {
       logger.error('MFA TOTP enrollment returned invalid data:', { userId: user.id, data });
-      return jsonError('Invalid response from authentication server', 500, ERROR_CODES.INTERNAL_ERROR);
+      return jsonError(
+        'Invalid response from authentication server',
+        500,
+        ERROR_CODES.INTERNAL_ERROR,
+      );
     }
 
     // SECURITY: Prevent proxy caching of TOTP secrets
@@ -112,8 +120,12 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('MFA enroll unexpected error:', {
       error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
     });
-    return jsonError('Failed to set up authenticator. Please try again later.', 500, ERROR_CODES.INTERNAL_ERROR);
+    return jsonError(
+      'Failed to set up authenticator. Please try again later.',
+      500,
+      ERROR_CODES.INTERNAL_ERROR,
+    );
   }
 }

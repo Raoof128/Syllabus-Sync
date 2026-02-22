@@ -45,7 +45,6 @@ describe('useWeather Hook', () => {
     // Setup fetch mock
     global.fetch = fetchMock;
 
-
     // Default successful response
     fetchMock.mockResolvedValue({
       ok: true,

@@ -550,9 +550,9 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                   <div className="font-bold text-lg text-mq-content">
                     {navState.instructions.length > 0
                       ? generateNavigationText(
-                        navState.instructions[navState.currentInstructionIndex],
-                        navState.remainingDistance,
-                      )
+                          navState.instructions[navState.currentInstructionIndex],
+                          navState.remainingDistance,
+                        )
                       : safeT('followRoute', 'Follow the route to your destination')}
                   </div>
                   <div className="text-sm text-mq-content-secondary">

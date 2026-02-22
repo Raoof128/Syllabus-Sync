@@ -2,25 +2,28 @@ Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Map Navigation Realtime Throttler
 Summary: Resolved API thrashing in `useMapLocation.ts` and `useMapNavigation.ts` by throttling the `setOrigin` hook update to 20m thresholds and preventing `updateRoute` fetching during active navigation.
 Files Changed:
+
 - /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapLocation.ts
 - /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapNavigation.ts
-Verification: Map tests passing cleanly, zero lint errors, no UI freezing on coordinates.
+  Verification: Map tests passing cleanly, zero lint errors, no UI freezing on coordinates.
 
 Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Map Navigation Integration
 Summary: Enabled Realtime Location tracking explicitly inside `GoogleMapEmbed.tsx`. Set up a distance thresholder using `navigator.geolocation.watchPosition` to feed raw coordinates, preventing the iframe from flickering too often, increasing navigation accuracy.
 Files Changed:
+
 - /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx
-Verification: Passed 68 tests across features/map without UI flickering. No lint warnings.
+  Verification: Passed 68 tests across features/map without UI flickering. No lint warnings.
 
 Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Map Navigation Audit
 Summary: Performed a full audit of both map systems (Campus Map and Google Embed). Fixed a bug in Google Map Embed where navigating with 'center on user' active would incorrectly route to the user's location instead of the destination. Hardened the Campus Map instruction overlay to not crash if navigation instructions are empty, gracefully allowing users to stop navigation. Verified all tests passed and no lint warnings left.
 Files Changed:
+
 - /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx
 - /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/CampusMap.tsx
-Verification: Linted and passed 68 tests across features/map.
-Follow-ups: None.
+  Verification: Linted and passed 68 tests across features/map.
+  Follow-ups: None.
 
 Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Maintenance & UI Polish

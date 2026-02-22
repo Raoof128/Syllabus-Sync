@@ -324,11 +324,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Protected route check: redirect unauthenticated users to login
-  if (
-    isProtectedRoute &&
-    !user &&
-    !publicRoutes.some((route) => path.startsWith(route))
-  ) {
+  if (isProtectedRoute && !user && !publicRoutes.some((route) => path.startsWith(route))) {
     // If auth status couldn't be resolved (timeout/transient upstream issue), do not
     // redirect to /login. This avoids redirect loops and "blinking" UX.
     if (authResolution === 'unknown') {

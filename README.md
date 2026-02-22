@@ -9,7 +9,7 @@ _Next-Generation Student Experience Platform for Macquarie University_
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green?logo=supabase)](https://supabase.com/)
-[![Vitest](https://img.shields.io/badge/Tests-443_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-482_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
 
 ---
 
@@ -22,42 +22,64 @@ From precision campus navigation with real-time wayfinding to intelligent deadli
 ### 🗺️ System Architecture
 
 ```mermaid
-graph TD
-    User([User / Browser])
+flowchart TD
+    classDef frontend fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#fff
+    classDef backend fill:#1e1b4b,stroke:#8b5cf6,stroke-width:2px,color:#fff
+    classDef external fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#fff
+    classDef db fill:#3f6212,stroke:#84cc16,stroke-width:2px,color:#fff
+    classDef security fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fff
 
-    subgraph "Frontend (Next.js 16 + React 19)"
-        UI[Apple Liquid Glass UI]
-        State[Zustand Stores]
-        Auth[Supabase Auth Client]
-        SW[Service Workers / Notifications]
+    User([👤 User / Browser])
+
+    subgraph FE ["🎨 Frontend Layer (Next.js 16 + React 19)"]
+        UI[Apple Liquid Glass UI]:::frontend
+        State[Zustand Stores]:::frontend
+        Auth[Supabase Auth Client]:::frontend
+        Navigation[Hybrid Map Engine\nLeaflet + Google]:::frontend
+        SW[Service Workers / PWA]:::frontend
     end
 
-    subgraph "Backend (Next.js API Routes)"
-        Middleware{Security Middleware}
-        RL[Rate Limiting - Upstash]
-        CSRF[CSRF Validation]
-        API[Feature Endpoints]
+    subgraph Gateway ["🛡️ Security & API Gateway (Edge)"]
+        Middleware{Next.js Middleware}:::security
+        RL[Upstash Redis Rate Limit]:::security
+        CSRF[Double-Submit CSRF]:::security
     end
 
-    subgraph "External Services"
-        Supabase[(PostgreSQL / RLS)]
-        ORS[OpenRouteService Proxy]
-        OSM[OpenStreetMap Data]
+    subgraph BE ["⚙️ Backend Services (Server Components & Routes)"]
+        API_Routes[REST API Endpoints]:::backend
+        Auth_Handler[WebAuthn / Passkeys]:::backend
+        Map_Proxy[OpenRouteService Proxy]:::backend
+        Sync_Engine[Academic Sync Engine]:::backend
     end
 
-    User <--> UI
+    subgraph Services ["☁️ External Providers"]
+        Supabase[(PostgreSQL + RLS)]:::db
+        ORS[OpenRouteService Core]:::external
+        Resend[Resend Email Delivery]:::external
+        Vercel[Vercel Edge & Cron]:::external
+    end
+
+    %% Connections
+    User ==== UI
     UI <--> State
+    UI <--> Navigation
     State <--> Auth
     UI <--> SW
 
-    UI <--> Middleware
+    UI --->|Encrypted API Requests| Middleware
     Middleware --> RL
     Middleware --> CSRF
-    CSRF --> API
+    CSRF --> API_Routes
 
-    API <--> Supabase
-    API <--> ORS
-    ORS <--> OSM
+    API_Routes <--> Auth_Handler
+    API_Routes <--> Map_Proxy
+    API_Routes <--> Sync_Engine
+
+    Auth_Handler ===>|JWT Verification| Supabase
+    Sync_Engine ===>|Strict RLS Queries| Supabase
+    Map_Proxy ===>|Geospatial Queries| ORS
+    API_Routes ===>|Transactional Auth| Resend
+    Vercel -.->|Automated Sync Triggers| Sync_Engine
 ```
 
 ### 💎 Technical Excellence
@@ -93,10 +115,10 @@ graph TD
 
 ### 🗺️ **Campus Navigation Platform**
 
-- **Precision Wayfinding:** Hybrid navigation system with real-time path calculation and mobile app handoff
-- **Comprehensive Building Directory:** 100+ campus structures with detailed metadata, accessibility info, and real-time status
-- **Multi-Layer Map System:** Toggleable overlays for parking, facilities, accessibility routes, and exam venues
-- **GPS Integration:** Kalman-filtered positioning with haptic feedback and turn-by-turn navigation
+- **Precision Wayfinding System:** Dual-engine architecture featuring an advanced in-house Leaflet-based renderer alongside dynamic Google Maps integration with precise coordinate tracking.
+- **Real-Time GPS Engine:** High-frequency tracker utilizing `navigator.geolocation.watchPosition` enriched by sensor-fusion, Kalman filtering, and spatial threshold debouncing (~20m bounds) to completely eliminate map-flashing and UI jitter during active roaming.
+- **Turn-by-Turn Telemetry:** Resilient routing subsystem powered by OpenRouteService with built-in crash-hardening, graceful missing-instruction handlers, and dynamic off-route recalibration capabilities.
+- **Comprehensive Building Directory:** Highly curated geospatial layer containing 100+ campus structures, dynamic visual overlays (parking, events), and accessibility status vectors.
 
 ### 🎮 **Academic Gamification Framework**
 
@@ -268,13 +290,13 @@ syllabus-sync/
 │   ├── services/                   # External API integrations
 │   ├── hooks/                      # Custom React hooks
 │   └── utils/                      # Shared utility functions
-├── tests/                          # Comprehensive test suite (443+ tests)
-│   ├── settings/                   # Settings feature tests (85 tests)
-│   ├── map/                        # Map/navigation tests (64 tests)
-│   ├── gamification/               # Gamification logic tests (96 tests)
-│   ├── api/                        # API route tests
-│   ├── security/                   # Security-focused tests (68 tests)
-│   └── unit/                       # Unit tests for components and utilities
+├── tests/                          # Comprehensive test suite (482+ tests)
+│   ├── settings/                   # Settings feature tests
+│   ├── map/                        # Real-time navigation tests (68 tests)
+│   ├── gamification/               # Gamification logic tests
+│   ├── api/                        # API route and authentication tests
+│   ├── security/                   # Security boundary tests
+│   └── unit/                       # Unit tests for core primitives
 ├── docs/                           # Documentation and project artifacts
 │   ├── README.md                  # Docs index
 │   └── project/                   # Team plans, sketches, restructure notes
@@ -311,10 +333,10 @@ Our platform maintains a defense-in-depth security architecture:
 
 ### **Quality Assurance Framework**
 
-- **Automated CI/CD Pipeline:** GitHub Actions workflows with secrets detection, code formatting, linting, and test coverage requirements
-- **Comprehensive Testing:** 443+ tests across 50 test files covering unit/integration/API/security scenarios with accessibility validation
-- **Performance Monitoring:** Core Web Vitals tracking, bundle analysis, and production error reporting
-- **Code Quality Gates:** TypeScript strict mode, ESLint rules, and Prettier formatting enforcement
+- **Automated CI/CD Pipeline:** GitHub Actions workflows with secrets detection, code formatting, linting, Vercel deployments, and mandatory test coverage requirements.
+- **Comprehensive Testing:** Over 480 verified tests across unit, integration, and security layers. Fully mocked map components test GPS drift without real-world latency.
+- **Performance Monitoring:** Core Web Vitals tracking, bundle analysis, and 60fps framerate locking on critical UI animations.
+- **Code Quality Gates:** Edge-native TypeScript strictness, automated ESLint formatting, and Prettier CI checks.
 
 ### **Compliance & Privacy**
 
