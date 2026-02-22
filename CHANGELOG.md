@@ -1,3 +1,22 @@
+### Raouf: Map Navigation Audit — 2026-02-22
+
+**Scope:** Map Navigation Audit
+**Type:** Fix / Refactor
+
+#### Changes
+
+1. **Google Map Embed:**
+   - Fixed a bug where 'My Location' was incorrectly set as the destination if the user had pressed 'center on user' before starting navigation. `forceCenter` is now correctly reset when navigation starts.
+
+2. **Campus Map Overlay:**
+   - Added robust empty-state handling for `navState.instructions.length === 0` to prevent an array out of bounds crash. This safety measure ensures users can ALWAYS see the 'Stop Navigation' button even with an empty route array.
+
+#### Verification
+
+- `npm run lint` passed without errors.
+- `npm run test -- tests/map/` passed 68 out of 68 tests.
+
+
 ### Raouf: Weather System 2.0 & Component Polish — 2026-02-21
 
 **Scope:** Maintenance & UI Robustness

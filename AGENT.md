@@ -1,3 +1,12 @@
+Raouf: 2026-02-22 (Australia/Sydney)
+Scope: Map Navigation Audit
+Summary: Performed a full audit of both map systems (Campus Map and Google Embed). Fixed a bug in Google Map Embed where navigating with 'center on user' active would incorrectly route to the user's location instead of the destination. Hardened the Campus Map instruction overlay to not crash if navigation instructions are empty, gracefully allowing users to stop navigation. Verified all tests passed and no lint warnings left.
+Files Changed:
+- /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx
+- /Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/CampusMap.tsx
+Verification: Linted and passed 68 tests across features/map.
+Follow-ups: None.
+
 Raouf: 2026-02-21 (Australia/Sydney)
 Scope: Maintenance & UI Polish
 Summary: Fixed critical React purity error in `WeatherWidget.tsx` by implementing a `WeatherTimestamp` hook-based component. Resolved multiple accessibility and type-safety lint errors (A11y roles, `cn` utility integration, and `any` removals). Fixed regression in `useWeather.test.ts` caused by the new coordinate-based caching key logic. Verified all 482 tests and production build.

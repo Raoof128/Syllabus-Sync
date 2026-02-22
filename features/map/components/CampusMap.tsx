@@ -542,16 +542,18 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         </button>
 
         {/* Minimal Instructions Overlay (only when navigating) */}
-        {isNavigating && navState && navState.instructions.length > 0 && (
+        {isNavigating && navState && (
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] w-full max-w-md px-4 pointer-events-none">
             <div className="bg-mq-card-background border border-mq-border shadow-lg rounded-xl p-4 pointer-events-auto">
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <div className="font-bold text-lg text-mq-content">
-                    {generateNavigationText(
-                      navState.instructions[navState.currentInstructionIndex],
-                      navState.remainingDistance,
-                    )}
+                    {navState.instructions.length > 0
+                      ? generateNavigationText(
+                        navState.instructions[navState.currentInstructionIndex],
+                        navState.remainingDistance,
+                      )
+                      : safeT('followRoute', 'Follow the route to your destination')}
                   </div>
                   <div className="text-sm text-mq-content-secondary">
                     {t('next')}:{' '}

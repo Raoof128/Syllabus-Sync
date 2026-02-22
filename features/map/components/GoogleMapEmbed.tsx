@@ -56,6 +56,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
     // Expose navigation control via ref (same pattern as CampusMap)
     useImperativeHandle(ref, () => ({
       startNavigation: () => {
+        setForceCenter(false);
         setMode('directions');
       },
       stopNavigation: () => {
