@@ -1,3 +1,33 @@
+### Raouf: Google Live-Origin Navigation & Destination Update — 2026-02-23
+
+**Scope:** Google map live location recognition and navigation recalculation
+**Type:** Navigation behavior enhancement / regression tests
+
+#### Changes
+
+1. **Live user-location origin for directions:**
+   - Google directions now use live user geolocation (`userLoc`) as route origin when available.
+   - Falls back safely to MQ campus center when user location is unavailable.
+2. **Immediate recalculation on destination selection:**
+   - While in directions mode, selecting a new destination now keeps directions active and updates route immediately.
+   - Removed behavior that forced a reset back to view mode on destination change.
+3. **Expanded Google map regression coverage:**
+   - Added test for directions using live user origin (`saddr=<live lat,lng>`) and destination coordinates.
+   - Added test for preserving directions mode and updating route when destination changes.
+
+#### Files Changed
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+
+#### Verification
+
+- `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapEmbed.tsx tests/map/GoogleMapEmbed.test.tsx` ✅
+- `npm run test -- tests/map` ✅ (82/82)
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Campus Live Location & Navigation Audit Tests — 2026-02-23
 
 **Scope:** Campus map live geolocation and navigation reliability

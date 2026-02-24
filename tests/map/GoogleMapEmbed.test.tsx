@@ -17,12 +17,21 @@ vi.mock('@/lib/hooks/useTypedTranslation', () => ({
 }));
 
 describe('GoogleMapEmbed', () => {
-  const installGeolocationMock = (watchImpl?: (success: PositionCallback) => number) => {
+  const installGeolocationMock = (
+    watchImpl?: (success: PositionCallback, error?: PositionErrorCallback) => number,
+  ) => {
     const originalGeolocation = navigator.geolocation;
     const clearWatch = vi.fn();
+    let successCallback: PositionCallback | null = null;
+    let errorCallback: PositionErrorCallback | null = null;
     const watchPosition = vi
       .fn()
-      .mockImplementation(watchImpl || (() => 1)) as unknown as Geolocation['watchPosition'];
+      .mockImplementation((success: PositionCallback, error?: PositionErrorCallback) => {
+        successCallback = success;
+        errorCallback = error || null;
+        if (watchImpl) return watchImpl(success, error);
+        return 1;
+      }) as unknown as Geolocation['watchPosition'];
 
     Object.defineProperty(navigator, 'geolocation', {
       configurable: true,
@@ -43,7 +52,13 @@ describe('GoogleMapEmbed', () => {
       });
     };
 
-    return { watchPosition, clearWatch, restore };
+    return {
+      watchPosition,
+      clearWatch,
+      emitSuccess: (position: GeolocationPosition) => successCallback?.(position),
+      emitError: (error: GeolocationPositionError) => errorCallback?.(error),
+      restore,
+    };
   };
 
   const makePosition = (lat: number, lng: number): GeolocationPosition =>
@@ -127,22 +142,97 @@ describe('GoogleMapEmbed', () => {
   });
 
   it('shows live user location in view mode when center button is used', () => {
-    let successCallback: PositionCallback | null = null;
-    const { restore } = installGeolocationMock((success: PositionCallback) => {
-      successCallback = success;
-      return 11;
-    });
+    const { restore, emitSuccess } = installGeolocationMock(() => 11);
 
     const { unmount } = render(<GoogleMapEmbed />);
 
     act(() => {
-      successCallback?.(makePosition(-33.7748, 151.1132));
+      emitSuccess(makePosition(-33.7748, 151.1132));
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Center on my location' }));
 
     const iframe = screen.getByTitle('Google Maps — My Location');
     expect(iframe.getAttribute('src')).toContain('q=-33.7748,151.1132');
+
+    unmount();
+    restore();
+  });
+
+  it('uses live user location as directions origin when available', () => {
+    const { restore, emitSuccess } = installGeolocationMock(() => 15);
+    const ref = React.createRef<GoogleMapRef>();
+
+    const { unmount } = render(
+      <GoogleMapEmbed
+        ref={ref}
+        selectedBuilding={{
+          id: '18WW',
+          name: '18 Wallys Walk',
+          position: [0, 0],
+          translationKey: 'building_18WW_name',
+          descriptionKey: 'building_18WW_desc',
+          location: { lat: -33.7734389, lng: 151.1134919 },
+        }}
+        destinationLabel="18 Wallys Walk"
+      />,
+    );
+
+    act(() => {
+      emitSuccess(makePosition(-33.771, 151.114));
+      ref.current?.startNavigation();
+    });
+
+    const iframe = screen.getByTitle('Directions to 18 Wallys Walk');
+    expect(iframe.getAttribute('src')).toContain('saddr=-33.771,151.114');
+    expect(iframe.getAttribute('src')).toContain('daddr=-33.7734389,151.1134919');
+    expect(iframe.getAttribute('src')).toContain('dirflg=w');
+
+    unmount();
+    restore();
+  });
+
+  it('keeps directions active and updates route when destination changes', () => {
+    const { restore } = installGeolocationMock(() => 3);
+    const ref = React.createRef<GoogleMapRef>();
+
+    const { rerender, unmount } = render(
+      <GoogleMapEmbed
+        ref={ref}
+        selectedBuilding={{
+          id: 'A',
+          name: 'Building A',
+          position: [0, 0],
+          translationKey: 'building_18WW_name',
+          descriptionKey: 'building_18WW_desc',
+          location: { lat: -33.77, lng: 151.11 },
+        }}
+        destinationLabel="Building A"
+      />,
+    );
+
+    act(() => {
+      ref.current?.startNavigation();
+    });
+
+    rerender(
+      <GoogleMapEmbed
+        ref={ref}
+        selectedBuilding={{
+          id: 'B',
+          name: 'Building B',
+          position: [0, 0],
+          translationKey: 'building_18WW_name',
+          descriptionKey: 'building_18WW_desc',
+          location: { lat: -33.78, lng: 151.12 },
+        }}
+        destinationLabel="Building B"
+      />,
+    );
+
+    const iframe = screen.getByTitle('Directions to Building B');
+    expect(iframe.getAttribute('src')).toContain('daddr=-33.78,151.12');
+    expect(iframe.getAttribute('src')).toContain('dirflg=w');
 
     unmount();
     restore();

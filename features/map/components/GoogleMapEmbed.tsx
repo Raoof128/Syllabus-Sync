@@ -18,8 +18,9 @@ const buildViewUrl = (query: string) => {
   return `https://www.google.com/maps?q=${query}&z=17&ie=UTF8&iwloc=&output=embed`;
 };
 
-const buildDirectionsUrl = (destination: string, origin: { lat: number; lng: number }) => {
-  const originStr = `${origin.lat},${origin.lng}`;
+const buildDirectionsUrl = (destination: string, origin?: { lat: number; lng: number } | null) => {
+  const resolvedOrigin = origin ?? CAMPUS_CENTRE_GPS;
+  const originStr = `${resolvedOrigin.lat},${resolvedOrigin.lng}`;
   return `https://www.google.com/maps?saddr=${originStr}&daddr=${destination}&dirflg=w&z=16&ie=UTF8&output=embed`;
 };
 
@@ -109,9 +110,9 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
       });
     }, [mode, onNavStateChange]);
 
-    // Reset to view mode when building changes
+    // Keep directions mode active across destination changes so selecting
+    // another destination immediately updates navigation.
     useEffect(() => {
-      setMode('view');
       setForceCenter(false);
     }, [selectedBuilding?.id]);
 
@@ -157,7 +158,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
           src={
             mode === 'view'
               ? buildViewUrl(destinationQuery)
-              : buildDirectionsUrl(destinationQuery, CAMPUS_CENTRE_GPS)
+              : buildDirectionsUrl(destinationQuery, userLoc)
           }
           className="h-full w-full flex-1 border-0"
           loading="lazy"

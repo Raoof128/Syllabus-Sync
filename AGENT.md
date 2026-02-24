@@ -1,4 +1,14 @@
 Raouf: 2026-02-23 (UTC)
+Scope: Google Map Live Origin Navigation + Destination Recalculation
+Summary: Updated Google map navigation logic to recognize user live location as the directions origin when available, with automatic fallback to `CAMPUS_CENTRE_GPS` when geolocation is unavailable. Improved navigation UX so that when users select a new destination while already in directions mode, navigation remains active and recalculates immediately to the newly selected location instead of dropping back to map view. Added regression coverage for both behaviors: live user-origin routing in directions and active directions route update on destination switch.
+Files Changed:
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+  Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapEmbed.tsx tests/map/GoogleMapEmbed.test.tsx` ✅, `npm run test -- tests/map` ✅ (82/82), `npm run typecheck` ✅.
+  Follow-ups: None.
+
+Raouf: 2026-02-23 (UTC)
 Scope: Campus Map Live Location & Navigation Audit + Test Expansion
 Summary: Completed a dedicated campus-map audit focused on live geolocation and active navigation behavior. Added a new `useMapLocation` test suite covering: successful live location tracking + center-on-user behavior, off-campus detection and warning throttling, permission-denied handling, timeout/unknown geolocation error handling, and watch cleanup for id `0`. Hardened geolocation watcher lifecycle by capturing a stable geolocation object for cleanup. Fixed a race condition where initial `searching` status could overwrite `found` after a fast first GPS fix by making the transition conditional (`idle` -> `searching` only), preventing incorrect live-location state and center-on-user failures.
 Files Changed:
