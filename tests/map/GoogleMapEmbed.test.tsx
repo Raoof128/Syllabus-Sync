@@ -17,16 +17,12 @@ vi.mock('@/lib/hooks/useTypedTranslation', () => ({
 }));
 
 describe('GoogleMapEmbed', () => {
-  const installGeolocationMock = (
-    watchImpl?: (success: PositionCallback) => number,
-  ) => {
+  const installGeolocationMock = (watchImpl?: (success: PositionCallback) => number) => {
     const originalGeolocation = navigator.geolocation;
     const clearWatch = vi.fn();
     const watchPosition = vi
       .fn()
-      .mockImplementation(
-        watchImpl || (() => 1),
-      ) as unknown as Geolocation['watchPosition'];
+      .mockImplementation(watchImpl || (() => 1)) as unknown as Geolocation['watchPosition'];
 
     Object.defineProperty(navigator, 'geolocation', {
       configurable: true,
@@ -120,9 +116,7 @@ describe('GoogleMapEmbed', () => {
   });
 
   it('clears geolocation watch on unmount when watch id is 0', () => {
-    const { watchPosition, clearWatch, restore } = installGeolocationMock(
-      () => 0,
-    );
+    const { watchPosition, clearWatch, restore } = installGeolocationMock(() => 0);
 
     const { unmount } = render(<GoogleMapEmbed />);
     expect(watchPosition).toHaveBeenCalledTimes(1);
@@ -159,9 +153,7 @@ describe('GoogleMapEmbed', () => {
     const onNavStateChange = vi.fn();
     const ref = React.createRef<GoogleMapRef>();
 
-    const { unmount } = render(
-      <GoogleMapEmbed ref={ref} onNavStateChange={onNavStateChange} />,
-    );
+    const { unmount } = render(<GoogleMapEmbed ref={ref} onNavStateChange={onNavStateChange} />);
 
     act(() => {
       ref.current?.startNavigation();

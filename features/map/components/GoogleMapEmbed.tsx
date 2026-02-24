@@ -18,10 +18,7 @@ const buildViewUrl = (query: string) => {
   return `https://www.google.com/maps?q=${query}&z=17&ie=UTF8&iwloc=&output=embed`;
 };
 
-const buildDirectionsUrl = (
-  destination: string,
-  origin: { lat: number; lng: number },
-) => {
+const buildDirectionsUrl = (destination: string, origin: { lat: number; lng: number }) => {
   const originStr = `${origin.lat},${origin.lng}`;
   return `https://www.google.com/maps?saddr=${originStr}&daddr=${destination}&dirflg=w&z=16&ie=UTF8&output=embed`;
 };

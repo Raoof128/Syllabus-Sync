@@ -1,19 +1,31 @@
 Raouf: 2026-02-23 (UTC)
+Scope: Campus Map Live Location & Navigation Audit + Test Expansion
+Summary: Completed a dedicated campus-map audit focused on live geolocation and active navigation behavior. Added a new `useMapLocation` test suite covering: successful live location tracking + center-on-user behavior, off-campus detection and warning throttling, permission-denied handling, timeout/unknown geolocation error handling, and watch cleanup for id `0`. Hardened geolocation watcher lifecycle by capturing a stable geolocation object for cleanup. Fixed a race condition where initial `searching` status could overwrite `found` after a fast first GPS fix by making the transition conditional (`idle` -> `searching` only), preventing incorrect live-location state and center-on-user failures.
+Files Changed:
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapLocation.ts`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/useMapLocation.test.ts`
+  Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/hooks/useMapLocation.ts tests/map/useMapLocation.test.ts` ✅, `npm run test -- tests/map` ✅ (80/80), `npm run typecheck` ✅.
+  Follow-ups: None.
+
+Raouf: 2026-02-23 (UTC)
 Scope: Google Map Live Location & Live Navigation Test Coverage
 Summary: Added explicit verification tests for Google map live location and navigation transitions. Implemented robust geolocation mock harness in `GoogleMapEmbed` tests (safe install/restore with delete fallback) to avoid leaked `navigator.geolocation` state between tests. Added test that simulates real-time geolocation update and verifies "Center on my location" updates iframe query (`q=lat,lng`) in view mode. Added test that verifies `onNavStateChange` emits navigating → idle transitions for live navigation lifecycle. Existing campus-origin walking-directions behavior remains intact and covered.
 Files Changed:
+
 - `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
-Verification: `npx eslint --config config/eslint/eslint.config.mjs tests/map/GoogleMapEmbed.test.tsx` ✅, `npm run test -- tests/map/GoogleMapEmbed.test.tsx tests/map/useMapNavigation.test.ts tests/map/realtimeNavigation.test.ts` ✅ (30/30), `npm run typecheck` ✅.
-Follow-ups: None.
+  Verification: `npx eslint --config config/eslint/eslint.config.mjs tests/map/GoogleMapEmbed.test.tsx` ✅, `npm run test -- tests/map/GoogleMapEmbed.test.tsx tests/map/useMapNavigation.test.ts tests/map/realtimeNavigation.test.ts` ✅ (30/30), `npm run typecheck` ✅.
+  Follow-ups: None.
 
 Raouf: 2026-02-23 (UTC)
 Scope: Google Map Navigation Origin Alignment (Match Campus Flow)
 Summary: Updated Google map embedded navigation to always start walking directions from Macquarie University campus center, matching expected campus navigation behavior for destination routing context. Previously, Google mode used `My+Location` as origin in directions mode; now origin is fixed to `CAMPUS_CENTRE_GPS` while retaining destination selection behavior and `dirflg=w` walking mode. Added regression assertion in map tests to enforce campus-origin directions URL construction.
 Files Changed:
+
 - `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
 - `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
-Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapEmbed.tsx tests/map/GoogleMapEmbed.test.tsx` ✅, `npm run test -- tests/map/GoogleMapEmbed.test.tsx tests/map/useMapNavigation.test.ts` ✅, `npm run typecheck` ✅.
-Follow-ups: None.
+  Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapEmbed.tsx tests/map/GoogleMapEmbed.test.tsx` ✅, `npm run test -- tests/map/GoogleMapEmbed.test.tsx tests/map/useMapNavigation.test.ts` ✅, `npm run typecheck` ✅.
+  Follow-ups: None.
 
 Raouf: 2026-02-23 (UTC)
 Scope: Full Audit — Live Location & Navigation Logic (Campus + Google Maps)

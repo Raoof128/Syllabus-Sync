@@ -1,3 +1,34 @@
+### Raouf: Campus Live Location & Navigation Audit Tests — 2026-02-23
+
+**Scope:** Campus map live geolocation and navigation reliability
+**Type:** Logic hardening / test expansion
+
+#### Changes
+
+1. **Added dedicated campus live-location test suite (`useMapLocation`):**
+   - Validates live geolocation updates (`found` + origin update).
+   - Validates center-on-user path triggers map `flyTo` when location is available.
+   - Validates off-campus detection and warning throttling.
+   - Validates permission-denied and timeout/unknown geolocation error handling.
+   - Validates geolocation watcher cleanup with watch id `0`.
+2. **Hardened geolocation cleanup in `useMapLocation`:**
+   - Captures stable `geolocation` reference for watch + cleanup, avoiding cleanup breakage from mutable `navigator.geolocation`.
+3. **Fixed live-status race condition:**
+   - Prevented `searching` status from overriding a fast first `found` update by applying `searching` only when prior state is `idle`.
+
+#### Files Changed
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapLocation.ts`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/useMapLocation.test.ts`
+
+#### Verification
+
+- `npx eslint --config config/eslint/eslint.config.mjs features/map/hooks/useMapLocation.ts tests/map/useMapLocation.test.ts` ✅
+- `npm run test -- tests/map` ✅ (80/80)
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Google Live Location & Live Navigation Tests — 2026-02-23
 
 **Scope:** Google map live-location visibility and live navigation state behavior

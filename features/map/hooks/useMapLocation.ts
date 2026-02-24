@@ -159,8 +159,10 @@ export function useMapLocation({
 
   // Geolocation Effect
   useEffect(() => {
-    if (!mapInstance || !isMapReady(mapInstance) || !leafletModule || !navigator.geolocation) {
-      if (typeof navigator !== 'undefined' && !navigator.geolocation) {
+    const geolocation = typeof navigator !== 'undefined' ? navigator.geolocation : undefined;
+
+    if (!mapInstance || !isMapReady(mapInstance) || !leafletModule || !geolocation) {
+      if (typeof navigator !== 'undefined' && !geolocation) {
         mapLog.log('Geolocation API not available');
         // Avoid synchronous state update in effect
         setTimeout(() => setLocationStatus('error'), 0);
@@ -169,9 +171,11 @@ export function useMapLocation({
     }
 
     mapLog.log('Starting geolocation watch...');
-    setTimeout(() => setLocationStatus('searching'), 0);
+    setTimeout(() => {
+      setLocationStatus((prev) => (prev === 'idle' ? 'searching' : prev));
+    }, 0);
 
-    const watchId = navigator.geolocation.watchPosition(
+    const watchId = geolocation.watchPosition(
       (pos) => {
         if (!isMapReady(mapInstance)) {
           return;
@@ -417,7 +421,7 @@ export function useMapLocation({
     );
 
     return () => {
-      navigator.geolocation.clearWatch(watchId);
+      geolocation.clearWatch(watchId);
     };
   }, [mapInstance, leafletModule, isMapReady, userIcon, navManagerRef]);
 
