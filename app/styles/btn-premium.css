@@ -24,7 +24,7 @@
 }
 
 .btn-premium::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
@@ -39,7 +39,7 @@
 }
 
 .btn-premium::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 10px;
   left: 0;

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useRef } from "react";
-import { useSafeTranslation } from "@/lib/hooks/useSafeTranslation";
+import { useEffect, useState, useRef } from 'react';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 
 interface NavState {
   isNavigating: boolean;
@@ -10,18 +10,12 @@ interface NavState {
   eta?: Date;
   instructions?: Array<{ text: string }>;
   currentInstructionIndex?: number;
-  status?:
-    | "idle"
-    | "navigating"
-    | "arrived"
-    | "off-route"
-    | "recalculating"
-    | "error";
+  status?: 'idle' | 'navigating' | 'arrived' | 'off-route' | 'recalculating' | 'error';
 }
 
 interface RouteAnnouncerProps {
   navState: NavState | null;
-  locationStatus: "idle" | "searching" | "found" | "denied" | "error";
+  locationStatus: 'idle' | 'searching' | 'found' | 'denied' | 'error';
   selectedBuildingName?: string;
 }
 
@@ -44,7 +38,7 @@ export function RouteAnnouncer({
   selectedBuildingName,
 }: RouteAnnouncerProps) {
   const { safeT } = useSafeTranslation();
-  const [announcement, setAnnouncement] = useState("");
+  const [announcement, setAnnouncement] = useState('');
   const lastAnnouncementTime = useRef<number>(0);
   const lastDistance = useRef<number | undefined>(undefined);
 
@@ -60,22 +54,16 @@ export function RouteAnnouncer({
     const now = Date.now();
     const timeSinceLastAnnouncement = now - lastAnnouncementTime.current;
 
-    let newAnnouncement = "";
+    let newAnnouncement = '';
     let shouldAnnounce = false;
 
     // Priority 1: Arrived at destination
-    if (navState?.status === "arrived") {
-      newAnnouncement = safeT(
-        "navigationArrived",
-        "You have arrived at your destination.",
-      );
+    if (navState?.status === 'arrived') {
+      newAnnouncement = safeT('navigationArrived', 'You have arrived at your destination.');
       shouldAnnounce = true;
     }
     // Priority 2: Navigation updates (throttled)
-    else if (
-      navState?.isNavigating &&
-      navState.remainingDistance !== undefined
-    ) {
+    else if (navState?.isNavigating && navState.remainingDistance !== undefined) {
       const currentDistance = Math.round(navState.remainingDistance);
       const distanceChanged =
         lastDistance.current === undefined ||
@@ -85,13 +73,10 @@ export function RouteAnnouncer({
       if (distanceChanged || timeSinceLastAnnouncement >= THROTTLE_INTERVAL) {
         const distanceText =
           currentDistance < 1000
-            ? `${currentDistance} ${safeT("meters", "meters")}`
-            : `${(currentDistance / 1000).toFixed(1)} ${safeT("kilometers", "kilometers")}`;
+            ? `${currentDistance} ${safeT('meters', 'meters')}`
+            : `${(currentDistance / 1000).toFixed(1)} ${safeT('kilometers', 'kilometers')}`;
 
-        newAnnouncement = safeT(
-          "navigationUpdate",
-          `Continue for ${distanceText}.`,
-        );
+        newAnnouncement = safeT('navigationUpdate', `Continue for ${distanceText}.`);
 
         lastDistance.current = currentDistance;
         shouldAnnounce = true;
@@ -103,10 +88,7 @@ export function RouteAnnouncer({
       selectedBuildingName &&
       timeSinceLastAnnouncement >= THROTTLE_INTERVAL
     ) {
-      newAnnouncement = safeT(
-        "navigatingTo",
-        `Navigating to: ${selectedBuildingName}`,
-      );
+      newAnnouncement = safeT('navigatingTo', `Navigating to: ${selectedBuildingName}`);
       shouldAnnounce = true;
     }
 
@@ -118,12 +100,7 @@ export function RouteAnnouncer({
   /* eslint-enable react-hooks/set-state-in-effect */
 
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-      className="sr-only"
-    >
+    <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
       {announcement}
     </div>
   );

@@ -1,8 +1,8 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 
-vi.mock("next/navigation", () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
@@ -13,11 +13,11 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-import EventsFeed from "@/features/home/components/EventsFeed";
+import EventsFeed from '@/features/home/components/EventsFeed';
 
-describe("EventsFeed", () => {
-  it("renders the events header", () => {
+describe('EventsFeed', () => {
+  it('renders the events header', () => {
     render(<EventsFeed />);
-    expect(screen.getByText("Events Today")).toBeInTheDocument();
+    expect(screen.getByText('Events Today')).toBeInTheDocument();
   });
 });

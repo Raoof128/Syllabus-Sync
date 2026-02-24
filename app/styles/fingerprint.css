@@ -50,18 +50,14 @@
   }
 }
 
-.fp-login-container:hover:not(.scanning):not(.success):not(.error):not(
-    .disabled
-  ) {
+.fp-login-container:hover:not(.scanning):not(.success):not(.error):not(.disabled) {
   transform: translateY(-2px);
   box-shadow:
     0 16px 32px rgba(166, 25, 46, 0.3),
     0 12px 12px rgba(166, 25, 46, 0.25);
 }
 
-.fp-login-container:active:not(.scanning):not(.success):not(.error):not(
-    .disabled
-  ) {
+.fp-login-container:active:not(.scanning):not(.success):not(.error):not(.disabled) {
   transform: translateY(0);
 }
 

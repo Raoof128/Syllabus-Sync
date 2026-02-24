@@ -15,11 +15,11 @@
 // - Respects prefers-reduced-motion (static gradients)
 // - Low-frequency animations (60s+ duration) for minimal CPU impact
 // ============================================================================
-"use client";
+'use client';
 
-import { memo } from "react";
-import { LazyMotion, m, domAnimation, useReducedMotion } from "framer-motion";
-import { useHydration } from "@/lib/hooks/useHydration";
+import { memo } from 'react';
+import { LazyMotion, m, domAnimation, useReducedMotion } from 'framer-motion';
+import { useHydration } from '@/lib/hooks/useHydration';
 
 /**
  * MeshGradient Component
@@ -64,7 +64,7 @@ const MeshGradient = memo(() => {
           transition={{
             duration: 45,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
 
@@ -80,7 +80,7 @@ const MeshGradient = memo(() => {
           transition={{
             duration: 55,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
 
@@ -96,7 +96,7 @@ const MeshGradient = memo(() => {
           transition={{
             duration: 65,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
 
@@ -113,7 +113,7 @@ const MeshGradient = memo(() => {
           transition={{
             duration: 80,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
       </div>
@@ -121,6 +121,6 @@ const MeshGradient = memo(() => {
   );
 });
 
-MeshGradient.displayName = "MeshGradient";
+MeshGradient.displayName = 'MeshGradient';
 
 export default MeshGradient;

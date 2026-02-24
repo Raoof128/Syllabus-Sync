@@ -1,20 +1,20 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { toastUtils } from "@/lib/utils/toast";
-import { devLog } from "@/lib/utils/devLog";
-import { useSafeTranslation } from "@/lib/hooks/useSafeTranslation";
-import { fetchORSRoute } from "@/lib/services/ors";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { toastUtils } from '@/lib/utils/toast';
+import { devLog } from '@/lib/utils/devLog';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
+import { fetchORSRoute } from '@/lib/services/ors';
 import {
   parseRouteInstructions,
   NavigationStateManager,
   type NavigationState,
   type RouteInstruction,
-} from "@/features/map/lib/realtimeNavigation";
+} from '@/features/map/lib/realtimeNavigation';
 import {
   formatDistance,
   formatDuration,
   type RoutePreview,
-} from "@/features/map/lib/navigationHelpers";
-import { getBuildingGps, type Building } from "@/features/map/lib/buildings";
+} from '@/features/map/lib/navigationHelpers';
+import { getBuildingGps, type Building } from '@/features/map/lib/buildings';
 
 const mapLog = devLog.map;
 
@@ -23,10 +23,7 @@ interface UseMapNavigationProps {
   origin: { lat: number; lng: number } | null;
   isOffCampus: boolean;
   navManagerRef: React.MutableRefObject<NavigationStateManager | null>;
-  gpsToCrsSimple: (
-    lat: number,
-    lng: number,
-  ) => { lat: number; lng: number } | null;
+  gpsToCrsSimple: (lat: number, lng: number) => { lat: number; lng: number } | null;
   getBuildingLatLng: (building: Building) => { lat: number; lng: number };
 }
 
@@ -48,11 +45,10 @@ export function useMapNavigation({
   const [routeError, setRouteError] = useState<string | null>(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
   const [navState, setNavState] = useState<NavigationState | null>(null);
-  const [routeInstructions, setRouteInstructions] = useState<
-    RouteInstruction[]
-  >([]);
+  const [routeInstructions, setRouteInstructions] = useState<RouteInstruction[]>([]);
 
   const isNavigatingRef = useRef(isNavigating);
+  const activeDestinationIdRef = useRef<string | undefined>(undefined);
   const selectedBuildingRef = useRef(selectedBuilding);
   const originRef = useRef(origin);
   const stopNavigationRef = useRef<() => void>(() => {});
@@ -78,28 +74,23 @@ export function useMapNavigation({
     if (!mgr) return;
     mgr.setOnStateChange((state) => {
       setNavState(state);
-      if (state.status === "arrived" && isNavigatingRef.current) {
-        mapLog.log("User arrived at destination!");
-        toastUtils.success(
-          safeT("arrived", "Arrived!"),
-          selectedBuildingRef.current?.name || "",
-        );
+      if (state.status === 'arrived' && isNavigatingRef.current) {
+        mapLog.log('User arrived at destination!');
+        toastUtils.success(safeT('arrived', 'Arrived!'), selectedBuildingRef.current?.name || '');
         setIsNavigating(false);
         rerouteCountRef.current = 0;
       }
       // Trigger automatic re-route when off-route and recalculating
-      if (state.status === "recalculating" && isNavigatingRef.current) {
+      if (state.status === 'recalculating' && isNavigatingRef.current) {
         if (rerouteCountRef.current < MAX_REROUTES) {
           rerouteCountRef.current += 1;
-          mapLog.log(
-            `Off-route recalculation ${rerouteCountRef.current}/${MAX_REROUTES}`,
-          );
+          mapLog.log(`Off-route recalculation ${rerouteCountRef.current}/${MAX_REROUTES}`);
           setRerouteTrigger((prev) => prev + 1);
         } else {
-          mapLog.log("Max reroute attempts reached, stopping navigation");
+          mapLog.log('Max reroute attempts reached, stopping navigation');
           toastUtils.warning(
-            safeT("navigationError", "Navigation stopped"),
-            safeT("tooManyReroutes", "Unable to find route. Please try again."),
+            safeT('navigationError', 'Navigation stopped'),
+            safeT('tooManyReroutes', 'Unable to find route. Please try again.'),
           );
           stopNavigationRef.current();
         }
@@ -112,16 +103,16 @@ export function useMapNavigation({
   const startNavigation = useCallback(() => {
     if (isOffCampus) {
       toastUtils.warning(
-        safeT("locationOutsideCampusTitle", "Outside campus boundary"),
+        safeT('locationOutsideCampusTitle', 'Outside campus boundary'),
         safeT(
-          "locationOutsideCampusMessage",
-          "Navigation is disabled while you are outside campus.",
+          'locationOutsideCampusMessage',
+          'Navigation is disabled while you are outside campus.',
         ),
       );
       return;
     }
     if (!gpsRouteCoords.length || !preview || !navManagerRef.current) {
-      toastUtils.warning(safeT("noRouteAvailable", "No route available"));
+      toastUtils.warning(safeT('noRouteAvailable', 'No route available'));
       return;
     }
 
@@ -131,20 +122,17 @@ export function useMapNavigation({
     // Pass REAL GPS coordinates to navigation manager
     // gpsRouteCoords are already [lng, lat] from ORS
     rerouteCountRef.current = 0;
-    navManagerRef.current.startNavigation(
-      gpsRouteCoords,
-      instructions,
-      preview.distanceMeters,
-    );
+    navManagerRef.current.startNavigation(gpsRouteCoords, instructions, preview.distanceMeters);
     setIsNavigating(true);
+    activeDestinationIdRef.current = selectedBuilding?.id;
 
-    mapLog.log("Navigation started", {
+    mapLog.log('Navigation started', {
       totalDistance: preview.distanceMeters,
       estimatedTime: preview.durationSeconds,
     });
 
     toastUtils.success(
-      safeT("navigationStarted", "Navigation started"),
+      safeT('navigationStarted', 'Navigation started'),
       `${formatDistance(preview.distanceMeters)} • ${formatDuration(preview.durationSeconds)}`,
     );
   }, [
@@ -153,6 +141,7 @@ export function useMapNavigation({
     preview,
     navManagerRef,
     routeInstructions,
+    selectedBuilding?.id,
     safeT,
   ]);
 
@@ -161,13 +150,46 @@ export function useMapNavigation({
       navManagerRef.current.stopNavigation();
     }
     setIsNavigating(false);
+    activeDestinationIdRef.current = undefined;
     setNavState(null);
-    mapLog.log("Navigation stopped");
+    mapLog.log('Navigation stopped');
   }, [navManagerRef]);
 
   useEffect(() => {
     stopNavigationRef.current = stopNavigation;
   }, [stopNavigation]);
+
+  // If destination changes mid-navigation, stop and require explicit restart.
+  // This prevents guidance from continuing toward a stale destination.
+  useEffect(() => {
+    if (!isNavigatingRef.current) return;
+    const activeDestinationId = activeDestinationIdRef.current;
+    if (!activeDestinationId) return;
+
+    const nextDestinationId = selectedBuilding?.id;
+    if (nextDestinationId === activeDestinationId) return;
+
+    stopNavigationRef.current();
+    if (nextDestinationId) {
+      toastUtils.info(
+        safeT('destinationChanged', 'Destination changed'),
+        safeT(
+          'restartNavigationForNewDestination',
+          'Navigation stopped. Tap navigate again for the new destination.',
+        ),
+      );
+    }
+  }, [selectedBuilding?.id, safeT]);
+
+  // Campus-mode navigation must stop immediately once user leaves campus bounds.
+  useEffect(() => {
+    if (!isOffCampus || !isNavigatingRef.current) return;
+    stopNavigationRef.current();
+    toastUtils.warning(
+      safeT('locationOutsideCampusTitle', 'Outside campus boundary'),
+      safeT('locationOutsideCampusMessage', 'Navigation is disabled while you are outside campus.'),
+    );
+  }, [isOffCampus, safeT]);
 
   // Reroute Effect: re-fetch route when user goes significantly off-route
   useEffect(() => {
@@ -182,7 +204,7 @@ export function useMapNavigation({
       const destGps = getBuildingGps(currentBuilding!);
       if (!destGps || !currentOrigin) return;
 
-      mapLog.log("Rerouting from current position...");
+      mapLog.log('Rerouting from current position...');
       const {
         coordinates,
         preview: routeData,
@@ -215,7 +237,7 @@ export function useMapNavigation({
             routeData.distanceMeters,
           );
         }
-        mapLog.log("Reroute complete", { distance: routeData.distanceMeters });
+        mapLog.log('Reroute complete', { distance: routeData.distanceMeters });
       }
     }
 
@@ -230,6 +252,14 @@ export function useMapNavigation({
 
     async function updateRoute() {
       if (isNavigatingRef.current) return;
+      if (isOffCampus) {
+        setPreview(null);
+        setRouteError(null);
+        setRouteCoords([]);
+        setGpsRouteCoords([]);
+        setRouteInstructions([]);
+        return;
+      }
       if (!selectedBuilding || !origin) {
         setPreview(null);
         setRouteCoords([]);
@@ -275,7 +305,7 @@ export function useMapNavigation({
         setPreview(routeData);
         setRouteInstructions(orsData ? parseRouteInstructions(orsData) : []);
       } else {
-        setRouteError(error || "Unknown error");
+        setRouteError(error || 'Unknown error');
         setRouteCoords([]);
         setGpsRouteCoords([]);
         setPreview(null);
@@ -289,7 +319,7 @@ export function useMapNavigation({
       controller.abort();
       clearTimeout(timer);
     };
-  }, [selectedBuilding, origin, gpsToCrsSimple, getBuildingLatLng]);
+  }, [selectedBuilding, origin, isOffCampus, gpsToCrsSimple, getBuildingLatLng]);
 
   return {
     isNavigating,

@@ -1,10 +1,7 @@
-"use client";
+'use client';
 
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import {
-  MapSettings,
-  NotificationSettings,
-} from "@/features/settings/components";
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { MapSettings, NotificationSettings } from '@/features/settings/components';
 
 export default function GeneralSettingsPage() {
   const { t } = useTypedTranslation();

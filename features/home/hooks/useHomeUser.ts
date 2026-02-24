@@ -1,22 +1,15 @@
-import { useState, useEffect } from "react";
-import { useProfilesStore } from "@/lib/store/profilesStore";
-import { useHydration } from "@/lib/hooks";
-import {
-  createBrowserClient,
-  isSupabaseConfigured,
-} from "@/lib/supabase/client";
-import { AuthUser } from "../types";
+import { useState, useEffect } from 'react';
+import { useProfilesStore } from '@/lib/store/profilesStore';
+import { useHydration } from '@/lib/hooks';
+import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import { AuthUser } from '../types';
 
 export function useHomeUser(initialUser: AuthUser | null = null) {
   const [user, setUser] = useState<AuthUser | null>(initialUser);
   const profiles = useProfilesStore((state) => state.profiles);
   const currentProfileId = useProfilesStore((state) => state.currentProfileId);
-  const setCurrentProfile = useProfilesStore(
-    (state) => state.setCurrentProfile,
-  );
-  const getCurrentProfile = useProfilesStore(
-    (state) => state.getCurrentProfile,
-  );
+  const setCurrentProfile = useProfilesStore((state) => state.setCurrentProfile);
+  const getCurrentProfile = useProfilesStore((state) => state.getCurrentProfile);
   const hasHydrated = useHydration();
   // Avoid reading persisted store state until after hydration to prevent SSR/client text mismatches.
   const currentProfile = hasHydrated ? getCurrentProfile() : null;
@@ -74,12 +67,11 @@ export function useHomeUser(initialUser: AuthUser | null = null) {
     if (user?.user_metadata?.name) return user.user_metadata.name;
     // Extract name from email prefix and capitalize it
     if (user?.email) {
-      const emailPrefix = user.email.split("@")[0];
-      const nameWithoutNumbers = emailPrefix.replace(/\d+$/, "");
+      const emailPrefix = user.email.split('@')[0];
+      const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
       if (nameWithoutNumbers.length > 0) {
         return (
-          nameWithoutNumbers.charAt(0).toUpperCase() +
-          nameWithoutNumbers.slice(1).toLowerCase()
+          nameWithoutNumbers.charAt(0).toUpperCase() + nameWithoutNumbers.slice(1).toLowerCase()
         );
       }
     }

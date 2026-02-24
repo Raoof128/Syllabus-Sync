@@ -1,15 +1,15 @@
-import { z } from "zod";
-import { createServerClient } from "@/lib/supabase/server";
+import { z } from 'zod';
+import { createServerClient } from '@/lib/supabase/server';
 import {
   jsonSuccess,
   jsonError,
   handleValidationError,
   handleDatabaseError,
   ERROR_CODES,
-} from "@/app/api/_lib/response";
-import { mapNotificationRow } from "@/app/api/_lib/mappers";
-import { requireAuth, validateRequest } from "@/app/api/_lib/middleware";
-import { logger } from "@/lib/logger";
+} from '@/app/api/_lib/response';
+import { mapNotificationRow } from '@/app/api/_lib/mappers';
+import { requireAuth, validateRequest } from '@/app/api/_lib/middleware';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // SCHEMAS & VALIDATION
@@ -19,7 +19,7 @@ const notificationSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1).max(200),
   message: z.string().min(1).max(1000),
-  type: z.enum(["deadline", "event", "class", "system"]),
+  type: z.enum(['deadline', 'event', 'class', 'system']),
   read: z.boolean().default(false),
   link: z.string().url().optional(),
   relatedId: z.string().uuid().optional(),
@@ -27,7 +27,7 @@ const notificationSchema = z.object({
 });
 
 const notificationQuerySchema = z.object({
-  type: z.enum(["deadline", "event", "class", "system"]).optional(),
+  type: z.enum(['deadline', 'event', 'class', 'system']).optional(),
   read: z.boolean().optional(),
   limit: z.number().int().min(1).max(100).default(50),
   offset: z.number().int().min(0).default(0),
@@ -52,38 +52,31 @@ export async function GET(request: Request) {
       const supabase = await createServerClient();
       const url = new URL(request.url);
       const query = notificationQuerySchema.parse({
-        type: url.searchParams.get("type") || undefined,
-        read: url.searchParams.get("read")
-          ? url.searchParams.get("read") === "true"
-          : undefined,
-        limit: url.searchParams.get("limit")
-          ? parseInt(url.searchParams.get("limit")!)
-          : undefined,
-        offset: url.searchParams.get("offset")
-          ? parseInt(url.searchParams.get("offset")!)
+        type: url.searchParams.get('type') || undefined,
+        read: url.searchParams.get('read') ? url.searchParams.get('read') === 'true' : undefined,
+        limit: url.searchParams.get('limit') ? parseInt(url.searchParams.get('limit')!) : undefined,
+        offset: url.searchParams.get('offset')
+          ? parseInt(url.searchParams.get('offset')!)
           : undefined,
       });
 
       let queryBuilder = supabase
-        .from("notifications")
-        .select("*", { count: "exact" })
-        .eq("user_id", userId)
-        .is("deleted_at", null) // Exclude soft-deleted
-        .order("created_at", { ascending: false });
+        .from('notifications')
+        .select('*', { count: 'exact' })
+        .eq('user_id', userId)
+        .is('deleted_at', null) // Exclude soft-deleted
+        .order('created_at', { ascending: false });
 
       // Apply filters
       if (query.type) {
-        queryBuilder = queryBuilder.eq("type", query.type);
+        queryBuilder = queryBuilder.eq('type', query.type);
       }
       if (query.read !== undefined) {
-        queryBuilder = queryBuilder.eq("read", query.read);
+        queryBuilder = queryBuilder.eq('read', query.read);
       }
 
       // Apply pagination
-      queryBuilder = queryBuilder.range(
-        query.offset,
-        query.offset + query.limit - 1,
-      );
+      queryBuilder = queryBuilder.range(query.offset, query.offset + query.limit - 1);
 
       const { data, error, count } = await queryBuilder;
 
@@ -105,12 +98,8 @@ export async function GET(request: Request) {
       if (error instanceof z.ZodError) {
         return handleValidationError(error);
       }
-      logger.error("GET /api/notifications error:", error);
-      return jsonError(
-        "Failed to fetch notifications",
-        500,
-        ERROR_CODES.INTERNAL_ERROR,
-      );
+      logger.error('GET /api/notifications error:', error);
+      return jsonError('Failed to fetch notifications', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
 }
@@ -139,11 +128,11 @@ export async function DELETE(request: Request) {
       const supabase = await createServerClient();
 
       const { data, error } = await supabase
-        .from("notifications")
+        .from('notifications')
         .delete()
-        .eq("user_id", userId)
-        .is("deleted_at", null)
-        .select("id");
+        .eq('user_id', userId)
+        .is('deleted_at', null)
+        .select('id');
 
       if (error) {
         return handleDatabaseError(error);
@@ -151,15 +140,11 @@ export async function DELETE(request: Request) {
 
       return jsonSuccess({
         deleted: data?.length ?? 0,
-        message: "All notifications cleared",
+        message: 'All notifications cleared',
       });
     } catch (error) {
-      logger.error("DELETE /api/notifications error:", error);
-      return jsonError(
-        "Failed to clear notifications",
-        500,
-        ERROR_CODES.INTERNAL_ERROR,
-      );
+      logger.error('DELETE /api/notifications error:', error);
+      return jsonError('Failed to clear notifications', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
 }
@@ -168,55 +153,44 @@ export async function POST(request: Request) {
   // Note: CSRF protection removed - Supabase authentication with requireAuth provides sufficient security
   // for client-side API calls. CSRF is more relevant for cookie-based session auth without tokens.
   return requireAuth(request, async (userId) => {
-    return validateRequest(notificationSchema)(
-      request,
-      async (validatedData) => {
-        try {
-          const supabase = await createServerClient();
-          const payload = {
-            ...validatedData,
-            id: validatedData.id ?? crypto.randomUUID(),
-            createdAt: validatedData.createdAt ?? new Date(),
-          };
+    return validateRequest(notificationSchema)(request, async (validatedData) => {
+      try {
+        const supabase = await createServerClient();
+        const payload = {
+          ...validatedData,
+          id: validatedData.id ?? crypto.randomUUID(),
+          createdAt: validatedData.createdAt ?? new Date(),
+        };
 
-          const { data, error } = await supabase
-            .from("notifications")
-            .insert({
-              id: payload.id,
-              user_id: userId,
-              title: payload.title,
-              message: payload.message,
-              type: payload.type,
-              read: payload.read,
-              link: payload.link,
-              related_id: payload.relatedId,
-              created_at: payload.createdAt.toISOString(),
-            })
-            .select("*")
-            .single();
+        const { data, error } = await supabase
+          .from('notifications')
+          .insert({
+            id: payload.id,
+            user_id: userId,
+            title: payload.title,
+            message: payload.message,
+            type: payload.type,
+            read: payload.read,
+            link: payload.link,
+            related_id: payload.relatedId,
+            created_at: payload.createdAt.toISOString(),
+          })
+          .select('*')
+          .single();
 
-          if (error) {
-            if (error.code === "23505") {
-              // Unique constraint violation
-              return jsonError(
-                "Notification already exists",
-                409,
-                ERROR_CODES.CONFLICT,
-              );
-            }
-            return handleDatabaseError(error);
+        if (error) {
+          if (error.code === '23505') {
+            // Unique constraint violation
+            return jsonError('Notification already exists', 409, ERROR_CODES.CONFLICT);
           }
-
-          return jsonSuccess(mapNotificationRow(data), 201);
-        } catch (error) {
-          logger.error("POST /api/notifications error:", error);
-          return jsonError(
-            "Failed to create notification",
-            500,
-            ERROR_CODES.INTERNAL_ERROR,
-          );
+          return handleDatabaseError(error);
         }
-      },
-    );
+
+        return jsonSuccess(mapNotificationRow(data), 201);
+      } catch (error) {
+        logger.error('POST /api/notifications error:', error);
+        return jsonError('Failed to create notification', 500, ERROR_CODES.INTERNAL_ERROR);
+      }
+    });
   });
 }

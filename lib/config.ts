@@ -11,13 +11,13 @@
  */
 export const UNIVERSITY_CONFIG = {
   // Full name of the university
-  name: "Macquarie University",
+  name: 'Macquarie University',
   // Short name for display in tight spaces
-  shortName: "Macquarie University",
+  shortName: 'Macquarie University',
   // University website
-  website: "https://www.mq.edu.au",
+  website: 'https://www.mq.edu.au',
   // Support email
-  supportEmail: "support@mq.edu.au",
+  supportEmail: 'support@mq.edu.au',
 } as const;
 
 /**
@@ -26,15 +26,15 @@ export const UNIVERSITY_CONFIG = {
  */
 export const APP_CONFIG = {
   // App name displayed in header and title
-  name: "Syllabus Sync",
+  name: 'Syllabus Sync',
   // App base URL (for security checks)
-  url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   // App tagline/description
-  description: "Campus navigation and schedule management",
+  description: 'Campus navigation and schedule management',
   // Full description for metadata
   fullDescription: `Campus navigation and schedule management for ${UNIVERSITY_CONFIG.name}`,
   // Version number
-  version: "1.0.0",
+  version: '1.0.0',
 } as const;
 
 /**
@@ -43,11 +43,11 @@ export const APP_CONFIG = {
  */
 export const DEMO_USER = {
   // Display name
-  name: "Student",
+  name: 'Student',
   // Student ID (optional, for display)
-  studentId: "",
+  studentId: '',
   // Email
-  email: "",
+  email: '',
 } as const;
 
 /**
@@ -57,11 +57,11 @@ export const DEMO_USER = {
  */
 export const BRAND_COLORS = {
   // Primary brand color (used for accents, user avatar, etc.)
-  primary: "#A6192E", // Macquarie Red
+  primary: '#A6192E', // Macquarie Red
   // Secondary brand color
-  secondary: "#002A45", // Macquarie Blue
+  secondary: '#002A45', // Macquarie Blue
   // Accent color
-  accent: "#FFB81C", // Macquarie Gold
+  accent: '#FFB81C', // Macquarie Gold
 } as const;
 
 /**
@@ -69,14 +69,14 @@ export const BRAND_COLORS = {
  * Colors available for users to assign to their units/courses
  */
 export const UNIT_COLORS = [
-  { name: "Red", value: "#A6192E", translationKey: "colorUniversityRed" },
-  { name: "Blue", value: "#1E5AA8", translationKey: "colorUniversityBlue" },
-  { name: "Gold", value: "#FFB81C", translationKey: "colorUniversityGold" },
-  { name: "Green", value: "#10b981", translationKey: "colorGreen" },
-  { name: "Purple", value: "#a855f7", translationKey: "colorPurple" },
-  { name: "Orange", value: "#f97316", translationKey: "colorOrange" },
-  { name: "Pink", value: "#ec4899", translationKey: "colorPink" },
-  { name: "Cyan", value: "#06b6d4", translationKey: "colorCyan" },
+  { name: 'Red', value: '#A6192E', translationKey: 'colorUniversityRed' },
+  { name: 'Blue', value: '#1E5AA8', translationKey: 'colorUniversityBlue' },
+  { name: 'Gold', value: '#FFB81C', translationKey: 'colorUniversityGold' },
+  { name: 'Green', value: '#10b981', translationKey: 'colorGreen' },
+  { name: 'Purple', value: '#a855f7', translationKey: 'colorPurple' },
+  { name: 'Orange', value: '#f97316', translationKey: 'colorOrange' },
+  { name: 'Pink', value: '#ec4899', translationKey: 'colorPink' },
+  { name: 'Cyan', value: '#06b6d4', translationKey: 'colorCyan' },
 ] as const;
 
 /**
@@ -84,7 +84,7 @@ export const UNIT_COLORS = [
  * @deprecated Use `buildings` from '@/features/map/lib/buildings' instead.
  * This export is kept for backwards compatibility but imports from the canonical source.
  */
-export { buildings as CAMPUS_BUILDINGS } from "@/features/map/lib/buildings";
+export { buildings as CAMPUS_BUILDINGS } from '@/features/map/lib/buildings';
 
 /**
  * Feature Flags
@@ -108,17 +108,17 @@ export const FEATURES = {
  * 'glass' - Current liquid glass style
  * 'solid' - New solid, designed product style
  */
-export const HOME_STYLE_VARIANT = "solid";
+export const HOME_STYLE_VARIANT = 'solid';
 
 /**
  * Social Links
  * Links to university social media (optional)
  */
 export const SOCIAL_LINKS = {
-  twitter: "https://x.com/macquarieuni",
-  facebook: "https://facebook.com/macquarieuniversity",
-  instagram: "https://instagram.com/macquarieuni",
-  linkedin: "https://linkedin.com/school/macquarie-university",
+  twitter: 'https://x.com/macquarieuni',
+  facebook: 'https://facebook.com/macquarieuniversity',
+  instagram: 'https://instagram.com/macquarieuni',
+  linkedin: 'https://linkedin.com/school/macquarie-university',
 } as const;
 
 /**
@@ -126,8 +126,8 @@ export const SOCIAL_LINKS = {
  * Links to documentation, feedback, and support
  */
 export const EXTERNAL_LINKS = {
-  documentation: "https://github.com/mrpouyaalavi",
-  feedback: "mailto:support@mq.edu.au?subject=Syllabus Sync Feedback",
-  privacy: "/privacy",
-  terms: "/terms",
+  documentation: 'https://github.com/mrpouyaalavi',
+  feedback: 'mailto:support@mq.edu.au?subject=Syllabus Sync Feedback',
+  privacy: '/privacy',
+  terms: '/terms',
 } as const;

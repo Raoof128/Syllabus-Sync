@@ -1,1 +1,1 @@
-export { default } from "./config/next/next.config";
+export { default } from './config/next/next.config';

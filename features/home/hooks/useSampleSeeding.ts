@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { useUnitsStore } from "@/lib/store/unitsStore";
-import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
-import { sampleUnits, sampleDeadlines } from "@/data/sampleUnits";
-import { useHydration } from "@/lib/hooks";
+import { useState, useEffect, useRef } from 'react';
+import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { sampleUnits, sampleDeadlines } from '@/data/sampleUnits';
+import { useHydration } from '@/lib/hooks';
 
 export function useSampleSeeding() {
   const hasHydrated = useHydration();
@@ -10,9 +10,9 @@ export function useSampleSeeding() {
   const addDeadline = useDeadlinesStore((state) => state.addDeadline);
 
   const [seedDisabled] = useState(() => {
-    if (typeof window === "undefined") return false;
+    if (typeof window === 'undefined') return false;
     try {
-      return localStorage.getItem("seed-disabled") === "true";
+      return localStorage.getItem('seed-disabled') === 'true';
     } catch {
       return false;
     }
@@ -25,13 +25,12 @@ export function useSampleSeeding() {
       return;
     }
 
-    const unitsSeededKey = "units-seeded";
-    const deadlinesSeededKey = "deadlines-seeded";
+    const unitsSeededKey = 'units-seeded';
+    const deadlinesSeededKey = 'deadlines-seeded';
 
     try {
-      const unitsSeeded = localStorage.getItem(unitsSeededKey) === "true";
-      const deadlinesSeeded =
-        localStorage.getItem(deadlinesSeededKey) === "true";
+      const unitsSeeded = localStorage.getItem(unitsSeededKey) === 'true';
+      const deadlinesSeeded = localStorage.getItem(deadlinesSeededKey) === 'true';
 
       // Validate sample data before adding
       const validUnits = sampleUnits.filter((unit) => {
@@ -58,27 +57,21 @@ export function useSampleSeeding() {
 
       if (!unitsSeeded && validUnits.length > 0) {
         validUnits.forEach(addUnit);
-        localStorage.setItem(unitsSeededKey, "true");
+        localStorage.setItem(unitsSeededKey, 'true');
       }
 
       if (!deadlinesSeeded && validDeadlines.length > 0) {
         validDeadlines.forEach(addDeadline);
-        localStorage.setItem(deadlinesSeededKey, "true");
+        localStorage.setItem(deadlinesSeededKey, 'true');
       }
     } catch {
       try {
         // Fallback: add data without localStorage
         const validUnits = sampleUnits.filter(
-          (unit) =>
-            unit &&
-            unit.code &&
-            unit.name &&
-            unit.color &&
-            Array.isArray(unit.schedule),
+          (unit) => unit && unit.code && unit.name && unit.color && Array.isArray(unit.schedule),
         );
         const validDeadlines = sampleDeadlines.filter(
-          (deadline) =>
-            deadline && deadline.title && deadline.unitCode && deadline.dueDate,
+          (deadline) => deadline && deadline.title && deadline.unitCode && deadline.dueDate,
         );
 
         validUnits.forEach(addUnit);

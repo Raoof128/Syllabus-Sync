@@ -1,15 +1,10 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { Unit, Deadline } from "@/lib/types";
-import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/mq/badge";
+import { useMemo } from 'react';
+import { Unit, Deadline } from '@/lib/types';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/mq/badge';
 import {
   BookOpen,
   FileText,
@@ -19,13 +14,13 @@ import {
   Circle,
   AlertCircle,
   Navigation,
-} from "lucide-react";
-import Link from "next/link";
-import { format, isPast, isFuture, differenceInDays } from "date-fns";
-import { cn } from "@/lib/utils";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { formatScheduleTime, formatLocation } from "@/lib/utils/locale";
-import ItemActionButtons from "@/features/calendar/components/ItemActionButtons";
+} from 'lucide-react';
+import Link from 'next/link';
+import { format, isPast, isFuture, differenceInDays } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
+import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
 
 interface UnitDetailPanelProps {
   unit: Unit | null;
@@ -63,13 +58,11 @@ export default function UnitDetailPanel({
     const filtered = deadlines.filter((d) => d.unitCode === unit.code);
 
     return {
-      assignments: filtered.filter((d) => d.type === "Assignment"),
-      exams: filtered.filter((d) => d.type === "Exam"),
-      quizzes: filtered.filter((d) => d.type === "Quiz"),
-      presentations: filtered.filter((d) => d.type === "Presentation"),
-      all: filtered.sort(
-        (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
-      ),
+      assignments: filtered.filter((d) => d.type === 'Assignment'),
+      exams: filtered.filter((d) => d.type === 'Exam'),
+      quizzes: filtered.filter((d) => d.type === 'Quiz'),
+      presentations: filtered.filter((d) => d.type === 'Presentation'),
+      all: filtered.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()),
     };
   }, [deadlines, unit]);
 
@@ -83,34 +76,32 @@ export default function UnitDetailPanel({
     return {
       total: all.length,
       completed: all.filter((d) => d.completed).length,
-      upcoming: all.filter((d) => !d.completed && isFuture(new Date(d.dueDate)))
-        .length,
-      overdue: all.filter((d) => !d.completed && isPast(new Date(d.dueDate)))
-        .length,
+      upcoming: all.filter((d) => !d.completed && isFuture(new Date(d.dueDate))).length,
+      overdue: all.filter((d) => !d.completed && isPast(new Date(d.dueDate))).length,
     };
   }, [unitDeadlines.all, unit]);
 
   if (!unit) return null;
 
   const getDeadlineStatus = (deadline: Deadline) => {
-    if (deadline.completed) return "completed";
+    if (deadline.completed) return 'completed';
     const dueDate = new Date(deadline.dueDate);
-    if (isPast(dueDate)) return "overdue";
+    if (isPast(dueDate)) return 'overdue';
     const daysUntil = differenceInDays(dueDate, new Date());
-    if (daysUntil <= 3) return "urgent";
-    return "upcoming";
+    if (daysUntil <= 3) return 'urgent';
+    return 'upcoming';
   };
 
   const formatDueDate = (date: Date) => {
     const d = new Date(date);
     const daysUntil = differenceInDays(d, new Date());
 
-    if (daysUntil === 0) return "Due today";
-    if (daysUntil === 1) return "Due tomorrow";
+    if (daysUntil === 0) return 'Due today';
+    if (daysUntil === 1) return 'Due tomorrow';
     if (daysUntil < 0) return `${Math.abs(daysUntil)} days overdue`;
     if (daysUntil <= 7) return `Due in ${daysUntil} days`;
 
-    return format(d, "MMM d, yyyy");
+    return format(d, 'MMM d, yyyy');
   };
 
   const DeadlineItem = ({ deadline }: { deadline: Deadline }) => {
@@ -121,14 +112,14 @@ export default function UnitDetailPanel({
         role="button"
         tabIndex={0}
         className={cn(
-          "flex items-center gap-3 p-3 rounded-lg border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:border-opacity-80",
-          status === "completed" && "opacity-60",
-          status === "upcoming" && "hover:border-mq-primary/30",
+          'flex items-center gap-3 p-3 rounded-lg border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:border-opacity-80',
+          status === 'completed' && 'opacity-60',
+          status === 'upcoming' && 'hover:border-mq-primary/30',
         )}
-        style={{ borderLeftColor: unit.color, borderLeftWidth: "4px" }}
+        style={{ borderLeftColor: unit.color, borderLeftWidth: '4px' }}
         onClick={() => onEditDeadline?.(deadline)}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+          if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             onEditDeadline?.(deadline);
           }
@@ -143,7 +134,7 @@ export default function UnitDetailPanel({
         >
           {deadline.completed ? (
             <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-          ) : status === "overdue" ? (
+          ) : status === 'overdue' ? (
             <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
           ) : (
             <Circle className="h-5 w-5 text-mq-content-secondary hover:text-mq-primary" />
@@ -153,10 +144,7 @@ export default function UnitDetailPanel({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h4
-              className={cn(
-                "font-medium text-sm truncate",
-                deadline.completed && "line-through",
-              )}
+              className={cn('font-medium text-sm truncate', deadline.completed && 'line-through')}
             >
               {unit.code} – {deadline.title}
             </h4>
@@ -167,7 +155,7 @@ export default function UnitDetailPanel({
                 backgroundColor: `${unit.color}25`,
                 color: unit.color,
                 borderColor: `${unit.color}50`,
-                textShadow: "none",
+                textShadow: 'none',
               }}
             >
               {deadline.type}
@@ -175,30 +163,28 @@ export default function UnitDetailPanel({
           </div>
           <p
             className={cn(
-              "text-xs mt-0.5",
-              status === "overdue" && "text-red-600",
-              status === "urgent" && "text-amber-600",
-              (status === "upcoming" || status === "completed") &&
-                "text-mq-content-secondary",
+              'text-xs mt-0.5',
+              status === 'overdue' && 'text-red-600',
+              status === 'urgent' && 'text-amber-600',
+              (status === 'upcoming' || status === 'completed') && 'text-mq-content-secondary',
             )}
           >
-            {formatDueDate(deadline.dueDate)} •{" "}
-            {format(new Date(deadline.dueDate), "h:mm a")}
+            {formatDueDate(deadline.dueDate)} • {format(new Date(deadline.dueDate), 'h:mm a')}
           </p>
         </div>
 
         <Badge
           variant="neutral"
           className={cn(
-            "text-[10px]",
-            deadline.priority === "Urgent" &&
-              "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300",
-            deadline.priority === "High" &&
-              "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300",
-            deadline.priority === "Medium" &&
-              "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300",
-            deadline.priority === "Low" &&
-              "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300",
+            'text-[10px]',
+            deadline.priority === 'Urgent' &&
+              'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
+            deadline.priority === 'High' &&
+              'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
+            deadline.priority === 'Medium' &&
+              'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
+            deadline.priority === 'Low' &&
+              'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
           )}
         >
           {deadline.priority}
@@ -240,7 +226,7 @@ export default function UnitDetailPanel({
               <div
                 className="w-6 h-6 rounded-full border-2"
                 style={{ backgroundColor: unit.color, borderColor: unit.color }}
-                title={t("unitColor")}
+                title={t('unitColor')}
               />
             </div>
           </div>
@@ -250,19 +236,13 @@ export default function UnitDetailPanel({
         <div className="flex flex-wrap gap-4 py-3 border-b border-mq-border">
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
             <MapPin className="h-4 w-4" />
-            <span>
-              {formatLocation(
-                unit.location.building,
-                unit.location.room,
-                t("room"),
-              )}
-            </span>
+            <span>{formatLocation(unit.location.building, unit.location.room, t('room'))}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
             <Clock className="h-4 w-4" />
             <span>
               {unit.schedule.length} class
-              {unit.schedule.length !== 1 ? "es" : ""}/week
+              {unit.schedule.length !== 1 ? 'es' : ''}/week
             </span>
           </div>
         </div>
@@ -284,18 +264,11 @@ export default function UnitDetailPanel({
               </Link>
             </div>
             <div className="flex items-center gap-3">
-              <div
-                className="w-4 h-4 rounded shrink-0"
-                style={{ backgroundColor: unit.color }}
-              />
+              <div className="w-4 h-4 rounded shrink-0" style={{ backgroundColor: unit.color }} />
               <div>
-                <p className="font-semibold text-sm">
-                  {unit.location.building}
-                </p>
+                <p className="font-semibold text-sm">{unit.location.building}</p>
                 {unit.location.room && (
-                  <p className="text-xs text-mq-content-secondary">
-                    Room {unit.location.room}
-                  </p>
+                  <p className="text-xs text-mq-content-secondary">Room {unit.location.room}</p>
                 )}
               </div>
             </div>
@@ -308,33 +281,23 @@ export default function UnitDetailPanel({
             <div className="text-2xl font-bold" style={{ color: unit.color }}>
               {stats.total}
             </div>
-            <div className="text-xs text-mq-content-secondary">
-              {t("totalLabel")}
-            </div>
+            <div className="text-xs text-mq-content-secondary">{t('totalLabel')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {stats.completed}
             </div>
-            <div className="text-xs text-mq-content-secondary">
-              {t("completed")}
-            </div>
+            <div className="text-xs text-mq-content-secondary">{t('completed')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {stats.upcoming}
             </div>
-            <div className="text-xs text-mq-content-secondary">
-              {t("upcomingLabel")}
-            </div>
+            <div className="text-xs text-mq-content-secondary">{t('upcomingLabel')}</div>
           </div>
           <div className="text-center p-2 rounded-lg bg-mq-background-secondary border border-mq-border">
-            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
-              {stats.overdue}
-            </div>
-            <div className="text-xs text-mq-content-secondary">
-              {t("overdueLabel")}
-            </div>
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">{stats.overdue}</div>
+            <div className="text-xs text-mq-content-secondary">{t('overdueLabel')}</div>
           </div>
         </div>
 
@@ -345,12 +308,8 @@ export default function UnitDetailPanel({
               <div className="text-mq-content-tertiary">
                 <FileText className="h-12 w-12 mx-auto mb-3" />
               </div>
-              <p className="text-mq-content-secondary">
-                {t("noUnitsForDeadline")}
-              </p>
-              <p className="text-xs text-mq-content-tertiary mt-1">
-                {t("noUnitsForDeadlineDesc")}
-              </p>
+              <p className="text-mq-content-secondary">{t('noUnitsForDeadline')}</p>
+              <p className="text-xs text-mq-content-tertiary mt-1">{t('noUnitsForDeadlineDesc')}</p>
             </div>
           ) : (
             <>
@@ -359,7 +318,7 @@ export default function UnitDetailPanel({
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
                     <FileText className="h-4 w-4" />
-                    {t("assignments")} ({unitDeadlines.assignments.length})
+                    {t('assignments')} ({unitDeadlines.assignments.length})
                   </h3>
                   <div className="space-y-2">
                     {unitDeadlines.assignments.map((d) => (
@@ -374,7 +333,7 @@ export default function UnitDetailPanel({
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
                     <BookOpen className="h-4 w-4" />
-                    {t("exams")} ({unitDeadlines.exams.length})
+                    {t('exams')} ({unitDeadlines.exams.length})
                   </h3>
                   <div className="space-y-2">
                     {unitDeadlines.exams.map((d) => (
@@ -389,7 +348,7 @@ export default function UnitDetailPanel({
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
                     <AlertCircle className="h-4 w-4 text-amber-500" />
-                    {t("quizzes")} ({unitDeadlines.quizzes.length})
+                    {t('quizzes')} ({unitDeadlines.quizzes.length})
                   </h3>
                   <div className="space-y-2">
                     {unitDeadlines.quizzes.map((d) => (
@@ -404,7 +363,7 @@ export default function UnitDetailPanel({
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
                     <Clock className="h-4 w-4" />
-                    {t("presentations")} ({unitDeadlines.presentations.length})
+                    {t('presentations')} ({unitDeadlines.presentations.length})
                   </h3>
                   <div className="space-y-2">
                     {unitDeadlines.presentations.map((d) => (
@@ -420,7 +379,7 @@ export default function UnitDetailPanel({
         {/* Schedule Preview */}
         {unit.schedule.length > 0 && (
           <div className="flex-shrink-0 pt-3 border-t border-mq-border">
-            <h3 className="text-sm font-medium mb-2">{t("weeklySchedule")}</h3>
+            <h3 className="text-sm font-medium mb-2">{t('weeklySchedule')}</h3>
             <div className="flex flex-wrap gap-2">
               {unit.schedule.map((s) => (
                 <div
@@ -433,7 +392,7 @@ export default function UnitDetailPanel({
                 >
                   <span className="font-medium">{s.day.slice(0, 3)}</span>
                   <span>
-                    {formatScheduleTime(s.startTime, language)} -{" "}
+                    {formatScheduleTime(s.startTime, language)} -{' '}
                     {formatScheduleTime(s.endTime, language)}
                   </span>
                 </div>

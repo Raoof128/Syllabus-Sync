@@ -1,7 +1,7 @@
 // app/offline/page.tsx
-"use client";
+'use client';
 
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export default function OfflinePage() {
   const { t } = useTypedTranslation();
@@ -27,11 +27,9 @@ export default function OfflinePage() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-mq-content">
-            {t("youAreOffline")}
-          </h1>
+          <h1 className="text-2xl font-bold text-mq-content">{t('youAreOffline')}</h1>
           <p className="text-mq-content-secondary text-sm leading-relaxed">
-            {t("youAreOfflineDesc")}
+            {t('youAreOfflineDesc')}
           </p>
         </div>
 
@@ -39,7 +37,7 @@ export default function OfflinePage() {
           onClick={() => window.location.reload()}
           className="inline-flex items-center gap-2 rounded-mq-md bg-mq-primary px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-mq-primary/90 focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 focus:ring-offset-mq-background"
         >
-          {t("tryAgain")}
+          {t('tryAgain')}
         </button>
       </div>
     </div>

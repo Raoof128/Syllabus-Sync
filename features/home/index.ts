@@ -1,2 +1,2 @@
-export * from "./components/WelcomeHeader";
-export * from "./components/TodaySchedule";
+export * from './components/WelcomeHeader';
+export * from './components/TodaySchedule';

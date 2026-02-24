@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/mq/button";
-import { Download, Trash2 } from "lucide-react";
-import { ExportDataDialog } from "./ExportDataDialog";
-import { ClearDataDialog } from "./ClearDataDialog";
-import type { TranslationKey } from "@/lib/i18n/translations";
+import { useState } from 'react';
+import { Button } from '@/components/ui/mq/button';
+import { Download, Trash2 } from 'lucide-react';
+import { ExportDataDialog } from './ExportDataDialog';
+import { ClearDataDialog } from './ClearDataDialog';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 type DataManagementProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -22,10 +22,8 @@ export function DataManagement({ t, language }: DataManagementProps) {
       <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-mq-content">{t("exportData")}</h3>
-            <p className="text-mq-sm text-mq-content-secondary">
-              {t("exportDataDesc")}
-            </p>
+            <h3 className="font-semibold text-mq-content">{t('exportData')}</h3>
+            <p className="text-mq-sm text-mq-content-secondary">{t('exportDataDesc')}</p>
           </div>
           <Button
             variant="ghost"
@@ -35,7 +33,7 @@ export function DataManagement({ t, language }: DataManagementProps) {
             data-testid="export-data-button"
           >
             <Download className="h-4 w-4 mr-2" aria-hidden="true" />
-            {t("export")}
+            {t('export')}
           </Button>
         </div>
       </div>
@@ -44,12 +42,8 @@ export function DataManagement({ t, language }: DataManagementProps) {
       <div className="p-3 bg-mq-error/5 rounded-mq-lg border border-mq-error/20 hover:border-mq-error/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.1)] transition-all duration-300">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-mq-content">
-              {t("clearAllData")}
-            </h3>
-            <p className="text-mq-sm text-mq-content-secondary">
-              {t("clearAllDataDesc")}
-            </p>
+            <h3 className="font-semibold text-mq-content">{t('clearAllData')}</h3>
+            <p className="text-mq-sm text-mq-content-secondary">{t('clearAllDataDesc')}</p>
           </div>
           <Button
             variant="destructive"
@@ -58,7 +52,7 @@ export function DataManagement({ t, language }: DataManagementProps) {
             data-testid="clear-data-button"
           >
             <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
-            {t("clearData")}
+            {t('clearData')}
           </Button>
         </div>
       </div>
@@ -70,11 +64,7 @@ export function DataManagement({ t, language }: DataManagementProps) {
         language={language}
       />
 
-      <ClearDataDialog
-        open={showClearDataDialog}
-        onOpenChange={setShowClearDataDialog}
-        t={t}
-      />
+      <ClearDataDialog open={showClearDataDialog} onOpenChange={setShowClearDataDialog} t={t} />
     </>
   );
 }

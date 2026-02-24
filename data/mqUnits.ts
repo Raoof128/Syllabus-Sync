@@ -18,14 +18,14 @@ export interface MQUnit {
 }
 
 // Import the MQ unit data
-import { mqUnitsData } from "./mqUnitsData";
+import { mqUnitsData } from './mqUnitsData';
 
 // Export the MQ units data
 export const mqUnits: MQUnit[] = mqUnitsData;
 
 // Search function for MQ units - matches code, title, and description
 export function searchMQUnits(query: string, limit: number = 20): MQUnit[] {
-  if (!query || query.trim() === "") {
+  if (!query || query.trim() === '') {
     return mqUnits.slice(0, limit);
   }
 
@@ -96,7 +96,5 @@ export function getMQUnitsByLevel(level: number): MQUnit[] {
 // Get all units for a specific school
 export function getMQUnitsBySchool(school: string): MQUnit[] {
   const normalizedSchool = school.toLowerCase();
-  return mqUnits.filter((unit) =>
-    unit.school.toLowerCase().includes(normalizedSchool),
-  );
+  return mqUnits.filter((unit) => unit.school.toLowerCase().includes(normalizedSchool));
 }

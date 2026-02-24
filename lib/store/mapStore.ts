@@ -4,13 +4,13 @@
 // ============================================
 // Manages map state including active overlays and user preferences
 
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import {
   MAP_OVERLAY_IDS,
   normaliseOverlayIds,
   type MapOverlayId,
-} from "@/features/map/lib/mapOverlays";
+} from '@/features/map/lib/mapOverlays';
 
 export interface MapState {
   // Active overlay layers (always in registry order, no duplicates)
@@ -31,9 +31,7 @@ export interface MapState {
   setShowOverlayPanel: (show: boolean) => void;
   // Last viewed position (for restoring map state)
   lastPosition: { lat: number; lng: number; zoom: number } | null;
-  setLastPosition: (
-    pos: { lat: number; lng: number; zoom: number } | null,
-  ) => void;
+  setLastPosition: (pos: { lat: number; lng: number; zoom: number } | null) => void;
   // Haptic feedback for navigation (mobile)
   hapticFeedbackEnabled: boolean;
   setHapticFeedbackEnabled: (enabled: boolean) => void;
@@ -43,10 +41,7 @@ export interface MapState {
 
 type MapPersistedState = Pick<
   MapState,
-  | "activeOverlays"
-  | "showOverlayPanel"
-  | "lastPosition"
-  | "hapticFeedbackEnabled"
+  'activeOverlays' | 'showOverlayPanel' | 'lastPosition' | 'hapticFeedbackEnabled'
 >;
 
 export const useMapStore = create<MapState>()(
@@ -62,8 +57,7 @@ export const useMapStore = create<MapState>()(
           return { activeOverlays: next };
         }),
 
-      setOverlays: (overlays) =>
-        set({ activeOverlays: normaliseOverlayIds(overlays) }),
+      setOverlays: (overlays) => set({ activeOverlays: normaliseOverlayIds(overlays) }),
 
       clearOverlays: () => set({ activeOverlays: [] }),
 
@@ -71,8 +65,7 @@ export const useMapStore = create<MapState>()(
 
       selectedBuildingId: null,
 
-      setSelectedBuilding: (buildingId) =>
-        set({ selectedBuildingId: buildingId }),
+      setSelectedBuilding: (buildingId) => set({ selectedBuildingId: buildingId }),
 
       showOverlayPanel: false,
 
@@ -85,8 +78,7 @@ export const useMapStore = create<MapState>()(
       // Haptic feedback settings (default enabled on mobile)
       hapticFeedbackEnabled: true,
 
-      setHapticFeedbackEnabled: (enabled) =>
-        set({ hapticFeedbackEnabled: enabled }),
+      setHapticFeedbackEnabled: (enabled) => set({ hapticFeedbackEnabled: enabled }),
 
       toggleHapticFeedback: () =>
         set((state) => ({
@@ -103,7 +95,7 @@ export const useMapStore = create<MapState>()(
         }),
     }),
     {
-      name: "map-storage",
+      name: 'map-storage',
       storage: createJSONStorage(() => localStorage),
       version: 2,
       partialize: (state): MapPersistedState => ({
@@ -113,9 +105,7 @@ export const useMapStore = create<MapState>()(
         hapticFeedbackEnabled: state.hapticFeedbackEnabled,
       }),
       migrate: (persistedState, version) => {
-        const state = persistedState as Partial<
-          MapPersistedState & { activeOverlays: string[] }
-        >;
+        const state = persistedState as Partial<MapPersistedState & { activeOverlays: string[] }>;
         // Re-normalise overlays on migration to drop stale IDs (e.g. 'exam', 'walk', 'water', 'permits')
         const migrated: MapPersistedState = {
           activeOverlays: normaliseOverlayIds(state?.activeOverlays ?? []),
@@ -132,17 +122,15 @@ export const useMapStore = create<MapState>()(
 );
 
 // Helper to parse overlays from URL query string
-export const parseOverlaysFromURL = (
-  searchParams: URLSearchParams,
-): MapOverlayId[] => {
-  const layersParam = searchParams.get("layers");
+export const parseOverlaysFromURL = (searchParams: URLSearchParams): MapOverlayId[] => {
+  const layersParam = searchParams.get('layers');
   if (!layersParam) return [];
-  return normaliseOverlayIds(layersParam.split(","));
+  return normaliseOverlayIds(layersParam.split(','));
 };
 
 // Helper to create URL query string from overlays (always in registry order)
 export const overlaysToURLParam = (overlays: MapOverlayId[]): string => {
   // Ensure stable ordering
   const ordered = MAP_OVERLAY_IDS.filter((id) => overlays.includes(id));
-  return ordered.length > 0 ? ordered.join(",") : "";
+  return ordered.length > 0 ? ordered.join(',') : '';
 };

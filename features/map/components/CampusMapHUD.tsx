@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from 'react';
 import {
   Search,
   Share2,
@@ -10,16 +10,16 @@ import {
   Navigation,
   ChevronDown,
   ChevronUp,
-} from "lucide-react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { AnimatePresence, m, useReducedMotion } from "framer-motion";
-import { Badge } from "@/components/ui/mq/badge";
-import { Button } from "@/components/ui/mq/button";
-import type { Building } from "@/features/map/lib/buildings";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { cn } from "@/lib/utils";
-import { triggerHaptic } from "@/lib/utils/haptics";
+} from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
+import type { Building } from '@/features/map/lib/buildings';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { cn } from '@/lib/utils';
+import { triggerHaptic } from '@/lib/utils/haptics';
 
 type Props = {
   selectedBuilding?: Building;
@@ -34,7 +34,7 @@ type Props = {
   isGoogleMode?: boolean;
 };
 
-import { LayeredCard } from "./LayeredCard";
+import { LayeredCard } from './LayeredCard';
 
 export default function CampusMapHUD({
   selectedBuilding,
@@ -51,20 +51,20 @@ export default function CampusMapHUD({
   const { t } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
   const searchParams = useSearchParams();
-  const layersParam = searchParams.get("layers");
+  const layersParam = searchParams.get('layers');
 
   // Mobile: Places panel is collapsed by default, expanded on desktop.
   const [isPlacesPanelExpanded, setIsPlacesPanelExpanded] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 640px)");
+    const mediaQuery = window.matchMedia('(min-width: 640px)');
     const syncExpandedState = () => {
       setIsPlacesPanelExpanded(mediaQuery.matches);
     };
 
     syncExpandedState();
-    mediaQuery.addEventListener("change", syncExpandedState);
-    return () => mediaQuery.removeEventListener("change", syncExpandedState);
+    mediaQuery.addEventListener('change', syncExpandedState);
+    return () => mediaQuery.removeEventListener('change', syncExpandedState);
   }, []);
 
   /* eslint-disable react-hooks/set-state-in-effect */
@@ -77,31 +77,31 @@ export default function CampusMapHUD({
 
   const buildMapHref = (buildingId?: string) => {
     const params = new URLSearchParams();
-    if (layersParam) params.set("layers", layersParam);
-    const viewParam = searchParams.get("view");
-    if (viewParam) params.set("view", viewParam);
-    if (buildingId) params.set("building", buildingId);
+    if (layersParam) params.set('layers', layersParam);
+    const viewParam = searchParams.get('view');
+    if (viewParam) params.set('view', viewParam);
+    if (buildingId) params.set('building', buildingId);
 
     const qs = params.toString();
-    return qs ? `/map?${qs}` : "/map";
+    return qs ? `/map?${qs}` : '/map';
   };
 
   // Cmd/Ctrl+K keyboard shortcut to focus search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        const searchInput = document.getElementById("map-search-input");
+        const searchInput = document.getElementById('map-search-input');
         if (searchInput) {
           searchInput.focus();
           setIsPlacesPanelExpanded(true);
-          triggerHaptic("tap", "light");
+          triggerHaptic('tap', 'light');
         }
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const visibleBuildings = useMemo(() => {
@@ -114,8 +114,8 @@ export default function CampusMapHUD({
       {!isPlacesPanelExpanded && (
         <div
           className={cn(
-            "absolute left-3 pointer-events-auto sm:hidden",
-            isGoogleMode ? "top-20" : "top-3",
+            'absolute left-3 pointer-events-auto sm:hidden',
+            isGoogleMode ? 'top-20' : 'top-3',
           )}
         >
           <Button
@@ -124,37 +124,31 @@ export default function CampusMapHUD({
             className="h-9 gap-1.5 rounded-full border border-mq-border bg-mq-card-background/95 px-3 text-mq-content shadow-md backdrop-blur-sm"
             onClick={() => {
               setIsPlacesPanelExpanded(true);
-              triggerHaptic("tap", "light");
+              triggerHaptic('tap', 'light');
             }}
-            aria-label={t("places")}
-            title={t("places")}
+            aria-label={t('places')}
+            title={t('places')}
           >
             <Building2 className="h-4 w-4" />
-            <span className="text-xs font-medium">{t("places")}</span>
+            <span className="text-xs font-medium">{t('places')}</span>
           </Button>
         </div>
       )}
 
       {/* Top-right actions - Floating Toolbar */}
       <div
-        className={cn(
-          "absolute right-3 pointer-events-auto",
-          isGoogleMode ? "top-20" : "top-3",
-        )}
+        className={cn('absolute right-3 pointer-events-auto', isGoogleMode ? 'top-20' : 'top-3')}
       >
-        <LayeredCard
-          interactive={false}
-          className="flex items-center gap-1 p-1.5 rounded-full"
-        >
+        <LayeredCard interactive={false} className="flex items-center gap-1 p-1.5 rounded-full">
           <Button
             variant="ghost"
             size="sm"
             className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
             onClick={onCopyShare}
-            aria-label={t("share")}
+            aria-label={t('share')}
           >
             <Share2 className="h-4 w-4" />
-            <span className="hidden sm:inline font-medium">{t("share")}</span>
+            <span className="hidden sm:inline font-medium">{t('share')}</span>
           </Button>
           <div className="w-px h-4 bg-mq-border/50" />
           <Button
@@ -163,10 +157,10 @@ export default function CampusMapHUD({
             className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
             onClick={onExport}
             disabled={!onExport}
-            aria-label={t("export")}
+            aria-label={t('export')}
           >
             <Download className="h-4 w-4" />
-            <span className="hidden sm:inline font-medium">{t("export")}</span>
+            <span className="hidden sm:inline font-medium">{t('export')}</span>
           </Button>
         </LayeredCard>
       </div>
@@ -174,21 +168,14 @@ export default function CampusMapHUD({
       {/* Left sidebar */}
       <div
         className={cn(
-          "absolute left-3 w-[min(240px,calc(100vw-24px))] sm:w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[40svh] sm:max-h-[500px]",
-          isGoogleMode ? "top-20" : "top-3",
-          !isPlacesPanelExpanded && "hidden sm:flex",
+          'absolute left-3 w-[min(240px,calc(100vw-24px))] sm:w-[min(320px,calc(100vw-24px))] pointer-events-auto flex flex-col max-h-[40svh] sm:max-h-[500px]',
+          isGoogleMode ? 'top-20' : 'top-3',
+          !isPlacesPanelExpanded && 'hidden sm:flex',
         )}
       >
         {/* Screen reader announcement for search results */}
-        <div
-          className="sr-only"
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {buildingSearch
-            ? t("buildingsFound", { count: visibleBuildings.length })
-            : ""}
+        <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {buildingSearch ? t('buildingsFound', { count: visibleBuildings.length }) : ''}
         </div>
         <LayeredCard
           interactive={false}
@@ -204,9 +191,7 @@ export default function CampusMapHUD({
           >
             <div className="flex items-center gap-2">
               <Building2 className="h-4 w-4 text-mq-content-tertiary" />
-              <span className="font-semibold text-mq-content">
-                {t("places")}
-              </span>
+              <span className="font-semibold text-mq-content">{t('places')}</span>
             </div>
             <span className="sm:hidden text-mq-content-tertiary">
               {isPlacesPanelExpanded ? (
@@ -223,7 +208,7 @@ export default function CampusMapHUD({
               <m.div
                 id="places-panel-content"
                 initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
+                animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
                 className="overflow-hidden flex flex-col bg-mq-card-background"
@@ -235,17 +220,17 @@ export default function CampusMapHUD({
                       id="map-search-input"
                       value={buildingSearch}
                       onChange={(e) => setBuildingSearch(e.target.value)}
-                      placeholder={t("filterBuildings")}
-                      aria-label={t("filterBuildings")}
+                      placeholder={t('filterBuildings')}
+                      aria-label={t('filterBuildings')}
                       className="w-full pl-10 pr-12 py-2 bg-mq-input-background border border-mq-border rounded-mq-lg text-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-2 focus:ring-mq-primary/35 focus:border-mq-primary transition-all"
                     />
                     {buildingSearch.trim() && (
                       <button
                         type="button"
-                        onClick={() => setBuildingSearch("")}
+                        onClick={() => setBuildingSearch('')}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-mq-content-secondary hover:text-mq-content hover:bg-mq-hover-background transition-colors"
-                        aria-label={t("clearSearch")}
-                        title={t("clearSearch")}
+                        aria-label={t('clearSearch')}
+                        title={t('clearSearch')}
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -291,34 +276,30 @@ export default function CampusMapHUD({
                         animate={
                           isSelected
                             ? {
-                                borderLeftWidth: "4px",
-                                borderLeftColor: "var(--mq-primary)",
+                                borderLeftWidth: '4px',
+                                borderLeftColor: 'var(--mq-primary)',
                                 backgroundColor:
-                                  "color-mix(in srgb, var(--mq-primary) 10%, transparent)",
+                                  'color-mix(in srgb, var(--mq-primary) 10%, transparent)',
                                 x: prefersReducedMotion ? 0 : 4,
                               }
                             : {
-                                borderLeftWidth: "1px",
-                                borderLeftColor: "transparent",
-                                backgroundColor: "transparent",
+                                borderLeftWidth: '1px',
+                                borderLeftColor: 'transparent',
+                                backgroundColor: 'transparent',
                                 x: 0,
                               }
                         }
                         className={cn(
-                          "rounded-mq-lg transition-colors duration-200",
+                          'rounded-mq-lg transition-colors duration-200',
                           isSelected
-                            ? "bg-mq-primary/10 border border-mq-primary/20 shadow-sm"
-                            : "hover:bg-mq-hover-background border border-transparent",
+                            ? 'bg-mq-primary/10 border border-mq-primary/20 shadow-sm'
+                            : 'hover:bg-mq-hover-background border border-transparent',
                         )}
                       >
                         <Link
-                          href={
-                            isSelected
-                              ? buildMapHref(undefined)
-                              : buildMapHref(b.id)
-                          }
+                          href={isSelected ? buildMapHref(undefined) : buildMapHref(b.id)}
                           onClick={() => {
-                            triggerHaptic("tap", "medium");
+                            triggerHaptic('tap', 'medium');
                             setIsPlacesPanelExpanded(false);
                           }}
                           className="flex items-center justify-between p-2.5"
@@ -326,10 +307,8 @@ export default function CampusMapHUD({
                           <div className="flex flex-col min-w-0">
                             <span
                               className={cn(
-                                "text-sm font-medium truncate",
-                                isSelected
-                                  ? "text-mq-primary"
-                                  : "text-mq-content",
+                                'text-sm font-medium truncate',
+                                isSelected ? 'text-mq-primary' : 'text-mq-content',
                               )}
                             >
                               {b.id}
@@ -348,7 +327,7 @@ export default function CampusMapHUD({
                   {visibleBuildings.length === 0 && (
                     <div className="p-8 text-center text-sm text-mq-content-tertiary">
                       <Building2 className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                      {t("noMatchingBuildings")}
+                      {t('noMatchingBuildings')}
                     </div>
                   )}
                 </m.div>
@@ -368,15 +347,10 @@ export default function CampusMapHUD({
             exit={{ y: prefersReducedMotion ? 0 : 20, opacity: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
           >
-            <LayeredCard
-              interactive={false}
-              className="rounded-mq-xl border-mq-border p-4"
-            >
+            <LayeredCard interactive={false} className="rounded-mq-xl border-mq-border p-4">
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="font-bold text-mq-content text-lg">
-                    {selectedBuilding.id}
-                  </h3>
+                  <h3 className="font-bold text-mq-content text-lg">{selectedBuilding.id}</h3>
                   <p className="text-sm text-mq-content-secondary line-clamp-1">
                     {t(selectedBuilding.translationKey)}
                   </p>
@@ -385,17 +359,14 @@ export default function CampusMapHUD({
                   href={buildMapHref(undefined)}
                   className="text-mq-content-tertiary hover:text-mq-content transition-colors p-1 hover:bg-mq-background-secondary rounded-full"
                 >
-                  <span className="sr-only">{t("close")}</span>
+                  <span className="sr-only">{t('close')}</span>
                   <X className="h-5 w-5" />
                 </Link>
               </div>
 
               <div className="space-y-2 mt-3">
                 {selectedBuilding.category && (
-                  <Badge
-                    variant="neutral"
-                    className="bg-mq-background/50 text-xs"
-                  >
+                  <Badge variant="neutral" className="bg-mq-background/50 text-xs">
                     {selectedBuilding.category.charAt(0).toUpperCase() +
                       selectedBuilding.category.slice(1)}
                   </Badge>
@@ -413,7 +384,7 @@ export default function CampusMapHUD({
                       }}
                     >
                       <Navigation className="h-4 w-4" />
-                      {isGoogleMode ? t("navigate") : t("navigateOnCampus")}
+                      {isGoogleMode ? t('navigate') : t('navigateOnCampus')}
                     </Button>
                   )}
                   {!isGoogleMode && (
@@ -426,14 +397,14 @@ export default function CampusMapHUD({
                         if (gps) {
                           window.open(
                             `https://www.google.com/maps/search/?api=1&query=${gps.lat},${gps.lng}`,
-                            "_blank",
-                            "noopener,noreferrer",
+                            '_blank',
+                            'noopener,noreferrer',
                           );
                         }
                       }}
                     >
                       <Search className="h-4 w-4" />
-                      {t("navigateToGoogleMaps")}
+                      {t('navigateToGoogleMaps')}
                     </Button>
                   )}
                 </div>

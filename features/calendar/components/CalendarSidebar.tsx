@@ -1,25 +1,22 @@
-"use client";
+'use client';
 
-import React from "react";
-import { cn } from "@/lib/utils";
-import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
 
 interface CalendarSidebarProps {
   children: React.ReactNode;
   className?: string;
 }
 
-export default function CalendarSidebar({
-  children,
-  className,
-}: CalendarSidebarProps) {
+export default function CalendarSidebar({ children, className }: CalendarSidebarProps) {
   return (
     <aside
       className={cn(
         // Mobile & tablet: full width, stacked below calendar
-        "w-full min-w-0 space-y-4 lg:w-[22rem] lg:flex-shrink-0 lg:space-y-6 xl:w-96",
+        'w-full min-w-0 space-y-4 lg:w-[22rem] lg:flex-shrink-0 lg:space-y-6 xl:w-96',
         // Desktop: sticky sidebar
-        "lg:sticky lg:top-[80px] lg:p-1",
+        'lg:sticky lg:top-[80px] lg:p-1',
         // Order: on mobile, widgets come after calendar (order handled in parent)
         className,
       )}

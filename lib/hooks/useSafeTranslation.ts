@@ -1,6 +1,6 @@
-import { useCallback } from "react";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import type { TranslationKey } from "@/lib/i18n/translations";
+import { useCallback } from 'react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 /**
  * Type-safe translation hook with fallback support

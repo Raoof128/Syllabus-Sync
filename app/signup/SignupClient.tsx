@@ -1,40 +1,37 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useForm, Controller } from "react-hook-form";
-import Image from "next/image";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/mq/button";
-import { Input } from "@/components/ui/mq/input";
-import { PasswordInput } from "@/components/ui/custom/PasswordInput";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/mq/alert";
-import { APP_CONFIG, UNIVERSITY_CONFIG } from "@/lib/config";
-import { API_ROUTES } from "@/lib/constants/config";
-import { toastUtils } from "@/lib/utils/toast";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { useProfilesStore } from "@/lib/store/profilesStore";
-import { AlertTriangle, Check, Loader2, Mail } from "lucide-react";
-import { calculatePasswordStrength } from "@/lib/utils/security";
-import clsx from "clsx";
-import { createSignupSchema } from "@/lib/schemas/auth";
-import {
-  createBrowserClient,
-  isSupabaseConfigured,
-} from "@/lib/supabase/client";
-import { CourseCombobox } from "./components/CourseCombobox";
-import { FacultySelect } from "./components/FacultySelect";
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useForm, Controller } from 'react-hook-form';
+import Image from 'next/image';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/mq/button';
+import { Input } from '@/components/ui/mq/input';
+import { PasswordInput } from '@/components/ui/custom/PasswordInput';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/mq/alert';
+import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import { API_ROUTES } from '@/lib/constants/config';
+import { toastUtils } from '@/lib/utils/toast';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useProfilesStore } from '@/lib/store/profilesStore';
+import { AlertTriangle, Check, Loader2, Mail } from 'lucide-react';
+import { calculatePasswordStrength } from '@/lib/utils/security';
+import clsx from 'clsx';
+import { createSignupSchema } from '@/lib/schemas/auth';
+import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import { CourseCombobox } from './components/CourseCombobox';
+import { FacultySelect } from './components/FacultySelect';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { getYearOptions } from "@/lib/data/mq-courses";
+} from '@/components/ui/select';
+import { getYearOptions } from '@/lib/data/mq-courses';
 
 // react-hook-form expects the schema *input* shape, not the transformed output.
 type SignupFormData = z.input<ReturnType<typeof createSignupSchema>>;
@@ -46,10 +43,10 @@ export default function SignupClient() {
 
   const signupSchema = createSignupSchema(t);
 
-  const [step, setStep] = useState<"auth" | "profile" | "confirmation">("auth");
+  const [step, setStep] = useState<'auth' | 'profile' | 'confirmation'>('auth');
   const [serverError, setServerError] = useState<string | null>(null);
   const [oauthLoading, setOauthLoading] = useState(false);
-  const [signupEmail, setSignupEmail] = useState<string>("");
+  const [signupEmail, setSignupEmail] = useState<string>('');
 
   // Focus management
   const fullNameRef = useRef<HTMLInputElement>(null);
@@ -58,13 +55,13 @@ export default function SignupClient() {
   const handleGoogleLogin = async () => {
     if (!isSupabaseConfigured()) {
       toastUtils.error(
-        t("loginErrorFailed"),
-        "Supabase is not configured. OAuth sign-up is disabled.",
+        t('loginErrorFailed'),
+        'Supabase is not configured. OAuth sign-up is disabled.',
       );
       return;
     }
 
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     setServerError(null);
     setOauthLoading(true);
@@ -72,11 +69,11 @@ export default function SignupClient() {
     try {
       const supabase = createBrowserClient();
 
-      const callbackUrl = new URL("/auth/callback", window.location.origin);
-      callbackUrl.searchParams.set("redirectTo", "/home");
+      const callbackUrl = new URL('/auth/callback', window.location.origin);
+      callbackUrl.searchParams.set('redirectTo', '/home');
 
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
+        provider: 'google',
         options: {
           redirectTo: callbackUrl.toString(),
           skipBrowserRedirect: true,
@@ -84,7 +81,7 @@ export default function SignupClient() {
       });
 
       if (error) {
-        toastUtils.error(t("loginErrorFailed"), error.message);
+        toastUtils.error(t('loginErrorFailed'), error.message);
         setOauthLoading(false);
         return;
       }
@@ -94,10 +91,10 @@ export default function SignupClient() {
         return;
       }
 
-      toastUtils.error(t("loginErrorFailed"), t("oauthSignInFailed"));
+      toastUtils.error(t('loginErrorFailed'), t('oauthSignInFailed'));
       setOauthLoading(false);
     } catch {
-      toastUtils.error(t("loginErrorFailed"), t("unexpectedError"));
+      toastUtils.error(t('loginErrorFailed'), t('unexpectedError'));
       setOauthLoading(false);
     }
   };
@@ -112,52 +109,50 @@ export default function SignupClient() {
     formState: { errors, isSubmitting },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
-    mode: "onBlur",
+    mode: 'onBlur',
     defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
+      email: '',
+      password: '',
+      confirmPassword: '',
       agreedToTerms: false,
-      fullName: "",
-      studentId: "",
-      faculty: "",
-      course: "",
-      year: "",
-      _gotcha: "",
+      fullName: '',
+      studentId: '',
+      faculty: '',
+      course: '',
+      year: '',
+      _gotcha: '',
     } as unknown as SignupFormData,
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library
-  const password = watch("password");
-  const passwordStrength = password
-    ? calculatePasswordStrength(password)
-    : null;
+  const password = watch('password');
+  const passwordStrength = password ? calculatePasswordStrength(password) : null;
 
-  const watchedFaculty = watch("faculty");
-  const watchedCourse = watch("course");
+  const watchedFaculty = watch('faculty');
+  const watchedCourse = watch('course');
   const yearOptions = watchedCourse ? getYearOptions(watchedCourse) : [];
 
   // Reset course when faculty changes:
   useEffect(() => {
-    setValue("course", "");
-    setValue("year", "");
+    setValue('course', '');
+    setValue('year', '');
   }, [watchedFaculty, setValue]);
 
   // Reset year when course changes:
   useEffect(() => {
-    setValue("year", "");
+    setValue('year', '');
   }, [watchedCourse, setValue]);
 
   const handleNextStep = async () => {
     const isValid = await trigger([
-      "email",
-      "password",
-      "confirmPassword",
-      "agreedToTerms",
-      "_gotcha",
+      'email',
+      'password',
+      'confirmPassword',
+      'agreedToTerms',
+      '_gotcha',
     ]);
     if (isValid) {
-      setStep("profile");
+      setStep('profile');
       setServerError(null);
       setTimeout(() => fullNameRef.current?.focus(), 100);
     }
@@ -168,8 +163,8 @@ export default function SignupClient() {
 
     try {
       const response = await fetch(API_ROUTES.AUTH.SIGNUP, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: data.email,
           password: data.password,
@@ -188,9 +183,9 @@ export default function SignupClient() {
 
       if (!response.ok) {
         const errorMessage =
-          typeof result.error === "string"
+          typeof result.error === 'string'
             ? result.error
-            : result.error?.message || t("unexpectedError");
+            : result.error?.message || t('unexpectedError');
         setServerError(errorMessage);
         return;
       }
@@ -199,9 +194,9 @@ export default function SignupClient() {
         name: data.fullName,
         email: data.email,
         studentId: data.studentId,
-        faculty: data.faculty || "",
-        course: data.course || "",
-        year: data.year || "",
+        faculty: data.faculty || '',
+        course: data.course || '',
+        year: data.year || '',
         preferences: {
           notifications: true,
           emailReminders: true,
@@ -210,14 +205,14 @@ export default function SignupClient() {
       });
 
       if (result.data?.session) {
-        toastUtils.success(t("accountCreated"), t("signedInNow"));
-        router.push("/home");
+        toastUtils.success(t('accountCreated'), t('signedInNow'));
+        router.push('/home');
       } else {
         setSignupEmail(data.email);
-        setStep("confirmation");
+        setStep('confirmation');
       }
     } catch {
-      setServerError(t("unexpectedError"));
+      setServerError(t('unexpectedError'));
     }
   };
 
@@ -244,14 +239,14 @@ export default function SignupClient() {
             {/* Card Header */}
             <div className="px-6 pt-8 pb-4 space-y-3">
               <div className="flex items-center justify-center">
-                {step === "confirmation" ? (
+                {step === 'confirmation' ? (
                   <div className="w-14 h-14 rounded-full bg-mq-success flex items-center justify-center shadow-lg">
                     <Mail className="w-7 h-7 text-white" />
                   </div>
                 ) : (
                   <Image
                     src="/MQ_Logo_Final.png"
-                    alt={t("mqLogoAlt")}
+                    alt={t('mqLogoAlt')}
                     width={240}
                     height={240}
                     className="object-contain"
@@ -262,65 +257,65 @@ export default function SignupClient() {
 
               <div className="text-center space-y-1">
                 <h1 className="text-2xl font-bold text-mq-content">
-                  {step === "confirmation"
-                    ? t("accountCreated")
-                    : step === "auth"
-                      ? t("joinApp", { appName: APP_CONFIG.name })
-                      : t("completeProfile")}
+                  {step === 'confirmation'
+                    ? t('accountCreated')
+                    : step === 'auth'
+                      ? t('joinApp', { appName: APP_CONFIG.name })
+                      : t('completeProfile')}
                 </h1>
                 <p className="text-sm text-mq-content-secondary">
-                  {step === "confirmation"
-                    ? t("verifyEmail")
-                    : step === "auth"
-                      ? t("createAccountFor", {
+                  {step === 'confirmation'
+                    ? t('verifyEmail')
+                    : step === 'auth'
+                      ? t('createAccountFor', {
                           uniName: UNIVERSITY_CONFIG.name,
                         })
-                      : t("fillProfileDetails")}
+                      : t('fillProfileDetails')}
                 </p>
               </div>
 
               {/* Step indicator */}
-              {step !== "confirmation" && (
+              {step !== 'confirmation' && (
                 <div className="flex items-center justify-center gap-2 pt-1">
                   <button
                     type="button"
-                    onClick={() => step === "profile" && setStep("auth")}
+                    onClick={() => step === 'profile' && setStep('auth')}
                     className={clsx(
-                      "flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors text-xs font-semibold",
-                      step === "auth"
-                        ? "bg-mq-primary/15 text-mq-primary border border-mq-primary/20"
-                        : "bg-mq-success/15 text-mq-success cursor-pointer hover:bg-mq-success/25 border border-mq-success/20",
+                      'flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors text-xs font-semibold',
+                      step === 'auth'
+                        ? 'bg-mq-primary/15 text-mq-primary border border-mq-primary/20'
+                        : 'bg-mq-success/15 text-mq-success cursor-pointer hover:bg-mq-success/25 border border-mq-success/20',
                     )}
-                    disabled={step === "auth" || isSubmitting}
+                    disabled={step === 'auth' || isSubmitting}
                   >
-                    {step === "profile" ? (
+                    {step === 'profile' ? (
                       <Check className="w-3 h-3" />
                     ) : (
                       <div className="w-2 h-2 rounded-full bg-mq-primary" />
                     )}
-                    {t("stepAccount")}
+                    {t('stepAccount')}
                   </button>
                   <div
                     className={clsx(
-                      "w-8 h-0.5 rounded-full",
-                      step === "profile" ? "bg-mq-primary" : "bg-mq-border",
+                      'w-8 h-0.5 rounded-full',
+                      step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border',
                     )}
                   />
                   <div
                     className={clsx(
-                      "flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border",
-                      step === "profile"
-                        ? "bg-mq-primary/15 text-mq-primary border-mq-primary/20"
-                        : "bg-mq-border/30 text-mq-content-secondary border-mq-border/20",
+                      'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border',
+                      step === 'profile'
+                        ? 'bg-mq-primary/15 text-mq-primary border-mq-primary/20'
+                        : 'bg-mq-border/30 text-mq-content-secondary border-mq-border/20',
                     )}
                   >
                     <div
                       className={clsx(
-                        "w-2 h-2 rounded-full",
-                        step === "profile" ? "bg-mq-primary" : "bg-mq-border",
+                        'w-2 h-2 rounded-full',
+                        step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border',
                       )}
                     />
-                    {t("stepProfile")}
+                    {t('stepProfile')}
                   </div>
                 </div>
               )}
@@ -338,55 +333,43 @@ export default function SignupClient() {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Honeypot field */}
                 <input
-                  {...register("_gotcha")}
-                  style={{ display: "none" }}
+                  {...register('_gotcha')}
+                  style={{ display: 'none' }}
                   tabIndex={-1}
                   autoComplete="off"
                   aria-hidden="true"
                 />
 
                 {/* ── Step 1: Authentication ── */}
-                <div className={clsx("space-y-4", step !== "auth" && "hidden")}>
+                <div className={clsx('space-y-4', step !== 'auth' && 'hidden')}>
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="email"
-                      className="font-bold text-mq-content"
-                    >
-                      {t("email")} <span className="text-red-500">*</span>
+                    <Label htmlFor="email" className="font-bold text-mq-content">
+                      {t('email')} <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder={t("emailPlaceholder")}
+                      placeholder={t('emailPlaceholder')}
                       disabled={isSubmitting}
                       className="h-12 rounded-xl"
-                      {...register("email")}
+                      {...register('email')}
                     />
-                    {errors.email && (
-                      <p className="text-xs text-red-500">
-                        {errors.email.message}
-                      </p>
-                    )}
+                    {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
                   </div>
 
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="password"
-                      className="font-bold text-mq-content"
-                    >
-                      {t("password")} <span className="text-red-500">*</span>
+                    <Label htmlFor="password" className="font-bold text-mq-content">
+                      {t('password')} <span className="text-red-500">*</span>
                     </Label>
                     <PasswordInput
                       id="password"
                       disabled={isSubmitting}
                       maxLength={64}
                       className="h-12 rounded-xl"
-                      {...register("password")}
+                      {...register('password')}
                     />
                     {errors.password && (
-                      <p className="text-xs text-red-500">
-                        {errors.password.message}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.password.message}</p>
                     )}
 
                     {/* Visual Password Feedback */}
@@ -397,10 +380,10 @@ export default function SignupClient() {
                             <div
                               key={idx}
                               className={clsx(
-                                "flex-1 rounded-full transition-colors",
+                                'flex-1 rounded-full transition-colors',
                                 idx <= passwordStrength.score
                                   ? passwordStrength.color
-                                  : "bg-mq-border",
+                                  : 'bg-mq-border',
                               )}
                             />
                           ))}
@@ -408,10 +391,8 @@ export default function SignupClient() {
                         <div className="flex justify-between items-center">
                           <p
                             className={clsx(
-                              "text-xs font-medium",
-                              passwordStrength.score < 2
-                                ? "text-red-500"
-                                : "text-green-600",
+                              'text-xs font-medium',
+                              passwordStrength.score < 2 ? 'text-red-500' : 'text-green-600',
                             )}
                           >
                             {passwordStrength.label}
@@ -425,29 +406,23 @@ export default function SignupClient() {
                       </div>
                     )}
                     <p className="text-xs text-mq-content-secondary mt-1">
-                      {t("passwordMinLength")}
+                      {t('passwordMinLength')}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="confirmPassword"
-                      className="font-bold text-mq-content"
-                    >
-                      {t("confirmPassword")}{" "}
-                      <span className="text-red-500">*</span>
+                    <Label htmlFor="confirmPassword" className="font-bold text-mq-content">
+                      {t('confirmPassword')} <span className="text-red-500">*</span>
                     </Label>
                     <PasswordInput
                       id="confirmPassword"
                       disabled={isSubmitting}
                       maxLength={64}
                       className="h-12 rounded-xl"
-                      {...register("confirmPassword")}
+                      {...register('confirmPassword')}
                     />
                     {errors.confirmPassword && (
-                      <p className="text-xs text-red-500">
-                        {errors.confirmPassword.message}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
                     )}
                   </div>
 
@@ -457,43 +432,28 @@ export default function SignupClient() {
                       id="terms"
                       className="mt-1 h-4 w-4 rounded border-mq-border text-mq-primary focus:ring-mq-primary"
                       disabled={isSubmitting}
-                      {...register("agreedToTerms")}
+                      {...register('agreedToTerms')}
                     />
-                    <label
-                      htmlFor="terms"
-                      className="text-sm text-mq-content-secondary"
-                    >
-                      <span className="text-red-500">*</span>{" "}
-                      {t("agreeToTerms")}{" "}
-                      <Link
-                        href="/terms"
-                        className="text-mq-primary hover:underline font-medium"
-                      >
-                        {t("termsOfService")}
-                      </Link>{" "}
-                      {t("and")}{" "}
-                      <Link
-                        href="/privacy"
-                        className="text-mq-primary hover:underline font-medium"
-                      >
-                        {t("privacyPolicy")}
+                    <label htmlFor="terms" className="text-sm text-mq-content-secondary">
+                      <span className="text-red-500">*</span> {t('agreeToTerms')}{' '}
+                      <Link href="/terms" className="text-mq-primary hover:underline font-medium">
+                        {t('termsOfService')}
+                      </Link>{' '}
+                      {t('and')}{' '}
+                      <Link href="/privacy" className="text-mq-primary hover:underline font-medium">
+                        {t('privacyPolicy')}
                       </Link>
                     </label>
                   </div>
                   {errors.agreedToTerms && (
-                    <p className="text-xs text-red-500">
-                      {errors.agreedToTerms.message}
-                    </p>
+                    <p className="text-xs text-red-500">{errors.agreedToTerms.message}</p>
                   )}
 
                   {/* APP 5 Collection Notice */}
                   <p className="text-xs text-mq-content-secondary leading-relaxed">
-                    {t("collectionNotice")}{" "}
-                    <Link
-                      href="/privacy"
-                      className="text-mq-primary hover:underline font-medium"
-                    >
-                      {t("privacyPolicy")}
+                    {t('collectionNotice')}{' '}
+                    <Link href="/privacy" className="text-mq-primary hover:underline font-medium">
+                      {t('privacyPolicy')}
                     </Link>
                   </p>
 
@@ -503,13 +463,13 @@ export default function SignupClient() {
                     className="w-full h-12 rounded-xl font-bold"
                     disabled={isSubmitting || oauthLoading}
                   >
-                    {t("next")}
+                    {t('next')}
                   </Button>
 
                   {/* OAuth divider */}
                   <div className="flex items-center gap-3 text-xs text-mq-content font-semibold">
                     <div className="h-px flex-1 bg-mq-border" />
-                    <span>{t("orSignWith")}</span>
+                    <span>{t('orSignWith')}</span>
                     <div className="h-px flex-1 bg-mq-border" />
                   </div>
 
@@ -547,100 +507,80 @@ export default function SignupClient() {
                         />
                       </svg>
                     )}
-                    <span>{t("loginWithGoogle")}</span>
+                    <span>{t('loginWithGoogle')}</span>
                   </Button>
                 </div>
 
                 {/* ── Step 2: Profile ── */}
-                <div
-                  className={clsx("space-y-4", step !== "profile" && "hidden")}
-                >
+                <div className={clsx('space-y-4', step !== 'profile' && 'hidden')}>
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="fullName"
-                      className="font-bold text-mq-content"
-                    >
-                      {t("fullName")} <span className="text-red-500">*</span>
+                    <Label htmlFor="fullName" className="font-bold text-mq-content">
+                      {t('fullName')} <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="fullName"
-                      placeholder={t("enterFullName")}
+                      placeholder={t('enterFullName')}
                       disabled={isSubmitting}
                       className="h-12 rounded-xl"
-                      {...register("fullName")}
+                      {...register('fullName')}
                       ref={(e) => {
-                        register("fullName").ref(e);
+                        register('fullName').ref(e);
                         fullNameRef.current = e;
                       }}
                     />
                     {errors.fullName && (
-                      <p className="text-xs text-red-500">
-                        {errors.fullName.message}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.fullName.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="studentId"
-                      className="font-bold text-mq-content"
-                    >
-                      {t("studentId")} <span className="text-red-500">*</span>
+                    <Label htmlFor="studentId" className="font-bold text-mq-content">
+                      {t('studentId')} <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="studentId"
-                      placeholder={t("studentIdPlaceholder")}
+                      placeholder={t('studentIdPlaceholder')}
                       disabled={isSubmitting}
                       className="h-12 rounded-xl"
-                      {...register("studentId")}
+                      {...register('studentId')}
                     />
                     {errors.studentId && (
-                      <p className="text-xs text-red-500">
-                        {errors.studentId.message}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.studentId.message}</p>
                     )}
                   </div>
 
                   {/* Faculty */}
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="faculty"
-                      className="font-bold text-mq-content"
-                    >
-                      {t("faculty")} <span className="text-red-500">*</span>
+                    <Label htmlFor="faculty" className="font-bold text-mq-content">
+                      {t('faculty')} <span className="text-red-500">*</span>
                     </Label>
                     <Controller
                       name="faculty"
                       control={control}
                       render={({ field }) => (
                         <FacultySelect
-                          value={field.value ?? ""}
+                          value={field.value ?? ''}
                           onChange={field.onChange}
-                          placeholder={t("selectFaculty")}
+                          placeholder={t('selectFaculty')}
                         />
                       )}
                     />
                     {errors.faculty && (
-                      <p className="text-xs text-red-500">
-                        {errors.faculty.message}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.faculty.message}</p>
                     )}
                   </div>
 
                   {/* Course — searchable combobox */}
                   <div className="space-y-2">
-                    <Label
-                      htmlFor="course"
-                      className="font-bold text-mq-content"
-                    >
-                      {t("course")} <span className="text-red-500">*</span>
+                    <Label htmlFor="course" className="font-bold text-mq-content">
+                      {t('course')} <span className="text-red-500">*</span>
                     </Label>
                     <Controller
                       name="course"
                       control={control}
                       render={({ field }) => (
                         <CourseCombobox
-                          value={field.value ?? ""}
+                          value={field.value ?? ''}
                           onChange={field.onChange}
                           disabled={isSubmitting || !watchedFaculty}
                           error={!!errors.course}
@@ -649,37 +589,33 @@ export default function SignupClient() {
                       )}
                     />
                     {errors.course && (
-                      <p className="text-xs text-red-500">
-                        {errors.course.message}
-                      </p>
+                      <p className="text-xs text-red-500">{errors.course.message}</p>
                     )}
                   </div>
 
                   {/* Year of Study */}
                   <div className="space-y-2">
                     <Label htmlFor="year" className="font-bold text-mq-content">
-                      {t("year")} <span className="text-red-500">*</span>
+                      {t('year')} <span className="text-red-500">*</span>
                     </Label>
                     <Controller
                       name="year"
                       control={control}
                       render={({ field }) => (
                         <Select
-                          value={field.value ?? ""}
+                          value={field.value ?? ''}
                           onValueChange={field.onChange}
                           disabled={isSubmitting || !watchedCourse}
                         >
                           <SelectTrigger
                             className={clsx(
-                              "w-full h-12 rounded-xl border-mq-border focus:ring-[3px] focus:border-mq-focus focus:ring-mq-focus/40 bg-mq-input-background",
-                              errors.year && "border-red-500",
+                              'w-full h-12 rounded-xl border-mq-border focus:ring-[3px] focus:border-mq-focus focus:ring-mq-focus/40 bg-mq-input-background',
+                              errors.year && 'border-red-500',
                             )}
                           >
                             <SelectValue
                               placeholder={
-                                watchedCourse
-                                  ? t("yearPlaceholder")
-                                  : t("selectCourseFirst")
+                                watchedCourse ? t('yearPlaceholder') : t('selectCourseFirst')
                               }
                             />
                           </SelectTrigger>
@@ -690,18 +626,14 @@ export default function SignupClient() {
                                 value={String(y)}
                                 className="cursor-pointer hover:bg-mq-hover-background focus:bg-mq-hover-background focus:text-mq-primary"
                               >
-                                {t("yearNumber", { year: y })}
+                                {t('yearNumber', { year: y })}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       )}
                     />
-                    {errors.year && (
-                      <p className="text-xs text-red-500">
-                        {errors.year.message}
-                      </p>
-                    )}
+                    {errors.year && <p className="text-xs text-red-500">{errors.year.message}</p>}
                   </div>
 
                   <div className="flex gap-2 pt-2">
@@ -709,60 +641,58 @@ export default function SignupClient() {
                       type="button"
                       variant="outline"
                       className="flex-1 h-12 rounded-xl font-bold"
-                      onClick={() => setStep("auth")}
+                      onClick={() => setStep('auth')}
                       disabled={isSubmitting}
                     >
-                      {t("back")}
+                      {t('back')}
                     </Button>
                     <Button
                       type="submit"
                       className={clsx(
-                        "flex-1 h-12 rounded-xl font-bold",
-                        isSubmitting ? "opacity-50 cursor-not-allowed" : "",
+                        'flex-1 h-12 rounded-xl font-bold',
+                        isSubmitting ? 'opacity-50 cursor-not-allowed' : '',
                       )}
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? (
-                        <Loader2 className="animate-spin w-4 h-4 mr-2" />
-                      ) : null}
-                      {isSubmitting ? t("creatingAccount") : t("createAccount")}
+                      {isSubmitting ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
+                      {isSubmitting ? t('creatingAccount') : t('createAccount')}
                     </Button>
                   </div>
                 </div>
               </form>
 
               {/* ── Email Confirmation Screen ── */}
-              {step === "confirmation" && (
+              {step === 'confirmation' && (
                 <div className="space-y-4 text-center">
                   <div className="bg-mq-success/10 border border-mq-success/20 rounded-xl p-4">
                     <p className="text-sm text-mq-content leading-relaxed">
-                      {t("signupConfirmationSent", { email: signupEmail })}
+                      {t('signupConfirmationSent', { email: signupEmail })}
                     </p>
                   </div>
                   <div className="space-y-2 text-sm text-mq-content-secondary">
-                    <p>{t("signupConfirmationHint")}</p>
+                    <p>{t('signupConfirmationHint')}</p>
                   </div>
                   <Button
                     type="button"
-                    onClick={() => router.push("/login")}
+                    onClick={() => router.push('/login')}
                     className="w-full h-12 rounded-xl font-bold"
                   >
-                    {t("goToLogin")}
+                    {t('goToLogin')}
                   </Button>
                 </div>
               )}
 
-              {step !== "confirmation" && (
+              {step !== 'confirmation' && (
                 <div className="text-center text-sm text-mq-content-secondary">
                   <p>
-                    {t("alreadyHaveAccount")}{" "}
+                    {t('alreadyHaveAccount')}{' '}
                     <button
                       type="button"
-                      onClick={() => router.push("/login")}
+                      onClick={() => router.push('/login')}
                       className="text-mq-primary hover:underline font-bold"
                       disabled={isSubmitting || oauthLoading}
                     >
-                      {t("signIn")}
+                      {t('signIn')}
                     </button>
                   </p>
                 </div>
@@ -770,20 +700,14 @@ export default function SignupClient() {
 
               {/* Footer */}
               <div className="pt-2 text-center text-xs text-mq-content-secondary space-y-1">
-                <div>{t("copyright", { year: new Date().getFullYear() })}</div>
+                <div>{t('copyright', { year: new Date().getFullYear() })}</div>
                 <div>
-                  <Link
-                    href="/privacy"
-                    className="hover:underline hover:text-mq-primary"
-                  >
-                    {t("privacyPolicy")}
+                  <Link href="/privacy" className="hover:underline hover:text-mq-primary">
+                    {t('privacyPolicy')}
                   </Link>
-                  {" · "}
-                  <Link
-                    href="/terms"
-                    className="hover:underline hover:text-mq-primary"
-                  >
-                    {t("termsOfService")}
+                  {' · '}
+                  <Link href="/terms" className="hover:underline hover:text-mq-primary">
+                    {t('termsOfService')}
                   </Link>
                 </div>
               </div>

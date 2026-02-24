@@ -1,27 +1,25 @@
 // tests/stores.test.ts
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useUnitsStore } from "@/lib/store/unitsStore";
-import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
-import { useNotificationsStore } from "@/lib/store/notificationsStore";
-import { Unit, Deadline, Notification } from "@/lib/types";
-import { apiRequest } from "@/lib/utils/api";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { Unit, Deadline, Notification } from '@/lib/types';
+import { apiRequest } from '@/lib/utils/api';
 
-vi.mock("@/lib/utils/api", () => ({
+vi.mock('@/lib/utils/api', () => ({
   apiRequest: vi.fn(),
 }));
 
 const apiRequestMock = apiRequest as unknown as ReturnType<typeof vi.fn>;
 
-describe("unitsStore", () => {
+describe('unitsStore', () => {
   const mockUnit: Unit = {
-    id: "test-unit-1",
-    code: "COMP2310",
-    name: "Networking",
-    color: "#A6192E",
-    location: { building: "C5C", room: "204" },
-    schedule: [
-      { id: "schedule-1", day: "Monday", startTime: "09:00", endTime: "11:00" },
-    ],
+    id: 'test-unit-1',
+    code: 'COMP2310',
+    name: 'Networking',
+    color: '#A6192E',
+    location: { building: 'C5C', room: '204' },
+    schedule: [{ id: 'schedule-1', day: 'Monday', startTime: '09:00', endTime: '11:00' }],
     createdAt: new Date(),
   };
 
@@ -30,105 +28,103 @@ describe("unitsStore", () => {
     useUnitsStore.setState({ units: [], isLoading: false, hasLoaded: false });
     apiRequestMock.mockReset();
     const unitState: Unit[] = [];
-    apiRequestMock.mockImplementation(
-      async (input: RequestInfo, init?: RequestInit) => {
-        const url = input.toString();
-        const method = init?.method ?? "GET";
-        if (url.endsWith("/api/units") && method === "GET") {
-          return unitState;
+    apiRequestMock.mockImplementation(async (input: RequestInfo, init?: RequestInit) => {
+      const url = input.toString();
+      const method = init?.method ?? 'GET';
+      if (url.endsWith('/api/units') && method === 'GET') {
+        return unitState;
+      }
+      if (url.endsWith('/api/units') && method === 'POST') {
+        const created = JSON.parse(String(init?.body));
+        unitState.push(created);
+        return created;
+      }
+      // Handle Atomic Sync Endpoint
+      if (url.endsWith('/api/units/sync') && method === 'POST') {
+        const payload = JSON.parse(String(init?.body));
+        const index = unitState.findIndex((unit) => unit.id === payload.id);
+        if (index >= 0) {
+          unitState[index] = { ...unitState[index], ...payload };
+          return unitState[index];
         }
-        if (url.endsWith("/api/units") && method === "POST") {
-          const created = JSON.parse(String(init?.body));
-          unitState.push(created);
-          return created;
+        unitState.push(payload);
+        return payload;
+      }
+      if (url.includes('/api/units/') && method === 'PUT') {
+        const id = url.split('/').pop() as string;
+        const updates = JSON.parse(String(init?.body));
+        const index = unitState.findIndex((unit) => unit.id === id);
+        if (index >= 0) {
+          unitState[index] = { ...unitState[index], ...updates };
+          return unitState[index];
         }
-        // Handle Atomic Sync Endpoint
-        if (url.endsWith("/api/units/sync") && method === "POST") {
-          const payload = JSON.parse(String(init?.body));
-          const index = unitState.findIndex((unit) => unit.id === payload.id);
-          if (index >= 0) {
-            unitState[index] = { ...unitState[index], ...payload };
-            return unitState[index];
-          }
-          unitState.push(payload);
-          return payload;
-        }
-        if (url.includes("/api/units/") && method === "PUT") {
-          const id = url.split("/").pop() as string;
-          const updates = JSON.parse(String(init?.body));
-          const index = unitState.findIndex((unit) => unit.id === id);
-          if (index >= 0) {
-            unitState[index] = { ...unitState[index], ...updates };
-            return unitState[index];
-          }
-          return { id, ...updates };
-        }
-        if (url.includes("/api/units/") && method === "DELETE") {
-          const id = url.split("/").pop() as string;
-          return { id };
-        }
-        throw new Error("Unhandled apiRequest call");
-      },
-    );
+        return { id, ...updates };
+      }
+      if (url.includes('/api/units/') && method === 'DELETE') {
+        const id = url.split('/').pop() as string;
+        return { id };
+      }
+      throw new Error('Unhandled apiRequest call');
+    });
   });
 
-  it("should add a unit", async () => {
+  it('should add a unit', async () => {
     const { addUnit } = useUnitsStore.getState();
     await addUnit(mockUnit);
 
     const { units } = useUnitsStore.getState();
     expect(units).toHaveLength(1);
-    expect(units[0].code).toBe("COMP2310");
+    expect(units[0].code).toBe('COMP2310');
   });
 
-  it("should remove a unit", async () => {
+  it('should remove a unit', async () => {
     useUnitsStore.setState({ units: [mockUnit] });
 
     const { removeUnit } = useUnitsStore.getState();
-    await removeUnit("test-unit-1");
+    await removeUnit('test-unit-1');
 
     const { units } = useUnitsStore.getState();
     expect(units).toHaveLength(0);
   });
 
-  it("should update a unit", async () => {
+  it('should update a unit', async () => {
     useUnitsStore.setState({ units: [mockUnit] });
 
     const { updateUnit } = useUnitsStore.getState();
-    await updateUnit("test-unit-1", { name: "Updated Name" });
+    await updateUnit('test-unit-1', { name: 'Updated Name' });
 
     const { units } = useUnitsStore.getState();
-    expect(units[0].name).toBe("Updated Name");
+    expect(units[0].name).toBe('Updated Name');
   });
 
-  it("should get unit by code", () => {
+  it('should get unit by code', () => {
     useUnitsStore.setState({ units: [mockUnit] });
 
     const { getUnitByCode } = useUnitsStore.getState();
-    const unit = getUnitByCode("COMP2310");
+    const unit = getUnitByCode('COMP2310');
 
     expect(unit).toBeDefined();
-    expect(unit?.name).toBe("Networking");
+    expect(unit?.name).toBe('Networking');
   });
 
-  it("should return undefined for non-existent unit code", () => {
+  it('should return undefined for non-existent unit code', () => {
     useUnitsStore.setState({ units: [mockUnit] });
 
     const { getUnitByCode } = useUnitsStore.getState();
-    const unit = getUnitByCode("NONEXISTENT");
+    const unit = getUnitByCode('NONEXISTENT');
 
     expect(unit).toBeUndefined();
   });
 });
 
-describe("deadlinesStore", () => {
+describe('deadlinesStore', () => {
   const mockDeadline: Deadline = {
-    id: "11111111-1111-1111-1111-111111111111",
-    title: "Assignment 1",
-    unitCode: "COMP2310",
+    id: '11111111-1111-1111-1111-111111111111',
+    title: 'Assignment 1',
+    unitCode: 'COMP2310',
     dueDate: new Date(Date.now() + 86400000 * 2), // 2 days from now
-    priority: "High",
-    type: "Assignment",
+    priority: 'High',
+    type: 'Assignment',
     completed: false,
     createdAt: new Date(),
   };
@@ -142,94 +138,90 @@ describe("deadlinesStore", () => {
     });
     apiRequestMock.mockReset();
     const deadlineState: Deadline[] = [];
-    apiRequestMock.mockImplementation(
-      async (input: RequestInfo, init?: RequestInit) => {
-        const url = input.toString();
-        const method = init?.method ?? "GET";
-        if (url.endsWith("/api/deadlines") && method === "GET") {
-          return deadlineState;
+    apiRequestMock.mockImplementation(async (input: RequestInfo, init?: RequestInit) => {
+      const url = input.toString();
+      const method = init?.method ?? 'GET';
+      if (url.endsWith('/api/deadlines') && method === 'GET') {
+        return deadlineState;
+      }
+      if (url.endsWith('/api/deadlines') && method === 'POST') {
+        const created = JSON.parse(String(init?.body));
+        deadlineState.push(created);
+        return created;
+      }
+      if (url.includes('/api/deadlines/') && method === 'PUT') {
+        const id = url.split('/').pop() as string;
+        const updates = JSON.parse(String(init?.body));
+        const index = deadlineState.findIndex((deadline) => deadline.id === id);
+        if (index >= 0) {
+          deadlineState[index] = { ...deadlineState[index], ...updates };
+          return deadlineState[index];
         }
-        if (url.endsWith("/api/deadlines") && method === "POST") {
-          const created = JSON.parse(String(init?.body));
-          deadlineState.push(created);
-          return created;
-        }
-        if (url.includes("/api/deadlines/") && method === "PUT") {
-          const id = url.split("/").pop() as string;
-          const updates = JSON.parse(String(init?.body));
-          const index = deadlineState.findIndex(
-            (deadline) => deadline.id === id,
-          );
-          if (index >= 0) {
-            deadlineState[index] = { ...deadlineState[index], ...updates };
-            return deadlineState[index];
-          }
-          return { id, ...updates };
-        }
-        if (url.includes("/api/deadlines/") && method === "DELETE") {
-          const id = url.split("/").pop() as string;
-          return { id };
-        }
-        throw new Error("Unhandled apiRequest call");
-      },
-    );
+        return { id, ...updates };
+      }
+      if (url.includes('/api/deadlines/') && method === 'DELETE') {
+        const id = url.split('/').pop() as string;
+        return { id };
+      }
+      throw new Error('Unhandled apiRequest call');
+    });
   });
 
-  it("should add a deadline", async () => {
+  it('should add a deadline', async () => {
     const { addDeadline } = useDeadlinesStore.getState();
     await addDeadline(mockDeadline);
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines).toHaveLength(1);
-    expect(deadlines[0].title).toBe("Assignment 1");
+    expect(deadlines[0].title).toBe('Assignment 1');
   });
 
-  it("should remove a deadline", async () => {
+  it('should remove a deadline', async () => {
     useDeadlinesStore.setState({ deadlines: [mockDeadline] });
 
     const { removeDeadline } = useDeadlinesStore.getState();
-    await removeDeadline("11111111-1111-1111-1111-111111111111");
+    await removeDeadline('11111111-1111-1111-1111-111111111111');
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines).toHaveLength(0);
   });
 
-  it("should update a deadline", async () => {
+  it('should update a deadline', async () => {
     useDeadlinesStore.setState({ deadlines: [mockDeadline] });
 
     const { updateDeadline } = useDeadlinesStore.getState();
-    await updateDeadline("11111111-1111-1111-1111-111111111111", {
-      title: "Updated Title",
+    await updateDeadline('11111111-1111-1111-1111-111111111111', {
+      title: 'Updated Title',
     });
 
     const { deadlines } = useDeadlinesStore.getState();
-    expect(deadlines[0].title).toBe("Updated Title");
+    expect(deadlines[0].title).toBe('Updated Title');
   });
 
-  it("should toggle deadline completion", async () => {
+  it('should toggle deadline completion', async () => {
     useDeadlinesStore.setState({ deadlines: [mockDeadline] });
 
     const { toggleComplete } = useDeadlinesStore.getState();
-    await toggleComplete("11111111-1111-1111-1111-111111111111");
+    await toggleComplete('11111111-1111-1111-1111-111111111111');
 
     const { deadlines } = useDeadlinesStore.getState();
     expect(deadlines[0].completed).toBe(true);
   });
 
-  it("should get upcoming deadlines sorted by due date", () => {
+  it('should get upcoming deadlines sorted by due date', () => {
     const deadline1 = {
       ...mockDeadline,
-      id: "22222222-2222-2222-2222-222222222222",
+      id: '22222222-2222-2222-2222-222222222222',
       dueDate: new Date(Date.now() + 86400000 * 5),
     };
     const deadline2 = {
       ...mockDeadline,
-      id: "33333333-3333-3333-3333-333333333333",
+      id: '33333333-3333-3333-3333-333333333333',
       dueDate: new Date(Date.now() + 86400000),
     };
     const deadline3 = {
       ...mockDeadline,
-      id: "44444444-4444-4444-4444-444444444444",
+      id: '44444444-4444-4444-4444-444444444444',
       dueDate: new Date(Date.now() + 86400000 * 3),
       completed: true,
     };
@@ -242,58 +234,58 @@ describe("deadlinesStore", () => {
     const upcoming = getUpcoming(3);
 
     expect(upcoming).toHaveLength(2); // Excludes completed
-    expect(upcoming[0].id).toBe("33333333-3333-3333-3333-333333333333"); // Closest due date first
-    expect(upcoming[1].id).toBe("22222222-2222-2222-2222-222222222222");
+    expect(upcoming[0].id).toBe('33333333-3333-3333-3333-333333333333'); // Closest due date first
+    expect(upcoming[1].id).toBe('22222222-2222-2222-2222-222222222222');
   });
 
-  it("should calculate stress level correctly", () => {
+  it('should calculate stress level correctly', () => {
     // Low stress - no deadlines
     useDeadlinesStore.setState({ deadlines: [] });
     let { getStressLevel } = useDeadlinesStore.getState();
-    expect(getStressLevel()).toBe("Low");
+    expect(getStressLevel()).toBe('Low');
 
     // High stress - multiple urgent deadlines soon
     const urgentDeadlines = [
       {
         ...mockDeadline,
-        id: "55555555-5555-5555-5555-555555555555",
-        priority: "Urgent" as const,
+        id: '55555555-5555-5555-5555-555555555555',
+        priority: 'Urgent' as const,
         dueDate: new Date(Date.now() + 86400000),
       },
       {
         ...mockDeadline,
-        id: "66666666-6666-6666-6666-666666666666",
-        priority: "Urgent" as const,
+        id: '66666666-6666-6666-6666-666666666666',
+        priority: 'Urgent' as const,
         dueDate: new Date(Date.now() + 86400000),
       },
       {
         ...mockDeadline,
-        id: "77777777-7777-7777-7777-777777777777",
-        priority: "High" as const,
+        id: '77777777-7777-7777-7777-777777777777',
+        priority: 'High' as const,
         dueDate: new Date(Date.now() + 86400000 * 2),
       },
       {
         ...mockDeadline,
-        id: "88888888-8888-8888-8888-888888888888",
-        priority: "High" as const,
+        id: '88888888-8888-8888-8888-888888888888',
+        priority: 'High' as const,
         dueDate: new Date(Date.now() + 86400000 * 2),
       },
     ];
     useDeadlinesStore.setState({ deadlines: urgentDeadlines });
     ({ getStressLevel } = useDeadlinesStore.getState());
-    expect(getStressLevel()).toBe("High");
+    expect(getStressLevel()).toBe('High');
   });
 });
 
-describe("notificationsStore", () => {
+describe('notificationsStore', () => {
   const mockNotification: Notification = {
-    id: "notif-1",
-    title: "Welcome",
-    message: "Test notification",
-    type: "system",
+    id: 'notif-1',
+    title: 'Welcome',
+    message: 'Test notification',
+    type: 'system',
     read: false,
     createdAt: new Date(),
-    link: "/home",
+    link: '/home',
   };
 
   beforeEach(() => {
@@ -305,34 +297,34 @@ describe("notificationsStore", () => {
     apiRequestMock.mockReset();
     apiRequestMock.mockImplementation(async (input: RequestInfo) => {
       const url = input.toString();
-      if (url.endsWith("/api/notifications")) {
+      if (url.endsWith('/api/notifications')) {
         return [];
       }
-      throw new Error("Unhandled apiRequest call");
+      throw new Error('Unhandled apiRequest call');
     });
   });
 
-  it("should add a notification", () => {
+  it('should add a notification', () => {
     const { addNotification } = useNotificationsStore.getState();
     addNotification(mockNotification);
 
     const { notifications } = useNotificationsStore.getState();
     expect(notifications).toHaveLength(1);
-    expect(notifications[0].title).toBe("Welcome");
+    expect(notifications[0].title).toBe('Welcome');
   });
 
-  it("should mark a notification as read", () => {
+  it('should mark a notification as read', () => {
     useNotificationsStore.setState({ notifications: [mockNotification] });
 
     const { markAsRead } = useNotificationsStore.getState();
-    markAsRead("notif-1");
+    markAsRead('notif-1');
 
     const { notifications } = useNotificationsStore.getState();
     expect(notifications[0].read).toBe(true);
   });
 
-  it("should mark all notifications as read", () => {
-    const notification2 = { ...mockNotification, id: "notif-2", read: false };
+  it('should mark all notifications as read', () => {
+    const notification2 = { ...mockNotification, id: 'notif-2', read: false };
     useNotificationsStore.setState({
       notifications: [mockNotification, notification2],
     });
@@ -344,18 +336,18 @@ describe("notificationsStore", () => {
     expect(notifications.every((n) => n.read)).toBe(true);
   });
 
-  it("should remove a notification", () => {
+  it('should remove a notification', () => {
     useNotificationsStore.setState({ notifications: [mockNotification] });
 
     const { removeNotification } = useNotificationsStore.getState();
-    removeNotification("notif-1");
+    removeNotification('notif-1');
 
     const { notifications } = useNotificationsStore.getState();
     expect(notifications).toHaveLength(0);
   });
 
-  it("should get unread count", () => {
-    const notification2 = { ...mockNotification, id: "notif-2", read: true };
+  it('should get unread count', () => {
+    const notification2 = { ...mockNotification, id: 'notif-2', read: true };
     useNotificationsStore.setState({
       notifications: [mockNotification, notification2],
     });

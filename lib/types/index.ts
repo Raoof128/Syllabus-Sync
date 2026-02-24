@@ -1,13 +1,13 @@
 // lib/types/index.ts
 
 export type DayOfWeek =
-  | "Monday"
-  | "Tuesday"
-  | "Wednesday"
-  | "Thursday"
-  | "Friday"
-  | "Saturday"
-  | "Sunday";
+  | 'Monday'
+  | 'Tuesday'
+  | 'Wednesday'
+  | 'Thursday'
+  | 'Friday'
+  | 'Saturday'
+  | 'Sunday';
 
 export interface Unit {
   id: string;
@@ -39,8 +39,8 @@ export type Deadline = {
   building?: string; // Building code for exams (e.g., "C5C")
   room?: string; // Room number for exams (e.g., "204")
   dueDate: Date;
-  priority: "Low" | "Medium" | "High" | "Urgent";
-  type: "Assignment" | "Exam" | "Quiz" | "Presentation";
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  type: 'Assignment' | 'Exam' | 'Quiz' | 'Presentation';
   completed: boolean;
   notificationEnabled?: boolean; // Whether notifications are enabled for this deadline
   createdAt: Date;
@@ -55,7 +55,7 @@ export type Event = {
   building?: string; // Building code (e.g., "C5C") - optional for map navigation
   room?: string; // Room number (e.g., "204") - optional
   location?: string; // Legacy: combined "Building Room" string for backward compatibility
-  category: "Career" | "Social" | "Academic" | "Free Food";
+  category: 'Career' | 'Social' | 'Academic' | 'Free Food';
   color?: string; // Optional custom color (hex value like "#A6192E")
   imageUrl?: string;
   translationKey?: string;
@@ -74,17 +74,17 @@ export type Notification = {
   id: string;
   title: string;
   message: string;
-  type: "deadline" | "event" | "class" | "system";
+  type: 'deadline' | 'event' | 'class' | 'system';
   read: boolean;
   createdAt: Date;
   link?: string; // Navigation link
   relatedId?: string; // Related deadline/event/unit ID
 };
 
-export type StressLevel = "Low" | "Busy" | "High";
+export type StressLevel = 'Low' | 'Busy' | 'High';
 
 // To-Do List types
-export type TodoPriority = "Low" | "Medium" | "High";
+export type TodoPriority = 'Low' | 'Medium' | 'High';
 
 export type Todo = {
   id: string;
@@ -118,7 +118,7 @@ export type FormErrors = {
   [key: string]: string;
 };
 
-export type ErrorSeverity = "low" | "medium" | "high" | "critical";
+export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
 
 // Settings types
 export type SessionInfo = {
@@ -135,7 +135,7 @@ export type NotificationPreferences = {
 };
 
 // Password strength levels
-export type PasswordStrength = "weak" | "fair" | "good" | "strong";
+export type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong';
 
 export type PasswordStrengthResult = {
   strength: PasswordStrength;
@@ -165,16 +165,16 @@ export interface GamificationProfile {
  * XP event types that can trigger XP awards
  */
 export type XPEventType =
-  | "deadline_completed"
-  | "deadline_early"
-  | "daily_login"
-  | "streak_bonus"
-  | "unit_added"
-  | "event_attended"
-  | "profile_completed"
-  | "first_deadline"
-  | "weekly_goal"
-  | "level_up_bonus";
+  | 'deadline_completed'
+  | 'deadline_early'
+  | 'daily_login'
+  | 'streak_bonus'
+  | 'unit_added'
+  | 'event_attended'
+  | 'profile_completed'
+  | 'first_deadline'
+  | 'weekly_goal'
+  | 'level_up_bonus';
 
 /**
  * XP event record for audit logging
@@ -191,24 +191,18 @@ export interface XPEvent {
 /**
  * Level tier for badge coloring
  */
-export type LevelTier =
-  | "bronze"
-  | "silver"
-  | "gold"
-  | "platinum"
-  | "diamond"
-  | "master";
+export type LevelTier = 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond' | 'master';
 
 /**
  * Get the tier for a given level
  */
 export function getLevelTier(level: number): LevelTier {
-  if (level <= 5) return "bronze";
-  if (level <= 10) return "silver";
-  if (level <= 20) return "gold";
-  if (level <= 35) return "platinum";
-  if (level <= 50) return "diamond";
-  return "master";
+  if (level <= 5) return 'bronze';
+  if (level <= 10) return 'silver';
+  if (level <= 20) return 'gold';
+  if (level <= 35) return 'platinum';
+  if (level <= 50) return 'diamond';
+  return 'master';
 }
 
 /**

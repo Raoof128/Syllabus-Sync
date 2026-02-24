@@ -1,9 +1,7 @@
-import { withRetry, retryConditions, RetryError } from "./retry";
+import { withRetry, retryConditions, RetryError } from './retry';
 
 export interface ApiErrorResponse {
-  error:
-    | string
-    | { code: string; message: string; details?: Record<string, unknown> };
+  error: string | { code: string; message: string; details?: Record<string, unknown> };
 }
 
 export interface ApiSuccessResponse<T = unknown> {
@@ -33,10 +31,10 @@ export function isLikelyNetworkError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
   const message = error.message.toLowerCase();
   return (
-    message.includes("failed to fetch") ||
-    message.includes("networkerror") ||
-    message.includes("network request failed") ||
-    message.includes("load failed")
+    message.includes('failed to fetch') ||
+    message.includes('networkerror') ||
+    message.includes('network request failed') ||
+    message.includes('load failed')
   );
 }
 
@@ -44,25 +42,25 @@ export function isLikelyNetworkError(error: unknown): boolean {
  * Browser offline hint.
  */
 export function isBrowserOffline(): boolean {
-  return typeof navigator !== "undefined" && navigator.onLine === false;
+  return typeof navigator !== 'undefined' && navigator.onLine === false;
 }
 
 // ============================================================================
 // CSRF TOKEN HELPERS
 // ============================================================================
 
-const CSRF_COOKIE_NAME = "__Host-csrf";
-const CSRF_HEADER_NAME = "x-csrf-token";
+const CSRF_COOKIE_NAME = '__Host-csrf';
+const CSRF_HEADER_NAME = 'x-csrf-token';
 
 /**
  * Get CSRF token from cookie
  */
 function getCsrfToken(): string | null {
-  if (typeof document === "undefined") return null;
+  if (typeof document === 'undefined') return null;
 
-  const cookies = document.cookie.split(";");
+  const cookies = document.cookie.split(';');
   for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split("=");
+    const [name, value] = cookie.trim().split('=');
     if (name === CSRF_COOKIE_NAME) {
       return decodeURIComponent(value);
     }
@@ -74,7 +72,7 @@ function getCsrfToken(): string | null {
  * Generate and set a new CSRF token (called on app init)
  */
 export function initCsrfToken(): string {
-  if (typeof document === "undefined") return "";
+  if (typeof document === 'undefined') return '';
 
   // Check if token already exists
   let token = getCsrfToken();
@@ -83,20 +81,18 @@ export function initCsrfToken(): string {
   // Generate new token
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
-  token = Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
-    "",
-  );
+  token = Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
 
   // Set cookie (secure in production, sameSite strict)
-  const isSecure = window.location.protocol === "https:";
-  const cookieValue = `${CSRF_COOKIE_NAME}=${token}; path=/; max-age=86400; samesite=strict${isSecure ? "; secure" : ""}`;
+  const isSecure = window.location.protocol === 'https:';
+  const cookieValue = `${CSRF_COOKIE_NAME}=${token}; path=/; max-age=86400; samesite=strict${isSecure ? '; secure' : ''}`;
   document.cookie = cookieValue;
 
   return token;
 }
 
 // Methods that require CSRF protection
-const MUTATION_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
+const MUTATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
 
 /**
  * Makes an API request with automatic retry logic for network and server errors.
@@ -105,19 +101,11 @@ const MUTATION_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
  *
  * SECURITY: Automatically includes CSRF token for mutation requests (POST, PUT, PATCH, DELETE)
  */
-export async function apiRequest<T>(
-  input: RequestInfo,
-  init?: ApiRequestOptions,
-): Promise<T> {
-  const {
-    noRetry = false,
-    maxRetries = 3,
-    skipCsrf = false,
-    ...fetchInit
-  } = init || {};
+export async function apiRequest<T>(input: RequestInfo, init?: ApiRequestOptions): Promise<T> {
+  const { noRetry = false, maxRetries = 3, skipCsrf = false, ...fetchInit } = init || {};
 
   // Add CSRF token for mutation methods
-  const method = (fetchInit.method || "GET").toUpperCase();
+  const method = (fetchInit.method || 'GET').toUpperCase();
   if (!skipCsrf && MUTATION_METHODS.includes(method)) {
     const csrfToken = getCsrfToken() || initCsrfToken();
     if (csrfToken) {
@@ -130,27 +118,20 @@ export async function apiRequest<T>(
 
   // Ensure cookies are sent with requests (critical for Supabase auth)
   if (!fetchInit.credentials) {
-    fetchInit.credentials = "include";
+    fetchInit.credentials = 'include';
   }
 
   const executeRequest = async (): Promise<T> => {
     const response = await fetch(input, fetchInit);
-    const data = (await response.json().catch(() => null)) as
-      | T
-      | ApiSuccessResponse<T>
-      | null;
+    const data = (await response.json().catch(() => null)) as T | ApiSuccessResponse<T> | null;
 
     if (!response.ok) {
       // Handle different error response formats
-      if (data && typeof data === "object" && "error" in data) {
+      if (data && typeof data === 'object' && 'error' in data) {
         const errorData = (data as ApiSuccessResponse).error;
-        if (
-          errorData &&
-          typeof errorData === "object" &&
-          "message" in errorData
-        ) {
+        if (errorData && typeof errorData === 'object' && 'message' in errorData) {
           throw new Error(`${response.status}: ${errorData.message}`);
-        } else if (typeof errorData === "string") {
+        } else if (typeof errorData === 'string') {
           throw new Error(`${response.status}: ${errorData}`);
         }
       }
@@ -158,10 +139,10 @@ export async function apiRequest<T>(
     }
 
     // Handle success response format
-    if (data && typeof data === "object" && "success" in data) {
+    if (data && typeof data === 'object' && 'success' in data) {
       const apiResponse = data as ApiSuccessResponse<T>;
       if (!apiResponse.success) {
-        const errorMessage = apiResponse.error?.message || "API request failed";
+        const errorMessage = apiResponse.error?.message || 'API request failed';
         throw new Error(errorMessage);
       }
       return apiResponse.data as T;

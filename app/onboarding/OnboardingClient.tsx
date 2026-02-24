@@ -1,35 +1,35 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
-import { CourseCombobox } from "@/app/signup/components/CourseCombobox";
-import { FacultySelect } from "@/app/signup/components/FacultySelect";
-import { getYearOptions } from "@/lib/data/mq-courses";
+import { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import { CourseCombobox } from '@/app/signup/components/CourseCombobox';
+import { FacultySelect } from '@/app/signup/components/FacultySelect';
+import { getYearOptions } from '@/lib/data/mq-courses';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/mq/button";
-import { Label } from "@/components/ui/label";
-import { isValidRedirect } from "@/lib/utils/security";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { TranslationKey } from "@/lib/i18n/translations";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/mq/button';
+import { Label } from '@/components/ui/label';
+import { isValidRedirect } from '@/lib/utils/security';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { TranslationKey } from '@/lib/i18n/translations';
 
 const createSchema = (
   t: (key: TranslationKey, options?: Record<string, string | number>) => string,
 ) =>
   z.object({
-    faculty: z.string().min(1, t("pleaseSelectFaculty" as TranslationKey)),
-    course: z.string().min(1, t("pleaseSelectCourse" as TranslationKey)),
-    year: z.string().min(1, t("pleaseSelectYear" as TranslationKey)),
+    faculty: z.string().min(1, t('pleaseSelectFaculty' as TranslationKey)),
+    course: z.string().min(1, t('pleaseSelectCourse' as TranslationKey)),
+    year: z.string().min(1, t('pleaseSelectYear' as TranslationKey)),
   });
 type FormData = z.infer<ReturnType<typeof createSchema>>;
 
@@ -38,10 +38,10 @@ export default function OnboardingClient() {
   const schema = createSchema(t);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawNext = searchParams.get("next") ?? "/home";
-  const next = isValidRedirect(rawNext) ? rawNext : "/home";
+  const rawNext = searchParams.get('next') ?? '/home';
+  const next = isValidRedirect(rawNext) ? rawNext : '/home';
 
-  const [serverError, setServerError] = useState("");
+  const [serverError, setServerError] = useState('');
 
   const {
     control,
@@ -51,40 +51,40 @@ export default function OnboardingClient() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { faculty: "", course: "", year: "" },
+    defaultValues: { faculty: '', course: '', year: '' },
   });
 
-  const selectedFaculty = watch("faculty");
-  const selectedCourse = watch("course");
+  const selectedFaculty = watch('faculty');
+  const selectedCourse = watch('course');
 
   // Reset course and year when faculty changes
   useEffect(() => {
-    setValue("course", "");
-    setValue("year", "");
+    setValue('course', '');
+    setValue('year', '');
   }, [selectedFaculty, setValue]);
 
   // Reset year when course changes
   useEffect(() => {
-    setValue("year", "");
+    setValue('year', '');
   }, [selectedCourse, setValue]);
 
   const yearOptions = selectedCourse ? getYearOptions(selectedCourse) : [];
 
   const onSubmit = async (data: FormData) => {
-    setServerError("");
+    setServerError('');
     try {
-      const res = await fetch("/api/auth/onboarding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/auth/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body?.error?.message || t("failedToSave"));
+        throw new Error(body?.error?.message || t('failedToSave'));
       }
       router.push(next);
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : t("unexpectedError"));
+      setServerError(err instanceof Error ? err.message : t('unexpectedError'));
     }
   };
 
@@ -114,31 +114,22 @@ export default function OnboardingClient() {
               <div className="flex items-center justify-center mb-4">
                 <Image
                   src="/MQ_Logo_Final.png"
-                  alt={t("mqLogoAlt")}
+                  alt={t('mqLogoAlt')}
                   width={216}
                   height={216}
                   className="object-contain"
                   priority
                 />
               </div>
-              <h1 className="text-2xl font-bold text-mq-content mb-2">
-                {t("onboardingTitle")}
-              </h1>
-              <p className="text-sm text-mq-content-secondary">
-                {t("onboardingDesc")}
-              </p>
+              <h1 className="text-2xl font-bold text-mq-content mb-2">{t('onboardingTitle')}</h1>
+              <p className="text-sm text-mq-content-secondary">{t('onboardingDesc')}</p>
             </div>
 
             {/* Form */}
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="px-6 pb-8 space-y-5"
-            >
+            <form onSubmit={handleSubmit(onSubmit)} className="px-6 pb-8 space-y-5">
               {/* Faculty */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-mq-content">
-                  {t("faculty")}
-                </Label>
+                <Label className="text-sm font-medium text-mq-content">{t('faculty')}</Label>
                 <Controller
                   name="faculty"
                   control={control}
@@ -146,22 +137,16 @@ export default function OnboardingClient() {
                     <FacultySelect
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder={t("selectFaculty")}
+                      placeholder={t('selectFaculty')}
                     />
                   )}
                 />
-                {errors.faculty && (
-                  <p className="text-xs text-red-500">
-                    {errors.faculty.message}
-                  </p>
-                )}
+                {errors.faculty && <p className="text-xs text-red-500">{errors.faculty.message}</p>}
               </div>
 
               {/* Course */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-mq-content">
-                  {t("course")}
-                </Label>
+                <Label className="text-sm font-medium text-mq-content">{t('course')}</Label>
                 <Controller
                   name="course"
                   control={control}
@@ -175,18 +160,12 @@ export default function OnboardingClient() {
                     />
                   )}
                 />
-                {errors.course && (
-                  <p className="text-xs text-red-500">
-                    {errors.course.message}
-                  </p>
-                )}
+                {errors.course && <p className="text-xs text-red-500">{errors.course.message}</p>}
               </div>
 
               {/* Year */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-mq-content">
-                  {t("yearOfStudy")}
-                </Label>
+                <Label className="text-sm font-medium text-mq-content">{t('yearOfStudy')}</Label>
                 <Controller
                   name="year"
                   control={control}
@@ -197,36 +176,28 @@ export default function OnboardingClient() {
                       disabled={!selectedCourse}
                     >
                       <SelectTrigger
-                        className={`h-12 rounded-xl ${errors.year ? "border-red-500" : ""}`}
+                        className={`h-12 rounded-xl ${errors.year ? 'border-red-500' : ''}`}
                       >
                         <SelectValue
                           placeholder={
-                            selectedCourse
-                              ? t("yearPlaceholder")
-                              : t("selectCourseFirst")
+                            selectedCourse ? t('yearPlaceholder') : t('selectCourseFirst')
                           }
                         />
                       </SelectTrigger>
                       <SelectContent>
                         {yearOptions.map((y) => (
                           <SelectItem key={y} value={String(y)}>
-                            {t("yearNumber", { year: y })}
+                            {t('yearNumber', { year: y })}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   )}
                 />
-                {errors.year && (
-                  <p className="text-xs text-red-500">{errors.year.message}</p>
-                )}
+                {errors.year && <p className="text-xs text-red-500">{errors.year.message}</p>}
               </div>
 
-              {serverError && (
-                <p className="text-sm text-red-500 text-center">
-                  {serverError}
-                </p>
-              )}
+              {serverError && <p className="text-sm text-red-500 text-center">{serverError}</p>}
 
               <Button
                 type="submit"
@@ -237,7 +208,7 @@ export default function OnboardingClient() {
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
-                    {t("continue")}
+                    {t('continue')}
                     <ArrowRight className="h-5 w-5" />
                   </>
                 )}

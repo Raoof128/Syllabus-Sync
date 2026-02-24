@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React, { useRef, useEffect, useCallback, useMemo } from "react";
-import { cn } from "@/lib/utils";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
-type AnimationState = "idle" | "scanning" | "success" | "error";
+type AnimationState = 'idle' | 'scanning' | 'success' | 'error';
 
 interface FingerprintButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
@@ -24,7 +24,7 @@ export function FingerprintButton({
   className,
   disabled,
   text,
-  type = "button",
+  type = 'button',
   ...props
 }: FingerprintButtonProps) {
   const containerRef = useRef<HTMLButtonElement>(null);
@@ -32,16 +32,16 @@ export function FingerprintButton({
 
   // Compute animation state directly from props (no internal state needed)
   const animationState: AnimationState = useMemo(() => {
-    if (isSuccess) return "success";
-    if (isError) return "error";
-    if (isLoading) return "scanning";
-    return "idle";
+    if (isSuccess) return 'success';
+    if (isError) return 'error';
+    if (isLoading) return 'scanning';
+    return 'idle';
   }, [isLoading, isSuccess, isError]);
 
   // Call onAnimationComplete after success/error state ends
   // This is a side effect (calling external callback), which is valid in useEffect
   useEffect(() => {
-    if (animationState === "success" || animationState === "error") {
+    if (animationState === 'success' || animationState === 'error') {
       const timer = setTimeout(() => {
         onAnimationComplete?.();
       }, 1500);
@@ -51,7 +51,7 @@ export function FingerprintButton({
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (disabled || animationState !== "idle") return;
+      if (disabled || animationState !== 'idle') return;
       onClick?.(e);
     },
     [disabled, animationState, onClick],
@@ -59,14 +59,14 @@ export function FingerprintButton({
 
   const getStateClass = () => {
     switch (animationState) {
-      case "scanning":
-        return "scanning";
-      case "success":
-        return "success";
-      case "error":
-        return "error";
+      case 'scanning':
+        return 'scanning';
+      case 'success':
+        return 'success';
+      case 'error':
+        return 'error';
       default:
-        return "";
+        return '';
     }
   };
 
@@ -75,18 +75,13 @@ export function FingerprintButton({
       ref={containerRef}
       type={type}
       onClick={handleClick}
-      disabled={disabled || animationState !== "idle"}
-      className={cn(
-        "fp-login-container",
-        getStateClass(),
-        disabled && "disabled",
-        className,
-      )}
-      aria-label={text || t("signIn")}
-      aria-busy={animationState === "scanning"}
+      disabled={disabled || animationState !== 'idle'}
+      className={cn('fp-login-container', getStateClass(), disabled && 'disabled', className)}
+      aria-label={text || t('signIn')}
+      aria-busy={animationState === 'scanning'}
       {...props}
     >
-      <span className="fp-text">{text || t("signIn")}</span>
+      <span className="fp-text">{text || t('signIn')}</span>
 
       {/* Base fingerprint SVG (semi-transparent) */}
       <svg
@@ -110,10 +105,7 @@ export function FingerprintButton({
             className="fp-odd"
             d="m 57.131213,26.814448 c 0,0 5.127709,1.731228 9.899495,7.513009 4.771786,5.781781 4.772971,12.109204 4.772971,12.109204"
           />
-          <path
-            className="fp-odd"
-            d="m 72.334009,50.76769 0.09597,2.298098 -0.09597,2.386485"
-          />
+          <path className="fp-odd" d="m 72.334009,50.76769 0.09597,2.298098 -0.09597,2.386485" />
           <path
             className="fp-even"
             d="m 27.849282,62.75 c 0,0 1.286086,-1.279223 1.25,-4.25 -0.03609,-2.970777 -1.606117,-7.675266 -0.625,-12.75 0.981117,-5.074734 4.5,-9.5 4.5,-9.5"
@@ -195,10 +187,7 @@ export function FingerprintButton({
             className="fp-odd"
             d="m 57.131213,26.814448 c 0,0 5.127709,1.731228 9.899495,7.513009 4.771786,5.781781 4.772971,12.109204 4.772971,12.109204"
           />
-          <path
-            className="fp-odd"
-            d="m 72.334009,50.76769 0.09597,2.298098 -0.09597,2.386485"
-          />
+          <path className="fp-odd" d="m 72.334009,50.76769 0.09597,2.298098 -0.09597,2.386485" />
           <path
             className="fp-even"
             d="m 27.849282,62.75 c 0,0 1.286086,-1.279223 1.25,-4.25 -0.03609,-2.970777 -1.606117,-7.675266 -0.625,-12.75 0.981117,-5.074734 4.5,-9.5 4.5,-9.5"
@@ -267,12 +256,7 @@ export function FingerprintButton({
         viewBox="0 0 100 100"
         aria-hidden="true"
       >
-        <path
-          d="M34.912 50.75l10.89 10.125L67 36.75"
-          fill="none"
-          stroke="#fff"
-          strokeWidth="6"
-        />
+        <path d="M34.912 50.75l10.89 10.125L67 36.75" fill="none" stroke="#fff" strokeWidth="6" />
       </svg>
 
       {/* Error X mark */}

@@ -13,9 +13,9 @@
 // </div>
 // ============================================================================
 
-"use client";
+'use client';
 
-import { useRef, useCallback, useEffect, useSyncExternalStore } from "react";
+import { useRef, useCallback, useEffect, useSyncExternalStore } from 'react';
 
 // ============================================================================
 // TYPES
@@ -38,7 +38,7 @@ export interface CardGlowProps {
   onMouseMove?: (e: React.MouseEvent) => void;
   style?: React.CSSProperties;
   className?: string;
-  "data-mouse-glow"?: string;
+  'data-mouse-glow'?: string;
 }
 
 // ============================================================================
@@ -46,15 +46,14 @@ export interface CardGlowProps {
 // ============================================================================
 
 const subscribeToReducedMotion = (callback: () => void) => {
-  if (typeof window === "undefined") return () => {};
-  const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-  mediaQuery.addEventListener("change", callback);
-  return () => mediaQuery.removeEventListener("change", callback);
+  if (typeof window === 'undefined') return () => {};
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  mediaQuery.addEventListener('change', callback);
+  return () => mediaQuery.removeEventListener('change', callback);
 };
 
 const getReducedMotionSnapshot = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const getReducedMotionServerSnapshot = () => false;
 
@@ -64,7 +63,7 @@ const getReducedMotionServerSnapshot = () => false;
 
 export function useMouseGlow(options: MouseGlowOptions = {}) {
   const {
-    glowColor = "166, 25, 46", // MQ Red RGB values
+    glowColor = '166, 25, 46', // MQ Red RGB values
     glowRadius = 600,
     borderGlowOpacity = 0.4,
     surfaceGlowOpacity = 0.06,
@@ -91,8 +90,8 @@ export function useMouseGlow(options: MouseGlowOptions = {}) {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        card.style.setProperty("--mouse-x", `${x}px`);
-        card.style.setProperty("--mouse-y", `${y}px`);
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
       });
     },
     [enabled, prefersReducedMotion],
@@ -105,8 +104,8 @@ export function useMouseGlow(options: MouseGlowOptions = {}) {
 
     const handleMouseMove = (e: MouseEvent) => updateCards(e);
 
-    container.addEventListener("mousemove", handleMouseMove);
-    return () => container.removeEventListener("mousemove", handleMouseMove);
+    container.addEventListener('mousemove', handleMouseMove);
+    return () => container.removeEventListener('mousemove', handleMouseMove);
   }, [enabled, prefersReducedMotion, updateCards]);
 
   // Register a card element
@@ -131,30 +130,23 @@ export function useMouseGlow(options: MouseGlowOptions = {}) {
       }
 
       return {
-        "data-mouse-glow": "card",
+        'data-mouse-glow': 'card',
         style: {
           // CSS custom properties for the glow effect
-          "--glow-color": glowColor,
-          "--glow-radius": `${glowRadius}px`,
-          "--border-glow-opacity": borderGlowOpacity,
-          "--surface-glow-opacity": surfaceGlowOpacity,
+          '--glow-color': glowColor,
+          '--glow-radius': `${glowRadius}px`,
+          '--border-glow-opacity': borderGlowOpacity,
+          '--surface-glow-opacity': surfaceGlowOpacity,
         } as React.CSSProperties,
-        className: "mouse-glow-card",
+        className: 'mouse-glow-card',
       };
     },
-    [
-      enabled,
-      prefersReducedMotion,
-      glowColor,
-      glowRadius,
-      borderGlowOpacity,
-      surfaceGlowOpacity,
-    ],
+    [enabled, prefersReducedMotion, glowColor, glowRadius, borderGlowOpacity, surfaceGlowOpacity],
   );
 
   // Get CSS styles for including in stylesheets
   const getStyles = useCallback(() => {
-    if (!enabled || prefersReducedMotion) return "";
+    if (!enabled || prefersReducedMotion) return '';
 
     return `
       .mouse-glow-container:hover > .mouse-glow-card::after {

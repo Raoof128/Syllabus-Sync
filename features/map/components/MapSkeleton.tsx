@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { LazyMotion, m, domAnimation } from "framer-motion";
-import { MapPin } from "lucide-react";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { LazyMotion, m, domAnimation } from 'framer-motion';
+import { MapPin } from 'lucide-react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 /**
  * MapLoadingSkeleton - Animated skeleton loader for map component
@@ -25,7 +25,7 @@ export function MapLoadingSkeleton() {
       <div
         className="relative w-full h-full bg-mq-background-secondary overflow-hidden"
         role="status"
-        aria-label={t("loadingMap")}
+        aria-label={t('loadingMap')}
       >
         {/* Pulsing background gradient (Tier 4: Enhanced Skeleton) */}
         <m.div
@@ -36,7 +36,7 @@ export function MapLoadingSkeleton() {
           transition={{
             duration: 1.5,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
 
@@ -52,8 +52,8 @@ export function MapLoadingSkeleton() {
                 transparent 100%
               )
             `,
-            backgroundSize: "200% 100%",
-            animation: "shimmer 2s infinite linear",
+            backgroundSize: '200% 100%',
+            animation: 'shimmer 2s infinite linear',
           }}
         />
 
@@ -66,7 +66,7 @@ export function MapLoadingSkeleton() {
               linear-gradient(to right, var(--mq-content-tertiary) 1px, transparent 1px),
               linear-gradient(to bottom, var(--mq-content-tertiary) 1px, transparent 1px)
             `,
-              backgroundSize: "40px 40px",
+              backgroundSize: '40px 40px',
             }}
           />
         </div>
@@ -93,7 +93,7 @@ export function MapLoadingSkeleton() {
                 delay: pin.delay + 0.5,
                 duration: 1.5,
                 repeat: Infinity,
-                ease: "easeInOut",
+                ease: 'easeInOut',
               }}
             >
               <MapPin className="h-6 w-6 text-mq-primary/60" />
@@ -109,7 +109,7 @@ export function MapLoadingSkeleton() {
                 delay: pin.delay + 0.5,
                 duration: 1.5,
                 repeat: Infinity,
-                ease: "easeInOut",
+                ease: 'easeInOut',
               }}
             />
           </m.div>
@@ -129,17 +129,17 @@ export function MapLoadingSkeleton() {
               transition={{
                 duration: 1,
                 repeat: Infinity,
-                ease: "linear",
+                ease: 'linear',
               }}
             />
             <span className="text-mq-sm text-mq-content-secondary font-medium">
-              {t("loadingMap")}
+              {t('loadingMap')}
             </span>
           </m.div>
         </div>
 
         {/* Screen reader text */}
-        <span className="sr-only">{t("loadingMap")}</span>
+        <span className="sr-only">{t('loadingMap')}</span>
       </div>
     </LazyMotion>
   );
@@ -153,11 +153,7 @@ export function BuildingListSkeleton({ count = 8 }: { count?: number }) {
   const { t } = useTypedTranslation();
   return (
     <LazyMotion features={domAnimation}>
-      <div
-        className="space-y-3"
-        role="status"
-        aria-label={t("loadingBuildings")}
-      >
+      <div className="space-y-3" role="status" aria-label={t('loadingBuildings')}>
         {Array.from({ length: count }).map((_, index) => (
           <m.div
             key={index}
@@ -196,7 +192,7 @@ export function BuildingListSkeleton({ count = 8 }: { count?: number }) {
             </div>
           </m.div>
         ))}
-        <span className="sr-only">{t("loadingBuildings")}</span>
+        <span className="sr-only">{t('loadingBuildings')}</span>
       </div>
     </LazyMotion>
   );
@@ -212,11 +208,7 @@ export function CategoryFilterSkeleton() {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div
-        className="flex flex-wrap gap-2"
-        role="status"
-        aria-label={t("loadingFilters")}
-      >
+      <div className="flex flex-wrap gap-2" role="status" aria-label={t('loadingFilters')}>
         {widths.map((width, index) => (
           <m.div
             key={index}
@@ -230,7 +222,7 @@ export function CategoryFilterSkeleton() {
             }}
           />
         ))}
-        <span className="sr-only">{t("loadingFilters")}</span>
+        <span className="sr-only">{t('loadingFilters')}</span>
       </div>
     </LazyMotion>
   );

@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
-const LOCALES_DIR = "locales";
-const BASE_LOCALE = "en";
-const TRANSLATION_FILE = "translations.json";
+const LOCALES_DIR = 'locales';
+const BASE_LOCALE = 'en';
+const TRANSLATION_FILE = 'translations.json';
 
-function flattenKeys(value, parentKey = "", out = new Set()) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
+function flattenKeys(value, parentKey = '', out = new Set()) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return out;
   }
 
@@ -23,7 +23,7 @@ function flattenKeys(value, parentKey = "", out = new Set()) {
 
 async function loadTranslation(locale) {
   const filePath = path.join(LOCALES_DIR, locale, TRANSLATION_FILE);
-  const content = await fs.readFile(filePath, "utf8");
+  const content = await fs.readFile(filePath, 'utf8');
   return JSON.parse(content);
 }
 
@@ -58,20 +58,18 @@ async function main() {
   }
 
   if (missingKeyErrors.length > 0) {
-    console.warn("Translation key parity warnings:");
+    console.warn('Translation key parity warnings:');
     for (const error of missingKeyErrors) {
       console.warn(
-        `- ${error.locale}: missing ${error.total} keys (sample: ${error.missing.join(", ")})`,
+        `- ${error.locale}: missing ${error.total} keys (sample: ${error.missing.join(', ')})`,
       );
     }
   }
 
-  console.log(
-    `Translation check completed (${locales.length} locales validated).`,
-  );
+  console.log(`Translation check completed (${locales.length} locales validated).`);
 }
 
 main().catch((error) => {
-  console.error("Translation check failed:", error.message);
+  console.error('Translation check failed:', error.message);
   process.exit(1);
 });

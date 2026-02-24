@@ -1,28 +1,25 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FingerprintButton } from "@/features/auth/components/FingerprintButton"; // Keeping original UI component
-import { Input } from "@/components/ui/mq/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/mq/alert";
-import { Button } from "@/components/ui/mq/button";
-import { APP_CONFIG, UNIVERSITY_CONFIG } from "@/lib/config";
-import { toastUtils } from "@/lib/utils/toast";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { API_ROUTES } from "@/lib/constants/config";
-import {
-  createBrowserClient,
-  isSupabaseConfigured,
-} from "@/lib/supabase/client";
-import { createLoginSchema, type LoginFormData } from "./schemas/loginSchema";
-import { loginAction, type MFAFactorInfo } from "./actions";
-import { usePasskeyLogin } from "./hooks/usePasskeyLogin";
-import { MFAChallenge } from "./components/MFAChallenge";
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FingerprintButton } from '@/features/auth/components/FingerprintButton'; // Keeping original UI component
+import { Input } from '@/components/ui/mq/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/mq/alert';
+import { Button } from '@/components/ui/mq/button';
+import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import { toastUtils } from '@/lib/utils/toast';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { API_ROUTES } from '@/lib/constants/config';
+import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import { createLoginSchema, type LoginFormData } from './schemas/loginSchema';
+import { loginAction, type MFAFactorInfo } from './actions';
+import { usePasskeyLogin } from './hooks/usePasskeyLogin';
+import { MFAChallenge } from './components/MFAChallenge';
 import {
   AlertTriangle,
   Eye,
@@ -31,7 +28,7 @@ import {
   Loader2,
   Shield,
   ShieldCheck,
-} from "lucide-react";
+} from 'lucide-react';
 
 export default function LoginClient() {
   const { t } = useTypedTranslation();
@@ -49,14 +46,14 @@ export default function LoginClient() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(localLoginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-    mode: "onSubmit",
+    mode: 'onSubmit',
   });
 
   // Check email for UI states
-  const email = watch("email");
+  const email = watch('email');
 
   // UI States (Preserving original UI richness)
   const [showPassword, setShowPassword] = useState(false);
@@ -74,21 +71,20 @@ export default function LoginClient() {
 
   // Passkey availability check (could be in the hook too, but kept simple here for now)
   const [passkeyStatus, setPasskeyStatus] = useState<
-    "idle" | "checking" | "available" | "unavailable" | "unsupported"
-  >("idle");
+    'idle' | 'checking' | 'available' | 'unavailable' | 'unsupported'
+  >('idle');
 
   // MFA status for the entered email
   const [mfaEnabled, setMfaEnabled] = useState(false);
 
   // Redirect Logic
-  const redirectTo = "/home";
-  const forceMfa = searchParams.get("mfa") === "1";
-  const callbackError = searchParams.get("error");
-  const logoutReason = searchParams.get("reason");
+  const redirectTo = '/home';
+  const forceMfa = searchParams.get('mfa') === '1';
+  const callbackError = searchParams.get('error');
+  const logoutReason = searchParams.get('reason');
 
   // Computed
-  const isGlobalLoading =
-    isSubmitting || isPasskeyLoading || isSuccess || oauthLoading;
+  const isGlobalLoading = isSubmitting || isPasskeyLoading || isSuccess || oauthLoading;
   const isError = !!generalError || Object.keys(errors).length > 0;
 
   const onSubmit = async (data: LoginFormData) => {
@@ -103,19 +99,19 @@ export default function LoginClient() {
         // Map server codes to translation keys or use default
         const errorKey = `auth.errors.${result.error}`;
         // @ts-expect-error Dynamic error key resolution
-        const msg = t(errorKey) || t("auth.errors.default") || result.error;
-        toastUtils.error(t("loginErrorFailed"), msg);
+        const msg = t(errorKey) || t('auth.errors.default') || result.error;
+        toastUtils.error(t('loginErrorFailed'), msg);
 
         // Fallback for specific known errors to maintain current UI behavior
-        if (result.error === "invalid_credentials") {
-          setGeneralError(t("loginErrorInvalidCredentials"));
-        } else if (result.error === "email_not_confirmed") {
-          setGeneralError(t("loginErrorEmailNotConfirmed"));
+        if (result.error === 'invalid_credentials') {
+          setGeneralError(t('loginErrorInvalidCredentials'));
+        } else if (result.error === 'email_not_confirmed') {
+          setGeneralError(t('loginErrorEmailNotConfirmed'));
           setShowResendVerification(true);
-        } else if (result.error === "rate_limit_exceeded") {
-          const base = t("loginErrorTooManyRequests");
+        } else if (result.error === 'rate_limit_exceeded') {
+          const base = t('loginErrorTooManyRequests');
           const minutes =
-            typeof result.retryAfter === "number"
+            typeof result.retryAfter === 'number'
               ? Math.max(1, Math.ceil(result.retryAfter / 60))
               : null;
           setGeneralError(minutes ? `${base} (${minutes} min)` : base);
@@ -135,7 +131,7 @@ export default function LoginClient() {
       }
 
       setIsSuccess(true);
-      toastUtils.success(t("welcomeBack"), t("loginSuccess"));
+      toastUtils.success(t('welcomeBack'), t('loginSuccess'));
 
       // 1. Force server to re-render layout (Updates "Guest" -> "User" in navbar)
       router.refresh();
@@ -144,28 +140,28 @@ export default function LoginClient() {
         router.push(redirectTo);
       }, 800);
     } catch {
-      setGeneralError(t("unexpectedError"));
+      setGeneralError(t('unexpectedError'));
     }
   };
 
   const handleResendVerification = async () => {
-    if (!email || !email.includes("@")) return;
+    if (!email || !email.includes('@')) return;
     setIsResendingVerification(true);
     try {
       const res = await fetch(API_ROUTES.AUTH.EMAIL_RESEND_VERIFICATION, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
       });
 
       // Always treat as success to avoid account enumeration in UI copy.
       if (res.status === 429) {
-        toastUtils.error(t("loginErrorFailed"), t("loginErrorTooManyRequests"));
+        toastUtils.error(t('loginErrorFailed'), t('loginErrorTooManyRequests'));
       } else {
-        toastUtils.success(t("verifyEmail"), t("verificationEmailSent"));
+        toastUtils.success(t('verifyEmail'), t('verificationEmailSent'));
       }
     } catch {
-      toastUtils.error(t("loginErrorFailed"), t("loginErrorFailed"));
+      toastUtils.error(t('loginErrorFailed'), t('loginErrorFailed'));
     } finally {
       setIsResendingVerification(false);
     }
@@ -190,22 +186,21 @@ export default function LoginClient() {
 
     const loadMfaStatus = async () => {
       try {
-        const res = await fetch(API_ROUTES.AUTH.MFA_STATUS, { method: "GET" });
+        const res = await fetch(API_ROUTES.AUTH.MFA_STATUS, { method: 'GET' });
         if (!res.ok) return;
 
         const json: unknown = await res.json();
         if (!active) return;
-        if (typeof json !== "object" || json === null) return;
+        if (typeof json !== 'object' || json === null) return;
 
         const data = (json as Record<string, unknown>).data;
-        if (typeof data !== "object" || data === null) return;
+        if (typeof data !== 'object' || data === null) return;
 
         const currentLevel = (data as Record<string, unknown>).currentLevel;
         const nextLevel = (data as Record<string, unknown>).nextLevel;
 
         const needsUpgrade =
-          nextLevel === "aal2" &&
-          (currentLevel === "aal1" || typeof currentLevel !== "string");
+          nextLevel === 'aal2' && (currentLevel === 'aal1' || typeof currentLevel !== 'string');
 
         if (!needsUpgrade) return;
 
@@ -213,18 +208,14 @@ export default function LoginClient() {
         const factors = Array.isArray(factorsVal) ? factorsVal : [];
 
         const verified = factors
-          .filter(
-            (f): f is Record<string, unknown> =>
-              typeof f === "object" && f !== null,
-          )
-          .filter((f) => f.status === "verified")
+          .filter((f): f is Record<string, unknown> => typeof f === 'object' && f !== null)
+          .filter((f) => f.status === 'verified')
           .map(
             (f): MFAFactorInfo => ({
-              id: String(f.id ?? ""),
-              type: f.type === "phone" ? "phone" : "totp",
-              name:
-                typeof f.friendlyName === "string" ? f.friendlyName : undefined,
-              phone: typeof f.phone === "string" ? f.phone : undefined,
+              id: String(f.id ?? ''),
+              type: f.type === 'phone' ? 'phone' : 'totp',
+              name: typeof f.friendlyName === 'string' ? f.friendlyName : undefined,
+              phone: typeof f.phone === 'string' ? f.phone : undefined,
             }),
           )
           .filter((f) => Boolean(f.id));
@@ -245,32 +236,32 @@ export default function LoginClient() {
 
   // Passkey & Security Status Effect
   useEffect(() => {
-    if (!email || !email.includes("@")) {
-      setPasskeyStatus("idle");
+    if (!email || !email.includes('@')) {
+      setPasskeyStatus('idle');
       setMfaEnabled(false);
       return;
     }
 
-    if (typeof window === "undefined" || !window.PublicKeyCredential) {
-      setPasskeyStatus("unsupported");
+    if (typeof window === 'undefined' || !window.PublicKeyCredential) {
+      setPasskeyStatus('unsupported');
       return;
     }
 
     let active = true;
     // Debounce passkey status check to avoid hitting rate limits while typing
     const timer = setTimeout(async () => {
-      setPasskeyStatus("checking");
+      setPasskeyStatus('checking');
       try {
-        const response = await fetch("/api/auth/passkey/status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch('/api/auth/passkey/status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email.trim() }),
         });
 
         // Handle rate limiting gracefully
         if (response.status === 429) {
           if (active) {
-            setPasskeyStatus("unavailable");
+            setPasskeyStatus('unavailable');
             setMfaEnabled(false);
           }
           return;
@@ -278,11 +269,11 @@ export default function LoginClient() {
 
         const result = await response.json();
         if (!active) return;
-        setPasskeyStatus(result?.data?.available ? "available" : "unavailable");
+        setPasskeyStatus(result?.data?.available ? 'available' : 'unavailable');
         setMfaEnabled(Boolean(result?.data?.mfaEnabled));
       } catch {
         if (active) {
-          setPasskeyStatus("unavailable");
+          setPasskeyStatus('unavailable');
           setMfaEnabled(false);
         }
       }
@@ -297,13 +288,13 @@ export default function LoginClient() {
   const handleGoogleLogin = async () => {
     if (!isSupabaseConfigured()) {
       toastUtils.error(
-        t("loginErrorFailed"),
-        "Supabase is not configured. OAuth sign-in is disabled.",
+        t('loginErrorFailed'),
+        'Supabase is not configured. OAuth sign-in is disabled.',
       );
       return;
     }
 
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     setGeneralError(null);
     setOauthLoading(true);
@@ -313,11 +304,11 @@ export default function LoginClient() {
 
       // Ensure Supabase returns to our callback route, which performs the secure code exchange
       // and then redirects the user to the validated `redirectTo` path.
-      const callbackUrl = new URL("/auth/callback", window.location.origin);
-      callbackUrl.searchParams.set("redirectTo", redirectTo);
+      const callbackUrl = new URL('/auth/callback', window.location.origin);
+      callbackUrl.searchParams.set('redirectTo', redirectTo);
 
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
+        provider: 'google',
         options: {
           redirectTo: callbackUrl.toString(),
           skipBrowserRedirect: true,
@@ -325,7 +316,7 @@ export default function LoginClient() {
       });
 
       if (error) {
-        toastUtils.error(t("loginErrorFailed"), error.message);
+        toastUtils.error(t('loginErrorFailed'), error.message);
         setOauthLoading(false);
         return;
       }
@@ -335,10 +326,10 @@ export default function LoginClient() {
         return;
       }
 
-      toastUtils.error(t("loginErrorFailed"), t("oauthSignInFailed"));
+      toastUtils.error(t('loginErrorFailed'), t('oauthSignInFailed'));
       setOauthLoading(false);
     } catch {
-      toastUtils.error(t("loginErrorFailed"), t("unexpectedError"));
+      toastUtils.error(t('loginErrorFailed'), t('unexpectedError'));
       setOauthLoading(false);
     }
   };
@@ -354,7 +345,7 @@ export default function LoginClient() {
             <div className="relative w-28 h-28 sm:w-32 sm:h-32 lg:w-40 lg:h-40 flex items-center justify-center">
               <Image
                 src="/MQ_Logo_Final.png"
-                alt={t("mqLogoAlt")}
+                alt={t('mqLogoAlt')}
                 width={160}
                 height={160}
                 className="object-contain drop-shadow-xl w-full h-full"
@@ -365,18 +356,15 @@ export default function LoginClient() {
 
           <div className="space-y-2 mb-5 sm:mb-6 text-center">
             <h1 className="text-xl sm:text-2xl font-bold text-mq-content">
-              {t("welcomeTo", { appName: APP_CONFIG.name })}
+              {t('welcomeTo', { appName: APP_CONFIG.name })}
             </h1>
             <p className="text-sm sm:text-base text-mq-content font-medium">
-              {t("signInToAccess", { uniName: UNIVERSITY_CONFIG.name })}
+              {t('signInToAccess', { uniName: UNIVERSITY_CONFIG.name })}
             </p>
             <p className="text-sm text-mq-content font-medium">
-              {t("noAccount")}{" "}
-              <Link
-                href="/signup"
-                className="text-mq-primary hover:underline font-bold"
-              >
-                {t("signUp")}
+              {t('noAccount')}{' '}
+              <Link href="/signup" className="text-mq-primary hover:underline font-bold">
+                {t('signUp')}
               </Link>
             </p>
           </div>
@@ -393,13 +381,9 @@ export default function LoginClient() {
                       variant="outline"
                       className="h-10 w-full rounded-full font-bold"
                       onClick={handleResendVerification}
-                      disabled={
-                        isGlobalLoading || isResendingVerification || !email
-                      }
+                      disabled={isGlobalLoading || isResendingVerification || !email}
                     >
-                      {isResendingVerification
-                        ? t("loading")
-                        : t("resendVerificationEmail")}
+                      {isResendingVerification ? t('loading') : t('resendVerificationEmail')}
                     </Button>
                   )}
                 </div>
@@ -407,14 +391,12 @@ export default function LoginClient() {
             </Alert>
           )}
 
-          {searchParams.get("verified") === "1" &&
-            !generalError &&
-            !isSuccess && (
-              <Alert variant="success" className="mb-3">
-                <ShieldCheck className="h-4 w-4" />
-                <AlertDescription>{t("emailVerifiedSuccess")}</AlertDescription>
-              </Alert>
-            )}
+          {searchParams.get('verified') === '1' && !generalError && !isSuccess && (
+            <Alert variant="success" className="mb-3">
+              <ShieldCheck className="h-4 w-4" />
+              <AlertDescription>{t('emailVerifiedSuccess')}</AlertDescription>
+            </Alert>
+          )}
 
           {callbackError && !generalError && !isSuccess && (
             <Alert variant="error" className="mb-3">
@@ -422,45 +404,43 @@ export default function LoginClient() {
               <AlertDescription>
                 <div className="space-y-2">
                   <div>
-                    {callbackError === "oauth_failed"
-                      ? t("oauthSignInFailed")
-                      : callbackError === "verification_failed"
-                        ? t("oauthCodeExchangeFailed")
-                        : t("loginErrorFailed")}
+                    {callbackError === 'oauth_failed'
+                      ? t('oauthSignInFailed')
+                      : callbackError === 'verification_failed'
+                        ? t('oauthCodeExchangeFailed')
+                        : t('loginErrorFailed')}
                   </div>
-                  {(callbackError === "oauth_failed" ||
-                    callbackError === "verification_failed") && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-9 w-full rounded-full font-bold text-xs"
-                        onClick={handleGoogleLogin}
-                        disabled={oauthLoading}
-                      >
-                        {oauthLoading ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-                        ) : null}
-                        {t("tryAgain")}
-                      </Button>
-                    )}
+                  {(callbackError === 'oauth_failed' ||
+                    callbackError === 'verification_failed') && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-9 w-full rounded-full font-bold text-xs"
+                      onClick={handleGoogleLogin}
+                      disabled={oauthLoading}
+                    >
+                      {oauthLoading ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                      ) : null}
+                      {t('tryAgain')}
+                    </Button>
+                  )}
                 </div>
               </AlertDescription>
             </Alert>
           )}
 
-          {logoutReason === "inactive" && !generalError && !isSuccess && (
+          {logoutReason === 'inactive' && !generalError && !isSuccess && (
             <Alert variant="error" className="mb-3">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                {t("sessionExpiredInactivity")}
-              </AlertDescription>
+              <AlertDescription>{t('sessionExpiredInactivity')}</AlertDescription>
             </Alert>
           )}
 
           {isSuccess && !generalError && (
             <Alert variant="success" className="mb-3">
               <ShieldCheck className="h-4 w-4" />
-              <AlertDescription>{t("loginSuccess")}</AlertDescription>
+              <AlertDescription>{t('loginSuccess')}</AlertDescription>
             </Alert>
           )}
 
@@ -472,7 +452,7 @@ export default function LoginClient() {
               onSuccess={() => {
                 setMfaState(null);
                 setIsSuccess(true);
-                toastUtils.success(t("welcomeBack"), t("loginSuccess"));
+                toastUtils.success(t('welcomeBack'), t('loginSuccess'));
                 router.refresh();
                 setTimeout(() => {
                   router.push(redirectTo);
@@ -490,32 +470,30 @@ export default function LoginClient() {
             >
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-mq-content font-bold">
-                  {t("email")}
+                  {t('email')}
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder={t("emailPlaceholder")}
-                  {...register("email")}
+                  placeholder={t('emailPlaceholder')}
+                  {...register('email')}
                   autoComplete="email"
                   disabled={isGlobalLoading}
                   className="h-12 rounded-xl text-mq-content font-medium"
                 />
                 {errors.email && (
-                  <p className="text-xs text-red-500 font-medium ml-1">
-                    {errors.email.message}
-                  </p>
+                  <p className="text-xs text-red-500 font-medium ml-1">{errors.email.message}</p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-mq-content font-bold">
-                  {t("password")}
+                  {t('password')}
                 </Label>
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? "text" : "password"}
-                    {...register("password")}
+                    type={showPassword ? 'text' : 'password'}
+                    {...register('password')}
                     autoComplete="current-password"
                     disabled={isGlobalLoading}
                     className="pr-10 h-12 rounded-xl text-mq-content font-medium"
@@ -524,23 +502,15 @@ export default function LoginClient() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-mq-content hover:text-mq-primary transition-colors"
-                    aria-label={
-                      showPassword ? t("hidePassword") : t("showPassword")
-                    }
+                    aria-label={showPassword ? t('hidePassword') : t('showPassword')}
                     aria-pressed={showPassword}
                     disabled={isGlobalLoading}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-xs text-red-500 font-medium ml-1">
-                    {errors.password.message}
-                  </p>
+                  <p className="text-xs text-red-500 font-medium ml-1">{errors.password.message}</p>
                 )}
               </div>
 
@@ -551,14 +521,14 @@ export default function LoginClient() {
                   aria-disabled={isGlobalLoading}
                   onClick={() => setGeneralError(null)}
                 >
-                  {t("forgotPassword")}
+                  {t('forgotPassword')}
                 </Link>
               </div>
 
               <div className="pt-1 sm:pt-2 flex justify-center">
                 <FingerprintButton
                   type="submit"
-                  text={t("signIn")}
+                  text={t('signIn')}
                   disabled={isGlobalLoading}
                   isLoading={isSubmitting}
                   isSuccess={isSuccess}
@@ -570,53 +540,52 @@ export default function LoginClient() {
 
               <div className="text-center text-sm text-mq-content font-medium">
                 <p>
-                  {t("noAccount")}{" "}
-                  <Link
-                    href="/signup"
-                    className="text-mq-primary hover:underline font-bold"
-                  >
-                    {t("signUp")}
+                  {t('noAccount')}{' '}
+                  <Link href="/signup" className="text-mq-primary hover:underline font-bold">
+                    {t('signUp')}
                   </Link>
                 </p>
               </div>
 
               {/* Security Methods Section */}
-              {email && email.includes("@") && passkeyStatus !== "idle" && (
+              {email && email.includes('@') && passkeyStatus !== 'idle' && (
                 <div className="rounded-xl border border-mq-border bg-mq-card-background/50 p-3 space-y-2 min-w-0">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-mq-content-secondary">
                     <Shield className="h-3.5 w-3.5" aria-hidden="true" />
-                    {t("securityMethods")}
+                    {t('securityMethods')}
                   </div>
 
                   <div className="flex flex-wrap gap-2">
                     {/* Biometric / Passkey Status */}
                     <span
-                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${passkeyStatus === "available"
-                          ? "bg-mq-success/10 text-mq-success"
-                          : passkeyStatus === "checking"
-                            ? "bg-mq-content-secondary/10 text-mq-content-secondary"
-                            : "bg-mq-content-secondary/10 text-mq-content-tertiary"
-                        }`}
+                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${
+                        passkeyStatus === 'available'
+                          ? 'bg-mq-success/10 text-mq-success'
+                          : passkeyStatus === 'checking'
+                            ? 'bg-mq-content-secondary/10 text-mq-content-secondary'
+                            : 'bg-mq-content-secondary/10 text-mq-content-tertiary'
+                      }`}
                     >
                       <Fingerprint className="h-3 w-3" aria-hidden="true" />
-                      {passkeyStatus === "checking"
-                        ? t("loading")
-                        : passkeyStatus === "available"
-                          ? t("biometricLogin")
-                          : passkeyStatus === "unsupported"
-                            ? t("notSupported")
-                            : t("disabled")}
+                      {passkeyStatus === 'checking'
+                        ? t('loading')
+                        : passkeyStatus === 'available'
+                          ? t('biometricLogin')
+                          : passkeyStatus === 'unsupported'
+                            ? t('notSupported')
+                            : t('disabled')}
                     </span>
 
                     {/* MFA Status */}
                     <span
-                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${mfaEnabled
-                          ? "bg-mq-success/10 text-mq-success"
-                          : "bg-mq-content-secondary/10 text-mq-content-tertiary"
-                        }`}
+                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${
+                        mfaEnabled
+                          ? 'bg-mq-success/10 text-mq-success'
+                          : 'bg-mq-content-secondary/10 text-mq-content-tertiary'
+                      }`}
                     >
                       <ShieldCheck className="h-3 w-3" aria-hidden="true" />
-                      {mfaEnabled ? t("twoFactorAuth") : t("twoFactorAuthOff")}
+                      {mfaEnabled ? t('twoFactorAuth') : t('twoFactorAuthOff')}
                     </span>
                   </div>
                 </div>
@@ -625,26 +594,25 @@ export default function LoginClient() {
               <Button
                 type="button"
                 variant="outline"
-                className={`h-12 w-full rounded-full flex items-center justify-center gap-2 font-bold ${passkeyStatus === "available"
-                    ? "border-mq-success/30 hover:border-mq-success/50"
-                    : ""
-                  }`}
+                className={`h-12 w-full rounded-full flex items-center justify-center gap-2 font-bold ${
+                  passkeyStatus === 'available'
+                    ? 'border-mq-success/30 hover:border-mq-success/50'
+                    : ''
+                }`}
                 onClick={handlePasskeyLogin}
-                disabled={
-                  isGlobalLoading || !email || passkeyStatus !== "available"
-                }
+                disabled={isGlobalLoading || !email || passkeyStatus !== 'available'}
               >
                 {isPasskeyLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Fingerprint className="h-4 w-4" aria-hidden="true" />
                 )}
-                {isPasskeyLoading ? t("loading") : t("biometricLogin")}
+                {isPasskeyLoading ? t('loading') : t('biometricLogin')}
               </Button>
 
               <div className="flex items-center gap-3 text-xs text-mq-content font-semibold pt-2">
                 <div className="h-px flex-1 bg-mq-border" />
-                <span>{t("orSignWith")}</span>
+                <span>{t('orSignWith')}</span>
                 <div className="h-px flex-1 bg-mq-border" />
               </div>
 
@@ -682,7 +650,7 @@ export default function LoginClient() {
                     />
                   </svg>
                 )}
-                {t("loginWithGoogle")}
+                {t('loginWithGoogle')}
               </Button>
 
               <div className="pt-4 text-center text-xs text-mq-content font-medium space-y-1">
@@ -690,18 +658,12 @@ export default function LoginClient() {
                   &copy; {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
                 </div>
                 <div className="text-mq-content-secondary">
-                  <Link
-                    href="/privacy"
-                    className="hover:underline hover:text-mq-primary"
-                  >
-                    {t("privacyPolicy")}
+                  <Link href="/privacy" className="hover:underline hover:text-mq-primary">
+                    {t('privacyPolicy')}
                   </Link>
-                  {" · "}
-                  <Link
-                    href="/terms"
-                    className="hover:underline hover:text-mq-primary"
-                  >
-                    {t("termsOfService")}
+                  {' · '}
+                  <Link href="/terms" className="hover:underline hover:text-mq-primary">
+                    {t('termsOfService')}
                   </Link>
                 </div>
               </div>
@@ -713,7 +675,7 @@ export default function LoginClient() {
         <div className="hidden md:block relative md:min-h-[320px] lg:min-h-0 flex-1 lg:w-7/12">
           <Image
             src="/images/login-bg.png"
-            alt={t("mqSignpostAlt")}
+            alt={t('mqSignpostAlt')}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 0vw, 60vw"
@@ -724,13 +686,13 @@ export default function LoginClient() {
           <div className="relative z-10 h-full w-full p-5 sm:p-8 lg:p-12 flex flex-col justify-between">
             <div className="space-y-3 sm:space-y-4 max-w-2xl">
               <p className="uppercase tracking-[0.16em] sm:tracking-[0.2em] text-xs text-mq-primary font-semibold">
-                {t("campusNavigation")}
+                {t('campusNavigation')}
               </p>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-[#18181b]">
-                {t("loginHeroTitle")}
+                {t('loginHeroTitle')}
               </h2>
               <p className="text-sm sm:text-base max-w-xl text-[#3f3f46]">
-                {t("loginHeroDescription")}
+                {t('loginHeroDescription')}
               </p>
             </div>
 

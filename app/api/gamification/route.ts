@@ -1,11 +1,11 @@
-import { NextRequest } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
-import { jsonError, jsonSuccess, ERROR_CODES } from "@/app/api/_lib/response";
-import { requireAuth, optionalAuth } from "@/app/api/_lib/middleware";
-import { withCSRFProtection } from "@/lib/security/csrf";
-import { apiLimiter } from "@/lib/services/rateLimitService";
-import { getClientIP } from "@/lib/security/ip";
-import { logger } from "@/lib/logger";
+import { NextRequest } from 'next/server';
+import { createServerClient } from '@/lib/supabase/server';
+import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
+import { requireAuth, optionalAuth } from '@/app/api/_lib/middleware';
+import { withCSRFProtection } from '@/lib/security/csrf';
+import { apiLimiter } from '@/lib/services/rateLimitService';
+import { getClientIP } from '@/lib/security/ip';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -54,7 +54,7 @@ function xpForLevel(level: number): number {
 }
 
 function parseEventsLimit(limitParam: string | null): number {
-  const parsed = Number.parseInt(limitParam ?? "", 10);
+  const parsed = Number.parseInt(limitParam ?? '', 10);
   if (!Number.isFinite(parsed)) {
     return 10;
   }
@@ -82,7 +82,7 @@ function generateDemoProfile(): GamificationProfile {
     level,
     streakDays: 5,
     longestStreak: 12,
-    lastActivityDate: new Date().toISOString().split("T")[0],
+    lastActivityDate: new Date().toISOString().split('T')[0],
     xpToNextLevel: nextLevelXp - demoXp,
     xpForCurrentLevel: currentLevelXp,
     levelProgress: Math.round((xpInCurrentLevel / xpNeededForLevel) * 100),
@@ -93,40 +93,40 @@ function generateDemoEvents(): XPEvent[] {
   const now = new Date();
   return [
     {
-      id: "demo-1",
-      eventType: "deadline_completed",
+      id: 'demo-1',
+      eventType: 'deadline_completed',
       xpAmount: 25,
       referenceId: null,
-      metadata: { title: "COMP2000 Assignment 2" },
+      metadata: { title: 'COMP2000 Assignment 2' },
       createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
     },
     {
-      id: "demo-2",
-      eventType: "daily_login",
+      id: 'demo-2',
+      eventType: 'daily_login',
       xpAmount: 5,
       referenceId: null,
       metadata: {},
       createdAt: new Date(now.getTime() - 8 * 60 * 60 * 1000).toISOString(), // 8 hours ago
     },
     {
-      id: "demo-3",
-      eventType: "streak_bonus",
+      id: 'demo-3',
+      eventType: 'streak_bonus',
       xpAmount: 25,
       referenceId: null,
       metadata: { streak_days: 5 },
       createdAt: new Date(now.getTime() - 8 * 60 * 60 * 1000).toISOString(),
     },
     {
-      id: "demo-4",
-      eventType: "unit_added",
+      id: 'demo-4',
+      eventType: 'unit_added',
       xpAmount: 15,
       referenceId: null,
-      metadata: { code: "COMP3000", name: "Machine Learning" },
+      metadata: { code: 'COMP3000', name: 'Machine Learning' },
       createdAt: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
     },
     {
-      id: "demo-5",
-      eventType: "deadline_early",
+      id: 'demo-5',
+      eventType: 'deadline_early',
       xpAmount: 10,
       referenceId: null,
       metadata: { hours_early: 48 },
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
   const { allowed, resetIn } = await apiLimiter(`gamification:${clientIP}`);
   if (!allowed) {
     return jsonError(
-      "Rate limit exceeded. Please try again later.",
+      'Rate limit exceeded. Please try again later.',
       429,
       ERROR_CODES.RATE_LIMITED,
       { retryAfter: resetIn },
@@ -158,8 +158,8 @@ export async function GET(request: NextRequest) {
 
   // Check for events query parameter
   const url = new URL(request.url);
-  const includeEvents = url.searchParams.get("events") === "true";
-  const eventsLimit = parseEventsLimit(url.searchParams.get("limit"));
+  const includeEvents = url.searchParams.get('events') === 'true';
+  const eventsLimit = parseEventsLimit(url.searchParams.get('limit'));
 
   return optionalAuth(request, async (userId) => {
     // Demo mode: return sample data
@@ -186,38 +186,30 @@ export async function GET(request: NextRequest) {
 
     // Get or create gamification profile
     const { data: initialProfileData, error: profileError } = await supabase
-      .from("gamification_profiles")
-      .select("*")
-      .eq("user_id", userId)
+      .from('gamification_profiles')
+      .select('*')
+      .eq('user_id', userId)
       .single();
 
     let profileData = initialProfileData;
 
-    if (profileError?.code === "PGRST116") {
+    if (profileError?.code === 'PGRST116') {
       // No profile exists, create one
       const { data: newProfile, error: createError } = await supabase
-        .from("gamification_profiles")
+        .from('gamification_profiles')
         .insert({ user_id: userId })
-        .select("*")
+        .select('*')
         .single();
 
       if (createError) {
-        logger.error("Failed to create gamification profile:", createError);
-        return jsonError(
-          "Failed to create profile",
-          500,
-          ERROR_CODES.INTERNAL_ERROR,
-        );
+        logger.error('Failed to create gamification profile:', createError);
+        return jsonError('Failed to create profile', 500, ERROR_CODES.INTERNAL_ERROR);
       }
 
       profileData = newProfile;
     } else if (profileError) {
-      logger.error("Failed to fetch gamification profile:", profileError);
-      return jsonError(
-        "Failed to fetch profile",
-        500,
-        ERROR_CODES.INTERNAL_ERROR,
-      );
+      logger.error('Failed to fetch gamification profile:', profileError);
+      return jsonError('Failed to fetch profile', 500, ERROR_CODES.INTERNAL_ERROR);
     }
 
     // Calculate derived values
@@ -237,9 +229,7 @@ export async function GET(request: NextRequest) {
       xpToNextLevel: nextLevelXp - xp,
       xpForCurrentLevel: currentLevelXp,
       levelProgress:
-        xpNeededForLevel > 0
-          ? Math.round((xpInCurrentLevel / xpNeededForLevel) * 100)
-          : 100,
+        xpNeededForLevel > 0 ? Math.round((xpInCurrentLevel / xpNeededForLevel) * 100) : 100,
     };
 
     const response: {
@@ -254,14 +244,14 @@ export async function GET(request: NextRequest) {
     // Optionally include recent XP events
     if (includeEvents) {
       const { data: eventsData, error: eventsError } = await supabase
-        .from("xp_events")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
+        .from('xp_events')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
         .limit(eventsLimit);
 
       if (eventsError) {
-        logger.error("Failed to fetch XP events:", eventsError);
+        logger.error('Failed to fetch XP events:', eventsError);
         // Don't fail the whole request, just don't include events
       } else {
         response.events = (eventsData ?? []).map(
@@ -296,12 +286,10 @@ export async function POST(request: NextRequest) {
   // SECURITY: Apply CSRF protection and rate limiting (stricter for mutations)
   return withCSRFProtection(async (req: NextRequest) => {
     const clientIP = getClientIP(req);
-    const { allowed, resetIn } = await apiLimiter(
-      `gamification-post:${clientIP}`,
-    );
+    const { allowed, resetIn } = await apiLimiter(`gamification-post:${clientIP}`);
     if (!allowed) {
       return jsonError(
-        "Rate limit exceeded. Please try again later.",
+        'Rate limit exceeded. Please try again later.',
         429,
         ERROR_CODES.RATE_LIMITED,
         { retryAfter: resetIn },
@@ -312,30 +300,26 @@ export async function POST(request: NextRequest) {
       const supabase = await createServerClient();
 
       // Call the update_streak function (which also awards daily XP)
-      const { error } = await supabase.rpc("update_streak", {
+      const { error } = await supabase.rpc('update_streak', {
         p_user_id: userId,
       });
 
       if (error) {
-        logger.error("Failed to update streak:", error);
-        return jsonError(
-          "Failed to record activity",
-          500,
-          ERROR_CODES.INTERNAL_ERROR,
-        );
+        logger.error('Failed to update streak:', error);
+        return jsonError('Failed to record activity', 500, ERROR_CODES.INTERNAL_ERROR);
       }
 
       // Fetch updated profile
       const { data: profileData, error: profileError } = await supabase
-        .from("gamification_profiles")
-        .select("*")
-        .eq("user_id", userId)
+        .from('gamification_profiles')
+        .select('*')
+        .eq('user_id', userId)
         .single();
 
       if (profileError) {
-        logger.error("Failed to fetch updated profile:", profileError);
+        logger.error('Failed to fetch updated profile:', profileError);
         return jsonError(
-          "Activity recorded but failed to fetch profile",
+          'Activity recorded but failed to fetch profile',
           500,
           ERROR_CODES.INTERNAL_ERROR,
         );
@@ -349,7 +333,7 @@ export async function POST(request: NextRequest) {
       const xpNeededForLevel = nextLevelXp - currentLevelXp;
 
       return jsonSuccess({
-        message: "Activity recorded",
+        message: 'Activity recorded',
         profile: {
           xp,
           level,
@@ -359,9 +343,7 @@ export async function POST(request: NextRequest) {
           xpToNextLevel: nextLevelXp - xp,
           xpForCurrentLevel: currentLevelXp,
           levelProgress:
-            xpNeededForLevel > 0
-              ? Math.round((xpInCurrentLevel / xpNeededForLevel) * 100)
-              : 100,
+            xpNeededForLevel > 0 ? Math.round((xpInCurrentLevel / xpNeededForLevel) * 100) : 100,
         },
       });
     });

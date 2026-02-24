@@ -1,19 +1,19 @@
 // app/feed/page.tsx
-import { Metadata } from "next";
-import { Suspense } from "react";
-import { APP_CONFIG, UNIVERSITY_CONFIG } from "@/lib/config";
-import PublicFeedClient from "@/features/feed/components/PublicFeedClient";
-import { FeedSkeletons } from "@/features/feed/components/FeedSkeletons";
+import { Metadata } from 'next';
+import { Suspense } from 'react';
+import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import PublicFeedClient from '@/features/feed/components/PublicFeedClient';
+import { FeedSkeletons } from '@/features/feed/components/FeedSkeletons';
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - University Events & Announcements`,
   description:
-    "Browse university-wide events, announcements, and activities. Add events to your personal calendar to stay organized and never miss what matters.",
+    'Browse university-wide events, announcements, and activities. Add events to your personal calendar to stay organized and never miss what matters.',
   openGraph: {
     title: `${APP_CONFIG.name} - University Events & Announcements`,
     description:
-      "Browse university-wide events, announcements, and activities. Add events to your personal calendar to stay organized.",
-    type: "website",
+      'Browse university-wide events, announcements, and activities. Add events to your personal calendar to stay organized.',
+    type: 'website',
     images: [
       {
         url: `${UNIVERSITY_CONFIG.website}/MQ_Logo_Final.png`,
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
     images: [`${UNIVERSITY_CONFIG.website}/MQ_Logo_Final.png`],
   },
 };

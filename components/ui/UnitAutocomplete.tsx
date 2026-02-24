@@ -1,20 +1,14 @@
-"use client";
+'use client';
 
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect,
-} from "react";
-import { BookOpen, Search, X, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/mq/input";
-import { Button } from "@/components/ui/mq/button";
-import { Badge } from "@/components/ui/mq/badge";
-import { searchMQUnits, getMQUnitByCode, type MQUnit } from "@/data/mqUnits";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import type { TranslationKey } from "@/lib/i18n/translations";
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { BookOpen, Search, X, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/mq/input';
+import { Button } from '@/components/ui/mq/button';
+import { Badge } from '@/components/ui/mq/badge';
+import { searchMQUnits, getMQUnitByCode, type MQUnit } from '@/data/mqUnits';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 interface UnitAutocompleteProps {
   /** Current unit code value */
@@ -52,7 +46,7 @@ export default function UnitAutocomplete({
   allowCustom = true,
 }: UnitAutocompleteProps) {
   const { t } = useTypedTranslation();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -77,20 +71,17 @@ export default function UnitAutocomplete({
   }, [query, isOpen]);
 
   // Handle input change
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setQuery(e.target.value);
-      setIsOpen(true);
-      setHighlightedIndex(0);
-    },
-    [],
-  );
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    setIsOpen(true);
+    setHighlightedIndex(0);
+  }, []);
 
   // Handle selection from dropdown
   const handleSelect = useCallback(
     (unit: MQUnit) => {
       onSelect(unit.code, unit.title);
-      setQuery("");
+      setQuery('');
       setIsOpen(false);
     },
     [onSelect],
@@ -98,8 +89,8 @@ export default function UnitAutocomplete({
 
   // Handle clear
   const handleClear = useCallback(() => {
-    onSelect("", "");
-    setQuery("");
+    onSelect('', '');
+    setQuery('');
     setIsOpen(false);
   }, [onSelect]);
 
@@ -107,7 +98,7 @@ export default function UnitAutocomplete({
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (!isOpen) {
-        if (e.key === "ArrowDown" || e.key === "Enter") {
+        if (e.key === 'ArrowDown' || e.key === 'Enter') {
           setIsOpen(true);
           e.preventDefault();
         }
@@ -115,26 +106,24 @@ export default function UnitAutocomplete({
       }
 
       switch (e.key) {
-        case "ArrowDown":
+        case 'ArrowDown':
           e.preventDefault();
-          setHighlightedIndex((prev) =>
-            prev < searchResults.length - 1 ? prev + 1 : prev,
-          );
+          setHighlightedIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : prev));
           break;
-        case "ArrowUp":
+        case 'ArrowUp':
           e.preventDefault();
           setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
           break;
-        case "Enter":
+        case 'Enter':
           e.preventDefault();
           if (searchResults[highlightedIndex]) {
             handleSelect(searchResults[highlightedIndex]);
           }
           break;
-        case "Escape":
+        case 'Escape':
           e.preventDefault();
           setIsOpen(false);
-          setQuery("");
+          setQuery('');
           break;
       }
     },
@@ -144,57 +133,48 @@ export default function UnitAutocomplete({
   // Close on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
-        setQuery("");
+        setQuery('');
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // Scroll highlighted item into view
   useEffect(() => {
     if (listRef.current && isOpen) {
-      const highlightedElement = listRef.current.children[
-        highlightedIndex
-      ] as HTMLElement;
+      const highlightedElement = listRef.current.children[highlightedIndex] as HTMLElement;
       if (highlightedElement) {
-        highlightedElement.scrollIntoView({ block: "nearest" });
+        highlightedElement.scrollIntoView({ block: 'nearest' });
       }
     }
   }, [highlightedIndex, isOpen]);
 
   // Get level badge variant based on unit level
-  const getLevelBadgeVariant = (
-    level: number,
-  ): "neutral" | "brand" | "secondary" => {
-    if (level >= 8000) return "brand";
-    if (level >= 6000) return "secondary";
-    return "neutral";
+  const getLevelBadgeVariant = (level: number): 'neutral' | 'brand' | 'secondary' => {
+    if (level >= 8000) return 'brand';
+    if (level >= 6000) return 'secondary';
+    return 'neutral';
   };
 
   return (
-    <div ref={containerRef} className={cn("relative w-full", className)}>
+    <div ref={containerRef} className={cn('relative w-full', className)}>
       {/* Selected unit display or search input */}
       {selectedMQUnit && !isOpen ? (
         /* Selected unit card */
         <div
           className={cn(
-            "flex items-start gap-3 p-3 border rounded-lg bg-mq-card-background",
-            disabled
-              ? "opacity-50 cursor-not-allowed"
-              : "cursor-pointer hover:border-mq-primary",
+            'flex items-start gap-3 p-3 border rounded-lg bg-mq-card-background',
+            disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-mq-primary',
           )}
           onClick={() => !disabled && setIsOpen(true)}
           role="button"
           tabIndex={disabled ? -1 : 0}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+            if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               if (!disabled) setIsOpen(true);
             }
@@ -203,9 +183,7 @@ export default function UnitAutocomplete({
           <BookOpen className="h-5 w-5 text-mq-primary shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-mono font-semibold text-sm">
-                {selectedMQUnit.code}
-              </span>
+              <span className="font-mono font-semibold text-sm">{selectedMQUnit.code}</span>
               <Badge
                 variant={getLevelBadgeVariant(selectedMQUnit.level)}
                 className="text-[10px] h-5"
@@ -213,9 +191,7 @@ export default function UnitAutocomplete({
                 {selectedMQUnit.unitType}
               </Badge>
             </div>
-            <span className="block text-sm truncate">
-              {selectedMQUnit.title}
-            </span>
+            <span className="block text-sm truncate">{selectedMQUnit.title}</span>
             <span className="block text-xs text-mq-content-secondary truncate mt-0.5">
               {selectedMQUnit.school}
             </span>
@@ -239,16 +215,14 @@ export default function UnitAutocomplete({
         /* Custom unit display (not from MQ list) */
         <div
           className={cn(
-            "flex items-start gap-3 p-3 border rounded-lg bg-mq-card-background border-dashed",
-            disabled
-              ? "opacity-50 cursor-not-allowed"
-              : "cursor-pointer hover:border-mq-primary",
+            'flex items-start gap-3 p-3 border rounded-lg bg-mq-card-background border-dashed',
+            disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-mq-primary',
           )}
           onClick={() => !disabled && setIsOpen(true)}
           role="button"
           tabIndex={disabled ? -1 : 0}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+            if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               if (!disabled) setIsOpen(true);
             }
@@ -257,16 +231,12 @@ export default function UnitAutocomplete({
           <BookOpen className="h-5 w-5 text-mq-content-secondary shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-mono font-semibold text-sm">
-                {codeValue}
-              </span>
+              <span className="font-mono font-semibold text-sm">{codeValue}</span>
               <Badge variant="neutral" className="text-[10px] h-5">
-                {tOr("customUnit", "Custom")}
+                {tOr('customUnit', 'Custom')}
               </Badge>
             </div>
-            <span className="block text-sm truncate">
-              {nameValue || tOr("noName", "No name")}
-            </span>
+            <span className="block text-sm truncate">{nameValue || tOr('noName', 'No name')}</span>
           </div>
           {!disabled && (
             <Button
@@ -295,11 +265,10 @@ export default function UnitAutocomplete({
             onKeyDown={handleKeyDown}
             onFocus={() => setIsOpen(true)}
             placeholder={
-              codePlaceholder ||
-              tOr("searchMQUnit", "Search MQ units by code or name...")
+              codePlaceholder || tOr('searchMQUnit', 'Search MQ units by code or name...')
             }
             disabled={disabled}
-            className={cn("pl-10", error && "border-red-500")}
+            className={cn('pl-10', error && 'border-red-500')}
           />
         </div>
       )}
@@ -314,8 +283,8 @@ export default function UnitAutocomplete({
           {searchResults.length === 0 ? (
             <li className="px-3 py-4 text-center text-sm text-mq-content-secondary">
               {query.length > 0
-                ? tOr("noUnitsFound", "No units found matching your search")
-                : tOr("typeToSearchUnits", "Type to search MQ units...")}
+                ? tOr('noUnitsFound', 'No units found matching your search')
+                : tOr('typeToSearchUnits', 'Type to search MQ units...')}
             </li>
           ) : (
             searchResults.map((unit, index) => (
@@ -326,11 +295,11 @@ export default function UnitAutocomplete({
                 role="option"
                 aria-selected={highlightedIndex === index}
                 className={cn(
-                  "flex items-start gap-3 px-3 py-2 cursor-pointer transition-colors",
+                  'flex items-start gap-3 px-3 py-2 cursor-pointer transition-colors',
                   highlightedIndex === index
-                    ? "bg-mq-primary/10 text-mq-primary"
-                    : "hover:bg-mq-hover-background",
-                  selectedMQUnit?.code === unit.code && "font-medium",
+                    ? 'bg-mq-primary/10 text-mq-primary'
+                    : 'hover:bg-mq-hover-background',
+                  selectedMQUnit?.code === unit.code && 'font-medium',
                 )}
                 onClick={() => handleSelect(unit)}
                 onMouseEnter={() => setHighlightedIndex(index)}
@@ -338,9 +307,7 @@ export default function UnitAutocomplete({
                 <BookOpen className="h-4 w-4 shrink-0 text-mq-content-secondary mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-mono font-semibold text-sm">
-                      {unit.code}
-                    </span>
+                    <span className="font-mono font-semibold text-sm">{unit.code}</span>
                     <Badge
                       variant={getLevelBadgeVariant(unit.level)}
                       className="text-[10px] h-4 px-1"
@@ -364,7 +331,7 @@ export default function UnitAutocomplete({
           {allowCustom && query.length > 0 && (
             <li className="border-t border-mq-border px-3 py-2 text-xs text-mq-content-secondary">
               {tOr(
-                "customUnitHint",
+                'customUnitHint',
                 "Can't find your unit? Enter the code and name manually below.",
               )}
             </li>

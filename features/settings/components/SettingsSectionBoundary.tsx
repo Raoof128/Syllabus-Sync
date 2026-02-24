@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from "react";
-import { Button } from "@/components/ui/mq/button";
-import { AlertTriangle } from "lucide-react";
-import { logger } from "@/lib/logger";
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Button } from '@/components/ui/mq/button';
+import { AlertTriangle } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Props {
   children: ReactNode;
@@ -32,17 +32,14 @@ export class SettingsSectionBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     logger.error(
-      `SettingsSectionBoundary caught an error in ${this.props.sectionName || "section"}:`,
+      `SettingsSectionBoundary caught an error in ${this.props.sectionName || 'section'}:`,
       error,
       errorInfo,
     );
   }
 
   public componentDidUpdate(prevProps: Props) {
-    if (
-      this.props.sectionName !== prevProps.sectionName &&
-      this.state.hasError
-    ) {
+    if (this.props.sectionName !== prevProps.sectionName && this.state.hasError) {
       this.setState({ hasError: false, error: null });
     }
   }
@@ -64,19 +61,17 @@ export class SettingsSectionBoundary extends Component<Props, State> {
           </div>
           <div>
             <h3 className="text-lg font-semibold text-foreground">
-              {this.props.sectionName
-                ? `Error in ${this.props.sectionName}`
-                : "Section Error"}
+              {this.props.sectionName ? `Error in ${this.props.sectionName}` : 'Section Error'}
             </h3>
             <p className="text-sm text-muted-foreground max-w-md mt-1">
-              Something went wrong while loading this section. You can try again
-              or check other settings.
+              Something went wrong while loading this section. You can try again or check other
+              settings.
             </p>
           </div>
           <Button variant="outline" onClick={this.handleRetry}>
             Try Again
           </Button>
-          {process.env.NODE_ENV === "development" && this.state.error && (
+          {process.env.NODE_ENV === 'development' && this.state.error && (
             <pre className="text-xs text-left w-full p-2 bg-black/5 rounded overflow-auto max-h-40 mt-4">
               {this.state.error.toString()}
             </pre>

@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Shield } from "lucide-react";
-import { APP_CONFIG, UNIVERSITY_CONFIG } from "@/lib/config";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import Link from 'next/link';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Shield } from 'lucide-react';
+import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 const SECTION_TITLES = [
-  "terms_s1_title",
-  "terms_s2_title",
-  "terms_s3_title",
-  "terms_s4_title",
-  "terms_s5_title",
-  "terms_s6_title",
-  "terms_s7_title",
-  "terms_s8_title",
-  "terms_s9_title",
-  "terms_s10_title",
+  'terms_s1_title',
+  'terms_s2_title',
+  'terms_s3_title',
+  'terms_s4_title',
+  'terms_s5_title',
+  'terms_s6_title',
+  'terms_s7_title',
+  'terms_s8_title',
+  'terms_s9_title',
+  'terms_s10_title',
 ] as const;
 
 export default function TermsPage() {
@@ -35,18 +35,18 @@ export default function TermsPage() {
             className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors mb-6"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            {t("terms_back_to", { appName: APP_CONFIG.name })}
+            {t('terms_back_to', { appName: APP_CONFIG.name })}
           </button>
 
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-[0.2em] text-mq-primary font-semibold">
-                {t("terms_legal_doc")}
+                {t('terms_legal_doc')}
               </p>
               <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
-                {t("terms_title")}
+                {t('terms_title')}
               </h1>
-              <p className="text-sm text-white/50">{t("terms_last_updated")}</p>
+              <p className="text-sm text-white/50">{t('terms_last_updated')}</p>
             </div>
             <div className="hidden sm:flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-white/10 border border-white/15">
               <Shield className="h-6 w-6 text-mq-primary" />
@@ -65,7 +65,7 @@ export default function TermsPage() {
           <aside className="hidden lg:block">
             <div className="sticky top-8 space-y-1">
               <p className="text-xs uppercase tracking-[0.15em] font-semibold text-mq-content-secondary mb-3">
-                {t("terms_sections")}
+                {t('terms_sections')}
               </p>
               {SECTION_TITLES.map((key, i) => (
                 <a
@@ -74,7 +74,7 @@ export default function TermsPage() {
                   className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-sm text-mq-content-secondary hover:text-mq-content hover:bg-mq-border/30 transition-colors group"
                 >
                   <span className="text-xs font-bold text-mq-primary/60 group-hover:text-mq-primary w-5 flex-shrink-0">
-                    {String(i + 1).padStart(2, "0")}
+                    {String(i + 1).padStart(2, '0')}
                   </span>
                   <span className="truncate">{t(key)}</span>
                 </a>
@@ -93,10 +93,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   1
                 </span>
-                {t("terms_s1_title")}
+                {t('terms_s1_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s1_p1", { appName: APP_CONFIG.name })}
+                {t('terms_s1_p1', { appName: APP_CONFIG.name })}
               </p>
             </section>
 
@@ -109,10 +109,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   2
                 </span>
-                {t("terms_s2_title")}
+                {t('terms_s2_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s2_p1", {
+                {t('terms_s2_p1', {
                   appName: APP_CONFIG.name,
                   uniName: UNIVERSITY_CONFIG.name,
                 })}
@@ -128,10 +128,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   3
                 </span>
-                {t("terms_s3_title")}
+                {t('terms_s3_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s3_p1")}
+                {t('terms_s3_p1')}
               </p>
             </section>
 
@@ -144,19 +144,19 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   4
                 </span>
-                {t("terms_s4_title")}
+                {t('terms_s4_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s4_p1")}
+                {t('terms_s4_p1')}
               </p>
               <ul className="space-y-2">
                 {(
                   [
-                    "terms_s4_li1",
-                    "terms_s4_li2",
-                    "terms_s4_li3",
-                    "terms_s4_li4",
-                    "terms_s4_li5",
+                    'terms_s4_li1',
+                    'terms_s4_li2',
+                    'terms_s4_li3',
+                    'terms_s4_li4',
+                    'terms_s4_li5',
                   ] as const
                 ).map((key) => (
                   <li
@@ -179,10 +179,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   5
                 </span>
-                {t("terms_s5_title")}
+                {t('terms_s5_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s5_p1", { appName: APP_CONFIG.name })}
+                {t('terms_s5_p1', { appName: APP_CONFIG.name })}
               </p>
             </section>
 
@@ -195,10 +195,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   6
                 </span>
-                {t("terms_s6_title")}
+                {t('terms_s6_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s6_p1", { appName: APP_CONFIG.name })}
+                {t('terms_s6_p1', { appName: APP_CONFIG.name })}
               </p>
             </section>
 
@@ -211,10 +211,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   7
                 </span>
-                {t("terms_s7_title")}
+                {t('terms_s7_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s7_p1")}
+                {t('terms_s7_p1')}
               </p>
             </section>
 
@@ -227,10 +227,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   8
                 </span>
-                {t("terms_s8_title")}
+                {t('terms_s8_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s8_p1", {
+                {t('terms_s8_p1', {
                   appNameCaps: APP_CONFIG.name.toUpperCase(),
                 })}
               </p>
@@ -245,10 +245,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   9
                 </span>
-                {t("terms_s9_title")}
+                {t('terms_s9_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s9_p1")}
+                {t('terms_s9_p1')}
               </p>
             </section>
 
@@ -261,10 +261,10 @@ export default function TermsPage() {
                 <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-mq-primary/10 text-mq-primary flex items-center justify-center text-xs font-bold border border-mq-primary/20">
                   10
                 </span>
-                {t("terms_s10_title")}
+                {t('terms_s10_title')}
               </h2>
               <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t("terms_s10_p1")}{" "}
+                {t('terms_s10_p1')}{' '}
                 <a
                   href={`mailto:${UNIVERSITY_CONFIG.supportEmail}`}
                   className="text-mq-primary hover:underline font-medium"
@@ -279,13 +279,13 @@ export default function TermsPage() {
               <div className="flex items-center gap-2">
                 <Image
                   src="/MQ_Logo_Final.png"
-                  alt={t("mqLogoAlt")}
+                  alt={t('mqLogoAlt')}
                   width={32}
                   height={32}
                   className="object-contain opacity-70"
                 />
                 <p className="text-xs text-mq-content-secondary">
-                  {t("terms_footer_copy", {
+                  {t('terms_footer_copy', {
                     year: currentYear,
                     appName: APP_CONFIG.name,
                   })}
@@ -293,14 +293,11 @@ export default function TermsPage() {
               </div>
               <div className="flex items-center gap-3 text-xs text-mq-content-secondary">
                 <Link href="/terms" className="text-mq-primary font-medium">
-                  {t("termsFooter")}
+                  {t('termsFooter')}
                 </Link>
                 <span className="text-mq-border">·</span>
-                <Link
-                  href="/privacy"
-                  className="hover:text-mq-primary transition-colors"
-                >
-                  {t("privacyFooter")}
+                <Link href="/privacy" className="hover:text-mq-primary transition-colors">
+                  {t('privacyFooter')}
                 </Link>
               </div>
             </div>

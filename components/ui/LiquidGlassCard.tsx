@@ -27,7 +27,7 @@
 // - gridItem: Optimized for grid layouts
 // - subtle: Minimal effects for nested cards
 // ============================================================================
-"use client";
+'use client';
 
 import React, {
   useRef,
@@ -36,8 +36,8 @@ import React, {
   useMemo,
   useSyncExternalStore,
   useEffect,
-} from "react";
-import { cn } from "@/lib/utils";
+} from 'react';
+import { cn } from '@/lib/utils';
 
 // ============================================================================
 // TYPES
@@ -71,15 +71,14 @@ interface LiquidGlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
 // ============================================================================
 
 const subscribeToReducedMotion = (callback: () => void) => {
-  if (typeof window === "undefined") return () => {};
-  const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-  mediaQuery.addEventListener("change", callback);
-  return () => mediaQuery.removeEventListener("change", callback);
+  if (typeof window === 'undefined') return () => {};
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  mediaQuery.addEventListener('change', callback);
+  return () => mediaQuery.removeEventListener('change', callback);
 };
 
 const getReducedMotionSnapshot = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const getReducedMotionServerSnapshot = () => false;
 
@@ -163,8 +162,8 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
 
       // Update mouse position CSS variables for mouse glow effect
       if (mouseGlow) {
-        cardRef.current.style.setProperty("--mouse-x", `${x}px`);
-        cardRef.current.style.setProperty("--mouse-y", `${y}px`);
+        cardRef.current.style.setProperty('--mouse-x', `${x}px`);
+        cardRef.current.style.setProperty('--mouse-y', `${y}px`);
       }
 
       if (disableTilt) return;
@@ -182,14 +181,7 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
         setGlowPosition({ x: glowX, y: glowY });
       }
     },
-    [
-      onMouseMove,
-      prefersReducedMotion,
-      disableTilt,
-      disableGlow,
-      effectParams.maxTilt,
-      mouseGlow,
-    ],
+    [onMouseMove, prefersReducedMotion, disableTilt, disableGlow, effectParams.maxTilt, mouseGlow],
   );
 
   const handleMouseEnter = useCallback(
@@ -223,7 +215,7 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
 
     const transform = isHovered
       ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(${effectParams.hoverScale}, ${effectParams.hoverScale}, 1)`
-      : "rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
+      : 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
 
     // Dynamic shadow based on tilt
     const shadowOffsetX = tilt.y * 2 * effectParams.shadowIntensity;
@@ -235,7 +227,7 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
     return {
       ...baseStyles,
       transform,
-      transformStyle: "preserve-3d" as const,
+      transformStyle: 'preserve-3d' as const,
       boxShadow: isHovered
         ? `
           ${shadowOffsetX}px ${shadowOffsetY + 20}px ${shadowBlur}px ${shadowSpread}px rgba(0, 0, 0, ${shadowOpacity}),
@@ -247,8 +239,8 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
           0 0 0 1px var(--c-border)
         `,
       transition: isHovered
-        ? "transform 0.1s ease-out, box-shadow 0.3s ease-out"
-        : "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease-out",
+        ? 'transform 0.1s ease-out, box-shadow 0.3s ease-out'
+        : 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease-out',
     };
   }, [style, effectParams, prefersReducedMotion, isHovered, tilt]);
 
@@ -257,10 +249,10 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
     if (prefersReducedMotion || disableGlow || !isHovered) return null;
 
     return {
-      position: "absolute" as const,
+      position: 'absolute' as const,
       inset: 0,
-      pointerEvents: "none" as const,
-      borderRadius: "inherit",
+      pointerEvents: 'none' as const,
+      borderRadius: 'inherit',
       opacity: effectParams.glowIntensity,
       background: `radial-gradient(
         circle at ${glowPosition.x}% ${glowPosition.y}%,
@@ -268,16 +260,10 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
         rgba(166, 25, 46, 0.1) 40%,
         transparent 70%
       )`,
-      transition: "opacity 0.3s ease-out",
+      transition: 'opacity 0.3s ease-out',
       zIndex: 1,
     };
-  }, [
-    prefersReducedMotion,
-    disableGlow,
-    isHovered,
-    glowPosition,
-    effectParams.glowIntensity,
-  ]);
+  }, [prefersReducedMotion, disableGlow, isHovered, glowPosition, effectParams.glowIntensity]);
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- Mouse handlers for 3D tilt visual effect only
@@ -285,21 +271,21 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
       ref={cardRef}
       className={cn(
         // Base styles
-        "relative overflow-hidden rounded-mq-lg",
+        'relative overflow-hidden rounded-mq-lg',
         // Background and border
-        "bg-mq-card-background border border-mq-border",
+        'bg-mq-card-background border border-mq-border',
         // Transitions (CSS backup for non-JS)
-        "transition-all duration-300",
+        'transition-all duration-300',
         // Cursor
-        "cursor-pointer",
+        'cursor-pointer',
         // Liquid glass enhancement
-        liquidGlass && "mq-liquid-enhanced",
+        liquidGlass && 'mq-liquid-enhanced',
         // Mouse glow effect
-        mouseGlow && !prefersReducedMotion && "mouse-glow-card",
+        mouseGlow && !prefersReducedMotion && 'mouse-glow-card',
         // Variant-specific classes
-        hero && "lg:min-h-[200px]",
-        gridItem && "h-full",
-        subtle && "border-transparent",
+        hero && 'lg:min-h-[200px]',
+        gridItem && 'h-full',
+        subtle && 'border-transparent',
         // User className
         className,
       )}
@@ -314,16 +300,10 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
 
       {/* Content wrapper with 3D depth */}
       <div
-        className={cn(
-          "relative z-10 h-full",
-          mouseGlow && "mouse-glow-content",
-        )}
+        className={cn('relative z-10 h-full', mouseGlow && 'mouse-glow-content')}
         style={{
-          transform:
-            isHovered && !prefersReducedMotion
-              ? "translateZ(20px)"
-              : "translateZ(0)",
-          transition: "transform 0.3s ease-out",
+          transform: isHovered && !prefersReducedMotion ? 'translateZ(20px)' : 'translateZ(0)',
+          transition: 'transform 0.3s ease-out',
         }}
       >
         {children}
@@ -335,7 +315,7 @@ export const LiquidGlassCard: React.FC<LiquidGlassCardProps> = ({
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none"
           style={{
-            borderRadius: "inherit",
+            borderRadius: 'inherit',
             zIndex: 2,
             boxShadow: `
               inset 0 0 0 2px rgba(166, 25, 46, 0.3),
@@ -379,27 +359,23 @@ export const MouseGlowContainer: React.FC<MouseGlowContainerProps> = ({
     if (!container || prefersReducedMotion) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const cards = container.querySelectorAll<HTMLElement>(".mouse-glow-card");
+      const cards = container.querySelectorAll<HTMLElement>('.mouse-glow-card');
       cards.forEach((card) => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        card.style.setProperty("--mouse-x", `${x}px`);
-        card.style.setProperty("--mouse-y", `${y}px`);
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
       });
     };
 
-    container.addEventListener("mousemove", handleMouseMove);
-    return () => container.removeEventListener("mousemove", handleMouseMove);
+    container.addEventListener('mousemove', handleMouseMove);
+    return () => container.removeEventListener('mousemove', handleMouseMove);
   }, [prefersReducedMotion]);
 
   return (
-    <div
-      ref={containerRef}
-      className={cn("mouse-glow-container", className)}
-      {...props}
-    >
+    <div ref={containerRef} className={cn('mouse-glow-container', className)} {...props}>
       {children}
     </div>
   );
@@ -448,8 +424,8 @@ export const SubCard: React.FC<SubCardProps> = ({
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        cardRef.current.style.setProperty("--mouse-x", `${x}px`);
-        cardRef.current.style.setProperty("--mouse-y", `${y}px`);
+        cardRef.current.style.setProperty('--mouse-x', `${x}px`);
+        cardRef.current.style.setProperty('--mouse-y', `${y}px`);
       }
     },
     [onMouseMove, mouseGlow, prefersReducedMotion],
@@ -461,23 +437,23 @@ export const SubCard: React.FC<SubCardProps> = ({
       ref={cardRef}
       className={cn(
         // Base styles
-        "relative rounded-mq-lg p-3 transition-all duration-300",
+        'relative rounded-mq-lg p-3 transition-all duration-300',
         // Background states
-        "hover:bg-mq-subcard-hover active:bg-mq-subcard-active",
-        active && "bg-mq-subcard-active",
+        'hover:bg-mq-subcard-hover active:bg-mq-subcard-active',
+        active && 'bg-mq-subcard-active',
         // Red hover effect (unless disabled)
         !disableRedHover && [
-          "hover:shadow-[inset_0_0_0_1px_rgba(166,25,46,0.2)]",
-          "hover:shadow-[0_0_12px_rgba(166,25,46,0.08)]",
+          'hover:shadow-[inset_0_0_0_1px_rgba(166,25,46,0.2)]',
+          'hover:shadow-[0_0_12px_rgba(166,25,46,0.08)]',
         ],
         // Mouse glow effect
-        mouseGlow && !prefersReducedMotion && "mouse-glow-subcard",
+        mouseGlow && !prefersReducedMotion && 'mouse-glow-subcard',
         className,
       )}
       style={{
         // Red glow on hover via box-shadow
         ...(!disableRedHover && {
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }),
       }}
       onMouseMove={handleMouseMove}

@@ -1,21 +1,16 @@
-"use client";
+'use client';
 
-import { memo, useState, useCallback, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/mq/card";
-import { Shield, Loader2, MessageSquare } from "lucide-react";
-import type { TranslationKey } from "@/lib/i18n/translations";
-import { MagicCard } from "@/components/ui/MagicCard";
-import { DataManagement } from "./privacy/DataManagement";
-import { PasskeySecuritySection } from "./security/PasskeySecuritySection";
-import { TOTPSetup } from "./security/TOTPSetup";
+import { memo, useState, useCallback, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Shield, Loader2, MessageSquare } from 'lucide-react';
+import type { TranslationKey } from '@/lib/i18n/translations';
+import { MagicCard } from '@/components/ui/MagicCard';
+import { DataManagement } from './privacy/DataManagement';
+import { PasskeySecuritySection } from './security/PasskeySecuritySection';
+import { TOTPSetup } from './security/TOTPSetup';
 
-import { API_ROUTES } from "@/lib/constants/config";
-import type { MFAFactor } from "@/lib/security/mfa";
+import { API_ROUTES } from '@/lib/constants/config';
+import type { MFAFactor } from '@/lib/security/mfa';
 
 type PrivacySettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -52,11 +47,8 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
         <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Shield
-                className="h-5 w-5 security-indicator"
-                aria-hidden="true"
-              />
-              <span id="privacy-security-heading">{t("security")}</span>
+              <Shield className="h-5 w-5 security-indicator" aria-hidden="true" />
+              <span id="privacy-security-heading">{t('security')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent
@@ -68,8 +60,7 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-mq-content flex items-center gap-2">
                 <Shield className="h-4 w-4" aria-hidden="true" />
-                {t("twoFactorAuthentication" as TranslationKey) ||
-                  "Two-Factor Authentication"}
+                {t('twoFactorAuthentication' as TranslationKey) || 'Two-Factor Authentication'}
               </h3>
 
               {isLoadingMFA ? (
@@ -79,11 +70,7 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
               ) : (
                 <div className="space-y-3">
                   {/* Authenticator App (TOTP) */}
-                  <TOTPSetup
-                    t={t}
-                    factors={factors}
-                    onStatusChange={fetchMFAStatus}
-                  />
+                  <TOTPSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
 
                   {/* Passkeys & Biometric Login */}
                   <PasskeySecuritySection t={t} />
@@ -92,21 +79,18 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
                   <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border opacity-60">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-3 flex-1">
-                        <MessageSquare
-                          className="h-4 w-4 flex-shrink-0"
-                          aria-hidden="true"
-                        />
+                        <MessageSquare className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                         <div className="flex-1 min-w-0">
                           <p className="text-mq-sm font-medium text-mq-content">
-                            {t("smsVerification")}
+                            {t('smsVerification')}
                           </p>
                           <p className="text-mq-xs text-mq-content-secondary mt-0.5">
-                            {t("smsVerificationDesc")}
+                            {t('smsVerificationDesc')}
                           </p>
                         </div>
                       </div>
                       <span className="text-mq-xs text-mq-content-secondary sm:ml-2">
-                        {t("comingSoon")}
+                        {t('comingSoon')}
                       </span>
                     </div>
                   </div>
@@ -125,6 +109,6 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
   );
 });
 
-PrivacySettings.displayName = "PrivacySettings";
+PrivacySettings.displayName = 'PrivacySettings';
 
 export default PrivacySettings;

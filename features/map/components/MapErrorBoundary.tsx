@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Component, type ReactNode } from "react";
-import { AlertTriangle, RefreshCw, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/mq/button";
-import { errorHandler } from "@/lib/utils/errorHandling";
-import { logger } from "@/lib/logger";
-import { useSafeTranslation } from "@/lib/hooks/useSafeTranslation";
+import { Component, type ReactNode } from 'react';
+import { AlertTriangle, RefreshCw, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/mq/button';
+import { errorHandler } from '@/lib/utils/errorHandling';
+import { logger } from '@/lib/logger';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 
 /** Translated strings passed from the functional wrapper to the class component */
 interface MapErrorTranslations {
@@ -56,8 +56,8 @@ const TRANSIENT_LEAFLET_ERRORS = [
   "Cannot read properties of null (reading 'style')",
   "Cannot read properties of null (reading '_leaflet_pos')",
   // Map container errors
-  "Map container is already initialized",
-  "Map container not found",
+  'Map container is already initialized',
+  'Map container not found',
   // Layer errors during rapid state changes
   "Cannot read properties of undefined (reading '_map')",
   "Cannot read properties of null (reading '_map')",
@@ -68,11 +68,9 @@ const TRANSIENT_LEAFLET_ERRORS = [
  */
 function isTransientLeafletError(error: Error | null): boolean {
   if (!error) return false;
-  const message = error.message || "";
+  const message = error.message || '';
   return TRANSIENT_LEAFLET_ERRORS.some(
-    (pattern) =>
-      message.includes(pattern) ||
-      message.toLowerCase().includes(pattern.toLowerCase()),
+    (pattern) => message.includes(pattern) || message.toLowerCase().includes(pattern.toLowerCase()),
   );
 }
 
@@ -83,10 +81,7 @@ const MAX_AUTO_RETRIES = 3; // Increased from 2 to handle Turbopack fast refresh
  * Catches rendering errors and provides a graceful fallback UI
  * Automatically retries transient Leaflet DOM errors
  */
-export class MapErrorBoundary extends Component<
-  MapErrorBoundaryProps,
-  MapErrorBoundaryState
-> {
+export class MapErrorBoundary extends Component<MapErrorBoundaryProps, MapErrorBoundaryState> {
   private retryTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(props: MapErrorBoundaryProps) {
@@ -99,9 +94,7 @@ export class MapErrorBoundary extends Component<
     };
   }
 
-  static getDerivedStateFromError(
-    error: Error,
-  ): Partial<MapErrorBoundaryState> {
+  static getDerivedStateFromError(error: Error): Partial<MapErrorBoundaryState> {
     return {
       hasError: true,
       error,
@@ -110,12 +103,9 @@ export class MapErrorBoundary extends Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Check if this is a transient Leaflet error that can be auto-retried
-    if (
-      isTransientLeafletError(error) &&
-      this.state.retryCount < MAX_AUTO_RETRIES
-    ) {
+    if (isTransientLeafletError(error) && this.state.retryCount < MAX_AUTO_RETRIES) {
       // Don't log transient errors to error handler - they're expected during HMR
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NODE_ENV === 'development') {
         console.warn(
           `MapErrorBoundary: Transient Leaflet error detected, auto-retrying (${this.state.retryCount + 1}/${MAX_AUTO_RETRIES})...`,
           error.message,
@@ -137,16 +127,16 @@ export class MapErrorBoundary extends Component<
     }
 
     // Log non-transient errors to our error handling system
-    errorHandler.logError(error, "Map Component", "medium");
+    errorHandler.logError(error, 'Map Component', 'medium');
 
     this.setState({
       errorInfo: errorInfo.componentStack || null,
     });
 
     // In development, also log to console for debugging
-    if (process.env.NODE_ENV === "development") {
-      logger.error("MapErrorBoundary caught an error:", error);
-      logger.error("Component stack:", errorInfo.componentStack);
+    if (process.env.NODE_ENV === 'development') {
+      logger.error('MapErrorBoundary caught an error:', error);
+      logger.error('Component stack:', errorInfo.componentStack);
     }
   }
 
@@ -194,24 +184,24 @@ export class MapErrorBoundary extends Component<
 
             {/* Error message */}
             <h3 className="text-lg font-semibold text-mq-content mb-2">
-              {t?.mapFailedToLoad ?? "Map failed to load"}
+              {t?.mapFailedToLoad ?? 'Map failed to load'}
             </h3>
             <p className="text-mq-sm text-mq-content-secondary mb-4">
               {t?.mapLoadErrorDescription ??
-                "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem."}
+                'We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.'}
             </p>
 
             {/* Error details (development only) */}
-            {process.env.NODE_ENV === "development" && this.state.error && (
+            {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="w-full mb-4 text-left">
                 <summary className="text-mq-xs text-mq-content-tertiary cursor-pointer hover:text-mq-content">
-                  {t?.technicalDetails ?? "Technical details"}
+                  {t?.technicalDetails ?? 'Technical details'}
                 </summary>
                 <pre className="mt-2 p-3 text-xs bg-mq-background rounded-mq overflow-x-auto text-mq-error">
                   {this.state.error.message}
                   {this.state.errorInfo && (
                     <>
-                      {"\n\nComponent Stack:"}
+                      {'\n\nComponent Stack:'}
                       {this.state.errorInfo}
                     </>
                   )}
@@ -223,21 +213,21 @@ export class MapErrorBoundary extends Component<
             <div className="flex items-center gap-3">
               <Button onClick={this.handleRetry} className="gap-2">
                 <RefreshCw className="h-4 w-4" />
-                {t?.tryAgain ?? "Try again"}
+                {t?.tryAgain ?? 'Try again'}
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => window.location.reload()}
                 className="gap-2"
               >
-                {t?.reloadPage ?? "Reload page"}
+                {t?.reloadPage ?? 'Reload page'}
               </Button>
             </div>
 
             {/* Help text */}
             <p className="mt-4 text-mq-xs text-mq-content-tertiary">
               {t?.mapErrorPersistHelp ??
-                "If the problem persists, try refreshing the page or clearing your browser cache."}
+                'If the problem persists, try refreshing the page or clearing your browser cache.'}
             </p>
           </div>
         </div>
@@ -262,17 +252,17 @@ export function TranslatedMapErrorBoundary({
   const { safeT } = useSafeTranslation();
 
   const translations: MapErrorTranslations = {
-    mapFailedToLoad: safeT("mapFailedToLoad", "Map failed to load"),
+    mapFailedToLoad: safeT('mapFailedToLoad', 'Map failed to load'),
     mapLoadErrorDescription: safeT(
-      "mapLoadErrorDescription",
-      "We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.",
+      'mapLoadErrorDescription',
+      'We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.',
     ),
-    technicalDetails: safeT("technicalDetails", "Technical details"),
-    tryAgain: safeT("tryAgain", "Try again"),
-    reloadPage: safeT("reloadPage", "Reload page"),
+    technicalDetails: safeT('technicalDetails', 'Technical details'),
+    tryAgain: safeT('tryAgain', 'Try again'),
+    reloadPage: safeT('reloadPage', 'Reload page'),
     mapErrorPersistHelp: safeT(
-      "mapErrorPersistHelp",
-      "If the problem persists, try refreshing the page or clearing your browser cache.",
+      'mapErrorPersistHelp',
+      'If the problem persists, try refreshing the page or clearing your browser cache.',
     ),
   };
 
@@ -296,7 +286,7 @@ export function withMapErrorBoundary<P extends object>(
     </TranslatedMapErrorBoundary>
   );
 
-  ComponentWithErrorBoundary.displayName = `withMapErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name || "Component"})`;
+  ComponentWithErrorBoundary.displayName = `withMapErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
 
   return ComponentWithErrorBoundary;
 }

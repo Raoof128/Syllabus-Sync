@@ -33,10 +33,7 @@ export function calculateDistance(
  * @param speedKmh - Walking speed in km/h (default: 5)
  * @returns Estimated time in seconds
  */
-export function estimateWalkingTime(
-  distanceMeters: number,
-  speedKmh: number = 5,
-): number {
+export function estimateWalkingTime(distanceMeters: number, speedKmh: number = 5): number {
   const speedMs = speedKmh / 3.6; // Convert km/h to m/s
   return Math.round(distanceMeters / speedMs);
 }
@@ -47,9 +44,7 @@ export function formatDistance(m: number) {
 
 export function formatDuration(s: number) {
   const mins = Math.round(s / 60);
-  return mins < 60
-    ? `${mins} min`
-    : `${Math.floor(mins / 60)} h ${mins % 60} min`;
+  return mins < 60 ? `${mins} min` : `${Math.floor(mins / 60)} h ${mins % 60} min`;
 }
 
 export function openGoogleMaps(
@@ -60,7 +55,7 @@ export function openGoogleMaps(
   const url = origin
     ? `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${d}&travelmode=walking`
     : `https://www.google.com/maps/dir/?api=1&destination=${d}&travelmode=walking`;
-  window.open(url, "_blank", "noopener,noreferrer");
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 export function openAppleMaps(
@@ -71,7 +66,7 @@ export function openAppleMaps(
   const url = origin
     ? `https://maps.apple.com/?saddr=${origin.lat},${origin.lng}&daddr=${daddr}&dirflg=w`
     : `https://maps.apple.com/?daddr=${daddr}&dirflg=w`;
-  window.open(url, "_blank", "noopener,noreferrer");
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 export function openBestNavApp(

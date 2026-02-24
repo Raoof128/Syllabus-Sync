@@ -1,45 +1,37 @@
 // import { NextRequest } from 'next/server';
-import { z } from "zod";
-import { createServerClient } from "@/lib/supabase/server";
+import { z } from 'zod';
+import { createServerClient } from '@/lib/supabase/server';
 import {
   jsonSuccess,
   jsonError,
   handleValidationError,
   handleDatabaseError,
   ERROR_CODES,
-} from "@/app/api/_lib/response";
-import { mapUnitRow } from "@/app/api/_lib/mappers";
-import {
-  requireAuth,
-  requireAuthWithRateLimit,
-  validateRequest,
-} from "@/app/api/_lib/middleware";
-import { logger } from "@/lib/logger";
-import { isValidBuilding } from "@/lib/utils/buildingValidation";
+} from '@/app/api/_lib/response';
+import { mapUnitRow } from '@/app/api/_lib/mappers';
+import { requireAuth, requireAuthWithRateLimit, validateRequest } from '@/app/api/_lib/middleware';
+import { logger } from '@/lib/logger';
+import { isValidBuilding } from '@/lib/utils/buildingValidation';
 
 // ============================================================================
 // SCHEMAS & VALIDATION
 // ============================================================================
 
 const daySchema = z.enum([
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
 ]);
 
 const classTimeSchema = z.object({
   id: z.string().uuid().optional(),
   day: daySchema,
-  startTime: z
-    .string()
-    .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:MM)"),
-  endTime: z
-    .string()
-    .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format (HH:MM)"),
+  startTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:MM)'),
+  endTime: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Invalid time format (HH:MM)'),
 });
 
 const dateSchema = z.preprocess((value) => value, z.coerce.date());
@@ -48,39 +40,39 @@ const unitSchema = z.object({
   id: z.string().uuid().optional(),
   code: z
     .string()
-    .min(1, "Unit code is required")
-    .max(20, "Unit code must be 20 characters or less")
-    .regex(/^[^<>]*$/, "Unit code contains invalid characters") // XSS prevention
+    .min(1, 'Unit code is required')
+    .max(20, 'Unit code must be 20 characters or less')
+    .regex(/^[^<>]*$/, 'Unit code contains invalid characters') // XSS prevention
     .transform((val) => val.trim().toUpperCase()), // Normalize: trim and uppercase
   name: z
     .string()
-    .min(1, "Unit name is required")
+    .min(1, 'Unit name is required')
     .max(200)
-    .regex(/^[^<>]*$/, "Unit name contains invalid characters"), // XSS prevention
+    .regex(/^[^<>]*$/, 'Unit name contains invalid characters'), // XSS prevention
   color: z
     .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, "Color must be a valid hex color")
-    .default("#3B82F6"),
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color')
+    .default('#3B82F6'),
   description: z
     .string()
     .max(500)
-    .regex(/^[^<>]*$/, "Description contains invalid characters") // XSS prevention
+    .regex(/^[^<>]*$/, 'Description contains invalid characters') // XSS prevention
     .optional(),
   location: z
     .object({
       building: z
         .string()
         .max(100)
-        .regex(/^[^<>]*$/, "Building contains invalid characters")
-        .default(""),
+        .regex(/^[^<>]*$/, 'Building contains invalid characters')
+        .default(''),
       room: z
         .string()
         .max(50)
-        .regex(/^[^<>]*$/, "Room contains invalid characters")
-        .default(""),
+        .regex(/^[^<>]*$/, 'Room contains invalid characters')
+        .default(''),
     })
     .optional()
-    .default({ building: "", room: "" }),
+    .default({ building: '', room: '' }),
   schedule: z.array(classTimeSchema).optional().default([]), // Max 14 class times per week
   createdAt: dateSchema.optional(),
 });
@@ -89,8 +81,8 @@ const unitQuerySchema = z.object({
   search: z.string().optional(),
   limit: z.number().int().min(1).max(100).default(50),
   offset: z.number().int().min(0).default(0),
-  sortBy: z.enum(["code", "name", "created_at"]).default("created_at"),
-  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+  sortBy: z.enum(['code', 'name', 'created_at']).default('created_at'),
+  sortOrder: z.enum(['asc', 'desc']).default('desc'),
 });
 
 /**
@@ -98,7 +90,7 @@ const unitQuerySchema = z.object({
  * Escapes special characters: %, _, \
  */
 function sanitizeSearchInput(input: string): string {
-  return input.replace(/[%_\\]/g, "\\$&");
+  return input.replace(/[%_\\]/g, '\\$&');
 }
 
 /**
@@ -117,25 +109,23 @@ export async function GET(request: Request) {
       const supabase = await createServerClient();
       const url = new URL(request.url);
       const query = unitQuerySchema.parse({
-        search: url.searchParams.get("search") || undefined,
-        limit: url.searchParams.get("limit")
-          ? parseInt(url.searchParams.get("limit")!)
+        search: url.searchParams.get('search') || undefined,
+        limit: url.searchParams.get('limit') ? parseInt(url.searchParams.get('limit')!) : undefined,
+        offset: url.searchParams.get('offset')
+          ? parseInt(url.searchParams.get('offset')!)
           : undefined,
-        offset: url.searchParams.get("offset")
-          ? parseInt(url.searchParams.get("offset")!)
-          : undefined,
-        sortBy: url.searchParams.get("sortBy") || undefined,
-        sortOrder: url.searchParams.get("sortOrder") || undefined,
+        sortBy: url.searchParams.get('sortBy') || undefined,
+        sortOrder: url.searchParams.get('sortOrder') || undefined,
       });
 
       // Get units with pagination and search - SECURITY: filter by user_id to prevent IDOR
       // Exclude soft-deleted records
       let unitsQuery = supabase
-        .from("units")
-        .select("*", { count: "exact" })
-        .eq("user_id", userId) // Security: Only return user's own units
-        .is("deleted_at", null) // Exclude soft-deleted
-        .order(query.sortBy, { ascending: query.sortOrder === "asc" });
+        .from('units')
+        .select('*', { count: 'exact' })
+        .eq('user_id', userId) // Security: Only return user's own units
+        .is('deleted_at', null) // Exclude soft-deleted
+        .order(query.sortBy, { ascending: query.sortOrder === 'asc' });
 
       // Apply search filter (sanitized to prevent SQL injection)
       if (query.search) {
@@ -146,10 +136,7 @@ export async function GET(request: Request) {
       }
 
       // Apply pagination
-      unitsQuery = unitsQuery.range(
-        query.offset,
-        query.offset + query.limit - 1,
-      );
+      unitsQuery = unitsQuery.range(query.offset, query.offset + query.limit - 1);
 
       const { data: unitsData, error: unitsError, count } = await unitsQuery;
 
@@ -158,8 +145,7 @@ export async function GET(request: Request) {
       }
 
       // Get unit IDs for class times query
-      const unitIds =
-        unitsData?.map((unit: { id: unknown }) => String(unit.id)) ?? [];
+      const unitIds = unitsData?.map((unit: { id: unknown }) => String(unit.id)) ?? [];
 
       // Avoid `.in()` with an empty list (can error in PostgREST)
       if (unitIds.length === 0) {
@@ -175,10 +161,10 @@ export async function GET(request: Request) {
 
       // Get class times for these units
       const { data: classTimesData, error: classTimesError } = await supabase
-        .from("class_times")
-        .select("*")
-        .in("unit_id", unitIds)
-        .order("day", { ascending: true });
+        .from('class_times')
+        .select('*')
+        .in('unit_id', unitIds)
+        .order('day', { ascending: true });
 
       if (classTimesError) {
         return handleDatabaseError(classTimesError);
@@ -192,13 +178,13 @@ export async function GET(request: Request) {
             Array<{
               id: string;
               day:
-                | "Monday"
-                | "Tuesday"
-                | "Wednesday"
-                | "Thursday"
-                | "Friday"
-                | "Saturday"
-                | "Sunday";
+                | 'Monday'
+                | 'Tuesday'
+                | 'Wednesday'
+                | 'Thursday'
+                | 'Friday'
+                | 'Saturday'
+                | 'Sunday';
               startTime: string;
               endTime: string;
             }>
@@ -212,13 +198,13 @@ export async function GET(request: Request) {
           acc[unitId].push({
             id: String(c.id),
             day: String(c.day) as
-              | "Monday"
-              | "Tuesday"
-              | "Wednesday"
-              | "Thursday"
-              | "Friday"
-              | "Saturday"
-              | "Sunday",
+              | 'Monday'
+              | 'Tuesday'
+              | 'Wednesday'
+              | 'Thursday'
+              | 'Friday'
+              | 'Saturday'
+              | 'Sunday',
             startTime: String(c.start_time),
             endTime: String(c.end_time),
           });
@@ -228,14 +214,7 @@ export async function GET(request: Request) {
           string,
           Array<{
             id: string;
-            day:
-              | "Monday"
-              | "Tuesday"
-              | "Wednesday"
-              | "Thursday"
-              | "Friday"
-              | "Saturday"
-              | "Sunday";
+            day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
             startTime: string;
             endTime: string;
           }>
@@ -264,14 +243,10 @@ export async function GET(request: Request) {
         return handleValidationError(error);
       }
       logger.error(
-        "GET /api/units error:",
-        error instanceof Error ? error.message : "Unknown error",
+        'GET /api/units error:',
+        error instanceof Error ? error.message : 'Unknown error',
       );
-      return jsonError(
-        "Failed to fetch units",
-        500,
-        ERROR_CODES.INTERNAL_ERROR,
-      );
+      return jsonError('Failed to fetch units', 500, ERROR_CODES.INTERNAL_ERROR);
     }
   });
 }
@@ -314,12 +289,12 @@ export async function POST(request: Request) {
 
         // VALIDATION: Check building against the 118 supported buildings
         const building = location?.building;
-        if (building && building.trim() !== "" && !isValidBuilding(building)) {
+        if (building && building.trim() !== '' && !isValidBuilding(building)) {
           return jsonError(
-            "Building not found in the campus list. Please select a valid building.",
+            'Building not found in the campus list. Please select a valid building.',
             400,
             ERROR_CODES.VALIDATION_ERROR,
-            { field: "location.building", value: building },
+            { field: 'location.building', value: building },
           );
         }
 
@@ -332,7 +307,7 @@ export async function POST(request: Request) {
           name: unitData.name,
           color: unitData.color,
           location: location
-            ? { building: location.building || "", room: location.room || "" }
+            ? { building: location.building || '', room: location.room || '' }
             : null,
           description: unitData.description || null,
           created_at: unitData.createdAt
@@ -340,33 +315,26 @@ export async function POST(request: Request) {
             : new Date().toISOString(),
         };
 
-        console.warn("Creating unit for user:", userId);
-        console.warn(
-          "Creating unit with payload:",
-          JSON.stringify(unitPayload, null, 2),
-        );
+        console.warn('Creating unit for user:', userId);
+        console.warn('Creating unit with payload:', JSON.stringify(unitPayload, null, 2));
 
         const { data: unit, error: unitError } = await supabase
-          .from("units")
+          .from('units')
           .insert(unitPayload)
           .select()
           .single();
 
         if (unitError) {
           logger.error(
-            "Unit insert error:",
+            'Unit insert error:',
             unitError.code,
             unitError.message,
             unitError.details,
             unitError.hint,
           );
-          if (unitError.code === "23505") {
+          if (unitError.code === '23505') {
             // Unique constraint violation
-            return jsonError(
-              "Unit code already exists",
-              409,
-              ERROR_CODES.CONFLICT,
-            );
+            return jsonError('Unit code already exists', 409, ERROR_CODES.CONFLICT);
           }
           return handleDatabaseError(unitError);
         }
@@ -390,20 +358,18 @@ export async function POST(request: Request) {
           }));
 
           const { data: classTimesRaw, error: scheduleError } = await supabase
-            .from("class_times")
+            .from('class_times')
             .insert(classTimesPayload)
             .select();
 
           if (scheduleError) {
             // Rollback: Delete the unit if schedule insertion fails
             // This mimics the atomic transaction of the RPC
-            await supabase.from("units").delete().eq("id", unitId);
+            await supabase.from('units').delete().eq('id', unitId);
             return handleDatabaseError(scheduleError);
           }
 
-          insertedSchedule = ((classTimesRaw ?? []) as unknown[]).map(
-            (row) => row as ClassTimeRow,
-          );
+          insertedSchedule = ((classTimesRaw ?? []) as unknown[]).map((row) => row as ClassTimeRow);
         }
 
         // 3. Construct Response
@@ -420,14 +386,10 @@ export async function POST(request: Request) {
         return jsonSuccess(responseData, 201);
       } catch (error) {
         logger.error(
-          "POST /api/units error:",
-          error instanceof Error ? error.message : "Unknown error",
+          'POST /api/units error:',
+          error instanceof Error ? error.message : 'Unknown error',
         );
-        return jsonError(
-          "Failed to create unit",
-          500,
-          ERROR_CODES.INTERNAL_ERROR,
-        );
+        return jsonError('Failed to create unit', 500, ERROR_CODES.INTERNAL_ERROR);
       }
     });
   });

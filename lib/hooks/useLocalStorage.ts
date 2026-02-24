@@ -1,7 +1,7 @@
 // lib/hooks/useLocalStorage.ts
-"use client";
+'use client';
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 /**
  * Hook to sync state with localStorage.
@@ -14,7 +14,7 @@ export function useLocalStorage<T>(
 ): [T, (value: T | ((prev: T) => T)) => void] {
   // Lazy initialization - reads from localStorage on first render only
   const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return initialValue;
     }
     try {
@@ -40,8 +40,7 @@ export function useLocalStorage<T>(
       try {
         // Allow value to be a function so we have same API as useState
         // Use ref to get current value to avoid stale closure
-        const valueToStore =
-          value instanceof Function ? value(storedValueRef.current) : value;
+        const valueToStore = value instanceof Function ? value(storedValueRef.current) : value;
         setStoredValue(valueToStore);
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       } catch {

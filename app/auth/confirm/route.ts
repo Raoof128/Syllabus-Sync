@@ -1,6 +1,6 @@
-import { createServerClient } from "@/lib/supabase/server";
-import { NextRequest, NextResponse } from "next/server";
-import type { EmailOtpType } from "@supabase/supabase-js";
+import { createServerClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import type { EmailOtpType } from '@supabase/supabase-js';
 
 /**
  * Email Confirmation Handler (token_hash flow)
@@ -14,20 +14,17 @@ import type { EmailOtpType } from "@supabase/supabase-js";
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/";
+  const token_hash = searchParams.get('token_hash');
+  const type = searchParams.get('type') as EmailOtpType | null;
+  const next = searchParams.get('next') ?? '/';
 
   // Validate the next param is a relative path
-  const redirectPath = next.startsWith("/") ? next : "/";
+  const redirectPath = next.startsWith('/') ? next : '/';
 
   if (!token_hash || !type) {
-    const errorUrl = new URL("/reset-password", request.url);
-    errorUrl.searchParams.set("error", "missing_params");
-    errorUrl.searchParams.set(
-      "error_description",
-      "Invalid reset link. Please request a new one.",
-    );
+    const errorUrl = new URL('/reset-password', request.url);
+    errorUrl.searchParams.set('error', 'missing_params');
+    errorUrl.searchParams.set('error_description', 'Invalid reset link. Please request a new one.');
     return NextResponse.redirect(errorUrl);
   }
 
@@ -38,12 +35,12 @@ export async function GET(request: NextRequest) {
   });
 
   if (error) {
-    console.error("Token verification error:", error.message);
-    const errorUrl = new URL("/reset-password", request.url);
-    errorUrl.searchParams.set("error", "verification_failed");
+    console.error('Token verification error:', error.message);
+    const errorUrl = new URL('/reset-password', request.url);
+    errorUrl.searchParams.set('error', 'verification_failed');
     errorUrl.searchParams.set(
-      "error_description",
-      "Invalid or expired reset link. Please request a new one.",
+      'error_description',
+      'Invalid or expired reset link. Please request a new one.',
     );
     return NextResponse.redirect(errorUrl);
   }
@@ -51,8 +48,8 @@ export async function GET(request: NextRequest) {
   // Session is established. Redirect to the target page.
   // For recovery, this will be /reset-password
   const redirectUrl = new URL(redirectPath, request.url);
-  if (type === "recovery") {
-    redirectUrl.searchParams.set("recovery", "1");
+  if (type === 'recovery') {
+    redirectUrl.searchParams.set('recovery', '1');
   }
   return NextResponse.redirect(redirectUrl);
 }

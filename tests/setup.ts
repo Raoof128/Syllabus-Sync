@@ -1,18 +1,15 @@
-import "@testing-library/jest-dom/vitest";
+import '@testing-library/jest-dom/vitest';
 
 const originalEmitWarning = process.emitWarning;
 process.emitWarning = ((warning: string | Error, ...args: unknown[]) => {
-  const message = typeof warning === "string" ? warning : warning?.message;
-  if (message?.includes("--localstorage-file")) {
+  const message = typeof warning === 'string' ? warning : warning?.message;
+  if (message?.includes('--localstorage-file')) {
     return;
   }
   return originalEmitWarning(warning as string, ...(args as [string]));
 }) as typeof process.emitWarning;
 
-if (
-  !globalThis.localStorage ||
-  typeof globalThis.localStorage.setItem !== "function"
-) {
+if (!globalThis.localStorage || typeof globalThis.localStorage.setItem !== 'function') {
   const storage: Record<string, string> = {};
   globalThis.localStorage = {
     getItem: (key: string) => (key in storage ? storage[key] : null),
@@ -34,9 +31,9 @@ if (
 
 if (!globalThis.fetch) {
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-    const method = init?.method ?? "GET";
+    const method = init?.method ?? 'GET';
     const body = init?.body ? JSON.parse(String(init.body)) : null;
-    const responseBody = method === "GET" ? [] : (body ?? {});
+    const responseBody = method === 'GET' ? [] : (body ?? {});
     return {
       ok: true,
       status: 200,
@@ -46,10 +43,10 @@ if (!globalThis.fetch) {
 }
 
 // Mock IntersectionObserver for framer-motion's whileInView feature
-if (typeof globalThis.IntersectionObserver === "undefined") {
+if (typeof globalThis.IntersectionObserver === 'undefined') {
   class MockIntersectionObserver implements IntersectionObserver {
     readonly root: Element | Document | null = null;
-    readonly rootMargin: string = "";
+    readonly rootMargin: string = '';
     readonly thresholds: ReadonlyArray<number> = [];
 
     constructor(
@@ -87,7 +84,7 @@ if (typeof globalThis.IntersectionObserver === "undefined") {
 }
 
 // Mock matchMedia for prefers-reduced-motion and other media queries
-if (typeof globalThis.matchMedia === "undefined") {
+if (typeof globalThis.matchMedia === 'undefined') {
   globalThis.matchMedia = (query: string): MediaQueryList =>
     ({
       matches: false,
@@ -101,16 +98,16 @@ if (typeof globalThis.matchMedia === "undefined") {
     }) as MediaQueryList;
 }
 
-if (typeof HTMLAnchorElement !== "undefined") {
+if (typeof HTMLAnchorElement !== 'undefined') {
   HTMLAnchorElement.prototype.click = function () {};
 }
 
 // JSDOM does not implement scrollIntoView — stub it so components that call it don't throw
-if (typeof Element !== "undefined" && !Element.prototype.scrollIntoView) {
+if (typeof Element !== 'undefined' && !Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {};
 }
 
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   const currentLocation = window.location;
   const safeLocation = {
     ...currentLocation,
@@ -122,7 +119,7 @@ if (typeof window !== "undefined") {
     },
     set href(_value: string) {},
   };
-  Object.defineProperty(window, "location", {
+  Object.defineProperty(window, 'location', {
     configurable: true,
     value: safeLocation,
   });

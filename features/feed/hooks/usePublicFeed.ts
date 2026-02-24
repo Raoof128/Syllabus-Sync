@@ -1,8 +1,8 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { usePublicEventsStore } from "@/lib/store/publicEventsStore";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { toastUtils } from "@/lib/utils/toast";
-import { CategoryFilter, TimeFilter, SortOption } from "../types";
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { usePublicEventsStore } from '@/lib/store/publicEventsStore';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { toastUtils } from '@/lib/utils/toast';
+import { CategoryFilter, TimeFilter, SortOption } from '../types';
 
 export function usePublicFeed() {
   const { t } = useTypedTranslation();
@@ -20,10 +20,10 @@ export function usePublicFeed() {
   } = usePublicEventsStore();
 
   // Local state
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("All");
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
-  const [sortOption, setSortOption] = useState<SortOption>("date");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('All');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [sortOption, setSortOption] = useState<SortOption>('date');
 
   // Fetch events on mount
   useEffect(() => {
@@ -47,32 +47,32 @@ export function usePublicFeed() {
     }
 
     // Category filter
-    if (categoryFilter !== "All") {
+    if (categoryFilter !== 'All') {
       result = result.filter((e) => e.category === categoryFilter);
     }
 
     // Time filter
     const now = new Date();
-    if (timeFilter === "today") {
+    if (timeFilter === 'today') {
       const endOfDay = new Date(now);
       endOfDay.setHours(23, 59, 59, 999);
       result = result.filter((e) => e.startAt <= endOfDay);
-    } else if (timeFilter === "week") {
+    } else if (timeFilter === 'week') {
       const endOfWeek = new Date(now);
       endOfWeek.setDate(now.getDate() + 7);
       result = result.filter((e) => e.startAt <= endOfWeek);
-    } else if (timeFilter === "month") {
+    } else if (timeFilter === 'month') {
       const endOfMonth = new Date(now);
       endOfMonth.setMonth(now.getMonth() + 1);
       result = result.filter((e) => e.startAt <= endOfMonth);
     }
 
     // Sort
-    if (sortOption === "date") {
+    if (sortOption === 'date') {
       result.sort((a, b) => a.startAt.getTime() - b.startAt.getTime());
-    } else if (sortOption === "priority") {
+    } else if (sortOption === 'priority') {
       result.sort((a, b) => b.priority - a.priority);
-    } else if (sortOption === "category") {
+    } else if (sortOption === 'category') {
       result.sort((a, b) => a.category.localeCompare(b.category));
     }
 
@@ -92,11 +92,11 @@ export function usePublicFeed() {
       Career: 0,
       Social: 0,
       Academic: 0,
-      "Free Food": 0,
+      'Free Food': 0,
     };
     events.forEach((e) => {
       if (e.category in counts) {
-        counts[e.category as Exclude<CategoryFilter, "All">]++;
+        counts[e.category as Exclude<CategoryFilter, 'All'>]++;
       }
     });
     return counts;
@@ -109,12 +109,12 @@ export function usePublicFeed() {
 
       if (result.success) {
         if (result.alreadyAdded) {
-          toastUtils.info(t("alreadyAdded"), t("eventAlreadyInCalendar"));
+          toastUtils.info(t('alreadyAdded'), t('eventAlreadyInCalendar'));
         } else {
-          toastUtils.success(t("addedToCalendar"), t("eventAddedSuccess"));
+          toastUtils.success(t('addedToCalendar'), t('eventAddedSuccess'));
         }
       } else {
-        toastUtils.error(t("error"), t("failedToAddEvent"));
+        toastUtils.error(t('error'), t('failedToAddEvent'));
       }
     },
     [addToCalendar, t],

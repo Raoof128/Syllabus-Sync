@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { memo } from "react";
-import { ToggleControl } from "./ToggleControl";
-import type { TranslationKey } from "@/lib/i18n/translations";
-import type { GamificationSettings } from "@/lib/types";
+import { memo } from 'react';
+import { ToggleControl } from './ToggleControl';
+import type { TranslationKey } from '@/lib/i18n/translations';
+import type { GamificationSettings } from '@/lib/types';
 
 type GamificationToggleRowProps = {
   settingKey: keyof GamificationSettings;
@@ -16,15 +16,7 @@ type GamificationToggleRowProps = {
 };
 
 export const GamificationToggleRow = memo(
-  ({
-    settingKey,
-    labelKey,
-    descKey,
-    enabled,
-    t,
-    onToggle,
-    testId,
-  }: GamificationToggleRowProps) => (
+  ({ settingKey, labelKey, descKey, enabled, t, onToggle, testId }: GamificationToggleRowProps) => (
     <div className="p-3 bg-mq-card-background rounded-mq-lg border border-mq-border hover:border-mq-primary/20 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
       <div className="flex items-center justify-between">
         <div>
@@ -39,7 +31,7 @@ export const GamificationToggleRow = memo(
             testId={testId}
           />
           <span className="text-mq-xs text-mq-content-secondary">
-            {enabled ? t("enabled") : t("disabled")}
+            {enabled ? t('enabled') : t('disabled')}
           </span>
         </div>
       </div>
@@ -47,4 +39,4 @@ export const GamificationToggleRow = memo(
   ),
 );
 
-GamificationToggleRow.displayName = "GamificationToggleRow";
+GamificationToggleRow.displayName = 'GamificationToggleRow';

@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils";
-import { ComponentProps, forwardRef } from "react";
+import { cn } from '@/lib/utils';
+import { ComponentProps, forwardRef } from 'react';
 
-export interface LayeredCardProps extends ComponentProps<"div"> {
+export interface LayeredCardProps extends ComponentProps<'div'> {
   interactive?: boolean;
 }
 
@@ -16,22 +16,22 @@ export const LayeredCard = forwardRef<HTMLDivElement, LayeredCardProps>(
           // Base styles - Glassmorphism with depth
           // Light mode: 85% opacity for glass effect
           // Dark mode: 95% opacity for better content visibility
-          "bg-mq-card-background/85 dark:bg-mq-card-background/95 backdrop-blur-xl",
-          "border border-white/20 dark:border-white/10",
+          'bg-mq-card-background/85 dark:bg-mq-card-background/95 backdrop-blur-xl',
+          'border border-white/20 dark:border-white/10',
 
           // High Contrast Mode Overrides
-          "contrast-more:bg-mq-card-background contrast-more:backdrop-blur-none contrast-more:border-2 contrast-more:border-mq-border contrast-more:shadow-none",
+          'contrast-more:bg-mq-card-background contrast-more:backdrop-blur-none contrast-more:border-2 contrast-more:border-mq-border contrast-more:shadow-none',
 
           // Soft elevation - Multi-layered shadows for 3D feel
-          "shadow-[0_4px_12px_rgba(0,0,0,0.08),0_12px_32px_rgba(0,0,0,0.12)]",
-          "dark:shadow-[0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)]",
+          'shadow-[0_4px_12px_rgba(0,0,0,0.08),0_12px_32px_rgba(0,0,0,0.12)]',
+          'dark:shadow-[0_4px_12px_rgba(0,0,0,0.3),0_12px_32px_rgba(0,0,0,0.4)]',
 
           // Inner lighting for "thick glass" effect
-          "ring-1 ring-inset ring-white/10 dark:ring-white/5",
+          'ring-1 ring-inset ring-white/10 dark:ring-white/5',
 
           // Hover depth lift
           interactive &&
-            "transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12),0_20px_48px_rgba(0,0,0,0.16)] hover:bg-mq-card-background/95 dark:hover:bg-mq-card-background",
+            'transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12),0_20px_48px_rgba(0,0,0,0.16)] hover:bg-mq-card-background/95 dark:hover:bg-mq-card-background',
 
           className,
         )}
@@ -41,4 +41,4 @@ export const LayeredCard = forwardRef<HTMLDivElement, LayeredCardProps>(
   },
 );
 
-LayeredCard.displayName = "LayeredCard";
+LayeredCard.displayName = 'LayeredCard';

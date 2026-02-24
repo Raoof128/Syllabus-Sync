@@ -1,17 +1,17 @@
 // components/calendar/WeeklyCalendar.tsx
-"use client";
+'use client';
 
-import React, { useMemo, useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Clock, Plus } from "lucide-react";
-import { Button } from "@/components/ui/mq/button";
-import { Badge } from "@/components/ui/mq/badge";
-import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
-import { useUnitsStore } from "@/lib/store/unitsStore";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { formatLocation } from "@/lib/utils/locale";
-import { cn } from "@/lib/utils";
-import { PRIORITY_COLORS } from "@/lib/constants";
-import { Deadline, Unit, DayOfWeek } from "@/lib/types";
+import React, { useMemo, useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Clock, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/mq/button';
+import { Badge } from '@/components/ui/mq/badge';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { formatLocation } from '@/lib/utils/locale';
+import { cn } from '@/lib/utils';
+import { PRIORITY_COLORS } from '@/lib/constants';
+import { Deadline, Unit, DayOfWeek } from '@/lib/types';
 import {
   format,
   startOfWeek,
@@ -21,7 +21,7 @@ import {
   isToday,
   addWeeks,
   subWeeks,
-} from "date-fns";
+} from 'date-fns';
 
 interface WeeklyCalendarProps {
   onAddDeadline: () => void;
@@ -33,19 +33,16 @@ const HOURS = Array.from({ length: 18 }, (_, i) => i + 6);
 const HOUR_HEIGHT = 60; // pixels per hour
 
 const DAYS_OF_WEEK: DayOfWeek[] = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
 ];
 
-export default function WeeklyCalendar({
-  onAddDeadline,
-  onEditDeadline,
-}: WeeklyCalendarProps) {
+export default function WeeklyCalendar({ onAddDeadline, onEditDeadline }: WeeklyCalendarProps) {
   const { t } = useTypedTranslation();
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const units = useUnitsStore((state) => state.units);
@@ -60,11 +57,9 @@ export default function WeeklyCalendar({
   }, [currentWeekStart]);
 
   // Navigation handlers
-  const goToPreviousWeek = () =>
-    setCurrentWeekStart(subWeeks(currentWeekStart, 1));
+  const goToPreviousWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1));
   const goToNextWeek = () => setCurrentWeekStart(addWeeks(currentWeekStart, 1));
-  const goToToday = () =>
-    setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const goToToday = () => setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }));
 
   // Get deadlines for a specific day
   const getDeadlinesForDay = (date: Date) => {
@@ -98,7 +93,7 @@ export default function WeeklyCalendar({
 
   // Convert time string to position
   const timeToPosition = (timeStr: string) => {
-    const [hours, minutes] = timeStr.split(":").map(Number);
+    const [hours, minutes] = timeStr.split(':').map(Number);
     return (hours - 6) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
   };
 
@@ -110,15 +105,13 @@ export default function WeeklyCalendar({
   };
 
   // Get current time position for the time indicator line
-  const [currentTimePosition, setCurrentTimePosition] = useState<number | null>(
-    () => {
-      const now = new Date();
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-      if (hours < 6 || hours >= 24) return null;
-      return (hours - 6) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
-    },
-  );
+  const [currentTimePosition, setCurrentTimePosition] = useState<number | null>(() => {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    if (hours < 6 || hours >= 24) return null;
+    return (hours - 6) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
+  });
 
   // Update current time position every minute
   useEffect(() => {
@@ -129,9 +122,7 @@ export default function WeeklyCalendar({
       if (hours < 6 || hours >= 24) {
         setCurrentTimePosition(null);
       } else {
-        setCurrentTimePosition(
-          (hours - 6) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT,
-        );
+        setCurrentTimePosition((hours - 6) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT);
       }
     };
 
@@ -148,18 +139,18 @@ export default function WeeklyCalendar({
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="sm" onClick={goToToday}>
-            {t("today")}
+            {t('today')}
           </Button>
           <Button variant="outline" size="sm" onClick={goToNextWeek}>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
         <h2 className="text-lg font-semibold text-mq-content">
-          {format(currentWeekStart, "MMMM yyyy")}
+          {format(currentWeekStart, 'MMMM yyyy')}
         </h2>
         <Button onClick={onAddDeadline} size="sm" className="gap-1">
           <Plus className="h-4 w-4" />
-          {t("addDeadline")}
+          {t('addDeadline')}
         </Button>
       </div>
 
@@ -175,27 +166,27 @@ export default function WeeklyCalendar({
               <div
                 key={day.toISOString()}
                 className={cn(
-                  "p-2 text-center border-r border-mq-border last:border-r-0",
-                  isToday(day) && "bg-mq-primary/10",
+                  'p-2 text-center border-r border-mq-border last:border-r-0',
+                  isToday(day) && 'bg-mq-primary/10',
                 )}
               >
                 <div className="text-xs text-mq-content-secondary uppercase">
-                  {format(day, "EEE")}
+                  {format(day, 'EEE')}
                 </div>
                 <div
                   className={cn(
-                    "text-lg font-semibold mt-1",
+                    'text-lg font-semibold mt-1',
                     isToday(day)
-                      ? "w-8 h-8 mx-auto rounded-full bg-mq-primary text-white flex items-center justify-center"
-                      : "text-mq-content",
+                      ? 'w-8 h-8 mx-auto rounded-full bg-mq-primary text-white flex items-center justify-center'
+                      : 'text-mq-content',
                   )}
                 >
-                  {format(day, "d")}
+                  {format(day, 'd')}
                 </div>
                 {/* Deadlines count badge */}
                 {getDeadlinesForDay(day).length > 0 && (
                   <Badge variant="neutral" className="mt-1 text-xs">
-                    {getDeadlinesForDay(day).length} {t("pending")}
+                    {getDeadlinesForDay(day).length} {t('pending')}
                   </Badge>
                 )}
               </div>
@@ -209,12 +200,9 @@ export default function WeeklyCalendar({
             {/* Time labels */}
             <div className="relative">
               {HOURS.map((hour) => (
-                <div
-                  key={hour}
-                  className="h-[60px] border-b border-mq-border pr-2 text-right"
-                >
+                <div key={hour} className="h-[60px] border-b border-mq-border pr-2 text-right">
                   <span className="text-xs text-mq-content-secondary -mt-2 block">
-                    {format(new Date().setHours(hour, 0), "h a")}
+                    {format(new Date().setHours(hour, 0), 'h a')}
                   </span>
                 </div>
               ))}
@@ -233,16 +221,13 @@ export default function WeeklyCalendar({
                 <div
                   key={day.toISOString()}
                   className={cn(
-                    "relative border-r border-mq-border last:border-r-0",
-                    isToday(day) && "bg-mq-primary/10",
+                    'relative border-r border-mq-border last:border-r-0',
+                    isToday(day) && 'bg-mq-primary/10',
                   )}
                 >
                   {/* Hour lines */}
                   {HOURS.map((hour) => (
-                    <div
-                      key={hour}
-                      className="h-[60px] border-b border-mq-border border-dashed"
-                    />
+                    <div key={hour} className="h-[60px] border-b border-mq-border border-dashed" />
                   ))}
 
                   {/* Current time indicator */}
@@ -261,10 +246,7 @@ export default function WeeklyCalendar({
                   {/* Classes */}
                   {classes.map((classItem) => {
                     const top = timeToPosition(classItem.startTime);
-                    const height = getDuration(
-                      classItem.startTime,
-                      classItem.endTime,
-                    );
+                    const height = getDuration(classItem.startTime, classItem.endTime);
 
                     return (
                       <div
@@ -293,7 +275,7 @@ export default function WeeklyCalendar({
                               {formatLocation(
                                 classItem.unit.location.building,
                                 classItem.unit.location.room,
-                                t("room"),
+                                t('room'),
                               )}
                             </div>
                           )}
@@ -309,19 +291,16 @@ export default function WeeklyCalendar({
                         const dueTime = new Date(deadline.dueDate);
                         const hours = dueTime.getHours();
                         const minutes = dueTime.getMinutes();
-                        const timePosition =
-                          hours >= 6
-                            ? timeToPosition(`${hours}:${minutes}`)
-                            : 0;
+                        const timePosition = hours >= 6 ? timeToPosition(`${hours}:${minutes}`) : 0;
 
                         return (
                           <button
                             key={deadline.id}
                             onClick={() => onEditDeadline(deadline)}
                             className={cn(
-                              "absolute left-1 right-1 p-1 rounded text-xs font-medium truncate text-left hover:opacity-80 transition-opacity",
+                              'absolute left-1 right-1 p-1 rounded text-xs font-medium truncate text-left hover:opacity-80 transition-opacity',
                               PRIORITY_COLORS[deadline.priority],
-                              deadline.completed && "opacity-50 line-through",
+                              deadline.completed && 'opacity-50 line-through',
                             )}
                             style={{ top: timePosition || 0 }}
                           >

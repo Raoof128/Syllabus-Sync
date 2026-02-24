@@ -1,9 +1,9 @@
-import { useEffect, useMemo } from "react";
-import { useUnitsStore } from "@/lib/store/unitsStore";
-import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
-import { useTodosStore } from "@/lib/store/todosStore";
-import { useEventsStore } from "@/lib/store/eventsStore";
-import { useHydration } from "@/lib/hooks";
+import { useEffect, useMemo } from 'react';
+import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useTodosStore } from '@/lib/store/todosStore';
+import { useEventsStore } from '@/lib/store/eventsStore';
+import { useHydration } from '@/lib/hooks';
 
 export function useHomeData() {
   const hasHydrated = useHydration();
@@ -30,26 +30,18 @@ export function useHomeData() {
   // Memoized unit stats calculation for better performance
   const unitStats = useMemo(() => {
     try {
-      const totalClasses = units.reduce(
-        (acc, u) => acc + (u.schedule?.length || 0),
-        0,
-      );
+      const totalClasses = units.reduce((acc, u) => acc + (u.schedule?.length || 0), 0);
       const totalStudyHours = units.reduce((acc, u) => {
         if (!u.schedule) return acc;
         return (
           acc +
           u.schedule.reduce((hours, s) => {
             try {
-              const [startH, startM] = s.startTime.split(":").map(Number);
-              const [endH, endM] = s.endTime.split(":").map(Number);
+              const [startH, startM] = s.startTime.split(':').map(Number);
+              const [endH, endM] = s.endTime.split(':').map(Number);
 
               // Validate time values
-              if (
-                isNaN(startH) ||
-                isNaN(startM) ||
-                isNaN(endH) ||
-                isNaN(endM)
-              ) {
+              if (isNaN(startH) || isNaN(startM) || isNaN(endH) || isNaN(endM)) {
                 return hours;
               }
 

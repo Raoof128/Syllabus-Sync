@@ -1,7 +1,7 @@
 // import { NextRequest } from 'next/server';
-import { createServerClient } from "@/lib/supabase/server";
-import { jsonSuccess, jsonError } from "@/app/api/_lib/response";
-import { logger } from "@/lib/logger";
+import { createServerClient } from '@/lib/supabase/server';
+import { jsonSuccess, jsonError } from '@/app/api/_lib/response';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -17,14 +17,14 @@ export async function GET() {
 
     // Get profile data
     const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
       .single();
 
-    if (profileError && profileError.code !== "PGRST116") {
+    if (profileError && profileError.code !== 'PGRST116') {
       // PGRST116 is "not found"
-      console.warn("Profile fetch error:", profileError);
+      console.warn('Profile fetch error:', profileError);
     }
 
     return jsonSuccess({
@@ -32,7 +32,7 @@ export async function GET() {
       profile: profile || null,
     });
   } catch (error) {
-    logger.error("User fetch error:", error);
-    return jsonError("Internal server error", 500);
+    logger.error('User fetch error:', error);
+    return jsonError('Internal server error', 500);
   }
 }

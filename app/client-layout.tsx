@@ -1,54 +1,48 @@
 // app/client-layout.tsx
-"use client";
+'use client';
 
-import React, { useEffect, useState, memo, useCallback, useRef } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import Sidebar from "@/components/layout/Sidebar";
-import Header from "@/components/layout/Header";
-import ThemeProvider from "@/components/theme/ThemeProvider";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import { Toaster } from "@/components/ui/toaster";
-import { OfflineIndicator } from "@/components/ui/OfflineIndicator";
-import { errorHandler } from "@/lib/utils/errorHandling";
-import { registerServiceWorker } from "@/lib/utils/serviceWorker";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { useNotificationScheduler } from "@/lib/hooks/useNotificationScheduler";
-import { useInactivityLogout } from "@/lib/hooks/useInactivityLogout";
-import { useInstallPrompt } from "@/lib/hooks/useInstallPrompt";
-import { useSWUpdate } from "@/lib/hooks/useSWUpdate";
-import { useLanguageStore } from "@/lib/store/languageStore";
-import { LevelUpNotificationProvider } from "@/features/gamification/components/LevelUpNotification";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
-import { getBrowserAuthSnapshot } from "@/lib/supabase/browserSession";
-import {
-  clearAllClientStorage,
-  resetAllStores,
-} from "@/lib/utils/clientStorage";
-import { apiRequest } from "@/lib/utils/api";
-import { API_ROUTES } from "@/lib/constants/config";
-import SyncConflictDialog from "@/components/sync/SyncConflictDialog";
+import React, { useEffect, useState, memo, useCallback, useRef } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import Sidebar from '@/components/layout/Sidebar';
+import Header from '@/components/layout/Header';
+import ThemeProvider from '@/components/theme/ThemeProvider';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { Toaster } from '@/components/ui/toaster';
+import { OfflineIndicator } from '@/components/ui/OfflineIndicator';
+import { errorHandler } from '@/lib/utils/errorHandling';
+import { registerServiceWorker } from '@/lib/utils/serviceWorker';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
+import { useInactivityLogout } from '@/lib/hooks/useInactivityLogout';
+import { useInstallPrompt } from '@/lib/hooks/useInstallPrompt';
+import { useSWUpdate } from '@/lib/hooks/useSWUpdate';
+import { useLanguageStore } from '@/lib/store/languageStore';
+import { LevelUpNotificationProvider } from '@/features/gamification/components/LevelUpNotification';
+import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
+import { clearAllClientStorage, resetAllStores } from '@/lib/utils/clientStorage';
+import { apiRequest } from '@/lib/utils/api';
+import { API_ROUTES } from '@/lib/constants/config';
+import SyncConflictDialog from '@/components/sync/SyncConflictDialog';
 
 // V3.1: Performance optimization - move constant arrays outside component
-const AUTH_ROUTES = ["/login", "/signup", "/reset-password"] as const;
-const PUBLIC_ROUTES = ["/terms", "/privacy", "/verify"] as const;
+const AUTH_ROUTES = ['/login', '/signup', '/reset-password'] as const;
+const PUBLIC_ROUTES = ['/terms', '/privacy', '/verify'] as const;
 // Post-auth routes: render without sidebar/header but never redirect away if authenticated
-const POST_AUTH_ROUTES = ["/onboarding"] as const;
+const POST_AUTH_ROUTES = ['/onboarding'] as const;
 
 // V3.1: Performance optimization - run console.error override once at module load
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   const originalConsoleError = console.error.bind(console);
-  const NEXT_KEY_WARNING =
-    'Each child in a list should have a unique "key" prop';
-  const OUTER_LAYOUT_ROUTER = "OuterLayoutRouter";
+  const NEXT_KEY_WARNING = 'Each child in a list should have a unique "key" prop';
+  const OUTER_LAYOUT_ROUTER = 'OuterLayoutRouter';
 
   console.error = (...args: unknown[]) => {
     const firstArg = args[0];
     if (
-      typeof firstArg === "string" &&
+      typeof firstArg === 'string' &&
       firstArg.includes(NEXT_KEY_WARNING) &&
-      args.some(
-        (arg) => typeof arg === "string" && arg.includes(OUTER_LAYOUT_ROUTER),
-      )
+      args.some((arg) => typeof arg === 'string' && arg.includes(OUTER_LAYOUT_ROUTER))
     ) {
       return;
     }
@@ -57,22 +51,22 @@ if (typeof window !== "undefined") {
 
   // eslint-disable-next-line no-console
   const originalConsoleInfo = console.info.bind(console);
-  const REACT_DEVTOOLS_MSG = "Download the React DevTools";
+  const REACT_DEVTOOLS_MSG = 'Download the React DevTools';
 
   // eslint-disable-next-line no-console
   console.info = (...args: unknown[]) => {
     const firstArg = args[0];
-    if (typeof firstArg === "string" && firstArg.includes(REACT_DEVTOOLS_MSG)) {
+    if (typeof firstArg === 'string' && firstArg.includes(REACT_DEVTOOLS_MSG)) {
       return;
     }
     originalConsoleInfo(...args);
   };
 
-  window.addEventListener("unhandledrejection", (event) => {
-    const message = event.reason?.message || "";
+  window.addEventListener('unhandledrejection', (event) => {
+    const message = event.reason?.message || '';
     if (
-      message.includes("message channel closed") ||
-      message.includes("Frame with ID 0 was removed")
+      message.includes('message channel closed') ||
+      message.includes('Frame with ID 0 was removed')
     ) {
       event.preventDefault();
     }
@@ -80,8 +74,8 @@ if (typeof window !== "undefined") {
 }
 
 const scheduleIdleTask = (callback: () => void) => {
-  if (typeof window === "undefined") return;
-  if ("requestIdleCallback" in window) {
+  if (typeof window === 'undefined') return;
+  if ('requestIdleCallback' in window) {
     window.requestIdleCallback(() => callback());
   } else {
     setTimeout(callback, 200);
@@ -98,12 +92,8 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const language = useLanguageStore((state) => state.language);
 
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
-  const isPublicRoute = PUBLIC_ROUTES.some((route) =>
-    pathname.startsWith(route),
-  );
-  const isPostAuthRoute = POST_AUTH_ROUTES.some((route) =>
-    pathname.startsWith(route),
-  );
+  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
+  const isPostAuthRoute = POST_AUTH_ROUTES.some((route) => pathname.startsWith(route));
   const inactivityLogoutInProgressRef = useRef(false);
   // Start optimistically as authenticated for app pages only.
   // Auth routes (/login, /signup, /reset-password) must always render the unauth layout
@@ -123,11 +113,11 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     // should not be redirected away; they must complete onboarding first
     if (isPostAuthRoute) return;
     // Skip auth check for reset-password - it must be fully public for recovery flow
-    if (pathname.startsWith("/reset-password")) return;
+    if (pathname.startsWith('/reset-password')) return;
 
     try {
       const { user, resolution } = await getBrowserAuthSnapshot();
-      if (resolution === "unknown") {
+      if (resolution === 'unknown') {
         return;
       }
       const authenticated = Boolean(user?.id);
@@ -139,20 +129,13 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
       // Similarly, /reset-password with a `code` param means the user just
       // exchanged a recovery code for a session and needs to set a new password.
       const searchParams =
-        typeof window !== "undefined"
-          ? new URLSearchParams(window.location.search)
-          : null;
-      const isMfaUpgradeUrl = searchParams?.get("mfa") === "1";
+        typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const isMfaUpgradeUrl = searchParams?.get('mfa') === '1';
       const isPasswordResetFlow =
-        pathname.startsWith("/reset-password") && searchParams?.has("code");
+        pathname.startsWith('/reset-password') && searchParams?.has('code');
 
-      if (
-        authenticated &&
-        isAuthRoute &&
-        !isMfaUpgradeUrl &&
-        !isPasswordResetFlow
-      ) {
-        router.push("/home");
+      if (authenticated && isAuthRoute && !isMfaUpgradeUrl && !isPasswordResetFlow) {
+        router.push('/home');
       }
     } catch {
       // On error, keep optimistic state — proxy handles protection
@@ -169,43 +152,34 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     const handleFocus = () => {
       void checkAuth();
     };
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, [checkAuth]);
 
   // Set up global error handlers
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       errorHandler.logError(
-        event.reason instanceof Error
-          ? event.reason
-          : new Error(String(event.reason)),
-        "UnhandledPromiseRejection",
-        "high",
+        event.reason instanceof Error ? event.reason : new Error(String(event.reason)),
+        'UnhandledPromiseRejection',
+        'high',
       );
     };
 
     const handleError = (event: ErrorEvent) => {
-      errorHandler.logError(
-        event.error || new Error(event.message),
-        "UncaughtError",
-        "critical",
-      );
+      errorHandler.logError(event.error || new Error(event.message), 'UncaughtError', 'critical');
     };
 
-    window.addEventListener("unhandledrejection", handleUnhandledRejection);
-    window.addEventListener("error", handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    window.addEventListener('error', handleError);
 
     scheduleIdleTask(() => {
       void registerServiceWorker();
     });
 
     return () => {
-      window.removeEventListener(
-        "unhandledrejection",
-        handleUnhandledRejection,
-      );
-      window.removeEventListener("error", handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener('error', handleError);
     };
   }, []);
 
@@ -224,19 +198,18 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
       await resetAllStores();
       clearAllClientStorage();
       await apiRequest(API_ROUTES.AUTH.LOGOUT, {
-        method: "POST",
+        method: 'POST',
         noRetry: true,
       });
     } catch {
       // Best-effort cleanup; always redirect to enforce logout UX.
     } finally {
-      router.replace("/login?reason=inactive");
+      router.replace('/login?reason=inactive');
     }
   }, [router]);
 
   useInactivityLogout({
-    enabled:
-      isAuthenticated && !isAuthRoute && !isPublicRoute && !isPostAuthRoute,
+    enabled: isAuthenticated && !isAuthRoute && !isPublicRoute && !isPostAuthRoute,
     timeoutMs: 5 * 60 * 1000,
     onTimeout: () => {
       void handleInactivityLogout();
@@ -261,26 +234,17 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     <ThemeProvider>
       <LevelUpNotificationProvider locale={language}>
         <a href="#main-content" className="skip-link">
-          {t("skipToContent")}
+          {t('skipToContent')}
         </a>
         <div className="flex h-screen h-[100dvh] overflow-hidden bg-mq-background layout-shell">
           <Sidebar />
           <div className="flex-1 flex flex-col overflow-x-hidden overflow-y-auto md:ml-12 layout-main relative">
             <Header />
-            <main
-              id="main-content"
-              className="flex-1"
-              role="main"
-              aria-label={t("mainContent")}
-            >
+            <main id="main-content" className="flex-1" role="main" aria-label={t('mainContent')}>
               <ErrorBoundary>{children}</ErrorBoundary>
             </main>
-            <footer
-              role="contentinfo"
-              className="sr-only"
-              aria-label={t("footer")}
-            >
-              <p>{t("copyright", { year: new Date().getFullYear() })}</p>
+            <footer role="contentinfo" className="sr-only" aria-label={t('footer')}>
+              <p>{t('copyright', { year: new Date().getFullYear() })}</p>
             </footer>
             <OfflineIndicator />
 
@@ -290,24 +254,20 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
                 role="alert"
                 className="fixed bottom-4 right-4 z-50 max-w-sm rounded-mq-lg border border-mq-border bg-mq-card-background p-4 shadow-mq-lg animate-in slide-in-from-bottom-4 fade-in"
               >
-                <p className="text-sm font-medium text-mq-content">
-                  {t("installApp")}
-                </p>
-                <p className="mt-1 text-xs text-mq-content-secondary">
-                  {t("installAppDesc")}
-                </p>
+                <p className="text-sm font-medium text-mq-content">{t('installApp')}</p>
+                <p className="mt-1 text-xs text-mq-content-secondary">{t('installAppDesc')}</p>
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => void promptInstall()}
                     className="rounded-mq-lg bg-mq-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-mq-primary/90"
                   >
-                    {t("install")}
+                    {t('install')}
                   </button>
                   <button
                     onClick={dismissPrompt}
                     className="rounded-mq-lg bg-mq-background-secondary px-3 py-1.5 text-xs font-medium text-mq-content-secondary transition-colors hover:bg-mq-hover-background"
                   >
-                    {t("dismiss")}
+                    {t('dismiss')}
                   </button>
                 </div>
               </div>
@@ -319,17 +279,13 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
                 role="alert"
                 className="fixed top-4 right-4 z-50 max-w-sm rounded-mq-lg border border-mq-info bg-mq-info/10 p-4 shadow-mq-lg animate-in slide-in-from-top-4 fade-in"
               >
-                <p className="text-sm font-medium text-mq-content">
-                  {t("updateAvailable")}
-                </p>
-                <p className="mt-1 text-xs text-mq-content-secondary">
-                  {t("updateAvailableDesc")}
-                </p>
+                <p className="text-sm font-medium text-mq-content">{t('updateAvailable')}</p>
+                <p className="mt-1 text-xs text-mq-content-secondary">{t('updateAvailableDesc')}</p>
                 <button
                   onClick={applyUpdate}
                   className="mt-3 rounded-mq-lg bg-mq-info px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-mq-info/90"
                 >
-                  {t("updateNow")}
+                  {t('updateNow')}
                 </button>
               </div>
             )}
@@ -345,5 +301,5 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
 
 // V3.1: Export the memoized component
 const ClientLayout = memo(ClientLayoutComponent);
-ClientLayout.displayName = "ClientLayout";
+ClientLayout.displayName = 'ClientLayout';
 export default ClientLayout;

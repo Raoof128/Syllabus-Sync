@@ -1,24 +1,23 @@
-import { useState, useCallback, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { API_ROUTES } from "@/lib/constants/config";
-import { toastUtils } from "@/lib/utils/toast";
-import { errorHandler } from "@/lib/utils/errorHandling";
-import type { TranslationKey } from "@/lib/i18n/translations";
+import { useState, useCallback, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { API_ROUTES } from '@/lib/constants/config';
+import { toastUtils } from '@/lib/utils/toast';
+import { errorHandler } from '@/lib/utils/errorHandling';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 // Check if WebAuthn/biometric authentication is available
 function isBiometricAvailable(): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === 'undefined') return false;
   return !!window.PublicKeyCredential;
 }
 
 // Check if platform authenticator (Touch ID, Face ID, Windows Hello) is available
 async function isPlatformAuthenticatorAvailable(): Promise<boolean> {
-  if (typeof window === "undefined") return false;
+  if (typeof window === 'undefined') return false;
   if (!window.PublicKeyCredential) return false;
 
   try {
-    const available =
-      await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
     return available;
   } catch {
     return false;
@@ -49,8 +48,8 @@ export function useBiometrics({ t }: UseBiometricsProps) {
   const [isStatusLoading, setIsStatusLoading] = useState(true);
 
   const base64UrlToUint8Array = useCallback((value: string) => {
-    const padded = value.replace(/-/g, "+").replace(/_/g, "/");
-    const base64 = padded.padEnd(Math.ceil(padded.length / 4) * 4, "=");
+    const padded = value.replace(/-/g, '+').replace(/_/g, '/');
+    const base64 = padded.padEnd(Math.ceil(padded.length / 4) * 4, '=');
     const binary = window.atob(base64);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i += 1) {
@@ -61,12 +60,12 @@ export function useBiometrics({ t }: UseBiometricsProps) {
 
   const bufferToBase64Url = useCallback((buffer: ArrayBuffer) => {
     const bytes = new Uint8Array(buffer);
-    let binary = "";
+    let binary = '';
     bytes.forEach((byte) => {
       binary += String.fromCharCode(byte);
     });
     const base64 = window.btoa(binary);
-    return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
   }, []);
 
   // Check biometric availability on mount
@@ -80,10 +79,10 @@ export function useBiometrics({ t }: UseBiometricsProps) {
   }, []);
 
   const { data: biometricStatus, isLoading: isQueryLoading } = useQuery({
-    queryKey: ["biometricStatus"],
+    queryKey: ['biometricStatus'],
     queryFn: async () => {
       const response = await fetch(API_ROUTES.AUTH.BIOMETRIC_TOGGLE);
-      if (!response.ok) throw new Error("Failed to fetch biometric status");
+      if (!response.ok) throw new Error('Failed to fetch biometric status');
       return response.json();
     },
     enabled: platformAuthAvailable,
@@ -104,28 +103,19 @@ export function useBiometrics({ t }: UseBiometricsProps) {
   const enableBiometric = useCallback(async () => {
     setIsLoading(true);
     try {
-      if (!platformAuthAvailable || typeof window === "undefined") {
-        toastUtils.error(
-          t("biometricSetupFailed"),
-          t("biometricSetupFailedMsg"),
-        );
+      if (!platformAuthAvailable || typeof window === 'undefined') {
+        toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
         return false;
       }
 
-      const optionsResponse = await fetch(
-        API_ROUTES.AUTH.PASSKEY_REGISTER_OPTIONS,
-        {
-          method: "POST",
-        },
-      );
+      const optionsResponse = await fetch(API_ROUTES.AUTH.PASSKEY_REGISTER_OPTIONS, {
+        method: 'POST',
+      });
       const optionsResult = await optionsResponse.json();
       const options = optionsResult?.data?.options;
 
       if (!optionsResponse.ok || !options) {
-        toastUtils.error(
-          t("biometricSetupFailed"),
-          t("biometricSetupFailedMsg"),
-        );
+        toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
         return false;
       }
 
@@ -149,15 +139,11 @@ export function useBiometrics({ t }: UseBiometricsProps) {
       })) as PublicKeyCredential | null;
 
       if (!credential) {
-        toastUtils.error(
-          t("biometricSetupFailed"),
-          t("biometricSetupFailedMsg"),
-        );
+        toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
         return false;
       }
 
-      const attestation =
-        credential.response as AuthenticatorAttestationResponse;
+      const attestation = credential.response as AuthenticatorAttestationResponse;
       const transports = attestation.getTransports?.() ?? [];
 
       const credentialPayload = {
@@ -173,27 +159,24 @@ export function useBiometrics({ t }: UseBiometricsProps) {
       };
 
       const saveResponse = await fetch(API_ROUTES.AUTH.PASSKEY_REGISTER, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           credential: credentialPayload,
         }),
       });
 
       if (!saveResponse.ok) {
-        toastUtils.error(
-          t("biometricSetupFailed"),
-          t("biometricSetupFailedMsg"),
-        );
+        toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
         return false;
       }
 
       setBiometricEnabled(true);
-      toastUtils.success(t("biometricEnabled"), t("biometricEnabledMsg"));
+      toastUtils.success(t('biometricEnabled'), t('biometricEnabledMsg'));
       return true;
     } catch (error) {
-      errorHandler.logError(error as Error, "Enable Biometric", "medium");
-      toastUtils.error(t("biometricSetupFailed"), t("biometricSetupFailedMsg"));
+      errorHandler.logError(error as Error, 'Enable Biometric', 'medium');
+      toastUtils.error(t('biometricSetupFailed'), t('biometricSetupFailedMsg'));
       return false;
     } finally {
       setIsLoading(false);
@@ -204,13 +187,13 @@ export function useBiometrics({ t }: UseBiometricsProps) {
     setIsLoading(true);
     try {
       const response = await fetch(API_ROUTES.AUTH.BIOMETRIC_TOGGLE, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: false }),
       });
 
       if (!response.ok) {
-        toastUtils.error(t("error"), t("tryAgainLater"));
+        toastUtils.error(t('error'), t('tryAgainLater'));
         return false;
       }
 
@@ -219,11 +202,11 @@ export function useBiometrics({ t }: UseBiometricsProps) {
       }
 
       setBiometricEnabled(false);
-      toastUtils.success(t("biometricDisabled"), t("biometricDisabledMsg"));
+      toastUtils.success(t('biometricDisabled'), t('biometricDisabledMsg'));
       return true;
     } catch (error) {
-      errorHandler.logError(error as Error, "Disable Biometric", "medium");
-      toastUtils.error(t("error"), t("tryAgainLater"));
+      errorHandler.logError(error as Error, 'Disable Biometric', 'medium');
+      toastUtils.error(t('error'), t('tryAgainLater'));
       return false;
     } finally {
       setIsLoading(false);

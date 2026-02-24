@@ -1,11 +1,11 @@
 // components/home/QuickActions.tsx
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Button } from "@/components/ui/mq/button";
-import { Map, Calendar } from "lucide-react";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { CardSolid } from "@/features/home/components/HomeCard";
+import Link from 'next/link';
+import { Button } from '@/components/ui/mq/button';
+import { Map, Calendar } from 'lucide-react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { CardSolid } from '@/features/home/components/HomeCard';
 
 export default function QuickActions() {
   const { t } = useTypedTranslation();
@@ -20,7 +20,7 @@ export default function QuickActions() {
         >
           <Link href="/map" className="gap-2">
             <Map className="h-5 w-5" />
-            {t("openMap")}
+            {t('openMap')}
           </Link>
         </Button>
 
@@ -32,7 +32,7 @@ export default function QuickActions() {
         >
           <Link href="/calendar" className="gap-2">
             <Calendar className="h-5 w-5" />
-            {t("viewCalendar")}
+            {t('viewCalendar')}
           </Link>
         </Button>
       </div>

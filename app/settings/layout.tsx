@@ -1,23 +1,16 @@
-"use client";
+'use client';
 
-import { useRouter, usePathname } from "next/navigation";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { useHydration } from "@/lib/hooks/useHydration";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import { SettingsSectionBoundary } from "@/features/settings/components/SettingsSectionBoundary";
-import { cn } from "@/lib/utils";
-import {
-  Palette,
-  Shield,
-  Layout,
-  Settings,
-  Sparkles,
-  Info,
-} from "lucide-react";
-import MovingMeshBackground from "@/components/ui/MovingMeshBackground";
-import type { TranslationKey } from "@/lib/i18n/translations";
+import { useRouter, usePathname } from 'next/navigation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useHydration } from '@/lib/hooks/useHydration';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { SettingsSectionBoundary } from '@/features/settings/components/SettingsSectionBoundary';
+import { cn } from '@/lib/utils';
+import { Palette, Shield, Layout, Settings, Sparkles, Info } from 'lucide-react';
+import MovingMeshBackground from '@/components/ui/MovingMeshBackground';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
-import { SettingsSkeleton } from "@/features/settings/components";
+import { SettingsSkeleton } from '@/features/settings/components';
 
 const SECTIONS: {
   id: string;
@@ -27,39 +20,39 @@ const SECTIONS: {
   path: string;
 }[] = [
   {
-    id: "general",
+    id: 'general',
     icon: Layout,
-    labelKey: "settings_general",
-    color: "text-blue-500",
-    path: "/settings/general",
+    labelKey: 'settings_general',
+    color: 'text-blue-500',
+    path: '/settings/general',
   },
   {
-    id: "appearance",
+    id: 'appearance',
     icon: Palette,
-    labelKey: "settings_appearance",
-    color: "text-purple-500",
-    path: "/settings/appearance",
+    labelKey: 'settings_appearance',
+    color: 'text-purple-500',
+    path: '/settings/appearance',
   },
   {
-    id: "security",
+    id: 'security',
     icon: Shield,
-    labelKey: "security",
-    color: "text-green-500",
-    path: "/settings/security",
+    labelKey: 'security',
+    color: 'text-green-500',
+    path: '/settings/security',
   },
   {
-    id: "experience",
+    id: 'experience',
     icon: Sparkles,
-    labelKey: "settings_experience",
-    color: "text-amber-500",
-    path: "/settings/experience",
+    labelKey: 'settings_experience',
+    color: 'text-amber-500',
+    path: '/settings/experience',
   },
   {
-    id: "about",
+    id: 'about',
     icon: Info,
-    labelKey: "settings_about",
-    color: "text-slate-500",
-    path: "/settings/about",
+    labelKey: 'settings_about',
+    color: 'text-slate-500',
+    path: '/settings/about',
   },
 ];
 
@@ -73,8 +66,7 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
 
   // Determine active section based on current path
   const activeSectionId =
-    SECTIONS.find((section) => pathname?.startsWith(section.path))?.id ||
-    "general";
+    SECTIONS.find((section) => pathname?.startsWith(section.path))?.id || 'general';
 
   const navigateToSection = (path: string) => {
     router.push(path);
@@ -92,11 +84,11 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
               <Settings className="h-5 w-5" />
             </div>
             <h1 className="text-lg sm:text-2xl font-bold text-mq-content tracking-tight">
-              {t("settingsTitle")}
+              {t('settingsTitle')}
             </h1>
           </div>
           <p className="text-sm text-mq-content-secondary mt-1 max-w-md sm:ml-[44px]">
-            {t("settingsSubtitle")}
+            {t('settingsSubtitle')}
           </p>
         </div>
 
@@ -111,18 +103,13 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
                   key={section.id}
                   onClick={() => navigateToSection(section.path)}
                   className={cn(
-                    "flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap",
+                    'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap',
                     isActive
-                      ? "bg-mq-primary text-mq-background shadow-sm"
-                      : "bg-mq-card-background text-mq-content-secondary border border-mq-border/60 hover:bg-mq-card-background hover:text-mq-content",
+                      ? 'bg-mq-primary text-mq-background shadow-sm'
+                      : 'bg-mq-card-background text-mq-content-secondary border border-mq-border/60 hover:bg-mq-card-background hover:text-mq-content',
                   )}
                 >
-                  <Icon
-                    className={cn(
-                      "h-3.5 w-3.5",
-                      isActive ? "text-current" : section.color,
-                    )}
-                  />
+                  <Icon className={cn('h-3.5 w-3.5', isActive ? 'text-current' : section.color)} />
                   {t(section.labelKey)}
                 </button>
               );
@@ -136,7 +123,7 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
           {/* Desktop Sidebar Navigation */}
           <aside className="hidden lg:block sticky top-32 space-y-1">
             <div className="mb-4 px-3 text-xs font-semibold text-mq-content-tertiary uppercase tracking-wider">
-              {t("settings_sections")}
+              {t('settings_sections')}
             </div>
             {SECTIONS.map((section) => {
               const Icon = section.icon;
@@ -146,10 +133,10 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
                   key={section.id}
                   onClick={() => navigateToSection(section.path)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative",
+                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative',
                     isActive
-                      ? "bg-mq-primary/10 text-mq-primary"
-                      : "text-mq-content-secondary hover:bg-mq-hover-background hover:text-mq-content",
+                      ? 'bg-mq-primary/10 text-mq-primary'
+                      : 'text-mq-content-secondary hover:bg-mq-hover-background hover:text-mq-content',
                   )}
                 >
                   {isActive && (
@@ -157,10 +144,10 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
                   )}
                   <Icon
                     className={cn(
-                      "h-4.5 w-4.5 transition-colors",
+                      'h-4.5 w-4.5 transition-colors',
                       isActive
-                        ? "text-mq-primary"
-                        : "text-mq-content-tertiary group-hover:text-mq-content",
+                        ? 'text-mq-primary'
+                        : 'text-mq-content-tertiary group-hover:text-mq-content',
                     )}
                   />
                   {t(section.labelKey)}
@@ -185,11 +172,7 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
   );
 }
 
-export default function SettingsPage({
-  children,
-}: {
-  children?: React.ReactNode;
-}) {
+export default function SettingsPage({ children }: { children?: React.ReactNode }) {
   return (
     <ErrorBoundary>
       <SettingsLayout>{children}</SettingsLayout>

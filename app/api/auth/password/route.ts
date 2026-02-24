@@ -1,17 +1,15 @@
-import { NextRequest } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
-import { jsonSuccess, jsonError, ERROR_CODES } from "@/app/api/_lib/response";
-import { passwordResetLimiter } from "@/lib/services/rateLimitService";
-import { parseJsonBody } from "@/app/api/_lib/middleware";
-import { z } from "zod";
-import { logger } from "@/lib/logger";
+import { NextRequest } from 'next/server';
+import { createServerClient } from '@/lib/supabase/server';
+import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
+import { passwordResetLimiter } from '@/lib/services/rateLimitService';
+import { parseJsonBody } from '@/app/api/_lib/middleware';
+import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // SECURITY: Stronger password policy - min 12 chars
 const passwordChangeSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z
-    .string()
-    .min(12, "New password must be at least 12 characters"),
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(12, 'New password must be at least 12 characters'),
 });
 
 export async function POST(request: NextRequest) {
@@ -25,7 +23,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return jsonError("Not authenticated", 401, ERROR_CODES.UNAUTHORIZED);
+      return jsonError('Not authenticated', 401, ERROR_CODES.UNAUTHORIZED);
     }
 
     // SECURITY: Rate limit by user ID using distributed store (works in serverless)
@@ -49,7 +47,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       const firstError = parsed.error.issues[0];
       return jsonError(
-        firstError?.message || "Invalid request data",
+        firstError?.message || 'Invalid request data',
         400,
         ERROR_CODES.VALIDATION_ERROR,
       );
@@ -65,14 +63,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (verifyError) {
-      return jsonError(
-        "Current password is incorrect",
-        400,
-        ERROR_CODES.BAD_REQUEST,
-        {
-          remainingAttempts: remaining,
-        },
-      );
+      return jsonError('Current password is incorrect', 400, ERROR_CODES.BAD_REQUEST, {
+        remainingAttempts: remaining,
+      });
     }
 
     // Update password
@@ -82,19 +75,19 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       // SECURITY: Don't expose internal Supabase error messages to client
-      logger.error("Password update failed:", updateError.message);
+      logger.error('Password update failed:', updateError.message);
       return jsonError(
-        "Failed to update password. Please try again.",
+        'Failed to update password. Please try again.',
         400,
         ERROR_CODES.BAD_REQUEST,
       );
     }
 
     return jsonSuccess({
-      message: "Password changed successfully",
+      message: 'Password changed successfully',
     });
   } catch (error) {
-    logger.error("Password change error:", error);
-    return jsonError("Internal server error", 500, ERROR_CODES.INTERNAL_ERROR);
+    logger.error('Password change error:', error);
+    return jsonError('Internal server error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }

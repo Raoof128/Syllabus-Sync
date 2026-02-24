@@ -1,7 +1,7 @@
 // lib/hooks/useHydration.ts
-"use client";
+'use client';
 
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from 'react';
 
 const emptySubscribe = () => () => {};
 const getClientSnapshot = () => true;
@@ -14,9 +14,5 @@ const getServerSnapshot = () => false;
  * triggers the react-hooks/set-state-in-effect lint rule.
  */
 export function useHydration(): boolean {
-  return useSyncExternalStore(
-    emptySubscribe,
-    getClientSnapshot,
-    getServerSnapshot,
-  );
+  return useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
 }

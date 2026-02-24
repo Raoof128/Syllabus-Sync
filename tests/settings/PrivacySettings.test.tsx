@@ -1,12 +1,12 @@
 // tests/settings/PrivacySettings.test.tsx
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { act } from "react";
-import PrivacySettings from "@/features/settings/components/PrivacySettings";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act } from 'react';
+import PrivacySettings from '@/features/settings/components/PrivacySettings';
 
 // Mock next/navigation — share a stable push reference so tests can assert on it
 const mockRouterPush = vi.fn();
-vi.mock("next/navigation", () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockRouterPush,
     replace: vi.fn(),
@@ -17,7 +17,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Mock toast utils
-vi.mock("@/lib/utils/toast", () => ({
+vi.mock('@/lib/utils/toast', () => ({
   toastUtils: {
     success: vi.fn(),
     error: vi.fn(),
@@ -27,35 +27,35 @@ vi.mock("@/lib/utils/toast", () => ({
 }));
 
 // Mock error handler
-vi.mock("@/lib/utils/errorHandling", () => ({
+vi.mock('@/lib/utils/errorHandling', () => ({
   errorHandler: {
     logError: vi.fn(),
   },
 }));
 
 // Mock config
-vi.mock("@/lib/config", () => ({
+vi.mock('@/lib/config', () => ({
   APP_CONFIG: {
-    version: "1.0.0",
+    version: '1.0.0',
   },
   EXTERNAL_LINKS: {
-    privacy: "https://example.com/privacy",
+    privacy: 'https://example.com/privacy',
   },
 }));
 
 // Mock constants
-vi.mock("@/lib/constants", () => ({
+vi.mock('@/lib/constants', () => ({
   STORAGE_KEYS: {
-    SESSIONS: "syllabus-sync-sessions",
+    SESSIONS: 'syllabus-sync-sessions',
   },
 }));
 
 // Mock constants/config
-vi.mock("@/lib/constants/config", () => ({
+vi.mock('@/lib/constants/config', () => ({
   API_ROUTES: {
     AUTH: {
-      MFA_STATUS: "/api/auth/mfa/status",
-      PASSWORD: "/api/auth/password",
+      MFA_STATUS: '/api/auth/mfa/status',
+      PASSWORD: '/api/auth/password',
     },
   },
   SECURITY_CONFIG: {
@@ -66,22 +66,17 @@ vi.mock("@/lib/constants/config", () => ({
 }));
 
 // Mock security components that use react-query
-vi.mock(
-  "@/features/settings/components/security/PasskeySecuritySection",
-  () => ({
-    PasskeySecuritySection: () => (
-      <div data-testid="passkey-security-section">
-        Passkey & Biometric Login
-      </div>
-    ),
-  }),
-);
+vi.mock('@/features/settings/components/security/PasskeySecuritySection', () => ({
+  PasskeySecuritySection: () => (
+    <div data-testid="passkey-security-section">Passkey & Biometric Login</div>
+  ),
+}));
 
-vi.mock("@/features/settings/components/security/TOTPSetup", () => ({
+vi.mock('@/features/settings/components/security/TOTPSetup', () => ({
   TOTPSetup: () => <div data-testid="totp-setup">TOTP Setup</div>,
 }));
 
-vi.mock("@/features/settings/components/security/SMSSetup", () => ({
+vi.mock('@/features/settings/components/security/SMSSetup', () => ({
   SMSSetup: () => <div data-testid="sms-setup">SMS Setup</div>,
 }));
 
@@ -92,7 +87,7 @@ const mockEndAllSessions = vi.fn();
 let mockSessionsData: any[] = [];
 let mockIsLoadingSessions = false;
 
-vi.mock("@/lib/hooks/useSessionManager", () => ({
+vi.mock('@/lib/hooks/useSessionManager', () => ({
   useSessionManager: () => ({
     sessions: mockSessionsData,
     isLoadingSessions: mockIsLoadingSessions,
@@ -108,72 +103,72 @@ global.fetch = mockFetch;
 
 // Mock window.open
 const mockWindowOpen = vi.fn();
-Object.defineProperty(window, "open", {
+Object.defineProperty(window, 'open', {
   value: mockWindowOpen,
   writable: true,
 });
 
 // Mock URL.createObjectURL and revokeObjectURL
-const mockCreateObjectURL = vi.fn(() => "blob:test");
+const mockCreateObjectURL = vi.fn(() => 'blob:test');
 const mockRevokeObjectURL = vi.fn();
-Object.defineProperty(URL, "createObjectURL", {
+Object.defineProperty(URL, 'createObjectURL', {
   value: mockCreateObjectURL,
   writable: true,
 });
-Object.defineProperty(URL, "revokeObjectURL", {
+Object.defineProperty(URL, 'revokeObjectURL', {
   value: mockRevokeObjectURL,
   writable: true,
 });
 
-describe("PrivacySettings", () => {
+describe('PrivacySettings', () => {
   const mockT = vi.fn((key: string) => {
     const translations: Record<string, string> = {
-      security: "Security",
-      changePassword: "Change Password",
-      changePasswordDesc: "Update your account password",
-      changePasswordTitle: "Change Password",
-      changePasswordDialogDesc: "Enter your current and new password",
-      currentPassword: "Current Password",
-      newPassword: "New Password",
-      confirmNewPassword: "Confirm New Password",
-      showPassword: "Show password",
-      hidePassword: "Hide password",
-      passwordChangedSuccess: "Password changed successfully",
-      passwordsDoNotMatch: "Passwords do not match",
-      passwordTooShort: "Password must be at least 6 characters",
-      allFieldsRequired: "All fields are required",
-      settingsError: "Settings Error",
-      preferenceError: "Failed to update preference",
-      tooManyAttempts: "Too many attempts. Please try again later.",
-      cancel: "Cancel",
-      loading: "Loading...",
-      passwordWeak: "Weak",
-      passwordFair: "Fair",
-      passwordGood: "Good",
-      passwordStrong: "Strong",
-      manageSessions: "Manage Sessions",
-      manageSessionsDesc: "View and manage active sessions",
-      noSessions: "No active sessions",
-      current: "Current Session",
-      lastActive: "Last active:",
-      signOut: "Sign Out",
-      signOutAllSessions: "Sign Out All Sessions",
-      close: "Close",
-      preferenceUpdated: "Preference Updated",
-      privacyPolicy: "Privacy Policy",
-      privacyPolicyDesc: "Read our privacy policy",
-      view: "View",
-      exportData: "Export Data",
-      exportDataDesc: "Download your data",
-      export: "Export",
-      confirmExport: "Confirm Export",
-      confirmExportDesc: "Are you sure you want to export your data?",
-      exportWarning: "This file may contain sensitive information",
-      proceedExport: "Export Data",
-      exportComplete: "Export Complete",
-      exportCompleteMsg: "Your data has been exported",
-      exportFailed: "Export Failed",
-      exportFailedMsg: "Failed to export data",
+      security: 'Security',
+      changePassword: 'Change Password',
+      changePasswordDesc: 'Update your account password',
+      changePasswordTitle: 'Change Password',
+      changePasswordDialogDesc: 'Enter your current and new password',
+      currentPassword: 'Current Password',
+      newPassword: 'New Password',
+      confirmNewPassword: 'Confirm New Password',
+      showPassword: 'Show password',
+      hidePassword: 'Hide password',
+      passwordChangedSuccess: 'Password changed successfully',
+      passwordsDoNotMatch: 'Passwords do not match',
+      passwordTooShort: 'Password must be at least 6 characters',
+      allFieldsRequired: 'All fields are required',
+      settingsError: 'Settings Error',
+      preferenceError: 'Failed to update preference',
+      tooManyAttempts: 'Too many attempts. Please try again later.',
+      cancel: 'Cancel',
+      loading: 'Loading...',
+      passwordWeak: 'Weak',
+      passwordFair: 'Fair',
+      passwordGood: 'Good',
+      passwordStrong: 'Strong',
+      manageSessions: 'Manage Sessions',
+      manageSessionsDesc: 'View and manage active sessions',
+      noSessions: 'No active sessions',
+      current: 'Current Session',
+      lastActive: 'Last active:',
+      signOut: 'Sign Out',
+      signOutAllSessions: 'Sign Out All Sessions',
+      close: 'Close',
+      preferenceUpdated: 'Preference Updated',
+      privacyPolicy: 'Privacy Policy',
+      privacyPolicyDesc: 'Read our privacy policy',
+      view: 'View',
+      exportData: 'Export Data',
+      exportDataDesc: 'Download your data',
+      export: 'Export',
+      confirmExport: 'Confirm Export',
+      confirmExportDesc: 'Are you sure you want to export your data?',
+      exportWarning: 'This file may contain sensitive information',
+      proceedExport: 'Export Data',
+      exportComplete: 'Export Complete',
+      exportCompleteMsg: 'Your data has been exported',
+      exportFailed: 'Export Failed',
+      exportFailedMsg: 'Failed to export data',
     };
     return translations[key] || key;
   });
@@ -182,8 +177,8 @@ describe("PrivacySettings", () => {
     t: mockT,
     units: [],
     deadlines: [],
-    theme: "dark",
-    language: "en",
+    theme: 'dark',
+    language: 'en',
   };
 
   beforeEach(() => {
@@ -197,7 +192,7 @@ describe("PrivacySettings", () => {
   });
 
   // Basic rendering tests
-  it("renders privacy settings card", () => {
+  it('renders privacy settings card', () => {
     // Mock MFA status fetch
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -206,11 +201,11 @@ describe("PrivacySettings", () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    expect(screen.getByTestId("privacy-settings")).toBeInTheDocument();
-    expect(screen.getByText("Security")).toBeInTheDocument();
+    expect(screen.getByTestId('privacy-settings')).toBeInTheDocument();
+    expect(screen.getByText('Security')).toBeInTheDocument();
   });
 
-  it("renders export data button", () => {
+  it('renders export data button', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -218,11 +213,11 @@ describe("PrivacySettings", () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    expect(screen.getByTestId("export-data-button")).toBeInTheDocument();
+    expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
   });
 
   // Export dialog tests
-  it("opens export dialog when export button is clicked", () => {
+  it('opens export dialog when export button is clicked', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -230,12 +225,12 @@ describe("PrivacySettings", () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    fireEvent.click(screen.getByTestId("export-data-button"));
+    fireEvent.click(screen.getByTestId('export-data-button'));
 
-    expect(screen.getByTestId("export-dialog")).toBeInTheDocument();
+    expect(screen.getByTestId('export-dialog')).toBeInTheDocument();
   });
 
-  it("shows export warning in dialog", () => {
+  it('shows export warning in dialog', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -243,14 +238,12 @@ describe("PrivacySettings", () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    fireEvent.click(screen.getByTestId("export-data-button"));
+    fireEvent.click(screen.getByTestId('export-data-button'));
 
-    expect(
-      screen.getByText("This file may contain sensitive information"),
-    ).toBeInTheDocument();
+    expect(screen.getByText('This file may contain sensitive information')).toBeInTheDocument();
   });
 
-  it("triggers download when confirm export is clicked", () => {
+  it('triggers download when confirm export is clicked', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -258,15 +251,15 @@ describe("PrivacySettings", () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    fireEvent.click(screen.getByTestId("export-data-button"));
-    fireEvent.click(screen.getByTestId("confirm-export-button"));
+    fireEvent.click(screen.getByTestId('export-data-button'));
+    fireEvent.click(screen.getByTestId('confirm-export-button'));
 
     expect(mockCreateObjectURL).toHaveBeenCalled();
     expect(mockRevokeObjectURL).toHaveBeenCalled();
   });
 
   // Accessibility tests
-  it("has proper region role for accessibility", () => {
+  it('has proper region role for accessibility', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -274,12 +267,10 @@ describe("PrivacySettings", () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    expect(
-      screen.getByRole("region", { name: "Security" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Security' })).toBeInTheDocument();
   });
 
-  it("renders section headings as h3 elements", () => {
+  it('renders section headings as h3 elements', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -287,7 +278,7 @@ describe("PrivacySettings", () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    const headings = screen.getAllByRole("heading", { level: 3 });
+    const headings = screen.getAllByRole('heading', { level: 3 });
     expect(headings.length).toBeGreaterThanOrEqual(1);
   });
 });

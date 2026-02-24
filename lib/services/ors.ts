@@ -1,5 +1,5 @@
-import { RoutePreview } from "@/features/map/lib/navigationHelpers";
-import { logger } from "@/lib/logger";
+import { RoutePreview } from '@/features/map/lib/navigationHelpers';
+import { logger } from '@/lib/logger';
 
 interface ORSFeature {
   geometry: {
@@ -52,10 +52,10 @@ export async function fetchORSRoute(
 
   try {
     // Call local proxy instead of external API to avoid CORS/Network errors
-    const response = await fetch("/api/navigate", {
-      method: "POST",
+    const response = await fetch('/api/navigate', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ start, end }),
       signal,
@@ -65,10 +65,9 @@ export async function fetchORSRoute(
 
     if (!response.ok || !json.success) {
       // Extract error message from our API response format
-      const errorMessage =
-        json.error?.message || `Route Failed: ${response.status}`;
+      const errorMessage = json.error?.message || `Route Failed: ${response.status}`;
       // Log as warning rather than error to avoid flooding error trackers for transient upstream issues
-      console.warn("Navigation Proxy Failed:", errorMessage);
+      console.warn('Navigation Proxy Failed:', errorMessage);
       return { coordinates: [], preview: null, error: errorMessage };
     }
 
@@ -76,7 +75,7 @@ export async function fetchORSRoute(
     const data = json.data;
 
     if (!data?.features || data.features.length === 0) {
-      return { coordinates: [], preview: null, error: "No route found" };
+      return { coordinates: [], preview: null, error: 'No route found' };
     }
 
     const feature = data.features[0];
@@ -100,10 +99,10 @@ export async function fetchORSRoute(
 
     return { coordinates: coords, preview, orsData: data };
   } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") {
-      return { coordinates: [], preview: null, error: "Aborted" };
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      return { coordinates: [], preview: null, error: 'Aborted' };
     }
-    logger.error("Error fetching ORS route:", error);
-    return { coordinates: [], preview: null, error: "Network Error" };
+    logger.error('Error fetching ORS route:', error);
+    return { coordinates: [], preview: null, error: 'Network Error' };
   }
 }

@@ -4,125 +4,125 @@
 
 config:
   # Target API server
-  target: "http://localhost:3000/api"
+  target: 'http://localhost:3000/api'
 
   # HTTP processor configuration
-  processor: "./artillery-processor.js"
+  processor: './artillery-processor.js'
 
   # Load testing phases
   phases:
     - duration: 60
       arrivalRate: 5
-      name: "Warm up"
+      name: 'Warm up'
     - duration: 120
       arrivalRate: 10
-      name: "Load test"
+      name: 'Load test'
     - duration: 60
       arrivalRate: 20
-      name: "Peak load"
+      name: 'Peak load'
     - duration: 60
       arrivalRate: 50
-      name: "Stress test"
+      name: 'Stress test'
 
 scenarios:
   # Authentication endpoints
-  - name: "Session Management"
+  - name: 'Session Management'
     weight: 10
     flow:
       - get:
-          url: "/api/auth/session"
+          url: '/api/auth/session'
           expect:
             - statusCode: 200
-            - hasProperty: "success"
+            - hasProperty: 'success'
       - post:
-          url: "/api/auth/biometric"
+          url: '/api/auth/biometric'
           headers:
-            Content-Type: "application/json"
+            Content-Type: 'application/json'
           json:
-            credentialId: "test-credential"
+            credentialId: 'test-credential'
           expect:
             - statusCode: 200
-            - hasProperty: "success"
+            - hasProperty: 'success'
 
   # Units management
-  - name: "Units CRUD Operations"
+  - name: 'Units CRUD Operations'
     weight: 30
     flow:
       - get:
-          url: "/api/units"
+          url: '/api/units'
           expect:
             - statusCode: 200
-            - hasProperty: "data"
+            - hasProperty: 'data'
       - post:
-          url: "/api/units"
+          url: '/api/units'
           headers:
-            Content-Type: "application/json"
-            x-csrf-token: "{{ csrfToken }}"
+            Content-Type: 'application/json'
+            x-csrf-token: '{{ csrfToken }}'
           json:
-            code: "COMP101"
-            name: "Test Unit Load"
-            color: "#FF5733"
-          description: "Load test unit"
+            code: 'COMP101'
+            name: 'Test Unit Load'
+            color: '#FF5733'
+          description: 'Load test unit'
       - put:
-          url: "/api/units/{{ createUnitResponse.data.id }}"
+          url: '/api/units/{{ createUnitResponse.data.id }}'
           headers:
-            Content-Type: "application/json"
-            x-csrf-token: "{{ csrfToken }}"
+            Content-Type: 'application/json'
+            x-csrf-token: '{{ csrfToken }}'
           json:
-            name: "Updated Unit Load"
-            description: "Updated load test unit"
+            name: 'Updated Unit Load'
+            description: 'Updated load test unit'
       - delete:
-          url: "/api/units/{{ getRandomUnitId() }}"
+          url: '/api/units/{{ getRandomUnitId() }}'
           expect:
             - statusCode: 200
 
   # Deadlines management
-  - name: "Deadlines CRUD Operations"
+  - name: 'Deadlines CRUD Operations'
     weight: 30
     flow:
       - get:
-          url: "/api/deadlines"
+          url: '/api/deadlines'
           expect:
             - statusCode: 200
-            - hasProperty: "data"
+            - hasProperty: 'data'
       - post:
-          url: "/api/deadlines"
+          url: '/api/deadlines'
           headers:
-            Content-Type: "application/json"
-            x-csrf-token: "{{ csrfToken }}"
+            Content-Type: 'application/json'
+            x-csrf-token: '{{ csrfToken }}'
           json:
-            title: "Load Test Deadline"
-            due_date: "2024-12-15T23:59:59Z"
-            priority: "High"
-            type: "Assignment"
+            title: 'Load Test Deadline'
+            due_date: '2024-12-15T23:59:59Z'
+            priority: 'High'
+            type: 'Assignment'
       - put:
-          url: "/api/deadlines/{{ getRandomDeadlineId() }}"
+          url: '/api/deadlines/{{ getRandomDeadlineId() }}'
           json:
             completed: true
-            title: "Completed Load Test Deadline"
+            title: 'Completed Load Test Deadline'
 
   # Mixed operations (stress test)
-  - name: "Mixed Operations"
+  - name: 'Mixed Operations'
     weight: 20
     flow:
       - get:
-          url: "/api/units"
+          url: '/api/units'
           expect:
             - statusCode: 200
       - post:
-          url: "/api/units"
+          url: '/api/units'
           json:
-            code: "MIXED_STRESS"
-            name: "Mixed operation unit"
+            code: 'MIXED_STRESS'
+            name: 'Mixed operation unit'
       - get:
-          url: "/api/deadlines"
+          url: '/api/deadlines'
           expect:
             - statusCode: 200
       - post:
-          url: "/api/notifications"
+          url: '/api/notifications'
           json:
-            title: "Stress test notification"
-            message: "High load test notification"
+            title: 'Stress test notification'
+            message: 'High load test notification'
 
 # Performance criteria
 # payload:
@@ -139,4 +139,4 @@ scenarios:
 
 # Metrics collection
 processor:
-  path: "./artillery-processor.js"
+  path: './artillery-processor.js'

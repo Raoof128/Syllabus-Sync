@@ -1,7 +1,7 @@
 // app/page.tsx
-import { Suspense } from "react";
-import AuthRedirectHandler from "./AuthRedirectHandler";
-import { Loader2 } from "lucide-react";
+import { Suspense } from 'react';
+import AuthRedirectHandler from './AuthRedirectHandler';
+import { Loader2 } from 'lucide-react';
 
 function LoadingFallback() {
   return (

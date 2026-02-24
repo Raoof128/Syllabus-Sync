@@ -25,7 +25,7 @@
 /* ============================================
    TAILWIND CSS v4 - Single Import
    ============================================ */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ============================================
    TAILWIND CSS v4 THEME CONFIGURATION
@@ -149,16 +149,10 @@
   --color-macquarie-gold: #ffb81c;
 
   /* Font Family */
-  --font-sans:
-    var(--font-work-sans), var(--f-primary), ui-sans-serif, system-ui,
-    sans-serif;
-  --font-serif:
-    var(--font-source-serif-pro), var(--f-secondary), ui-serif, Georgia, serif;
-  --font-mq:
-    var(--font-work-sans), var(--f-primary), ui-sans-serif, system-ui,
-    sans-serif;
-  --font-mq-serif:
-    var(--font-source-serif-pro), var(--f-secondary), ui-serif, Georgia, serif;
+  --font-sans: var(--font-work-sans), var(--f-primary), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif-pro), var(--f-secondary), ui-serif, Georgia, serif;
+  --font-mq: var(--font-work-sans), var(--f-primary), ui-sans-serif, system-ui, sans-serif;
+  --font-mq-serif: var(--font-source-serif-pro), var(--f-secondary), ui-serif, Georgia, serif;
 
   /* Font Size - MQ tokens */
   --font-size-mq-small: var(--fs-small);
@@ -202,17 +196,17 @@
 /* ============================================
    CSS IMPORTS - Custom styles after Tailwind
    ============================================ */
-@import "./mq-tokens.css";
-@import "./styles/tokens.css";
-@import "./styles/animations.css";
-@import "./styles/dark-mode.css";
-@import "./styles/btn-premium.css";
-@import "./styles/fingerprint.css";
-@import "./styles/magic-card.css";
-@import "./styles/social-buttons.css";
-@import "./styles/sidebar.css";
-@import "./styles/settings-page.css";
-@import "./styles/alabaster-contrast.css";
+@import './mq-tokens.css';
+@import './styles/tokens.css';
+@import './styles/animations.css';
+@import './styles/dark-mode.css';
+@import './styles/btn-premium.css';
+@import './styles/fingerprint.css';
+@import './styles/magic-card.css';
+@import './styles/social-buttons.css';
+@import './styles/sidebar.css';
+@import './styles/settings-page.css';
+@import './styles/alabaster-contrast.css';
 /* @import './styles/liquid-glass.css'; - Deprecated in favor of solid surfaces */
 
 /* Login Page Readability Fixes */

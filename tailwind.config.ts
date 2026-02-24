@@ -1,1 +1,1 @@
-export { default } from "./config/tailwind/tailwind.config.ts";
+export { default } from './config/tailwind/tailwind.config.ts';

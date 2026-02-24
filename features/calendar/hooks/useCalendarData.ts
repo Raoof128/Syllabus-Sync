@@ -1,17 +1,15 @@
-import { useEffect, useCallback } from "react";
-import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
-import { useEventsStore } from "@/lib/store/eventsStore";
-import { useUnitsStore } from "@/lib/store/unitsStore";
-import { useTodosStore } from "@/lib/store/todosStore";
-import { useHydration } from "@/lib/hooks";
+import { useEffect, useCallback } from 'react';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useEventsStore } from '@/lib/store/eventsStore';
+import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useTodosStore } from '@/lib/store/todosStore';
+import { useHydration } from '@/lib/hooks';
 
 export function useCalendarData() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
   const removeDeadline = useDeadlinesStore((state) => state.removeDeadline);
-  const removeDeadlinesByUnit = useDeadlinesStore(
-    (state) => state.removeDeadlinesByUnit,
-  );
+  const removeDeadlinesByUnit = useDeadlinesStore((state) => state.removeDeadlinesByUnit);
 
   const userEvents = useEventsStore((state) => state.events);
   const loadEvents = useEventsStore((state) => state.loadEvents);
@@ -53,9 +51,9 @@ export function useCalendarData() {
   );
 
   useEffect(() => {
-    window.addEventListener("unit-deleted", handleUnitDeleted);
+    window.addEventListener('unit-deleted', handleUnitDeleted);
     return () => {
-      window.removeEventListener("unit-deleted", handleUnitDeleted);
+      window.removeEventListener('unit-deleted', handleUnitDeleted);
     };
   }, [handleUnitDeleted]);
 

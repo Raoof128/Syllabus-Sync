@@ -1,3 +1,45 @@
+### Raouf: Full Audit — Live Location & Navigation (Both Maps) — 2026-02-23
+
+**Scope:** Campus map + Google map live-location and navigation logic
+**Type:** Logic hardening / reliability / regression testing
+
+#### Changes
+
+1. **Campus navigation destination consistency fix (`useMapNavigation`):**
+   - Added active destination tracking for in-flight navigation sessions.
+   - If the selected building changes while navigating, navigation now stops immediately to prevent stale route guidance.
+   - If the destination is cleared while navigating, navigation also stops.
+2. **Off-campus navigation policy enforcement (`useMapNavigation`):**
+   - Active navigation now stops when the user transitions off-campus.
+   - Route fetching is now suppressed while off-campus, preventing unnecessary ORS calls and reducing noise/rate pressure.
+3. **Live-location error-state hardening (`useMapLocation`):**
+   - Geolocation timeout and unknown geolocation errors now set deterministic `error` state.
+   - Added throttled error/toast behavior so users get feedback without repeated toast spam.
+4. **Regression tests expanded (`tests/map/useMapNavigation.test.ts`):**
+   - Added tests for:
+     - stop on destination change while navigating,
+     - stop on destination clear while navigating,
+     - stop when going off-campus during active navigation,
+     - skip route fetch while off-campus.
+
+#### Files Changed
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapNavigation.ts`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapLocation.ts`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/useMapNavigation.test.ts`
+
+#### Verification
+
+- `npx eslint --config config/eslint/eslint.config.mjs features/map/hooks/useMapNavigation.ts features/map/hooks/useMapLocation.ts` ✅
+- `npm run test -- tests/map` ✅ (73/73)
+- `npm run typecheck` ✅
+
+#### Audit Note
+
+- Geospatial calibration diagnostic currently reports `RMSE: 145.35px` and passes existing threshold (`<150px`) but remains near the limit; calibration quality can still be improved for tighter location-to-raster fidelity.
+
+---
+
 ### Raouf: Map Mode Stability Audit & Fixes — 2026-02-23
 
 **Scope:** `/map` dual-mode behavior (Campus Map + Google Maps)
@@ -47,6 +89,7 @@
    - Removed legacy `Card` imports within `MapClient.tsx` carrying over from the previous edge-layout commit. Eliminated unreferenced `TranslationKey`, `useUnitsStore`, and `useEventsStore` from strict typing inside `CalendarWidgets.tsx`. Remapped typescript warnings globally inside `LoginClient.tsx` overriding explicit any handling with safe `@ts-expect-error` definitions.
 
 #### Verification
+
 - `npm run check` confirms compilation successfully without isolated eslint conflicts. All 482 test scripts execute reliably maintaining zero regressions.
 
 ---

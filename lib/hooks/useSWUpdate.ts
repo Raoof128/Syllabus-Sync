@@ -5,18 +5,16 @@
 // Detects when a new service worker version is available and provides
 // a function to activate it (skip waiting + reload).
 
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 
 export function useSWUpdate() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [registration, setRegistration] =
-    useState<ServiceWorkerRegistration | null>(null);
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("serviceWorker" in navigator))
-      return;
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
 
     // Listen for new service worker installations
     const handleControllerChange = () => {
@@ -24,10 +22,7 @@ export function useSWUpdate() {
       window.location.reload();
     };
 
-    navigator.serviceWorker.addEventListener(
-      "controllerchange",
-      handleControllerChange,
-    );
+    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
 
     // Check existing registration for waiting workers
     navigator.serviceWorker.ready.then((reg) => {
@@ -39,15 +34,12 @@ export function useSWUpdate() {
       }
 
       // Listen for future updates
-      reg.addEventListener("updatefound", () => {
+      reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;
         if (!newWorker) return;
 
-        newWorker.addEventListener("statechange", () => {
-          if (
-            newWorker.state === "installed" &&
-            navigator.serviceWorker.controller
-          ) {
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             // New version is installed and waiting to activate
             setUpdateAvailable(true);
           }
@@ -56,10 +48,7 @@ export function useSWUpdate() {
     });
 
     return () => {
-      navigator.serviceWorker.removeEventListener(
-        "controllerchange",
-        handleControllerChange,
-      );
+      navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
     };
   }, []);
 
@@ -67,7 +56,7 @@ export function useSWUpdate() {
     if (!registration?.waiting) return;
 
     // Tell the waiting SW to skip waiting and activate
-    registration.waiting.postMessage({ type: "SKIP_WAITING" });
+    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
     // controllerchange event handler will reload the page
   }, [registration]);
 

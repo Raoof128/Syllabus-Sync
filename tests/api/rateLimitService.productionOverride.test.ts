@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 function snapshotEnv(): NodeJS.ProcessEnv {
   return { ...process.env };
@@ -31,14 +31,14 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe("rateLimitService production memory override", () => {
-  it("blocks fail-closed limiters in production when no distributed store is configured", async () => {
-    process.env.VERCEL_ENV = "production";
+describe('rateLimitService production memory override', () => {
+  it('blocks fail-closed limiters in production when no distributed store is configured', async () => {
+    process.env.VERCEL_ENV = 'production';
     unsetDistributedStoreEnv();
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete process.env.ALLOW_MEMORY_RATE_LIMIT;
 
-    vi.doMock("@/lib/logger", () => ({
+    vi.doMock('@/lib/logger', () => ({
       logger: {
         info: vi.fn(),
         warn: vi.fn(),
@@ -46,9 +46,9 @@ describe("rateLimitService production memory override", () => {
       },
     }));
 
-    const { checkRateLimit } = await import("@/lib/services/rateLimitService");
-    const result = await checkRateLimit("127.0.0.1", {
-      prefix: "login",
+    const { checkRateLimit } = await import('@/lib/services/rateLimitService');
+    const result = await checkRateLimit('127.0.0.1', {
+      prefix: 'login',
       windowMs: 60_000,
       maxRequests: 10,
       failClosed: true,
@@ -59,12 +59,12 @@ describe("rateLimitService production memory override", () => {
     expect(result.resetIn).toBe(60);
   });
 
-  it("allows fail-closed limiters in production when ALLOW_MEMORY_RATE_LIMIT=true (demo override)", async () => {
-    process.env.VERCEL_ENV = "production";
-    process.env.ALLOW_MEMORY_RATE_LIMIT = "true";
+  it('allows fail-closed limiters in production when ALLOW_MEMORY_RATE_LIMIT=true (demo override)', async () => {
+    process.env.VERCEL_ENV = 'production';
+    process.env.ALLOW_MEMORY_RATE_LIMIT = 'true';
     unsetDistributedStoreEnv();
 
-    vi.doMock("@/lib/logger", () => ({
+    vi.doMock('@/lib/logger', () => ({
       logger: {
         info: vi.fn(),
         warn: vi.fn(),
@@ -72,9 +72,9 @@ describe("rateLimitService production memory override", () => {
       },
     }));
 
-    const { checkRateLimit } = await import("@/lib/services/rateLimitService");
-    const result = await checkRateLimit("127.0.0.1", {
-      prefix: "login",
+    const { checkRateLimit } = await import('@/lib/services/rateLimitService');
+    const result = await checkRateLimit('127.0.0.1', {
+      prefix: 'login',
       windowMs: 60_000,
       maxRequests: 10,
       failClosed: true,

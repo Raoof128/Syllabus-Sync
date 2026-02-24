@@ -4,13 +4,13 @@
 // ============================================
 // Manages user profiles with Supabase integration
 
-"use client";
+'use client';
 
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import { apiRequest } from "@/lib/utils/api";
-import { errorHandler } from "@/lib/utils/errorHandling";
-import { toastUtils } from "@/lib/utils/toast";
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { apiRequest } from '@/lib/utils/api';
+import { errorHandler } from '@/lib/utils/errorHandling';
+import { toastUtils } from '@/lib/utils/toast';
 
 // ============================================================================
 // TYPES
@@ -67,18 +67,13 @@ export interface ProfilesState {
   isLoading: boolean;
   hasLoaded: boolean;
   // Actions
-  addProfile: (profile: Omit<UserProfile, "id" | "createdAt">) => void;
+  addProfile: (profile: Omit<UserProfile, 'id' | 'createdAt'>) => void;
   deleteProfile: (id: string) => Promise<void>;
   fetchProfile: () => Promise<void>;
-  updateProfile: (
-    id: string,
-    updates: Partial<UserProfile>,
-  ) => Promise<UserProfile | null>;
+  updateProfile: (id: string, updates: Partial<UserProfile>) => Promise<UserProfile | null>;
   setCurrentProfile: (id: string | null) => void;
   getCurrentProfile: () => UserProfile | null;
-  updateCurrentProfile: (
-    updates: Partial<UserProfile>,
-  ) => Promise<UserProfile | null>;
+  updateCurrentProfile: (updates: Partial<UserProfile>) => Promise<UserProfile | null>;
   clearProfiles: () => void;
   reset: () => void;
 }
@@ -88,13 +83,13 @@ export interface ProfilesState {
 // ============================================================================
 
 const AVATAR_URL_MAX_LENGTH = 500;
-const AVATAR_STORAGE_BUCKET = "avatars";
+const AVATAR_STORAGE_BUCKET = 'avatars';
 
-const isDataUrl = (value: string) => value.startsWith("data:");
+const isDataUrl = (value: string) => value.startsWith('data:');
 
 const normalizeAvatarExtension = (mimeType: string) => {
-  const rawExtension = mimeType.split("/")[1] || "png";
-  return rawExtension.replace("svg+xml", "svg");
+  const rawExtension = mimeType.split('/')[1] || 'png';
+  return rawExtension.replace('svg+xml', 'svg');
 };
 
 /**
@@ -102,9 +97,9 @@ const normalizeAvatarExtension = (mimeType: string) => {
  * fetch(dataUrl) is blocked by CSP's connect-src which doesn't allow data: URIs.
  */
 function dataUrlToBlob(dataUrl: string): Blob {
-  const [header, base64] = dataUrl.split(",");
+  const [header, base64] = dataUrl.split(',');
   const mimeMatch = header.match(/:(.*?);/);
-  const mimeType = mimeMatch ? mimeMatch[1] : "image/png";
+  const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
   const binaryString = atob(base64);
   const bytes = new Uint8Array(binaryString.length);
   for (let i = 0; i < binaryString.length; i++) {
@@ -113,24 +108,20 @@ function dataUrlToBlob(dataUrl: string): Blob {
   return new Blob([bytes], { type: mimeType });
 }
 
-async function uploadAvatarToStorage(
-  dataUrl: string,
-  profileId: string,
-): Promise<string | null> {
-  if (typeof window === "undefined") {
+async function uploadAvatarToStorage(dataUrl: string, profileId: string): Promise<string | null> {
+  if (typeof window === 'undefined') {
     return null;
   }
 
   try {
-    const { createBrowserClient, isSupabaseConfigured } =
-      await import("@/lib/supabase/client");
+    const { createBrowserClient, isSupabaseConfigured } = await import('@/lib/supabase/client');
 
     if (!isSupabaseConfigured()) {
       return null;
     }
 
     const blob = dataUrlToBlob(dataUrl);
-    const mimeType = blob.type || "image/png";
+    const mimeType = blob.type || 'image/png';
     const extension = normalizeAvatarExtension(mimeType);
     const filename = `${crypto.randomUUID()}.${extension}`;
     const path = `${profileId}/${filename}`;
@@ -141,25 +132,17 @@ async function uploadAvatarToStorage(
       .upload(path, blob, { contentType: mimeType, upsert: true });
 
     if (error) {
-      errorHandler.logError(
-        error,
-        "ProfilesStore.uploadAvatarToStorage",
-        "medium",
-      );
+      errorHandler.logError(error, 'ProfilesStore.uploadAvatarToStorage', 'medium');
       return null;
     }
 
-    const { data } = supabase.storage
-      .from(AVATAR_STORAGE_BUCKET)
-      .getPublicUrl(path);
+    const { data } = supabase.storage.from(AVATAR_STORAGE_BUCKET).getPublicUrl(path);
     return data?.publicUrl ?? null;
   } catch (error) {
     errorHandler.logError(
-      error instanceof Error
-        ? error
-        : new Error("Failed to upload avatar to storage"),
-      "ProfilesStore.uploadAvatarToStorage",
-      "medium",
+      error instanceof Error ? error : new Error('Failed to upload avatar to storage'),
+      'ProfilesStore.uploadAvatarToStorage',
+      'medium',
     );
     return null;
   }
@@ -168,20 +151,17 @@ async function uploadAvatarToStorage(
 /**
  * Map database profile (snake_case) to client profile (camelCase)
  */
-function mapDbToClient(
-  db: DbProfile,
-  existing?: Partial<UserProfile>,
-): UserProfile {
+function mapDbToClient(db: DbProfile, existing?: Partial<UserProfile>): UserProfile {
   return {
     id: db.id,
-    name: db.full_name || "",
+    name: db.full_name || '',
     email: db.email,
-    studentId: db.student_id || "",
+    studentId: db.student_id || '',
     avatar: db.avatar_url || undefined,
     // Profile fields from database
-    faculty: db.faculty || "",
-    course: db.course || "",
-    year: db.year || "",
+    faculty: db.faculty || '',
+    course: db.course || '',
+    year: db.year || '',
     // Local-only fields from existing profile or use defaults
     preferences: existing?.preferences || {
       notifications: true,
@@ -234,8 +214,8 @@ function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
 
 function mapDbPreferencesToClient(
   dbPreferences?: DbUserPreferences | null,
-  existing?: UserProfile["preferences"],
-): UserProfile["preferences"] {
+  existing?: UserProfile['preferences'],
+): UserProfile['preferences'] {
   if (!dbPreferences) {
     return (
       existing || {
@@ -253,7 +233,7 @@ function mapDbPreferencesToClient(
   };
 }
 
-function mapClientPreferencesToDb(preferences: UserProfile["preferences"]) {
+function mapClientPreferencesToDb(preferences: UserProfile['preferences']) {
   return {
     notifications_enabled: preferences.notifications,
     email_notifications: preferences.emailReminders,
@@ -297,8 +277,7 @@ export const useProfilesStore = create<ProfilesState>()(
       deleteProfile: async (id) => {
         set((state) => {
           const newProfiles = state.profiles.filter((p) => p.id !== id);
-          const newCurrentProfileId =
-            state.currentProfileId === id ? null : state.currentProfileId;
+          const newCurrentProfileId = state.currentProfileId === id ? null : state.currentProfileId;
           return {
             profiles: newProfiles,
             currentProfileId: newCurrentProfileId,
@@ -308,16 +287,14 @@ export const useProfilesStore = create<ProfilesState>()(
         if (get().currentProfileId !== id) return;
 
         try {
-          await apiRequest<{ id: string }>("/api/profiles", {
-            method: "DELETE",
+          await apiRequest<{ id: string }>('/api/profiles', {
+            method: 'DELETE',
           });
         } catch (error) {
           errorHandler.logError(
-            error instanceof Error
-              ? error
-              : new Error("Failed to delete profile"),
-            "ProfilesStore.deleteProfile",
-            "high",
+            error instanceof Error ? error : new Error('Failed to delete profile'),
+            'ProfilesStore.deleteProfile',
+            'high',
           );
         }
       },
@@ -327,22 +304,17 @@ export const useProfilesStore = create<ProfilesState>()(
 
         set({ isLoading: true });
         try {
-          const dbProfile = await apiRequest<DbProfile | null>("/api/profiles");
+          const dbProfile = await apiRequest<DbProfile | null>('/api/profiles');
 
           if (dbProfile) {
-            const existingProfile = get().profiles.find(
-              (p) => p.id === dbProfile.id,
-            );
+            const existingProfile = get().profiles.find((p) => p.id === dbProfile.id);
             let preferences = existingProfile?.preferences;
             try {
               const dbPreferences = await apiRequest<DbUserPreferences | null>(
-                "/api/user-preferences",
+                '/api/user-preferences',
                 { noRetry: true },
               );
-              preferences = mapDbPreferencesToClient(
-                dbPreferences,
-                preferences,
-              );
+              preferences = mapDbPreferencesToClient(dbPreferences, preferences);
             } catch {
               // Keep existing preferences if API fails (e.g. unauthenticated)
             }
@@ -353,9 +325,7 @@ export const useProfilesStore = create<ProfilesState>()(
             });
 
             set((state) => {
-              const existingIndex = state.profiles.findIndex(
-                (p) => p.id === dbProfile.id,
-              );
+              const existingIndex = state.profiles.findIndex((p) => p.id === dbProfile.id);
               const newProfiles = [...state.profiles];
 
               if (existingIndex >= 0) {
@@ -380,19 +350,16 @@ export const useProfilesStore = create<ProfilesState>()(
           }
         } catch (error) {
           // Silently handle API errors - keep persisted data
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
+          const errorMessage = error instanceof Error ? error.message : String(error);
           if (
-            !errorMessage.includes("401") &&
-            !errorMessage.includes("authentication") &&
-            !errorMessage.includes("unauthorized")
+            !errorMessage.includes('401') &&
+            !errorMessage.includes('authentication') &&
+            !errorMessage.includes('unauthorized')
           ) {
             errorHandler.logError(
-              error instanceof Error
-                ? error
-                : new Error("Failed to fetch profile"),
-              "ProfilesStore.fetchProfile",
-              "medium",
+              error instanceof Error ? error : new Error('Failed to fetch profile'),
+              'ProfilesStore.fetchProfile',
+              'medium',
             );
           }
           set({ hasLoaded: true });
@@ -412,9 +379,7 @@ export const useProfilesStore = create<ProfilesState>()(
           lastLogin: new Date(),
         };
         set((state) => ({
-          profiles: state.profiles.map((p) =>
-            p.id === id ? optimisticProfile : p,
-          ),
+          profiles: state.profiles.map((p) => (p.id === id ? optimisticProfile : p)),
         }));
 
         let uploadedAvatarUrl: string | null = null;
@@ -424,9 +389,7 @@ export const useProfilesStore = create<ProfilesState>()(
           if (uploadedAvatarUrl) {
             set((state) => ({
               profiles: state.profiles.map((p) =>
-                p.id === id
-                  ? { ...p, avatar: uploadedAvatarUrl!, lastLogin: new Date() }
-                  : p,
+                p.id === id ? { ...p, avatar: uploadedAvatarUrl!, lastLogin: new Date() } : p,
               ),
             }));
           } else {
@@ -444,8 +407,8 @@ export const useProfilesStore = create<ProfilesState>()(
               ),
             }));
             toastUtils.error(
-              "Avatar upload failed",
-              "Your avatar could not be saved. Please try again.",
+              'Avatar upload failed',
+              'Your avatar could not be saved. Please try again.',
             );
           }
         }
@@ -463,11 +426,7 @@ export const useProfilesStore = create<ProfilesState>()(
         const dbUpdates = mapClientToDb(updatesForDb);
         const hasServerUpdates = Object.keys(dbUpdates).length > 0;
 
-        if (
-          avatarUploadFailed &&
-          !hasServerUpdates &&
-          !updatesForDb.preferences
-        ) {
+        if (avatarUploadFailed && !hasServerUpdates && !updatesForDb.preferences) {
           return null;
         }
 
@@ -475,32 +434,26 @@ export const useProfilesStore = create<ProfilesState>()(
 
         if (hasServerUpdates) {
           try {
-            const dbProfile = await apiRequest<DbProfile>("/api/profiles", {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
+            const dbProfile = await apiRequest<DbProfile>('/api/profiles', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(dbUpdates),
             });
 
             serverProfile = mapDbToClient(dbProfile, optimisticProfile);
             set((state) => ({
-              profiles: state.profiles.map((p) =>
-                p.id === id ? serverProfile : p,
-              ),
+              profiles: state.profiles.map((p) => (p.id === id ? serverProfile : p)),
             }));
           } catch (error) {
             // Revert on error
             set((state) => ({
-              profiles: state.profiles.map((p) =>
-                p.id === id ? currentProfile : p,
-              ),
+              profiles: state.profiles.map((p) => (p.id === id ? currentProfile : p)),
             }));
 
             errorHandler.logError(
-              error instanceof Error
-                ? error
-                : new Error("Failed to update profile"),
-              "ProfilesStore.updateProfile",
-              "high",
+              error instanceof Error ? error : new Error('Failed to update profile'),
+              'ProfilesStore.updateProfile',
+              'high',
             );
             return null;
           }
@@ -508,37 +461,29 @@ export const useProfilesStore = create<ProfilesState>()(
 
         if (preferences) {
           try {
-            const dbPreferences = await apiRequest<DbUserPreferences>(
-              "/api/user-preferences",
-              {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(mapClientPreferencesToDb(preferences)),
-              },
-            );
+            const dbPreferences = await apiRequest<DbUserPreferences>('/api/user-preferences', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(mapClientPreferencesToDb(preferences)),
+            });
             const nextPreferences = mapDbPreferencesToClient(
               dbPreferences,
               serverProfile.preferences,
             );
             serverProfile = { ...serverProfile, preferences: nextPreferences };
             set((state) => ({
-              profiles: state.profiles.map((p) =>
-                p.id === id ? serverProfile : p,
-              ),
+              profiles: state.profiles.map((p) => (p.id === id ? serverProfile : p)),
             }));
           } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : String(error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
             if (
-              !errorMessage.includes("authentication") &&
-              !errorMessage.includes("unauthorized")
+              !errorMessage.includes('authentication') &&
+              !errorMessage.includes('unauthorized')
             ) {
               errorHandler.logError(
-                error instanceof Error
-                  ? error
-                  : new Error("Failed to update preferences"),
-                "ProfilesStore.updatePreferences",
-                "medium",
+                error instanceof Error ? error : new Error('Failed to update preferences'),
+                'ProfilesStore.updatePreferences',
+                'medium',
               );
             }
           }
@@ -583,14 +528,14 @@ export const useProfilesStore = create<ProfilesState>()(
       },
     }),
     {
-      name: "profiles-storage",
+      name: 'profiles-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         profiles: state.profiles.map((p) => ({
           ...p,
           // SECURITY: Don't persist sensitive PII to localStorage
-          studentId: "",
-          email: "",
+          studentId: '',
+          email: '',
         })),
         currentProfileId: state.currentProfileId,
       }),

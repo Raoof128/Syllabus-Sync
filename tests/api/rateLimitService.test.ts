@@ -4,15 +4,15 @@
  * Tests for the distributed rate limiting service
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   checkRateLimit,
   createRateLimiter,
   type RateLimitConfig,
   type RateLimitResult,
-} from "@/lib/services/rateLimitService";
+} from '@/lib/services/rateLimitService';
 
-describe("Rate Limiting Service", () => {
+describe('Rate Limiting Service', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -21,14 +21,14 @@ describe("Rate Limiting Service", () => {
     vi.useRealTimers();
   });
 
-  describe("checkRateLimit", () => {
+  describe('checkRateLimit', () => {
     const defaultConfig: RateLimitConfig = {
-      prefix: "test",
+      prefix: 'test',
       windowMs: 60 * 1000, // 1 minute
       maxRequests: 5,
     };
 
-    it("should allow requests within limit", async () => {
+    it('should allow requests within limit', async () => {
       const identifier = `test-user-${Date.now()}`;
 
       const result = await checkRateLimit(identifier, defaultConfig);
@@ -38,7 +38,7 @@ describe("Rate Limiting Service", () => {
       expect(result.limit).toBe(5);
     });
 
-    it("should track remaining requests correctly", async () => {
+    it('should track remaining requests correctly', async () => {
       const identifier = `test-user-remaining-${Date.now()}`;
 
       // Make 3 requests
@@ -51,10 +51,10 @@ describe("Rate Limiting Service", () => {
       expect(result3.remaining).toBe(2);
     });
 
-    it("should deny requests when limit exceeded", async () => {
+    it('should deny requests when limit exceeded', async () => {
       const identifier = `test-user-exceeded-${Date.now()}`;
       const strictConfig: RateLimitConfig = {
-        prefix: "strict",
+        prefix: 'strict',
         windowMs: 60 * 1000,
         maxRequests: 2,
       };
@@ -70,7 +70,7 @@ describe("Rate Limiting Service", () => {
       expect(result.remaining).toBe(0);
     });
 
-    it("should include reset time in result", async () => {
+    it('should include reset time in result', async () => {
       const identifier = `test-user-reset-${Date.now()}`;
 
       const result = await checkRateLimit(identifier, defaultConfig);
@@ -79,15 +79,15 @@ describe("Rate Limiting Service", () => {
       expect(result.resetIn).toBeLessThanOrEqual(60); // Within 1 minute
     });
 
-    it("should use prefix in rate limit key", async () => {
+    it('should use prefix in rate limit key', async () => {
       const identifier = `test-user-prefix-${Date.now()}`;
       const config1: RateLimitConfig = {
-        prefix: "api",
+        prefix: 'api',
         windowMs: 60000,
         maxRequests: 5,
       };
       const config2: RateLimitConfig = {
-        prefix: "auth",
+        prefix: 'auth',
         windowMs: 60000,
         maxRequests: 5,
       };
@@ -106,10 +106,10 @@ describe("Rate Limiting Service", () => {
     });
   });
 
-  describe("createRateLimiter", () => {
-    it("should create a reusable limiter function", async () => {
+  describe('createRateLimiter', () => {
+    it('should create a reusable limiter function', async () => {
       const limiter = createRateLimiter({
-        prefix: "custom",
+        prefix: 'custom',
         windowMs: 30 * 1000,
         maxRequests: 10,
       });
@@ -121,9 +121,9 @@ describe("Rate Limiting Service", () => {
       expect(result.limit).toBe(10);
     });
 
-    it("should apply the same config to all calls", async () => {
+    it('should apply the same config to all calls', async () => {
       const limiter = createRateLimiter({
-        prefix: "consistent",
+        prefix: 'consistent',
         windowMs: 60 * 1000,
         maxRequests: 3,
       });
@@ -139,10 +139,10 @@ describe("Rate Limiting Service", () => {
     });
   });
 
-  describe("Rate limit configuration", () => {
-    it("should handle different window sizes", async () => {
+  describe('Rate limit configuration', () => {
+    it('should handle different window sizes', async () => {
       const shortWindow: RateLimitConfig = {
-        prefix: "short",
+        prefix: 'short',
         windowMs: 1000, // 1 second
         maxRequests: 2,
       };
@@ -157,9 +157,9 @@ describe("Rate Limiting Service", () => {
       expect(result.resetIn).toBeLessThanOrEqual(1);
     });
 
-    it("should handle high request limits", async () => {
+    it('should handle high request limits', async () => {
       const highLimit: RateLimitConfig = {
-        prefix: "high",
+        prefix: 'high',
         windowMs: 60 * 1000,
         maxRequests: 1000,
       };
@@ -173,10 +173,10 @@ describe("Rate Limiting Service", () => {
     });
   });
 
-  describe("RateLimitResult structure", () => {
-    it("should return all required fields", async () => {
+  describe('RateLimitResult structure', () => {
+    it('should return all required fields', async () => {
       const config: RateLimitConfig = {
-        prefix: "structure",
+        prefix: 'structure',
         windowMs: 60 * 1000,
         maxRequests: 5,
       };
@@ -185,15 +185,15 @@ describe("Rate Limiting Service", () => {
       const result: RateLimitResult = await checkRateLimit(identifier, config);
 
       // Verify all fields exist
-      expect(typeof result.allowed).toBe("boolean");
-      expect(typeof result.remaining).toBe("number");
-      expect(typeof result.resetIn).toBe("number");
-      expect(typeof result.limit).toBe("number");
+      expect(typeof result.allowed).toBe('boolean');
+      expect(typeof result.remaining).toBe('number');
+      expect(typeof result.resetIn).toBe('number');
+      expect(typeof result.limit).toBe('number');
     });
 
-    it("should have non-negative remaining count", async () => {
+    it('should have non-negative remaining count', async () => {
       const config: RateLimitConfig = {
-        prefix: "nonneg",
+        prefix: 'nonneg',
         windowMs: 60 * 1000,
         maxRequests: 2,
       };
@@ -210,17 +210,17 @@ describe("Rate Limiting Service", () => {
     });
   });
 
-  describe("Fail-closed behavior", () => {
-    it("should respect failClosed config", async () => {
+  describe('Fail-closed behavior', () => {
+    it('should respect failClosed config', async () => {
       const failClosedConfig: RateLimitConfig = {
-        prefix: "failclosed",
+        prefix: 'failclosed',
         windowMs: 60 * 1000,
         maxRequests: 5,
         failClosed: true,
       };
 
       const failOpenConfig: RateLimitConfig = {
-        prefix: "failopen",
+        prefix: 'failopen',
         windowMs: 60 * 1000,
         maxRequests: 5,
         failClosed: false,

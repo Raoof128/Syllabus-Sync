@@ -1,38 +1,33 @@
-"use client";
+'use client';
 
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { UserProfile, useProfilesStore } from "@/lib/store/profilesStore";
-import { MagicCard } from "@/components/ui/MagicCard";
-import { Camera, Mail, IdCard, Loader2 } from "lucide-react";
-import Image from "next/image";
-import { BRAND_COLORS } from "@/lib/config";
-import { toastUtils } from "@/lib/utils/toast";
-import { useState } from "react";
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { UserProfile, useProfilesStore } from '@/lib/store/profilesStore';
+import { MagicCard } from '@/components/ui/MagicCard';
+import { Camera, Mail, IdCard, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { BRAND_COLORS } from '@/lib/config';
+import { toastUtils } from '@/lib/utils/toast';
+import { useState } from 'react';
 
 interface ProfileHeaderProps {
   profile: UserProfile;
   isSaving: boolean;
 }
 
-export function ProfileHeader({
-  profile,
-  isSaving: isFormSaving,
-}: ProfileHeaderProps) {
+export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeaderProps) {
   const { t } = useTypedTranslation();
   const { updateProfile } = useProfilesStore();
   const [isAvatarSaving, setIsAvatarSaving] = useState(false);
 
-  const handleAvatarChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     // Reset input immediately so the same file can be re-selected after failure
-    event.target.value = "";
+    event.target.value = '';
     if (!file) return;
 
     // Security Check: 2MB Limit
     if (file.size > 2 * 1024 * 1024) {
-      toastUtils.error(t("error"), "File size exceeds 2MB limit");
+      toastUtils.error(t('error'), 'File size exceeds 2MB limit');
       return;
     }
 
@@ -44,11 +39,11 @@ export function ProfileHeader({
       try {
         const updated = await updateProfile(profileId, { avatar: result });
         if (updated) {
-          toastUtils.success(t("profileUpdated"), t("avatarUpdated"));
+          toastUtils.success(t('profileUpdated'), t('avatarUpdated'));
         }
         // If null, upload failed — store already shows error toast and reverts
       } catch {
-        toastUtils.error(t("error"), t("failedToUpdateProfile"));
+        toastUtils.error(t('error'), t('failedToUpdateProfile'));
       } finally {
         setIsAvatarSaving(false);
       }
@@ -66,9 +61,7 @@ export function ProfileHeader({
               <div
                 className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center overflow-hidden shadow-lg ring-4 ring-mq-background"
                 style={{
-                  backgroundColor: profile.avatar
-                    ? "transparent"
-                    : BRAND_COLORS.primary,
+                  backgroundColor: profile.avatar ? 'transparent' : BRAND_COLORS.primary,
                 }}
               >
                 {isAvatarSaving ? (
@@ -84,7 +77,7 @@ export function ProfileHeader({
                   />
                 ) : (
                   <span className="text-white font-bold text-3xl">
-                    {profile.name ? profile.name.charAt(0).toUpperCase() : "U"}
+                    {profile.name ? profile.name.charAt(0).toUpperCase() : 'U'}
                   </span>
                 )}
               </div>
@@ -98,7 +91,7 @@ export function ProfileHeader({
                 accept="image/*"
                 onChange={handleAvatarChange}
                 className="hidden"
-                aria-label={t("changeAvatar")}
+                aria-label={t('changeAvatar')}
                 disabled={isFormSaving || isAvatarSaving}
               />
             </label>
@@ -107,7 +100,7 @@ export function ProfileHeader({
           {/* Profile Summary */}
           <div className="flex-1 min-w-0 text-center sm:text-left">
             <h1 className="text-xl sm:text-2xl font-bold text-mq-content mb-1 break-words">
-              {profile.name || t("guest")}
+              {profile.name || t('guest')}
             </h1>
             <p className="text-mq-content-secondary flex items-center justify-center sm:justify-start gap-2 min-w-0">
               <Mail className="h-4 w-4" />
@@ -117,15 +110,13 @@ export function ProfileHeader({
               <p className="text-mq-content-tertiary text-sm mt-1 flex items-center justify-center sm:justify-start gap-2 min-w-0">
                 <IdCard className="h-4 w-4" />
                 <span className="break-all">
-                  {t("idPrefix")}
+                  {t('idPrefix')}
                   {profile.studentId}
                 </span>
               </p>
             )}
-            {profile.avatar?.startsWith("data:") && (
-              <p className="mt-2 text-xs text-mq-warning">
-                {t("avatarLocalOnlyWarning")}
-              </p>
+            {profile.avatar?.startsWith('data:') && (
+              <p className="mt-2 text-xs text-mq-warning">{t('avatarLocalOnlyWarning')}</p>
             )}
           </div>
         </div>

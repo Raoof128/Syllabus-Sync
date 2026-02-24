@@ -1,47 +1,47 @@
 // components/layout/Clock.tsx
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { Language } from "@/lib/i18n/translations";
+import { useEffect, useState } from 'react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { Language } from '@/lib/i18n/translations';
 
 // Map language codes to locale strings
 const localeMap: Record<Language, string> = {
-  en: "en-AU",
-  es: "es-ES",
-  fa: "fa-IR",
-  zh: "zh-CN",
-  ar: "ar-SA",
-  hi: "hi-IN",
-  ko: "ko-KR",
-  ja: "ja-JP",
-  ur: "ur-PK",
-  th: "th-TH",
-  vi: "vi-VN",
-  ru: "ru-RU",
-  ta: "ta-IN",
-  bn: "bn-BD",
-  id: "id-ID",
-  ms: "ms-MY",
-  it: "it-IT",
-  fr: "fr-FR",
-  he: "he-IL",
-  de: "de-DE",
-  da: "da-DK",
-  sv: "sv-SE",
-  tr: "tr-TR",
-  pt: "pt-PT",
-  nl: "nl-NL",
-  pl: "pl-PL",
-  no: "nb-NO",
-  fi: "fi-FI",
-  el: "el-GR",
-  ro: "ro-RO",
-  cs: "cs-CZ",
-  hu: "hu-HU",
-  uk: "uk-UA",
-  ne: "ne-NP",
-  si: "si-LK",
+  en: 'en-AU',
+  es: 'es-ES',
+  fa: 'fa-IR',
+  zh: 'zh-CN',
+  ar: 'ar-SA',
+  hi: 'hi-IN',
+  ko: 'ko-KR',
+  ja: 'ja-JP',
+  ur: 'ur-PK',
+  th: 'th-TH',
+  vi: 'vi-VN',
+  ru: 'ru-RU',
+  ta: 'ta-IN',
+  bn: 'bn-BD',
+  id: 'id-ID',
+  ms: 'ms-MY',
+  it: 'it-IT',
+  fr: 'fr-FR',
+  he: 'he-IL',
+  de: 'de-DE',
+  da: 'da-DK',
+  sv: 'sv-SE',
+  tr: 'tr-TR',
+  pt: 'pt-PT',
+  nl: 'nl-NL',
+  pl: 'pl-PL',
+  no: 'nb-NO',
+  fi: 'fi-FI',
+  el: 'el-GR',
+  ro: 'ro-RO',
+  cs: 'cs-CZ',
+  hu: 'hu-HU',
+  uk: 'uk-UA',
+  ne: 'ne-NP',
+  si: 'si-LK',
 };
 
 /**
@@ -78,17 +78,17 @@ export function Clock() {
     );
   }
 
-  const locale = localeMap[language] || "en-AU";
+  const locale = localeMap[language] || 'en-AU';
 
   return (
     <span className="text-mq-sm font-medium text-mq-content-secondary tabular-nums">
       {time.toLocaleTimeString(locale, {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
       })}
     </span>
   );
 }
 
-Clock.displayName = "Clock";
+Clock.displayName = 'Clock';

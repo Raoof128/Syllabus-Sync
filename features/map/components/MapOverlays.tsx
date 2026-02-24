@@ -1,9 +1,6 @@
-import { useMemo } from "react";
-import {
-  mapOverlayById,
-  type MapOverlayId,
-} from "@/features/map/lib/mapOverlays";
-import type { ReactLeafletModule } from "@/features/map/hooks/useLeafletLoader";
+import { useMemo } from 'react';
+import { mapOverlayById, type MapOverlayId } from '@/features/map/lib/mapOverlays';
+import type { ReactLeafletModule } from '@/features/map/hooks/useLeafletLoader';
 
 interface MapOverlaysProps {
   reactLeafletModule: ReactLeafletModule;
@@ -38,7 +35,7 @@ export function MapOverlays({
   if (!overlaysReady) return null;
 
   return (
-    <Pane name="campus-overlays" style={{ zIndex: 450, pointerEvents: "none" }}>
+    <Pane name="campus-overlays" style={{ zIndex: 450, pointerEvents: 'none' }}>
       {activeConfigs.map((cfg) => (
         <ImageOverlay
           key={cfg.id}

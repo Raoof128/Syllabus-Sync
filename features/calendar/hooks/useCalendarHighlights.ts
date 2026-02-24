@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
-import { Deadline, Event, Unit, Todo } from "@/lib/types";
-import { useCalendarDialogs } from "./useCalendarDialogs";
+import { useEffect, useMemo, useRef, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Deadline, Event, Unit, Todo } from '@/lib/types';
+import { useCalendarDialogs } from './useCalendarDialogs';
 
 export function useCalendarHighlights(
   units: Unit[],
@@ -36,27 +36,23 @@ export function useCalendarHighlights(
     return (
       rect.top >= 0 &&
       rect.left >= 0 &&
-      rect.bottom <=
-        (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
       rect.right <= (window.innerWidth || document.documentElement.clientWidth)
     );
   }, []);
 
   // Helper: scrollIfNotVisible
   const scrollIfNotVisible = useCallback(
-    (el: HTMLElement | null, block: ScrollLogicalPosition = "center") => {
+    (el: HTMLElement | null, block: ScrollLogicalPosition = 'center') => {
       if (el && !isElementInViewport(el)) {
-        el.scrollIntoView({ behavior: "smooth", block });
+        el.scrollIntoView({ behavior: 'smooth', block });
       }
     },
     [isElementInViewport],
   );
 
   // 1. Highlighted Unit
-  const highlightedUnitId = useMemo(
-    () => searchParams.get("highlightUnit"),
-    [searchParams],
-  );
+  const highlightedUnitId = useMemo(() => searchParams.get('highlightUnit'), [searchParams]);
   const highlightedUnit = useMemo(() => {
     if (!highlightedUnitId) return null;
     return units.find((unit) => unit.id === highlightedUnitId) ?? null;
@@ -65,10 +61,7 @@ export function useCalendarHighlights(
   const processedUnitHighlightRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (
-      highlightedUnitId &&
-      processedUnitHighlightRef.current !== highlightedUnitId
-    ) {
+    if (highlightedUnitId && processedUnitHighlightRef.current !== highlightedUnitId) {
       processedUnitHighlightRef.current = null;
     }
   }, [highlightedUnitId]);
@@ -86,9 +79,9 @@ export function useCalendarHighlights(
 
     const clearTimer = window.setTimeout(() => {
       const url = new URL(window.location.href);
-      if (url.searchParams.has("highlightUnit")) {
-        url.searchParams.delete("highlightUnit");
-        window.history.replaceState({}, "", url.toString());
+      if (url.searchParams.has('highlightUnit')) {
+        url.searchParams.delete('highlightUnit');
+        window.history.replaceState({}, '', url.toString());
       }
     }, 3000);
 
@@ -96,13 +89,7 @@ export function useCalendarHighlights(
       clearTimeout(timer);
       clearTimeout(clearTimer);
     };
-  }, [
-    highlightedUnitId,
-    highlightedUnit,
-    hasHydrated,
-    setSelectedUnit,
-    setUnitDetailOpen,
-  ]);
+  }, [highlightedUnitId, highlightedUnit, hasHydrated, setSelectedUnit, setUnitDetailOpen]);
 
   // Scroll to units widget when highlighted unit exists
   useEffect(() => {
@@ -115,32 +102,27 @@ export function useCalendarHighlights(
 
   // 2. Highlighted Deadline
   const highlightedDeadlineId = useMemo(
-    () => searchParams.get("highlightDeadline"),
+    () => searchParams.get('highlightDeadline'),
     [searchParams],
   );
 
   useEffect(() => {
     if (!highlightedDeadlineId) return;
 
-    const highlightedDeadline = deadlines.find(
-      (d) => d.id === highlightedDeadlineId,
-    );
+    const highlightedDeadline = deadlines.find((d) => d.id === highlightedDeadlineId);
 
     const scrollTimer = window.setTimeout(() => {
-      scrollIfNotVisible(assignmentsWidgetRef.current, "start");
+      scrollIfNotVisible(assignmentsWidgetRef.current, 'start');
 
       const deadlineElement = deadlineRefs.current.get(highlightedDeadlineId);
       if (deadlineElement) {
         setTimeout(() => {
-          scrollIfNotVisible(deadlineElement, "center");
+          scrollIfNotVisible(deadlineElement, 'center');
         }, 400);
       }
 
       if (highlightedDeadline) {
-        if (
-          highlightedDeadline.type === "Exam" ||
-          highlightedDeadline.type === "Quiz"
-        ) {
+        if (highlightedDeadline.type === 'Exam' || highlightedDeadline.type === 'Quiz') {
           setSelectedExam(highlightedDeadline);
           setExamDetailOpen(true);
         } else {
@@ -152,9 +134,9 @@ export function useCalendarHighlights(
 
     const clearTimer = window.setTimeout(() => {
       const url = new URL(window.location.href);
-      if (url.searchParams.has("highlightDeadline")) {
-        url.searchParams.delete("highlightDeadline");
-        window.history.replaceState({}, "", url.toString());
+      if (url.searchParams.has('highlightDeadline')) {
+        url.searchParams.delete('highlightDeadline');
+        window.history.replaceState({}, '', url.toString());
       }
     }, 3000);
 
@@ -173,10 +155,7 @@ export function useCalendarHighlights(
   ]);
 
   // 3. Highlighted Todo
-  const highlightedTodoId = useMemo(
-    () => searchParams.get("highlightTodo"),
-    [searchParams],
-  );
+  const highlightedTodoId = useMemo(() => searchParams.get('highlightTodo'), [searchParams]);
 
   useEffect(() => {
     if (!highlightedTodoId) return;
@@ -192,9 +171,9 @@ export function useCalendarHighlights(
 
     const clearTimer = window.setTimeout(() => {
       const url = new URL(window.location.href);
-      if (url.searchParams.has("highlightTodo")) {
-        url.searchParams.delete("highlightTodo");
-        window.history.replaceState({}, "", url.toString());
+      if (url.searchParams.has('highlightTodo')) {
+        url.searchParams.delete('highlightTodo');
+        window.history.replaceState({}, '', url.toString());
       }
     }, 3000);
 
@@ -205,10 +184,7 @@ export function useCalendarHighlights(
   }, [highlightedTodoId, todos, setSelectedTodo, setTodoDetailOpen]);
 
   // 4. Highlighted Event
-  const highlightedEventId = useMemo(
-    () => searchParams.get("highlightEvent"),
-    [searchParams],
-  );
+  const highlightedEventId = useMemo(() => searchParams.get('highlightEvent'), [searchParams]);
 
   useEffect(() => {
     if (!highlightedEventId) return;
@@ -224,9 +200,9 @@ export function useCalendarHighlights(
 
     const clearTimer = window.setTimeout(() => {
       const url = new URL(window.location.href);
-      if (url.searchParams.has("highlightEvent")) {
-        url.searchParams.delete("highlightEvent");
-        window.history.replaceState({}, "", url.toString());
+      if (url.searchParams.has('highlightEvent')) {
+        url.searchParams.delete('highlightEvent');
+        window.history.replaceState({}, '', url.toString());
       }
     }, 3000);
 
@@ -237,24 +213,21 @@ export function useCalendarHighlights(
   }, [highlightedEventId, events, setSelectedEvent, setEventDetailOpen]);
 
   // 5. Highlighted Widget
-  const highlightedWidget = useMemo(
-    () => searchParams.get("highlightWidget"),
-    [searchParams],
-  );
+  const highlightedWidget = useMemo(() => searchParams.get('highlightWidget'), [searchParams]);
 
   useEffect(() => {
     if (!highlightedWidget) return;
 
     const scrollTimer = window.setTimeout(() => {
-      if (highlightedWidget === "units") {
+      if (highlightedWidget === 'units') {
         scrollIfNotVisible(unitsWidgetRef.current);
       }
     }, 100);
 
     const clearTimer = window.setTimeout(() => {
       const url = new URL(window.location.href);
-      url.searchParams.delete("highlightWidget");
-      window.history.replaceState({}, "", url.toString());
+      url.searchParams.delete('highlightWidget');
+      window.history.replaceState({}, '', url.toString());
     }, 3000);
 
     return () => {

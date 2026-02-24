@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { useMemo } from "react";
-import { Unit } from "@/lib/types";
-import { CardTitle } from "@/components/ui/mq/card";
-import { Badge } from "@/components/ui/mq/badge";
-import { Button } from "@/components/ui/mq/button";
-import { MapPin, Clock, Edit, Trash2, ExternalLink } from "lucide-react";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { CardSolid } from "@/features/home/components/HomeCard";
-import { formatScheduleTime } from "@/lib/utils/locale";
-import { getMQUnitByCode } from "@/data/mqUnits";
+import React, { useMemo } from 'react';
+import { Unit } from '@/lib/types';
+import { CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
+import { MapPin, Clock, Edit, Trash2, ExternalLink } from 'lucide-react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { CardSolid } from '@/features/home/components/HomeCard';
+import { formatScheduleTime } from '@/lib/utils/locale';
+import { getMQUnitByCode } from '@/data/mqUnits';
 
 interface UnitCardProps {
   unit: Unit;
@@ -35,13 +35,13 @@ const UnitCard = React.memo(
     const mqUnitInfo = useMemo(() => getMQUnitByCode(unit.code), [unit.code]);
 
     const DAY_SHORT: { [key: string]: string } = {
-      Monday: t("mon"),
-      Tuesday: t("tue"),
-      Wednesday: t("wed"),
-      Thursday: t("thu"),
-      Friday: t("fri"),
-      Saturday: t("sat"),
-      Sunday: t("sun"),
+      Monday: t('mon'),
+      Tuesday: t('tue'),
+      Wednesday: t('wed'),
+      Thursday: t('thu'),
+      Friday: t('fri'),
+      Saturday: t('sat'),
+      Sunday: t('sun'),
     };
 
     // Day order for sorting (Monday first, Sunday last)
@@ -62,7 +62,7 @@ const UnitCard = React.memo(
       return uniqueDays
         .sort((a, b) => DAY_ORDER[a] - DAY_ORDER[b])
         .map((day) => DAY_SHORT[day])
-        .join(", ");
+        .join(', ');
     };
 
     const handleCardClick = () => {
@@ -73,23 +73,21 @@ const UnitCard = React.memo(
 
     return (
       <CardSolid
-        className={`h-full flex flex-col p-0 ${onClick ? "cursor-pointer hover:scale-[1.02] transition-transform" : ""} ${isHighlighted ? "ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background" : ""}`}
+        className={`h-full flex flex-col p-0 ${onClick ? 'cursor-pointer hover:scale-[1.02] transition-transform' : ''} ${isHighlighted ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background' : ''}`}
         onClick={handleCardClick}
-        role={onClick ? "button" : undefined}
+        role={onClick ? 'button' : undefined}
         tabIndex={onClick ? 0 : undefined}
         onKeyDown={
           onClick
             ? (e) => {
-                if (e.key === "Enter" || e.key === " ") {
+                if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   handleCardClick();
                 }
               }
             : undefined
         }
-        aria-label={
-          onClick ? `${t("view")} ${unit.code} - ${unit.name}` : undefined
-        }
+        aria-label={onClick ? `${t('view')} ${unit.code} - ${unit.name}` : undefined}
       >
         {/* Color indicator bar with unit code initials for accessibility */}
         <div
@@ -122,7 +120,7 @@ const UnitCard = React.memo(
                 aria-hidden="true"
                 title={unit.code}
               >
-                {unit.code.replace(/[0-9]/g, "").slice(0, 2)}
+                {unit.code.replace(/[0-9]/g, '').slice(0, 2)}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -132,7 +130,7 @@ const UnitCard = React.memo(
                   <Badge
                     variant="neutral"
                     className="font-normal shrink-0"
-                    aria-label={`${t("days")}: ${getUniqueDays()}`}
+                    aria-label={`${t('days')}: ${getUniqueDays()}`}
                   >
                     <span aria-hidden="true">{getUniqueDays()}</span>
                   </Badge>
@@ -154,14 +152,14 @@ const UnitCard = React.memo(
                     size="sm"
                     onClick={() => onEdit(unit)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
+                      if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         onEdit(unit);
                       }
                     }}
                     className="h-8 w-8 p-0 focus:ring-2 focus:ring-mq-primary/50"
-                    aria-label={`${t("editUnit")} ${unit.code} - ${unit.name}`}
-                    title={`${t("editUnit")} ${unit.code}`}
+                    aria-label={`${t('editUnit')} ${unit.code} - ${unit.name}`}
+                    title={`${t('editUnit')} ${unit.code}`}
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -172,14 +170,14 @@ const UnitCard = React.memo(
                     size="sm"
                     onClick={() => onDelete(unit)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
+                      if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         onDelete(unit);
                       }
                     }}
                     className="h-8 w-8 p-0 text-mq-error hover:text-mq-error hover:bg-mq-error/10 focus:ring-2 focus:ring-mq-error/50"
-                    aria-label={`${t("deleteUnit")} ${unit.code} - ${unit.name}`}
-                    title={`${t("deleteUnit")} ${unit.code}`}
+                    aria-label={`${t('deleteUnit')} ${unit.code} - ${unit.name}`}
+                    title={`${t('deleteUnit')} ${unit.code}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -191,13 +189,11 @@ const UnitCard = React.memo(
           {/* Location */}
           <div className="flex items-center gap-2 text-mq-sm">
             <MapPin className="w-4 h-4" />
-            <span className="font-medium text-mq-content">
-              {unit.location.building}
-            </span>
+            <span className="font-medium text-mq-content">{unit.location.building}</span>
             <span className="text-mq-content-tertiary">
-              {unit.location.room.toLowerCase().startsWith("room")
+              {unit.location.room.toLowerCase().startsWith('room')
                 ? unit.location.room
-                : `${t("room")} ${unit.location.room}`}
+                : `${t('room')} ${unit.location.room}`}
             </span>
           </div>
 
@@ -205,17 +201,14 @@ const UnitCard = React.memo(
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-mq-sm text-mq-content-tertiary">
               <Clock className="w-4 h-4" />
-              <span>{t("classTimes")}</span>
+              <span>{t('classTimes')}</span>
             </div>
             <div className="space-y-1 pl-6">
               {unit.schedule.map((ct) => (
-                <div
-                  key={ct.id}
-                  className="text-mq-sm flex items-center justify-between"
-                >
+                <div key={ct.id} className="text-mq-sm flex items-center justify-between">
                   <span className="font-medium text-mq-content">{ct.day}</span>
                   <span className="text-mq-content-secondary">
-                    {formatScheduleTime(ct.startTime, language)} -{" "}
+                    {formatScheduleTime(ct.startTime, language)} -{' '}
                     {formatScheduleTime(ct.endTime, language)}
                   </span>
                 </div>
@@ -236,9 +229,9 @@ const UnitCard = React.memo(
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-mq-primary hover:underline ml-2 shrink-0"
                   onClick={(e) => e.stopPropagation()}
-                  aria-label={t("openHandbookAria", { code: unit.code })}
+                  aria-label={t('openHandbookAria', { code: unit.code })}
                 >
-                  <span className="hidden sm:inline">{t("handbook")}</span>
+                  <span className="hidden sm:inline">{t('handbook')}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               )}
@@ -247,11 +240,8 @@ const UnitCard = React.memo(
 
           {/* Color indicator */}
           <div className="flex items-center gap-2 text-mq-xs text-mq-content-tertiary pt-2 border-t border-mq-border mt-auto">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: unit.color }}
-            />
-            <span>{t("colorCodingForCalendar")}</span>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: unit.color }} />
+            <span>{t('colorCodingForCalendar')}</span>
           </div>
         </div>
       </CardSolid>
@@ -259,6 +249,6 @@ const UnitCard = React.memo(
   },
 );
 
-UnitCard.displayName = "UnitCard";
+UnitCard.displayName = 'UnitCard';
 
 export default UnitCard;

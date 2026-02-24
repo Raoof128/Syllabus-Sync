@@ -18,17 +18,17 @@
 // TYPES
 // ============================================
 
-export type HapticIntensity = "light" | "medium" | "strong";
+export type HapticIntensity = 'light' | 'medium' | 'strong';
 
 export type HapticPattern =
-  | "tap" // Quick single tap
-  | "doubleTap" // Two quick taps
-  | "turnLeft" // Pattern for left turn
-  | "turnRight" // Pattern for right turn
-  | "arrival" // Arrival celebration
-  | "offRoute" // Warning for off-route
-  | "recalculating" // Route recalculation
-  | "error"; // Error notification
+  | 'tap' // Quick single tap
+  | 'doubleTap' // Two quick taps
+  | 'turnLeft' // Pattern for left turn
+  | 'turnRight' // Pattern for right turn
+  | 'arrival' // Arrival celebration
+  | 'offRoute' // Warning for off-route
+  | 'recalculating' // Route recalculation
+  | 'error'; // Error notification
 
 // Vibration pattern type: [vibrate, pause, vibrate, pause, ...]
 type VibrationPattern = number | number[];
@@ -60,7 +60,7 @@ const INTENSITY_MULTIPLIERS: Record<HapticIntensity, number> = {
 const HAPTIC_DEBOUNCE_MS = 300;
 
 /** Check if we're in a browser environment */
-const isBrowser = typeof window !== "undefined";
+const isBrowser = typeof window !== 'undefined';
 
 // ============================================
 // STATE
@@ -99,7 +99,7 @@ function getEffectiveEnabled(): boolean {
  */
 export function isHapticSupported(): boolean {
   if (!isBrowser) return false;
-  return "vibrate" in navigator;
+  return 'vibrate' in navigator;
 }
 
 /**
@@ -109,13 +109,12 @@ export function isMobileDevice(): boolean {
   if (!isBrowser) return false;
 
   // Check for touch capability
-  const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
   // Check user agent for mobile indicators
-  const mobileUA =
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent,
-    );
+  const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent,
+  );
 
   return hasTouch && mobileUA;
 }
@@ -140,7 +139,7 @@ export function setHapticEnabled(enabled: boolean): void {
   // Store preference
   if (isBrowser) {
     try {
-      localStorage.setItem("hapticFeedbackEnabled", JSON.stringify(enabled));
+      localStorage.setItem('hapticFeedbackEnabled', JSON.stringify(enabled));
     } catch {
       // Ignore storage errors
     }
@@ -161,7 +160,7 @@ export function initHapticPreferences(): void {
   if (!isBrowser) return;
 
   try {
-    const stored = localStorage.getItem("hapticFeedbackEnabled");
+    const stored = localStorage.getItem('hapticFeedbackEnabled');
     if (stored !== null) {
       hapticEnabled = JSON.parse(stored);
     }
@@ -182,7 +181,7 @@ export function initHapticPreferences(): void {
  */
 export function triggerHaptic(
   pattern: HapticPattern,
-  intensity: HapticIntensity = "medium",
+  intensity: HapticIntensity = 'medium',
 ): boolean {
   // Check if we should trigger
   if (!shouldTriggerHaptics()) {
@@ -215,11 +214,8 @@ export function triggerHaptic(
 /**
  * Apply intensity multiplier to a vibration pattern
  */
-function applyIntensity(
-  pattern: VibrationPattern,
-  multiplier: number,
-): VibrationPattern {
-  if (typeof pattern === "number") {
+function applyIntensity(pattern: VibrationPattern, multiplier: number): VibrationPattern {
+  if (typeof pattern === 'number') {
     return Math.round(pattern * multiplier);
   }
 
@@ -254,25 +250,19 @@ export function cancelHaptic(): void {
  * @param turnType - Type of turn
  */
 export function hapticForTurn(
-  turnType:
-    | "left"
-    | "right"
-    | "slight-left"
-    | "slight-right"
-    | "u-turn"
-    | "straight",
+  turnType: 'left' | 'right' | 'slight-left' | 'slight-right' | 'u-turn' | 'straight',
 ): boolean {
   switch (turnType) {
-    case "left":
-    case "slight-left":
-      return triggerHaptic("turnLeft", "medium");
-    case "right":
-    case "slight-right":
-      return triggerHaptic("turnRight", "medium");
-    case "u-turn":
-      return triggerHaptic("turnLeft", "strong"); // Strong left for U-turn
-    case "straight":
-      return triggerHaptic("tap", "light"); // Light tap for straight
+    case 'left':
+    case 'slight-left':
+      return triggerHaptic('turnLeft', 'medium');
+    case 'right':
+    case 'slight-right':
+      return triggerHaptic('turnRight', 'medium');
+    case 'u-turn':
+      return triggerHaptic('turnLeft', 'strong'); // Strong left for U-turn
+    case 'straight':
+      return triggerHaptic('tap', 'light'); // Light tap for straight
     default:
       return false;
   }
@@ -282,35 +272,35 @@ export function hapticForTurn(
  * Trigger haptic for navigation arrival
  */
 export function hapticForArrival(): boolean {
-  return triggerHaptic("arrival", "strong");
+  return triggerHaptic('arrival', 'strong');
 }
 
 /**
  * Trigger haptic for off-route warning
  */
 export function hapticForOffRoute(): boolean {
-  return triggerHaptic("offRoute", "strong");
+  return triggerHaptic('offRoute', 'strong');
 }
 
 /**
  * Trigger haptic for route recalculation
  */
 export function hapticForRecalculating(): boolean {
-  return triggerHaptic("recalculating", "light");
+  return triggerHaptic('recalculating', 'light');
 }
 
 /**
  * Trigger haptic for waypoint reached
  */
 export function hapticForWaypoint(): boolean {
-  return triggerHaptic("doubleTap", "medium");
+  return triggerHaptic('doubleTap', 'medium');
 }
 
 /**
  * Trigger haptic for error
  */
 export function hapticForError(): boolean {
-  return triggerHaptic("error", "strong");
+  return triggerHaptic('error', 'strong');
 }
 
 // ============================================

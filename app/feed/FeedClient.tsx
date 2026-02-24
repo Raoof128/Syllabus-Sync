@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { memo } from "react";
-import { Button } from "@/components/ui/mq/button";
-import { Plus, Trash2, Rss, Info } from "lucide-react";
-import { UNIVERSITY_CONFIG } from "@/lib/config";
-import type { TranslationKey } from "@/lib/i18n/translations";
-import { cn } from "@/lib/utils";
-import { ScrollReveal } from "@/components/ui/ScrollReveal";
-import { toastUtils } from "@/lib/utils/toast";
-import dynamic from "next/dynamic";
-import LoadingPlaceholder from "@/components/ui/LoadingPlaceholder";
-import { FeedFilters } from "@/features/feed/components/FeedFilters";
-import { FeedEventCard } from "@/features/feed/components/FeedEventCard";
-import { FeedSidebar } from "@/features/feed/components/FeedSidebar";
-import { useFeedLogic } from "@/features/feed/hooks/useFeedLogic";
+import { memo } from 'react';
+import { Button } from '@/components/ui/mq/button';
+import { Plus, Trash2, Rss, Info } from 'lucide-react';
+import { UNIVERSITY_CONFIG } from '@/lib/config';
+import type { TranslationKey } from '@/lib/i18n/translations';
+import { cn } from '@/lib/utils';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
+import { toastUtils } from '@/lib/utils/toast';
+import dynamic from 'next/dynamic';
+import LoadingPlaceholder from '@/components/ui/LoadingPlaceholder';
+import { FeedFilters } from '@/features/feed/components/FeedFilters';
+import { FeedEventCard } from '@/features/feed/components/FeedEventCard';
+import { FeedSidebar } from '@/features/feed/components/FeedSidebar';
+import { useFeedLogic } from '@/features/feed/hooks/useFeedLogic';
 
 // Dynamically import EventForm for code splitting
-const EventForm = dynamic(() => import("@/components/events/EventForm"), {
+const EventForm = dynamic(() => import('@/components/events/EventForm'), {
   loading: () => <LoadingPlaceholder />,
 });
 
@@ -56,17 +56,15 @@ const FeedClient = memo(() => {
   return (
     <section
       className="container mx-auto p-4 sm:p-6 max-w-7xl feed-page"
-      aria-label={t("campusFeedLabel")}
+      aria-label={t('campusFeedLabel')}
     >
       {/* Header */}
       <ScrollReveal>
         <header className="mb-8 flex items-center justify-between flex-wrap gap-4">
           <div className="flex-1 min-w-0">
-            <h1 className="text-mq-3xl font-bold text-mq-content mb-2">
-              {t("campusFeed")}
-            </h1>
+            <h1 className="text-mq-3xl font-bold text-mq-content mb-2">{t('campusFeed')}</h1>
             <p className="text-mq-content-secondary">
-              {t("campusFeedDesc", { uniName: UNIVERSITY_CONFIG.name })}
+              {t('campusFeedDesc', { uniName: UNIVERSITY_CONFIG.name })}
             </p>
           </div>
           <Button
@@ -77,7 +75,7 @@ const FeedClient = memo(() => {
             className="gap-2"
           >
             <Plus className="h-4 w-4" />
-            {t("addEvent")}
+            {t('addEvent')}
           </Button>
         </header>
       </ScrollReveal>
@@ -87,7 +85,7 @@ const FeedClient = memo(() => {
         <div
           className="mb-6 p-4 bg-mq-background-secondary border border-mq-border rounded-mq-lg flex items-start gap-3 stay-connected-banner"
           role="region"
-          aria-label={t("stayConnected")}
+          aria-label={t('stayConnected')}
         >
           <Info
             className="h-5 w-5 text-mq-content-secondary flex-shrink-0 mt-0.5"
@@ -95,7 +93,7 @@ const FeedClient = memo(() => {
           />
           <div className="flex-1">
             <p className="text-mq-sm text-mq-content">
-              <strong>{t("stayConnected")}</strong> {t("stayConnectedDesc")}
+              <strong>{t('stayConnected')}</strong> {t('stayConnectedDesc')}
             </p>
           </div>
         </div>
@@ -128,17 +126,17 @@ const FeedClient = memo(() => {
                   <article
                     key={event.id}
                     className={cn(
-                      "transition-transform duration-300",
+                      'transition-transform duration-300',
                       // Both sticky and non-sticky need to be positioned (relative vs sticky)
                       // and have z-0 to maintain correct stacking context (later covers earlier)
-                      isSticky ? "sticky" : "relative",
-                      "z-0",
+                      isSticky ? 'sticky' : 'relative',
+                      'z-0',
                     )}
                     style={{
                       // Stacking effect calculation only for top cards
                       top: isSticky ? `${140 + index * 10}px` : undefined,
                       // Add slight margin bottom to create spacing when stacked
-                      marginBottom: "2rem",
+                      marginBottom: '2rem',
                     }}
                     ref={(el) => {
                       if (el) eventRefs.current.set(event.id, el);
@@ -153,12 +151,9 @@ const FeedClient = memo(() => {
                         onRemind={() =>
                           handleRemindMe(
                             event.id,
-                            t(
-                              (event.translationKey ||
-                                event.title) as TranslationKey,
-                            ),
+                            t((event.translationKey || event.title) as TranslationKey),
                             event.startAt,
-                            event.location || "",
+                            event.location || '',
                           )
                         }
                         onEdit={() => {
@@ -178,23 +173,21 @@ const FeedClient = memo(() => {
             ) : (
               <div className="col-span-full py-12 text-center bg-mq-surface rounded-2xl border border-mq-border border-dashed">
                 <Rss className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary" />
-                <h3 className="text-lg font-semibold text-mq-content mb-2">
-                  {t("noEventsFound")}
-                </h3>
+                <h3 className="text-lg font-semibold text-mq-content mb-2">{t('noEventsFound')}</h3>
                 <p className="text-sm text-mq-content-secondary max-w-sm mx-auto mb-6">
-                  {t("noEventsFoundDesc") ||
+                  {t('noEventsFoundDesc') ||
                     "Try adjusting your filters or search query to find what you're looking for."}
                 </p>
                 <div className="flex justify-center gap-3">
                   <Button
                     variant="outline"
                     onClick={() => {
-                      setActiveFilter("All");
-                      setSearchQuery("");
-                      setTimeRange("upcoming");
+                      setActiveFilter('All');
+                      setSearchQuery('');
+                      setTimeRange('upcoming');
                     }}
                   >
-                    {t("clearFilters") || "Clear filters"}
+                    {t('clearFilters') || 'Clear filters'}
                   </Button>
                   <Button
                     onClick={() => {
@@ -202,7 +195,7 @@ const FeedClient = memo(() => {
                       setEventFormOpen(true);
                     }}
                   >
-                    {t("createFirstEvent") || "Create event"}
+                    {t('createFirstEvent') || 'Create event'}
                   </Button>
                 </div>
               </div>
@@ -219,11 +212,7 @@ const FeedClient = memo(() => {
       </div>
 
       {/* Event Form Dialog */}
-      <EventForm
-        open={eventFormOpen}
-        onOpenChange={setEventFormOpen}
-        editEvent={editingEvent}
-      />
+      <EventForm open={eventFormOpen} onOpenChange={setEventFormOpen} editEvent={editingEvent} />
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmOpen && eventToDelete && (
@@ -234,17 +223,11 @@ const FeedClient = memo(() => {
                 <Trash2 className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-mq-content">
-                  {t("deleteEventConfirm")}
-                </h3>
-                <p className="text-sm text-mq-content-secondary">
-                  {eventToDelete.title}
-                </p>
+                <h3 className="text-lg font-semibold text-mq-content">{t('deleteEventConfirm')}</h3>
+                <p className="text-sm text-mq-content-secondary">{eventToDelete.title}</p>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">
-              {t("deleteEventConfirmDesc")}
-            </p>
+            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteEventConfirmDesc')}</p>
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"
@@ -253,7 +236,7 @@ const FeedClient = memo(() => {
                   setEventToDelete(null);
                 }}
               >
-                {t("cancelAction")}
+                {t('cancelAction')}
               </Button>
               <Button
                 variant="destructive"
@@ -262,15 +245,12 @@ const FeedClient = memo(() => {
                     removeEvent(eventToDelete.id);
                     setDeleteConfirmOpen(false);
                     setEventToDelete(null);
-                    toastUtils.success(
-                      t("eventDeleted"),
-                      t("eventDeletedDesc"),
-                    );
+                    toastUtils.success(t('eventDeleted'), t('eventDeletedDesc'));
                   }
                 }}
                 className="bg-red-500 hover:bg-red-600 text-white"
               >
-                {t("confirmDelete")}
+                {t('confirmDelete')}
               </Button>
             </div>
           </div>
@@ -280,6 +260,6 @@ const FeedClient = memo(() => {
   );
 });
 
-FeedClient.displayName = "FeedClient";
+FeedClient.displayName = 'FeedClient';
 
 export default FeedClient;

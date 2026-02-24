@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/mq/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import React from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EventFormSkeleton() {
   return (

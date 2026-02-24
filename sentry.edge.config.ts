@@ -1,2 +1,2 @@
-import "./config/sentry/sentry.edge.config";
+import './config/sentry/sentry.edge.config';
 export {};

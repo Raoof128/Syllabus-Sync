@@ -1,18 +1,12 @@
-"use client";
+'use client';
 
-import {
-  useEffect,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-} from "react";
-import { Navigation, ArrowLeft, MapPin } from "lucide-react";
-import { useSafeTranslation } from "@/lib/hooks/useSafeTranslation";
-import { UNIVERSITY_CONFIG } from "@/lib/config";
-import { cn } from "@/lib/utils";
-import type { Building } from "@/features/map/lib/buildings";
-import { CAMPUS_CENTRE_GPS } from "@/features/map/lib/constants";
+import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react';
+import { Navigation, ArrowLeft, MapPin } from 'lucide-react';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
+import { UNIVERSITY_CONFIG } from '@/lib/config';
+import { cn } from '@/lib/utils';
+import type { Building } from '@/features/map/lib/buildings';
+import { CAMPUS_CENTRE_GPS } from '@/features/map/lib/constants';
 
 // Exact coordinates for Macquarie University campus center
 const MQ_COORDS = `${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`;
@@ -24,15 +18,12 @@ const buildViewUrl = (query: string) => {
   return `https://www.google.com/maps?q=${query}&z=17&ie=UTF8&iwloc=&output=embed`;
 };
 
-const buildDirectionsUrl = (
-  destination: string,
-  origin?: { lat: number; lng: number } | null,
-) => {
-  const originStr = origin ? `${origin.lat},${origin.lng}` : "My+Location";
+const buildDirectionsUrl = (destination: string, origin?: { lat: number; lng: number } | null) => {
+  const originStr = origin ? `${origin.lat},${origin.lng}` : 'My+Location';
   return `https://www.google.com/maps?saddr=${originStr}&daddr=${destination}&dirflg=w&z=16&ie=UTF8&output=embed`;
 };
 
-type MapMode = "view" | "directions";
+type MapMode = 'view' | 'directions';
 
 export interface GoogleMapRef {
   startNavigation: () => void;
@@ -43,25 +34,20 @@ export interface GoogleMapRef {
 interface GoogleMapEmbedProps {
   selectedBuilding?: Building;
   destinationLabel?: string;
-  onNavStateChange?: (state: {
-    isNavigating: boolean;
-    status: "idle" | "navigating";
-  }) => void;
+  onNavStateChange?: (state: { isNavigating: boolean; status: 'idle' | 'navigating' }) => void;
 }
 
 export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
   ({ selectedBuilding, destinationLabel, onNavStateChange }, ref) => {
     const { t, safeT } = useSafeTranslation();
-    const [mode, setMode] = useState<MapMode>("view");
+    const [mode, setMode] = useState<MapMode>('view');
     const [forceCenter, setForceCenter] = useState<boolean>(false);
-    const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
-      null,
-    );
+    const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null);
     const lastLocRef = useRef<{ lat: number; lng: number } | null>(null);
 
     useEffect(() => {
       let watchId: number | null = null;
-      if (typeof navigator !== "undefined" && "geolocation" in navigator) {
+      if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
         watchId = navigator.geolocation.watchPosition(
           (pos) => {
             const newLat = pos.coords.latitude;
@@ -77,16 +63,12 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
             lastLocRef.current = { lat: newLat, lng: newLng };
             setUserLoc({ lat: newLat, lng: newLng });
           },
-          (err) => console.warn("GoogleMapEmbed geolocation error:", err),
+          (err) => console.warn('GoogleMapEmbed geolocation error:', err),
           { enableHighAccuracy: true, maximumAge: 5000, timeout: 5000 },
         );
       }
       return () => {
-        if (
-          watchId !== null &&
-          typeof navigator !== "undefined" &&
-          "geolocation" in navigator
-        ) {
+        if (watchId !== null && typeof navigator !== 'undefined' && 'geolocation' in navigator) {
           navigator.geolocation.clearWatch(watchId);
         }
       };
@@ -96,40 +78,40 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
     const destinationQuery = forceCenter
       ? userLoc
         ? `${userLoc.lat},${userLoc.lng}`
-        : "My+Location"
+        : 'My+Location'
       : selectedBuilding?.location
         ? `${selectedBuilding.location.lat},${selectedBuilding.location.lng}`
         : MQ_COORDS;
 
     const resolvedDestinationLabel = forceCenter
-      ? safeT("myLocation", "My Location")
+      ? safeT('myLocation', 'My Location')
       : destinationLabel || UNIVERSITY_CONFIG.name;
 
     // Expose navigation control via ref (same pattern as CampusMap)
     useImperativeHandle(ref, () => ({
       startNavigation: () => {
         setForceCenter(false);
-        setMode("directions");
+        setMode('directions');
       },
       stopNavigation: () => {
-        setMode("view");
+        setMode('view');
       },
       get isNavigating() {
-        return mode === "directions";
+        return mode === 'directions';
       },
     }));
 
     // Notify parent of navigation state changes
     useEffect(() => {
       onNavStateChange?.({
-        isNavigating: mode === "directions",
-        status: mode === "directions" ? "navigating" : "idle",
+        isNavigating: mode === 'directions',
+        status: mode === 'directions' ? 'navigating' : 'idle',
       });
     }, [mode, onNavStateChange]);
 
     // Reset to view mode when building changes
     useEffect(() => {
-      setMode("view");
+      setMode('view');
       setForceCenter(false);
     }, [selectedBuilding?.id]);
 
@@ -138,7 +120,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
         {/* Header bar - shows current state */}
         <div className="flex shrink-0 items-center justify-between border-b border-mq-border bg-mq-card-background px-4 py-2.5">
           <div className="flex items-center gap-2">
-            {mode === "directions" ? (
+            {mode === 'directions' ? (
               <Navigation className="h-3.5 w-3.5 text-mq-primary" />
             ) : (
               <MapPin className="h-3.5 w-3.5 text-mq-content-tertiary" />
@@ -147,18 +129,18 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
               {resolvedDestinationLabel}
             </span>
             <span className="hidden text-xs text-mq-content-secondary sm:inline">
-              · {mode === "directions" ? t("directions") : t("googleMaps")}
+              · {mode === 'directions' ? t('directions') : t('googleMaps')}
             </span>
           </div>
 
-          {mode === "directions" && (
+          {mode === 'directions' && (
             <button
-              onClick={() => setMode("view")}
+              onClick={() => setMode('view')}
               className="flex items-center gap-1.5 rounded-mq-lg bg-mq-background-secondary px-3 py-1.5 text-xs font-medium text-mq-content transition-colors hover:bg-mq-hover-background"
-              aria-label={t("backToMap")}
+              aria-label={t('backToMap')}
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              <span>{t("backToMap")}</span>
+              <span>{t('backToMap')}</span>
             </button>
           )}
         </div>
@@ -166,14 +148,14 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
         <iframe
           key={`${mode}-${destinationQuery}`}
           title={
-            mode === "directions"
-              ? t("googleMapsDirectionsTo", {
+            mode === 'directions'
+              ? t('googleMapsDirectionsTo', {
                   destination: resolvedDestinationLabel,
                 })
-              : t("googleMapsViewAt", { destination: resolvedDestinationLabel })
+              : t('googleMapsViewAt', { destination: resolvedDestinationLabel })
           }
           src={
-            mode === "view"
+            mode === 'view'
               ? buildViewUrl(destinationQuery)
               : buildDirectionsUrl(destinationQuery, userLoc)
           }
@@ -181,25 +163,23 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           aria-label={
-            mode === "directions"
-              ? t("directionsIframeLabel")
-              : t("googleMapsIframeLabel")
+            mode === 'directions' ? t('directionsIframeLabel') : t('googleMapsIframeLabel')
           }
           allowFullScreen
           allow="geolocation"
         />
 
         {/* Floating Action Button - Center on User */}
-        {mode === "view" && (
+        {mode === 'view' && (
           <button
             onClick={() => setForceCenter(true)}
             className={cn(
-              "absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50",
+              'absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50',
               selectedBuilding
-                ? "bottom-[240px] right-4 sm:bottom-[140px] sm:right-4"
-                : "bottom-[100px] sm:bottom-[40px] right-4",
+                ? 'bottom-[240px] right-4 sm:bottom-[140px] sm:right-4'
+                : 'bottom-[100px] sm:bottom-[40px] right-4',
             )}
-            aria-label={safeT("centerOnLocation", "Center on my location")}
+            aria-label={safeT('centerOnLocation', 'Center on my location')}
           >
             <svg
               className="w-6 h-6"
@@ -224,4 +204,4 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
     );
   },
 );
-GoogleMapEmbed.displayName = "GoogleMapEmbed";
+GoogleMapEmbed.displayName = 'GoogleMapEmbed';

@@ -1,15 +1,14 @@
 // app/manage-profiles/layout.tsx
-import { Metadata } from "next";
-import { APP_CONFIG, UNIVERSITY_CONFIG } from "@/lib/config";
+import { Metadata } from 'next';
+import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - Manage Profiles`,
-  description: "Create, edit, and manage your user profiles for Syllabus Sync.",
+  description: 'Create, edit, and manage your user profiles for Syllabus Sync.',
   openGraph: {
     title: `${APP_CONFIG.name} - Manage Profiles`,
-    description:
-      "Create, edit, and manage your user profiles for Syllabus Sync.",
-    type: "website",
+    description: 'Create, edit, and manage your user profiles for Syllabus Sync.',
+    type: 'website',
     images: [
       {
         url: `${UNIVERSITY_CONFIG.website}/MQ_Logo_Final.png`,
@@ -18,7 +17,7 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
     images: [`${UNIVERSITY_CONFIG.website}/MQ_Logo_Final.png`],
   },
   robots: {
@@ -27,10 +26,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ManageProfilesLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ManageProfilesLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

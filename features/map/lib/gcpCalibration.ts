@@ -18,10 +18,10 @@
  * @date 2026-01-10
  */
 
-import { createDevLogger } from "@/lib/utils/devLog";
+import { createDevLogger } from '@/lib/utils/devLog';
 
 // Create a logger for GCP calibration
-const gcpLog = createDevLogger("GCP");
+const gcpLog = createDevLogger('GCP');
 
 // Map dimensions (must match the actual image size)
 export const GCP_MAP_WIDTH = 4678;
@@ -94,46 +94,46 @@ export interface CalibrationResult {
  */
 export const PRIMARY_GCPS: GCP[] = [
   {
-    id: "18WW",
+    id: '18WW',
     name: "18 Wally's Walk (Central Hub)",
     pixel: [1692, 1870], // Anchor GCP - GPS verified
     gps: { lat: -33.77551, lng: 151.11259 },
-    source: "GPS verified (anchor)",
+    source: 'GPS verified (anchor)',
   },
   {
-    id: "LIB",
-    name: "Waranara Library",
+    id: 'LIB',
+    name: 'Waranara Library',
     pixel: [1735, 2409], // Anchor GCP - GPS verified
     gps: { lat: -33.77842, lng: 151.11277 },
-    source: "GPS verified (anchor)",
+    source: 'GPS verified (anchor)',
   },
   {
-    id: "UBAR",
-    name: "UBar & Central Courtyard",
+    id: 'UBAR',
+    name: 'UBar & Central Courtyard',
     pixel: [1945, 1590], // Anchor GCP - GPS verified
     gps: { lat: -33.774, lng: 151.11365 },
-    source: "GPS verified (anchor)",
+    source: 'GPS verified (anchor)',
   },
   {
-    id: "HOSP",
-    name: "MQ University Hospital",
+    id: 'HOSP',
+    name: 'MQ University Hospital',
     pixel: [3001, 1557], // Calculated from GPS using calibrated bounds
     gps: { lat: -33.773819, lng: 151.118075 },
-    source: "OSM (pixel from GPS)",
+    source: 'OSM (pixel from GPS)',
   },
   {
-    id: "SPORT",
-    name: "Sport & Aquatic Centre",
+    id: 'SPORT',
+    name: 'Sport & Aquatic Centre',
     pixel: [1258, 1342], // Calculated from GPS using calibrated bounds
     gps: { lat: -33.772661, lng: 151.110771 },
-    source: "OSM (pixel from GPS)",
+    source: 'OSM (pixel from GPS)',
   },
   {
-    id: "DLC",
-    name: "Dunmore Lang College",
+    id: 'DLC',
+    name: 'Dunmore Lang College',
     pixel: [2520, 2363], // Calculated from GPS using calibrated bounds
     gps: { lat: -33.77817, lng: 151.11606 },
-    source: "OSM (pixel from GPS)",
+    source: 'OSM (pixel from GPS)',
   },
 ];
 
@@ -144,32 +144,32 @@ export const PRIMARY_GCPS: GCP[] = [
  */
 export const SECONDARY_GCPS: GCP[] = [
   {
-    id: "4ER",
-    name: "4 Eastern Road (Business School)",
+    id: '4ER',
+    name: '4 Eastern Road (Business School)',
     pixel: [2502, 1925], // Calculated from GPS
     gps: { lat: -33.775808, lng: 151.115985 },
-    source: "OSM (pixel from GPS)",
+    source: 'OSM (pixel from GPS)',
   },
   {
-    id: "OBS",
-    name: "Observatory",
+    id: 'OBS',
+    name: 'Observatory',
     pixel: [1342, 915], // Calculated from GPS
     gps: { lat: -33.770357, lng: 151.111125 },
-    source: "OSM (pixel from GPS)",
+    source: 'OSM (pixel from GPS)',
   },
   {
-    id: "COCHLEAR",
-    name: "Cochlear Limited",
+    id: 'COCHLEAR',
+    name: 'Cochlear Limited',
     pixel: [1934, 2230], // Calculated from GPS
     gps: { lat: -33.777452, lng: 151.113603 },
-    source: "OSM (pixel from GPS)",
+    source: 'OSM (pixel from GPS)',
   },
   {
-    id: "LOTUS",
-    name: "Lotus Theatre",
+    id: 'LOTUS',
+    name: 'Lotus Theatre',
     pixel: [1230, 1707], // Calculated from GPS
     gps: { lat: -33.774631, lng: 151.110656 },
-    source: "OSM (pixel from GPS)",
+    source: 'OSM (pixel from GPS)',
   },
 ];
 
@@ -241,7 +241,7 @@ export function gpsToPixelWithBounds(
  */
 export function solveForOptimalBounds(gcps: GCP[]): MapBounds {
   if (gcps.length < 2) {
-    throw new Error("Need at least 2 GCPs to solve for bounds");
+    throw new Error('Need at least 2 GCPs to solve for bounds');
   }
 
   // For a simple linear fit, we solve two independent 1D problems:
@@ -275,10 +275,7 @@ export function solveForOptimalBounds(gcps: GCP[]): MapBounds {
  * Simple linear regression: y = intercept + slope * x
  * Uses least squares to find optimal intercept and slope
  */
-function linearRegression(
-  x: number[],
-  y: number[],
-): { intercept: number; slope: number } {
+function linearRegression(x: number[], y: number[]): { intercept: number; slope: number } {
   const n = x.length;
 
   // Calculate means
@@ -312,18 +309,10 @@ function linearRegression(
 export function calculateErrors(gcps: GCP[], bounds: MapBounds): GCPError[] {
   return gcps.map((gcp) => {
     // Compute what pixel position the GPS coords would map to with these bounds
-    const computedPixel = gpsToPixelWithBounds(
-      gcp.gps.lat,
-      gcp.gps.lng,
-      bounds,
-    );
+    const computedPixel = gpsToPixelWithBounds(gcp.gps.lat, gcp.gps.lng, bounds);
 
     // Compute what GPS coords the pixel position would map to
-    const computedGps = pixelToGpsWithBounds(
-      gcp.pixel[0],
-      gcp.pixel[1],
-      bounds,
-    );
+    const computedGps = pixelToGpsWithBounds(gcp.pixel[0], gcp.pixel[1], bounds);
 
     // Calculate pixel error
     const pixelDx = computedPixel[0] - gcp.pixel[0];
@@ -356,10 +345,7 @@ export function calculateErrors(gcps: GCP[], bounds: MapBounds): GCPError[] {
 export function calculateRMSE(errors: GCPError[]): number {
   if (errors.length === 0) return 0;
 
-  const sumSquaredErrors = errors.reduce(
-    (sum, err) => sum + err.pixelError * err.pixelError,
-    0,
-  );
+  const sumSquaredErrors = errors.reduce((sum, err) => sum + err.pixelError * err.pixelError, 0);
   return Math.sqrt(sumSquaredErrors / errors.length);
 }
 
@@ -367,10 +353,7 @@ export function calculateRMSE(errors: GCPError[]): number {
  * Convert pixel error to approximate meters
  * At this latitude (~33.77S), 1 degree latitude ~ 110.9km, 1 degree longitude ~ 92.7km
  */
-export function pixelErrorToMeters(
-  pixelError: number,
-  bounds: MapBounds,
-): number {
+export function pixelErrorToMeters(pixelError: number, bounds: MapBounds): number {
   // Calculate meters per pixel
   const latSpan = bounds.north - bounds.south;
   const lngSpan = bounds.east - bounds.west;
@@ -408,9 +391,8 @@ export function runCalibration(gcps: GCP[] = PRIMARY_GCPS): CalibrationResult {
 
   // Find max error
   const maxError = errors.reduce(
-    (max, err) =>
-      err.pixelError > max.error ? { error: err.pixelError, id: err.id } : max,
-    { error: 0, id: "" },
+    (max, err) => (err.pixelError > max.error ? { error: err.pixelError, id: err.id } : max),
+    { error: 0, id: '' },
   );
 
   return {
@@ -435,9 +417,8 @@ export function validateCalibration(
   const rmseMeters = pixelErrorToMeters(rmsePixels, bounds);
 
   const maxError = errors.reduce(
-    (max, err) =>
-      err.pixelError > max.error ? { error: err.pixelError, id: err.id } : max,
-    { error: 0, id: "" },
+    (max, err) => (err.pixelError > max.error ? { error: err.pixelError, id: err.id } : max),
+    { error: 0, id: '' },
   );
 
   return {
@@ -459,19 +440,19 @@ export function validateCalibration(
  */
 export function formatCalibrationReport(result: CalibrationResult): string {
   const lines: string[] = [
-    "=== GCP Calibration Report ===",
-    "",
-    "Optimized Bounds:",
+    '=== GCP Calibration Report ===',
+    '',
+    'Optimized Bounds:',
     `  south: ${result.bounds.south.toFixed(7)}`,
     `  north: ${result.bounds.north.toFixed(7)}`,
     `  west:  ${result.bounds.west.toFixed(7)}`,
     `  east:  ${result.bounds.east.toFixed(7)}`,
-    "",
-    "Error Metrics:",
+    '',
+    'Error Metrics:',
     `  RMSE: ${result.rmsePixels.toFixed(2)} pixels (~${result.rmseMeters.toFixed(1)}m)`,
     `  Max Error: ${result.maxErrorPixels.toFixed(2)} pixels (${result.maxErrorBuilding})`,
-    "",
-    "Per-GCP Errors:",
+    '',
+    'Per-GCP Errors:',
   ];
 
   for (const err of result.errors) {
@@ -482,7 +463,7 @@ export function formatCalibrationReport(result: CalibrationResult): string {
     );
   }
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 /**
@@ -515,20 +496,20 @@ export function getBoundsAsLeaflet(bounds: MapBounds): string {
  * Run calibration and log results (for development/debugging)
  */
 export function runCalibrationWithLogging(): CalibrationResult {
-  gcpLog.log("Running GCP calibration...");
+  gcpLog.log('Running GCP calibration...');
   gcpLog.log(`Using ${PRIMARY_GCPS.length} primary GCPs`);
 
   const result = runCalibration();
   gcpLog.log(formatCalibrationReport(result));
 
-  gcpLog.log("\n--- Code to update MAP_CONFIG ---");
+  gcpLog.log('\n--- Code to update MAP_CONFIG ---');
   gcpLog.log(getBoundsAsCode(result.bounds));
 
-  gcpLog.log("\n--- Code to update CAMPUS_BOUNDS ---");
+  gcpLog.log('\n--- Code to update CAMPUS_BOUNDS ---');
   gcpLog.log(getBoundsAsLeaflet(result.bounds));
 
   // Validate against secondary GCPs
-  gcpLog.log("\n=== Validation against Secondary GCPs ===");
+  gcpLog.log('\n=== Validation against Secondary GCPs ===');
   const validation = validateCalibration(result.bounds);
   gcpLog.log(
     `Validation RMSE: ${validation.rmsePixels.toFixed(2)} pixels (~${validation.rmseMeters.toFixed(1)}m)`,
@@ -576,7 +557,7 @@ export interface AffineTransform {
  */
 export function solveAffineTransform(gcps: GCP[]): AffineTransform {
   if (gcps.length < 3) {
-    throw new Error("Need at least 3 GCPs to solve affine transformation");
+    throw new Error('Need at least 3 GCPs to solve affine transformation');
   }
 
   const n = gcps.length;
@@ -646,9 +627,7 @@ export function solveAffineTransform(gcps: GCP[]): AffineTransform {
     M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]);
 
   if (Math.abs(det) < 1e-10) {
-    throw new Error(
-      "GCPs are collinear or degenerate - cannot solve affine transformation",
-    );
+    throw new Error('GCPs are collinear or degenerate - cannot solve affine transformation');
   }
 
   // Calculate inverse of M using adjugate / determinant
@@ -717,7 +696,7 @@ export function gpsToPixelAffine(
   const det = a * e - b * d;
 
   if (Math.abs(det) < 1e-15) {
-    throw new Error("Affine transformation is degenerate - cannot invert");
+    throw new Error('Affine transformation is degenerate - cannot invert');
   }
 
   const x = (e * (lng - c) - b * (lat - f)) / det;
@@ -741,10 +720,7 @@ export interface AffineCalibrationResult {
 /**
  * Calculate errors using affine transformation
  */
-export function calculateAffineErrors(
-  gcps: GCP[],
-  transform: AffineTransform,
-): GCPError[] {
+export function calculateAffineErrors(gcps: GCP[], transform: AffineTransform): GCPError[] {
   return gcps.map((gcp) => {
     // Compute what pixel position the GPS coords would map to with this transform
     const computedPixel = gpsToPixelAffine(gcp.gps.lat, gcp.gps.lng, transform);
@@ -780,9 +756,7 @@ export function calculateAffineErrors(
 /**
  * Run affine calibration using GCPs
  */
-export function runAffineCalibration(
-  gcps: GCP[] = PRIMARY_GCPS,
-): AffineCalibrationResult {
+export function runAffineCalibration(gcps: GCP[] = PRIMARY_GCPS): AffineCalibrationResult {
   // Solve for affine transformation
   const transform = solveAffineTransform(gcps);
 
@@ -793,10 +767,7 @@ export function runAffineCalibration(
   const rmsePixels =
     errors.length > 0
       ? Math.sqrt(
-          errors.reduce(
-            (sum, err) => sum + err.pixelError * err.pixelError,
-            0,
-          ) / errors.length,
+          errors.reduce((sum, err) => sum + err.pixelError * err.pixelError, 0) / errors.length,
         )
       : 0;
 
@@ -804,18 +775,15 @@ export function runAffineCalibration(
   const LAT_DEG_TO_METERS = 110900;
   const LNG_DEG_TO_METERS = 92700;
   const avgMetersPerPixel =
-    ((Math.abs(transform.e) * GCP_MAP_HEIGHT * LAT_DEG_TO_METERS) /
-      GCP_MAP_HEIGHT +
-      (Math.abs(transform.a) * GCP_MAP_WIDTH * LNG_DEG_TO_METERS) /
-        GCP_MAP_WIDTH) /
+    ((Math.abs(transform.e) * GCP_MAP_HEIGHT * LAT_DEG_TO_METERS) / GCP_MAP_HEIGHT +
+      (Math.abs(transform.a) * GCP_MAP_WIDTH * LNG_DEG_TO_METERS) / GCP_MAP_WIDTH) /
     2;
   const rmseMeters = rmsePixels * avgMetersPerPixel;
 
   // Find max error
   const maxError = errors.reduce(
-    (max, err) =>
-      err.pixelError > max.error ? { error: err.pixelError, id: err.id } : max,
-    { error: 0, id: "" },
+    (max, err) => (err.pixelError > max.error ? { error: err.pixelError, id: err.id } : max),
+    { error: 0, id: '' },
   );
 
   return {
@@ -831,22 +799,20 @@ export function runAffineCalibration(
 /**
  * Format affine calibration report
  */
-export function formatAffineCalibrationReport(
-  result: AffineCalibrationResult,
-): string {
+export function formatAffineCalibrationReport(result: AffineCalibrationResult): string {
   const { transform } = result;
   const lines: string[] = [
-    "=== Affine Transformation Calibration Report ===",
-    "",
-    "Transformation Coefficients:",
+    '=== Affine Transformation Calibration Report ===',
+    '',
+    'Transformation Coefficients:',
     `  lng = ${transform.a.toExponential(6)} * x + ${transform.b.toExponential(6)} * y + ${transform.c.toFixed(7)}`,
     `  lat = ${transform.d.toExponential(6)} * x + ${transform.e.toExponential(6)} * y + ${transform.f.toFixed(7)}`,
-    "",
-    "Error Metrics:",
+    '',
+    'Error Metrics:',
     `  RMSE: ${result.rmsePixels.toFixed(2)} pixels (~${result.rmseMeters.toFixed(1)}m)`,
     `  Max Error: ${result.maxErrorPixels.toFixed(2)} pixels (${result.maxErrorBuilding})`,
-    "",
-    "Per-GCP Errors:",
+    '',
+    'Per-GCP Errors:',
   ];
 
   for (const err of result.errors) {
@@ -857,7 +823,7 @@ export function formatAffineCalibrationReport(
     );
   }
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 /**

@@ -1,15 +1,15 @@
-import { Metadata } from "next";
-import { Suspense } from "react";
-import { APP_CONFIG } from "@/lib/config";
-import ResetPasswordClient from "./reset-password-client";
+import { Metadata } from 'next';
+import { Suspense } from 'react';
+import { APP_CONFIG } from '@/lib/config';
+import ResetPasswordClient from './reset-password-client';
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - Reset Password`,
-  description: "Reset your password to access your account.",
+  description: 'Reset your password to access your account.',
   openGraph: {
     title: `${APP_CONFIG.name} - Reset Password`,
-    description: "Reset your password to access your account.",
-    type: "website",
+    description: 'Reset your password to access your account.',
+    type: 'website',
   },
   robots: {
     index: false,

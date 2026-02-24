@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface StrengthMeterProps {
   score: number;
@@ -14,28 +14,24 @@ export function StrengthMeter({ score, label }: StrengthMeterProps) {
           <div
             key={level}
             className={cn(
-              "h-full w-full rounded-full transition-colors duration-300",
+              'h-full w-full rounded-full transition-colors duration-300',
               score >= level
                 ? score <= 1
-                  ? "bg-red-500"
+                  ? 'bg-red-500'
                   : score === 2
-                    ? "bg-yellow-500"
+                    ? 'bg-yellow-500'
                     : score === 3
-                      ? "bg-blue-500"
-                      : "bg-green-500"
-                : "bg-muted",
+                      ? 'bg-blue-500'
+                      : 'bg-green-500'
+                : 'bg-muted',
             )}
           />
         ))}
       </div>
       <p
         className={cn(
-          "text-xs text-right font-medium",
-          score <= 1
-            ? "text-red-500"
-            : score === 4
-              ? "text-green-600"
-              : "text-muted-foreground",
+          'text-xs text-right font-medium',
+          score <= 1 ? 'text-red-500' : score === 4 ? 'text-green-600' : 'text-muted-foreground',
         )}
       >
         {label}

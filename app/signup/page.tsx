@@ -1,16 +1,16 @@
 // app/signup/page.tsx
-import { Metadata } from "next";
-import { Suspense } from "react";
-import { APP_CONFIG } from "@/lib/config";
-import SignupClient from "./SignupClient";
+import { Metadata } from 'next';
+import { Suspense } from 'react';
+import { APP_CONFIG } from '@/lib/config';
+import SignupClient from './SignupClient';
 
 export const metadata: Metadata = {
   title: `${APP_CONFIG.name} - Sign Up`,
-  description: "Create your Syllabus Sync account.",
+  description: 'Create your Syllabus Sync account.',
   openGraph: {
     title: `${APP_CONFIG.name} - Sign Up`,
-    description: "Create your Syllabus Sync account.",
-    type: "website",
+    description: 'Create your Syllabus Sync account.',
+    type: 'website',
   },
   robots: {
     index: false,

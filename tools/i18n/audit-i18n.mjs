@@ -1,13 +1,13 @@
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
-const LOCALES_DIR = "locales";
-const BASE_LOCALE = "en";
-const TRANSLATION_FILE = "translations.json";
+const LOCALES_DIR = 'locales';
+const BASE_LOCALE = 'en';
+const TRANSLATION_FILE = 'translations.json';
 
 async function main() {
   const baseFilePath = path.join(LOCALES_DIR, BASE_LOCALE, TRANSLATION_FILE);
-  const baseContent = await fs.readFile(baseFilePath, "utf8");
+  const baseContent = await fs.readFile(baseFilePath, 'utf8');
 
   // Check for duplicate keys in raw content
   const lines = baseContent.split(/\r?\n/);
@@ -31,12 +31,10 @@ async function main() {
   }
 
   if (duplicates.length > 0) {
-    console.log("Duplicate keys found in en/translations.json:");
-    duplicates.forEach((d) =>
-      console.log(`- ${d.key}: lines ${d.firstLine} and ${d.secondLine}`),
-    );
+    console.log('Duplicate keys found in en/translations.json:');
+    duplicates.forEach((d) => console.log(`- ${d.key}: lines ${d.firstLine} and ${d.secondLine}`));
   } else {
-    console.log("No duplicate keys found in en/translations.json.");
+    console.log('No duplicate keys found in en/translations.json.');
   }
 
   const baseJson = JSON.parse(baseContent);
@@ -51,7 +49,7 @@ async function main() {
 
   for (const locale of locales) {
     const localeFilePath = path.join(LOCALES_DIR, locale, TRANSLATION_FILE);
-    const content = await fs.readFile(localeFilePath, "utf8");
+    const content = await fs.readFile(localeFilePath, 'utf8');
     const json = JSON.parse(content);
     const localeKeySet = new Set(Object.keys(json));
 
@@ -64,14 +62,12 @@ async function main() {
         console.log(`  Missing keys (${missing.length}):`);
         // Limit to 10 for brevity in console
         missing.slice(0, 10).forEach((k) => console.log(`    - ${k}`));
-        if (missing.length > 10)
-          console.log(`    ... and ${missing.length - 10} more`);
+        if (missing.length > 10) console.log(`    ... and ${missing.length - 10} more`);
       }
       if (extra.length > 0) {
         console.log(`  Extra keys (${extra.length}):`);
         extra.slice(0, 10).forEach((k) => console.log(`    - ${k}`));
-        if (extra.length > 10)
-          console.log(`    ... and ${extra.length - 10} more`);
+        if (extra.length > 10) console.log(`    ... and ${extra.length - 10} more`);
       }
     }
   }

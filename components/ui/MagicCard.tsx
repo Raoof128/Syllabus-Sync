@@ -1,12 +1,7 @@
-"use client";
+'use client';
 
-import React, {
-  useRef,
-  useState,
-  useCallback,
-  useSyncExternalStore,
-} from "react";
-import { cn } from "@/lib/utils";
+import React, { useRef, useState, useCallback, useSyncExternalStore } from 'react';
+import { cn } from '@/lib/utils';
 
 interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -21,15 +16,14 @@ interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {
 // ============================================================================
 
 const subscribeToReducedMotion = (callback: () => void) => {
-  if (typeof window === "undefined") return () => {};
-  const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-  mediaQuery.addEventListener("change", callback);
-  return () => mediaQuery.removeEventListener("change", callback);
+  if (typeof window === 'undefined') return () => {};
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  mediaQuery.addEventListener('change', callback);
+  return () => mediaQuery.removeEventListener('change', callback);
 };
 
 const getReducedMotionSnapshot = () =>
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const getReducedMotionServerSnapshot = () => false;
 
@@ -103,23 +97,23 @@ export const MagicCard = ({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        "mq-magic-card mouse-glow-card relative group",
-        isLiquidEnhanced && "mq-liquid-enhanced",
+        'mq-magic-card mouse-glow-card relative group',
+        isLiquidEnhanced && 'mq-liquid-enhanced',
         // Disable mouse glow in reduced motion
-        prefersReducedMotion && "reduce-motion",
+        prefersReducedMotion && 'reduce-motion',
         className,
       )}
       style={
         prefersReducedMotion
           ? undefined
           : ({
-              "--mouse-x": `${position.x}px`,
-              "--mouse-y": `${position.y}px`,
-              "--glow-opacity": opacity,
+              '--mouse-x': `${position.x}px`,
+              '--mouse-y': `${position.y}px`,
+              '--glow-opacity': opacity,
             } as React.CSSProperties)
       }
       {...props}
-      aria-hidden={prefersReducedMotion ? "false" : undefined}
+      aria-hidden={prefersReducedMotion ? 'false' : undefined}
     >
       {/* 
         Note: The glow effect is handled via CSS in magic-card.css

@@ -1,25 +1,16 @@
 // components/ProfileCard.tsx
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Image from "next/image";
-import { Card, CardContent, CardHeader } from "@/components/ui/mq/card";
-import { Button } from "@/components/ui/mq/button";
-import { Badge } from "@/components/ui/mq/badge";
-import {
-  User,
-  Mail,
-  Calendar,
-  Settings,
-  Edit,
-  Trash2,
-  Check,
-  Camera,
-} from "lucide-react";
-import { UserProfile } from "@/lib/store/profilesStore";
-import { cn } from "@/lib/utils";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { LiquidGlassCard, SubCard } from "@/components/ui/LiquidGlassCard";
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { Card, CardContent, CardHeader } from '@/components/ui/mq/card';
+import { Button } from '@/components/ui/mq/button';
+import { Badge } from '@/components/ui/mq/badge';
+import { User, Mail, Calendar, Settings, Edit, Trash2, Check, Camera } from 'lucide-react';
+import { UserProfile } from '@/lib/store/profilesStore';
+import { cn } from '@/lib/utils';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { LiquidGlassCard, SubCard } from '@/components/ui/LiquidGlassCard';
 
 interface ProfileCardProps {
   profile: UserProfile;
@@ -31,14 +22,7 @@ interface ProfileCardProps {
 }
 
 const ProfileCard = React.memo(
-  ({
-    profile,
-    isCurrent,
-    onEdit,
-    onDelete,
-    onSetCurrent,
-    onUpdate,
-  }: ProfileCardProps) => {
+  ({ profile, isCurrent, onEdit, onDelete, onSetCurrent, onUpdate }: ProfileCardProps) => {
     const { t } = useTypedTranslation();
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,14 +47,11 @@ const ProfileCard = React.memo(
     };
 
     return (
-      <LiquidGlassCard
-        liquidGlass
-        className={cn(isCurrent && "ring-2 ring-mq-primary")}
-      >
+      <LiquidGlassCard liquidGlass className={cn(isCurrent && 'ring-2 ring-mq-primary')}>
         <Card
           className={cn(
-            "relative transition-all duration-300 border border-mq-border bg-mq-card-background",
-            isCurrent ? "bg-mq-primary/10" : "",
+            'relative transition-all duration-300 border border-mq-border bg-mq-card-background',
+            isCurrent ? 'bg-mq-primary/10' : '',
           )}
         >
           <CardHeader className="flex flex-col sm:flex-row items-start justify-between gap-3">
@@ -99,13 +80,13 @@ const ProfileCard = React.memo(
                     accept="image/*"
                     onChange={handleAvatarChange}
                     className="hidden"
-                    aria-label={t("changeAvatar")}
+                    aria-label={t('changeAvatar')}
                   />
                 </label>
 
                 {isCurrent && (
                   <Badge className="absolute -top-1 -right-1 bg-mq-success text-white text-xs">
-                    {t("current")}
+                    {t('current')}
                   </Badge>
                 )}
               </div>
@@ -114,12 +95,10 @@ const ProfileCard = React.memo(
                 <h3 className="font-semibold text-sm sm:text-base text-mq-content">
                   {profile.name}
                 </h3>
-                <p className="text-xs sm:text-sm text-mq-content-secondary">
-                  {profile.email}
-                </p>
+                <p className="text-xs sm:text-sm text-mq-content-secondary">{profile.email}</p>
                 <div className="flex items-center gap-4 mt-1 text-xs text-mq-content-tertiary">
                   <span>
-                    {t("idPrefix")}
+                    {t('idPrefix')}
                     {profile.studentId}
                   </span>
                   <span>•</span>
@@ -137,7 +116,7 @@ const ProfileCard = React.memo(
                   size="sm"
                   onClick={() => onEdit(profile)}
                   className="h-8 w-8 p-0 text-mq-content-secondary hover:text-mq-primary"
-                  aria-label={t("editProfileAria", { name: profile.name })}
+                  aria-label={t('editProfileAria', { name: profile.name })}
                 >
                   <Edit className="w-4 h-4" />
                 </Button>
@@ -147,7 +126,7 @@ const ProfileCard = React.memo(
                 size="sm"
                 onClick={() => onSetCurrent(profile.id)}
                 className="h-8 w-8 p-0 text-mq-content-secondary hover:text-mq-success"
-                aria-label={t("useProfileAria", { name: profile.name })}
+                aria-label={t('useProfileAria', { name: profile.name })}
               >
                 <Check className="w-4 h-4" />
               </Button>
@@ -157,7 +136,7 @@ const ProfileCard = React.memo(
                   size="sm"
                   onClick={() => setDeleteConfirm(true)}
                   className="h-8 w-8 p-0 text-mq-error hover:text-mq-error/80"
-                  aria-label={t("deleteProfileAria", { name: profile.name })}
+                  aria-label={t('deleteProfileAria', { name: profile.name })}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -171,26 +150,24 @@ const ProfileCard = React.memo(
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
                   <span className="text-sm text-mq-content-secondary">
-                    {t("emailNotifications")}
+                    {t('emailNotifications')}
                   </span>
                 </div>
                 <button
                   role="switch"
                   aria-checked={profile.preferences.notifications}
-                  onClick={() => togglePreference("notifications")}
+                  onClick={() => togglePreference('notifications')}
                   className={cn(
-                    "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2",
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2',
                     profile.preferences.notifications
-                      ? "bg-mq-success"
-                      : "bg-mq-background-tertiary",
+                      ? 'bg-mq-success'
+                      : 'bg-mq-background-tertiary',
                   )}
                 >
                   <span
                     className={cn(
-                      "inline-block h-4 w-4 transform rounded-full bg-mq-background transition-transform shadow-sm",
-                      profile.preferences.notifications
-                        ? "translate-x-6"
-                        : "translate-x-1",
+                      'inline-block h-4 w-4 transform rounded-full bg-mq-background transition-transform shadow-sm',
+                      profile.preferences.notifications ? 'translate-x-6' : 'translate-x-1',
                     )}
                   />
                 </button>
@@ -198,27 +175,23 @@ const ProfileCard = React.memo(
               <SubCard className="flex items-center justify-between border border-mq-border">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  <span className="text-sm text-mq-content-secondary">
-                    {t("emailReminders")}
-                  </span>
+                  <span className="text-sm text-mq-content-secondary">{t('emailReminders')}</span>
                 </div>
                 <button
                   role="switch"
                   aria-checked={profile.preferences.emailReminders}
-                  onClick={() => togglePreference("emailReminders")}
+                  onClick={() => togglePreference('emailReminders')}
                   className={cn(
-                    "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2",
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2',
                     profile.preferences.emailReminders
-                      ? "bg-mq-success"
-                      : "bg-mq-background-tertiary",
+                      ? 'bg-mq-success'
+                      : 'bg-mq-background-tertiary',
                   )}
                 >
                   <span
                     className={cn(
-                      "inline-block h-4 w-4 transform rounded-full bg-mq-background transition-transform shadow-sm",
-                      profile.preferences.emailReminders
-                        ? "translate-x-6"
-                        : "translate-x-1",
+                      'inline-block h-4 w-4 transform rounded-full bg-mq-background transition-transform shadow-sm',
+                      profile.preferences.emailReminders ? 'translate-x-6' : 'translate-x-1',
                     )}
                   />
                 </button>
@@ -227,26 +200,24 @@ const ProfileCard = React.memo(
                 <div className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   <span className="text-sm text-mq-content-secondary">
-                    {t("pushNotifications")}
+                    {t('pushNotifications')}
                   </span>
                 </div>
                 <button
                   role="switch"
                   aria-checked={profile.preferences.pushNotifications}
-                  onClick={() => togglePreference("pushNotifications")}
+                  onClick={() => togglePreference('pushNotifications')}
                   className={cn(
-                    "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2",
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary focus:ring-offset-2',
                     profile.preferences.pushNotifications
-                      ? "bg-mq-success"
-                      : "bg-mq-background-tertiary",
+                      ? 'bg-mq-success'
+                      : 'bg-mq-background-tertiary',
                   )}
                 >
                   <span
                     className={cn(
-                      "inline-block h-4 w-4 transform rounded-full bg-mq-background transition-transform shadow-sm",
-                      profile.preferences.pushNotifications
-                        ? "translate-x-6"
-                        : "translate-x-1",
+                      'inline-block h-4 w-4 transform rounded-full bg-mq-background transition-transform shadow-sm',
+                      profile.preferences.pushNotifications ? 'translate-x-6' : 'translate-x-1',
                     )}
                   />
                 </button>
@@ -257,34 +228,26 @@ const ProfileCard = React.memo(
           <div className="px-4 pb-4">
             <label className="flex items-center justify-center gap-2 w-full p-2 text-sm font-medium text-mq-content-secondary bg-mq-card-background hover:bg-mq-hover-background rounded-mq border border-mq-border cursor-pointer transition-colors">
               <Camera className="h-4 w-4" />
-              <span>{t("changeAvatar")}</span>
+              <span>{t('changeAvatar')}</span>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleAvatarChange}
                 className="hidden"
-                aria-label={t("changeAvatar")}
+                aria-label={t('changeAvatar')}
               />
             </label>
-            {profile.avatar?.startsWith("data:") && (
-              <p className="mt-2 text-xs text-mq-warning">
-                {t("avatarLocalOnlyWarning")}
-              </p>
+            {profile.avatar?.startsWith('data:') && (
+              <p className="mt-2 text-xs text-mq-warning">{t('avatarLocalOnlyWarning')}</p>
             )}
           </div>
 
           {deleteConfirm && onDelete && (
             <div className="m-4 mt-0 p-4 bg-mq-error/10 border border-mq-error/20 rounded-mq">
-              <p className="text-sm text-mq-error mb-3 font-medium">
-                {t("deleteProfileConfirm")}
-              </p>
+              <p className="text-sm text-mq-error mb-3 font-medium">{t('deleteProfileConfirm')}</p>
               <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setDeleteConfirm(false)}
-                >
-                  {t("cancel")}
+                <Button variant="secondary" size="sm" onClick={() => setDeleteConfirm(false)}>
+                  {t('cancel')}
                 </Button>
                 <Button
                   variant="destructive"
@@ -294,7 +257,7 @@ const ProfileCard = React.memo(
                     setDeleteConfirm(false);
                   }}
                 >
-                  {t("deleteProfile")}
+                  {t('deleteProfile')}
                 </Button>
               </div>
             </div>
@@ -305,6 +268,6 @@ const ProfileCard = React.memo(
   },
 );
 
-ProfileCard.displayName = "ProfileCard";
+ProfileCard.displayName = 'ProfileCard';
 
 export default ProfileCard;

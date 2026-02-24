@@ -2,7 +2,7 @@
  * Real-time Navigation Tests
  * Tests for GPS smoothing, route tracking, and navigation state management
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   GpsPositionSmoother,
   NavigationStateManager,
@@ -11,16 +11,16 @@ import {
   generateNavigationText,
   formatETA,
   OFF_ROUTE_THRESHOLD,
-} from "@/features/map/lib/realtimeNavigation";
+} from '@/features/map/lib/realtimeNavigation';
 
-describe("GpsPositionSmoother", () => {
+describe('GpsPositionSmoother', () => {
   let smoother: GpsPositionSmoother;
 
   beforeEach(() => {
     smoother = new GpsPositionSmoother();
   });
 
-  it("should smooth GPS positions with Kalman filter", () => {
+  it('should smooth GPS positions with Kalman filter', () => {
     // Simulate a series of noisy GPS positions
     const positions = [
       {
@@ -68,7 +68,7 @@ describe("GpsPositionSmoother", () => {
     expect(lastSmoothed?.confidence).toBeGreaterThan(0);
   });
 
-  it("should calculate movement heading from position history", () => {
+  it('should calculate movement heading from position history', () => {
     // Simulate walking north
     const positions = [
       {
@@ -106,12 +106,11 @@ describe("GpsPositionSmoother", () => {
     // North can be 0° or close to 360° due to wrapping
     expect(heading).not.toBeNull();
     // Check if heading is within 20° of north (either 0-20 or 340-360)
-    const isNorth =
-      (heading! >= 0 && heading! <= 20) || (heading! >= 340 && heading! <= 360);
+    const isNorth = (heading! >= 0 && heading! <= 20) || (heading! >= 340 && heading! <= 360);
     expect(isNorth).toBe(true);
   });
 
-  it("should calculate speed from position history", () => {
+  it('should calculate speed from position history', () => {
     // Simulate walking at ~5 km/h (~1.4 m/s)
     // Moving ~2.8m in 2 seconds
     const positions = [
@@ -151,7 +150,7 @@ describe("GpsPositionSmoother", () => {
     expect(speed).toBeLessThan(3.0);
   });
 
-  it("should reset properly", () => {
+  it('should reset properly', () => {
     smoother.update({
       lat: -33.7737,
       lng: 151.1126,
@@ -168,8 +167,8 @@ describe("GpsPositionSmoother", () => {
   });
 });
 
-describe("findClosestPointOnRoute", () => {
-  it("should find closest point on a simple route", () => {
+describe('findClosestPointOnRoute', () => {
+  it('should find closest point on a simple route', () => {
     // Route from A to B (west to east)
     const route: [number, number][] = [
       [151.112, -33.7737], // [lng, lat]
@@ -185,7 +184,7 @@ describe("findClosestPointOnRoute", () => {
     expect(result.closestPoint[1]).toBeCloseTo(-33.7737, 3); // lat on the route
   });
 
-  it("should detect user far from route", () => {
+  it('should detect user far from route', () => {
     const route: [number, number][] = [
       [151.112, -33.7737],
       [151.113, -33.7737],
@@ -198,8 +197,8 @@ describe("findClosestPointOnRoute", () => {
   });
 });
 
-describe("calculateRemainingDistance", () => {
-  it("should calculate remaining distance correctly", () => {
+describe('calculateRemainingDistance', () => {
+  it('should calculate remaining distance correctly', () => {
     // Simple route: ~100m total
     const route: [number, number][] = [
       [151.112, -33.7737],
@@ -218,20 +217,20 @@ describe("calculateRemainingDistance", () => {
   });
 });
 
-describe("NavigationStateManager", () => {
+describe('NavigationStateManager', () => {
   let manager: NavigationStateManager;
 
   beforeEach(() => {
     manager = new NavigationStateManager();
   });
 
-  it("should start in idle state", () => {
+  it('should start in idle state', () => {
     const state = manager.getState();
-    expect(state.status).toBe("idle");
+    expect(state.status).toBe('idle');
     expect(state.routeCoordinates).toHaveLength(0);
   });
 
-  it("should start navigation with route", () => {
+  it('should start navigation with route', () => {
     const route: [number, number][] = [
       [151.112, -33.7737],
       [151.113, -33.7737],
@@ -240,12 +239,12 @@ describe("NavigationStateManager", () => {
     manager.startNavigation(route, [], 100);
 
     const state = manager.getState();
-    expect(state.status).toBe("navigating");
+    expect(state.status).toBe('navigating');
     expect(state.totalDistance).toBe(100);
     expect(state.routeCoordinates).toHaveLength(2);
   });
 
-  it("should stop navigation", () => {
+  it('should stop navigation', () => {
     const route: [number, number][] = [
       [151.112, -33.7737],
       [151.113, -33.7737],
@@ -255,58 +254,58 @@ describe("NavigationStateManager", () => {
     manager.stopNavigation();
 
     const state = manager.getState();
-    expect(state.status).toBe("idle");
+    expect(state.status).toBe('idle');
   });
 });
 
-describe("generateNavigationText", () => {
-  it("should generate turn instruction text", () => {
+describe('generateNavigationText', () => {
+  it('should generate turn instruction text', () => {
     const instruction = {
-      type: "left" as const,
-      text: "Turn left",
+      type: 'left' as const,
+      text: 'Turn left',
       distance: 50,
       duration: 30,
       coordinates: [151.1125, -33.7737] as [number, number],
-      streetName: "Main Street",
+      streetName: 'Main Street',
     };
 
     const text = generateNavigationText(instruction, 100, true);
-    expect(text).toContain("left");
-    expect(text).toContain("Main Street");
+    expect(text).toContain('left');
+    expect(text).toContain('Main Street');
   });
 
-  it("should generate arrival text", () => {
+  it('should generate arrival text', () => {
     const instruction = {
-      type: "destination" as const,
-      text: "Arrive at destination",
+      type: 'destination' as const,
+      text: 'Arrive at destination',
       distance: 10,
       duration: 5,
       coordinates: [151.1125, -33.7737] as [number, number],
     };
 
     const text = generateNavigationText(instruction, 10, false);
-    expect(text.toLowerCase()).toContain("arrived");
+    expect(text.toLowerCase()).toContain('arrived');
   });
 });
 
-describe("formatETA", () => {
-  it("should format short ETA", () => {
+describe('formatETA', () => {
+  it('should format short ETA', () => {
     const eta = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
     const formatted = formatETA(eta);
-    expect(formatted).toContain("5");
-    expect(formatted).toContain("min");
+    expect(formatted).toContain('5');
+    expect(formatted).toContain('min');
   });
 
-  it("should format long ETA", () => {
+  it('should format long ETA', () => {
     const eta = new Date(Date.now() + 90 * 60 * 1000); // 90 minutes from now
     const formatted = formatETA(eta);
-    expect(formatted).toContain("1");
-    expect(formatted).toContain("h");
+    expect(formatted).toContain('1');
+    expect(formatted).toContain('h');
   });
 
-  it("should show arriving now for immediate arrival", () => {
+  it('should show arriving now for immediate arrival', () => {
     const eta = new Date(Date.now() - 1000); // In the past
     const formatted = formatETA(eta);
-    expect(formatted.toLowerCase()).toContain("arriving");
+    expect(formatted.toLowerCase()).toContain('arriving');
   });
 });

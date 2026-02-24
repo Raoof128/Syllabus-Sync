@@ -1,15 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect, useMemo, startTransition } from "react";
-import { createPortal } from "react-dom";
-import { ChevronDown, Search, X } from "lucide-react";
-import {
-  getCoursesByFaculty,
-  DEGREE_TYPE_LABELS,
-  DEGREE_TYPE_ORDER,
-} from "@/lib/data/mq-courses";
-import { cn } from "@/lib/utils";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
+import { useState, useRef, useEffect, useMemo, startTransition } from 'react';
+import { createPortal } from 'react-dom';
+import { ChevronDown, Search, X } from 'lucide-react';
+import { getCoursesByFaculty, DEGREE_TYPE_LABELS, DEGREE_TYPE_ORDER } from '@/lib/data/mq-courses';
+import { cn } from '@/lib/utils';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 type Props = {
   value: string;
@@ -19,16 +15,10 @@ type Props = {
   facultyFilter?: string;
 };
 
-export function CourseCombobox({
-  value,
-  onChange,
-  disabled,
-  error,
-  facultyFilter,
-}: Props) {
+export function CourseCombobox({ value, onChange, disabled, error, facultyFilter }: Props) {
   const { t } = useTypedTranslation();
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -45,7 +35,7 @@ export function CourseCombobox({
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       setDropdownStyle({
-        position: "fixed",
+        position: 'fixed',
         top: rect.bottom + 4,
         left: rect.left,
         width: rect.width,
@@ -67,8 +57,8 @@ export function CourseCombobox({
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
 
   // Reposition dropdown on scroll or resize while open
@@ -76,11 +66,11 @@ export function CourseCombobox({
     if (!open) return;
     updateDropdownPosition();
     const update = () => updateDropdownPosition();
-    window.addEventListener("scroll", update, true);
-    window.addEventListener("resize", update);
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
     return () => {
-      window.removeEventListener("scroll", update, true);
-      window.removeEventListener("resize", update);
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
     };
   }, [open]);
 
@@ -91,15 +81,10 @@ export function CourseCombobox({
 
   // Filter courses by query (name or code)
   const filtered = useMemo(() => {
-    const pool = facultyFilter
-      ? getCoursesByFaculty(facultyFilter)
-      : getCoursesByFaculty("");
+    const pool = facultyFilter ? getCoursesByFaculty(facultyFilter) : getCoursesByFaculty('');
     const q = query.trim().toLowerCase();
     if (!q) return pool;
-    return pool.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q),
-    );
+    return pool.filter((c) => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
   }, [query, facultyFilter]);
 
   // Group filtered results by simplified degree label, in defined order
@@ -129,17 +114,17 @@ export function CourseCombobox({
   const handleSelect = (name: string) => {
     onChange(name);
     setOpen(false);
-    setQuery("");
+    setQuery('');
   };
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onChange("");
-    setQuery("");
+    onChange('');
+    setQuery('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") setOpen(false);
+    if (e.key === 'Escape') setOpen(false);
   };
 
   const totalResults = filtered.length;
@@ -156,26 +141,18 @@ export function CourseCombobox({
         aria-haspopup="listbox"
         aria-expanded={open}
         className={cn(
-          "flex w-full items-center justify-between gap-2 rounded-mq border px-3 py-2 text-sm",
-          "bg-mq-input-background text-mq-content",
-          "transition-[color,box-shadow] outline-none",
-          "focus-visible:ring-[3px] focus-visible:border-mq-focus focus-visible:ring-mq-focus/40",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          "h-9",
-          error ? "border-red-500" : "border-mq-border",
-          open && "border-mq-focus ring-[3px] ring-mq-focus/40",
+          'flex w-full items-center justify-between gap-2 rounded-mq border px-3 py-2 text-sm',
+          'bg-mq-input-background text-mq-content',
+          'transition-[color,box-shadow] outline-none',
+          'focus-visible:ring-[3px] focus-visible:border-mq-focus focus-visible:ring-mq-focus/40',
+          'disabled:cursor-not-allowed disabled:opacity-50',
+          'h-9',
+          error ? 'border-red-500' : 'border-mq-border',
+          open && 'border-mq-focus ring-[3px] ring-mq-focus/40',
         )}
       >
-        <span
-          className={cn(
-            "truncate text-left flex-1",
-            !value && "text-mq-content-tertiary",
-          )}
-        >
-          {value ||
-            (facultyFilter
-              ? t("selectCoursePlaceholder")
-              : t("selectFacultyFirst"))}
+        <span className={cn('truncate text-left flex-1', !value && 'text-mq-content-tertiary')}>
+          {value || (facultyFilter ? t('selectCoursePlaceholder') : t('selectFacultyFirst'))}
         </span>
         <span className="flex items-center gap-0.5 shrink-0">
           {value && (
@@ -184,13 +161,13 @@ export function CourseCombobox({
               tabIndex={-1}
               onClick={handleClear}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
+                if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onChange("");
-                  setQuery("");
+                  onChange('');
+                  setQuery('');
                 }
               }}
-              aria-label={t("clearSelection")}
+              aria-label={t('clearSelection')}
               className="p-0.5 rounded hover:bg-mq-hover-background text-mq-content-secondary hover:text-mq-content transition-colors"
             >
               <X className="h-3 w-3" />
@@ -198,8 +175,8 @@ export function CourseCombobox({
           )}
           <ChevronDown
             className={cn(
-              "h-4 w-4 opacity-50 transition-transform duration-150",
-              open && "rotate-180",
+              'h-4 w-4 opacity-50 transition-transform duration-150',
+              open && 'rotate-180',
             )}
           />
         </span>
@@ -212,7 +189,7 @@ export function CourseCombobox({
           <div
             ref={dropdownRef}
             role="listbox"
-            aria-label={t("courseList")}
+            aria-label={t('courseList')}
             style={dropdownStyle}
             className="rounded-mq border border-mq-border bg-mq-card-background shadow-lg overflow-hidden"
           >
@@ -224,12 +201,12 @@ export function CourseCombobox({
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={t("searchCoursesPlaceholder")}
+                placeholder={t('searchCoursesPlaceholder')}
                 className="flex-1 bg-transparent text-sm text-mq-content placeholder:text-mq-content-tertiary outline-none"
               />
               {query && (
                 <span className="text-xs text-mq-content-secondary shrink-0">
-                  {totalResults} {t("results")}
+                  {totalResults} {t('results')}
                 </span>
               )}
             </div>
@@ -238,7 +215,7 @@ export function CourseCombobox({
             <div className="max-h-64 overflow-y-auto py-1">
               {grouped.size === 0 ? (
                 <div className="px-3 py-6 text-sm text-mq-content-secondary text-center">
-                  {t("noCoursesMatch")} &ldquo;{query}&rdquo;
+                  {t('noCoursesMatch')} &ldquo;{query}&rdquo;
                 </div>
               ) : (
                 Array.from(grouped.entries()).map(([label, courses]) => (
@@ -254,10 +231,10 @@ export function CourseCombobox({
                         aria-selected={value === course.name}
                         onClick={() => handleSelect(course.name)}
                         className={cn(
-                          "w-full text-left px-3 py-1.5 text-sm transition-colors",
+                          'w-full text-left px-3 py-1.5 text-sm transition-colors',
                           value === course.name
-                            ? "bg-mq-primary/10 text-mq-primary font-medium"
-                            : "text-mq-content hover:bg-mq-hover-background",
+                            ? 'bg-mq-primary/10 text-mq-primary font-medium'
+                            : 'text-mq-content hover:bg-mq-hover-background',
                         )}
                       >
                         {course.name}

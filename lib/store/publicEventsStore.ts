@@ -5,15 +5,11 @@
  * These events are visible to all users and can be added to personal calendar.
  */
 
-import { create } from "zustand";
-import { devtools } from "zustand/middleware";
-import { createBrowserClient } from "@/lib/supabase/client";
-import {
-  PublicEvent,
-  PublicEventFromDB,
-  transformPublicEvent,
-} from "@/lib/types/publicEvents";
-import { useEventsStore } from "@/lib/store/eventsStore";
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { createBrowserClient } from '@/lib/supabase/client';
+import { PublicEvent, PublicEventFromDB, transformPublicEvent } from '@/lib/types/publicEvents';
+import { useEventsStore } from '@/lib/store/eventsStore';
 
 interface PublicEventsState {
   // Data
@@ -30,9 +26,7 @@ interface PublicEventsState {
 
   // Actions
   fetchPublicEvents: () => Promise<void>;
-  addToCalendar: (
-    eventId: string,
-  ) => Promise<{
+  addToCalendar: (eventId: string) => Promise<{
     success: boolean;
     userEventId?: string;
     alreadyAdded?: boolean;
@@ -60,24 +54,22 @@ export const usePublicEventsStore = create<PublicEventsState>()(
           const supabase = createBrowserClient();
 
           const { data, error } = await supabase
-            .from("public_events")
-            .select("*")
-            .is("deleted_at", null)
-            .gte("start_at", new Date().toISOString())
-            .order("priority", { ascending: false })
-            .order("start_at", { ascending: true });
+            .from('public_events')
+            .select('*')
+            .is('deleted_at', null)
+            .gte('start_at', new Date().toISOString())
+            .order('priority', { ascending: false })
+            .order('start_at', { ascending: true });
 
           if (error) {
             set({
               isLoading: false,
-              error: error.message || "Failed to load events",
+              error: error.message || 'Failed to load events',
             });
             return;
           }
 
-          const events = (data as PublicEventFromDB[]).map(
-            transformPublicEvent,
-          );
+          const events = (data as PublicEventFromDB[]).map(transformPublicEvent);
           const featuredEvents = events.filter((e) => e.isFeatured);
 
           set({
@@ -89,11 +81,10 @@ export const usePublicEventsStore = create<PublicEventsState>()(
           // Check which events user has already added
           await get().checkUserEvents();
         } catch (error) {
-          console.error("Failed to fetch public events:", error);
+          console.error('Failed to fetch public events:', error);
           set({
             isLoading: false,
-            error:
-              error instanceof Error ? error.message : "Failed to load events",
+            error: error instanceof Error ? error.message : 'Failed to load events',
           });
         }
       },
@@ -110,25 +101,22 @@ export const usePublicEventsStore = create<PublicEventsState>()(
           if (!user) return;
 
           const { data } = await supabase
-            .from("events")
-            .select("source_public_event_id")
-            .eq("user_id", user.id)
-            .not("source_public_event_id", "is", null)
-            .is("deleted_at", null);
+            .from('events')
+            .select('source_public_event_id')
+            .eq('user_id', user.id)
+            .not('source_public_event_id', 'is', null)
+            .is('deleted_at', null);
 
           if (data) {
             const addedIds = new Set<string>(
               data
-                .map(
-                  (e: { source_public_event_id: string | null }) =>
-                    e.source_public_event_id,
-                )
+                .map((e: { source_public_event_id: string | null }) => e.source_public_event_id)
                 .filter((id: string | null): id is string => id !== null),
             );
             set({ addedToCalendar: addedIds });
           }
         } catch (error) {
-          console.error("Failed to check user events:", error);
+          console.error('Failed to check user events:', error);
         }
       },
 
@@ -155,15 +143,12 @@ export const usePublicEventsStore = create<PublicEventsState>()(
           const supabase = createBrowserClient();
 
           // Call the database function to copy the event
-          const { data, error } = await supabase.rpc(
-            "add_public_event_to_calendar",
-            {
-              p_public_event_id: eventId,
-            },
-          );
+          const { data, error } = await supabase.rpc('add_public_event_to_calendar', {
+            p_public_event_id: eventId,
+          });
 
           if (error) {
-            console.error("Failed to add event to calendar:", error);
+            console.error('Failed to add event to calendar:', error);
             const newLoading = new Set(get().isAddingToCalendar);
             newLoading.delete(eventId);
             set({ isAddingToCalendar: newLoading });
@@ -190,7 +175,7 @@ export const usePublicEventsStore = create<PublicEventsState>()(
 
           return { success: true, userEventId: data as string };
         } catch (error) {
-          console.error("Failed to add event to calendar:", error);
+          console.error('Failed to add event to calendar:', error);
 
           // Remove from loading
           const newLoading = new Set(get().isAddingToCalendar);
@@ -213,6 +198,6 @@ export const usePublicEventsStore = create<PublicEventsState>()(
         });
       },
     }),
-    { name: "public-events-store" },
+    { name: 'public-events-store' },
   ),
 );

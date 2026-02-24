@@ -1,29 +1,22 @@
-"use client";
+'use client';
 
-import React, { useMemo, memo } from "react";
-import { useRouter } from "next/navigation";
-import { useTodosStore } from "@/lib/store/todosStore";
-import { PRIORITY_COLORS } from "@/lib/constants";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/mq/card";
-import { Badge } from "@/components/ui/mq/badge";
-import {
-  CheckSquare,
-  ExternalLink,
-  CheckCircle2,
-  Circle,
-  Clock,
-  Eye,
-} from "lucide-react";
-import { format, isValid, isPast } from "date-fns";
-import { enAU, es, faIR } from "date-fns/locale";
-import Link from "next/link";
-import { useHydration } from "@/lib/hooks";
-import { Button } from "@/components/ui/mq/button";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import type { TranslationKey } from "@/lib/i18n/translations";
-import { CardSolid } from "@/features/home/components/HomeCard";
-import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
+import React, { useMemo, memo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTodosStore } from '@/lib/store/todosStore';
+import { PRIORITY_COLORS } from '@/lib/constants';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Badge } from '@/components/ui/mq/badge';
+import { CheckSquare, ExternalLink, CheckCircle2, Circle, Clock, Eye } from 'lucide-react';
+import { format, isValid, isPast } from 'date-fns';
+import { enAU, es, faIR } from 'date-fns/locale';
+import Link from 'next/link';
+import { useHydration } from '@/lib/hooks';
+import { Button } from '@/components/ui/mq/button';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
+import { CardSolid } from '@/features/home/components/HomeCard';
+import { cn } from '@/lib/utils';
+import dayjs from 'dayjs';
 
 const TodosWidget = memo(() => {
   const isHydrated = useHydration();
@@ -39,9 +32,9 @@ const TodosWidget = memo(() => {
 
   const currentLocale = useMemo(() => {
     switch (language) {
-      case "es":
+      case 'es':
         return es;
-      case "fa":
+      case 'fa':
         return faIR;
       default:
         return enAU;
@@ -83,8 +76,8 @@ const TodosWidget = memo(() => {
 
   const formatDueDate = (date: Date) => {
     const d = new Date(date);
-    if (!isValid(d)) return "";
-    return format(d, "EEE, MMM d • h:mm a", { locale: currentLocale });
+    if (!isValid(d)) return '';
+    return format(d, 'EEE, MMM d • h:mm a', { locale: currentLocale });
   };
 
   return (
@@ -92,21 +85,21 @@ const TodosWidget = memo(() => {
       <CardHeader
         className="flex flex-row items-center justify-between"
         style={{
-          color: "var(--mq-content)",
-          WebkitTextFillColor: "var(--mq-content)",
+          color: 'var(--mq-content)',
+          WebkitTextFillColor: 'var(--mq-content)',
         }}
       >
         <div className="flex items-center gap-2">
           <CardTitle className="flex items-center gap-2">
             <CheckSquare className="h-5 w-5" />
-            {tOr("todos", "To-Do List")}
+            {tOr('todos', 'To-Do List')}
           </CardTitle>
           {isHydrated && totalPending > 0 && (
             <Badge
               variant="neutral"
               className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
             >
-              {totalPending} {t("pending")}
+              {totalPending} {t('pending')}
             </Badge>
           )}
           {/* View Only Badge */}
@@ -116,17 +109,17 @@ const TodosWidget = memo(() => {
               className="ml-1 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 flex items-center gap-1"
             >
               <Eye className="h-3 w-3" aria-hidden="true" />
-              {t("viewOnly")}
+              {t('viewOnly')}
             </Badge>
           )}
         </div>
         <Button size="sm" variant="outline" className="gap-1.5" asChild>
           <Link
             href="/calendar?section=todos&highlight=true"
-            aria-label={`${t("viewAll")} ${tOr("todos", "Todos")}`}
+            aria-label={`${t('viewAll')} ${tOr('todos', 'Todos')}`}
           >
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{t("viewAll")}</span>
+            <span>{t('viewAll')}</span>
           </Link>
         </Button>
       </CardHeader>
@@ -136,34 +129,32 @@ const TodosWidget = memo(() => {
             <p
               className="text-lg text-mq-content alabaster-readable"
               style={{
-                color: "var(--mq-content)",
-                WebkitTextFillColor: "var(--mq-content)",
+                color: 'var(--mq-content)',
+                WebkitTextFillColor: 'var(--mq-content)',
                 opacity: 1,
-                mixBlendMode: "normal",
+                mixBlendMode: 'normal',
               }}
             >
-              {t("loading")}
+              {t('loading')}
             </p>
           </div>
         ) : pendingTodos.length === 0 ? (
           <div
             className="text-center py-8 alabaster-readable"
             style={{
-              color: "var(--mq-content)",
-              WebkitTextFillColor: "var(--mq-content)",
+              color: 'var(--mq-content)',
+              WebkitTextFillColor: 'var(--mq-content)',
               opacity: 1,
-              mixBlendMode: "normal",
+              mixBlendMode: 'normal',
             }}
           >
             <CheckSquare
               className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
               aria-hidden="true"
             />
-            <p className="text-mq-content-tertiary">
-              {tOr("noTodos", "No to-do items")}
-            </p>
+            <p className="text-mq-content-tertiary">{tOr('noTodos', 'No to-do items')}</p>
             <p className="text-mq-content-tertiary text-sm mt-1">
-              {tOr("addTodosInCalendar", "Add to-do items in the Calendar tab")}
+              {tOr('addTodosInCalendar', 'Add to-do items in the Calendar tab')}
             </p>
           </div>
         ) : (
@@ -173,39 +164,35 @@ const TodosWidget = memo(() => {
               const isOverdue = dueDate && isPast(dueDate);
               const todoDateStr =
                 dueDate && isValid(dueDate)
-                  ? format(dueDate, "yyyy-MM-dd")
-                  : format(new Date(), "yyyy-MM-dd");
+                  ? format(dueDate, 'yyyy-MM-dd')
+                  : format(new Date(), 'yyyy-MM-dd');
 
               return (
                 <div
                   key={todo.id}
                   className={cn(
-                    "group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer",
-                    "bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background",
+                    'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer',
+                    'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
                   onClick={() =>
-                    router.push(
-                      `/calendar?date=${todoDateStr}&highlightTodo=${todo.id}`,
-                    )
+                    router.push(`/calendar?date=${todoDateStr}&highlightTodo=${todo.id}`)
                   }
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
+                    if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      router.push(
-                        `/calendar?date=${todoDateStr}&highlightTodo=${todo.id}`,
-                      );
+                      router.push(`/calendar?date=${todoDateStr}&highlightTodo=${todo.id}`);
                     }
                   }}
                 >
                   {/* Color indicator based on priority */}
                   <div
                     className={cn(
-                      "w-1.5 self-stretch rounded-full shrink-0",
-                      todo.priority === "High" && "bg-red-500",
-                      todo.priority === "Medium" && "bg-amber-500",
-                      todo.priority === "Low" && "bg-green-500",
+                      'w-1.5 self-stretch rounded-full shrink-0',
+                      todo.priority === 'High' && 'bg-red-500',
+                      todo.priority === 'Medium' && 'bg-amber-500',
+                      todo.priority === 'Low' && 'bg-green-500',
                     )}
                   />
 
@@ -222,8 +209,8 @@ const TodosWidget = memo(() => {
                           className="shrink-0 p-1.5 -m-1.5 hover:bg-mq-hover-background rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
                           aria-label={
                             todo.completed
-                              ? tOr("markIncomplete", "Mark incomplete")
-                              : tOr("markComplete", "Mark complete")
+                              ? tOr('markIncomplete', 'Mark incomplete')
+                              : tOr('markComplete', 'Mark complete')
                           }
                         >
                           {todo.completed ? (
@@ -234,9 +221,8 @@ const TodosWidget = memo(() => {
                         </button>
                         <h4
                           className={cn(
-                            "text-mq-sm font-medium text-mq-content truncate",
-                            todo.completed &&
-                              "line-through text-mq-content-tertiary",
+                            'text-mq-sm font-medium text-mq-content truncate',
+                            todo.completed && 'line-through text-mq-content-tertiary',
                           )}
                           title={todo.title}
                         >
@@ -246,7 +232,7 @@ const TodosWidget = memo(() => {
                       <Badge
                         className={cn(
                           PRIORITY_COLORS[todo.priority],
-                          "text-[10px] px-1.5 py-0.5 font-medium shrink-0",
+                          'text-[10px] px-1.5 py-0.5 font-medium shrink-0',
                         )}
                         variant="neutral"
                       >
@@ -256,12 +242,8 @@ const TodosWidget = memo(() => {
                     {dueDate && (
                       <div className="flex items-center gap-1 text-sm text-mq-content-secondary">
                         <Clock className="h-3.5 w-3.5 shrink-0" />
-                        <span
-                          className={
-                            isOverdue ? "text-red-600 font-medium" : ""
-                          }
-                        >
-                          {isOverdue && `${tOr("overdue", "Overdue")} • `}
+                        <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
+                          {isOverdue && `${tOr('overdue', 'Overdue')} • `}
                           {formatDueDate(dueDate)}
                         </span>
                       </div>
@@ -277,6 +259,6 @@ const TodosWidget = memo(() => {
   );
 });
 
-TodosWidget.displayName = "TodosWidget";
+TodosWidget.displayName = 'TodosWidget';
 
 export default TodosWidget;

@@ -1,7 +1,7 @@
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
-const dirs = ["app", "features", "components"];
+const dirs = ['app', 'features', 'components'];
 
 async function walk(dir) {
   let files = await fs.readdir(dir, { withFileTypes: true });
@@ -9,10 +9,10 @@ async function walk(dir) {
     files.map(async (file) => {
       const res = path.join(dir, file.name);
       if (file.isDirectory()) {
-        if (file.name === "node_modules" || file.name === ".next") return [];
+        if (file.name === 'node_modules' || file.name === '.next') return [];
         return walk(res);
       }
-      return res.endsWith(".tsx") ? res : [];
+      return res.endsWith('.tsx') ? res : [];
     }),
   );
   return files.flat();
@@ -23,7 +23,7 @@ async function main() {
   const hardcoded = [];
 
   for (const file of files) {
-    const content = await fs.readFile(file, "utf8");
+    const content = await fs.readFile(file, 'utf8');
 
     // Simple regex for JSX text content: >Some Text<
     const jsxTextRegex = />([^<>{}\n]+)</g;
@@ -34,20 +34,20 @@ async function main() {
       if (
         text.length > 2 &&
         /[A-Z]/.test(text[0]) &&
-        !text.includes("className") &&
-        !text.includes("style=")
+        !text.includes('className') &&
+        !text.includes('style=')
       ) {
-        hardcoded.push({ file, text, type: "JSX" });
+        hardcoded.push({ file, text, type: 'JSX' });
       }
     }
 
     // Attributes
-    const attrs = ["aria-label", "placeholder", "title"];
+    const attrs = ['aria-label', 'placeholder', 'title'];
     for (const attr of attrs) {
-      const attrRegex = new RegExp(`${attr}="([^"{}]+)"`, "g");
+      const attrRegex = new RegExp(`${attr}="([^"{}]+)"`, 'g');
       while ((match = attrRegex.exec(content)) !== null) {
         const text = match[1].trim();
-        if (text.length > 1 && !text.startsWith("/") && !text.includes("t(")) {
+        if (text.length > 1 && !text.startsWith('/') && !text.includes('t(')) {
           hardcoded.push({ file, text, type: attr });
         }
       }

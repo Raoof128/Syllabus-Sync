@@ -64,17 +64,15 @@ module.exports = {
       }
 
       if (metrics.errors > 0) {
-        console.log(
-          `❌ Error rate: ${((metrics.errors / metrics.success) * 100).toFixed(2)}%`,
-        );
+        console.log(`❌ Error rate: ${((metrics.errors / metrics.success) * 100).toFixed(2)}%`);
       }
     };
   },
 
   // Generate CSRF token for protected requests
   createCSRFToken: () => {
-    const crypto = require("crypto");
-    return crypto.randomBytes(32).toString("hex");
+    const crypto = require('crypto');
+    return crypto.randomBytes(32).toString('hex');
   },
 
   // Generate random data for testing
@@ -86,7 +84,7 @@ module.exports = {
       color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
       description: `Load test unit generated at ${new Date().toISOString()}`,
       location: {
-        building: "C5C",
+        building: 'C5C',
         room: `${Math.floor(Math.random() * 300) + 1}`,
       },
     };
@@ -94,11 +92,9 @@ module.exports = {
 
   generateRandomDeadline: () => {
     const now = new Date();
-    const dueDate = new Date(
-      now.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000,
-    ); // Random date in next 7 days
-    const priorities = ["Low", "Medium", "High", "Urgent"];
-    const types = ["Assignment", "Exam", "Quiz", "Presentation"];
+    const dueDate = new Date(now.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000); // Random date in next 7 days
+    const priorities = ['Low', 'Medium', 'High', 'Urgent'];
+    const types = ['Assignment', 'Exam', 'Quiz', 'Presentation'];
 
     return {
       id: `deadline-${Date.now()}`,
@@ -108,17 +104,17 @@ module.exports = {
       priority: priorities[Math.floor(Math.random() * priorities.length)],
       type: types[Math.floor(Math.random() * types.length)],
       completed: false,
-      unit_code: "COMP2310",
+      unit_code: 'COMP2310',
     };
   },
 
   getRandomUnitId: () => {
     // This would typically query from actual data
     // For load testing, we'll use a predefined UUID
-    return "123e4567-e89b-12d3-a456-426614174000";
+    return '123e4567-e89b-12d3-a456-426614174000';
   },
 
   getRandomDeadlineId: () => {
-    return "123e4567-e89b-12d3-a456-426614174001";
+    return '123e4567-e89b-12d3-a456-426614174001';
   },
 };

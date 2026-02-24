@@ -1,10 +1,10 @@
 // lib/hooks/useNotificationScheduler.ts
-"use client";
+'use client';
 
-import { useEffect, useRef, useCallback } from "react";
-import { useDeadlinesStore } from "@/lib/store/deadlinesStore";
-import { useUnitsStore } from "@/lib/store/unitsStore";
-import { useNotificationPreferencesStore } from "@/lib/store/notificationPreferencesStore";
+import { useEffect, useRef, useCallback } from 'react';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useUnitsStore } from '@/lib/store/unitsStore';
+import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 
 /**
  * Hook that automatically schedules notifications for upcoming deadlines and classes
@@ -15,38 +15,26 @@ export function useNotificationScheduler() {
   const units = useUnitsStore((state) => state.units);
 
   // Use individual selectors to prevent infinite re-renders
-  const permissionStatus = useNotificationPreferencesStore(
-    (state) => state.permissionStatus,
-  );
-  const pushEnabled = useNotificationPreferencesStore(
-    (state) => state.pushEnabled,
-  );
-  const deadlinesEnabled = useNotificationPreferencesStore(
-    (state) => state.deadlinesEnabled,
-  );
-  const classesEnabled = useNotificationPreferencesStore(
-    (state) => state.classesEnabled,
-  );
+  const permissionStatus = useNotificationPreferencesStore((state) => state.permissionStatus);
+  const pushEnabled = useNotificationPreferencesStore((state) => state.pushEnabled);
+  const deadlinesEnabled = useNotificationPreferencesStore((state) => state.deadlinesEnabled);
+  const classesEnabled = useNotificationPreferencesStore((state) => state.classesEnabled);
   const scheduleDeadlineReminder = useNotificationPreferencesStore(
     (state) => state.scheduleDeadlineReminder,
   );
   const scheduleClassReminder = useNotificationPreferencesStore(
     (state) => state.scheduleClassReminder,
   );
-  const clearAllReminders = useNotificationPreferencesStore(
-    (state) => state.clearAllReminders,
-  );
+  const clearAllReminders = useNotificationPreferencesStore((state) => state.clearAllReminders);
   const deadlineReminderTiming = useNotificationPreferencesStore(
     (state) => state.deadlineReminderTiming,
   );
-  const classReminderTiming = useNotificationPreferencesStore(
-    (state) => state.classReminderTiming,
-  );
+  const classReminderTiming = useNotificationPreferencesStore((state) => state.classReminderTiming);
 
   // Track if we've initialized to avoid re-scheduling on every render
   const initializedRef = useRef(false);
-  const lastDeadlinesRef = useRef<string>("");
-  const lastUnitsRef = useRef<string>("");
+  const lastDeadlinesRef = useRef<string>('');
+  const lastUnitsRef = useRef<string>('');
   const clearAllRemindersRef = useRef(clearAllReminders);
 
   // Keep ref updated with latest function
@@ -56,7 +44,7 @@ export function useNotificationScheduler() {
 
   // Memoize the schedule function to prevent dependency array changes
   const scheduleDeadlines = useCallback(() => {
-    if (permissionStatus !== "granted" || !pushEnabled || !deadlinesEnabled) {
+    if (permissionStatus !== 'granted' || !pushEnabled || !deadlinesEnabled) {
       return;
     }
 
@@ -85,12 +73,7 @@ export function useNotificationScheduler() {
       const dueDate = new Date(deadline.dueDate);
       if (dueDate <= now) return; // Skip past deadlines
 
-      scheduleDeadlineReminder(
-        deadline.id,
-        deadline.title,
-        deadline.unitCode,
-        dueDate,
-      );
+      scheduleDeadlineReminder(deadline.id, deadline.title, deadline.unitCode, dueDate);
     });
   }, [
     deadlines,
@@ -108,7 +91,7 @@ export function useNotificationScheduler() {
 
   // Memoize the schedule function to prevent dependency array changes
   const scheduleClasses = useCallback(() => {
-    if (permissionStatus !== "granted" || !pushEnabled || !classesEnabled) {
+    if (permissionStatus !== 'granted' || !pushEnabled || !classesEnabled) {
       return;
     }
 
@@ -127,13 +110,13 @@ export function useNotificationScheduler() {
     // Schedule reminders for upcoming classes (next 7 days)
     const now = new Date();
     const daysOfWeek = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
     ];
 
     // Schedule for today and next 6 days
@@ -149,7 +132,7 @@ export function useNotificationScheduler() {
           if (classTime.day !== dayOfWeek) return;
 
           // Parse the start time
-          const [hours, minutes] = classTime.startTime.split(":").map(Number);
+          const [hours, minutes] = classTime.startTime.split(':').map(Number);
           const classDateTime = new Date(targetDate);
           classDateTime.setHours(hours, minutes, 0, 0);
 
@@ -182,7 +165,7 @@ export function useNotificationScheduler() {
 
   // Memoize clear function to prevent dependency array changes
   const handleClearReminders = useCallback(() => {
-    if (!pushEnabled || permissionStatus !== "granted") {
+    if (!pushEnabled || permissionStatus !== 'granted') {
       clearAllReminders();
     }
   }, [pushEnabled, permissionStatus, clearAllReminders]);

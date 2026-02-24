@@ -1,22 +1,17 @@
-"use client";
+'use client';
 
-import { memo, useState, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/mq/card";
-import { Shield, Loader2, LogIn, KeyRound } from "lucide-react";
-import { Button } from "@/components/ui/mq/button";
-import { MagicCard } from "@/components/ui/MagicCard";
-import type { TranslationKey } from "@/lib/i18n/translations";
-import { PasskeySecuritySection } from "./security/PasskeySecuritySection";
-import { TOTPSetup } from "./security/TOTPSetup";
-import { SMSSetup } from "./security/SMSSetup";
-import { API_ROUTES } from "@/lib/constants/config";
-import type { MFAFactor } from "@/lib/security/mfa";
+import { memo, useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
+import { Shield, Loader2, LogIn, KeyRound } from 'lucide-react';
+import { Button } from '@/components/ui/mq/button';
+import { MagicCard } from '@/components/ui/MagicCard';
+import type { TranslationKey } from '@/lib/i18n/translations';
+import { PasskeySecuritySection } from './security/PasskeySecuritySection';
+import { TOTPSetup } from './security/TOTPSetup';
+import { SMSSetup } from './security/SMSSetup';
+import { API_ROUTES } from '@/lib/constants/config';
+import type { MFAFactor } from '@/lib/security/mfa';
 
 type SecuritySettingsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
@@ -52,14 +47,10 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" aria-hidden="true" />
-            <span id="security-heading">{t("security")}</span>
+            <span id="security-heading">{t('security')}</span>
           </CardTitle>
         </CardHeader>
-        <CardContent
-          className="space-y-6"
-          role="region"
-          aria-labelledby="security-heading"
-        >
+        <CardContent className="space-y-6" role="region" aria-labelledby="security-heading">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-mq-primary" />
@@ -67,18 +58,10 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
           ) : (
             <>
               {/* TOTP Authenticator App */}
-              <TOTPSetup
-                t={t}
-                factors={factors}
-                onStatusChange={fetchMFAStatus}
-              />
+              <TOTPSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
 
               {/* SMS Verification */}
-              <SMSSetup
-                t={t}
-                factors={factors}
-                onStatusChange={fetchMFAStatus}
-              />
+              <SMSSetup t={t} factors={factors} onStatusChange={fetchMFAStatus} />
 
               {/* Passkeys & Biometric Login */}
               <PasskeySecuritySection t={t} />
@@ -87,17 +70,15 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
               <div className="pt-2 border-t border-mq-border space-y-3">
                 <h3 className="text-sm font-medium text-mq-content-secondary flex items-center gap-2">
                   <KeyRound className="h-4 w-4" aria-hidden="true" />
-                  {t("accountSecurity" as TranslationKey) || "Account Security"}
+                  {t('accountSecurity' as TranslationKey) || 'Account Security'}
                 </h3>
                 <Button
                   variant="outline"
                   className="w-full justify-start gap-2"
-                  onClick={() =>
-                    router.push("/login?redirectTo=/settings/security")
-                  }
+                  onClick={() => router.push('/login?redirectTo=/settings/security')}
                 >
                   <LogIn className="h-4 w-4" aria-hidden="true" />
-                  {t("changePassword" as TranslationKey) || "Change Password"}
+                  {t('changePassword' as TranslationKey) || 'Change Password'}
                 </Button>
               </div>
             </>
@@ -108,6 +89,6 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
   );
 });
 
-SecuritySettings.displayName = "SecuritySettings";
+SecuritySettings.displayName = 'SecuritySettings';
 
 export default SecuritySettings;

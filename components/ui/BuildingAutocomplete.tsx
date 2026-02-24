@@ -1,20 +1,14 @@
-"use client";
+'use client';
 
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect,
-} from "react";
-import { MapPin, Search, X, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/mq/input";
-import { Button } from "@/components/ui/mq/button";
-import { buildings, type Building } from "@/features/map/lib/buildings";
-import { searchBuildings } from "@/lib/utils/buildingValidation";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import type { TranslationKey } from "@/lib/i18n/translations";
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { MapPin, Search, X, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/mq/input';
+import { Button } from '@/components/ui/mq/button';
+import { buildings, type Building } from '@/features/map/lib/buildings';
+import { searchBuildings } from '@/lib/utils/buildingValidation';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 interface BuildingAutocompleteProps {
   /** Current value (building ID) */
@@ -46,7 +40,7 @@ export default function BuildingAutocomplete({
   label,
 }: BuildingAutocompleteProps) {
   const { t } = useTypedTranslation();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -71,20 +65,17 @@ export default function BuildingAutocomplete({
   }, [query, isOpen]);
 
   // Handle input change
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setQuery(e.target.value);
-      setIsOpen(true);
-      setHighlightedIndex(0);
-    },
-    [],
-  );
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    setIsOpen(true);
+    setHighlightedIndex(0);
+  }, []);
 
   // Handle selection
   const handleSelect = useCallback(
     (building: Building) => {
       onChange(building.id);
-      setQuery("");
+      setQuery('');
       setIsOpen(false);
     },
     [onChange],
@@ -92,8 +83,8 @@ export default function BuildingAutocomplete({
 
   // Handle clear
   const handleClear = useCallback(() => {
-    onChange("");
-    setQuery("");
+    onChange('');
+    setQuery('');
     setIsOpen(false);
   }, [onChange]);
 
@@ -101,7 +92,7 @@ export default function BuildingAutocomplete({
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (!isOpen) {
-        if (e.key === "ArrowDown" || e.key === "Enter") {
+        if (e.key === 'ArrowDown' || e.key === 'Enter') {
           setIsOpen(true);
           e.preventDefault();
         }
@@ -109,26 +100,24 @@ export default function BuildingAutocomplete({
       }
 
       switch (e.key) {
-        case "ArrowDown":
+        case 'ArrowDown':
           e.preventDefault();
-          setHighlightedIndex((prev) =>
-            prev < searchResults.length - 1 ? prev + 1 : prev,
-          );
+          setHighlightedIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : prev));
           break;
-        case "ArrowUp":
+        case 'ArrowUp':
           e.preventDefault();
           setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
           break;
-        case "Enter":
+        case 'Enter':
           e.preventDefault();
           if (searchResults[highlightedIndex]) {
             handleSelect(searchResults[highlightedIndex]);
           }
           break;
-        case "Escape":
+        case 'Escape':
           e.preventDefault();
           setIsOpen(false);
-          setQuery("");
+          setQuery('');
           break;
       }
     },
@@ -138,33 +127,28 @@ export default function BuildingAutocomplete({
   // Close on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
-        setQuery("");
+        setQuery('');
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // Scroll highlighted item into view
   useEffect(() => {
     if (listRef.current && isOpen) {
-      const highlightedElement = listRef.current.children[
-        highlightedIndex
-      ] as HTMLElement;
+      const highlightedElement = listRef.current.children[highlightedIndex] as HTMLElement;
       if (highlightedElement) {
-        highlightedElement.scrollIntoView({ block: "nearest" });
+        highlightedElement.scrollIntoView({ block: 'nearest' });
       }
     }
   }, [highlightedIndex, isOpen]);
 
   return (
-    <div ref={containerRef} className={cn("relative", className)}>
+    <div ref={containerRef} className={cn('relative', className)}>
       {label && (
         <label className="block text-sm font-medium text-mq-content mb-1.5">
           {label}
@@ -177,17 +161,15 @@ export default function BuildingAutocomplete({
         {selectedBuilding && !isOpen ? (
           <div
             className={cn(
-              "flex items-center gap-2 px-3 py-2 border rounded-md bg-mq-background",
-              error ? "border-red-500" : "border-mq-border",
-              disabled
-                ? "opacity-50 cursor-not-allowed"
-                : "cursor-pointer hover:border-mq-primary",
+              'flex items-center gap-2 px-3 py-2 border rounded-md bg-mq-background',
+              error ? 'border-red-500' : 'border-mq-border',
+              disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-mq-primary',
             )}
             onClick={() => !disabled && setIsOpen(true)}
             role="button"
             tabIndex={disabled ? -1 : 0}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
+              if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 if (!disabled) setIsOpen(true);
               }
@@ -195,9 +177,7 @@ export default function BuildingAutocomplete({
           >
             <MapPin className="h-4 w-4 text-mq-content-secondary shrink-0" />
             <div className="flex-1 min-w-0">
-              <span className="block text-sm font-medium truncate">
-                {selectedBuilding.name}
-              </span>
+              <span className="block text-sm font-medium truncate">{selectedBuilding.name}</span>
               {selectedBuilding.address && (
                 <span className="block text-xs text-mq-content-secondary truncate">
                   {selectedBuilding.address}
@@ -230,11 +210,9 @@ export default function BuildingAutocomplete({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => setIsOpen(true)}
-              placeholder={
-                placeholder || tOr("searchBuilding", "Search for a building...")
-              }
+              placeholder={placeholder || tOr('searchBuilding', 'Search for a building...')}
               disabled={disabled}
-              className={cn("pl-10", error && "border-red-500")}
+              className={cn('pl-10', error && 'border-red-500')}
             />
           </div>
         )}
@@ -249,8 +227,8 @@ export default function BuildingAutocomplete({
             {searchResults.length === 0 ? (
               <li className="px-3 py-4 text-center text-sm text-mq-content-secondary">
                 {query.length > 0
-                  ? tOr("noBuildingsFound", "No buildings found")
-                  : tOr("typeToSearchBuildings", "Type to search buildings...")}
+                  ? tOr('noBuildingsFound', 'No buildings found')
+                  : tOr('typeToSearchBuildings', 'Type to search buildings...')}
               </li>
             ) : (
               searchResults.map((building, index) => (
@@ -261,20 +239,18 @@ export default function BuildingAutocomplete({
                   role="option"
                   aria-selected={highlightedIndex === index}
                   className={cn(
-                    "flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors",
+                    'flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors',
                     highlightedIndex === index
-                      ? "bg-mq-primary/10 text-mq-primary"
-                      : "hover:bg-mq-hover-background",
-                    selectedBuilding?.id === building.id && "font-medium",
+                      ? 'bg-mq-primary/10 text-mq-primary'
+                      : 'hover:bg-mq-hover-background',
+                    selectedBuilding?.id === building.id && 'font-medium',
                   )}
                   onClick={() => handleSelect(building)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                 >
                   <MapPin className="h-4 w-4 shrink-0 text-mq-content-secondary" />
                   <div className="flex-1 min-w-0">
-                    <span className="block text-sm truncate">
-                      {building.name}
-                    </span>
+                    <span className="block text-sm truncate">{building.name}</span>
                     {building.address && (
                       <span className="block text-xs text-mq-content-secondary truncate">
                         {building.address}

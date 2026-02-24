@@ -1,11 +1,11 @@
 // tests/gamification/StreakIndicator.test.tsx
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import {
   StreakIndicator,
   StreakBadge,
   StreakCard,
-} from "@/features/gamification/components/StreakIndicator";
+} from '@/features/gamification/components/StreakIndicator';
 
 // Mock the gamification store
 const mockProfile = {
@@ -13,7 +13,7 @@ const mockProfile = {
   level: 3,
   streakDays: 5,
   longestStreak: 10,
-  lastActivityDate: "2026-01-09",
+  lastActivityDate: '2026-01-09',
   xpToNextLevel: 50,
   xpForCurrentLevel: 100,
   levelProgress: 50,
@@ -21,7 +21,7 @@ const mockProfile = {
 
 const mockLoadProfile = vi.fn();
 
-vi.mock("@/lib/store/gamificationStore", () => ({
+vi.mock('@/lib/store/gamificationStore', () => ({
   useGamificationStore: vi.fn((selector: unknown) => {
     const state = {
       profile: mockProfile,
@@ -29,145 +29,144 @@ vi.mock("@/lib/store/gamificationStore", () => ({
       hasLoaded: true,
       isLoading: false,
     };
-    return typeof selector === "function"
+    return typeof selector === 'function'
       ? (selector as (s: typeof state) => unknown)(state)
       : state;
   }),
   useStreak: vi.fn(() => ({
     days: 5,
     longest: 10,
-    emoji: "🔥🔥",
+    emoji: '🔥🔥',
     isActive: true,
   })),
 }));
 
-describe("StreakIndicator", () => {
+describe('StreakIndicator', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("renders streak with fire emoji", () => {
+  it('renders streak with fire emoji', () => {
     render(<StreakIndicator />);
 
-    const emoji = screen.getByRole("img", { name: "5 day streak" });
+    const emoji = screen.getByRole('img', { name: '5 day streak' });
     expect(emoji).toBeInTheDocument();
   });
 
-  it("displays streak count by default", () => {
+  it('displays streak count by default', () => {
     render(<StreakIndicator />);
 
-    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument();
   });
 
-  it("hides streak count when showCount is false", () => {
+  it('hides streak count when showCount is false', () => {
     render(<StreakIndicator showCount={false} />);
 
-    expect(screen.queryByText("5")).not.toBeInTheDocument();
+    expect(screen.queryByText('5')).not.toBeInTheDocument();
   });
 
-  it("shows day streak label when showLabel is true", () => {
+  it('shows day streak label when showLabel is true', () => {
     render(<StreakIndicator showLabel />);
 
-    expect(screen.getByText("5 day streak")).toBeInTheDocument();
+    expect(screen.getByText('5 day streak')).toBeInTheDocument();
   });
 
-  it("applies small size classes", () => {
+  it('applies small size classes', () => {
     const { container } = render(<StreakIndicator size="sm" />);
 
     const emoji = container.querySelector('[role="img"]');
-    expect(emoji).toHaveClass("text-base");
+    expect(emoji).toHaveClass('text-base');
   });
 
-  it("applies medium size classes", () => {
+  it('applies medium size classes', () => {
     const { container } = render(<StreakIndicator size="md" />);
 
     const emoji = container.querySelector('[role="img"]');
-    expect(emoji).toHaveClass("text-xl");
+    expect(emoji).toHaveClass('text-xl');
   });
 
-  it("applies large size classes", () => {
+  it('applies large size classes', () => {
     const { container } = render(<StreakIndicator size="lg" />);
 
     const emoji = container.querySelector('[role="img"]');
-    expect(emoji).toHaveClass("text-2xl");
+    expect(emoji).toHaveClass('text-2xl');
   });
 
-  it("applies custom className", () => {
+  it('applies custom className', () => {
     const { container } = render(<StreakIndicator className="custom-streak" />);
 
-    expect(container.firstChild).toHaveClass("custom-streak");
+    expect(container.firstChild).toHaveClass('custom-streak');
   });
 
-  it("shows title with streak info", () => {
+  it('shows title with streak info', () => {
     const { container } = render(<StreakIndicator />);
 
     const indicator = container.firstChild;
     expect(indicator).toHaveAttribute(
-      "title",
-      "5 day streak! Complete tasks daily to keep it going. Your longest streak: 10 days.",
+      'title',
+      '5 day streak! Complete tasks daily to keep it going. Your longest streak: 10 days.',
     );
   });
 
-  it("applies orange color when streak is active", () => {
+  it('applies orange color when streak is active', () => {
     const { container } = render(<StreakIndicator />);
 
-    expect(container.firstChild).toHaveClass("text-orange-500");
+    expect(container.firstChild).toHaveClass('text-orange-500');
   });
 });
 
-describe("StreakIndicator - Zero Streak", () => {
+describe('StreakIndicator - Zero Streak', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("shows start message when no streak", async () => {
-    const { useStreak } = await import("@/lib/store/gamificationStore");
+  it('shows start message when no streak', async () => {
+    const { useStreak } = await import('@/lib/store/gamificationStore');
     vi.mocked(useStreak).mockReturnValue({
       days: 0,
       longest: 5,
-      emoji: "",
+      emoji: '',
       isActive: false,
     });
 
     render(<StreakIndicator />);
 
-    expect(screen.getByText("Start a streak!")).toBeInTheDocument();
+    expect(screen.getByText('Start a streak!')).toBeInTheDocument();
   });
 
-  it("shows fire emoji with no streak aria label", async () => {
-    const { useStreak } = await import("@/lib/store/gamificationStore");
+  it('shows fire emoji with no streak aria label', async () => {
+    const { useStreak } = await import('@/lib/store/gamificationStore');
     vi.mocked(useStreak).mockReturnValue({
       days: 0,
       longest: 5,
-      emoji: "",
+      emoji: '',
       isActive: false,
     });
 
     render(<StreakIndicator />);
 
-    const emoji = screen.getByRole("img", { name: "No streak" });
+    const emoji = screen.getByRole('img', { name: 'No streak' });
     expect(emoji).toBeInTheDocument();
   });
 
-  it("applies opacity when no streak", async () => {
-    const { useStreak } = await import("@/lib/store/gamificationStore");
+  it('applies opacity when no streak', async () => {
+    const { useStreak } = await import('@/lib/store/gamificationStore');
     vi.mocked(useStreak).mockReturnValue({
       days: 0,
       longest: 5,
-      emoji: "",
+      emoji: '',
       isActive: false,
     });
 
     const { container } = render(<StreakIndicator />);
 
-    expect(container.firstChild).toHaveClass("opacity-50");
+    expect(container.firstChild).toHaveClass('opacity-50');
   });
 });
 
-describe("StreakIndicator Loading State", () => {
-  it("shows loading skeleton when loading", async () => {
-    const { useGamificationStore } =
-      await import("@/lib/store/gamificationStore");
+describe('StreakIndicator Loading State', () => {
+  it('shows loading skeleton when loading', async () => {
+    const { useGamificationStore } = await import('@/lib/store/gamificationStore');
     vi.mocked(useGamificationStore).mockImplementation((selector: unknown) => {
       const state = {
         profile: null,
@@ -175,69 +174,64 @@ describe("StreakIndicator Loading State", () => {
         hasLoaded: false,
         isLoading: true,
       };
-      return typeof selector === "function"
+      return typeof selector === 'function'
         ? (selector as (s: typeof state) => unknown)(state)
         : state;
     });
 
     const { container } = render(<StreakIndicator />);
 
-    const skeleton = container.querySelector(".animate-pulse");
+    const skeleton = container.querySelector('.animate-pulse');
     expect(skeleton).toBeInTheDocument();
   });
 });
 
-describe("StreakBadge", () => {
+describe('StreakBadge', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     // Reset mock to default state for badge tests
-    const { useStreak } = await import("@/lib/store/gamificationStore");
+    const { useStreak } = await import('@/lib/store/gamificationStore');
     vi.mocked(useStreak).mockReturnValue({
       days: 5,
       longest: 10,
-      emoji: "🔥🔥",
+      emoji: '🔥🔥',
       isActive: true,
     });
   });
 
-  it("renders streak badge with count", () => {
+  it('renders streak badge with count', () => {
     render(<StreakBadge />);
 
-    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument();
   });
 
-  it("includes fire emoji", () => {
+  it('includes fire emoji', () => {
     render(<StreakBadge />);
 
-    const emoji = screen.getByRole("img", { hidden: true });
-    expect(emoji).toHaveTextContent("🔥");
+    const emoji = screen.getByRole('img', { hidden: true });
+    expect(emoji).toHaveTextContent('🔥');
   });
 
-  it("applies active styling when streak is active", () => {
+  it('applies active styling when streak is active', () => {
     render(<StreakBadge />);
 
-    const badge = screen.getByText("5").parentElement;
-    expect(badge).toHaveClass(
-      "bg-linear-to-r",
-      "from-orange-400",
-      "to-amber-500",
-      "text-white",
-    );
+    const badge = screen.getByText('5').parentElement;
+    expect(badge).toHaveClass('bg-linear-to-r', 'from-orange-400', 'to-amber-500', 'text-white');
   });
 
-  it("applies custom className", () => {
+  it('applies custom className', () => {
     render(<StreakBadge className="custom-badge" />);
 
-    const badge = screen.getByText("5").parentElement;
-    expect(badge).toHaveClass("custom-badge");
+    const badge = screen.getByText('5').parentElement;
+    expect(badge).toHaveClass('custom-badge');
   });
 
-  it("returns null when no streak", async () => {
-    const { useStreak } = await import("@/lib/store/gamificationStore");
+  it('returns null when no streak', async () => {
+    const { useStreak } = await import('@/lib/store/gamificationStore');
     vi.mocked(useStreak).mockReturnValue({
       days: 0,
       longest: 5,
-      emoji: "",
+      emoji: '',
       isActive: false,
     });
 
@@ -247,12 +241,11 @@ describe("StreakBadge", () => {
   });
 });
 
-describe("StreakCard", () => {
+describe('StreakCard', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     // Reset mocks for card tests
-    const { useGamificationStore, useStreak } =
-      await import("@/lib/store/gamificationStore");
+    const { useGamificationStore, useStreak } = await import('@/lib/store/gamificationStore');
     vi.mocked(useGamificationStore).mockImplementation((selector: unknown) => {
       const state = {
         profile: mockProfile,
@@ -260,80 +253,75 @@ describe("StreakCard", () => {
         hasLoaded: true,
         isLoading: false,
       };
-      return typeof selector === "function"
+      return typeof selector === 'function'
         ? (selector as (s: typeof state) => unknown)(state)
         : state;
     });
     vi.mocked(useStreak).mockReturnValue({
       days: 5,
       longest: 10,
-      emoji: "🔥🔥",
+      emoji: '🔥🔥',
       isActive: true,
     });
   });
 
-  it("renders streak card with days count", () => {
+  it('renders streak card with days count', () => {
     render(<StreakCard />);
 
-    expect(screen.getByText("5 Days")).toBeInTheDocument();
+    expect(screen.getByText('5 Days')).toBeInTheDocument();
   });
 
-  it("shows current streak label when active", () => {
+  it('shows current streak label when active', () => {
     render(<StreakCard />);
 
-    expect(screen.getByText("Current Streak")).toBeInTheDocument();
+    expect(screen.getByText('Current Streak')).toBeInTheDocument();
   });
 
-  it("displays longest streak", () => {
+  it('displays longest streak', () => {
     render(<StreakCard />);
 
-    expect(screen.getByText("Best")).toBeInTheDocument();
-    expect(screen.getByText("10 days")).toBeInTheDocument();
+    expect(screen.getByText('Best')).toBeInTheDocument();
+    expect(screen.getByText('10 days')).toBeInTheDocument();
   });
 
-  it("applies active gradient styling", () => {
+  it('applies active gradient styling', () => {
     const { container } = render(<StreakCard />);
 
-    expect(container.firstChild).toHaveClass(
-      "from-orange-50",
-      "border-orange-200",
-    );
+    expect(container.firstChild).toHaveClass('from-orange-50', 'border-orange-200');
   });
 
-  it("applies custom className", () => {
+  it('applies custom className', () => {
     const { container } = render(<StreakCard className="custom-card" />);
 
-    expect(container.firstChild).toHaveClass("custom-card");
+    expect(container.firstChild).toHaveClass('custom-card');
   });
 
-  it("shows singular day for 1 day streak", async () => {
-    const { useStreak } = await import("@/lib/store/gamificationStore");
+  it('shows singular day for 1 day streak', async () => {
+    const { useStreak } = await import('@/lib/store/gamificationStore');
     vi.mocked(useStreak).mockReturnValue({
       days: 1,
       longest: 5,
-      emoji: "🔥",
+      emoji: '🔥',
       isActive: true,
     });
 
     render(<StreakCard />);
 
-    expect(screen.getByText("1 Day")).toBeInTheDocument();
+    expect(screen.getByText('1 Day')).toBeInTheDocument();
   });
 
-  it("shows motivation message when streak is inactive but has days", async () => {
-    const { useStreak } = await import("@/lib/store/gamificationStore");
+  it('shows motivation message when streak is inactive but has days', async () => {
+    const { useStreak } = await import('@/lib/store/gamificationStore');
     vi.mocked(useStreak).mockReturnValue({
       days: 3,
       longest: 5,
-      emoji: "🔥",
+      emoji: '🔥',
       isActive: false,
     });
 
     render(<StreakCard />);
 
-    expect(screen.getByText("Streak Inactive")).toBeInTheDocument();
-    expect(
-      screen.getByText("Complete a task to continue your streak!"),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Streak Inactive')).toBeInTheDocument();
+    expect(screen.getByText('Complete a task to continue your streak!')).toBeInTheDocument();
   });
 });

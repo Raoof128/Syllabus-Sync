@@ -17,11 +17,11 @@
 // 5. Gamification stats (Level, XP, Streak) provide motivation and progression.
 // ============================================
 
-"use client";
+'use client';
 
-import { useMemo, ReactNode } from "react";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { GamificationStats } from "@/features/gamification/components";
+import { useMemo, ReactNode } from 'react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { GamificationStats } from '@/features/gamification/components';
 
 // ============================================
 // TYPES
@@ -107,7 +107,7 @@ function formatDisplayName(name: string | null | undefined): string | null {
 export function WelcomeHeader({
   name,
   fallbackName,
-  className = "",
+  className = '',
   showGamification = true,
   children,
 }: WelcomeHeaderProps) {
@@ -123,47 +123,37 @@ export function WelcomeHeader({
 
   const messageKey = useMemo(() => {
     const generalKeys = [
-      "welcomeMsg1",
-      "welcomeMsg2",
-      "welcomeMsg3",
-      "welcomeMsg4",
-      "welcomeMsg5",
-      "welcomeMsg6",
-      "welcomeMsg7",
-      "welcomeMsg8",
+      'welcomeMsg1',
+      'welcomeMsg2',
+      'welcomeMsg3',
+      'welcomeMsg4',
+      'welcomeMsg5',
+      'welcomeMsg6',
+      'welcomeMsg7',
+      'welcomeMsg8',
     ];
 
-    const seed = `${getUtcDateKey()}|${displayName ?? fallbackName ?? ""}`;
+    const seed = `${getUtcDateKey()}|${displayName ?? fallbackName ?? ''}`;
     return generalKeys[hashToIndex(seed, generalKeys.length)];
   }, [displayName, fallbackName]);
 
   // Build the greeting text
-  const greeting = displayName
-    ? `${t("welcome")}, ${displayName}!`
-    : `${t("welcome")}!`;
+  const greeting = displayName ? `${t('welcome')}, ${displayName}!` : `${t('welcome')}!`;
 
   // Get the translated message using the selected key
-  const message = messageKey
-    ? t(messageKey as "welcomeMsg1")
-    : t("dayAtGlance");
+  const message = messageKey ? t(messageKey as 'welcomeMsg1') : t('dayAtGlance');
 
   return (
-    <div
-      className={`flex flex-col md:flex-row md:items-end justify-between gap-4 ${className}`}
-    >
+    <div className={`flex flex-col md:flex-row md:items-end justify-between gap-4 ${className}`}>
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-2">
-          <h1 className="text-2xl font-semibold text-mq-content leading-tight">
-            {greeting}
-          </h1>
+          <h1 className="text-2xl font-semibold text-mq-content leading-tight">{greeting}</h1>
           {showGamification && <GamificationStats variant="compact" />}
         </div>
         <p className="text-sm text-mq-content-secondary">{message}</p>
       </div>
 
-      {children && (
-        <div className="flex items-center gap-3 shrink-0">{children}</div>
-      )}
+      {children && <div className="flex items-center gap-3 shrink-0">{children}</div>}
     </div>
   );
 }

@@ -1,16 +1,12 @@
-import { v4 as uuidv4 } from "uuid";
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { Deadline, StressLevel } from "@/lib/types";
-import {
-  apiRequest,
-  isLikelyNetworkError,
-  isBrowserOffline,
-} from "@/lib/utils/api";
-import { errorHandler } from "@/lib/utils/errorHandling";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
-import { getBrowserAuthSnapshot } from "@/lib/supabase/browserSession";
-import { useGamificationStore } from "@/lib/store/gamificationStore";
+import { v4 as uuidv4 } from 'uuid';
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { Deadline, StressLevel } from '@/lib/types';
+import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
+import { errorHandler } from '@/lib/utils/errorHandling';
+import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
+import { useGamificationStore } from '@/lib/store/gamificationStore';
 // NOTE: Sample data fallback removed - authenticated users load from database only
 // This ensures proper user isolation and data ownership
 let hasLoggedNetworkFallback = false;
@@ -23,10 +19,7 @@ interface DeadlinesState {
   addDeadline: (deadline: Deadline) => Promise<Deadline | null>;
   removeDeadline: (id: string) => Promise<void>;
   removeDeadlinesByUnit: (unitId: string, unitCode: string) => void;
-  updateDeadline: (
-    id: string,
-    deadline: Partial<Deadline>,
-  ) => Promise<Deadline | null>;
+  updateDeadline: (id: string, deadline: Partial<Deadline>) => Promise<Deadline | null>;
   toggleComplete: (id: string) => Promise<void>;
   toggleNotification: (id: string) => Promise<void>;
   getUpcoming: (limit?: number) => Deadline[];
@@ -37,20 +30,13 @@ interface DeadlinesState {
 
 const normalizeDeadline = (deadline: Deadline): Deadline => ({
   ...deadline,
-  dueDate:
-    deadline.dueDate instanceof Date
-      ? deadline.dueDate
-      : new Date(deadline.dueDate),
-  createdAt:
-    deadline.createdAt instanceof Date
-      ? deadline.createdAt
-      : new Date(deadline.createdAt),
+  dueDate: deadline.dueDate instanceof Date ? deadline.dueDate : new Date(deadline.dueDate),
+  createdAt: deadline.createdAt instanceof Date ? deadline.createdAt : new Date(deadline.createdAt),
 });
 
 // Helper to validate UUIDs
 const isValidUUID = (id: string) => {
-  const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(id);
 };
 
@@ -75,15 +61,13 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         if (get().hasLoaded) return;
         set({ isLoading: true });
         try {
-          const data = await apiRequest<Deadline[]>("/api/deadlines", {
+          const data = await apiRequest<Deadline[]>('/api/deadlines', {
             noRetry: true,
           });
           // Ensure loaded data has valid UUIDs (filter out bad ones from API if any)
           const validData = data.map(normalizeDeadline).filter((d) => {
             if (!isValidUUID(d.id)) {
-              console.warn(
-                `Filtered out invalid deadline ID from API: ${d.id}`,
-              );
+              console.warn(`Filtered out invalid deadline ID from API: ${d.id}`);
               return false;
             }
             return true;
@@ -96,23 +80,20 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           // Silently fail for auth errors - expected when not logged in
           const isAuthError =
             error instanceof Error &&
-            (error.message.includes("401") ||
-              error.message.includes("authentication") ||
-              error.message.includes("Unauthorized"));
+            (error.message.includes('401') ||
+              error.message.includes('authentication') ||
+              error.message.includes('Unauthorized'));
 
           if (isAuthError) {
             // Auth failure: clear persisted data to prevent showing stale user data
             set({ deadlines: [], hasLoaded: true });
           } else {
-            const isNetworkError =
-              isLikelyNetworkError(error) || isBrowserOffline();
+            const isNetworkError = isLikelyNetworkError(error) || isBrowserOffline();
             if (!isNetworkError) {
-              console.warn("Failed to load deadlines from API:", error);
+              console.warn('Failed to load deadlines from API:', error);
             } else if (!hasLoggedNetworkFallback) {
               hasLoggedNetworkFallback = true;
-              console.warn(
-                "Deadlines API unavailable; using persisted data fallback.",
-              );
+              console.warn('Deadlines API unavailable; using persisted data fallback.');
             }
             // Non-auth error: keep persisted data but mark as loaded
             set({ hasLoaded: true });
@@ -124,8 +105,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
 
       addDeadline: async (deadline) => {
         // Ensure new ID is a UUID
-        const id =
-          deadline.id && isValidUUID(deadline.id) ? deadline.id : uuidv4();
+        const id = deadline.id && isValidUUID(deadline.id) ? deadline.id : uuidv4();
 
         const deadlineWithId: Deadline = {
           ...deadline,
@@ -135,9 +115,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
 
         const normalized = normalizeDeadline(deadlineWithId);
         set((state) => {
-          if (
-            state.deadlines.some((existing) => existing.id === normalized.id)
-          ) {
+          if (state.deadlines.some((existing) => existing.id === normalized.id)) {
             return state;
           }
           return { deadlines: [...state.deadlines, normalized] };
@@ -156,31 +134,23 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             ...(unitId && isValidUUID(unitId) ? { unitId } : {}),
           };
 
-          const created = await apiRequest<Deadline>("/api/deadlines", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+          const created = await apiRequest<Deadline>('/api/deadlines', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(apiPayload),
           });
           const serverNormalized = normalizeDeadline(created);
           set((state) => ({
-            deadlines: state.deadlines.map((d) =>
-              d.id === normalized.id ? serverNormalized : d,
-            ),
+            deadlines: state.deadlines.map((d) => (d.id === normalized.id ? serverNormalized : d)),
           }));
           return serverNormalized;
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          if (
-            !errorMessage.includes("authentication") &&
-            !errorMessage.includes("unauthorized")
-          ) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          if (!errorMessage.includes('authentication') && !errorMessage.includes('unauthorized')) {
             errorHandler.logError(
-              error instanceof Error
-                ? error
-                : new Error("Failed to add deadline"),
-              "DeadlinesStore.addDeadline",
-              "medium",
+              error instanceof Error ? error : new Error('Failed to add deadline'),
+              'DeadlinesStore.addDeadline',
+              'medium',
             );
           }
           return normalized;
@@ -211,7 +181,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           }
 
           await apiRequest<{ id: string }>(`/api/deadlines/${id}`, {
-            method: "DELETE",
+            method: 'DELETE',
           });
           // SUCCESS: Delete persisted to DB
         } catch (error) {
@@ -222,11 +192,9 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             }));
           }
           errorHandler.logError(
-            error instanceof Error
-              ? error
-              : new Error(`Failed to remove deadline ${id}`),
-            "DeadlinesStore.removeDeadline",
-            "high",
+            error instanceof Error ? error : new Error(`Failed to remove deadline ${id}`),
+            'DeadlinesStore.removeDeadline',
+            'high',
           );
           // Rethrow so UI can show error feedback
           throw error;
@@ -236,9 +204,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       // Remove all deadlines associated with a deleted unit (cascade delete)
       removeDeadlinesByUnit: (unitId: string, unitCode: string) => {
         set((state) => ({
-          deadlines: state.deadlines.filter(
-            (d) => d.unitId !== unitId && d.unitCode !== unitCode,
-          ),
+          deadlines: state.deadlines.filter((d) => d.unitId !== unitId && d.unitCode !== unitCode),
         }));
       },
 
@@ -252,18 +218,14 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           console.warn(`Updating non-UUID deadline locally only: ${id}`);
           const localUpdate = { ...currentDeadline, ...updatedDeadline };
           set((state) => ({
-            deadlines: state.deadlines.map((d) =>
-              d.id === id ? localUpdate : d,
-            ),
+            deadlines: state.deadlines.map((d) => (d.id === id ? localUpdate : d)),
           }));
           return localUpdate;
         }
 
         const optimisticUpdate = { ...currentDeadline, ...updatedDeadline };
         set((state) => ({
-          deadlines: state.deadlines.map((d) =>
-            d.id === id ? optimisticUpdate : d,
-          ),
+          deadlines: state.deadlines.map((d) => (d.id === id ? optimisticUpdate : d)),
         }));
 
         try {
@@ -280,26 +242,20 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           };
 
           const updated = await apiRequest<Deadline>(`/api/deadlines/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(apiPayload),
           });
           const normalized = normalizeDeadline(updated);
           set((state) => ({
-            deadlines: state.deadlines.map((d) =>
-              d.id === id ? normalized : d,
-            ),
+            deadlines: state.deadlines.map((d) => (d.id === id ? normalized : d)),
           }));
           return normalized;
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
+          const errorMessage = error instanceof Error ? error.message : String(error);
 
           // Fix for 404: If deadline is missing on server (e.g. from migration), create it instead
-          if (
-            errorMessage.includes("404") ||
-            errorMessage.includes("not found")
-          ) {
+          if (errorMessage.includes('404') || errorMessage.includes('not found')) {
             console.warn(
               `Deadline ${id} not found on server during update, attempting to create it...`,
             );
@@ -309,16 +265,12 @@ export const useDeadlinesStore = create<DeadlinesState>()(
 
           // FAILURE: Revert to original state
           set((state) => ({
-            deadlines: state.deadlines.map((d) =>
-              d.id === id ? currentDeadline : d,
-            ),
+            deadlines: state.deadlines.map((d) => (d.id === id ? currentDeadline : d)),
           }));
           errorHandler.logError(
-            error instanceof Error
-              ? error
-              : new Error(`Failed to update deadline ${id}`),
-            "DeadlinesStore.updateDeadline",
-            "high",
+            error instanceof Error ? error : new Error(`Failed to update deadline ${id}`),
+            'DeadlinesStore.updateDeadline',
+            'high',
           );
           // Rethrow so UI can show error feedback
           throw error;
@@ -352,10 +304,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         const now = new Date();
         return get()
           .deadlines.filter((d) => !d.completed && new Date(d.dueDate) > now)
-          .sort(
-            (a, b) =>
-              new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime(),
-          )
+          .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
           .slice(0, limit);
       },
 
@@ -363,9 +312,9 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         try {
           const upcoming = get().getUpcoming(20);
           const now = new Date();
-          if (isNaN(now.getTime())) return "Low";
+          if (isNaN(now.getTime())) return 'Low';
 
-          const priorityPoints: Record<Deadline["priority"], number> = {
+          const priorityPoints: Record<Deadline['priority'], number> = {
             Urgent: 4,
             High: 3,
             Medium: 2,
@@ -391,19 +340,17 @@ export const useDeadlinesStore = create<DeadlinesState>()(
                         : daysUntil <= 14
                           ? 0.75
                           : 0.5;
-              return (
-                sum + (priorityPoints[deadline.priority] || 1) * timeWeight
-              );
+              return sum + (priorityPoints[deadline.priority] || 1) * timeWeight;
             } catch {
               return sum;
             }
           }, 0);
 
-          if (totalPoints >= 12) return "High";
-          if (totalPoints >= 6) return "Busy";
-          return "Low";
+          if (totalPoints >= 12) return 'High';
+          if (totalPoints >= 6) return 'Busy';
+          return 'Low';
         } catch {
-          return "Low";
+          return 'Low';
         }
       },
 
@@ -411,7 +358,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
       reset: () => set({ deadlines: [], hasLoaded: false, isLoading: false }),
     }),
     {
-      name: "deadlines-storage",
+      name: 'deadlines-storage',
       storage: createJSONStorage(() => localStorage),
       version: 4,
       // Only persist deadlines array, not loading state flags
@@ -431,31 +378,26 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         if (version < 4) {
           if (state?.state?.deadlines && Array.isArray(state.state.deadlines)) {
             // Migration: Version 4 forces ALL IDs to be valid UUIDs
-            state.state.deadlines = state.state.deadlines.map(
-              (deadline: Partial<Deadline>) => {
-                // Legacy hardcoded map
-                const idMap: Record<string, string> = {
-                  "deadline-comp2310-assignment-1":
-                    "550e8400-e29b-41d4-a716-446655440001",
-                  "deadline-math1001-quiz-1":
-                    "550e8400-e29b-41d4-a716-446655440002",
-                  "deadline-hist2002-essay-1":
-                    "550e8400-e29b-41d4-a716-446655440003",
-                };
+            state.state.deadlines = state.state.deadlines.map((deadline: Partial<Deadline>) => {
+              // Legacy hardcoded map
+              const idMap: Record<string, string> = {
+                'deadline-comp2310-assignment-1': '550e8400-e29b-41d4-a716-446655440001',
+                'deadline-math1001-quiz-1': '550e8400-e29b-41d4-a716-446655440002',
+                'deadline-hist2002-essay-1': '550e8400-e29b-41d4-a716-446655440003',
+              };
 
-                let newId = deadline.id ?? "";
+              let newId = deadline.id ?? '';
 
-                if (newId && idMap[newId]) {
-                  // Known legacy ID -> Map to specific UUID
-                  newId = idMap[newId];
-                } else if (!newId || !isValidUUID(newId)) {
-                  // Unknown legacy/invalid ID -> Generate random UUID
-                  newId = uuidv4();
-                }
+              if (newId && idMap[newId]) {
+                // Known legacy ID -> Map to specific UUID
+                newId = idMap[newId];
+              } else if (!newId || !isValidUUID(newId)) {
+                // Unknown legacy/invalid ID -> Generate random UUID
+                newId = uuidv4();
+              }
 
-                return { ...deadline, id: newId };
-              },
-            );
+              return { ...deadline, id: newId };
+            });
           }
         }
         return persistedState;

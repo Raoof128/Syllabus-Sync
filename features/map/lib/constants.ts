@@ -7,7 +7,7 @@ export const GPS_CAMPUS_BOUNDS = {
 };
 
 // Campus image path (versioned to bust stale caches)
-export const MAP_ASSET_VERSION = "2026-02-07-1";
+export const MAP_ASSET_VERSION = '2026-02-07-1';
 export const CAMPUS_IMAGE_URL = `/maps/raster/mq-campus.png?v=${MAP_ASSET_VERSION}`;
 
 // Real GPS coordinates for campus center (used ONLY for geolocation comparison)
@@ -28,7 +28,4 @@ export const PIXEL_BOUNDS: [[number, number], [number, number]] = [
 ];
 
 // Campus center in pixel coordinates (for initial view)
-export const CAMPUS_CENTER_PIXEL: [number, number] = [
-  MAP_DIMS.height / 2,
-  MAP_DIMS.width / 2,
-];
+export const CAMPUS_CENTER_PIXEL: [number, number] = [MAP_DIMS.height / 2, MAP_DIMS.width / 2];

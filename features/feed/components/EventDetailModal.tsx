@@ -1,35 +1,21 @@
-"use client";
+'use client';
 
-import { memo } from "react";
-import Link from "next/link";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/mq/button";
-import { Badge } from "@/components/ui/mq/badge";
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  Plus,
-  Check,
-  Navigation,
-  Loader2,
-  Building2,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { PublicEvent } from "@/lib/types/publicEvents";
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { buildings } from "@/features/map/lib/buildings";
+import { memo } from 'react';
+import Link from 'next/link';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/mq/button';
+import { Badge } from '@/components/ui/mq/badge';
+import { Calendar, Clock, MapPin, Plus, Check, Navigation, Loader2, Building2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { PublicEvent } from '@/lib/types/publicEvents';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { buildings } from '@/features/map/lib/buildings';
 
 const categoryStyles: Record<string, { gradient: string; icon: string }> = {
-  Career: { gradient: "from-blue-500 to-blue-700", icon: "💼" },
-  Social: { gradient: "from-purple-500 to-purple-700", icon: "🎉" },
-  Academic: { gradient: "from-emerald-500 to-emerald-700", icon: "📚" },
-  "Free Food": { gradient: "from-amber-500 to-orange-600", icon: "🍕" },
+  Career: { gradient: 'from-blue-500 to-blue-700', icon: '💼' },
+  Social: { gradient: 'from-purple-500 to-purple-700', icon: '🎉' },
+  Academic: { gradient: 'from-emerald-500 to-emerald-700', icon: '📚' },
+  'Free Food': { gradient: 'from-amber-500 to-orange-600', icon: '🍕' },
 };
 
 interface EventDetailModalProps {
@@ -50,7 +36,7 @@ export const EventDetailModal = memo(
     isAdded,
     isAdding,
     onAddToCalendar,
-    locale = "en-AU",
+    locale = 'en-AU',
   }: EventDetailModalProps) => {
     const { t } = useTypedTranslation();
 
@@ -59,28 +45,26 @@ export const EventDetailModal = memo(
     const style = categoryStyles[event.category] || categoryStyles.Academic;
 
     // Find building details
-    const buildingInfo = event.building
-      ? buildings.find((b) => b.id === event.building)
-      : null;
+    const buildingInfo = event.building ? buildings.find((b) => b.id === event.building) : null;
 
     const formatTime = (date: Date) => {
       return date.toLocaleTimeString(locale, {
-        hour: "numeric",
-        minute: "2-digit",
+        hour: 'numeric',
+        minute: '2-digit',
       });
     };
 
     const formatFullDate = (date: Date) => {
       return date.toLocaleDateString(locale, {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
     };
 
     const getTimeRange = () => {
-      if (event.allDay) return "All Day";
+      if (event.allDay) return 'All Day';
       const start = formatTime(event.startAt);
       if (event.endAt) {
         const end = formatTime(event.endAt);
@@ -93,9 +77,7 @@ export const EventDetailModal = memo(
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent className="max-w-lg p-0 overflow-hidden">
           {/* Header with Gradient */}
-          <div
-            className={cn("relative bg-linear-to-br p-6 pb-8", style.gradient)}
-          >
+          <div className={cn('relative bg-linear-to-br p-6 pb-8', style.gradient)}>
             {/* Decorative Elements */}
             <div className="absolute inset-0 opacity-10">
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-white rounded-full" />
@@ -126,11 +108,9 @@ export const EventDetailModal = memo(
             {/* Description */}
             <div>
               <h4 className="text-sm font-semibold text-mq-content-tertiary uppercase tracking-wide mb-2">
-                {t("description") || "Description"}
+                {t('description') || 'Description'}
               </h4>
-              <p className="text-mq-content leading-relaxed">
-                {event.description}
-              </p>
+              <p className="text-mq-content leading-relaxed">{event.description}</p>
             </div>
 
             {/* Date & Time */}
@@ -141,7 +121,7 @@ export const EventDetailModal = memo(
                 </div>
                 <div>
                   <p className="text-xs text-mq-content-tertiary font-medium uppercase">
-                    {t("date") || "Date"}
+                    {t('date') || 'Date'}
                   </p>
                   <p className="text-sm font-semibold text-mq-content">
                     {formatFullDate(event.startAt)}
@@ -155,11 +135,9 @@ export const EventDetailModal = memo(
                 </div>
                 <div>
                   <p className="text-xs text-mq-content-tertiary font-medium uppercase">
-                    {t("time") || "Time"}
+                    {t('time') || 'Time'}
                   </p>
-                  <p className="text-sm font-semibold text-mq-content">
-                    {getTimeRange()}
-                  </p>
+                  <p className="text-sm font-semibold text-mq-content">{getTimeRange()}</p>
                 </div>
               </div>
             </div>
@@ -171,11 +149,9 @@ export const EventDetailModal = memo(
               </div>
               <div className="flex-1">
                 <p className="text-xs text-mq-content-tertiary font-medium uppercase mb-1">
-                  {t("location") || "Location"}
+                  {t('location') || 'Location'}
                 </p>
-                <p className="text-sm font-semibold text-mq-content mb-1">
-                  {event.location}
-                </p>
+                <p className="text-sm font-semibold text-mq-content mb-1">{event.location}</p>
                 {buildingInfo && (
                   <div className="flex items-center gap-2 text-xs text-mq-content-secondary">
                     <Building2 className="h-3.5 w-3.5" />
@@ -192,10 +168,10 @@ export const EventDetailModal = memo(
                   className="shrink-0 text-mq-primary hover:bg-mq-primary/10"
                 >
                   <Link
-                    href={`/map?building=${encodeURIComponent(event.building)}${event.room ? `&room=${encodeURIComponent(event.room)}` : ""}&autonav=true`}
+                    href={`/map?building=${encodeURIComponent(event.building)}${event.room ? `&room=${encodeURIComponent(event.room)}` : ''}&autonav=true`}
                   >
                     <Navigation className="h-4 w-4 mr-1.5" />
-                    {t("navigate") || "Navigate"}
+                    {t('navigate') || 'Navigate'}
                   </Link>
                 </Button>
               )}
@@ -208,34 +184,34 @@ export const EventDetailModal = memo(
                 disabled={isAdding || isAdded}
                 size="lg"
                 className={cn(
-                  "w-full gap-2 transition-all",
+                  'w-full gap-2 transition-all',
                   isAdded
-                    ? "bg-emerald-600 hover:bg-emerald-600 border-emerald-600"
-                    : "bg-mq-primary hover:bg-mq-primary-dark",
+                    ? 'bg-emerald-600 hover:bg-emerald-600 border-emerald-600'
+                    : 'bg-mq-primary hover:bg-mq-primary-dark',
                 )}
               >
                 {isAdding ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    {t("adding") || "Adding..."}
+                    {t('adding') || 'Adding...'}
                   </>
                 ) : isAdded ? (
                   <>
                     <Check className="h-5 w-5" />
-                    {t("addedToCalendar") || "Added to Your Calendar"}
+                    {t('addedToCalendar') || 'Added to Your Calendar'}
                   </>
                 ) : (
                   <>
                     <Plus className="h-5 w-5" />
-                    {t("addToMyCalendar") || "Add to My Calendar"}
+                    {t('addToMyCalendar') || 'Add to My Calendar'}
                   </>
                 )}
               </Button>
 
               {isAdded && (
                 <p className="text-xs text-mq-content-tertiary text-center mt-2">
-                  {t("eventAddedInfo") ||
-                    "This event has been added to your personal calendar. You can view it in the Calendar tab."}
+                  {t('eventAddedInfo') ||
+                    'This event has been added to your personal calendar. You can view it in the Calendar tab.'}
                 </p>
               )}
             </div>
@@ -246,4 +222,4 @@ export const EventDetailModal = memo(
   },
 );
 
-EventDetailModal.displayName = "EventDetailModal";
+EventDetailModal.displayName = 'EventDetailModal';

@@ -15,7 +15,7 @@
  * @since 2026-01-24
  */
 
-import { MAP_CONFIG, pixelToCrsSimple } from "./buildings";
+import { MAP_CONFIG, pixelToCrsSimple } from './buildings';
 
 // =============================================================================
 // TYPES
@@ -26,7 +26,7 @@ export interface GroundControlPoint {
   name: string;
   gps: { lat: number; lng: number };
   pixel: [number, number];
-  source: "google_maps" | "osm" | "survey" | "exif";
+  source: 'google_maps' | 'osm' | 'survey' | 'exif';
   verifiedDate: string;
 }
 
@@ -46,14 +46,14 @@ export interface TransformResult {
   crsSimple: { lat: number; lng: number };
   isOnCampus: boolean;
   accuracy: number;
-  method: "gcp_affine";
+  method: 'gcp_affine';
 }
 
 export interface ExifGpsData {
   latitude: number;
-  latitudeRef: "N" | "S";
+  latitudeRef: 'N' | 'S';
   longitude: number;
-  longitudeRef: "E" | "W";
+  longitudeRef: 'E' | 'W';
   altitude?: number;
   timestamp?: Date;
 }
@@ -64,156 +64,156 @@ export interface ExifGpsData {
 
 export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
   {
-    id: "GCP_LIBRARY",
-    name: "Waranara Library (Main Entrance)",
+    id: 'GCP_LIBRARY',
+    name: 'Waranara Library (Main Entrance)',
     gps: { lat: -33.7756994, lng: 151.1131306 },
     pixel: [2455, 2388], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-20",
+    source: 'google_maps',
+    verifiedDate: '2026-01-20',
   },
   {
-    id: "GCP_SPORT",
-    name: "Macquarie University Sport and Aquatic Centre",
+    id: 'GCP_SPORT',
+    name: 'Macquarie University Sport and Aquatic Centre',
     gps: { lat: -33.7726489, lng: 151.1105693 },
     pixel: [1781, 1162], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-20",
+    source: 'google_maps',
+    verifiedDate: '2026-01-20',
   },
   {
-    id: "GCP_COURTYARD",
-    name: "Central Courtyard",
+    id: 'GCP_COURTYARD',
+    name: 'Central Courtyard',
     gps: { lat: -33.7738842, lng: 151.1135164 },
     pixel: [2638, 1618], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-20",
+    source: 'google_maps',
+    verifiedDate: '2026-01-20',
   },
   {
-    id: "GCP_18WW",
+    id: 'GCP_18WW',
     name: "18 Wally's Walk (Central Hub)",
     gps: { lat: -33.7734389, lng: 151.1134919 },
     pixel: [2392, 1881], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-20",
+    source: 'google_maps',
+    verifiedDate: '2026-01-20',
   },
   {
-    id: "GCP_4ER",
-    name: "4 Eastern Road (Business School)",
+    id: 'GCP_4ER',
+    name: '4 Eastern Road (Business School)',
     gps: { lat: -33.775787, lng: 151.1160258 },
     pixel: [3176, 2352], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-20",
+    source: 'google_maps',
+    verifiedDate: '2026-01-20',
   },
   {
-    id: "GCP_HOSP",
-    name: "MQ University Hospital",
+    id: 'GCP_HOSP',
+    name: 'MQ University Hospital',
     gps: { lat: -33.7735912, lng: 151.1179502 },
     pixel: [3909, 1568], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_INCUB",
-    name: "MQ Incubator",
+    id: 'GCP_INCUB',
+    name: 'MQ Incubator',
     gps: { lat: -33.7763444, lng: 151.1090529 },
     pixel: [1295, 2537], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_OBS",
-    name: "Observatory",
+    id: 'GCP_OBS',
+    name: 'Observatory',
     gps: { lat: -33.7703261, lng: 151.1111248 },
     pixel: [1865, 492], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_19ER",
-    name: "19 Eastern Road (Chancellery)",
+    id: 'GCP_19ER',
+    name: '19 Eastern Road (Chancellery)',
     gps: { lat: -33.7724696, lng: 151.1148539 },
     pixel: [3052, 1203], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_BANKSIA",
-    name: "Banksia Cottage",
+    id: 'GCP_BANKSIA',
+    name: 'Banksia Cottage',
     gps: { lat: -33.7752254, lng: 151.1090476 },
     pixel: [1305, 2175], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_17WW",
+    id: 'GCP_17WW',
     name: "17 Wally's Walk (Law)",
     gps: { lat: -33.7748805, lng: 151.1133652 },
     pixel: [2621, 1916], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_29WW",
+    id: 'GCP_29WW',
     name: "29 Wally's Walk (Walanga Muru)",
     gps: { lat: -33.7743082, lng: 151.1104628 },
     pixel: [1661, 1879], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_CHAP",
-    name: "10 Hadenfeld Ave (Chaplaincy)",
+    id: 'GCP_CHAP',
+    name: '10 Hadenfeld Ave (Chaplaincy)',
     gps: { lat: -33.7760151, lng: 151.1080508 },
     pixel: [1085, 2580], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_LAKESIDE",
-    name: "Lakeside Hotel",
+    id: 'GCP_LAKESIDE',
+    name: 'Lakeside Hotel',
     gps: { lat: -33.7713301, lng: 151.1158846 },
     pixel: [3309, 719], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_SHOPPING",
-    name: "Macquarie Centre",
+    id: 'GCP_SHOPPING',
+    name: 'Macquarie Centre',
     gps: { lat: -33.7772506, lng: 151.1211352 },
     pixel: [4314, 2607], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_HEARING",
-    name: "Australian Hearing Hub",
+    id: 'GCP_HEARING',
+    name: 'Australian Hearing Hub',
     gps: { lat: -33.7764943, lng: 151.1118029 },
     pixel: [1932, 2706], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_21WW",
-    name: "Macquarie Theatre",
+    id: 'GCP_21WW',
+    name: 'Macquarie Theatre',
     gps: { lat: -33.7746449, lng: 151.1122661 },
     pixel: [2188, 1950], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_12SW",
-    name: "Student Services (12SW)",
+    id: 'GCP_12SW',
+    name: 'Student Services (12SW)',
     gps: { lat: -33.775054, lng: 151.113053 },
     pixel: [2287, 2120], // +110px offset applied
-    source: "google_maps",
-    verifiedDate: "2026-01-24",
+    source: 'google_maps',
+    verifiedDate: '2026-01-24',
   },
   {
-    id: "GCP_8SCO",
-    name: "8 Sir Christopher Ondaatje Ave",
+    id: 'GCP_8SCO',
+    name: '8 Sir Christopher Ondaatje Ave',
     gps: { lat: -33.77578, lng: 151.11473 },
     pixel: [2933, 2260], // +110px offset applied
-    source: "survey",
-    verifiedDate: "2026-01-24",
+    source: 'survey',
+    verifiedDate: '2026-01-24',
   },
 ];
 
@@ -257,10 +257,7 @@ function multiplyMatrixVector(m: number[][], v: number[]): number[] {
   ];
 }
 
-function solveMultipleRegression(
-  inputs: number[][],
-  outputs: number[],
-): number[] | null {
+function solveMultipleRegression(inputs: number[][], outputs: number[]): number[] | null {
   const n = inputs.length;
   const xtx = [
     [0, 0, 0],
@@ -300,11 +297,8 @@ let _cachedRmse = 0;
  */
 const MANUAL_OFFSET = { x: 0, y: 0 }; // Reset to 0 as GCPs now include the offset
 
-export function computeAffineCoefficients(
-  gcps: GroundControlPoint[],
-): AffineCoefficients {
-  if (gcps.length < 3)
-    throw new Error("Need at least 3 GCPs for affine transformation");
+export function computeAffineCoefficients(gcps: GroundControlPoint[]): AffineCoefficients {
+  if (gcps.length < 3) throw new Error('Need at least 3 GCPs for affine transformation');
 
   const lats = gcps.map((g) => g.gps.lat);
   const lngs = gcps.map((g) => g.gps.lng);
@@ -313,8 +307,7 @@ export function computeAffineCoefficients(
   const minLng = Math.min(...lngs);
   const maxLng = Math.max(...lngs);
 
-  const normalize = (val: number, min: number, max: number) =>
-    (val - min) / (max - min);
+  const normalize = (val: number, min: number, max: number) => (val - min) / (max - min);
 
   const inputs = gcps.map((g) => [
     1,
@@ -332,9 +325,7 @@ export function computeAffineCoefficients(
   );
 
   if (!xParams || !yParams) {
-    throw new Error(
-      "Failed to solve regression matrix - points may be collinear",
-    );
+    throw new Error('Failed to solve regression matrix - points may be collinear');
   }
 
   return {
@@ -348,7 +339,7 @@ export function getAffineCoefficients(): AffineCoefficients {
   if (!_cachedCoeffs) {
     _cachedCoeffs = computeAffineCoefficients(GROUND_CONTROL_POINTS);
     _cachedRmse = computeRMSE(_cachedCoeffs, GROUND_CONTROL_POINTS);
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env.NODE_ENV !== 'production') {
       console.warn(
         `[GeoCalibration] Affine transformation computed from ${GROUND_CONTROL_POINTS.length} GCPs. RMSE: ${_cachedRmse.toFixed(2)} px`,
       );
@@ -357,11 +348,7 @@ export function getAffineCoefficients(): AffineCoefficients {
   return _cachedCoeffs;
 }
 
-function gpsToPixelAffine(
-  lat: number,
-  lng: number,
-  coeffs: AffineCoefficients,
-): [number, number] {
+function gpsToPixelAffine(lat: number, lng: number, coeffs: AffineCoefficients): [number, number] {
   const { minLat, maxLat, minLng, maxLng } = coeffs.normalization;
   const normLng = (lng - minLng) / (maxLng - minLng);
   const normLat = (lat - minLat) / (maxLat - minLat);
@@ -373,10 +360,7 @@ function gpsToPixelAffine(
   return [Math.round(x + MANUAL_OFFSET.x), Math.round(y + MANUAL_OFFSET.y)];
 }
 
-function computeRMSE(
-  coeffs: AffineCoefficients,
-  gcps: GroundControlPoint[],
-): number {
+function computeRMSE(coeffs: AffineCoefficients, gcps: GroundControlPoint[]): number {
   let sumSqError = 0;
   for (const gcp of gcps) {
     const predicted = gpsToPixelAffine(gcp.gps.lat, gcp.gps.lng, coeffs);
@@ -391,10 +375,7 @@ function computeRMSE(
 // PUBLIC API
 // =============================================================================
 
-export function gpsToPixelCalibrated(
-  lat: number,
-  lng: number,
-): TransformResult {
+export function gpsToPixelCalibrated(lat: number, lng: number): TransformResult {
   const coeffs = getAffineCoefficients();
   const pixel = gpsToPixelAffine(lat, lng, coeffs);
 
@@ -417,14 +398,11 @@ export function gpsToPixelCalibrated(
     crsSimple,
     isOnCampus,
     accuracy: _cachedRmse,
-    method: "gcp_affine",
+    method: 'gcp_affine',
   };
 }
 
-export function gpsToCrsSimple(
-  lat: number,
-  lng: number,
-): { lat: number; lng: number } | null {
+export function gpsToCrsSimple(lat: number, lng: number): { lat: number; lng: number } | null {
   const result = gpsToPixelCalibrated(lat, lng);
   return result.isOnCampus ? result.crsSimple : null;
 }
@@ -432,15 +410,12 @@ export function gpsToCrsSimple(
 export function calibratePhotoMarker(exifData: ExifGpsData): TransformResult {
   let lat = exifData.latitude;
   let lng = exifData.longitude;
-  if (exifData.latitudeRef === "S") lat = -Math.abs(lat);
-  if (exifData.longitudeRef === "W") lng = -Math.abs(lng);
+  if (exifData.latitudeRef === 'S') lat = -Math.abs(lat);
+  if (exifData.longitudeRef === 'W') lng = -Math.abs(lng);
   return gpsToPixelCalibrated(lat, lng);
 }
 
-export function calibratePhotoMarkerFromCoords(
-  lat: number,
-  lng: number,
-): TransformResult {
+export function calibratePhotoMarkerFromCoords(lat: number, lng: number): TransformResult {
   return gpsToPixelCalibrated(lat, lng);
 }
 
@@ -465,7 +440,7 @@ export function getCalibrationDiagnostics() {
     gcpCount: GROUND_CONTROL_POINTS.length,
     rmsePixels: _cachedRmse,
     rmseMeters: _cachedRmse * metersPerPixel,
-    method: "Affine (Multiple Regression)",
+    method: 'Affine (Multiple Regression)',
     gcpResiduals: residuals,
   };
 }

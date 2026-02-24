@@ -1,17 +1,14 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
-import { cn } from "@/lib/utils";
-import {
-  useGamificationStore,
-  useXPProgress,
-} from "@/lib/store/gamificationStore";
+import React, { useEffect } from 'react';
+import { cn } from '@/lib/utils';
+import { useGamificationStore, useXPProgress } from '@/lib/store/gamificationStore';
 
 interface XPProgressBarProps {
   /** Show the XP numbers (e.g., "120 / 250 XP") */
   showNumbers?: boolean;
   /** Size variant */
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
   /** Additional className */
   className?: string;
   /** Animate on mount */
@@ -24,13 +21,12 @@ interface XPProgressBarProps {
  */
 export function XPProgressBar({
   showNumbers = true,
-  size = "md",
+  size = 'md',
   className,
   animate = true,
 }: XPProgressBarProps) {
   const { loadProfile, hasLoaded, isLoading } = useGamificationStore();
-  const { level, progress, xpToNext, xpInLevel, xpNeededForLevel } =
-    useXPProgress();
+  const { level, progress, xpToNext, xpInLevel, xpNeededForLevel } = useXPProgress();
 
   // Load profile on mount
   useEffect(() => {
@@ -40,23 +36,23 @@ export function XPProgressBar({
   }, [hasLoaded, loadProfile]);
 
   const sizeClasses = {
-    sm: "h-1.5",
-    md: "h-2.5",
-    lg: "h-4",
+    sm: 'h-1.5',
+    md: 'h-2.5',
+    lg: 'h-4',
   };
 
   const textSizeClasses = {
-    sm: "text-xs",
-    md: "text-sm",
-    lg: "text-base",
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base',
   };
 
   if (isLoading && !hasLoaded) {
     return (
-      <div className={cn("space-y-1", className)}>
+      <div className={cn('space-y-1', className)}>
         <div
           className={cn(
-            "w-full bg-mq-background-secondary rounded-full overflow-hidden",
+            'w-full bg-mq-background-secondary rounded-full overflow-hidden',
             sizeClasses[size],
           )}
         >
@@ -67,11 +63,11 @@ export function XPProgressBar({
   }
 
   return (
-    <div className={cn("space-y-1", className)}>
+    <div className={cn('space-y-1', className)}>
       {/* Progress Bar */}
       <div
         className={cn(
-          "w-full bg-mq-background-secondary rounded-full overflow-hidden",
+          'w-full bg-mq-background-secondary rounded-full overflow-hidden',
           sizeClasses[size],
         )}
         role="progressbar"
@@ -82,9 +78,9 @@ export function XPProgressBar({
       >
         <div
           className={cn(
-            "h-full rounded-full transition-all duration-700 ease-out",
-            "bg-gradient-to-r from-mq-primary to-mq-success",
-            animate && "animate-in slide-in-from-left",
+            'h-full rounded-full transition-all duration-700 ease-out',
+            'bg-gradient-to-r from-mq-primary to-mq-success',
+            animate && 'animate-in slide-in-from-left',
           )}
           style={{ width: `${progress}%` }}
         />
@@ -92,15 +88,9 @@ export function XPProgressBar({
 
       {/* XP Numbers */}
       {showNumbers && (
-        <div
-          className={cn(
-            "flex justify-between items-center",
-            textSizeClasses[size],
-          )}
-        >
+        <div className={cn('flex justify-between items-center', textSizeClasses[size])}>
           <span className="text-mq-content-secondary font-medium">
-            {xpInLevel.toLocaleString()} / {xpNeededForLevel.toLocaleString()}{" "}
-            XP
+            {xpInLevel.toLocaleString()} / {xpNeededForLevel.toLocaleString()} XP
           </span>
           <span className="text-mq-content-tertiary">
             {xpToNext.toLocaleString()} to Lv. {level + 1}
@@ -129,7 +119,7 @@ export function XPProgressCompact({ className }: XPProgressCompactProps) {
   }, [hasLoaded, loadProfile]);
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn('flex items-center gap-2', className)}>
       {/* Level Badge */}
       <span className="text-xs font-bold text-mq-primary">Lv.{level}</span>
 

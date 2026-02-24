@@ -13,52 +13,52 @@
  * - Does not print secret values.
  */
 
-import { execFileSync } from "node:child_process";
+import { execFileSync } from 'node:child_process';
 
 const REQUIRED_KEYS = [
   // Resend email service
-  "RESEND_API_KEY",
-  "VERIFICATION_EMAIL_FROM",
-  "VERIFICATION_EMAIL_NAME",
+  'RESEND_API_KEY',
+  'VERIFICATION_EMAIL_FROM',
+  'VERIFICATION_EMAIL_NAME',
   // Email verification link base URL (fallbacks exist, but this is recommended)
-  "NEXT_PUBLIC_APP_URL",
+  'NEXT_PUBLIC_APP_URL',
   // Supabase (required for auth + security-critical operations)
-  "NEXT_PUBLIC_SUPABASE_URL",
-  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-  "SUPABASE_SERVICE_ROLE_KEY",
+  'NEXT_PUBLIC_SUPABASE_URL',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'SUPABASE_SERVICE_ROLE_KEY',
   // Distributed rate limiting (required for production)
-  "KV_REST_API_URL",
-  "KV_REST_API_TOKEN",
+  'KV_REST_API_URL',
+  'KV_REST_API_TOKEN',
   // Cron endpoint auth
-  "CRON_SECRET",
+  'CRON_SECRET',
 ];
 
 const FORBIDDEN_KEYS_BY_ENV = {
-  production: ["ALLOW_MEMORY_RATE_LIMIT"],
+  production: ['ALLOW_MEMORY_RATE_LIMIT'],
 };
 
 function readEnvList(environment) {
-  const args = ["env", "ls", environment];
+  const args = ['env', 'ls', environment];
 
   // Prefer explicit non-interactive auth in CI when available.
   if (process.env.VERCEL_TOKEN?.trim()) {
-    args.push("--token", process.env.VERCEL_TOKEN.trim());
+    args.push('--token', process.env.VERCEL_TOKEN.trim());
   }
   if (process.env.VERCEL_ORG_ID?.trim()) {
-    args.push("--scope", process.env.VERCEL_ORG_ID.trim());
+    args.push('--scope', process.env.VERCEL_ORG_ID.trim());
   }
 
   // `vercel env ls <env>` prints a table including keys; we only need to detect names.
-  const out = execFileSync("vercel", args, {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
+  const out = execFileSync('vercel', args, {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
     env: process.env,
   });
   return out;
 }
 
 function main() {
-  const environment = process.env.VERCEL_ENVIRONMENT || "production";
+  const environment = process.env.VERCEL_ENVIRONMENT || 'production';
 
   let output;
   try {
@@ -67,7 +67,7 @@ function main() {
     const msg =
       err?.stderr?.toString?.() ||
       err?.message ||
-      "failed to run `vercel env ls` (is the Vercel CLI installed and authenticated?)";
+      'failed to run `vercel env ls` (is the Vercel CLI installed and authenticated?)';
     console.error(msg);
     process.exitCode = 2;
     return;
@@ -79,28 +79,26 @@ function main() {
       [
         `Missing required Vercel environment keys for "${environment}":`,
         ...missing.map((k) => `- ${k}`),
-        "",
-        "Fix:",
+        '',
+        'Fix:',
         `- vercel env add <KEY> ${environment}`,
         `- or set them in the Vercel dashboard: Project -> Settings -> Environment Variables`,
-      ].join("\n"),
+      ].join('\n'),
     );
     process.exitCode = 1;
     return;
   }
 
-  const forbidden = (FORBIDDEN_KEYS_BY_ENV[environment] || []).filter((k) =>
-    output.includes(k),
-  );
+  const forbidden = (FORBIDDEN_KEYS_BY_ENV[environment] || []).filter((k) => output.includes(k));
   if (forbidden.length > 0) {
     console.error(
       [
         `Forbidden Vercel environment keys present for "${environment}":`,
         ...forbidden.map((k) => `- ${k}`),
-        "",
-        "Fix:",
+        '',
+        'Fix:',
         `- vercel env rm <KEY> ${environment}`,
-      ].join("\n"),
+      ].join('\n'),
     );
     process.exitCode = 1;
     return;

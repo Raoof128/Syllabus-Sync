@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Deadline, Event, Unit, Todo } from "@/lib/types";
-import dayjs from "dayjs";
+import { useState } from 'react';
+import { Deadline, Event, Unit, Todo } from '@/lib/types';
+import dayjs from 'dayjs';
 
 export function useCalendarDialogs() {
   // Dialog states
@@ -22,22 +22,18 @@ export function useCalendarDialogs() {
   // Todo dialog state
   const [todoDialogOpen, setTodoDialogOpen] = useState(false);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [editTodoTitle, setEditTodoTitle] = useState("");
-  const [editTodoPriority, setEditTodoPriority] = useState<
-    "High" | "Medium" | "Low"
-  >("Medium");
-  const [editTodoDueDate, setEditTodoDueDate] = useState("");
-  const [editTodoDueTime, setEditTodoDueTime] = useState("");
-  const [editTodoColor, setEditTodoColor] = useState<string>("#10b981");
+  const [editTodoTitle, setEditTodoTitle] = useState('');
+  const [editTodoPriority, setEditTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
+  const [editTodoDueDate, setEditTodoDueDate] = useState('');
+  const [editTodoDueTime, setEditTodoDueTime] = useState('');
+  const [editTodoColor, setEditTodoColor] = useState<string>('#10b981');
 
   // Detail panel states
   const [unitDetailOpen, setUnitDetailOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
 
   const [assignmentDetailOpen, setAssignmentDetailOpen] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState<Deadline | null>(
-    null,
-  );
+  const [selectedAssignment, setSelectedAssignment] = useState<Deadline | null>(null);
 
   const [examDetailOpen, setExamDetailOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState<Deadline | null>(null);
@@ -52,20 +48,14 @@ export function useCalendarDialogs() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<Unit | null>(null);
 
-  const [assignmentDeleteConfirmOpen, setAssignmentDeleteConfirmOpen] =
-    useState(false);
-  const [assignmentToDelete, setAssignmentToDelete] = useState<Deadline | null>(
-    null,
-  );
+  const [assignmentDeleteConfirmOpen, setAssignmentDeleteConfirmOpen] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<Deadline | null>(null);
 
   const [examDeleteConfirmOpen, setExamDeleteConfirmOpen] = useState(false);
   const [examToDelete, setExamToDelete] = useState<Deadline | null>(null);
 
-  const [deadlineDeleteConfirmOpen, setDeadlineDeleteConfirmOpen] =
-    useState(false);
-  const [deadlineToDelete, setDeadlineToDelete] = useState<Deadline | null>(
-    null,
-  );
+  const [deadlineDeleteConfirmOpen, setDeadlineDeleteConfirmOpen] = useState(false);
+  const [deadlineToDelete, setDeadlineToDelete] = useState<Deadline | null>(null);
 
   const [eventDeleteConfirmOpen, setEventDeleteConfirmOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
@@ -119,11 +109,11 @@ export function useCalendarDialogs() {
 
   const openAddTodo = () => {
     setEditingTodo(null);
-    setEditTodoTitle("");
-    setEditTodoPriority("Medium");
-    setEditTodoDueDate("");
-    setEditTodoDueTime("");
-    setEditTodoColor("#10b981");
+    setEditTodoTitle('');
+    setEditTodoPriority('Medium');
+    setEditTodoDueDate('');
+    setEditTodoDueTime('');
+    setEditTodoColor('#10b981');
     setTodoDialogOpen(true);
   };
 
@@ -131,14 +121,14 @@ export function useCalendarDialogs() {
     setEditingTodo(todo);
     setEditTodoTitle(todo.title);
     setEditTodoPriority(todo.priority);
-    setEditTodoColor(todo.color || "#10b981");
+    setEditTodoColor(todo.color || '#10b981');
     if (todo.dueDate) {
       const date = new Date(todo.dueDate);
-      setEditTodoDueDate(dayjs(date).format("YYYY-MM-DD"));
-      setEditTodoDueTime(dayjs(date).format("HH:mm"));
+      setEditTodoDueDate(dayjs(date).format('YYYY-MM-DD'));
+      setEditTodoDueTime(dayjs(date).format('HH:mm'));
     } else {
-      setEditTodoDueDate("");
-      setEditTodoDueTime("");
+      setEditTodoDueDate('');
+      setEditTodoDueTime('');
     }
     setTodoDialogOpen(true);
   };

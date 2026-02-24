@@ -12,19 +12,13 @@
 // - Broadcast channels should use private channels for sensitive data
 // - Never trust broadcast payloads from peers without server validation
 
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback, useRef } from "react";
-import {
-  createBrowserClient,
-  isSupabaseConfigured,
-} from "@/lib/supabase/client";
-import { useEventsStore } from "@/lib/store/eventsStore";
-import { logger } from "@/lib/logger";
-import type {
-  RealtimeChannel,
-  RealtimePostgresChangesPayload,
-} from "@supabase/supabase-js";
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import { useEventsStore } from '@/lib/store/eventsStore';
+import { logger } from '@/lib/logger';
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // ============================================================================
 // TYPES
@@ -58,14 +52,14 @@ interface CollaborationState {
 
 // Predefined collaboration colors (MQ brand-adjacent)
 const COLLAB_COLORS = [
-  "#A6192E", // MQ Red
-  "#E87722", // MQ Orange
-  "#00B2A9", // Teal
-  "#7B2D8E", // Purple
-  "#0077C8", // Blue
-  "#D4A017", // Gold
-  "#2E8B57", // Green
-  "#DC143C", // Crimson
+  '#A6192E', // MQ Red
+  '#E87722', // MQ Orange
+  '#00B2A9', // Teal
+  '#7B2D8E', // Purple
+  '#0077C8', // Blue
+  '#D4A017', // Gold
+  '#2E8B57', // Green
+  '#DC143C', // Crimson
 ];
 
 function getCollabColor(userId: string): string {
@@ -101,8 +95,8 @@ export function useLiveCollaboration(
     (x: number, y: number) => {
       if (!channelRef.current || !userProfile) return;
       channelRef.current.send({
-        type: "broadcast",
-        event: "cursor-move",
+        type: 'broadcast',
+        event: 'cursor-move',
         payload: {
           userId: userProfile.id,
           x,
@@ -129,15 +123,15 @@ export function useLiveCollaboration(
 
     // 1. POSTGRES CHANGES - Live database edits
     room.on(
-      "postgres_changes",
+      'postgres_changes',
       {
-        event: "*",
-        schema: "public",
-        table: "events",
+        event: '*',
+        schema: 'public',
+        table: 'events',
         filter: `schedule_id=eq.${scheduleId}`,
       },
       (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
-        logger.info("Realtime event change:", payload.eventType);
+        logger.info('Realtime event change:', payload.eventType);
 
         // Refresh events store when a peer makes a change
         // This is simpler than granular patch application and avoids
@@ -147,44 +141,37 @@ export function useLiveCollaboration(
     );
 
     // 2. BROADCAST - Peer cursor tracking
-    room.on(
-      "broadcast",
-      { event: "cursor-move" },
-      (payload: { payload: CursorPosition }) => {
-        const cursor = payload.payload as CursorPosition;
-        if (!cursor?.userId) return;
+    room.on('broadcast', { event: 'cursor-move' }, (payload: { payload: CursorPosition }) => {
+      const cursor = payload.payload as CursorPosition;
+      if (!cursor?.userId) return;
 
-        setState((prev) => {
-          const updated = new Map(prev.peerCursors);
-          updated.set(cursor.userId, cursor);
+      setState((prev) => {
+        const updated = new Map(prev.peerCursors);
+        updated.set(cursor.userId, cursor);
 
-          // Clean up stale cursors (older than 10 seconds)
-          const now = Date.now();
-          for (const [id, pos] of updated) {
-            if (now - pos.timestamp > 10_000) {
-              updated.delete(id);
-            }
+        // Clean up stale cursors (older than 10 seconds)
+        const now = Date.now();
+        for (const [id, pos] of updated) {
+          if (now - pos.timestamp > 10_000) {
+            updated.delete(id);
           }
+        }
 
-          return { ...prev, peerCursors: updated };
-        });
-      },
-    );
+        return { ...prev, peerCursors: updated };
+      });
+    });
 
     // 3. PRESENCE - Who is online
-    room.on("presence", { event: "sync" }, () => {
+    room.on('presence', { event: 'sync' }, () => {
       const presenceState = room.presenceState();
-      const users: ActiveUser[] = Object.entries(presenceState).flatMap(
-        ([_key, presences]) =>
-          (
-            presences as Array<{ id: string; name: string; avatar?: string }>
-          ).map((p) => ({
-            id: p.id,
-            name: p.name,
-            avatar: p.avatar,
-            color: getCollabColor(p.id),
-            lastSeen: new Date().toISOString(),
-          })),
+      const users: ActiveUser[] = Object.entries(presenceState).flatMap(([_key, presences]) =>
+        (presences as Array<{ id: string; name: string; avatar?: string }>).map((p) => ({
+          id: p.id,
+          name: p.name,
+          avatar: p.avatar,
+          color: getCollabColor(p.id),
+          lastSeen: new Date().toISOString(),
+        })),
       );
 
       setState((prev) => ({ ...prev, activeUsers: users }));
@@ -192,7 +179,7 @@ export function useLiveCollaboration(
 
     // Subscribe and track presence
     room.subscribe(async (status: string) => {
-      if (status === "SUBSCRIBED") {
+      if (status === 'SUBSCRIBED') {
         await room.track({
           id: userProfile.id,
           name: userProfile.name,

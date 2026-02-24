@@ -1,4 +1,4 @@
-import { toast } from "@/lib/hooks/use-toast";
+import { toast } from '@/lib/hooks/use-toast';
 
 type ToastOptions = {
   id?: string;
@@ -10,7 +10,7 @@ export const toastUtils = {
     toast({
       title,
       description,
-      variant: "success",
+      variant: 'success',
       ...options,
     });
   },
@@ -19,7 +19,7 @@ export const toastUtils = {
     toast({
       title,
       description,
-      variant: "destructive",
+      variant: 'destructive',
       ...options,
     });
   },
@@ -28,7 +28,7 @@ export const toastUtils = {
     toast({
       title,
       description,
-      variant: "warning",
+      variant: 'warning',
       ...options,
     });
   },
@@ -37,7 +37,7 @@ export const toastUtils = {
     toast({
       title,
       description,
-      variant: "info",
+      variant: 'info',
       ...options,
     });
   },

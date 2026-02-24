@@ -1,11 +1,8 @@
-import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
-import {
-  verifyRegistrationResponse,
-  type RegistrationResponseJSON,
-} from "@simplewebauthn/server";
-import { createServerClient } from "@/lib/supabase/server";
-import { logger } from "@/lib/logger";
+import { cookies } from 'next/headers';
+import { NextRequest } from 'next/server';
+import { verifyRegistrationResponse, type RegistrationResponseJSON } from '@simplewebauthn/server';
+import { createServerClient } from '@/lib/supabase/server';
+import { logger } from '@/lib/logger';
 
 import {
   jsonSuccess,
@@ -14,7 +11,7 @@ import {
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
-} from "@/app/api/_lib/response";
+} from '@/app/api/_lib/response';
 import {
   getRpId,
   getOrigin,
@@ -22,7 +19,7 @@ import {
   PASSKEY_USER_COOKIE,
   clearPasskeyCookies,
   bufferToBase64Url,
-} from "@/app/api/auth/passkey/_lib";
+} from '@/app/api/auth/passkey/_lib';
 
 type RegistrationBody = {
   credential: Record<string, unknown>;
@@ -37,19 +34,17 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return jsonUnauthorized("Not authenticated");
+      return jsonUnauthorized('Not authenticated');
     }
 
-    const { data: body, error: parseError } =
-      await parseJsonBody<RegistrationBody>(request, BODY_SIZE_LIMITS.AUTH);
+    const { data: body, error: parseError } = await parseJsonBody<RegistrationBody>(
+      request,
+      BODY_SIZE_LIMITS.AUTH,
+    );
     if (parseError) return parseError;
 
     if (!body?.credential) {
-      return jsonError(
-        "Missing credential payload",
-        400,
-        ERROR_CODES.VALIDATION_ERROR,
-      );
+      return jsonError('Missing credential payload', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
     const cookieStore = await cookies();
@@ -57,11 +52,7 @@ export async function POST(request: NextRequest) {
     const expectedUser = cookieStore.get(PASSKEY_USER_COOKIE)?.value;
 
     if (!expectedChallenge || !expectedUser || expectedUser !== user.id) {
-      return jsonError(
-        "Passkey challenge expired",
-        400,
-        ERROR_CODES.BAD_REQUEST,
-      );
+      return jsonError('Passkey challenge expired', 400, ERROR_CODES.BAD_REQUEST);
     }
 
     const verification = await verifyRegistrationResponse({
@@ -73,11 +64,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!verification.verified || !verification.registrationInfo) {
-      return jsonError(
-        "Passkey verification failed",
-        400,
-        ERROR_CODES.BAD_REQUEST,
-      );
+      return jsonError('Passkey verification failed', 400, ERROR_CODES.BAD_REQUEST);
     }
 
     const { credential } = verification.registrationInfo;
@@ -93,19 +80,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (updateError) {
-      logger.error("Passkey registration update failed:", updateError.message);
-      return jsonError("Failed to save passkey", 400, ERROR_CODES.BAD_REQUEST);
+      logger.error('Passkey registration update failed:', updateError.message);
+      return jsonError('Failed to save passkey', 400, ERROR_CODES.BAD_REQUEST);
     }
 
     const response = jsonSuccess({ verified: true });
     clearPasskeyCookies(response);
     return response;
   } catch (error) {
-    logger.error("Passkey register error:", error);
-    return jsonError(
-      "Failed to register passkey",
-      500,
-      ERROR_CODES.INTERNAL_ERROR,
-    );
+    logger.error('Passkey register error:', error);
+    return jsonError('Failed to register passkey', 500, ERROR_CODES.INTERNAL_ERROR);
   }
 }
