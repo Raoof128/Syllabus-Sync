@@ -1,3 +1,37 @@
+### Raouf: Map Mode Stability Audit & Fixes — 2026-02-23
+
+**Scope:** `/map` dual-mode behavior (Campus Map + Google Maps)
+**Type:** Bug Fix / Stability / Regression Test
+
+#### Changes
+
+1. **Fixed cross-mode loading state leakage in `MapClient`:**
+   - Scoped campus loading timeout logic to campus mode only.
+   - Prevented false "map loading slowly" banners from carrying into Google mode.
+   - Cleared timeout banner when campus map reports ready.
+2. **Hardened mode transition lifecycle:**
+   - On mode switch, stop navigation in the inactive map implementation.
+   - Reset stale navigation state between campus and Google views.
+   - Reset campus readiness state when re-entering campus mode for clean remount behavior.
+3. **Fixed geolocation watcher cleanup edge case in `GoogleMapEmbed`:**
+   - Correctly handles and clears `watchPosition` id `0` during unmount.
+4. **Added regression test:**
+   - New test ensures geolocation `clearWatch(0)` executes as expected.
+
+#### Files Changed
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/MapClient.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+
+#### Verification
+
+- `npx eslint --config config/eslint/eslint.config.mjs features/map/components/MapClient.tsx features/map/components/GoogleMapEmbed.tsx tests/map/GoogleMapEmbed.test.tsx` ✅
+- `npm run test -- tests/map` ✅ (69/69)
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Map UI Polish & Interactive Tweaks — 2026-02-22
 
 **Scope:** Map UI Interactivity & Lint Fixes

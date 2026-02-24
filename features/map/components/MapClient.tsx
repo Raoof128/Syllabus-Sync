@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
   useState,
+  startTransition,
 } from "react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -129,6 +130,11 @@ export default function MapClient() {
   const hasAutoNavigatedRef = useRef(false);
   const mapView: MapView =
     searchParams.get("view") === "google" ? "google" : "campus";
+
+  const handleCampusMapReady = useCallback(() => {
+    setMapLoadTimedOut(false);
+    setIsMapReady(true);
+  }, []);
 
   // Use map store for overlay persistence
   const {
@@ -350,6 +356,14 @@ export default function MapClient() {
   }, []);
 
   useEffect(() => {
+    if (mapView !== "campus") {
+      if (mapReadyTimeoutRef.current) {
+        window.clearTimeout(mapReadyTimeoutRef.current);
+        mapReadyTimeoutRef.current = null;
+      }
+      return;
+    }
+
     if (!isMapReady) {
       if (mapReadyTimeoutRef.current) {
         window.clearTimeout(mapReadyTimeoutRef.current);
@@ -368,7 +382,24 @@ export default function MapClient() {
         mapReadyTimeoutRef.current = null;
       }
     };
-  }, [isMapReady]);
+  }, [isMapReady, mapView]);
+
+  useEffect(() => {
+    if (mapView !== "campus") {
+      campusMapRef.current?.stopNavigation();
+      startTransition(() => {
+        setNavState(null);
+      });
+      return;
+    }
+
+    googleMapRef.current?.stopNavigation();
+    startTransition(() => {
+      setIsMapReady(false);
+      setMapLoadTimedOut(false);
+      setNavState(null);
+    });
+  }, [mapView]);
 
   // NOTE: No IntersectionObserver - map loads immediately for better LCP
   // The map component is loaded with Suspense for progressive enhancement
@@ -602,7 +633,7 @@ export default function MapClient() {
                         activeOverlays={activeOverlays}
                         onLocationStatusChange={setLocationStatus}
                         onNavStateChange={setNavState}
-                        onMapReady={() => setIsMapReady(true)}
+                        onMapReady={handleCampusMapReady}
                       />
                     </Suspense>
                   </TranslatedMapErrorBoundary>

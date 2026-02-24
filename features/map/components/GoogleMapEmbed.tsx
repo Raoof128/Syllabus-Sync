@@ -60,7 +60,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
     const lastLocRef = useRef<{ lat: number; lng: number } | null>(null);
 
     useEffect(() => {
-      let watchId: number;
+      let watchId: number | null = null;
       if (typeof navigator !== "undefined" && "geolocation" in navigator) {
         watchId = navigator.geolocation.watchPosition(
           (pos) => {
@@ -82,7 +82,11 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
         );
       }
       return () => {
-        if (watchId && typeof navigator !== "undefined") {
+        if (
+          watchId !== null &&
+          typeof navigator !== "undefined" &&
+          "geolocation" in navigator
+        ) {
           navigator.geolocation.clearWatch(watchId);
         }
       };

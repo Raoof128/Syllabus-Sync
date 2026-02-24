@@ -73,4 +73,29 @@ describe("GoogleMapEmbed", () => {
     const iframe = screen.getByTitle("Google Maps — 18 Wallys Walk");
     expect(iframe.getAttribute("src")).toContain("-33.7734389,151.1134919");
   });
+
+  it("clears geolocation watch on unmount when watch id is 0", () => {
+    const originalGeolocation = navigator.geolocation;
+    const clearWatch = vi.fn();
+    const watchPosition = vi.fn().mockReturnValue(0);
+
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: {
+        watchPosition,
+        clearWatch,
+      } as unknown as Geolocation,
+    });
+
+    const { unmount } = render(<GoogleMapEmbed />);
+    expect(watchPosition).toHaveBeenCalledTimes(1);
+
+    unmount();
+    expect(clearWatch).toHaveBeenCalledWith(0);
+
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: originalGeolocation,
+    });
+  });
 });

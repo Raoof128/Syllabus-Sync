@@ -1,3 +1,13 @@
+Raouf: 2026-02-23 (UTC)
+Scope: Map Page Dual-Mode Audit (Campus + Google) and Stability Fixes
+Summary: Performed a focused production audit of the `/map` page for both map modes. Fixed cross-mode state leakage in `MapClient` where campus-map loading timeout and readiness state could persist incorrectly after switching to Google mode, causing false "slow load" UI and stale navigation state. Added explicit mode-transition handling to reset relevant state when returning to campus mode and stop the inactive mode's navigation. Updated campus map ready callback to clear slow-load state once map initialization succeeds. Hardened `GoogleMapEmbed` geolocation watch cleanup to correctly clear watcher id `0` on unmount.
+Files Changed:
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/MapClient.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/MapClient.tsx features/map/components/GoogleMapEmbed.tsx tests/map/GoogleMapEmbed.test.tsx` ✅, `npm run test -- tests/map` ✅ (69/69), `npm run typecheck` ✅.
+Follow-ups: Consider adding a dedicated `MapClient` component test for mode-switch lifecycle and timeout behavior.
+
 Raouf: 2026-02-22 (Australia/Sydney)
 Scope: Map UI Polish & Interactive Tweaks
 Summary: Added automatic closing of the map's floating Places sidebar when users explicitly select an active building hook, enhancing UX clarity. Lowered the active Google Find-Me and user routing location HUD logic avoiding responsive mobile cutoff. Resolved lingering `eslint` exceptions in `CalendarWidgets`, `MapClient`, and `LoginClient` files to maintain strict compilation tests.
