@@ -1,4 +1,13 @@
 Raouf: 2026-02-23 (UTC)
+Scope: Google Map Navigation Origin Alignment (Match Campus Flow)
+Summary: Updated Google map embedded navigation to always start walking directions from Macquarie University campus center, matching expected campus navigation behavior for destination routing context. Previously, Google mode used `My+Location` as origin in directions mode; now origin is fixed to `CAMPUS_CENTRE_GPS` while retaining destination selection behavior and `dirflg=w` walking mode. Added regression assertion in map tests to enforce campus-origin directions URL construction.
+Files Changed:
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapEmbed.tsx tests/map/GoogleMapEmbed.test.tsx` ✅, `npm run test -- tests/map/GoogleMapEmbed.test.tsx tests/map/useMapNavigation.test.ts` ✅, `npm run typecheck` ✅.
+Follow-ups: None.
+
+Raouf: 2026-02-23 (UTC)
 Scope: Full Audit — Live Location & Navigation Logic (Campus + Google Maps)
 Summary: Performed a full logic audit of map live-location and navigation flows across both map modes, then fixed high-impact state consistency issues. In campus navigation, destination changes (or destination clearing) during active guidance could leave navigation running against a stale route; added active-destination tracking and automatic stop on destination drift. Added guard to stop active campus navigation when user transitions off-campus, and blocked route-fetch churn while off-campus to avoid unnecessary ORS calls/rate pressure. In live-location handling, hardened geolocation timeout/unknown-error paths to set deterministic `error` state and provide throttled user feedback instead of leaving the status in indefinite searching. Expanded regression coverage for `useMapNavigation` with tests for destination-change stop, destination-clear stop, off-campus stop, and off-campus fetch suppression.
 Files Changed:

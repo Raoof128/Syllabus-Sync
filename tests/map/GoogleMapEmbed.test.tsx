@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { GoogleMapEmbed, type GoogleMapRef } from '@/features/map/components/GoogleMapEmbed';
+import { CAMPUS_CENTRE_GPS } from '@/features/map/lib/constants';
 
 vi.mock('@/lib/hooks/useTypedTranslation', () => ({
   useTypedTranslation: () => ({
@@ -33,7 +34,9 @@ describe('GoogleMapEmbed', () => {
     });
 
     const iframe = screen.getByTitle('Directions to Macquarie University');
-    expect(iframe.getAttribute('src')).toContain('saddr=My+Location');
+    expect(iframe.getAttribute('src')).toContain(
+      `saddr=${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`,
+    );
     expect(iframe.getAttribute('src')).toContain('dirflg=w');
   });
 

@@ -18,8 +18,11 @@ const buildViewUrl = (query: string) => {
   return `https://www.google.com/maps?q=${query}&z=17&ie=UTF8&iwloc=&output=embed`;
 };
 
-const buildDirectionsUrl = (destination: string, origin?: { lat: number; lng: number } | null) => {
-  const originStr = origin ? `${origin.lat},${origin.lng}` : 'My+Location';
+const buildDirectionsUrl = (
+  destination: string,
+  origin: { lat: number; lng: number },
+) => {
+  const originStr = `${origin.lat},${origin.lng}`;
   return `https://www.google.com/maps?saddr=${originStr}&daddr=${destination}&dirflg=w&z=16&ie=UTF8&output=embed`;
 };
 
@@ -157,7 +160,7 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
           src={
             mode === 'view'
               ? buildViewUrl(destinationQuery)
-              : buildDirectionsUrl(destinationQuery, userLoc)
+              : buildDirectionsUrl(destinationQuery, CAMPUS_CENTRE_GPS)
           }
           className="h-full w-full flex-1 border-0"
           loading="lazy"

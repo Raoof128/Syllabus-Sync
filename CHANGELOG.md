@@ -1,3 +1,31 @@
+### Raouf: Google Map Origin Fix (Start from MQ Campus) — 2026-02-23
+
+**Scope:** Google map embedded navigation parity with campus map expectations
+**Type:** Navigation behavior fix / regression test
+
+#### Changes
+
+1. **Google directions origin corrected:**
+   - Updated `GoogleMapEmbed` directions URL generation to always use MQ campus center (`CAMPUS_CENTRE_GPS`) as the route start point.
+   - Removed fallback behavior that started routes from `My+Location` in embedded directions mode.
+2. **Walking mode preserved:**
+   - Confirmed Google directions URL still enforces walking routing with `dirflg=w`.
+3. **Regression test updated:**
+   - `GoogleMapEmbed` test now asserts `saddr=<MQ campus coords>` instead of `saddr=My+Location`.
+
+#### Files Changed
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+
+#### Verification
+
+- `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapEmbed.tsx tests/map/GoogleMapEmbed.test.tsx` ✅
+- `npm run test -- tests/map/GoogleMapEmbed.test.tsx tests/map/useMapNavigation.test.ts` ✅
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Full Audit — Live Location & Navigation (Both Maps) — 2026-02-23
 
 **Scope:** Campus map + Google map live-location and navigation logic
