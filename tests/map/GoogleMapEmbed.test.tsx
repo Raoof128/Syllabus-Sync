@@ -17,6 +17,53 @@ vi.mock('@/lib/hooks/useTypedTranslation', () => ({
 }));
 
 describe('GoogleMapEmbed', () => {
+  const installGeolocationMock = (
+    watchImpl?: (success: PositionCallback) => number,
+  ) => {
+    const originalGeolocation = navigator.geolocation;
+    const clearWatch = vi.fn();
+    const watchPosition = vi
+      .fn()
+      .mockImplementation(
+        watchImpl || (() => 1),
+      ) as unknown as Geolocation['watchPosition'];
+
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: {
+        watchPosition,
+        clearWatch,
+      } as unknown as Geolocation,
+    });
+
+    const restore = () => {
+      if (typeof originalGeolocation === 'undefined') {
+        Reflect.deleteProperty(navigator, 'geolocation');
+        return;
+      }
+      Object.defineProperty(navigator, 'geolocation', {
+        configurable: true,
+        value: originalGeolocation,
+      });
+    };
+
+    return { watchPosition, clearWatch, restore };
+  };
+
+  const makePosition = (lat: number, lng: number): GeolocationPosition =>
+    ({
+      coords: {
+        latitude: lat,
+        longitude: lng,
+        accuracy: 5,
+        altitude: null,
+        altitudeAccuracy: null,
+        heading: null,
+        speed: null,
+      },
+      timestamp: Date.now(),
+    }) as GeolocationPosition;
+
   it('renders the iframe in view mode by default', () => {
     render(<GoogleMapEmbed />);
     const iframe = screen.getByTitle('Google Maps — Macquarie University');
@@ -73,27 +120,66 @@ describe('GoogleMapEmbed', () => {
   });
 
   it('clears geolocation watch on unmount when watch id is 0', () => {
-    const originalGeolocation = navigator.geolocation;
-    const clearWatch = vi.fn();
-    const watchPosition = vi.fn().mockReturnValue(0);
-
-    Object.defineProperty(navigator, 'geolocation', {
-      configurable: true,
-      value: {
-        watchPosition,
-        clearWatch,
-      } as unknown as Geolocation,
-    });
+    const { watchPosition, clearWatch, restore } = installGeolocationMock(
+      () => 0,
+    );
 
     const { unmount } = render(<GoogleMapEmbed />);
     expect(watchPosition).toHaveBeenCalledTimes(1);
 
     unmount();
     expect(clearWatch).toHaveBeenCalledWith(0);
+    restore();
+  });
 
-    Object.defineProperty(navigator, 'geolocation', {
-      configurable: true,
-      value: originalGeolocation,
+  it('shows live user location in view mode when center button is used', () => {
+    let successCallback: PositionCallback | null = null;
+    const { restore } = installGeolocationMock((success: PositionCallback) => {
+      successCallback = success;
+      return 11;
     });
+
+    const { unmount } = render(<GoogleMapEmbed />);
+
+    act(() => {
+      successCallback?.(makePosition(-33.7748, 151.1132));
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Center on my location' }));
+
+    const iframe = screen.getByTitle('Google Maps — My Location');
+    expect(iframe.getAttribute('src')).toContain('q=-33.7748,151.1132');
+
+    unmount();
+    restore();
+  });
+
+  it('emits live navigation state transitions via callback', () => {
+    const { restore } = installGeolocationMock();
+    const onNavStateChange = vi.fn();
+    const ref = React.createRef<GoogleMapRef>();
+
+    const { unmount } = render(
+      <GoogleMapEmbed ref={ref} onNavStateChange={onNavStateChange} />,
+    );
+
+    act(() => {
+      ref.current?.startNavigation();
+    });
+    act(() => {
+      ref.current?.stopNavigation();
+    });
+
+    expect(onNavStateChange).toHaveBeenCalledWith({
+      isNavigating: true,
+      status: 'navigating',
+    });
+    expect(onNavStateChange).toHaveBeenCalledWith({
+      isNavigating: false,
+      status: 'idle',
+    });
+
+    unmount();
+    restore();
   });
 });

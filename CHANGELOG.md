@@ -1,3 +1,29 @@
+### Raouf: Google Live Location & Live Navigation Tests — 2026-02-23
+
+**Scope:** Google map live-location visibility and live navigation state behavior
+**Type:** Test hardening / behavior verification
+
+#### Changes
+
+1. **Added live location rendering test:**
+   - Simulates geolocation watch updates and verifies Google map view mode updates to `q=<user-lat>,<user-lng>` after tapping "Center on my location".
+2. **Added live navigation callback test:**
+   - Verifies `onNavStateChange` emits `navigating` and `idle` transitions when start/stop navigation is invoked via ref.
+3. **Hardened geolocation test harness:**
+   - Added reusable geolocation mock installer/restorer with safe cleanup (`delete` fallback when original geolocation is undefined) to prevent cross-test leakage and unmount errors.
+
+#### Files Changed
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+
+#### Verification
+
+- `npx eslint --config config/eslint/eslint.config.mjs tests/map/GoogleMapEmbed.test.tsx` ✅
+- `npm run test -- tests/map/GoogleMapEmbed.test.tsx tests/map/useMapNavigation.test.ts tests/map/realtimeNavigation.test.ts` ✅ (30/30)
+- `npm run typecheck` ✅
+
+---
+
 ### Raouf: Google Map Origin Fix (Start from MQ Campus) — 2026-02-23
 
 **Scope:** Google map embedded navigation parity with campus map expectations
