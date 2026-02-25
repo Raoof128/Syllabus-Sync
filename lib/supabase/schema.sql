@@ -269,6 +269,7 @@ ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.gamification_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.xp_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.xp_config ENABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- PERMISSIONS - REVOKE FROM ANON (Security)
@@ -526,6 +527,49 @@ CREATE POLICY "Users can view their own xp events"
 
 -- Note: xp_events INSERT is handled by SECURITY DEFINER functions (triggers)
 -- This prevents users from awarding themselves XP directly
+
+-- ============================================================================
+-- XP_CONFIG RLS POLICIES
+-- SECURITY: Configuration table is read-only for authenticated users
+-- ============================================================================
+
+CREATE POLICY "Authenticated users can read xp_config"
+  ON public.xp_config
+  FOR SELECT
+  TO authenticated
+  USING (true);
+
+-- ============================================================================
+-- VIEWS
+-- ============================================================================
+
+-- User details view - combines profile with gamification data
+-- SECURITY: Uses security_invoker to respect RLS policies on underlying tables
+CREATE VIEW public.user_details
+WITH (security_invoker = true)
+AS
+SELECT
+    p.id,
+    p.email,
+    p.full_name,
+    p.student_id,
+    p.course,
+    p.year,
+    p.avatar_url,
+    p.created_at,
+    p.updated_at,
+    COALESCE(gp.xp, 0) AS xp,
+    COALESCE(gp.streak_days, 0) AS streak_days,
+    COALESCE(gp.longest_streak, 0) AS longest_streak,
+    gp.last_activity_date,
+    CASE
+        WHEN gp.xp IS NULL OR gp.xp < 0 THEN 1
+        ELSE LEAST(100, FLOOR(SQRT(gp.xp::float / 25)) + 1)::integer
+    END AS level
+FROM public.profiles p
+LEFT JOIN public.gamification_profiles gp ON p.id = gp.user_id;
+
+GRANT SELECT ON public.user_details TO authenticated;
 
 -- ============================================================================
 -- SECURITY FUNCTIONS
