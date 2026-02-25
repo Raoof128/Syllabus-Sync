@@ -39,17 +39,14 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   const { t } = useTypedTranslation();
   const router = useRouter();
 
-  // -- HOOKS --
   const { hasError, errorMessage, handleErrorRecovery } = useHomeErrorBoundary();
   const { displayName, hasHydrated } = useHomeUser(initialUser);
   useSampleSeeding();
   const { units, hasUnits, unitStats } = useHomeData();
   useHomeEventListeners();
 
-  // FAB state
   const [fabOpen, setFabOpen] = useState(false);
 
-  // If there's an error, show error UI
   if (hasError) {
     return (
       <div className="container mx-auto p-6 max-w-7xl home-page">

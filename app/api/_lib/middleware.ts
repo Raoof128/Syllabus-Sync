@@ -9,11 +9,6 @@ import {
 import { validateOrigin, shouldSkipCSRF, validateCSRF } from '@/lib/security/csrf';
 import { logger } from '@/lib/logger';
 
-// ============================================================================
-// AUTHENTICATION MIDDLEWARE
-// ============================================================================
-
-// HTTP methods that modify state and require CSRF protection
 const MUTATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
 let lastTransientAuthLogAt = 0;
 const TRANSIENT_AUTH_LOG_INTERVAL_MS = 60_000;

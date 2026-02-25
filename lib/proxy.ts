@@ -42,21 +42,16 @@ function isPublicApiPath(path: string): boolean {
   return (
     path.startsWith('/api/auth/') ||
     path.startsWith('/api/health') ||
-    path.startsWith('/api/mq-demo') ||
-    path.startsWith('/api/weather') ||
-    path.startsWith('/api/test-weather')
+    path.startsWith('/api/weather')
   );
 }
 
 /**
- * Next.js 16 Proxy handler (formerly Middleware)
- * Enforces security headers, refreshes sessions, and protects routes.
+ * Next.js 16 Proxy — security headers, session refresh, and route protection.
  */
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // CRITICAL: Static files should ALWAYS be public - return immediately without any processing
-  // This prevents 401 errors on manifest.webmanifest, icons, fonts, etc.
   const staticFileExtensions = [
     '.webmanifest',
     '.json',
@@ -81,14 +76,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ── STEP 1: Generate per-request CSP nonce (must be early)
   const nonce = generateNonce();
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
 
   const protectedRoutes = ['/home', '/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
   const authRoutes = ['/login', '/signup', '/reset-password'];
-  const publicRoutes = ['/test-weather', '/terms', '/privacy', '/verify', '/onboarding'];
+  const publicRoutes = ['/terms', '/privacy', '/verify', '/onboarding'];
 
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
@@ -99,11 +93,6 @@ export async function proxy(request: NextRequest) {
   const isAuthCallbackRoute = path.startsWith('/auth/callback');
   const isAuthConfirmRoute = path.startsWith('/auth/confirm');
 
-  // Don't resolve user for:
-  // - Root path (handled by AuthRedirectHandler)
-  // - Reset password (needs to be fully public for recovery flow)
-  // - Auth callback (handles OAuth/email verification)
-  // - Auth confirm (handles token_hash verification for password recovery)
   const shouldResolveUser =
     !isRootPath &&
     !isResetPasswordRoute &&
@@ -120,7 +109,6 @@ export async function proxy(request: NextRequest) {
     });
   }
 
-  // ── STEP 2: CSRF origin check (state-mutating browser requests only)
   if (!shouldSkipCSRF(request)) {
     const csrfResult = validateCSRF(request);
     if (!csrfResult.valid) {
@@ -131,7 +119,6 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Build nonce-based CSP (replaces hash-based getCSP() — no unsafe-inline)
   const cspHeader = buildNonceCSP(nonce);
 
   let response = NextResponse.next({
@@ -140,7 +127,6 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  // 1. Set Security Headers
   const setSecurityHeaders = (headers: Headers) => {
     headers.set('Content-Security-Policy', cspHeader);
     headers.set('x-nonce', nonce);
@@ -156,9 +142,6 @@ export async function proxy(request: NextRequest) {
 
   setSecurityHeaders(response.headers);
 
-  // Set CSRF cookie for page navigations (not API).
-  // Avoid setting cookies on public/cacheable API responses to preserve CDN caching
-  // and reduce Vercel function invocations.
   if (!isApiRoute && !request.cookies.get('__Host-csrf')?.value) {
     setCSRFCookie(response);
   }
@@ -166,7 +149,6 @@ export async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Check if Supabase is properly configured
   const hasValidUrl =
     supabaseUrl && supabaseUrl.includes('supabase.co') && !supabaseUrl.includes('your-project-id');
   const hasValidKey =
@@ -182,7 +164,6 @@ export async function proxy(request: NextRequest) {
           'To enable auth, update .env.local with your Supabase credentials.',
       );
     }
-    // Even in demo mode, redirect unauthenticated users from protected routes to login
     if (isProtectedRoute) {
       const redirectUrl = new URL('/login', request.url);
       redirectUrl.searchParams.set('redirectTo', path);
@@ -191,12 +172,10 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // Fast path: routes that don't require user context avoid expensive auth fetch.
   if (!shouldResolveUser) {
     return response;
   }
 
-  // 2. Initialize Supabase Client
   const supabase = createServerClient(supabaseUrl!, supabaseAnonKey!, {
     global: {
       fetch: fetchWithTimeout,
@@ -206,20 +185,15 @@ export async function proxy(request: NextRequest) {
         return request.cookies.getAll();
       },
       setAll(cookiesToSet) {
-        // Update request cookies for downstream middleware/routes
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
         });
 
-        // Re-create the response to include the new cookies
         response = NextResponse.next({
           request,
         });
 
-        // Re-apply security headers to the new response
         setSecurityHeaders(response.headers);
-
-        // Apply the cookies to the actual response
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
@@ -227,8 +201,6 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  // 3. Refresh Session — race against a hard deadline so a slow upstream
-  //    Supabase response never blocks the entire page render.
   const PROXY_AUTH_DEADLINE_MS = process.env.NODE_ENV === 'development' ? 12_000 : 6_000;
 
   let user = null;
@@ -270,9 +242,6 @@ export async function proxy(request: NextRequest) {
         }
       }
     } else {
-      // Timeout — let the request through without auth context.
-      // Protected routes should NOT hard-redirect to /login on timeout; this creates
-      // buggy redirect loops when Supabase is cold-starting or transiently slow.
       if (shouldLogTransientProxyAuthError()) {
         console.warn(`Proxy auth: timed out after ${PROXY_AUTH_DEADLINE_MS}ms; request continuing`);
       }
@@ -290,13 +259,6 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // 4. Route Protection
-
-  // Logic:
-  // If authenticated and on auth route -> redirect to /home
-  // MFA enforcement:
-  // If a user has MFA factors enrolled, Supabase may issue an aal1 session after password auth.
-  // We must prevent access to protected routes until the session is upgraded to aal2.
   let requiresMfaUpgrade = false;
   let mfaResolution: 'resolved' | 'unknown' = 'unknown';
   if (user && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi))) {
@@ -313,9 +275,6 @@ export async function proxy(request: NextRequest) {
         mfaResolution = 'resolved';
         const aal = result.data;
         requiresMfaUpgrade = aal?.nextLevel === 'aal2' && aal?.currentLevel === 'aal1';
-      } else {
-        // Unknown MFA status (timeout). For API routes we fail closed below.
-        // For page routes, do not redirect to /login on this path; it causes user-facing flapping.
       }
     } catch (err) {
       logger.warn('Proxy MFA AAL check failed; MFA status unknown', {
@@ -326,13 +285,10 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAuthRoute && user) {
-    // Allow /reset-password even when authenticated - user needs to set new password after recovery
     if (path.startsWith('/reset-password')) {
       return response;
     }
 
-    // If MFA is required, allow /login to render so the user can complete the challenge.
-    // Other auth routes should redirect back to /login in MFA mode.
     if (requiresMfaUpgrade) {
       if (!path.startsWith('/login')) {
         const redirectUrl = new URL('/login', request.url);
@@ -344,10 +300,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Protected route check: redirect unauthenticated users to login
   if (isProtectedRoute && !user && !publicRoutes.some((route) => path.startsWith(route))) {
-    // If auth status couldn't be resolved (timeout/transient upstream issue), do not
-    // redirect to /login. This avoids redirect loops and "blinking" UX.
     if (authResolution === 'unknown') {
       return response;
     }
@@ -356,7 +309,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // If authenticated but MFA upgrade required and on protected route -> redirect to /login MFA step
   if (isProtectedRoute && user && requiresMfaUpgrade) {
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('mfa', '1');
@@ -364,7 +316,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // If authenticated and MFA status is unknown (timeout/error) on a non-public API route -> 503
   if (isApiRoute && !isPublicApi && user && mfaResolution === 'unknown') {
     const unavailableResponse = NextResponse.json(
       { error: 'Auth temporarily unavailable', code: 'AUTH_UNAVAILABLE' },
@@ -374,7 +325,6 @@ export async function proxy(request: NextRequest) {
     return unavailableResponse;
   }
 
-  // If authenticated but MFA upgrade required and on non-public API route -> 403
   if (isApiRoute && !isPublicApi && user && requiresMfaUpgrade) {
     const forbiddenResponse = NextResponse.json(
       { error: 'MFA required', code: 'MFA_REQUIRED' },
@@ -384,7 +334,6 @@ export async function proxy(request: NextRequest) {
     return forbiddenResponse;
   }
 
-  // If auth status is unknown (timeout/transient upstream issue) on a non-public API route -> 503
   if (isApiRoute && !isPublicApi && !user && authResolution === 'unknown') {
     const unavailableResponse = NextResponse.json(
       { error: 'Auth temporarily unavailable', code: 'AUTH_UNAVAILABLE' },
@@ -394,7 +343,6 @@ export async function proxy(request: NextRequest) {
     return unavailableResponse;
   }
 
-  // If not authenticated and on non-public API route -> return 401
   if (isApiRoute && !isPublicApi && !user) {
     const unauthorizedResponse = NextResponse.json(
       { error: 'Unauthorized', code: 'UNAUTHORIZED' },

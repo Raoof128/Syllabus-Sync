@@ -85,4 +85,5 @@ The repository had mixed placement for feature code and duplicates:
 
 ### Documentation
 
-- Moved `AGENT.md` to `docs/project/`
+- `AGENT.md` at project root serves as the development guide
+- `CHANGELOG.md` at project root tracks version history

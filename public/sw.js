@@ -42,7 +42,6 @@ const NO_CACHE_PATHS = [
   "/map",
   "/login",
   "/signup",
-  "/test-auth",
   "/manage-profiles",
 ];
 

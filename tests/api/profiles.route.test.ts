@@ -108,6 +108,6 @@ describe('profiles API route', () => {
     const json = await response.json();
 
     expect(response.status).toBe(403);
-    expect(JSON.stringify(json)).toContain('Cannot modify student_id');
+    expect(JSON.stringify(json)).toContain('Cannot modify protected fields');
   });
 });

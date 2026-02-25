@@ -477,9 +477,8 @@ By contributing to this project, you agree to:
 
 ## 📞 Getting Help
 
-- **Discord:** [Our Community Server](https://discord.gg/syllabus-sync)
 - **GitHub Issues:** [Create an Issue](https://github.com/mrpouyaalavi/syllabus-sync/issues)
-- **Documentation:** [Developer Portal](https://docs.syllabus-sync.dev)
+- **Email:** [support@mq.edu.au](mailto:support@mq.edu.au)
 
 ---
 

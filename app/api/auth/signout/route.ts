@@ -1,4 +1,3 @@
-// import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonSuccess, jsonError } from '@/app/api/_lib/response';
 import { logger } from '@/lib/logger';
@@ -9,7 +8,8 @@ export async function POST() {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      return jsonError(error.message, 400);
+      logger.error('Signout error:', error);
+      return jsonError('Failed to sign out', 400);
     }
 
     return jsonSuccess({ message: 'Signout successful' });

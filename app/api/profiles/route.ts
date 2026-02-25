@@ -153,7 +153,7 @@ export async function PUT(request: Request) {
       logger.error('Profile update error:', updateError);
       // Check for protected field modification
       if (updateError.message?.includes('Cannot modify')) {
-        return jsonError(updateError.message, 403);
+        return jsonError('Cannot modify protected fields', 403);
       }
       return jsonError('Failed to update profile', 500);
     }

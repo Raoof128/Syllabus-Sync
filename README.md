@@ -9,7 +9,7 @@ _Next-Generation Student Experience Platform for Macquarie University_
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-green?logo=supabase)](https://supabase.com/)
-[![Vitest](https://img.shields.io/badge/Tests-482_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-498_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
 
 ---
 
@@ -32,7 +32,7 @@ flowchart TD
     User([👤 User / Browser])
 
     subgraph FE ["🎨 Frontend Layer (Next.js 16 + React 19)"]
-        UI[Apple Liquid Glass UI]:::frontend
+        UI[MQ Design System UI]:::frontend
         State[Zustand Stores]:::frontend
         Auth[Supabase Auth Client]:::frontend
         Navigation[Hybrid Map Engine\nLeaflet + Google]:::frontend
@@ -86,7 +86,7 @@ flowchart TD
 
 #### **🎨 Premium User Experience**
 
-- **Apple Liquid Glass 2025 UI:** Award-winning design system featuring organic SVG refractions, fluid mesh gradients, and haptic-responsive interactions
+- **MQ Design System:** Custom design system built on Macquarie University brand tokens with glassmorphism accents, fluid animations, and haptic-responsive interactions
 - **Micro-animations & Transitions:** Sophisticated motion design with respect for user accessibility preferences
 - **Responsive Design:** Mobile-first approach with full breakpoint passes (360px-2560px) across all pages — login, calendar, map, settings, manage-profiles — with optimized touch targets and progressive enhancement
 
@@ -350,8 +350,8 @@ Our platform maintains a defense-in-depth security architecture:
 
 ### **Technical Documentation**
 
-- **[📋 Agent Progress](docs/project/team_plan/AGENT.md)** - Detailed development logs, architectural decisions, and team protocols
-- **[📅 Changelog](docs/project/team_plan/CHANGELOG.md)** - Comprehensive version history, feature rollouts, and migration guides
+- **[📋 Development Guide](AGENT.md)** - Project architecture, tech stack, and development commands
+- **[📅 Changelog](CHANGELOG.md)** - Version history and feature rollouts
 - **[🗂️ Restructure Notes](docs/project/restructure-notes.md)** - Before/after tree and migration decisions
 - **[📁 Docs Index](docs/README.md)** - Documentation structure and usage
 - **[🔒 Security Guide](SECURITY.md)** - Security policies, vulnerability reporting, and best practices

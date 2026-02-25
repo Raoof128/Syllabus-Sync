@@ -1,4 +1,3 @@
-// app/page.tsx
 import { Suspense } from 'react';
 import AuthRedirectHandler from './AuthRedirectHandler';
 import { Loader2 } from 'lucide-react';
@@ -18,8 +17,6 @@ function LoadingFallback() {
 }
 
 export default function RootPage() {
-  // The AuthRedirectHandler will check for auth tokens in hash fragment
-  // If found, it redirects appropriately. Otherwise, redirect to home.
   return (
     <Suspense fallback={<LoadingFallback />}>
       <AuthRedirectHandler fallbackRedirect="/home" />
