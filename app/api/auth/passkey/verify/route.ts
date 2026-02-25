@@ -22,6 +22,7 @@ import {
   clearPasskeyCookies,
   base64UrlToBuffer,
 } from '@/app/api/auth/passkey/_lib';
+import { passkeyAuthLimiter } from '@/lib/services/rateLimitService';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -34,6 +35,17 @@ export async function POST(request: NextRequest) {
     const adminClient = createAdminClient();
     if (!adminClient) {
       return jsonError('Passkey login is not configured', 503, ERROR_CODES.EXTERNAL_SERVICE_ERROR);
+    }
+
+    // SECURITY: Rate limit passkey verification to prevent brute-force
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const rateLimitResult = await passkeyAuthLimiter(`ip:${ip}:passkey-verify`);
+    if (!rateLimitResult.allowed) {
+      return jsonError(
+        `Too many attempts. Try again in ${rateLimitResult.resetIn} seconds.`,
+        429,
+        ERROR_CODES.RATE_LIMITED,
+      );
     }
 
     const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);

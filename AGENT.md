@@ -1,4 +1,25 @@
 Raouf: 2026-02-25 (Australia/Sydney)
+Scope: Full API Security Audit — Error Leakage, Rate Limiting, CSRF Comments
+Summary: Audited all 59 API routes. Fixed error message leakage in 7 locations (deadlines, todos, units/sync). Added rate limiting to 9 mutation endpoints (notifications, profiles, user-preferences, sync) and brute-force protection to 3 auth verification endpoints (email/verify, password/reset, passkey/verify) with dedicated limiters. Removed 4 stale "CSRF protection removed" comments (now enforced at proxy level). Updated test mocks. 496/496 tests pass.
+Files Changed: 18 files across app/api/*, lib/services/rateLimitService.ts, tests/api/auth/passwordReset.test.ts
+Verification: eslint 0 errors, tsc pre-existing only, vitest 496/496 pass
+Follow-ups: Consider migrating remaining manual-auth routes (profiles, user-preferences, sync) to requireAuthWithRateLimit middleware pattern for consistency.
+
+Raouf: 2026-02-25 (Australia/Sydney)
+Scope: Security Blueprint — Nonce-Based CSP, CSRF Origin Validation, API Guard
+Summary: Implemented the full security middleware blueprint. Replaced hash-based/unsafe-inline CSP with per-request nonce-based CSP via `generateNonce()` + `buildNonceCSP(nonce)`. Added origin/referer-based CSRF validation (`shouldSkipCSRF`, `validateCSRF`) with strict `new URL(origin).host === host` comparison (no substring/includes bugs), trusted origins from env vars, and exempt paths for OAuth callbacks/webhooks. Integrated nonce generation and CSRF check into the existing `lib/proxy.ts` (Next.js 16 uses `proxy.ts`, not `middleware.ts`). Wired nonce to `app/layout.tsx` inline scripts via `(await headers()).get('x-nonce')`. Added `withApiGuard()` per-route API guard combining CSRF + optional auth + error wrapping. All existing exports preserved — zero breaking changes to existing consumers.
+Files Changed:
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/lib/security/csp.ts` — Added `generateNonce()`, `buildNonceCSP(nonce)` with nonce-based directives
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/lib/security/csrf.ts` — Added `shouldSkipCSRF()`, `validateCSRF()`, `getTrustedOrigins()`, exempt paths
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/lib/proxy.ts` — Integrated nonce generation, CSRF origin check, nonce-based CSP header, x-nonce propagation
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/layout.tsx` — Reads x-nonce header, applies nonce attribute to all inline scripts
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/api/_lib/middleware.ts` — Added `withApiGuard()` helper, imported new CSRF functions
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/lib/security/index.ts` — Exported `shouldSkipCSRF`, `validateCSRF`, `generateNonce`, `buildNonceCSP`
+  Verification: `npx eslint` ✅ (0 errors), `npm run test` ✅ (496/496), `npm run typecheck` ✅ (only pre-existing WeatherWidget error), `npm run build` ✅ (only pre-existing WeatherWidget type error).
+  Follow-ups: Add `condition` and `windy` keys to translation type definitions to fix pre-existing WeatherWidget build error. Consider adding rate limiting to the proxy-level CSRF check if needed.
+
+Raouf: 2026-02-25 (Australia/Sydney)
 Scope: Repository-Wide i18n Audit Fixes (Parity, Placeholder Safety, Hardcoded UI Strings)
 Summary: Completed a full repository i18n audit against `locales/en/translations.json` and fixed cross-locale inconsistencies without changing UI logic/layout. Verified locale key parity across all 35 locales, fixed all detected placeholder mismatches (`eventsCount_one` and privacy section key segmentation), and replaced hardcoded user-facing loading/error/weather strings with existing translation keys in runtime components. Confirmed no missing keys, no empty translations, and no placeholder drift remain across non-English locales.
 Files Changed:

@@ -8,6 +8,7 @@ import {
   ERROR_CODES,
 } from '@/app/api/_lib/response';
 import { hashToken } from '@/lib/security/emailVerification';
+import { emailVerifyTokenLimiter } from '@/lib/services/rateLimitService';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
@@ -37,6 +38,17 @@ export async function POST(request: NextRequest) {
         'Email verification is not available',
         503,
         ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+      );
+    }
+
+    // SECURITY: Rate limit token verification to prevent brute-force
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const rateLimitResult = await emailVerifyTokenLimiter(`ip:${ip}:email-verify`);
+    if (!rateLimitResult.allowed) {
+      return jsonError(
+        `Too many attempts. Try again in ${rateLimitResult.resetIn} seconds.`,
+        429,
+        ERROR_CODES.RATE_LIMITED,
       );
     }
 

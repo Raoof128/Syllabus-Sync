@@ -6,7 +6,7 @@ import {
   type RateLimitConfig,
   mutationLimiter,
 } from '@/lib/services/rateLimitService';
-import { validateOrigin } from '@/lib/security/csrf';
+import { validateOrigin, shouldSkipCSRF, validateCSRF } from '@/lib/security/csrf';
 import { logger } from '@/lib/logger';
 
 // ============================================================================
@@ -585,3 +585,61 @@ export const logRequest = (level: 'warn' | 'error' = 'warn') => {
     }
   };
 };
+
+// ============================================================================
+// PER-ROUTE API GUARD
+// ============================================================================
+
+/**
+ * Per-route API guard that combines CSRF validation, optional auth, and
+ * a generic error wrapper that never leaks internals.
+ *
+ * Usage:
+ *   export async function POST(req: NextRequest) {
+ *     return withApiGuard(req, async (r) => {
+ *       // handler
+ *     }, { requireAuth: true });
+ *   }
+ */
+export async function withApiGuard(
+  req: NextRequest,
+  handler: (req: NextRequest) => Promise<NextResponse>,
+  options: { requireAuth?: boolean; skipCSRF?: boolean } = {},
+): Promise<NextResponse> {
+  // CSRF origin/referer check
+  if (!options.skipCSRF && !shouldSkipCSRF(req)) {
+    const csrf = validateCSRF(req);
+    if (!csrf.valid) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
+
+  // Auth check
+  if (options.requireAuth) {
+    try {
+      const supabase = await createServerClient();
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        return jsonUnauthorized('Valid authentication token required');
+      }
+    } catch (error) {
+      logger.error(
+        'withApiGuard auth error:',
+        error instanceof Error ? error.message : 'Unknown error',
+      );
+      return jsonError('Authentication failed', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+  }
+
+  // Generic error wrapper — never leak internals
+  try {
+    return await handler(req);
+  } catch (err) {
+    logger.error('[API Error]', req.nextUrl.pathname, err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

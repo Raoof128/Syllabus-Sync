@@ -1,11 +1,89 @@
 /**
  * CSP (Content Security Policy) Configuration
  *
- * SECURITY: This module defines the CSP configuration with hash-based script validation.
+ * SECURITY: This module defines the CSP configuration with hash-based script validation
+ * and nonce-based CSP for middleware-driven requests.
  *
  * The inline scripts for theme and RTL are static and pre-computed hashes are used
  * instead of 'unsafe-inline' to maintain XSS protection.
+ *
+ * Nonce-based CSP is used by the root middleware to tag every request with a
+ * unique cryptographic nonce, eliminating the need for 'unsafe-inline' entirely.
  */
+
+import crypto from 'crypto';
+
+// ============================================================================
+// NONCE GENERATION
+// ============================================================================
+
+/**
+ * Generate a cryptographically random nonce for CSP.
+ * Used by middleware.ts to create a per-request nonce.
+ */
+export function generateNonce(): string {
+  return crypto.randomBytes(16).toString('base64');
+}
+
+// ============================================================================
+// NONCE-BASED CSP BUILDER
+// ============================================================================
+
+/**
+ * Build a nonce-based Content Security Policy header value.
+ * This replaces 'unsafe-inline' with a per-request nonce for maximum XSS protection.
+ *
+ * Used by the root middleware.ts on every request.
+ */
+export function buildNonceCSP(nonce: string): string {
+  const isDev = process.env.NODE_ENV === 'development';
+
+  const directives = [
+    "default-src 'self'",
+
+    // Scripts: nonce + strict-dynamic (no unsafe-inline!)
+    // strict-dynamic allows scripts loaded by nonced scripts to execute
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://maps.googleapis.com https://maps.gstatic.com${isDev ? " 'unsafe-eval'" : ''}`,
+
+    // Styles: nonce replaces unsafe-inline for styles too
+    `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+
+    // Fonts
+    "font-src 'self' data: https://fonts.gstatic.com https://r2cdn.perplexity.ai",
+
+    // Images: self, data, blob, Google Maps tiles
+    "img-src 'self' data: blob: https://*.googleapis.com https://*.gstatic.com https://*.google.com https:",
+
+    // Connect: Supabase, routing, weather, Sentry, HMR in dev
+    `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.openrouteservice.org https://api.open-meteo.com https://maps.googleapis.com https://*.sentry.io${isDev ? ' ws://localhost:* ws://127.0.0.1:*' : ''}`,
+
+    // Frame sources: Google Maps embed
+    "frame-src 'self' https://www.google.com https://maps.google.com",
+
+    // Frame ancestors: prevent clickjacking
+    "frame-ancestors 'self'",
+
+    // Disable plugins
+    "object-src 'none'",
+
+    // Restrict base tag
+    "base-uri 'self'",
+
+    // Form actions: self + Google OAuth
+    "form-action 'self' https://accounts.google.com",
+
+    // Workers
+    "worker-src 'self' blob:",
+
+    // Manifest
+    "manifest-src 'self'",
+
+    // Upgrade in production
+    ...(isDev ? [] : ['upgrade-insecure-requests']),
+  ];
+
+  return directives.join('; ');
+}
 
 // ============================================================================
 // SCRIPT DEFINITIONS (keep in sync with app/layout.tsx)

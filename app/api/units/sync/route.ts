@@ -102,9 +102,8 @@ export async function POST(request: Request) {
             });
           }
 
-          return jsonError('Failed to sync unit', 500, ERROR_CODES.DATABASE_ERROR, {
-            details: error.message,
-          });
+          // SECURITY: Log actual error server-side, return generic message to client
+          return jsonError('Failed to sync unit', 500, ERROR_CODES.DATABASE_ERROR);
         }
 
         return jsonSuccess(data, 200);

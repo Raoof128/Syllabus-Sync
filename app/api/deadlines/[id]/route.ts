@@ -89,7 +89,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         if (error.code === 'PGRST116') {
           return jsonError('Deadline not found', 404, ERROR_CODES.NOT_FOUND);
         }
-        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+        // SECURITY: Log actual error server-side, return generic message to client
+        logger.error('Database error updating deadline:', error.code, error.message);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess(mapDeadlineRow(data));
@@ -122,7 +124,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         .eq('user_id', userId);
 
       if (error) {
-        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+        // SECURITY: Log actual error server-side, return generic message to client
+        logger.error('Database error deleting deadline:', error.code, error.message);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess({ id });

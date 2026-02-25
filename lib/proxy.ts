@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { getCSP } from '@/lib/security/csp';
-import { setCSRFCookie } from '@/lib/security/csrf';
+import { generateNonce, buildNonceCSP } from '@/lib/security/csp';
+import { setCSRFCookie, shouldSkipCSRF, validateCSRF } from '@/lib/security/csrf';
 import { logger } from '@/lib/logger';
 import { fetchWithTimeout } from '@/lib/supabase/fetch';
 
@@ -81,6 +81,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // ── STEP 1: Generate per-request CSP nonce (must be early)
+  const nonce = generateNonce();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+
   const protectedRoutes = ['/home', '/calendar', '/feed', '/map', '/settings', '/manage-profiles'];
   const authRoutes = ['/login', '/signup', '/reset-password'];
   const publicRoutes = ['/test-weather', '/terms', '/privacy', '/verify', '/onboarding'];
@@ -115,17 +120,30 @@ export async function proxy(request: NextRequest) {
     });
   }
 
-  const cspHeader = getCSP();
+  // ── STEP 2: CSRF origin check (state-mutating browser requests only)
+  if (!shouldSkipCSRF(request)) {
+    const csrfResult = validateCSRF(request);
+    if (!csrfResult.valid) {
+      return NextResponse.json(
+        { error: 'Invalid request origin' },
+        { status: 403 },
+      );
+    }
+  }
+
+  // Build nonce-based CSP (replaces hash-based getCSP() — no unsafe-inline)
+  const cspHeader = buildNonceCSP(nonce);
 
   let response = NextResponse.next({
     request: {
-      headers: request.headers,
+      headers: requestHeaders,
     },
   });
 
   // 1. Set Security Headers
   const setSecurityHeaders = (headers: Headers) => {
     headers.set('Content-Security-Policy', cspHeader);
+    headers.set('x-nonce', nonce);
     headers.set('X-Frame-Options', 'SAMEORIGIN');
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');

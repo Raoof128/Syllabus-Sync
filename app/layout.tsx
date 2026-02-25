@@ -1,5 +1,6 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import './globals.css';
 // mq-tokens.css is already imported via globals.css — do not import again here
 import ClientLayout from './client-layout';
@@ -53,6 +54,9 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // SECURITY: Read the per-request CSP nonce set by middleware.ts
+  const nonce = (await headers()).get('x-nonce') ?? '';
+
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -61,14 +65,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     logo: new URL('/MQ_Logo_Final.png', UNIVERSITY_CONFIG.website).toString(),
   };
 
+  // SECURITY: THEME_SCRIPT and RTL_SCRIPT are static string constants defined
+  // in lib/security/csp.ts — they are NOT user input. The nonce attribute
+  // authorises these known scripts under the nonce-based CSP policy.
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Theme and RTL scripts - minified and hash-validated by CSP */}
-        {/* SECURITY: These scripts are validated via SHA-256 hashes in the CSP header */}
-        {/* If you modify these scripts, update lib/security/csp.ts with new hashes */}
-        <script key="theme-script" dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        <script key="rtl-script" dangerouslySetInnerHTML={{ __html: RTL_SCRIPT }} />
+        {/* Theme and RTL scripts - validated by nonce-based CSP */}
+        {/* SECURITY: The nonce is generated per-request by middleware.ts */}
+        {/* Hash-based validation remains as fallback in csp.ts/csp-enhanced.ts */}
+        <script
+          key="theme-script"
+          nonce={nonce}
+          dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
+        />
+        <script
+          key="rtl-script"
+          nonce={nonce}
+          dangerouslySetInnerHTML={{ __html: RTL_SCRIPT }}
+        />
       </head>
       <body className="font-sans" suppressHydrationWarning>
         {/* ================================================================
@@ -77,6 +92,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             ================================================================ */}
 
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationSchema),

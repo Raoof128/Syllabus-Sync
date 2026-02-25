@@ -251,6 +251,114 @@ export function withCSRFProtection<T>(
 }
 
 // ============================================================================
+// ORIGIN-BASED CSRF (used by root middleware.ts)
+// ============================================================================
+
+/**
+ * Routes that must never be CSRF-checked by the middleware origin validator.
+ * These receive legitimate cross-origin or server-to-server traffic.
+ */
+const CSRF_EXEMPT_PREFIXES = [
+  '/api/auth/callback',   // Supabase OAuth callback
+  '/api/auth/confirm',    // Supabase email confirm
+  '/api/webhooks',        // Inbound webhooks (Stripe, etc.)
+  '/api/maps',            // Google Maps proxy
+  '/api/health',          // Health checks
+  '/api/cron/',           // Cron jobs
+];
+
+/** HTTP methods that cannot carry state-changing intent */
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+/**
+ * Trusted external origins that may legitimately POST to our endpoints.
+ * Built lazily from environment variables.
+ */
+function getTrustedOrigins(): Set<string> {
+  const origins = new Set<string>();
+
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    origins.add(process.env.NEXT_PUBLIC_SITE_URL);
+  }
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    try {
+      origins.add(new URL(process.env.NEXT_PUBLIC_APP_URL).origin);
+    } catch { /* ignore invalid URL */ }
+  }
+
+  origins.add('https://maps.googleapis.com');
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF) {
+    origins.add(`https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.supabase.co`);
+  }
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    try {
+      origins.add(new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin);
+    } catch { /* ignore invalid URL */ }
+  }
+  if (process.env.VERCEL_URL) {
+    origins.add(`https://${process.env.VERCEL_URL}`);
+  }
+
+  return origins;
+}
+
+/**
+ * Determine whether a request should skip CSRF origin checking entirely.
+ * Safe methods and exempt paths bypass the check.
+ */
+export function shouldSkipCSRF(req: NextRequest): boolean {
+  if (SAFE_METHODS.has(req.method.toUpperCase())) return true;
+  const path = req.nextUrl.pathname;
+  if (CSRF_EXEMPT_PREFIXES.some((p) => path.startsWith(p))) return true;
+  return false;
+}
+
+/**
+ * Validate a request's origin/referer against the host header.
+ * Uses strict `new URL(origin).host === host` comparison (not substring/includes).
+ *
+ * Returns `{ valid: true }` for server-to-server requests (no origin AND no referer).
+ */
+export function validateCSRF(req: NextRequest): { valid: boolean; reason?: string } {
+  const origin = req.headers.get('origin');
+  const referer = req.headers.get('referer');
+  const host = req.headers.get('host');
+
+  // No origin + no referer = non-browser (server-to-server / SW) → allow
+  if (!origin && !referer) {
+    return { valid: true, reason: 'no-origin-server-request' };
+  }
+
+  const trustedOrigins = getTrustedOrigins();
+
+  // Check origin strictly (not substring/includes!)
+  if (origin) {
+    try {
+      const originHost = new URL(origin).host;
+      if (originHost === host) return { valid: true };
+      if (trustedOrigins.has(origin)) return { valid: true };
+      return { valid: false, reason: `origin-mismatch: ${origin}` };
+    } catch {
+      return { valid: false, reason: 'malformed-origin' };
+    }
+  }
+
+  // Fallback: check referer
+  if (referer) {
+    try {
+      const refererHost = new URL(referer).host;
+      if (refererHost === host) return { valid: true };
+      return { valid: false, reason: `referer-mismatch: ${referer}` };
+    } catch {
+      return { valid: false, reason: 'malformed-referer' };
+    }
+  }
+
+  return { valid: false, reason: 'no-valid-origin' };
+}
+
+// ============================================================================
 // RESPONSE HELPERS
 // ============================================================================
 

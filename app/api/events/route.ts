@@ -73,8 +73,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // SECURITY: Use rate-limited auth for mutation endpoint
-  // Note: CSRF protection removed - Supabase authentication provides sufficient security
+  // SECURITY: Rate-limited auth for mutation. CSRF is enforced at proxy level.
   return requireAuthWithRateLimit(request, async (userId) => {
     try {
       // SECURITY: Parse with size limit protection

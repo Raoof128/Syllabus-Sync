@@ -8,7 +8,7 @@ import {
   ERROR_CODES,
 } from '@/app/api/_lib/response';
 import { mapNotificationRow } from '@/app/api/_lib/mappers';
-import { requireAuth, validateRequest } from '@/app/api/_lib/middleware';
+import { requireAuth, requireAuthWithRateLimit, validateRequest } from '@/app/api/_lib/middleware';
 import { logger } from '@/lib/logger';
 
 // ============================================================================
@@ -123,7 +123,7 @@ export async function GET(request: Request) {
  * Soft-deletes all notifications by setting deleted_at timestamp.
  */
 export async function DELETE(request: Request) {
-  return requireAuth(request, async (userId) => {
+  return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const supabase = await createServerClient();
 
@@ -150,9 +150,8 @@ export async function DELETE(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // Note: CSRF protection removed - Supabase authentication with requireAuth provides sufficient security
-  // for client-side API calls. CSRF is more relevant for cookie-based session auth without tokens.
-  return requireAuth(request, async (userId) => {
+  // SECURITY: Rate-limited auth for mutation endpoint. CSRF is handled at proxy level.
+  return requireAuthWithRateLimit(request, async (userId) => {
     return validateRequest(notificationSchema)(request, async (validatedData) => {
       try {
         const supabase = await createServerClient();

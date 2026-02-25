@@ -1,3 +1,75 @@
+### Raouf: Full API Security Audit — Error Leakage, Rate Limiting, CSRF Comments — 2026-02-25
+
+**Scope:** API security audit across all 59 route files
+**Type:** Security / Audit / Rate Limiting / Error Handling
+
+**Summary:**
+Comprehensive security audit of all API routes. Fixed error message leakage (7 locations), added rate limiting to 9 unprotected mutation endpoints, added brute-force protection to 3 auth verification endpoints, removed 4 stale CSRF comments, and updated test mocks.
+
+**Fixes:**
+1. **Error message leakage** — Replaced `error.message` in client responses with generic messages + server-side `logger.error` in: deadlines/route.ts, deadlines/[id]/route.ts, todos/route.ts, todos/[id]/route.ts, units/sync/route.ts
+2. **Rate limiting added** — notifications (route.ts, [id]/route.ts, mark-all-read/route.ts) upgraded from `requireAuth` to `requireAuthWithRateLimit`; profiles/route.ts, user-preferences/route.ts, sync/route.ts got inline `mutationLimiter` calls
+3. **Auth verification brute-force protection** — Added `emailVerifyTokenLimiter` (20/15min) to auth/email/verify, `passwordResetTokenLimiter` (10/15min) to auth/password/reset, `passkeyAuthLimiter` to auth/passkey/verify
+4. **Stale CSRF comments** — Updated misleading "CSRF protection removed" comments in events, deadlines, todos, units routes to "CSRF is enforced at proxy level"
+5. **Test mock** — Updated passwordReset.test.ts to mock new rate limiter using `importOriginal`
+
+**Files Changed:**
+- `app/api/deadlines/route.ts` — error leakage fix + CSRF comment update
+- `app/api/deadlines/[id]/route.ts` — error leakage fix (PUT + DELETE)
+- `app/api/todos/route.ts` — error leakage fix + CSRF comment update
+- `app/api/todos/[id]/route.ts` — error leakage fix (PUT + DELETE)
+- `app/api/units/sync/route.ts` — error leakage fix
+- `app/api/events/route.ts` — CSRF comment update
+- `app/api/units/route.ts` — CSRF comment update
+- `app/api/notifications/route.ts` — upgraded to requireAuthWithRateLimit
+- `app/api/notifications/[id]/route.ts` — upgraded to requireAuthWithRateLimit
+- `app/api/notifications/mark-all-read/route.ts` — upgraded to requireAuthWithRateLimit
+- `app/api/profiles/route.ts` — added mutationLimiter to PUT + DELETE
+- `app/api/user-preferences/route.ts` — added mutationLimiter to PUT
+- `app/api/sync/route.ts` — added mutationLimiter to POST
+- `app/api/auth/email/verify/route.ts` — added emailVerifyTokenLimiter
+- `app/api/auth/password/reset/route.ts` — added passwordResetTokenLimiter
+- `app/api/auth/passkey/verify/route.ts` — added passkeyAuthLimiter
+- `lib/services/rateLimitService.ts` — added emailVerifyTokenLimiter + passwordResetTokenLimiter presets
+- `tests/api/auth/passwordReset.test.ts` — mock for rate limiter
+
+**Verification:**
+- ESLint: 0 errors on all modified files
+- TypeScript: only pre-existing WeatherWidget errors
+- Tests: 69/69 suites, 496/496 tests pass
+- No breaking changes
+
+---
+
+### Raouf: Security Blueprint — Nonce-Based CSP, CSRF Origin Validation, API Guard — 2026-02-25
+
+**Scope:** Security middleware hardening
+**Type:** Security / CSP / CSRF / API guard
+
+#### Changes
+
+1. Added `generateNonce()` and `buildNonceCSP(nonce)` — per-request nonce-based CSP that eliminates `unsafe-inline` for scripts entirely.
+2. Added `shouldSkipCSRF()` and `validateCSRF()` — origin/referer-based CSRF with strict `new URL(origin).host === host` comparison, trusted origins from env vars, exempt paths for OAuth/webhooks.
+3. Integrated nonce generation and CSRF origin check into `lib/proxy.ts` (Next.js 16 proxy convention). Nonce propagated via `x-nonce` request/response header.
+4. Wired nonce attribute to all inline `<script>` tags in `app/layout.tsx` via `(await headers()).get('x-nonce')`.
+5. Added `withApiGuard()` per-route API guard in `app/api/_lib/middleware.ts` — combines CSRF + optional auth + generic error wrapping.
+6. Exported all new functions from `lib/security/index.ts`. Zero breaking changes to existing consumers.
+
+#### Files Changed
+
+- `lib/security/csp.ts` — Added nonce generation + nonce-based CSP builder
+- `lib/security/csrf.ts` — Added origin-based CSRF validation
+- `lib/proxy.ts` — Integrated nonce + CSRF into proxy handler
+- `app/layout.tsx` — Reads x-nonce, applies to inline scripts
+- `app/api/_lib/middleware.ts` — Added withApiGuard, imported new CSRF
+- `lib/security/index.ts` — New exports
+
+#### Verification
+
+`npx eslint` ✅ | `npm run test` ✅ (496/496) | `npm run typecheck` ✅ (only pre-existing WeatherWidget error)
+
+---
+
 ### Raouf: Full i18n audit + parity hardening — 2026-02-25
 
 **Scope:** Repository-wide internationalization audit and fixes

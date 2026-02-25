@@ -111,7 +111,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
             { hint: 'Run: npx supabase db push' },
           );
         }
-        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+        // SECURITY: Log actual error server-side, return generic message to client
+        logger.error('Database error updating todo:', error.code, error.message);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess(mapTodoRow(data));
@@ -148,7 +150,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
             { hint: 'Run: npx supabase db push' },
           );
         }
-        return jsonError(error.message, 500, ERROR_CODES.DATABASE_ERROR);
+        // SECURITY: Log actual error server-side, return generic message to client
+        logger.error('Database error deleting todo:', error.code, error.message);
+        return jsonError('Database operation failed', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return jsonSuccess({ id });

@@ -1,10 +1,10 @@
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
-import { requireAuth } from '@/app/api/_lib/middleware';
+import { requireAuthWithRateLimit } from '@/app/api/_lib/middleware';
 import { logger } from '@/lib/logger';
 
 export async function PUT(request: Request) {
-  return requireAuth(request, async (userId) => {
+  return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const supabase = await createServerClient();
 

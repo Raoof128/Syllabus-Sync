@@ -485,3 +485,19 @@ export const passkeyAuthLimiter = createRateLimiter({
   maxRequests: 50, // Max 50 passkey auth attempts per 15 min (increased for testing)
   failClosed: true, // SECURITY: Deny on store failure
 });
+
+/** Rate limiter for email verification token consumption - prevents brute force */
+export const emailVerifyTokenLimiter = createRateLimiter({
+  prefix: 'email_verify_token',
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 20, // Max 20 token attempts per 15 min per IP
+  failClosed: true, // SECURITY: Deny on store failure
+});
+
+/** Rate limiter for password reset token consumption - prevents brute force */
+export const passwordResetTokenLimiter = createRateLimiter({
+  prefix: 'password_reset_token',
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 10, // Max 10 token attempts per 15 min per IP
+  failClosed: true, // SECURITY: Deny on store failure
+});

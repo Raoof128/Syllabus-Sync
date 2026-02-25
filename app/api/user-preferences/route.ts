@@ -10,7 +10,9 @@ import {
   jsonUnauthorized,
   parseJsonBody,
   BODY_SIZE_LIMITS,
+  ERROR_CODES,
 } from '@/app/api/_lib/response';
+import { mutationLimiter } from '@/lib/services/rateLimitService';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -72,6 +74,16 @@ export async function PUT(request: Request) {
 
     if (authError || !user) {
       return jsonUnauthorized('Not authenticated');
+    }
+
+    // SECURITY: Rate limit preference mutations
+    const rateLimitResult = await mutationLimiter(`user:${user.id}:preferences`);
+    if (!rateLimitResult.allowed) {
+      return jsonError(
+        `Rate limit exceeded. Try again in ${rateLimitResult.resetIn} seconds.`,
+        429,
+        ERROR_CODES.RATE_LIMITED,
+      );
     }
 
     const { data: body, error: parseError } = await parseJsonBody(

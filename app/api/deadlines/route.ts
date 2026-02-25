@@ -56,7 +56,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // Note: CSRF protection removed - Supabase authentication provides sufficient security
+  // SECURITY: Rate-limited auth for mutation. CSRF is enforced at proxy level.
   return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const supabase = await createServerClient();
@@ -165,10 +165,10 @@ export async function POST(request: Request) {
         .single();
 
       if (error) {
+        // SECURITY: Log actual error server-side, return generic message to client
         logger.error('Database error creating deadline:', error.code, error.message, error.details);
-        // Return actual error for debugging
         return jsonError(
-          `Failed to create deadline: ${error.message}`,
+          'Failed to create deadline',
           500,
           ERROR_CODES.DATABASE_ERROR,
         );

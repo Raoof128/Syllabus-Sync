@@ -94,7 +94,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // Note: CSRF protection removed - Supabase authentication provides sufficient security
+  // SECURITY: Rate-limited auth for mutation. CSRF is enforced at proxy level.
   return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const supabase = await createServerClient();
@@ -142,8 +142,9 @@ export async function POST(request: Request) {
             { hint: 'Run: npx supabase db push' },
           );
         }
+        // SECURITY: Log actual error server-side, return generic message to client
         return jsonError(
-          `Failed to create todo: ${error.message}`,
+          'Failed to create todo',
           500,
           ERROR_CODES.DATABASE_ERROR,
         );

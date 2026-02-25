@@ -8,6 +8,14 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => createAdminClientMock(),
 }));
 
+vi.mock(import('@/lib/services/rateLimitService'), async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    passwordResetTokenLimiter: vi.fn().mockResolvedValue({ allowed: true, remaining: 9, resetIn: 0 }),
+  };
+});
+
 function makePasswordResetsTable(record: { id: string; user_id: string } | null) {
   const chain: any = {};
 

@@ -55,6 +55,9 @@ export type {
   CSPSeverity,
 } from "./csp-enhanced";
 
+// Nonce-based CSP (used by root middleware.ts)
+export { generateNonce, buildNonceCSP } from "./csp";
+
 // ============================================================================
 // Audit Logging
 // ============================================================================
@@ -81,6 +84,8 @@ export {
   validateOrigin,
   withCSRFProtection,
   setCSRFCookie,
+  shouldSkipCSRF,
+  validateCSRF,
 } from "./csrf";
 
 // ============================================================================

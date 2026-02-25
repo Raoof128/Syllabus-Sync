@@ -13,7 +13,7 @@ import {
   ERROR_CODES,
 } from '@/app/api/_lib/response';
 import { mapNotificationRow } from '@/app/api/_lib/mappers';
-import { requireAuth } from '@/app/api/_lib/middleware';
+import { requireAuth, requireAuthWithRateLimit } from '@/app/api/_lib/middleware';
 import { logger } from '@/lib/logger';
 
 // ============================================================================
@@ -81,7 +81,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  return requireAuth(request, async (userId) => {
+  return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const supabase = await createServerClient();
       const body = await request.json();
@@ -145,7 +145,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  return requireAuth(request, async (userId) => {
+  return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const supabase = await createServerClient();
 

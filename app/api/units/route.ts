@@ -279,8 +279,7 @@ export async function GET(request: Request) {
  * }
  */
 export async function POST(request: Request) {
-  // Note: CSRF protection removed - Supabase authentication provides sufficient security
-  // The auth session cookies use SameSite=Lax which prevents CSRF attacks
+  // SECURITY: Rate-limited auth for mutation. CSRF is enforced at proxy level.
   return requireAuthWithRateLimit(request, async (userId) => {
     return validateRequest(unitSchema)(request, async (validatedData) => {
       try {

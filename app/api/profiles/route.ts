@@ -10,7 +10,9 @@ import {
   jsonUnauthorized,
   parseJsonBody,
   BODY_SIZE_LIMITS,
+  ERROR_CODES,
 } from '@/app/api/_lib/response';
+import { mutationLimiter } from '@/lib/services/rateLimitService';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -103,6 +105,16 @@ export async function PUT(request: Request) {
       return jsonUnauthorized('Not authenticated');
     }
 
+    // SECURITY: Rate limit profile mutations
+    const rateLimitResult = await mutationLimiter(`user:${user.id}:profiles`);
+    if (!rateLimitResult.allowed) {
+      return jsonError(
+        `Rate limit exceeded. Try again in ${rateLimitResult.resetIn} seconds.`,
+        429,
+        ERROR_CODES.RATE_LIMITED,
+      );
+    }
+
     // Parse and validate request body
     const { data: body, error: parseError } = await parseJsonBody(
       request,
@@ -167,6 +179,16 @@ export async function DELETE() {
 
     if (authError || !user) {
       return jsonUnauthorized('Not authenticated');
+    }
+
+    // SECURITY: Rate limit profile mutations
+    const rateLimitResult = await mutationLimiter(`user:${user.id}:profiles`);
+    if (!rateLimitResult.allowed) {
+      return jsonError(
+        `Rate limit exceeded. Try again in ${rateLimitResult.resetIn} seconds.`,
+        429,
+        ERROR_CODES.RATE_LIMITED,
+      );
     }
 
     const { error } = await supabase.from('profiles').delete().eq('id', user.id);
