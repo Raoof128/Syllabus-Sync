@@ -1,3 +1,34 @@
+### Raouf: Migrate Google Maps to Embed API v1 — 2026-02-25
+
+**Scope:** Google Maps navigation fix
+**Type:** Bugfix / Migration
+
+**Summary:**
+Google removed the legacy `output=embed` URL format entirely (returns HTTP 404). Migrated the embedded Google Maps component to the official Maps Embed API v1 which requires an API key (`NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`).
+
+**Fixes:**
+1. **URL format migration** — View mode now uses `/maps/embed/v1/place?key=...&q=...&zoom=17`, directions mode uses `/maps/embed/v1/directions?key=...&origin=...&destination=...&mode=walking`
+2. **Graceful fallback** — When no API key is configured, renders a centered "Open in Google Maps" link (with `ExternalLink` icon) that opens the map/directions externally instead of showing a broken iframe
+3. **Lazy env read** — Changed `EMBED_API_KEY` constant to `getEmbedApiKey()` function so tests can set the env var dynamically
+4. **Translation** — Added `openInGoogleMaps` key to all 35 locale files
+5. **Env docs** — Added `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` to `.env.example` and `.env.local.example`
+
+**Files Changed:**
+- `features/map/components/GoogleMapEmbed.tsx` — Embed API v1 migration + fallback UI
+- `tests/map/GoogleMapEmbed.test.tsx` — Updated URL assertions + 2 new fallback tests (11 total)
+- `locales/*/translations.json` (35 files) — Added `openInGoogleMaps`
+- `.env.example` — Added Google Maps Embed section
+- `.env.local.example` — Added Google Maps Embed section
+
+**Verification:**
+- ESLint: 0 errors
+- TypeScript: 0 errors
+- Tests: 69/69 suites, 498/498 tests pass
+
+**Follow-up:** Set `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` in Vercel env vars (enable "Maps Embed API" in Google Cloud Console).
+
+---
+
 ### Raouf: Fix Google Maps broken after CSP hardening — 2026-02-25
 
 **Scope:** CSP regression fix

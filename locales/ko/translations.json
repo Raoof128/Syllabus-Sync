@@ -61,6 +61,7 @@
   "backToMap": "Back to Map",
   "googleMapsIframeLabel": "Google Maps showing Macquarie University campus",
   "directionsIframeLabel": "Directions to Macquarie University",
+  "openInGoogleMaps": "Google 지도에서 열기",
   "cancel": "취소",
   "delete": "삭제",
   "edit": "편집",

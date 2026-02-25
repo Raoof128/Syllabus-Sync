@@ -61,6 +61,7 @@
   "backToMap": "Back to Map",
   "googleMapsIframeLabel": "Google Maps showing Macquarie University campus",
   "directionsIframeLabel": "Directions to Macquarie University",
+  "openInGoogleMaps": "Google マップで開く",
   "cancel": "キャンセル",
   "delete": "削除",
   "edit": "編集",

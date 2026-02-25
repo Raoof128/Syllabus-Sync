@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GoogleMapEmbed, type GoogleMapRef } from '@/features/map/components/GoogleMapEmbed';
 import { CAMPUS_CENTRE_GPS } from '@/features/map/lib/constants';
 
@@ -15,6 +15,21 @@ vi.mock('@/lib/hooks/useTypedTranslation', () => ({
     },
   }),
 }));
+
+vi.mock('@/lib/hooks/useSafeTranslation', () => ({
+  useSafeTranslation: () => ({
+    t: (k: string, params?: Record<string, string | number>) => {
+      if (k === 'googleMapsViewAt' && params?.destination)
+        return `Google Maps — ${params.destination}`;
+      if (k === 'googleMapsDirectionsTo' && params?.destination)
+        return `Directions to ${params.destination}`;
+      return k;
+    },
+    safeT: (_k: string, fallback: string) => fallback,
+  }),
+}));
+
+const TEST_API_KEY = 'test-embed-key-123';
 
 describe('GoogleMapEmbed', () => {
   const installGeolocationMock = (
@@ -75,11 +90,20 @@ describe('GoogleMapEmbed', () => {
       timestamp: Date.now(),
     }) as GeolocationPosition;
 
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY = TEST_API_KEY;
+  });
+
+  afterEach(() => {
+    delete process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
+  });
+
   it('renders the iframe in view mode by default', () => {
     render(<GoogleMapEmbed />);
     const iframe = screen.getByTitle('Google Maps — Macquarie University');
     expect(iframe).toBeTruthy();
-    expect(iframe.getAttribute('src')).toContain('output=embed');
+    expect(iframe.getAttribute('src')).toContain('maps/embed/v1/place');
+    expect(iframe.getAttribute('src')).toContain(`key=${TEST_API_KEY}`);
   });
 
   it('switches to directions mode via ref', () => {
@@ -92,10 +116,11 @@ describe('GoogleMapEmbed', () => {
     });
 
     const iframe = screen.getByTitle('Directions to Macquarie University');
+    expect(iframe.getAttribute('src')).toContain('maps/embed/v1/directions');
     expect(iframe.getAttribute('src')).toContain(
-      `saddr=${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`,
+      `origin=${encodeURIComponent(`${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`)}`,
     );
-    expect(iframe.getAttribute('src')).toContain('dirflg=w');
+    expect(iframe.getAttribute('src')).toContain('mode=walking');
   });
 
   it('switches back to view mode via ref or back button', () => {
@@ -127,7 +152,9 @@ describe('GoogleMapEmbed', () => {
     );
 
     const iframe = screen.getByTitle('Google Maps — 18 Wallys Walk');
-    expect(iframe.getAttribute('src')).toContain('-33.7734389,151.1134919');
+    expect(iframe.getAttribute('src')).toContain(
+      encodeURIComponent('-33.7734389,151.1134919'),
+    );
   });
 
   it('clears geolocation watch on unmount when watch id is 0', () => {
@@ -153,7 +180,9 @@ describe('GoogleMapEmbed', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Center on my location' }));
 
     const iframe = screen.getByTitle('Google Maps — My Location');
-    expect(iframe.getAttribute('src')).toContain('q=-33.7748,151.1132');
+    expect(iframe.getAttribute('src')).toContain(
+      encodeURIComponent('-33.7748,151.1132'),
+    );
 
     unmount();
     restore();
@@ -184,9 +213,13 @@ describe('GoogleMapEmbed', () => {
     });
 
     const iframe = screen.getByTitle('Directions to 18 Wallys Walk');
-    expect(iframe.getAttribute('src')).toContain('saddr=-33.771,151.114');
-    expect(iframe.getAttribute('src')).toContain('daddr=-33.7734389,151.1134919');
-    expect(iframe.getAttribute('src')).toContain('dirflg=w');
+    expect(iframe.getAttribute('src')).toContain(
+      `origin=${encodeURIComponent('-33.771,151.114')}`,
+    );
+    expect(iframe.getAttribute('src')).toContain(
+      `destination=${encodeURIComponent('-33.7734389,151.1134919')}`,
+    );
+    expect(iframe.getAttribute('src')).toContain('mode=walking');
 
     unmount();
     restore();
@@ -231,8 +264,10 @@ describe('GoogleMapEmbed', () => {
     );
 
     const iframe = screen.getByTitle('Directions to Building B');
-    expect(iframe.getAttribute('src')).toContain('daddr=-33.78,151.12');
-    expect(iframe.getAttribute('src')).toContain('dirflg=w');
+    expect(iframe.getAttribute('src')).toContain(
+      `destination=${encodeURIComponent('-33.78,151.12')}`,
+    );
+    expect(iframe.getAttribute('src')).toContain('mode=walking');
 
     unmount();
     restore();
@@ -263,5 +298,45 @@ describe('GoogleMapEmbed', () => {
 
     unmount();
     restore();
+  });
+
+  describe('fallback (no API key)', () => {
+    beforeEach(() => {
+      delete process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
+    });
+
+    it('renders external link instead of iframe when no API key', () => {
+      render(<GoogleMapEmbed />);
+      expect(screen.queryByTitle('Google Maps — Macquarie University')).toBeNull();
+      const link = screen.getByRole('link', { name: /Open in Google Maps/i });
+      expect(link.getAttribute('href')).toContain('google.com/maps/search');
+      expect(link.getAttribute('target')).toBe('_blank');
+    });
+
+    it('renders external directions link when navigating without API key', () => {
+      const ref = React.createRef<GoogleMapRef>();
+      render(
+        <GoogleMapEmbed
+          ref={ref}
+          selectedBuilding={{
+            id: '18WW',
+            name: '18 Wallys Walk',
+            position: [0, 0],
+            translationKey: 'building_18WW_name',
+            descriptionKey: 'building_18WW_desc',
+            location: { lat: -33.7734389, lng: 151.1134919 },
+          }}
+          destinationLabel="18 Wallys Walk"
+        />,
+      );
+
+      act(() => {
+        ref.current?.startNavigation();
+      });
+
+      const link = screen.getByRole('link', { name: /Open in Google Maps/i });
+      expect(link.getAttribute('href')).toContain('google.com/maps/dir');
+      expect(link.getAttribute('href')).toContain('travelmode=walking');
+    });
   });
 });

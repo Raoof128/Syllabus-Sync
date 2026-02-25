@@ -1,4 +1,11 @@
 Raouf: 2026-02-25 (Australia/Sydney)
+Scope: Migrate Google Maps to Embed API v1 (fix navigation 404s)
+Summary: Google removed the legacy `output=embed` URL format (returns 404). Migrated GoogleMapEmbed to use the official Maps Embed API v1 (`/maps/embed/v1/place` and `/maps/embed/v1/directions`) which requires `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`. Added graceful fallback: when no API key is configured, renders an "Open in Google Maps" link instead of a broken iframe. Made API key read lazy (`getEmbedApiKey()`) for testability. Added `openInGoogleMaps` translation to all 35 locales. Updated test suite from legacy URL assertions to Embed API v1 format + 2 new fallback tests. 498/498 tests pass.
+Files Changed: features/map/components/GoogleMapEmbed.tsx, tests/map/GoogleMapEmbed.test.tsx, locales/*/translations.json (35 files), .env.example, .env.local.example
+Verification: eslint 0 errors, tsc 0 errors, vitest 69/69 suites 498/498 pass
+Follow-ups: Set NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY in Vercel environment variables to enable embedded maps. Without it, users see the external link fallback.
+
+Raouf: 2026-02-25 (Australia/Sydney)
 Scope: Fix Google Maps broken after CSP hardening
 Summary: Removed `'strict-dynamic'` from `script-src` in `buildNonceCSP()` — per CSP L3 spec, strict-dynamic causes browsers to ignore host allowlists and `'self'`, which broke Next.js chunk loading and Google Maps. Restored `'unsafe-inline'` to `style-src` — Leaflet, Tailwind, and Next.js all inject dynamic `<style>` elements that can't be nonced. Script-src nonce protection is preserved. 496/496 tests pass.
 Files Changed: lib/security/csp.ts
