@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react';
-import { Navigation, ArrowLeft, MapPin, ExternalLink } from 'lucide-react';
+import { Navigation, ArrowLeft, MapPin } from 'lucide-react';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import { cn } from '@/lib/utils';
@@ -15,29 +15,28 @@ const MQ_COORDS = `${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`;
 // Read lazily so tests can set the env var before rendering.
 const getEmbedApiKey = () => process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY ?? '';
 
-// Build embed URLs using the official Maps Embed API v1.
-// The legacy `output=embed` format was removed by Google.
+// Build embed URLs using the official Maps Embed API v1 when key is available.
+// Without a key, use Google Maps keyless embed URLs and keep rendering in-iframe.
 const buildViewUrl = (query: string) => {
   const key = getEmbedApiKey();
-  if (!key) return '';
-  return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${encodeURIComponent(query)}&zoom=17`;
+  if (key) {
+    return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${encodeURIComponent(query)}&zoom=17`;
+  }
+
+  // Keep users inside the in-app map iframe when API key is not configured.
+  return `https://www.google.com/maps?output=embed&q=${encodeURIComponent(query)}&z=17`;
 };
 
 const buildDirectionsUrl = (destination: string, origin?: { lat: number; lng: number } | null) => {
   const key = getEmbedApiKey();
-  if (!key) return '';
   const resolvedOrigin = origin ?? CAMPUS_CENTRE_GPS;
   const originStr = `${resolvedOrigin.lat},${resolvedOrigin.lng}`;
-  return `https://www.google.com/maps/embed/v1/directions?key=${key}&origin=${encodeURIComponent(originStr)}&destination=${encodeURIComponent(destination)}&mode=walking`;
-};
+  if (key) {
+    return `https://www.google.com/maps/embed/v1/directions?key=${key}&origin=${encodeURIComponent(originStr)}&destination=${encodeURIComponent(destination)}&mode=walking`;
+  }
 
-/** Fallback link for when no API key is configured */
-const buildExternalUrl = (query: string) =>
-  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-
-const buildExternalDirectionsUrl = (destination: string, origin?: { lat: number; lng: number } | null) => {
-  const resolvedOrigin = origin ?? CAMPUS_CENTRE_GPS;
-  return `https://www.google.com/maps/dir/?api=1&origin=${resolvedOrigin.lat},${resolvedOrigin.lng}&destination=${encodeURIComponent(destination)}&travelmode=walking`;
+  // Keep directions embedded even without API key.
+  return `https://www.google.com/maps?output=embed&saddr=${encodeURIComponent(originStr)}&daddr=${encodeURIComponent(destination)}&dirflg=w`;
 };
 
 type MapMode = 'view' | 'directions';
@@ -162,51 +161,29 @@ export const GoogleMapEmbed = forwardRef<GoogleMapRef, GoogleMapEmbedProps>(
           )}
         </div>
 
-        {getEmbedApiKey() ? (
-          <iframe
-            key={`${mode}-${destinationQuery}`}
-            title={
-              mode === 'directions'
-                ? t('googleMapsDirectionsTo', {
-                    destination: resolvedDestinationLabel,
-                  })
-                : t('googleMapsViewAt', { destination: resolvedDestinationLabel })
-            }
-            src={
-              mode === 'view'
-                ? buildViewUrl(destinationQuery)
-                : buildDirectionsUrl(destinationQuery, userLoc)
-            }
-            className="h-full w-full flex-1 border-0"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            aria-label={
-              mode === 'directions' ? t('directionsIframeLabel') : t('googleMapsIframeLabel')
-            }
-            allowFullScreen
-            allow="geolocation"
-          />
-        ) : (
-          <div className="flex h-full w-full flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-            <MapPin className="h-12 w-12 text-mq-content-tertiary" />
-            <p className="text-sm text-mq-content-secondary">
-              {resolvedDestinationLabel}
-            </p>
-            <a
-              href={
-                mode === 'view'
-                  ? buildExternalUrl(destinationQuery)
-                  : buildExternalDirectionsUrl(destinationQuery, userLoc)
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-mq-lg bg-mq-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-mq-primary/90"
-            >
-              <ExternalLink className="h-4 w-4" />
-              {safeT('openInGoogleMaps', 'Open in Google Maps')}
-            </a>
-          </div>
-        )}
+        <iframe
+          key={`${mode}-${destinationQuery}`}
+          title={
+            mode === 'directions'
+              ? t('googleMapsDirectionsTo', {
+                  destination: resolvedDestinationLabel,
+                })
+              : t('googleMapsViewAt', { destination: resolvedDestinationLabel })
+          }
+          src={
+            mode === 'view'
+              ? buildViewUrl(destinationQuery)
+              : buildDirectionsUrl(destinationQuery, userLoc)
+          }
+          className="h-full w-full flex-1 border-0"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          aria-label={
+            mode === 'directions' ? t('directionsIframeLabel') : t('googleMapsIframeLabel')
+          }
+          allowFullScreen
+          allow="geolocation"
+        />
 
         {/* Floating Action Button - Center on User */}
         {mode === 'view' && (

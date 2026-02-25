@@ -1,4 +1,11 @@
 Raouf: 2026-02-25 (Australia/Sydney)
+Scope: Google Map Full Audit — In-App Only (No External Redirect)
+Summary: Completed a focused production audit of Google map behavior and identified root cause of "Google not working" reports: when `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` was unset, `GoogleMapEmbed` intentionally rendered an external Google Maps link instead of an iframe, causing user flow to leave the app. Implemented in-app-only fallback by keeping map and directions embedded with keyless Google embed URLs (`output=embed`) when API key is absent. Removed remaining map-page external redirect action in `CampusMapHUD` ("Navigate to Google Maps" button) so map interactions remain inside the app. Updated regression tests to enforce iframe fallback behavior (view + directions) without external links.
+Files Changed: `features/map/components/GoogleMapEmbed.tsx`, `features/map/components/CampusMapHUD.tsx`, `tests/map/GoogleMapEmbed.test.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapEmbed.tsx features/map/components/CampusMapHUD.tsx tests/map/GoogleMapEmbed.test.tsx` ✅, `npm run test -- tests/map` ✅ (84/84), `npm run typecheck` ✅.
+Follow-ups: Optional hardening — set `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` in all environments to prefer official Embed API v1 consistently; keyless embed fallback remains active for resilience.
+
+Raouf: 2026-02-25 (Australia/Sydney)
 Scope: Migrate Google Maps to Embed API v1 (fix navigation 404s)
 Summary: Google removed the legacy `output=embed` URL format (returns 404). Migrated GoogleMapEmbed to use the official Maps Embed API v1 (`/maps/embed/v1/place` and `/maps/embed/v1/directions`) which requires `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`. Added graceful fallback: when no API key is configured, renders an "Open in Google Maps" link instead of a broken iframe. Made API key read lazy (`getEmbedApiKey()`) for testability. Added `openInGoogleMaps` translation to all 35 locales. Updated test suite from legacy URL assertions to Embed API v1 format + 2 new fallback tests. 498/498 tests pass.
 Files Changed: features/map/components/GoogleMapEmbed.tsx, tests/map/GoogleMapEmbed.test.tsx, locales/*/translations.json (35 files), .env.example, .env.local.example

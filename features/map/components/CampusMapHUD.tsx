@@ -387,26 +387,6 @@ export default function CampusMapHUD({
                       {isGoogleMode ? t('navigate') : t('navigateOnCampus')}
                     </Button>
                   )}
-                  {!isGoogleMode && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="w-full gap-2 touch-optimized"
-                      onClick={() => {
-                        const gps = selectedBuilding.location;
-                        if (gps) {
-                          window.open(
-                            `https://www.google.com/maps/search/?api=1&query=${gps.lat},${gps.lng}`,
-                            '_blank',
-                            'noopener,noreferrer',
-                          );
-                        }
-                      }}
-                    >
-                      <Search className="h-4 w-4" />
-                      {t('navigateToGoogleMaps')}
-                    </Button>
-                  )}
                 </div>
               </div>
             </LayeredCard>

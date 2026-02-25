@@ -1,3 +1,10 @@
+Raouf: 2026-02-25 (Australia/Sydney)
+Scope: Google Map Full Audit — In-App Only (No External Redirect)
+Summary: Audited Google map failure path and fixed the no-key flow so users are no longer redirected outside the app. `GoogleMapEmbed` now uses embedded keyless URLs (`output=embed`) for both map view and directions when `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` is missing, instead of rendering an external "Open in Google Maps" link. Also removed the remaining external redirect action from `CampusMapHUD` to keep map interactions in-app. Updated tests to verify iframe fallback behavior in both modes.
+Files: Modified `features/map/components/GoogleMapEmbed.tsx`, `features/map/components/CampusMapHUD.tsx`, `tests/map/GoogleMapEmbed.test.tsx`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapEmbed.tsx features/map/components/CampusMapHUD.tsx tests/map/GoogleMapEmbed.test.tsx` ✅, `npm run test -- tests/map` ✅ (84/84), `npm run typecheck` ✅.
+Follow-ups: Configure `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` in deployment environments for official Embed API v1 behavior by default.
+
 ### Raouf: Migrate Google Maps to Embed API v1 — 2026-02-25
 
 **Scope:** Google Maps navigation fix

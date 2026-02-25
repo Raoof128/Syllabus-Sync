@@ -305,15 +305,16 @@ describe('GoogleMapEmbed', () => {
       delete process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
     });
 
-    it('renders external link instead of iframe when no API key', () => {
+    it('renders embedded view iframe when no API key', () => {
       render(<GoogleMapEmbed />);
-      expect(screen.queryByTitle('Google Maps — Macquarie University')).toBeNull();
-      const link = screen.getByRole('link', { name: /Open in Google Maps/i });
-      expect(link.getAttribute('href')).toContain('google.com/maps/search');
-      expect(link.getAttribute('target')).toBe('_blank');
+      const iframe = screen.getByTitle('Google Maps — Macquarie University');
+      expect(iframe.getAttribute('src')).toContain('google.com/maps?output=embed');
+      expect(iframe.getAttribute('src')).toContain(
+        `q=${encodeURIComponent(`${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`)}`,
+      );
     });
 
-    it('renders external directions link when navigating without API key', () => {
+    it('renders embedded directions iframe when navigating without API key', () => {
       const ref = React.createRef<GoogleMapRef>();
       render(
         <GoogleMapEmbed
@@ -334,9 +335,15 @@ describe('GoogleMapEmbed', () => {
         ref.current?.startNavigation();
       });
 
-      const link = screen.getByRole('link', { name: /Open in Google Maps/i });
-      expect(link.getAttribute('href')).toContain('google.com/maps/dir');
-      expect(link.getAttribute('href')).toContain('travelmode=walking');
+      const iframe = screen.getByTitle('Directions to 18 Wallys Walk');
+      expect(iframe.getAttribute('src')).toContain('google.com/maps?output=embed');
+      expect(iframe.getAttribute('src')).toContain(
+        `saddr=${encodeURIComponent(`${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`)}`,
+      );
+      expect(iframe.getAttribute('src')).toContain(
+        `daddr=${encodeURIComponent('-33.7734389,151.1134919')}`,
+      );
+      expect(iframe.getAttribute('src')).toContain('dirflg=w');
     });
   });
 });
