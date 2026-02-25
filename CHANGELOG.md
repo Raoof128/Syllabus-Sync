@@ -1,3 +1,27 @@
+### Raouf: Fix Google Maps broken after CSP hardening — 2026-02-25
+
+**Scope:** CSP regression fix
+**Type:** Bugfix / Security
+
+**Summary:**
+Google Maps (and potentially Leaflet/Tailwind) broke after the nonce-based CSP update because:
+1. `'strict-dynamic'` in `script-src` causes browsers to **ignore all host-based allowlists** (`'self'`, `https://maps.googleapis.com`, etc.) per the CSP Level 3 spec — so Next.js chunks and any external scripts were blocked.
+2. Removing `'unsafe-inline'` from `style-src` blocked Leaflet CSS, Tailwind injected styles, and Next.js dynamic `<style>` elements.
+
+**Fixes:**
+- Removed `'strict-dynamic'` from `script-src` — host allowlists (`'self'`, Google Maps domains) now work as expected alongside the nonce.
+- Restored `'unsafe-inline'` to `style-src` — style-based XSS is far less exploitable than script-based, and noncing all dynamic styles is impractical.
+
+**Files Changed:**
+- `lib/security/csp.ts` — `buildNonceCSP()` updated
+
+**Verification:**
+- ESLint: 0 errors
+- TypeScript: 0 errors
+- Tests: 69/69 suites, 496/496 tests pass
+
+---
+
 ### Raouf: Full API Security Audit — Error Leakage, Rate Limiting, CSRF Comments — 2026-02-25
 
 **Scope:** API security audit across all 59 route files

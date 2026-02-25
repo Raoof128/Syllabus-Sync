@@ -1,4 +1,10 @@
 Raouf: 2026-02-25 (Australia/Sydney)
+Scope: Fix Google Maps broken after CSP hardening
+Summary: Removed `'strict-dynamic'` from `script-src` in `buildNonceCSP()` — per CSP L3 spec, strict-dynamic causes browsers to ignore host allowlists and `'self'`, which broke Next.js chunk loading and Google Maps. Restored `'unsafe-inline'` to `style-src` — Leaflet, Tailwind, and Next.js all inject dynamic `<style>` elements that can't be nonced. Script-src nonce protection is preserved. 496/496 tests pass.
+Files Changed: lib/security/csp.ts
+Verification: eslint 0 errors, tsc 0 errors, vitest 496/496 pass
+
+Raouf: 2026-02-25 (Australia/Sydney)
 Scope: Full API Security Audit — Error Leakage, Rate Limiting, CSRF Comments
 Summary: Audited all 59 API routes. Fixed error message leakage in 7 locations (deadlines, todos, units/sync). Added rate limiting to 9 mutation endpoints (notifications, profiles, user-preferences, sync) and brute-force protection to 3 auth verification endpoints (email/verify, password/reset, passkey/verify) with dedicated limiters. Removed 4 stale "CSRF protection removed" comments (now enforced at proxy level). Updated test mocks. 496/496 tests pass.
 Files Changed: 18 files across app/api/*, lib/services/rateLimitService.ts, tests/api/auth/passwordReset.test.ts

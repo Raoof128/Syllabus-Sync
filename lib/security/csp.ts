@@ -41,12 +41,16 @@ export function buildNonceCSP(nonce: string): string {
   const directives = [
     "default-src 'self'",
 
-    // Scripts: nonce + strict-dynamic (no unsafe-inline!)
-    // strict-dynamic allows scripts loaded by nonced scripts to execute
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://maps.googleapis.com https://maps.gstatic.com${isDev ? " 'unsafe-eval'" : ''}`,
+    // Scripts: nonce-based (no unsafe-inline!).
+    // NOTE: 'strict-dynamic' intentionally omitted — it causes browsers to
+    // ignore host allowlists ('self', maps.googleapis.com, etc.) per the CSP
+    // spec, which breaks Google Maps embeds and Next.js chunk loading.
+    `script-src 'self' 'nonce-${nonce}' https://maps.googleapis.com https://maps.gstatic.com${isDev ? " 'unsafe-eval'" : ''}`,
 
-    // Styles: nonce replaces unsafe-inline for styles too
-    `style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+    // Styles: 'unsafe-inline' kept because Leaflet, Tailwind, and Next.js
+    // all inject dynamic <style> elements that cannot be nonced at runtime.
+    // Style-based XSS is far less exploitable than script-based XSS.
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
 
     // Fonts
     "font-src 'self' data: https://fonts.gstatic.com https://r2cdn.perplexity.ai",
