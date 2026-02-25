@@ -2103,7 +2103,7 @@
   "errorProfileLoad": "تعذر تحميل إعدادات ملفك الشخصي. تم تسجيل ذلك لفريق الهندسة لدينا.",
   "viewLabel": "View {{label}}",
   "viewCategoryEvents": "View {{label}} events",
-  "eventsCount_one": "حدث واحد",
+  "eventsCount_one": "{{count}} حدث",
   "eventsCount_other": "{{count}} أحداث",
   "allDay": "طوال اليوم",
   "overdueToday": "متأخر (اليوم)",

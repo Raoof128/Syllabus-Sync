@@ -1,3 +1,45 @@
+### Raouf: Full i18n audit + parity hardening — 2026-02-25
+
+**Scope:** Repository-wide internationalization audit and fixes
+**Type:** Localization parity / placeholder integrity / hardcoded UI i18n alignment
+
+#### Changes
+
+1. Completed full locale audit against English source (`locales/en/translations.json`) for all 34 non-English locales.
+2. Verified and enforced locale parity with no missing keys and no empty translation values.
+3. Fixed all placeholder mismatches:
+   - `eventsCount_one` updated in `ar`, `es`, `fr`, `ru`, `zh` to preserve `{{count}}` placeholder.
+   - Privacy section segmentation fixed for `ja` and `zh` by removing unintended `{{supportEmail}}` placeholder drift from `privacy_s10_p2_part3`.
+4. Replaced hardcoded user-facing UI strings with translation keys in runtime UI:
+   - Global error page: title, body, action labels.
+   - App loading states (`app/loading.tsx`, `app/page.tsx`).
+   - Position editor loading view.
+   - Weather widget labels (`loading`, `condition`, `wind` semantic label via existing key).
+5. Re-ran hardcoded scan and reduced remaining findings to non-production literals (numeric placeholders, dev-only page text, usage-doc snippet strings).
+
+#### Files Changed
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/global-error.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/loading.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/page.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/map/position-editor/page.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/components/layout/WeatherWidget.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/ar/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/es/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/fr/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/ru/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/zh/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/ja/translations.json`
+
+#### Verification
+
+- `npm run check:i18n` ✅
+- Custom locale audit (all locales): `missing=0`, `empty=0`, `placeholder_mismatch=0` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs app/global-error.tsx app/loading.tsx app/page.tsx app/map/position-editor/page.tsx components/layout/WeatherWidget.tsx` ✅
+- `node tools/i18n/find-hardcoded.mjs` reviewed; remaining hits are non-user-facing placeholders/dev-only/docs-snippet text ✅
+
+---
+
 ### Raouf: Google Live-Origin Navigation & Destination Update — 2026-02-23
 
 **Scope:** Google map live location recognition and navigation recalculation

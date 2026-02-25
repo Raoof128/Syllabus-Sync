@@ -1,3 +1,22 @@
+Raouf: 2026-02-25 (Australia/Sydney)
+Scope: Repository-Wide i18n Audit Fixes (Parity, Placeholder Safety, Hardcoded UI Strings)
+Summary: Completed a full repository i18n audit against `locales/en/translations.json` and fixed cross-locale inconsistencies without changing UI logic/layout. Verified locale key parity across all 35 locales, fixed all detected placeholder mismatches (`eventsCount_one` and privacy section key segmentation), and replaced hardcoded user-facing loading/error/weather strings with existing translation keys in runtime components. Confirmed no missing keys, no empty translations, and no placeholder drift remain across non-English locales.
+Files Changed:
+
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/global-error.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/loading.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/page.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/map/position-editor/page.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/components/layout/WeatherWidget.tsx`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/ar/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/es/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/fr/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/ru/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/zh/translations.json`
+- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/ja/translations.json`
+  Verification: `npm run check:i18n` ✅, custom locale parity/placeholder validation (`missing=0`, `empty=0`, `mismatch=0`) ✅, `npx eslint --config config/eslint/eslint.config.mjs app/global-error.tsx app/loading.tsx app/page.tsx app/map/position-editor/page.tsx components/layout/WeatherWidget.tsx` ✅.
+  Follow-ups: Optional future pass can localize additional non-blocking literal placeholders in dev/demo-only UI samples (`app/test-auth/page.tsx`, component usage-doc snippets) if production i18n policy expands to those paths.
+
 Raouf: 2026-02-23 (UTC)
 Scope: Google Map Live Origin Navigation + Destination Recalculation
 Summary: Updated Google map navigation logic to recognize user live location as the directions origin when available, with automatic fallback to `CAMPUS_CENTRE_GPS` when geolocation is unavailable. Improved navigation UX so that when users select a new destination while already in directions mode, navigation remains active and recalculates immediately to the newly selected location instead of dropping back to map view. Added regression coverage for both behaviors: live user-origin routing in directions and active directions route update on destination switch.

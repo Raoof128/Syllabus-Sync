@@ -6,6 +6,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export default function GlobalError({
   error,
@@ -14,6 +15,8 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useTypedTranslation();
+
   useEffect(() => {
     // No-op: Sentry capture removed to avoid dev HMR module factory errors.
   }, [error]);
@@ -52,11 +55,12 @@ export default function GlobalError({
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
 
-            <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Something went wrong!</h1>
+            <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+              {t('somethingWentWrong')}!
+            </h1>
 
             <p style={{ color: '#666', marginBottom: '1.5rem' }}>
-              We&apos;re sorry, but something unexpected happened. Our team has been notified and is
-              working on a fix.
+              {t('appErrorDesc')}
             </p>
 
             <button
@@ -72,7 +76,7 @@ export default function GlobalError({
                 marginRight: '0.5rem',
               }}
             >
-              Try Again
+              {t('tryAgain')}
             </button>
 
             <a
@@ -87,7 +91,7 @@ export default function GlobalError({
                 borderRadius: '0.5rem',
               }}
             >
-              Go Home
+              {t('goHome')}
             </a>
 
             {error.digest && (

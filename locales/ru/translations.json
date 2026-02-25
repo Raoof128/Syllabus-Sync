@@ -2103,7 +2103,7 @@
   "errorProfileLoad": "Не удалось загрузить настройки вашего профиля. Информация об этом была передана нашей инженерной команде.",
   "viewLabel": "View {{label}}",
   "viewCategoryEvents": "View {{label}} events",
-  "eventsCount_one": "1 событие",
+  "eventsCount_one": "{{count}} событие",
   "eventsCount_other": "{{count}} событий",
   "allDay": "Весь день",
   "overdueToday": "Просрочено (сегодня)",

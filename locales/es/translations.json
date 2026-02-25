@@ -2103,7 +2103,7 @@
   "errorProfileLoad": "No hemos podido cargar la configuración de su perfil. Esto ha sido registrado para nuestro equipo de ingeniería.",
   "viewLabel": "View {{label}}",
   "viewCategoryEvents": "View {{label}} events",
-  "eventsCount_one": "1 evento",
+  "eventsCount_one": "{{count}} evento",
   "eventsCount_other": "{{count}} eventos",
   "allDay": "Todo el día",
   "overdueToday": "Vencido (hoy)",

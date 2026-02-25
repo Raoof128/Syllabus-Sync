@@ -93,7 +93,7 @@ const WeatherWidget = memo(() => {
     if (loading) {
       return (
         <div className="h-7 px-3 rounded-full bg-mq-background-secondary animate-pulse flex items-center justify-center shadow-inner">
-          <span className="text-mq-content-tertiary font-medium text-[9px]">Loading...</span>
+          <span className="text-mq-content-tertiary font-medium text-[9px]">{t('loading')}</span>
         </div>
       );
     }
@@ -196,7 +196,9 @@ const WeatherWidget = memo(() => {
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] text-mq-content-tertiary font-medium">Condition</span>
+                <span className="text-[10px] text-mq-content-tertiary font-medium">
+                  {t('condition')}
+                </span>
                 <span className="text-sm font-medium text-mq-content mt-1">
                   {weatherData.condition}
                 </span>
@@ -219,7 +221,9 @@ const WeatherWidget = memo(() => {
                   <Wind className="w-3.5 h-3.5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-mq-content-tertiary font-medium">Wind</span>
+                  <span className="text-[10px] text-mq-content-tertiary font-medium">
+                    {t('windy')}
+                  </span>
                   <span className="text-xs font-semibold text-mq-content tabular-nums">
                     {weatherData.windSpeed ?? 0} km/h
                   </span>

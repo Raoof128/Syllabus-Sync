@@ -2103,7 +2103,7 @@
   "errorProfileLoad": "Nous n'avons pas pu charger les paramètres de votre profil. Cela a été signalé à notre équipe d'ingénierie.",
   "viewLabel": "View {{label}}",
   "viewCategoryEvents": "View {{label}} events",
-  "eventsCount_one": "1 événement",
+  "eventsCount_one": "{{count}} événement",
   "eventsCount_other": "{{count}} événements",
   "allDay": "Toute la journée",
   "overdueToday": "En retard (aujourd'hui)",
