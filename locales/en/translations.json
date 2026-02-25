@@ -2148,5 +2148,7 @@
   "inDays_one": "In 1 day",
   "inDays_other": "In {{count}} days",
   "examPassed": "Exam passed",
-  "examLocation": "Exam Location"
+  "examLocation": "Exam Location",
+  "condition": "Condition",
+  "windy": "Wind"
 }

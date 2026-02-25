@@ -2148,5 +2148,7 @@
   "inDays_one": "dans 1 jour",
   "inDays_other": "dans {{count}} jours",
   "examPassed": "Examen passé",
-  "examLocation": "Lieu de l'examen"
+  "examLocation": "Lieu de l'examen",
+  "condition": "Condition",
+  "windy": "Vent"
 }

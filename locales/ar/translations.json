@@ -2148,5 +2148,7 @@
   "inDays_one": "خلال يوم واحد",
   "inDays_other": "خلال {{count}} أيام",
   "examPassed": "انتهى الامتحان",
-  "examLocation": "موقع الامتحان"
+  "examLocation": "موقع الامتحان",
+  "condition": "الحالة",
+  "windy": "الرياح"
 }

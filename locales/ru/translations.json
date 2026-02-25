@@ -2148,5 +2148,7 @@
   "inDays_one": "через 1 день",
   "inDays_other": "через {{count}} дн.",
   "examPassed": "Экзамен прошел",
-  "examLocation": "Место проведения экзамена"
+  "examLocation": "Место проведения экзамена",
+  "condition": "Состояние",
+  "windy": "Ветер"
 }
