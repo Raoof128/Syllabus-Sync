@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Deadline, Event, Unit, Todo } from '@/lib/types';
 import { useCalendarDialogs } from './useCalendarDialogs';
+import type { CalendarView } from '@/lib/types';
 
 export function useCalendarHighlights(
   units: Unit[],
@@ -10,6 +11,7 @@ export function useCalendarHighlights(
   todos: Todo[],
   hasHydrated: boolean,
   dialogs: ReturnType<typeof useCalendarDialogs>,
+  setView?: (view: CalendarView) => void,
 ) {
   const {
     setSelectedUnit,
@@ -72,6 +74,11 @@ export function useCalendarHighlights(
 
     processedUnitHighlightRef.current = highlightedUnitId;
 
+    // Switch to week view so the user can see all the unit's classes across the week
+    if (setView) {
+      setView('week');
+    }
+
     const timer = window.setTimeout(() => {
       setSelectedUnit(highlightedUnit);
       setUnitDetailOpen(true);
@@ -89,7 +96,7 @@ export function useCalendarHighlights(
       clearTimeout(timer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedUnitId, highlightedUnit, hasHydrated, setSelectedUnit, setUnitDetailOpen]);
+  }, [highlightedUnitId, highlightedUnit, hasHydrated, setSelectedUnit, setUnitDetailOpen, setView]);
 
   // Scroll to units widget when highlighted unit exists
   useEffect(() => {

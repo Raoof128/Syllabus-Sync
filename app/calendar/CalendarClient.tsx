@@ -224,7 +224,7 @@ export default function CalendarClient() {
 
   // 5. Highlights Hook
   const { unitsWidgetRef, assignmentsWidgetRef, deadlineRefs, highlightedDeadlineId } =
-    useCalendarHighlights(units, deadlines, userEvents, todos, hasHydrated, dialogs);
+    useCalendarHighlights(units, deadlines, userEvents, todos, hasHydrated, dialogs, setView);
 
   // 6. Getters Hook
   const { formatDayNumber, formatMonthYear, formatWeekRange, formatWeekdayShort, formatTimeShort } =

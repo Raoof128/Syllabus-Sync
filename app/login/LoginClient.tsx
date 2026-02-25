@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FingerprintButton } from '@/features/auth/components/FingerprintButton';
@@ -32,7 +32,6 @@ import {
 
 export default function LoginClient() {
   const { t } = useTypedTranslation();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { loginWithPasskey, isPasskeyLoading } = usePasskeyLogin();
 
@@ -133,11 +132,12 @@ export default function LoginClient() {
       setIsSuccess(true);
       toastUtils.success(t('welcomeBack'), t('loginSuccess'));
 
-      // 1. Force server to re-render layout (Updates "Guest" -> "User" in navbar)
-      router.refresh();
-
+      // Full page navigation to ensure auth cookies are fully propagated
+      // and all Zustand stores reload fresh data from the API.
+      // Using window.location instead of router.push avoids race conditions
+      // where client-side navigation fires before cookies are committed.
       setTimeout(() => {
-        router.push(redirectTo);
+        window.location.href = redirectTo;
       }, 800);
     } catch {
       setGeneralError(t('unexpectedError'));
@@ -172,7 +172,9 @@ export default function LoginClient() {
     setGeneralError(null);
     loginWithPasskey(email, () => {
       setIsSuccess(true);
-      setTimeout(() => router.push(redirectTo), 800);
+      setTimeout(() => {
+        window.location.href = redirectTo;
+      }, 800);
     });
   };
 
@@ -453,9 +455,8 @@ export default function LoginClient() {
                 setMfaState(null);
                 setIsSuccess(true);
                 toastUtils.success(t('welcomeBack'), t('loginSuccess'));
-                router.refresh();
                 setTimeout(() => {
-                  router.push(redirectTo);
+                  window.location.href = redirectTo;
                 }, 800);
               }}
               onCancel={() => {

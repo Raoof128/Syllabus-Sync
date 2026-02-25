@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { CalendarView } from '@/features/calendar/components/CalendarHeader';
+import { CalendarView } from '@/lib/types';
 import { START_HOUR, HOUR_HEIGHT } from '@/lib/calendar-utils';
 
 dayjs.extend(isoWeek);

@@ -1,5 +1,7 @@
 // lib/types/index.ts
 
+export type CalendarView = 'week' | 'day' | 'agenda';
+
 export type DayOfWeek =
   | 'Monday'
   | 'Tuesday'

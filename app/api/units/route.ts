@@ -314,9 +314,6 @@ export async function POST(request: Request) {
             : new Date().toISOString(),
         };
 
-        console.warn('Creating unit for user:', userId);
-        console.warn('Creating unit with payload:', JSON.stringify(unitPayload, null, 2));
-
         const { data: unit, error: unitError } = await supabase
           .from('units')
           .insert(unitPayload)

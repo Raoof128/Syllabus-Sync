@@ -137,9 +137,7 @@ export const useUnitsStore = create<UnitsState>()(
           // This can happen if localStorage is out of sync with DB
           // Force refresh to get the correct state and return the existing unit
           if (errorMessage.includes('409') || errorMessage.includes('already exists')) {
-            console.warn(
-              `Unit code ${normalized.code} already exists, refreshing from database...`,
-            );
+            // Unit code already exists in DB - refresh to get correct state
             await get().forceRefresh();
             // Find the existing unit by code (case-insensitive)
             const searchCode = normalized.code.toUpperCase();
@@ -264,7 +262,7 @@ export const useUnitsStore = create<UnitsState>()(
           // 404: Unit doesn't exist on server with this ID
           // This could mean: 1) unit was never synced, or 2) unit exists with different ID
           if (errorMessage.includes('404') || errorMessage.includes('not found')) {
-            console.warn(`Unit ${id} not found on server, syncing state from database...`);
+            // Unit not found on server - sync state from database
 
             // Force refresh to get the actual state from DB
             // This will replace local units with the correct DB data (including correct IDs)
@@ -274,20 +272,9 @@ export const useUnitsStore = create<UnitsState>()(
             const searchCode = optimisticUpdate.code.toUpperCase();
             const refreshedUnit = get().units.find((u) => u.code.toUpperCase() === searchCode);
 
-            console.warn('After refresh, looking for code:', searchCode);
-            console.warn(
-              'Available units:',
-              get().units.map((u) => ({ id: u.id, code: u.code })),
-            );
-            console.warn(
-              'Found refreshedUnit:',
-              refreshedUnit ? { id: refreshedUnit.id, code: refreshedUnit.code } : null,
-            );
-
             if (refreshedUnit) {
               // Unit exists in DB - now update it with the correct ID
               try {
-                console.warn('Updating existing unit with ID:', refreshedUnit.id);
                 const updated = await apiRequest<Unit>(`/api/units/${refreshedUnit.id}`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
@@ -313,7 +300,6 @@ export const useUnitsStore = create<UnitsState>()(
               }
             } else {
               // Unit doesn't exist in DB at all - try to create it
-              console.warn('Unit not found in DB, attempting to create...');
               try {
                 const created = await apiRequest<Unit>('/api/units', {
                   method: 'POST',
@@ -345,12 +331,10 @@ export const useUnitsStore = create<UnitsState>()(
 
                 // If 409, the unit exists - refresh and find it
                 if (createErrorMsg.includes('409') || createErrorMsg.includes('already exists')) {
-                  console.warn('Unit already exists (409), refreshing to find it...');
                   await get().forceRefresh();
                   const searchCode = optimisticUpdate.code.toUpperCase();
                   const found = get().units.find((u) => u.code.toUpperCase() === searchCode);
                   if (found) {
-                    console.warn('Found existing unit after 409:', found.id, found.code);
                     return found;
                   }
                 }
