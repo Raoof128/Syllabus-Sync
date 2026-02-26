@@ -200,15 +200,20 @@ export default function DayView({
           </div>
         )}
 
-        {/* Back to Today Banner - shows when viewing a different date */}
+        {/* Date Banner - shows date and Back to Today when viewing a different date */}
         {!isToday && onGoToToday && (
-          <button
-            onClick={onGoToToday}
-            className="w-full px-3 py-2 bg-mq-primary/10 border-b border-mq-primary/20 hover:bg-mq-primary/20 transition-colors flex items-center justify-center gap-2 text-sm font-medium text-mq-primary"
-          >
-            <CalendarClock className="h-4 w-4" />
-            <span>{t('backToToday')}</span>
-          </button>
+          <div className="w-full px-3 py-2 bg-mq-primary/10 border-b border-mq-primary/20 flex items-center justify-between gap-2">
+            <span className="text-sm font-semibold text-mq-content">
+              {dayDate.format('D MMMM YYYY')}
+            </span>
+            <button
+              onClick={onGoToToday}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-mq-primary/20 hover:bg-mq-primary/30 transition-colors text-sm font-medium text-mq-primary"
+            >
+              <CalendarClock className="h-4 w-4" />
+              <span>{t('backToToday')}</span>
+            </button>
+          </div>
         )}
 
         {/* Time Grid */}

@@ -196,23 +196,19 @@ export default function WeekHeatStrip() {
         </div>
       </div>
 
-      <div className="flex justify-between items-end h-24 gap-2 sm:gap-4 relative">
+      <div className="flex justify-between items-end h-28 gap-3 sm:gap-5 relative px-2 sm:px-3">
         {weekData.map((day, i) => (
           <Link
             key={i}
             href={`/calendar?date=${format(day.date, 'yyyy-MM-dd')}`}
-            className="flex-1 flex flex-col justify-end h-full group relative rounded-md hover:bg-mq-background-secondary/50 transition-colors focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background focus-visible:outline-none"
+            className="flex-1 flex flex-col justify-end items-center h-full group relative rounded-md hover:bg-mq-background-secondary/50 transition-colors focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background focus-visible:outline-none min-w-[40px]"
             aria-label={`${day.fullDate}: ${day.classCount} classes, ${day.examCount} exams, ${day.assignmentCount} assignments, ${day.eventCount} events`}
           >
-            {/* Tooltip - positioned to stay within bounds */}
+            {/* Tooltip - positioned directly above the bar, centered */}
             <div
-              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max min-w-[120px] max-w-[180px] sm:max-w-[200px] bg-mq-content text-mq-background text-xs px-3 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 text-center"
+              className="absolute bottom-full left-1/2 mb-2 w-max min-w-[110px] max-w-[160px] bg-mq-content text-mq-background text-xs px-2.5 py-1.5 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 text-center"
               style={{
-                // Ensure tooltip doesn't overflow on edges
-                left: i === 0 ? '0' : i === 6 ? 'auto' : '50%',
-                right: i === 6 ? '0' : 'auto',
-                transform:
-                  i === 0 ? 'translateX(0)' : i === 6 ? 'translateX(0)' : 'translateX(-50%)',
+                transform: 'translateX(-50%)',
               }}
             >
               <p className="font-bold whitespace-nowrap">{day.fullDate}</p>

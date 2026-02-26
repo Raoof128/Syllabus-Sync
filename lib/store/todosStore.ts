@@ -12,6 +12,7 @@ interface TodosState {
   isLoading: boolean;
   hasLoaded: boolean;
   loadTodos: () => Promise<void>;
+  forceRefresh: () => Promise<void>;
   addTodo: (todo: Omit<Todo, 'id' | 'createdAt' | 'completed'>) => Promise<Todo | null>;
   removeTodo: (id: string) => Promise<void>;
   updateTodo: (id: string, todo: Partial<Todo>) => Promise<Todo | null>;
@@ -103,6 +104,23 @@ export const useTodosStore = create<TodosState>()(
             console.warn('Failed to load todos from API:', error);
             set({ hasLoaded: true });
           }
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // Force refresh from database - clears hasLoaded and reloads
+      forceRefresh: async () => {
+        set({ isLoading: true, hasLoaded: false });
+        try {
+          const data = await apiRequest<Todo[]>('/api/todos', {
+            noRetry: true,
+          });
+          const validData = data.map(normalizeTodo).filter((t) => isValidUUID(t.id));
+          set({ todos: validData, hasLoaded: true });
+        } catch (error) {
+          console.error('Failed to force refresh todos:', error);
+          set({ hasLoaded: true });
         } finally {
           set({ isLoading: false });
         }

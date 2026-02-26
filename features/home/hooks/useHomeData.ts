@@ -1,29 +1,52 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useTodosStore } from '@/lib/store/todosStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { useHydration } from '@/lib/hooks';
+import { createBrowserClient } from '@/lib/supabase/client';
+import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 export function useHomeData() {
   const hasHydrated = useHydration();
+  const initialLoadDone = useRef(false);
 
   const units = useUnitsStore((state) => state.units);
-  const loadUnits = useUnitsStore((state) => state.loadUnits);
+  const forceRefreshUnits = useUnitsStore((state) => state.forceRefresh);
 
-  const loadDeadlines = useDeadlinesStore((state) => state.loadDeadlines);
-  const loadTodos = useTodosStore((state) => state.loadTodos);
-  const loadEvents = useEventsStore((state) => state.loadEvents);
+  const forceRefreshDeadlines = useDeadlinesStore((state) => state.forceRefresh);
+  const forceRefreshTodos = useTodosStore((state) => state.forceRefresh);
+  const forceRefreshEvents = useEventsStore((state) => state.forceRefresh);
 
   // Load data from database on mount
   useEffect(() => {
-    if (hasHydrated) {
-      loadUnits();
-      loadDeadlines();
-      loadTodos();
-      loadEvents();
+    if (hasHydrated && !initialLoadDone.current) {
+      initialLoadDone.current = true;
+      // Use forceRefresh on first load to ensure fresh data
+      forceRefreshUnits();
+      forceRefreshDeadlines();
+      forceRefreshTodos();
+      forceRefreshEvents();
     }
-  }, [hasHydrated, loadUnits, loadDeadlines, loadTodos, loadEvents]);
+  }, [hasHydrated, forceRefreshUnits, forceRefreshDeadlines, forceRefreshTodos, forceRefreshEvents]);
+
+  // Listen for auth state changes and refresh data on sign-in
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+
+    const supabase = createBrowserClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string) => {
+      if (event === 'SIGNED_IN') {
+        // Force refresh all data after sign-in
+        forceRefreshUnits();
+        forceRefreshDeadlines();
+        forceRefreshTodos();
+        forceRefreshEvents();
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [forceRefreshUnits, forceRefreshDeadlines, forceRefreshTodos, forceRefreshEvents]);
 
   const hasUnits = units.length > 0;
 

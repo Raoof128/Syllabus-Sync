@@ -16,6 +16,7 @@ interface EventsState {
   isLoading: boolean;
   hasLoaded: boolean;
   loadEvents: () => Promise<void>;
+  forceRefresh: () => Promise<void>;
   addEvent: (event: Omit<Event, 'id' | 'date' | 'time'> & { id?: string }) => Promise<Event | null>;
   updateEvent: (id: string, updates: Partial<Event>) => Promise<Event | null>;
   removeEvent: (id: string) => Promise<void>;
@@ -90,6 +91,23 @@ export const useEventsStore = create<EventsState>()(
             }
             set({ hasLoaded: true });
           }
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // Force refresh from database - clears hasLoaded and reloads
+      forceRefresh: async () => {
+        set({ isLoading: true, hasLoaded: false });
+        try {
+          const data = await apiRequest<Event[]>('/api/events', {
+            noRetry: true,
+          });
+          const normalizedApi = data.map(normalizeEvent);
+          set({ events: normalizedApi, hasLoaded: true });
+        } catch (error) {
+          console.error('Failed to force refresh events:', error);
+          set({ hasLoaded: true });
         } finally {
           set({ isLoading: false });
         }

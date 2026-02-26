@@ -7,7 +7,8 @@ import React from 'react';
 export function getDeadlineColor(deadline: Deadline, units: Unit[]): string {
   if (deadline.color) return deadline.color;
   const unit = units.find((u) => u.code === deadline.unitCode);
-  return unit?.color || 'var(--c-primary)';
+  // Return unit color if found, otherwise use a neutral gray instead of primary red
+  return unit?.color || '#6B7280';
 }
 
 // Hours to display (6 AM to 11 PM = 18 hours)

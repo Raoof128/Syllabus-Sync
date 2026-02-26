@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import {
@@ -25,6 +26,12 @@ import DayView from '@/features/calendar/components/DayView';
 import AgendaView from '@/features/calendar/components/AgendaView';
 import FilterPanel from '@/features/calendar/components/FilterPanel';
 import dynamic from 'next/dynamic';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 // Hooks
 import { useCalendarData } from '@/features/calendar/hooks/useCalendarData';
@@ -84,6 +91,9 @@ export default function CalendarClient() {
     const value = t(key);
     return value === key ? fallback : value;
   };
+
+  // Todo form saving state
+  const [todoSaving, setTodoSaving] = useState(false);
 
   // 1. Data Hook
   const {
@@ -495,22 +505,23 @@ export default function CalendarClient() {
           {/* Week View */}
           {view === 'week' && (
             <ScrollReveal>
-              <div className="grid grid-cols-1 gap-4 min-h-[calc(100vh-200px)] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
-                {weekDays.map((date, index) => {
-                  const { dayDeadlines, dayEvents } = getItemsForDay(date);
-                  const dayUnits = getUnitsForDay(date);
-                  const isToday = dayjs(date).isSame(dayjs(), 'day');
+              <div className="overflow-x-auto pb-4">
+                <div className="grid grid-cols-7 gap-3 min-w-[900px]">
+                  {weekDays.map((date, index) => {
+                    const { dayDeadlines, dayEvents } = getItemsForDay(date);
+                    const dayUnits = getUnitsForDay(date);
+                    const isToday = dayjs(date).isSame(dayjs(), 'day');
 
-                  return (
-                    <div
-                      key={index}
-                      className={cn(
-                        'flex flex-col gap-2 p-3 rounded-xl border min-h-[150px] transition-colors',
-                        isToday
-                          ? 'bg-mq-primary/5 border-mq-primary/20'
-                          : 'bg-mq-card-background border-mq-border hover:border-mq-primary/30',
-                      )}
-                    >
+                    return (
+                      <div
+                        key={index}
+                        className={cn(
+                          'flex flex-col gap-2 p-3 rounded-xl border min-h-[150px] min-w-[120px] transition-colors',
+                          isToday
+                            ? 'bg-mq-primary/5 border-mq-primary/20'
+                            : 'bg-mq-card-background border-mq-border hover:border-mq-primary/30',
+                        )}
+                      >
                       <div className="flex flex-col items-center mb-2">
                         <span className="text-xs font-medium text-mq-content-secondary uppercase">
                           {formatWeekdayShort(date)}
@@ -639,6 +650,7 @@ export default function CalendarClient() {
                     </div>
                   );
                 })}
+                </div>
               </div>
             </ScrollReveal>
           )}
@@ -1038,23 +1050,27 @@ export default function CalendarClient() {
       )}
 
       {/* Todo Modal */}
-      {todoDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
-            <div className="flex items-center gap-3 mb-4">
+      <Dialog open={todoDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setTodoDialogOpen(false);
+          setEditingTodo(null);
+        }
+      }}>
+        <DialogContent className="max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/30 flex items-center justify-center">
                 <Edit2 className="h-5 w-5 text-emerald-600" />
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-mq-content">
-                  {editingTodo ? tOr('editTodo', 'Edit Task') : tOr('addTodo', 'Add Task')}
-                </h3>
-              </div>
-            </div>
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (editTodoTitle.trim() && editTodoDueDate) {
+              {editingTodo ? tOr('editTodo', 'Edit Task') : tOr('addTodo', 'Add Task')}
+            </DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (editTodoTitle.trim() && editTodoDueDate && !todoSaving) {
+                setTodoSaving(true);
+                try {
                   // Build due date (required)
                   const dueDate = new Date(editTodoDueDate);
                   if (editTodoDueTime) {
@@ -1087,10 +1103,13 @@ export default function CalendarClient() {
                   setEditTodoDueDate('');
                   setEditTodoDueTime('');
                   setEditTodoColor('#10b981');
+                } finally {
+                  setTodoSaving(false);
                 }
-              }}
-              className="space-y-4"
-            >
+              }
+            }}
+            className="space-y-4"
+          >
               {/* Task Title - Required */}
               <div>
                 <label
@@ -1142,7 +1161,7 @@ export default function CalendarClient() {
                   {tOr('dueDateTime', 'Due Date & Time')} <span className="text-mq-error">*</span>
                 </label>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="flex items-center gap-2 flex-1">
+                  <div className="flex items-center gap-2 w-full sm:w-40">
                     <Calendar className="h-4 w-4 text-mq-content-secondary shrink-0" />
                     <input
                       type="date"
@@ -1153,7 +1172,7 @@ export default function CalendarClient() {
                       required
                     />
                   </div>
-                  <div className="flex items-center gap-2 w-full sm:w-36">
+                  <div className="flex items-center gap-2 flex-1">
                     <Clock className="h-4 w-4 text-mq-content-secondary shrink-0" />
                     <input
                       type="time"
@@ -1199,17 +1218,23 @@ export default function CalendarClient() {
                     setTodoDialogOpen(false);
                     setEditingTodo(null);
                   }}
+                  disabled={todoSaving}
                 >
                   {t('cancelAction')}
                 </Button>
-                <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                  {editingTodo ? tOr('saveChanges', 'Save Changes') : tOr('addTodo', 'Add Task')}
+                <Button type="submit" variant="outline" disabled={todoSaving}>
+                  {todoSaving
+                    ? editingTodo
+                      ? tOr('saving', 'Saving...')
+                      : tOr('adding', 'Adding...')
+                    : editingTodo
+                      ? tOr('saveChanges', 'Save Changes')
+                      : tOr('addTodo', 'Add Task')}
                 </Button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Todo Detail Panel */}
       <TodoDetailPanel

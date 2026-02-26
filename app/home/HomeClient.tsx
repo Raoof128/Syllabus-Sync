@@ -225,7 +225,10 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                     {/* Units Grid - READ ONLY (no edit/delete) */}
                     <m.div
                       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 auto-rows-fr"
+                      initial="hidden"
+                      animate="visible"
                       variants={{
+                        hidden: {},
                         visible: { transition: { staggerChildren: 0.1 } },
                       }}
                     >
@@ -241,7 +244,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                             onClick={(clickedUnit) => {
                               const today = new Date().toISOString().split('T')[0];
                               router.push(
-                                `/calendar?date=${today}&highlightUnit=${encodeURIComponent(clickedUnit.id)}`,
+                                `/calendar?date=${today}&view=week&highlightUnit=${encodeURIComponent(clickedUnit.id)}`,
                               );
                             }}
                           />

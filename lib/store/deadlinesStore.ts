@@ -16,6 +16,7 @@ interface DeadlinesState {
   isLoading: boolean;
   hasLoaded: boolean;
   loadDeadlines: () => Promise<void>;
+  forceRefresh: () => Promise<void>;
   addDeadline: (deadline: Deadline) => Promise<Deadline | null>;
   removeDeadline: (id: string) => Promise<void>;
   removeDeadlinesByUnit: (unitId: string, unitCode: string) => void;
@@ -98,6 +99,23 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             // Non-auth error: keep persisted data but mark as loaded
             set({ hasLoaded: true });
           }
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // Force refresh from database - clears hasLoaded and reloads
+      forceRefresh: async () => {
+        set({ isLoading: true, hasLoaded: false });
+        try {
+          const data = await apiRequest<Deadline[]>('/api/deadlines', {
+            noRetry: true,
+          });
+          const validData = data.map(normalizeDeadline).filter((d) => isValidUUID(d.id));
+          set({ deadlines: validData, hasLoaded: true });
+        } catch (error) {
+          console.error('Failed to force refresh deadlines:', error);
+          set({ hasLoaded: true });
         } finally {
           set({ isLoading: false });
         }

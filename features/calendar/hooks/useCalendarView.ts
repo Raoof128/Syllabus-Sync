@@ -22,8 +22,26 @@ export function useCalendarView() {
     return null;
   }, [searchParams]);
 
-  // View State - default to 'day' view
-  const [view, setView] = useState<CalendarView>('day');
+  // URL View
+  const urlView = useMemo(() => {
+    const viewParam = searchParams.get('view');
+    if (viewParam && ['day', 'week', 'agenda'].includes(viewParam)) {
+      return viewParam as CalendarView;
+    }
+    return null;
+  }, [searchParams]);
+
+  // View State - default to 'day' view, but can be initialized from URL
+  const [view, setView] = useState<CalendarView>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const viewParam = params.get('view');
+      if (viewParam && ['day', 'week', 'agenda'].includes(viewParam)) {
+        return viewParam as CalendarView;
+      }
+    }
+    return 'day';
+  });
 
   // Current Week Start
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
@@ -77,6 +95,21 @@ export function useCalendarView() {
       return () => clearTimeout(clearTimer);
     }
   }, [urlDate]);
+
+  // Effect: Update view from URL
+  useEffect(() => {
+    if (urlView) {
+      setView(urlView);
+
+      const clearTimer = setTimeout(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('view');
+        window.history.replaceState({}, '', url.toString());
+      }, 1000);
+
+      return () => clearTimeout(clearTimer);
+    }
+  }, [urlView]);
 
   // Derived: Week Days
   const weekDays = useMemo(

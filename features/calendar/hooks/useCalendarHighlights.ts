@@ -170,17 +170,26 @@ export function useCalendarHighlights(
 
   // 3. Highlighted Todo
   const highlightedTodoId = useMemo(() => searchParams.get('highlightTodo'), [searchParams]);
+  const processedTodoHighlightRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!highlightedTodoId) return;
+    if (highlightedTodoId && processedTodoHighlightRef.current !== highlightedTodoId) {
+      processedTodoHighlightRef.current = null;
+    }
+  }, [highlightedTodoId]);
+
+  useEffect(() => {
+    if (!hasHydrated || !highlightedTodoId) return;
+    if (processedTodoHighlightRef.current === highlightedTodoId) return;
 
     const highlightedTodo = todos.find((t) => t.id === highlightedTodoId);
+    if (!highlightedTodo) return;
+
+    processedTodoHighlightRef.current = highlightedTodoId;
 
     const timer = window.setTimeout(() => {
-      if (highlightedTodo) {
-        setSelectedTodo(highlightedTodo);
-        setTodoDetailOpen(true);
-      }
+      setSelectedTodo(highlightedTodo);
+      setTodoDetailOpen(true);
     }, 300);
 
     const clearTimer = window.setTimeout(() => {
@@ -195,7 +204,7 @@ export function useCalendarHighlights(
       clearTimeout(timer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedTodoId, todos, setSelectedTodo, setTodoDetailOpen]);
+  }, [highlightedTodoId, todos, hasHydrated, setSelectedTodo, setTodoDetailOpen]);
 
   // 4. Highlighted Event
   const highlightedEventId = useMemo(() => searchParams.get('highlightEvent'), [searchParams]);
