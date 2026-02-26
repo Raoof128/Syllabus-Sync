@@ -90,10 +90,10 @@ export const GROUND_CONTROL_POINTS: GroundControlPoint[] = [
   {
     id: 'GCP_18WW',
     name: "18 Wally's Walk (Central Hub)",
-    gps: { lat: -33.7734389, lng: 151.1134919 },
+    gps: { lat: -33.7739781, lng: 151.1126116 },
     pixel: [2392, 1881], // +110px offset applied
-    source: 'google_maps',
-    verifiedDate: '2026-01-20',
+    source: 'osm',
+    verifiedDate: '2026-02-26',
   },
   {
     id: 'GCP_4ER',
@@ -339,7 +339,7 @@ export function getAffineCoefficients(): AffineCoefficients {
   if (!_cachedCoeffs) {
     _cachedCoeffs = computeAffineCoefficients(GROUND_CONTROL_POINTS);
     _cachedRmse = computeRMSE(_cachedCoeffs, GROUND_CONTROL_POINTS);
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV === 'development') {
       console.warn(
         `[GeoCalibration] Affine transformation computed from ${GROUND_CONTROL_POINTS.length} GCPs. RMSE: ${_cachedRmse.toFixed(2)} px`,
       );

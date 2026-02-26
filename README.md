@@ -188,7 +188,7 @@ npm install
 cp .env.example .env.local
 
 # Configure your environment variables
-# Required: Supabase URL, Anon Key, Service Role Key
+# Required: Supabase URL, Anon Key, Service Role Key, Google Maps Embed API key
 # Optional: Redis URL, OpenWeather API Key, ORS API Key
 ```
 
@@ -196,6 +196,8 @@ Email (Resend) + Vercel notes:
 
 - Transactional email (verification) is sent via **Resend** using `RESEND_API_KEY` and `VERIFICATION_EMAIL_FROM`.
 - Vercel Cron endpoints are protected by `CRON_SECRET`.
+- Google embedded map mode should use `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` in every deployed environment
+  to guarantee consistent in-app iframe behavior.
 - Setup guide: `docs/operations/resend-vercel-setup.md`
 - OAuth setup: `docs/operations/supabase-oauth-setup.md`
 

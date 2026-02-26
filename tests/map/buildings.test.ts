@@ -68,6 +68,31 @@ describe('getBuildingById', () => {
     expect(building).toBeDefined();
     expect(building?.id).toBe('LIB');
   });
+
+  it('should keep 18WW destination aligned to Service Connect and not Central Courtyard', () => {
+    const b18 = getBuildingById('18WW');
+    const serviceConnect = getBuildingById('18WWSERVIC');
+    const courtyard = getBuildingById('1CC');
+
+    expect(b18?.location).toBeDefined();
+    expect(serviceConnect?.location).toBeDefined();
+    expect(courtyard?.location).toBeDefined();
+
+    const distance = (
+      a: { lat: number; lng: number },
+      b: { lat: number; lng: number },
+    ): number => {
+      const dLat = (a.lat - b.lat) * 111_000;
+      const dLng = (a.lng - b.lng) * 111_000 * Math.cos(((a.lat + b.lat) / 2) * (Math.PI / 180));
+      return Math.sqrt(dLat * dLat + dLng * dLng);
+    };
+
+    const dToService = distance(b18!.location!, serviceConnect!.location!);
+    const dToCourtyard = distance(b18!.location!, courtyard!.location!);
+
+    expect(dToService).toBeLessThan(30);
+    expect(dToCourtyard).toBeGreaterThan(50);
+  });
 });
 
 describe('searchBuildings', () => {

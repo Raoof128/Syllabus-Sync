@@ -26,6 +26,8 @@ const REQUIRED_KEYS = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   'SUPABASE_SERVICE_ROLE_KEY',
+  // Google Maps Embed (required for consistent in-app map embedding across environments)
+  'NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY',
   // Distributed rate limiting (required for production)
   'KV_REST_API_URL',
   'KV_REST_API_TOKEN',
@@ -104,7 +106,7 @@ function main() {
     return;
   }
 
-  console.log(`OK: required env keys present for "${environment}".`);
+  process.stdout.write(`OK: required env keys present for "${environment}".\n`);
 }
 
 main();

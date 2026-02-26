@@ -221,7 +221,7 @@ export const buildings: Building[] = [
   {
     id: '18WW',
     name: "18 Wally's Walk (Central Hub)",
-    position: [2282, 1881], // Calculated from GPS -33.77551, 151.11259
+    position: [2282, 1881], // Calibrated near Service Connect / Central Hub footprint
     description:
       'Main student services building housing Service Connect, IT, HR, Financial Services, and administration offices.',
     tags: ['services', 'administration', 'study'],
@@ -230,7 +230,8 @@ export const buildings: Building[] = [
     gridRef: 'N16',
     address: "18 Wally's Walk",
     category: 'services',
-    location: { lat: -33.7734389, lng: 151.1134919 }, // Google Maps MCP verified 2026-01-24
+    // Keep this aligned to 18WW Service Connect geocode, not Central Courtyard.
+    location: { lat: -33.7739781, lng: 151.1126116, osmId: 205588336 }, // OSM Nominatim verified 2026-02-26
     levels: 4,
   },
   {

@@ -97,8 +97,8 @@ export const PRIMARY_GCPS: GCP[] = [
     id: '18WW',
     name: "18 Wally's Walk (Central Hub)",
     pixel: [1692, 1870], // Anchor GCP - GPS verified
-    gps: { lat: -33.77551, lng: 151.11259 },
-    source: 'GPS verified (anchor)',
+    gps: { lat: -33.7739781, lng: 151.1126116 },
+    source: 'OSM verified (anchor)',
   },
   {
     id: 'LIB',

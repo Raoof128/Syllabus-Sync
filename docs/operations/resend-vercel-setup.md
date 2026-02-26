@@ -13,6 +13,7 @@ Set these in Vercel: Project -> Settings -> Environment Variables.
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (secret, required for admin auth operations and distributed rate limiting)
+- `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` (required for consistent embedded Google map/directions iframe behavior)
 - `CRON_SECRET` (secret, used to protect cron endpoints)
 
 ## Vercel CLI (Recommended)
@@ -33,6 +34,7 @@ vercel env add RESEND_API_KEY production
 vercel env add VERIFICATION_EMAIL_FROM production
 vercel env add VERIFICATION_EMAIL_NAME production
 vercel env add NEXT_PUBLIC_APP_URL production
+vercel env add NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY production
 vercel env add CRON_SECRET production
 ```
 
