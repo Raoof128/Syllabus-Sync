@@ -85,22 +85,24 @@ export function usePublicFeed() {
     return filteredEvents.filter((e) => !featuredIds.has(e.id));
   }, [filteredEvents, featuredEvents]);
 
-  // Category counts
+  // Category counts - exclude featured events to match what's shown in the grid
   const categoryCounts = useMemo(() => {
+    const featuredIds = new Set(featuredEvents.map((e) => e.id));
+    const nonFeatured = events.filter((e) => !featuredIds.has(e.id));
     const counts: Record<CategoryFilter, number> = {
-      All: events.length,
+      All: nonFeatured.length,
       Career: 0,
       Social: 0,
       Academic: 0,
       'Free Food': 0,
     };
-    events.forEach((e) => {
+    nonFeatured.forEach((e) => {
       if (e.category in counts) {
         counts[e.category as Exclude<CategoryFilter, 'All'>]++;
       }
     });
     return counts;
-  }, [events]);
+  }, [events, featuredEvents]);
 
   // Handle add to calendar
   const handleAddToCalendar = useCallback(

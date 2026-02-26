@@ -296,7 +296,7 @@ const Header = memo(() => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className={`group p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background ${unreadCount > 0 ? 'animate-pulse-subtle' : ''}`}
+                className={`group flex items-center justify-center p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out relative hover:bg-mq-red hover:text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background ${unreadCount > 0 ? 'animate-pulse-subtle' : ''}`}
                 aria-label={
                   unreadCount > 0
                     ? t('viewUnreadNotifications', { count: unreadCount })
@@ -482,7 +482,7 @@ const Header = memo(() => {
         {isClient && (
           <button
             onClick={toggleTheme}
-            className="group relative p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11"
+            className="group relative flex items-center justify-center p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11"
             aria-label={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
             aria-pressed={resolvedTheme === 'dark'}
             title={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
@@ -560,19 +560,19 @@ const Header = memo(() => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={async () => {
-                  try {
-                    await resetAllStores();
-                    await clearAllClientStorage();
-                    await apiRequest('/api/auth/signout', {
+                onClick={() => {
+                  // Redirect immediately for snappy UX, then clean up in background
+                  setUser(null);
+                  router.replace('/login');
+                  // Fire-and-forget cleanup
+                  Promise.allSettled([
+                    resetAllStores(),
+                    clearAllClientStorage(),
+                    apiRequest('/api/auth/signout', {
                       method: 'POST',
                       noRetry: true,
-                    });
-                    setUser(null);
-                    router.push('/login');
-                  } catch {
-                    router.push('/login');
-                  }
+                    }),
+                  ]).catch(() => {});
                 }}
                 className="flex items-center gap-2 text-mq-content hover:text-mq-content cursor-pointer"
               >

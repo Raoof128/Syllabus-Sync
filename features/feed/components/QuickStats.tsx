@@ -28,6 +28,7 @@ interface DialogState {
 export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
   const { t } = useTypedTranslation();
   const [dialogState, setDialogState] = useState<DialogState | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<PublicEvent | null>(null);
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -57,11 +58,13 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
   }, [events]);
 
   const openDialog = useCallback((title: string, eventsList: PublicEvent[]) => {
+    setSelectedEvent(null);
     setDialogState({ title, events: eventsList });
   }, []);
 
   const closeDialog = useCallback(() => {
     setDialogState(null);
+    setSelectedEvent(null);
   }, []);
 
   return (
@@ -151,26 +154,65 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
         <DialogContent className="max-w-3xl max-h-[80vh]">
           {dialogState && (
             <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl">{dialogState.title}</DialogTitle>
-                <DialogDescription className="text-sm text-mq-content-secondary">
-                  {t(dialogState.events.length === 1 ? 'eventsCount_one' : 'eventsCount_other', {
-                    count: dialogState.events.length,
-                  })}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="mt-4 space-y-3 overflow-y-auto max-h-[50vh]">
-                {dialogState.events.length === 0 ? (
-                  <p className="text-center py-8 text-mq-content-tertiary">{t('noEventsFound')}</p>
-                ) : (
-                  dialogState.events.map((event) => <EventCard key={event.id} event={event} />)
-                )}
-              </div>
-              <div className="flex justify-end mt-4">
-                <Button variant="outline" onClick={closeDialog}>
-                  {t('close')}
-                </Button>
-              </div>
+              {selectedEvent ? (
+                /* Single event detail view */
+                <>
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl">{selectedEvent.title}</DialogTitle>
+                    <DialogDescription className="text-sm text-mq-content-secondary">
+                      {selectedEvent.category}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-4">
+                    <EventCard event={selectedEvent} expanded />
+                  </div>
+                  <div className="flex justify-between mt-4">
+                    <Button variant="outline" onClick={() => setSelectedEvent(null)}>
+                      {t('back') || 'Back'}
+                    </Button>
+                    <Button variant="outline" onClick={closeDialog}>
+                      {t('close')}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                /* Events list view */
+                <>
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl">{dialogState.title}</DialogTitle>
+                    <DialogDescription className="text-sm text-mq-content-secondary">
+                      {t(
+                        dialogState.events.length === 1
+                          ? 'eventsCount_one'
+                          : 'eventsCount_other',
+                        {
+                          count: dialogState.events.length,
+                        },
+                      )}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="mt-4 space-y-3 overflow-y-auto max-h-[50vh]">
+                    {dialogState.events.length === 0 ? (
+                      <p className="text-center py-8 text-mq-content-tertiary">
+                        {t('noEventsFound')}
+                      </p>
+                    ) : (
+                      dialogState.events.map((event) => (
+                        <EventCard
+                          key={event.id}
+                          event={event}
+                          onClick={() => setSelectedEvent(event)}
+                        />
+                      ))
+                    )}
+                  </div>
+                  <div className="flex justify-end mt-4">
+                    <Button variant="outline" onClick={closeDialog}>
+                      {t('close')}
+                    </Button>
+                  </div>
+                </>
+              )}
             </>
           )}
         </DialogContent>
@@ -264,9 +306,11 @@ function CategoryBar({ icon, label, count, total, color, onClick }: CategoryBarP
 // Event Card Component for Dialog
 interface EventCardProps {
   event: PublicEvent;
+  onClick?: () => void;
+  expanded?: boolean;
 }
 
-function EventCard({ event }: EventCardProps) {
+function EventCard({ event, onClick, expanded }: EventCardProps) {
   const { t } = useTypedTranslation();
   const categoryColors: Record<string, string> = {
     Career: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
@@ -301,7 +345,25 @@ function EventCard({ event }: EventCardProps) {
   };
 
   return (
-    <div className="p-4 rounded-lg border border-mq-border bg-mq-card-background hover:shadow-sm transition-all">
+    <div
+      className={cn(
+        'p-4 rounded-lg border border-mq-border bg-mq-card-background transition-all',
+        onClick && 'cursor-pointer hover:shadow-md hover:border-mq-primary/30 active:scale-[0.99]',
+      )}
+      onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
       <div className="flex items-start justify-between gap-3 mb-2">
         <h4 className="font-semibold text-base text-mq-content flex-1">{event.title}</h4>
         <Badge className={cn('text-xs shrink-0 border', categoryColors[event.category])}>
@@ -309,7 +371,9 @@ function EventCard({ event }: EventCardProps) {
         </Badge>
       </div>
       {event.description && (
-        <p className="text-sm text-mq-content-secondary mb-3">{event.description}</p>
+        <p className={cn('text-sm text-mq-content-secondary mb-3', !expanded && 'line-clamp-2')}>
+          {event.description}
+        </p>
       )}
       <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-mq-content-secondary">
         <div className="flex items-center gap-1.5">
@@ -327,6 +391,14 @@ function EventCard({ event }: EventCardProps) {
           </div>
         )}
       </div>
+      {expanded && event.building && (
+        <div className="mt-3 pt-3 border-t border-mq-border">
+          <p className="text-xs text-mq-content-tertiary">
+            {t('building') || 'Building'}: {event.building}
+            {event.room && ` - ${t('room') || 'Room'} ${event.room}`}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

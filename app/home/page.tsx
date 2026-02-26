@@ -2,6 +2,8 @@
 import { Metadata } from 'next';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import HomeClient from './HomeClient';
+import { createServerClient } from '@/lib/supabase/server';
+import type { AuthUser } from '@/features/home/types';
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -25,6 +27,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
-  return <HomeClient initialUser={null} />;
+export default async function HomePage() {
+  // Pre-fetch user on server to avoid empty-state flash on client
+  let initialUser = null;
+  try {
+    const supabase = await createServerClient();
+    const { data } = await supabase.auth.getUser();
+    if (data?.user) {
+      initialUser = {
+        email: data.user.email,
+        user_metadata: data.user.user_metadata as AuthUser['user_metadata'],
+      };
+    }
+  } catch {
+    // Fall back to client-side auth
+  }
+  return <HomeClient initialUser={initialUser} />;
 }
