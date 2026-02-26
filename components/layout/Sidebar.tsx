@@ -47,6 +47,8 @@ const navigation: {
   { name: 'settings', href: '/settings', icon: Settings },
 ];
 
+export const GAMIFICATION_SETTINGS_ROUTE = '/settings/experience';
+
 /**
  * Sidebar Component
  *
@@ -284,7 +286,7 @@ const Sidebar = memo(() => {
         {/* XP/Level Badge */}
         {profile && (
           <Link
-            href="/settings"
+            href={GAMIFICATION_SETTINGS_ROUTE}
             onClick={() => setMobileMenuOpen(false)}
             className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors"
             title={`${t('level')} ${profile.level} - ${t(getLevelTitleKey(profile.level))} (${profile.xp.toLocaleString()} XP)`}
@@ -420,7 +422,7 @@ const Sidebar = memo(() => {
           {/* XP/Level Badge */}
           {profile && (
             <Link
-              href="/settings"
+              href={GAMIFICATION_SETTINGS_ROUTE}
               className="mb-4 flex items-center gap-2 px-3 py-2 rounded-mq bg-gradient-to-r from-mq-primary/10 to-mq-secondary/10 border border-mq-primary/20 hover:border-mq-primary/40 transition-colors sidebar-menu-item"
               title={`${t('level')} ${profile.level} - ${t(getLevelTitleKey(profile.level))} (${profile.xp.toLocaleString()} XP)`}
               aria-label={t('gamificationProgress', {

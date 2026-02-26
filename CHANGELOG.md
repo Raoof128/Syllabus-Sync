@@ -1,4 +1,10 @@
 Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Gamification Full Audit + Settings Experience Routing Fix
+Summary: Ran a full gamification audit across settings UI, gamification components, store logic, and API endpoints. Fixed navigation bug where the XP/level badge in sidebar routed users to `/settings` (redirecting to general) instead of experience. Added `GAMIFICATION_SETTINGS_ROUTE` constant and updated mobile/desktop badge links to `/settings/experience`. Added route integrity regression test to lock this behavior.
+Files: Modified `components/layout/Sidebar.tsx`, `tests/settings/SettingsRoutesIntegrity.test.ts`.
+Verification: `npm run test -- tests/gamification tests/settings/GamificationSettings.test.tsx tests/settings/SettingsRoutesIntegrity.test.ts tests/settings/QuickActions.test.tsx` ✅ (116/116), targeted ESLint ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-26 (Australia/Sydney)
 Scope: Notifications Audit Finalization — Typecheck Stabilization
 Summary: Resolved remaining typecheck blocker unrelated to notification logic by narrowing TS includes to stable Next-generated route types (`.next/types`) and excluding stale `.next/dev/types` validators that referenced removed pages (`/mq-demo`, `/test-auth`). This unblocked a clean `npm run typecheck` after notifications-module fixes.
 Files: Modified `config/ts/tsconfig.json`.
@@ -4034,3 +4040,15 @@ Scope: Settings Audit + Duplicate Function Elimination
 Summary: Full audit of all 7 settings pages — all imports valid, no broken functionality, error boundaries in place. Found and eliminated two classes of duplication: (1) `ToggleControl` component was identically redefined in `MapSettings.tsx` as a local component instead of being imported from the canonical `ToggleControl.tsx` — removed the duplicate, added import. (2) The `useSyncExternalStore` client-detection pattern (`emptySubscribe / getClientSnapshot / getServerSnapshot`) was copy-pasted into 4 separate files (`settings/layout.tsx`, `MeshGradient.tsx`, `MovingMeshBackground.tsx`, `NotificationSettings.tsx`) and also existed as a flawed `useState+useEffect` version in `useHydration.ts`. Rewrote `useHydration.ts` to use `useSyncExternalStore` (concurrent-safe, no set-state-in-effect hack), then replaced all 4 inline patterns with a simple `useHydration()` call.
 Files: Modified `lib/hooks/useHydration.ts`, `features/settings/components/NotificationSettings.tsx`, `features/settings/components/MapSettings.tsx`, `components/ui/MeshGradient.tsx`, `components/ui/MovingMeshBackground.tsx`, `app/settings/layout.tsx`.
 Verification: `npm run typecheck` ✅, `npm run lint` ✅, `npm run test:ci` ✅ (483/483), `npm run build` ✅.
+
+Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Presentation Deck from Full Documentation Audit
+Summary: Completed a documentation-grounded presentation build by reading AGENT, CHANGELOG, README, security/policy/operations docs, and project planning references. Added a professional slide deck for stakeholder, industry, and hiring-panel presentation use.
+Files: Added `docs/presentations/syllabus-sync-industry-deck.md`.
+Verification: Deck sections align with documented architecture, controls, workflows, and roadmap material in the repository.
+
+Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Export Industry Deck to PowerPoint
+Summary: Converted the Markdown presentation deck into a presentation-ready `.pptx` artifact for direct use in demos, stakeholder reviews, and interviews.
+Files: Added `docs/presentations/syllabus-sync-industry-presentation.pptx`.
+Verification: PPTX export successful and validated with 15 slide XML entries.

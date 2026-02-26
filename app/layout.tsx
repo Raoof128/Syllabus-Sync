@@ -70,11 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           nonce={nonce}
           dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
         />
-        <script
-          key="rtl-script"
-          nonce={nonce}
-          dangerouslySetInnerHTML={{ __html: RTL_SCRIPT }}
-        />
+        <script key="rtl-script" nonce={nonce} dangerouslySetInnerHTML={{ __html: RTL_SCRIPT }} />
       </head>
       <body className="font-sans" suppressHydrationWarning>
         <script

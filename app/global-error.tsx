@@ -59,9 +59,7 @@ export default function GlobalError({
               {t('somethingWentWrong')}!
             </h1>
 
-            <p style={{ color: '#666', marginBottom: '1.5rem' }}>
-              {t('appErrorDesc')}
-            </p>
+            <p style={{ color: '#666', marginBottom: '1.5rem' }}>{t('appErrorDesc')}</p>
 
             <button
               onClick={reset}

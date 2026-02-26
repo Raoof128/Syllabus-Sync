@@ -96,7 +96,14 @@ export function useCalendarHighlights(
       clearTimeout(timer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedUnitId, highlightedUnit, hasHydrated, setSelectedUnit, setUnitDetailOpen, setView]);
+  }, [
+    highlightedUnitId,
+    highlightedUnit,
+    hasHydrated,
+    setSelectedUnit,
+    setUnitDetailOpen,
+    setView,
+  ]);
 
   // Scroll to units widget when highlighted unit exists
   useEffect(() => {

@@ -32,9 +32,9 @@ export const DEMO_USER = {
  * MQ Brand Colors
  */
 export const BRAND_COLORS = {
-  primary: '#A6192E',   // Macquarie Red
+  primary: '#A6192E', // Macquarie Red
   secondary: '#002A45', // Macquarie Blue
-  accent: '#FFB81C',    // Macquarie Gold
+  accent: '#FFB81C', // Macquarie Gold
 } as const;
 
 /**

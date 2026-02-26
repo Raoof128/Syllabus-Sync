@@ -78,10 +78,7 @@ describe('getBuildingById', () => {
     expect(serviceConnect?.location).toBeDefined();
     expect(courtyard?.location).toBeDefined();
 
-    const distance = (
-      a: { lat: number; lng: number },
-      b: { lat: number; lng: number },
-    ): number => {
+    const distance = (a: { lat: number; lng: number }, b: { lat: number; lng: number }): number => {
       const dLat = (a.lat - b.lat) * 111_000;
       const dLng = (a.lng - b.lng) * 111_000 * Math.cos(((a.lat + b.lat) / 2) * (Math.PI / 180));
       return Math.sqrt(dLat * dLat + dLng * dLng);

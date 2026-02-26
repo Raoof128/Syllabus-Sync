@@ -112,10 +112,7 @@ export async function proxy(request: NextRequest) {
   if (!shouldSkipCSRF(request)) {
     const csrfResult = validateCSRF(request);
     if (!csrfResult.valid) {
-      return NextResponse.json(
-        { error: 'Invalid request origin' },
-        { status: 403 },
-      );
+      return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 });
     }
   }
 

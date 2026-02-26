@@ -1,4 +1,10 @@
 Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Gamification Full Audit + Settings Experience Routing Fix
+Summary: Completed an end-to-end gamification audit (UI widgets, settings toggles, Zustand store state/persistence, API profile retrieval, XP award endpoint, and route integrity). Verified flow from feed interaction (`/api/gamification/award-xp`) through store refresh and UI notifications, plus settings experience rendering (`/settings/experience`) with `GamificationSettings`. Fixed routing bug where clicking the XP/level badge in `Sidebar` opened `/settings` (which redirects to general) instead of the experience section. Introduced explicit `GAMIFICATION_SETTINGS_ROUTE` constant set to `/settings/experience` and wired both mobile + desktop badge links to it. Added regression assertion to settings route integrity tests.
+Files Changed: `components/layout/Sidebar.tsx`, `tests/settings/SettingsRoutesIntegrity.test.ts`
+Verification: `npm run test -- tests/gamification tests/settings/GamificationSettings.test.tsx tests/settings/SettingsRoutesIntegrity.test.ts tests/settings/QuickActions.test.tsx` ✅ (116/116), targeted ESLint ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-02-26 (Australia/Sydney)
 Scope: Notifications Audit Finalization — Typecheck Stabilization
 Summary: Finalized notification-audit delivery by fixing repository typecheck instability caused by stale `.next/dev/types` validator references to removed routes (`/mq-demo`, `/test-auth`). Updated TypeScript include paths to rely on stable `../../.next/types/**/*.ts` only. Notification module fixes and new API tests remain intact.
 Files Changed: `config/ts/tsconfig.json`
@@ -1118,3 +1124,15 @@ Scope: Avatar Fallback + MQ Units 2026 Refresh + Check Clean
 Summary: Key patterns: (a) Next.js `<Image>` with Supabase avatar URLs — always add `unoptimized` and an `onError` state to fall back to initials; don't rely on `remotePatterns` alone. (b) Regenerate `data/mqUnitsData.ts` with Python script: filter `status === 'Approved'`, strip non-ASCII with `re.sub(r'[^\x00-\x7F]+', ' ', s)`, parse `special_unit_type` label via `ast.literal_eval`, sort by code. (c) JSDOM missing browser APIs: stub in `tests/setup.ts` — `scrollIntoView` not implemented in JSDOM; add `Element.prototype.scrollIntoView = () => {}`. (d) React Compiler memoization errors: ensure all values used inside `useCallback` are in the dep array — the compiler flags missing deps as "Compilation Skipped".
 Files: Modified `components/layout/Header.tsx`, `data/mqUnitsData.ts`, `components/ui/ReminderModal.tsx`, `components/ui/UnitAutocomplete.tsx`, `tests/setup.ts`.
 Verification: `npm run check` ✅ — typecheck, lint, test (483/483), build all green.
+
+Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Documentation Ingestion + Industry Presentation Deck Creation
+Summary: Read AGENT/CHANGELOG/README and all repository documentation entry points (security, policies, operations, architecture/team docs) and produced a presentation-ready slide deck consolidating product value, architecture, security posture, reliability model, governance assets, deployment readiness, and roadmap execution framing.
+Files: Added `docs/presentations/syllabus-sync-industry-deck.md`.
+Verification: Confirmed deck file exists and content maps to current repository docs and package scripts.
+
+Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Presentation Artifact Export (PPTX)
+Summary: Generated a distributable PowerPoint presentation from the repository-backed slide source using Pandoc so the deck can be presented directly in stakeholder sessions.
+Files: Added `docs/presentations/syllabus-sync-industry-presentation.pptx`.
+Verification: Export completed successfully; PPTX archive contains 15 slides.

@@ -152,9 +152,7 @@ describe('GoogleMapEmbed', () => {
     );
 
     const iframe = screen.getByTitle('Google Maps — 18 Wallys Walk');
-    expect(iframe.getAttribute('src')).toContain(
-      encodeURIComponent('-33.7734389,151.1134919'),
-    );
+    expect(iframe.getAttribute('src')).toContain(encodeURIComponent('-33.7734389,151.1134919'));
   });
 
   it('clears geolocation watch on unmount when watch id is 0', () => {
@@ -180,9 +178,7 @@ describe('GoogleMapEmbed', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Center on my location' }));
 
     const iframe = screen.getByTitle('Google Maps — My Location');
-    expect(iframe.getAttribute('src')).toContain(
-      encodeURIComponent('-33.7748,151.1132'),
-    );
+    expect(iframe.getAttribute('src')).toContain(encodeURIComponent('-33.7748,151.1132'));
 
     unmount();
     restore();
@@ -213,9 +209,7 @@ describe('GoogleMapEmbed', () => {
     });
 
     const iframe = screen.getByTitle('Directions to 18 Wallys Walk');
-    expect(iframe.getAttribute('src')).toContain(
-      `origin=${encodeURIComponent('-33.771,151.114')}`,
-    );
+    expect(iframe.getAttribute('src')).toContain(`origin=${encodeURIComponent('-33.771,151.114')}`);
     expect(iframe.getAttribute('src')).toContain(
       `destination=${encodeURIComponent('-33.7734389,151.1134919')}`,
     );

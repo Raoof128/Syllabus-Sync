@@ -167,11 +167,7 @@ export async function POST(request: Request) {
       if (error) {
         // SECURITY: Log actual error server-side, return generic message to client
         logger.error('Database error creating deadline:', error.code, error.message, error.details);
-        return jsonError(
-          'Failed to create deadline',
-          500,
-          ERROR_CODES.DATABASE_ERROR,
-        );
+        return jsonError('Failed to create deadline', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return NextResponse.json(mapDeadlineRow(data));

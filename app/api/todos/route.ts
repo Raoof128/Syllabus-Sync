@@ -143,11 +143,7 @@ export async function POST(request: Request) {
           );
         }
         // SECURITY: Log actual error server-side, return generic message to client
-        return jsonError(
-          'Failed to create todo',
-          500,
-          ERROR_CODES.DATABASE_ERROR,
-        );
+        return jsonError('Failed to create todo', 500, ERROR_CODES.DATABASE_ERROR);
       }
 
       return NextResponse.json(mapTodoRow(data));
