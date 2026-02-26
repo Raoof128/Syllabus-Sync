@@ -13,6 +13,7 @@ export async function PUT(request: Request) {
         .update({ read: true })
         .eq('user_id', userId)
         .eq('read', false)
+        .is('deleted_at', null)
         .select('id');
 
       if (error) {

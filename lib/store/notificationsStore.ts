@@ -266,6 +266,11 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         method: 'DELETE',
       });
     } catch (error) {
+      const is404 = error instanceof Error && error.message.includes('404');
+      if (is404) {
+        return;
+      }
+
       if (notificationToRemove) {
         set((state) => ({
           notifications: [...state.notifications, notificationToRemove],

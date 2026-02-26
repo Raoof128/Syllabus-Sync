@@ -126,10 +126,11 @@ export async function DELETE(request: Request) {
   return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const supabase = await createServerClient();
+      const now = new Date().toISOString();
 
       const { data, error } = await supabase
         .from('notifications')
-        .delete()
+        .update({ deleted_at: now })
         .eq('user_id', userId)
         .is('deleted_at', null)
         .select('id');

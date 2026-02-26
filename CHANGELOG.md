@@ -1,4 +1,17 @@
 Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Notifications Audit Finalization — Typecheck Stabilization
+Summary: Resolved remaining typecheck blocker unrelated to notification logic by narrowing TS includes to stable Next-generated route types (`.next/types`) and excluding stale `.next/dev/types` validators that referenced removed pages (`/mq-demo`, `/test-auth`). This unblocked a clean `npm run typecheck` after notifications-module fixes.
+Files: Modified `config/ts/tsconfig.json`.
+Verification: `npm run test -- tests/api/notifications.routes.test.ts tests/stores.test.ts tests/stores-critical.test.ts tests/settings/NotificationSettings.test.tsx` ✅ (46/46), `npm run typecheck` ✅.
+
+Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Notifications Full Audit — Flow Trace + Soft-Delete Consistency + API Coverage
+Summary: Completed a full notifications-module audit and fixed route/store consistency issues. Notification delete operations now use soft-delete semantics (`deleted_at`) consistently with list filtering and schema expectations. Added deleted-row filtering to item GET/PUT and mark-all-read. Improved client delete idempotency by treating 404 on remove as success (prevents false rollback after race/deleted item). Added new API-level test coverage for notification routes.
+Files: Modified `app/api/notifications/route.ts`, `app/api/notifications/[id]/route.ts`, `app/api/notifications/mark-all-read/route.ts`, `lib/store/notificationsStore.ts`; Added `tests/api/notifications.routes.test.ts`.
+Verification: `npm run test -- tests/api/notifications.routes.test.ts tests/stores.test.ts tests/stores-critical.test.ts tests/settings/NotificationSettings.test.tsx` ✅ (46/46), targeted ESLint ✅.
+Notes: `npm run typecheck` still reports pre-existing `.next/*/validator.ts` missing-route errors for removed `app/mq-demo/page.js` and `app/test-auth/page.js` (not introduced by this change).
+
+Raouf: 2026-02-26 (Australia/Sydney)
 Scope: Map Navigation Fix — 18WW Incorrect Intermediate Destination
 Summary: Fixed reported 18WW navigation behavior where routes biased toward Central Courtyard before the final destination. Corrected 18WW GPS coordinates to Service Connect / 18WW geocode across map data + calibration sources and added regression coverage in `tests/map/buildings.test.ts` to enforce proximity to `18WWSERVIC` and separation from `1CC`.
 Files: Modified `features/map/lib/buildings.ts`, `features/map/lib/geospatialCalibration.ts`, `features/map/lib/gcpCalibration.ts`, `tests/map/buildings.test.ts`.

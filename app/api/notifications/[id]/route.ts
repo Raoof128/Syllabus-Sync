@@ -48,6 +48,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         .select('*')
         .eq('id', id)
         .eq('user_id', userId)
+        .is('deleted_at', null)
         .single();
 
       if (error) {
@@ -111,6 +112,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         .update(dbUpdates)
         .eq('id', id)
         .eq('user_id', userId)
+        .is('deleted_at', null)
         .select('*')
         .single();
 
@@ -148,18 +150,25 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
   return requireAuthWithRateLimit(request, async (userId) => {
     try {
       const supabase = await createServerClient();
+      const now = new Date().toISOString();
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('notifications')
-        .delete()
+        .update({ deleted_at: now })
         .eq('id', id)
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .is('deleted_at', null)
+        .select('id')
+        .single();
 
       if (error) {
+        if (error.code === 'PGRST116') {
+          return jsonError('Notification not found', 404, ERROR_CODES.NOT_FOUND);
+        }
         return handleDatabaseError(error);
       }
 
-      return jsonSuccess({ deleted: true, id });
+      return jsonSuccess({ deleted: true, id: data.id });
     } catch (error) {
       logger.error('DELETE /api/notifications/[id] error:', error);
       return jsonError('Failed to delete notification', 500, ERROR_CODES.INTERNAL_ERROR);

@@ -1,4 +1,17 @@
 Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Notifications Audit Finalization — Typecheck Stabilization
+Summary: Finalized notification-audit delivery by fixing repository typecheck instability caused by stale `.next/dev/types` validator references to removed routes (`/mq-demo`, `/test-auth`). Updated TypeScript include paths to rely on stable `../../.next/types/**/*.ts` only. Notification module fixes and new API tests remain intact.
+Files Changed: `config/ts/tsconfig.json`
+Verification: `npm run test -- tests/api/notifications.routes.test.ts tests/stores.test.ts tests/stores-critical.test.ts tests/settings/NotificationSettings.test.tsx` ✅ (46/46), `npm run typecheck` ✅.
+
+Raouf: 2026-02-26 (Australia/Sydney)
+Scope: Notifications Full Audit — Flow Trace + Soft-Delete Consistency + API Coverage
+Summary: Performed an end-to-end notifications audit across API routes, Zustand stores, scheduler, and UI usage. Traced runtime flow from `Header` + feed/gamification emitters through `notificationsStore` to `/api/notifications*` endpoints and verified settings/scheduler interactions with `notificationPreferencesStore`. Found and fixed consistency gap: routes/comments/filtering expected soft-deletes while delete handlers were hard-deleting. Updated collection/item delete handlers to set `deleted_at`, added deleted-row guardrails in item GET/PUT and mark-all-read, and hardened client remove flow to treat 404 delete responses as idempotent success. Added dedicated API route tests for notifications (no prior API coverage for this module).
+Files Changed: `app/api/notifications/route.ts`, `app/api/notifications/[id]/route.ts`, `app/api/notifications/mark-all-read/route.ts`, `lib/store/notificationsStore.ts`, `tests/api/notifications.routes.test.ts`
+Verification: `npm run test -- tests/api/notifications.routes.test.ts tests/stores.test.ts tests/stores-critical.test.ts tests/settings/NotificationSettings.test.tsx` ✅ (46/46), targeted ESLint ✅.
+Notes: `npm run typecheck` still reports pre-existing `.next/*/validator.ts` missing-module errors for removed routes (`app/mq-demo/page.js`, `app/test-auth/page.js`), unrelated to notifications logic.
+
+Raouf: 2026-02-26 (Australia/Sydney)
 Scope: Map Navigation Fix — 18WW Incorrect Intermediate Destination
 Summary: Investigated the reported 18WW behavior where navigation first pulled toward Central Courtyard before continuing. Root cause was inconsistent 18WW GPS coordinates in map datasets (`buildings.ts`, `geospatialCalibration.ts`, `gcpCalibration.ts`) pointing too close to Courtyard references. Updated 18WW coordinates to Service Connect / 18WW geocode (`-33.7739781, 151.1126116`) and added a regression test asserting 18WW stays close to `18WWSERVIC` and clearly separated from `1CC` (Central Courtyard).
 Files Changed: `features/map/lib/buildings.ts`, `features/map/lib/geospatialCalibration.ts`, `features/map/lib/gcpCalibration.ts`, `tests/map/buildings.test.ts`
