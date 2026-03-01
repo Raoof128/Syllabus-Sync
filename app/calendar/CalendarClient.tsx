@@ -349,7 +349,7 @@ export default function CalendarClient() {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-mq-background">
+    <div className="flex flex-col bg-mq-background min-h-dvh md:min-h-0 md:h-full">
       {/* Mobile Header (Date Selector) */}
       <div className="md:hidden flex flex-col bg-mq-card-background border-b border-mq-border sticky top-0 z-20">
         <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4">
@@ -358,19 +358,19 @@ export default function CalendarClient() {
           </h1>
           <div className="flex shrink-0 gap-2">
             <Button variant="ghost" size="icon" onClick={goToPreviousWeek}>
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-5 w-5 text-mq-content" />
             </Button>
             <Button variant="outline" size="sm" onClick={goToToday}>
               {t('today')}
             </Button>
             <Button variant="ghost" size="icon" onClick={goToNextWeek}>
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-5 w-5 text-mq-content" />
             </Button>
           </div>
         </div>
 
         {/* Mobile Days Row */}
-        <div className="flex overflow-x-auto pb-2 px-2 gap-2 scrollbar-hide">
+        <div className="flex overflow-x-auto pb-2 px-2 gap-2 scrollbar-hide -webkit-overflow-scrolling-touch">
           {weekDays.map((date, index) => {
             const isSelected = index === mobileSelectedDayIndex;
             const isToday = dayjs(date).isSame(dayjs(), 'day');

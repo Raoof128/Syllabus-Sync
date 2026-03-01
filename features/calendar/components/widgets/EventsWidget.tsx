@@ -76,8 +76,8 @@ export default function EventsWidget({
         >
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2 text-sm font-semibold">
-                <PartyPopper className="h-4 w-4" />
+              <span className="flex items-center gap-2 text-sm font-semibold text-mq-content">
+                <PartyPopper className="h-4 w-4 text-mq-content" />
                 {t('events')}
               </span>
               <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export default function EventsWidget({
                   onClick={onAddEvent}
                   aria-label={t('addEvent')}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-mq-content" />
                 </Button>
               </div>
             </CardTitle>

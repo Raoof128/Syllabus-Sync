@@ -200,13 +200,19 @@ class NotificationService {
 
     const now = new Date();
     const timeDiff = dueDate.getTime() - now.getTime();
-    const hoursUntil = Math.round(timeDiff / (1000 * 60 * 60));
-    const daysUntil = Math.round(timeDiff / (1000 * 60 * 60 * 24));
+    const minutesUntil = Math.floor(timeDiff / (1000 * 60));
+    const hoursUntil = Math.floor(timeDiff / (1000 * 60 * 60));
+    const daysUntil = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
     let timeText: string;
-    if (hoursUntil < 24) {
-      timeText = hoursUntil <= 1 ? 'in 1 hour' : `in ${hoursUntil} hours`;
+    if (minutesUntil < 60) {
+      // Less than an hour - show minutes
+      timeText = minutesUntil <= 1 ? 'in 1 minute' : `in ${minutesUntil} minutes`;
+    } else if (hoursUntil < 24) {
+      // Less than a day - show hours
+      timeText = hoursUntil === 1 ? 'in 1 hour' : `in ${hoursUntil} hours`;
     } else {
+      // Days
       timeText = daysUntil === 1 ? 'tomorrow' : `in ${daysUntil} days`;
     }
 

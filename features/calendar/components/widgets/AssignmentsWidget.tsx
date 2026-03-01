@@ -77,8 +77,8 @@ export default function AssignmentsWidget({
         <Card className="border border-mq-border shadow-sm bg-mq-card-background">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2 text-sm font-semibold">
-                <FileText className="h-4 w-4" />
+              <span className="flex items-center gap-2 text-sm font-semibold text-mq-content">
+                <FileText className="h-4 w-4 text-mq-content" />
                 {t('assignments')}
               </span>
               <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export default function AssignmentsWidget({
                   onClick={onAddAssignment}
                   aria-label={t('addAssignment')}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-mq-content" />
                 </Button>
               </div>
             </CardTitle>
@@ -144,9 +144,9 @@ export default function AssignmentsWidget({
                           )}
                         >
                           {assignment.completed ? (
-                            <CheckCircle2 className="h-4 w-4" />
+                            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                           ) : (
-                            <Circle className="h-4 w-4" />
+                            <Circle className="h-4 w-4 text-mq-content-secondary" />
                           )}
                         </button>
                         <div className="flex-1 min-w-0">

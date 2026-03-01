@@ -394,7 +394,7 @@ export const GoogleMapIntegration = forwardRef<GoogleMapRef, GoogleMapIntegratio
     return (
       <div className="relative flex h-full w-full flex-col overflow-hidden bg-mq-card-background">
         {/* Search Bar - Google's own search */}
-        <div className="shrink-0 border-b border-mq-border bg-mq-card-background p-3">
+        <div className="relative shrink-0 border-b border-mq-border bg-mq-card-background p-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
             <input
@@ -427,7 +427,7 @@ export const GoogleMapIntegration = forwardRef<GoogleMapRef, GoogleMapIntegratio
 
           {/* Search Results Dropdown */}
           {showSearchResults && searchResults.length > 0 && (
-            <div className="absolute left-3 right-3 top-15 z-50 bg-mq-card-background border border-mq-border rounded-mq-lg shadow-lg max-h-75 overflow-y-auto">
+            <div className="absolute left-0 right-0 top-full mt-1 z-100 bg-mq-card-background border border-mq-border rounded-mq-lg shadow-lg max-h-60 overflow-y-auto">
               {searchResults.map((place) => (
                 <button
                   key={place.place_id}

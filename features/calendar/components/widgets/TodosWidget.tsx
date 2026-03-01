@@ -101,8 +101,8 @@ export default function TodosWidget({
         >
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2 text-sm font-semibold">
-                <ListTodo className="h-4 w-4" />
+              <span className="flex items-center gap-2 text-sm font-semibold text-mq-content">
+                <ListTodo className="h-4 w-4 text-mq-content" />
                 {t('todos')}
               </span>
               <div className="flex items-center gap-2">
@@ -116,7 +116,7 @@ export default function TodosWidget({
                   onClick={onAddTodo}
                   aria-label={t('addTodo')}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-mq-content" />
                 </Button>
               </div>
             </CardTitle>
@@ -167,13 +167,13 @@ export default function TodosWidget({
                         }}
                         className={cn(
                           'text-mq-content-secondary hover:text-mq-primary transition-colors',
-                          todo.completed ? 'text-green-600' : '',
+                          todo.completed ? 'text-green-600 dark:text-green-400' : '',
                         )}
                       >
                         {todo.completed ? (
-                          <CheckCircle2 className="h-4 w-4" />
+                          <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                         ) : (
-                          <Circle className="h-4 w-4" />
+                          <Circle className="h-4 w-4 text-mq-content-secondary" />
                         )}
                       </button>
                       <div className="flex-1 min-w-0">
