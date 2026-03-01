@@ -114,7 +114,7 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
 
   const handleAddPasskey = useCallback(async () => {
     if (typeof window === "undefined" || !window.PublicKeyCredential) {
-      setAddPasskeyError("Passkeys are not supported on this device.");
+      setAddPasskeyError(t("passkeysNotSupported"));
       return;
     }
 

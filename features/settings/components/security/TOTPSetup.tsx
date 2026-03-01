@@ -65,7 +65,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
       if (!res.ok || !result?.data) {
         toastUtils.error(
           t("error"),
-          result?.error?.message || "Failed to start setup. Please try again.",
+          result?.error?.message || t("failedToStartSetup"),
         );
         return;
       }
@@ -97,22 +97,22 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
       if (!res.ok) {
         setVerifyError(
           result?.error?.message ||
-            "Verification failed. Please check your code.",
+            t("verificationFailedCheckCode"),
         );
         return;
       }
 
       if (!result?.data?.verified) {
-        setVerifyError("Invalid code. Please try again.");
+        setVerifyError(t("invalidCodeTryAgain"));
         return;
       }
 
       setStep("success");
-      toastUtils.success(t("security"), "Two-factor authentication enabled!");
+      toastUtils.success(t("security"), t("twoFactorEnabled"));
       onStatusChange();
     } catch {
       setVerifyError(
-        "Network error. Please check your connection and try again.",
+        t("networkErrorCheckConnection"),
       );
     } finally {
       setIsLoading(false);
@@ -134,14 +134,14 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
       if (!res.ok) {
         toastUtils.error(
           t("error"),
-          result?.error?.message || "Failed to disable 2FA",
+          result?.error?.message || t("failedToDisable2FA"),
         );
         return;
       }
 
       setShowDisableDialog(false);
       setDisableFactorId(null);
-      toastUtils.success(t("security"), "Two-factor authentication disabled.");
+      toastUtils.success(t("security"), t("twoFactorDisabled"));
       onStatusChange();
     } catch {
       toastUtils.error(t("error"), t("tryAgainLater"));
@@ -203,12 +203,10 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                 {t("authenticatorApp")}
               </p>
               <p className="text-mq-xs text-mq-content-secondary mt-0.5">
-                Google Authenticator, Authy, or Microsoft Authenticator
+                {t("authenticatorAppsList")}
               </p>
               <p className="text-[10px] text-mq-content-tertiary mt-2 leading-relaxed opacity-90 hidden sm:block max-w-[90%]">
-                For security, your 6-digit code acts as an active mathematical
-                signature refreshing every 30 seconds. Once used, it becomes
-                permanently invalidated to prevent replay attacks.
+                {t("totpSecurityNote")}
               </p>
             </div>
           </div>
@@ -280,7 +278,7 @@ export function TOTPSetup({ t, factors, onStatusChange }: TOTPSetupProps) {
                     {t("cantScanEnterManually")}
                   </p>
                   <p className="text-xs text-mq-content-secondary">
-                    Type this code into your app to link it manually.
+                    {t("typeCodeManually")}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 justify-center">

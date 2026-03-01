@@ -92,7 +92,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
         });
       }, 1000);
     } catch {
-      setVerifyError("Failed to send SMS");
+      setVerifyError(t("failedToSendSms"));
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +112,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
       const result = await res.json();
 
       if (!res.ok || !result?.data?.verified) {
-        setVerifyError(result?.error?.message || "Invalid code");
+        setVerifyError(result?.error?.message || t("invalidCode"));
         return;
       }
 
@@ -138,7 +138,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
       });
       const result = await res.json();
       if (!res.ok || !result?.data?.challengeId) {
-        setVerifyError(result?.error?.message || "Failed to resend code");
+        setVerifyError(result?.error?.message || t("failedToResendCode"));
         return;
       }
       setChallengeId(result.data.challengeId);
@@ -155,7 +155,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
         });
       }, 1000);
     } catch {
-      setVerifyError("Failed to resend code");
+      setVerifyError(t("failedToResendCode"));
     } finally {
       setIsLoading(false);
     }
@@ -176,7 +176,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
         const result = await res.json();
         toastUtils.error(
           t("error"),
-          result?.error?.message || "Failed to disable SMS 2FA",
+          result?.error?.message || t("failedToDisableSms2FA"),
         );
         return;
       }

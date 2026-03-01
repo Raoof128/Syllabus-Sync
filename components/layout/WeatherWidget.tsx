@@ -127,7 +127,7 @@ const WeatherWidget = memo(() => {
           border border-white/20
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mq-primary
         `}
-        title={`${weatherData.condition} · ${weatherData.temp}°C · ${weatherData.location} (click to change location)`}
+        title={`${weatherData.condition} · ${weatherData.temp}°C · ${weatherData.location} ${t('clickToChangeLocation')}`}
         aria-label={`Current weather in ${weatherData.location}: ${weatherData.condition}, ${weatherData.temp} degrees Celsius. Click to change location.`}
         aria-expanded={isDropdownOpen}
         aria-haspopup="listbox"
@@ -165,10 +165,10 @@ const WeatherWidget = memo(() => {
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-sm bg-mq-primary/10 text-mq-primary uppercase tracking-wider">
                     {weatherData.locationType === 'gps'
-                      ? 'Device GPS'
+                      ? t('deviceGps')
                       : weatherData.locationType === 'saved'
-                        ? 'Saved'
-                        : 'Approx'}
+                        ? t('savedLocation')
+                        : t('approxLocation')}
                   </span>
                   {weatherData.timestamp && <WeatherTimestamp timestamp={weatherData.timestamp} />}
                 </div>
@@ -183,7 +183,7 @@ const WeatherWidget = memo(() => {
             <div className="grid grid-cols-2 gap-y-3 gap-x-4 mt-2">
               <div className="flex flex-col">
                 <span className="text-[10px] text-mq-content-tertiary font-medium">
-                  Temperature
+                  {t('temperature')}
                 </span>
                 <span className="text-lg font-bold text-mq-content mt-0.5 tabular-nums leading-none">
                   {weatherData.temp}°
@@ -192,7 +192,7 @@ const WeatherWidget = memo(() => {
                   </small>
                 </span>
                 <span className="text-[10px] text-mq-content-secondary mt-1 tracking-tight">
-                  Feels like {weatherData.apparentTemp}°C
+                  {t('feelsLike', { temp: weatherData.apparentTemp ?? weatherData.temp })}
                 </span>
               </div>
               <div className="flex flex-col">
@@ -209,7 +209,7 @@ const WeatherWidget = memo(() => {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] text-mq-content-tertiary font-medium">
-                    Rain Chance
+                    {t('rainChance')}
                   </span>
                   <span className="text-xs font-semibold text-mq-content tabular-nums">
                     {weatherData.precipProb ?? 0}%
@@ -236,7 +236,7 @@ const WeatherWidget = memo(() => {
           <div className="p-2">
             <div className="px-2 py-1.5 pb-2">
               <span className="text-[10px] font-semibold text-mq-content-tertiary uppercase tracking-wider">
-                Select Location Source
+                {t('selectLocationSource')}
               </span>
             </div>
 
@@ -257,7 +257,7 @@ const WeatherWidget = memo(() => {
                 <Navigation
                   className={`w-3.5 h-3.5 ${useGps ? 'text-mq-primary' : 'text-mq-content-tertiary'}`}
                 />
-                Current Location (GPS)
+                {t('currentLocationGps')}
               </span>
               {useGps && <Check className="w-4 h-4 text-mq-primary" />}
             </button>
@@ -299,6 +299,7 @@ const WeatherWidget = memo(() => {
 WeatherWidget.displayName = 'WeatherWidget';
 
 const WeatherTimestamp = memo(({ timestamp }: { timestamp: number }) => {
+  const { t } = useTypedTranslation();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -309,7 +310,11 @@ const WeatherTimestamp = memo(({ timestamp }: { timestamp: number }) => {
   const diffMs = now - timestamp;
   const mins = Math.max(0, Math.round(diffMs / 60000));
 
-  return <span className="text-[10px] text-mq-content-tertiary">Updated {mins}m ago</span>;
+  return (
+    <span className="text-[10px] text-mq-content-tertiary">
+      {t('updatedAgo', { minutes: mins })}
+    </span>
+  );
 });
 
 WeatherTimestamp.displayName = 'WeatherTimestamp';
