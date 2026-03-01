@@ -1,3 +1,9 @@
+Agent: 2026-03-02 (Australia/Sydney)
+Scope: Google Maps View — Building Search Integration
+Summary: Implemented building search functionality for the Google Maps view, matching the campus map's search capability but with Google Maps styling and navigation integration. Created `GoogleMapBuildingSearch` component with Google Maps-inspired design (white cards, shadows, blue accents). Features include: expandable search panel, keyboard shortcut (⌘K), building filtering by name/code/address/tags, selected building info card with direct Google Maps navigation buttons. Updated `GoogleMapIntegration` to accept `selectedBuilding` prop and dynamically update the iframe to center on or navigate to the selected building. Added comprehensive test coverage for the new component.
+Files: Added `features/map/components/GoogleMapBuildingSearch.tsx`, `tests/map/GoogleMapBuildingSearch.test.tsx`. Modified `features/map/components/GoogleMapIntegration.tsx`, `features/map/components/MapClient.tsx`, `tests/map/GoogleMapIntegration.test.tsx`.
+Verification: `npm run test -- tests/map/` ✅ (104/104), `npm run lint` ✅, `npm run build` ✅, `npm run typecheck` ✅.
+
 Raouf: 2026-02-26 (Australia/Sydney)
 Scope: Gamification Full Audit + Settings Experience Routing Fix
 Summary: Ran a full gamification audit across settings UI, gamification components, store logic, and API endpoints. Fixed navigation bug where the XP/level badge in sidebar routed users to `/settings` (redirecting to general) instead of experience. Added `GAMIFICATION_SETTINGS_ROUTE` constant and updated mobile/desktop badge links to `/settings/experience`. Added route integrity regression test to lock this behavior.

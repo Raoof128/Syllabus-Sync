@@ -159,7 +159,7 @@ export function SMSSetup({ t, factors, onStatusChange }: SMSSetupProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [factorId, resendCooldown]);
+  }, [factorId, resendCooldown, t]);
 
   const handleDisable = useCallback(async () => {
     if (!disableFactorId) return;

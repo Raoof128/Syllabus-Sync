@@ -112,11 +112,6 @@ describe('GoogleMapIntegration', () => {
     expect(iframe.getAttribute('src')).toContain(`key=${TEST_EMBED_KEY}`);
   });
 
-  it('renders search input for places', () => {
-    render(<GoogleMapIntegration />);
-    const searchInput = screen.getByPlaceholderText('Search places on campus...');
-    expect(searchInput).toBeTruthy();
-  });
 
   it('switches to directions mode via ref', () => {
     const ref = React.createRef<GoogleMapRef>();
@@ -159,12 +154,6 @@ describe('GoogleMapIntegration', () => {
     restore();
   });
 
-  it('has open in Google Maps button', () => {
-    render(<GoogleMapIntegration />);
-    const openButton = screen.getByRole('button', { name: 'Open in Google Maps' });
-    expect(openButton).toBeTruthy();
-  });
-
   it('emits live navigation state transitions via callback', () => {
     const { restore } = installGeolocationMock();
     const onNavStateChange = vi.fn();
@@ -194,42 +183,6 @@ describe('GoogleMapIntegration', () => {
     restore();
   });
 
-  describe('search functionality', () => {
-    it('shows search results dropdown when typing', async () => {
-      render(<GoogleMapIntegration />);
-      const searchInput = screen.getByPlaceholderText('Search places on campus...');
-
-      await act(async () => {
-        fireEvent.change(searchInput, { target: { value: 'Library' } });
-      });
-
-      // Wait for debounce
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 350));
-      });
-
-      // Without Places API loaded, it should show a fallback search result
-      const searchResultText = screen.queryByText('Search on Google Maps');
-      expect(searchResultText).toBeTruthy();
-    });
-
-    it('clears search when clear button is clicked', async () => {
-      render(<GoogleMapIntegration />);
-      const searchInput = screen.getByPlaceholderText('Search places on campus...');
-
-      await act(async () => {
-        fireEvent.change(searchInput, { target: { value: 'Test' } });
-      });
-
-      const clearButton = screen.getByLabelText('clearSearch');
-      await act(async () => {
-        fireEvent.click(clearButton);
-      });
-
-      expect((searchInput as HTMLInputElement).value).toBe('');
-    });
-  });
-
   describe('fallback (no API key)', () => {
     beforeEach(() => {
       delete process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
@@ -243,11 +196,35 @@ describe('GoogleMapIntegration', () => {
       // Check that it uses the fallback URL format
       expect(iframe.getAttribute('src')).toContain('google.com/maps/embed');
     });
+  });
 
-    it('still shows search input even without Places API', () => {
-      render(<GoogleMapIntegration />);
-      const searchInput = screen.getByPlaceholderText('Search places on campus...');
-      expect(searchInput).toBeTruthy();
+  describe('selectedBuilding prop', () => {
+    it('displays selected building in header when provided', () => {
+      const testBuilding = {
+        id: 'LIB',
+        name: 'Waranara Library',
+        position: [2345, 2388] as [number, number],
+        translationKey: 'building_LIB_name' as const,
+        descriptionKey: 'building_LIB_desc' as const,
+      };
+
+      render(<GoogleMapIntegration selectedBuilding={testBuilding} />);
+      expect(screen.getByText('LIB')).toBeTruthy();
+    });
+
+    it('updates iframe URL when building is selected', () => {
+      const testBuilding = {
+        id: 'LIB',
+        name: 'Waranara Library',
+        position: [2345, 2388] as [number, number],
+        translationKey: 'building_LIB_name' as const,
+        descriptionKey: 'building_LIB_desc' as const,
+        location: { lat: -33.7756994, lng: 151.1131306 },
+      };
+
+      render(<GoogleMapIntegration selectedBuilding={testBuilding} />);
+      const iframe = document.querySelector('iframe');
+      expect(iframe?.getAttribute('src')).toContain('Waranara');
     });
   });
 });

@@ -42,6 +42,7 @@ import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
 import { MapViewToggle, type MapView } from './MapViewToggle';
 import { GoogleMapIntegration, type GoogleMapRef } from './GoogleMapIntegration';
+import { GoogleMapBuildingSearch } from './GoogleMapBuildingSearch';
 
 import { triggerHaptic } from '@/lib/utils/haptics';
 
@@ -619,6 +620,20 @@ export default function MapClient() {
                 <GoogleMapIntegration
                   ref={googleMapRef}
                   onNavStateChange={setNavState}
+                  selectedBuilding={selectedBuilding}
+                />
+                {/* Building Search Overlay for Google Maps */}
+                <GoogleMapBuildingSearch
+                  buildings={sidebarBuildings}
+                  selectedBuilding={selectedBuilding}
+                  onNavigateToBuilding={(building) => {
+                    // Update URL with selected building
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.set('building', building.id);
+                    const newUrl = `${window.location.pathname}?${params.toString()}`;
+                    window.history.pushState({}, '', newUrl);
+                  }}
+                  isNavigating={navState?.isNavigating || false}
                 />
               </div>
             )}

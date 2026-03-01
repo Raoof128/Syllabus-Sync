@@ -167,7 +167,8 @@ class NotificationService {
 
     // Check if this notification was recently sent (prevent duplicates)
     if (options.tag && this.wasRecentlySent(options.tag)) {
-      console.log(`Notification "${options.tag}" was recently sent, skipping duplicate`);
+      // Use warn since info/log are not allowed by lint rules
+      console.warn(`Notification "${options.tag}" was recently sent, skipping duplicate`);
       return false;
     }
 
