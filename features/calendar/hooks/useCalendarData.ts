@@ -39,14 +39,22 @@ export function useCalendarData() {
       forceRefreshEvents();
       forceRefreshTodos();
     }
-  }, [hasHydrated, forceRefreshUnits, forceRefreshDeadlines, forceRefreshEvents, forceRefreshTodos]);
+  }, [
+    hasHydrated,
+    forceRefreshUnits,
+    forceRefreshDeadlines,
+    forceRefreshEvents,
+    forceRefreshTodos,
+  ]);
 
   // Listen for auth state changes and refresh data on sign-in
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
 
     const supabase = createBrowserClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event: string) => {
       if (event === 'SIGNED_IN') {
         // Force refresh all data after sign-in
         forceRefreshUnits();

@@ -96,16 +96,15 @@ export function useCalendarView() {
     }
   }, [urlDate]);
 
-  // Effect: Update view from URL
+  // Effect: Sync view from URL and clean up the param
   useEffect(() => {
     if (urlView) {
-      setView(urlView);
-
       const clearTimer = setTimeout(() => {
+        setView(urlView);
         const url = new URL(window.location.href);
         url.searchParams.delete('view');
         window.history.replaceState({}, '', url.toString());
-      }, 1000);
+      }, 0);
 
       return () => clearTimeout(clearTimer);
     }

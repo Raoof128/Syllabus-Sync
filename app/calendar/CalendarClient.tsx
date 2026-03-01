@@ -26,12 +26,7 @@ import DayView from '@/features/calendar/components/DayView';
 import AgendaView from '@/features/calendar/components/AgendaView';
 import FilterPanel from '@/features/calendar/components/FilterPanel';
 import dynamic from 'next/dynamic';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Hooks
 import { useCalendarData } from '@/features/calendar/hooks/useCalendarData';
@@ -522,75 +517,64 @@ export default function CalendarClient() {
                             : 'bg-mq-card-background border-mq-border hover:border-mq-primary/30',
                         )}
                       >
-                      <div className="flex flex-col items-center mb-2">
-                        <span className="text-xs font-medium text-mq-content-secondary uppercase">
-                          {formatWeekdayShort(date)}
-                        </span>
-                        <span
-                          className={cn(
-                            'text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full mt-1',
-                            isToday ? 'bg-mq-primary text-white' : 'text-mq-content',
-                          )}
-                        >
-                          {formatDayNumber(date)}
-                        </span>
-                      </div>
+                        <div className="flex flex-col items-center mb-2">
+                          <span className="text-xs font-medium text-mq-content-secondary uppercase">
+                            {formatWeekdayShort(date)}
+                          </span>
+                          <span
+                            className={cn(
+                              'text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full mt-1',
+                              isToday ? 'bg-mq-primary text-white' : 'text-mq-content',
+                            )}
+                          >
+                            {formatDayNumber(date)}
+                          </span>
+                        </div>
 
-                      <div className="flex-1 flex flex-col gap-2">
-                        {/* Units */}
-                        {dayUnits.map((item) => (
-                          <div
-                            key={`unit-${item.id}-${(item.schedule[0] as ClassTime).startTime}`}
-                            onClick={() => {
-                              setSelectedUnit(item);
-                              setUnitDetailOpen(true);
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
+                        <div className="flex-1 flex flex-col gap-2">
+                          {/* Units */}
+                          {dayUnits.map((item) => (
+                            <div
+                              key={`unit-${item.id}-${(item.schedule[0] as ClassTime).startTime}`}
+                              onClick={() => {
                                 setSelectedUnit(item);
                                 setUnitDetailOpen(true);
-                              }
-                            }}
-                            role="button"
-                            tabIndex={0}
-                            className="text-xs p-2 rounded-lg bg-mq-background border border-mq-border cursor-pointer hover:border-mq-primary transition-colors group"
-                            style={{
-                              borderLeftColor: item.color,
-                              borderLeftWidth: '3px',
-                            }}
-                          >
-                            <div className="font-semibold truncate">{item.code}</div>
-                            <div className="text-[10px] text-mq-content-secondary truncate">
-                              {item.location?.building} {item.location?.room}
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  setSelectedUnit(item);
+                                  setUnitDetailOpen(true);
+                                }
+                              }}
+                              role="button"
+                              tabIndex={0}
+                              className="text-xs p-2 rounded-lg bg-mq-background border border-mq-border cursor-pointer hover:border-mq-primary transition-colors group"
+                              style={{
+                                borderLeftColor: item.color,
+                                borderLeftWidth: '3px',
+                              }}
+                            >
+                              <div className="font-semibold truncate">{item.code}</div>
+                              <div className="text-[10px] text-mq-content-secondary truncate">
+                                {item.location?.building} {item.location?.room}
+                              </div>
+                              <div className="text-[10px] text-mq-content-secondary mt-1 group-hover:text-mq-primary">
+                                {(item.schedule[0] as ClassTime).startTime}
+                              </div>
                             </div>
-                            <div className="text-[10px] text-mq-content-secondary mt-1 group-hover:text-mq-primary">
-                              {(item.schedule[0] as ClassTime).startTime}
-                            </div>
-                          </div>
-                        ))}
+                          ))}
 
-                        {/* Deadlines */}
-                        {dayDeadlines.map((deadline) => (
-                          <div
-                            key={deadline.id}
-                            ref={(el) => {
-                              if (el && deadlineRefs.current) {
-                                deadlineRefs.current.set(deadline.id, el);
-                              }
-                            }}
-                            onClick={() => {
-                              if (deadline.type === 'Exam' || deadline.type === 'Quiz') {
-                                setSelectedExam(deadline);
-                                setExamDetailOpen(true);
-                              } else {
-                                setSelectedAssignment(deadline);
-                                setAssignmentDetailOpen(true);
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
+                          {/* Deadlines */}
+                          {dayDeadlines.map((deadline) => (
+                            <div
+                              key={deadline.id}
+                              ref={(el) => {
+                                if (el && deadlineRefs.current) {
+                                  deadlineRefs.current.set(deadline.id, el);
+                                }
+                              }}
+                              onClick={() => {
                                 if (deadline.type === 'Exam' || deadline.type === 'Quiz') {
                                   setSelectedExam(deadline);
                                   setExamDetailOpen(true);
@@ -598,58 +582,69 @@ export default function CalendarClient() {
                                   setSelectedAssignment(deadline);
                                   setAssignmentDetailOpen(true);
                                 }
-                              }
-                            }}
-                            role="button"
-                            tabIndex={0}
-                            className={cn(
-                              'text-xs p-2 rounded-lg border cursor-pointer transition-all',
-                              highlightedDeadlineId === deadline.id
-                                ? 'ring-2 ring-mq-primary shadow-lg scale-[1.02]'
-                                : 'hover:scale-[1.02]',
-                            )}
-                            style={{
-                              backgroundColor: `${deadline.type === 'Exam' ? '#ef4444' : '#3b82f6'}15`,
-                              borderColor: `${deadline.type === 'Exam' ? '#ef4444' : '#3b82f6'}30`,
-                              borderLeftWidth: '3px',
-                              borderLeftColor: deadline.type === 'Exam' ? '#ef4444' : '#3b82f6',
-                            }}
-                          >
-                            <div className="font-medium truncate">{deadline.title}</div>
-                            <div className="flex items-center gap-1 text-[10px] text-mq-content-secondary mt-1">
-                              <Clock className="h-3 w-3" />
-                              {formatTimeShort(new Date(deadline.dueDate))}
-                            </div>
-                          </div>
-                        ))}
-
-                        {/* Events */}
-                        {dayEvents.map((event) => (
-                          <div
-                            key={event.id}
-                            onClick={() => handleEventClick(event)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                handleEventClick(event);
-                              }
-                            }}
-                            role="button"
-                            tabIndex={0}
-                            className="text-xs p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 border-l-emerald-500 border-l-[3px] cursor-pointer hover:bg-emerald-500/20 transition-colors"
-                          >
-                            <div className="font-medium truncate">{event.title}</div>
-                            {event.startAt && (
-                              <div className="text-[10px] text-mq-content-secondary mt-1">
-                                {formatTimeShort(new Date(event.startAt))}
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  if (deadline.type === 'Exam' || deadline.type === 'Quiz') {
+                                    setSelectedExam(deadline);
+                                    setExamDetailOpen(true);
+                                  } else {
+                                    setSelectedAssignment(deadline);
+                                    setAssignmentDetailOpen(true);
+                                  }
+                                }
+                              }}
+                              role="button"
+                              tabIndex={0}
+                              className={cn(
+                                'text-xs p-2 rounded-lg border cursor-pointer transition-all',
+                                highlightedDeadlineId === deadline.id
+                                  ? 'ring-2 ring-mq-primary shadow-lg scale-[1.02]'
+                                  : 'hover:scale-[1.02]',
+                              )}
+                              style={{
+                                backgroundColor: `${deadline.type === 'Exam' ? '#ef4444' : '#3b82f6'}15`,
+                                borderColor: `${deadline.type === 'Exam' ? '#ef4444' : '#3b82f6'}30`,
+                                borderLeftWidth: '3px',
+                                borderLeftColor: deadline.type === 'Exam' ? '#ef4444' : '#3b82f6',
+                              }}
+                            >
+                              <div className="font-medium truncate">{deadline.title}</div>
+                              <div className="flex items-center gap-1 text-[10px] text-mq-content-secondary mt-1">
+                                <Clock className="h-3 w-3" />
+                                {formatTimeShort(new Date(deadline.dueDate))}
                               </div>
-                            )}
-                          </div>
-                        ))}
+                            </div>
+                          ))}
+
+                          {/* Events */}
+                          {dayEvents.map((event) => (
+                            <div
+                              key={event.id}
+                              onClick={() => handleEventClick(event)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  handleEventClick(event);
+                                }
+                              }}
+                              role="button"
+                              tabIndex={0}
+                              className="text-xs p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 border-l-emerald-500 border-l-[3px] cursor-pointer hover:bg-emerald-500/20 transition-colors"
+                            >
+                              <div className="font-medium truncate">{event.title}</div>
+                              {event.startAt && (
+                                <div className="text-[10px] text-mq-content-secondary mt-1">
+                                  {formatTimeShort(new Date(event.startAt))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
                 </div>
               </div>
             </ScrollReveal>
@@ -1050,12 +1045,15 @@ export default function CalendarClient() {
       )}
 
       {/* Todo Modal */}
-      <Dialog open={todoDialogOpen} onOpenChange={(open) => {
-        if (!open) {
-          setTodoDialogOpen(false);
-          setEditingTodo(null);
-        }
-      }}>
+      <Dialog
+        open={todoDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setTodoDialogOpen(false);
+            setEditingTodo(null);
+          }
+        }}
+      >
         <DialogContent className="max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
@@ -1110,129 +1108,129 @@ export default function CalendarClient() {
             }}
             className="space-y-4"
           >
-              {/* Task Title - Required */}
-              <div>
-                <label
-                  htmlFor="edit-todo-title"
-                  className="block text-sm font-medium text-mq-content mb-1"
-                >
-                  {tOr('taskTitle', 'Task Title')} <span className="text-mq-error">*</span>
-                </label>
-                <input
-                  id="edit-todo-title"
-                  type="text"
-                  value={editTodoTitle}
-                  onChange={(e) => setEditTodoTitle(e.target.value)}
-                  placeholder={tOr('enterTaskTitle', 'Enter task title...')}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  autoFocus
-                  required
-                />
-              </div>
+            {/* Task Title - Required */}
+            <div>
+              <label
+                htmlFor="edit-todo-title"
+                className="block text-sm font-medium text-mq-content mb-1"
+              >
+                {tOr('taskTitle', 'Task Title')} <span className="text-mq-error">*</span>
+              </label>
+              <input
+                id="edit-todo-title"
+                type="text"
+                value={editTodoTitle}
+                onChange={(e) => setEditTodoTitle(e.target.value)}
+                placeholder={tOr('enterTaskTitle', 'Enter task title...')}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                autoFocus
+                required
+              />
+            </div>
 
-              {/* Priority */}
-              <div>
-                <label
-                  htmlFor="edit-todo-priority"
-                  className="block text-sm font-medium text-mq-content mb-1"
-                >
-                  {tOr('priority', 'Priority')}
-                </label>
-                <select
-                  id="edit-todo-priority"
-                  value={editTodoPriority}
-                  onChange={(e) => setEditTodoPriority(e.target.value as 'High' | 'Medium' | 'Low')}
-                  className={cn(
-                    'w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent',
-                    editTodoPriority === 'High' && 'text-red-600 dark:text-red-400',
-                    editTodoPriority === 'Medium' && 'text-amber-600 dark:text-amber-400',
-                    editTodoPriority === 'Low' && 'text-emerald-600 dark:text-emerald-400',
-                  )}
-                >
-                  <option value="High">{tOr('priorityHigh', 'High')}</option>
-                  <option value="Medium">{tOr('priorityMedium', 'Medium')}</option>
-                  <option value="Low">{tOr('priorityLow', 'Low')}</option>
-                </select>
-              </div>
+            {/* Priority */}
+            <div>
+              <label
+                htmlFor="edit-todo-priority"
+                className="block text-sm font-medium text-mq-content mb-1"
+              >
+                {tOr('priority', 'Priority')}
+              </label>
+              <select
+                id="edit-todo-priority"
+                value={editTodoPriority}
+                onChange={(e) => setEditTodoPriority(e.target.value as 'High' | 'Medium' | 'Low')}
+                className={cn(
+                  'w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent',
+                  editTodoPriority === 'High' && 'text-red-600 dark:text-red-400',
+                  editTodoPriority === 'Medium' && 'text-amber-600 dark:text-amber-400',
+                  editTodoPriority === 'Low' && 'text-emerald-600 dark:text-emerald-400',
+                )}
+              >
+                <option value="High">{tOr('priorityHigh', 'High')}</option>
+                <option value="Medium">{tOr('priorityMedium', 'Medium')}</option>
+                <option value="Low">{tOr('priorityLow', 'Low')}</option>
+              </select>
+            </div>
 
-              {/* Due Date and Time - Required */}
-              <div className="space-y-3">
-                <label className="block text-sm font-medium text-mq-content">
-                  {tOr('dueDateTime', 'Due Date & Time')} <span className="text-mq-error">*</span>
-                </label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="flex items-center gap-2 w-full sm:w-40">
-                    <Calendar className="h-4 w-4 text-mq-content-secondary shrink-0" />
-                    <input
-                      type="date"
-                      value={editTodoDueDate}
-                      onChange={(e) => setEditTodoDueDate(e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      aria-label={tOr('selectDueDate', 'Select due date')}
-                      required
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 flex-1">
-                    <Clock className="h-4 w-4 text-mq-content-secondary shrink-0" />
-                    <input
-                      type="time"
-                      value={editTodoDueTime}
-                      onChange={(e) => setEditTodoDueTime(e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      aria-label={tOr('selectDueTime', 'Select due time')}
-                    />
-                  </div>
+            {/* Due Date and Time - Required */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-mq-content">
+                {tOr('dueDateTime', 'Due Date & Time')} <span className="text-mq-error">*</span>
+              </label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-40">
+                  <Calendar className="h-4 w-4 text-mq-content-secondary shrink-0" />
+                  <input
+                    type="date"
+                    value={editTodoDueDate}
+                    onChange={(e) => setEditTodoDueDate(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    aria-label={tOr('selectDueDate', 'Select due date')}
+                    required
+                  />
+                </div>
+                <div className="flex items-center gap-2 flex-1">
+                  <Clock className="h-4 w-4 text-mq-content-secondary shrink-0" />
+                  <input
+                    type="time"
+                    value={editTodoDueTime}
+                    onChange={(e) => setEditTodoDueTime(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    aria-label={tOr('selectDueTime', 'Select due time')}
+                  />
                 </div>
               </div>
+            </div>
 
-              {/* Color Picker */}
-              <div>
-                <label className="block text-sm font-medium text-mq-content mb-2">
-                  {tOr('color', 'Color')}
-                </label>
-                <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
-                  {UNIT_COLORS.map((colorOption) => (
-                    <button
-                      key={colorOption.value}
-                      type="button"
-                      onClick={() => setEditTodoColor(colorOption.value)}
-                      className={cn(
-                        'w-8 h-8 rounded-full border transition-transform hover:scale-110',
-                        editTodoColor === colorOption.value
-                          ? 'ring-2 ring-offset-2 ring-offset-mq-background ring-mq-primary scale-110'
-                          : 'border-transparent',
-                      )}
-                      style={{ backgroundColor: colorOption.value }}
-                      aria-label={`Select color ${colorOption.name}`}
-                    />
-                  ))}
-                </div>
+            {/* Color Picker */}
+            <div>
+              <label className="block text-sm font-medium text-mq-content mb-2">
+                {tOr('color', 'Color')}
+              </label>
+              <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
+                {UNIT_COLORS.map((colorOption) => (
+                  <button
+                    key={colorOption.value}
+                    type="button"
+                    onClick={() => setEditTodoColor(colorOption.value)}
+                    className={cn(
+                      'w-8 h-8 rounded-full border transition-transform hover:scale-110',
+                      editTodoColor === colorOption.value
+                        ? 'ring-2 ring-offset-2 ring-offset-mq-background ring-mq-primary scale-110'
+                        : 'border-transparent',
+                    )}
+                    style={{ backgroundColor: colorOption.value }}
+                    aria-label={`Select color ${colorOption.name}`}
+                  />
+                ))}
               </div>
+            </div>
 
-              <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setTodoDialogOpen(false);
-                    setEditingTodo(null);
-                  }}
-                  disabled={todoSaving}
-                >
-                  {t('cancelAction')}
-                </Button>
-                <Button type="submit" variant="outline" disabled={todoSaving}>
-                  {todoSaving
-                    ? editingTodo
-                      ? tOr('saving', 'Saving...')
-                      : tOr('adding', 'Adding...')
-                    : editingTodo
-                      ? tOr('saveChanges', 'Save Changes')
-                      : tOr('addTodo', 'Add Task')}
-                </Button>
-              </div>
-            </form>
+            <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTodoDialogOpen(false);
+                  setEditingTodo(null);
+                }}
+                disabled={todoSaving}
+              >
+                {t('cancelAction')}
+              </Button>
+              <Button type="submit" variant="outline" disabled={todoSaving}>
+                {todoSaving
+                  ? editingTodo
+                    ? tOr('saving', 'Saving...')
+                    : tOr('adding', 'Adding...')
+                  : editingTodo
+                    ? tOr('saveChanges', 'Save Changes')
+                    : tOr('addTodo', 'Add Task')}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
 

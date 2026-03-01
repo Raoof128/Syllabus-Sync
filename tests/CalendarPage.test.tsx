@@ -26,6 +26,7 @@ const { deadlinesState, unitsState, eventsState, todosState } = vi.hoisted(() =>
     removeDeadline: vi.fn(),
     removeDeadlinesByUnit: vi.fn(),
     loadDeadlines: vi.fn(),
+    forceRefresh: vi.fn(),
   },
   unitsState: {
     units: [
@@ -41,11 +42,13 @@ const { deadlinesState, unitsState, eventsState, todosState } = vi.hoisted(() =>
     ],
     loadUnits: vi.fn(),
     removeUnit: vi.fn(),
+    forceRefresh: vi.fn(),
   },
   eventsState: {
     events: [],
     loadEvents: vi.fn(),
     removeEvent: vi.fn(),
+    forceRefresh: vi.fn(),
   },
   todosState: {
     todos: [],
@@ -53,6 +56,7 @@ const { deadlinesState, unitsState, eventsState, todosState } = vi.hoisted(() =>
     addTodo: vi.fn(),
     removeTodo: vi.fn(),
     updateTodo: vi.fn(),
+    forceRefresh: vi.fn(),
   },
 }));
 

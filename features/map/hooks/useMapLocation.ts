@@ -323,11 +323,7 @@ export function useMapLocation({
                 }
 
                 // Motion Arrow
-                if (
-                  isMoving &&
-                  typeof effectiveHeading === 'number' &&
-                  !isNaN(effectiveHeading)
-                ) {
+                if (isMoving && typeof effectiveHeading === 'number' && !isNaN(effectiveHeading)) {
                   iconElement.classList.add('is-moving');
                   const arrowElement = iconElement.querySelector(
                     '.user-motion-arrow',
