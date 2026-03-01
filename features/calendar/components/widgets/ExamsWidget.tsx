@@ -67,7 +67,14 @@ export default function ExamsWidget({
   };
 
   return (
-    <MagicCard isLiquidEnhanced>
+    <MagicCard
+      isLiquidEnhanced
+      className={
+        deadlineHighlightActive
+          ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
+          : ''
+      }
+    >
       <div
         className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
         ref={widgetRef}
@@ -117,7 +124,7 @@ export default function ExamsWidget({
                         className={cn(
                           'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
                           exam.completed && 'opacity-60 grayscale',
-                          isOverdue && 'bg-red-500/5',
+                          isOverdue && 'opacity-70 bg-red-500/5',
                           isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
                         )}
                         style={{
@@ -150,7 +157,7 @@ export default function ExamsWidget({
                             <h4
                               className={cn(
                                 'font-medium text-sm truncate',
-                                exam.completed && 'line-through decoration-mq-content-tertiary',
+                                (exam.completed || isOverdue) && 'line-through decoration-mq-content-tertiary',
                               )}
                             >
                               {exam.title}
@@ -159,13 +166,17 @@ export default function ExamsWidget({
                               className={cn(
                                 PRIORITY_COLORS[exam.priority],
                                 'ml-2 text-[10px] h-4 px-1',
+                                isOverdue && 'opacity-70',
                               )}
                               variant="neutral"
                             >
-                              {t(`priority_${exam.priority}` as TranslationKey)}
+                              {isOverdue ? t('overdue' as TranslationKey) : t(`priority_${exam.priority}` as TranslationKey)}
                             </Badge>
                           </div>
-                          <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
+                          <p className={cn(
+                            "text-[11px] text-mq-content-secondary truncate mt-0.5",
+                            isOverdue && "text-red-600 dark:text-red-400"
+                          )}>
                             {exam.unitCode} • {formatMonthDayTime(due.toDate())}
                           </p>
                         </div>

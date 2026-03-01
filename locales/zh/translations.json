@@ -439,6 +439,7 @@
   "noClassesToday": "今天没有课程",
   "noClassesDesc": "您已完成所有任务！享受空闲时间吧。",
   "addUnit": "添加课程",
+  "addUnitClass": "添加课程 + 班级",
   "addUnitAria": "添加新课程以开始跟踪",
   "noUpcomingDeadlines": "没有即将到来的截止日期",
   "noDeadlinesDesc": "全部完成！添加您的第一个截止日期以跟踪工作。",

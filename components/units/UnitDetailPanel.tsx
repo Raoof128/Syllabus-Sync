@@ -235,11 +235,11 @@ export default function UnitDetailPanel({
         {/* Unit Info Summary */}
         <div className="flex flex-wrap gap-4 py-3 border-b border-mq-border">
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
-            <MapPin className="h-4 w-4" />
+e            <MapPin className="h-4 w-4 text-mq-content-secondary" />
             <span>{formatLocation(unit.location.building, unit.location.room, t('room'))}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
-            <Clock className="h-4 w-4" />
+            <Clock className="h-4 w-4 text-mq-content-secondary" />
             <span>
               {unit.schedule.length} class
               {unit.schedule.length !== 1 ? 'es' : ''}/week
@@ -362,7 +362,7 @@ export default function UnitDetailPanel({
               {unitDeadlines.presentations.length > 0 && (
                 <div>
                   <h3 className="flex items-center gap-2 text-sm font-medium mb-2">
-                    <Clock className="h-4 w-4" />
+                    <Clock className="h-4 w-4 text-mq-content" />
                     {t('presentations')} ({unitDeadlines.presentations.length})
                   </h3>
                   <div className="space-y-2">

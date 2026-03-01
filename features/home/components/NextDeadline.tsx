@@ -165,9 +165,9 @@ const NextDeadline = memo(() => {
               {/* Time warning */}
               <div className="flex items-center gap-2 text-sm">
                 {nextDeadline.priority === 'Urgent' ? (
-                  <AlertCircle className="h-4 w-4" />
+                  <AlertCircle className="h-4 w-4 text-mq-error" />
                 ) : (
-                  <Clock className="h-4 w-4" />
+                  <Clock className="h-4 w-4 text-mq-content-secondary" />
                 )}
                 <span
                   className={

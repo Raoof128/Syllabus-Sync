@@ -15,6 +15,10 @@ export interface NotificationOptions {
   onClick?: () => void;
 }
 
+// Storage key for tracking sent notifications
+const SENT_NOTIFICATIONS_KEY = 'syllabus-sync-sent-notifications';
+const NOTIFICATION_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes cooldown between same notifications
+
 /**
  * NotificationService handles browser push notifications
  * and in-app notification preferences
@@ -23,11 +27,15 @@ class NotificationService {
   private static instance: NotificationService;
   private notificationClickHandlers: Map<string, () => void> = new Map();
   private isInitialized = false;
+  private sentNotifications: Map<string, number> = new Map(); // tag -> timestamp
 
   private constructor() {
     // Initialize only once
     if (this.isInitialized) return;
     this.isInitialized = true;
+
+    // Load sent notifications from storage
+    this.loadSentNotifications();
 
     // Set up notification click handler
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -48,6 +56,61 @@ class NotificationService {
         }
       }
     }
+  }
+
+  /**
+   * Load sent notifications from localStorage
+   */
+  private loadSentNotifications(): void {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = localStorage.getItem(SENT_NOTIFICATIONS_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as Record<string, number>;
+        const now = Date.now();
+        // Only keep notifications within cooldown period
+        Object.entries(parsed).forEach(([tag, timestamp]) => {
+          if (now - timestamp < NOTIFICATION_COOLDOWN_MS) {
+            this.sentNotifications.set(tag, timestamp);
+          }
+        });
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }
+
+  /**
+   * Save sent notifications to localStorage
+   */
+  private saveSentNotifications(): void {
+    if (typeof window === 'undefined') return;
+    try {
+      const obj: Record<string, number> = {};
+      this.sentNotifications.forEach((timestamp, tag) => {
+        obj[tag] = timestamp;
+      });
+      localStorage.setItem(SENT_NOTIFICATIONS_KEY, JSON.stringify(obj));
+    } catch {
+      // Ignore storage errors
+    }
+  }
+
+  /**
+   * Check if a notification was recently sent
+   */
+  private wasRecentlySent(tag: string): boolean {
+    const lastSent = this.sentNotifications.get(tag);
+    if (!lastSent) return false;
+    return Date.now() - lastSent < NOTIFICATION_COOLDOWN_MS;
+  }
+
+  /**
+   * Mark a notification as sent
+   */
+  private markAsSent(tag: string): void {
+    this.sentNotifications.set(tag, Date.now());
+    this.saveSentNotifications();
   }
 
   static getInstance(): NotificationService {
@@ -102,6 +165,12 @@ class NotificationService {
       return false;
     }
 
+    // Check if this notification was recently sent (prevent duplicates)
+    if (options.tag && this.wasRecentlySent(options.tag)) {
+      console.log(`Notification "${options.tag}" was recently sent, skipping duplicate`);
+      return false;
+    }
+
     try {
       // Prefer service worker notifications if available (more resilient when tab is hidden)
       if ('serviceWorker' in navigator) {
@@ -117,6 +186,10 @@ class NotificationService {
             // Register click handler for service worker notifications
             if (options.tag && options.onClick) {
               this.notificationClickHandlers.set(options.tag, options.onClick);
+            }
+            // Mark as sent to prevent duplicates
+            if (options.tag) {
+              this.markAsSent(options.tag);
             }
             return true;
           }
@@ -134,6 +207,11 @@ class NotificationService {
         tag: options.tag,
         data: options.data,
       });
+
+      // Mark as sent to prevent duplicates
+      if (options.tag) {
+        this.markAsSent(options.tag);
+      }
 
       if (options.onClick && options.tag) {
         this.notificationClickHandlers.set(options.tag, options.onClick);

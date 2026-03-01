@@ -23,6 +23,7 @@ import { clearAllClientStorage, resetAllStores } from '@/lib/utils/clientStorage
 import { apiRequest } from '@/lib/utils/api';
 import { API_ROUTES } from '@/lib/constants/config';
 import SyncConflictDialog from '@/components/sync/SyncConflictDialog';
+import { isRunningAsPWA } from '@/lib/utils/pwa';
 
 const AUTH_ROUTES = ['/login', '/signup', '/reset-password'] as const;
 const PUBLIC_ROUTES = ['/terms', '/privacy', '/verify'] as const;
@@ -179,9 +180,13 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     }
   }, [router]);
 
+  // Inactivity timeout: Website = 30 minutes, PWA = disabled (no restrictions)
+  const isPWA = typeof window !== 'undefined' && isRunningAsPWA();
+  const inactivityTimeoutMs = 30 * 60 * 1000; // 30 minutes for website
+
   useInactivityLogout({
-    enabled: isAuthenticated && !isAuthRoute && !isPublicRoute && !isPostAuthRoute,
-    timeoutMs: 5 * 60 * 1000,
+    enabled: isAuthenticated && !isAuthRoute && !isPublicRoute && !isPostAuthRoute && !isPWA,
+    timeoutMs: inactivityTimeoutMs,
     onTimeout: () => {
       void handleInactivityLogout();
     },

@@ -174,7 +174,7 @@ const ProfileCard = React.memo(
               </SubCard>
               <SubCard className="flex items-center justify-between border border-mq-border">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
+                  <Calendar className="h-4 w-4 text-mq-content-secondary" />
                   <span className="text-sm text-mq-content-secondary">{t('emailReminders')}</span>
                 </div>
                 <button

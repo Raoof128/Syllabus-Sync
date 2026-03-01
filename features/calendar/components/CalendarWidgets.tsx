@@ -85,23 +85,28 @@ export default function CalendarWidgets({
   const highlightedWidget = searchParams.get('highlightWidget');
   const highlightSection = searchParams.get('section');
   const sectionHighlight = searchParams.get('highlight') === 'true';
+  const actionParam = searchParams.get('action');
 
   // State for section highlight that persists for 3 seconds
-  const [sectionHighlightActive, setSectionHighlightActive] = useState<'events' | 'todos' | null>(
-    null,
-  );
+  const [sectionHighlightActive, setSectionHighlightActive] = useState<
+    'events' | 'todos' | 'units' | 'assignments' | 'exams' | null
+  >(null);
 
   // State for individual event highlight that auto-clears after 3 seconds
   const [eventHighlightDismissed, setEventHighlightDismissed] = useState(false);
 
   // Track if we've processed the current URL params to prevent re-processing
   const hasProcessedCurrentHighlight = useRef(false);
+  const hasProcessedActionRef = useRef<string | null>(null);
 
-  const deadlineHighlightActive = Boolean(highlightedDeadlineId);
+  const deadlineHighlightActive =
+    Boolean(highlightedDeadlineId) || sectionHighlightActive === 'assignments';
   const todoHighlightActive = Boolean(highlightedTodoId) || sectionHighlightActive === 'todos';
   const eventHighlightActive =
     (Boolean(highlightedEventId) && !eventHighlightDismissed) ||
     sectionHighlightActive === 'events';
+  const examsHighlightActive = sectionHighlightActive === 'exams';
+  const unitsHighlightActive = sectionHighlightActive === 'units';
 
   // Helper function to check if element is visible in viewport
   const isElementInViewport = React.useCallback((el: HTMLElement | null): boolean => {
@@ -220,6 +225,79 @@ export default function CalendarWidgets({
     }
   }, [highlightSection, sectionHighlight]);
 
+  // Handle highlightWidget + action params from FAB menu
+  useEffect(() => {
+    if (highlightedWidget && actionParam && hasProcessedActionRef.current !== actionParam) {
+      hasProcessedActionRef.current = actionParam;
+
+      // Scroll to the appropriate widget and activate highlight
+      const activateTimer = setTimeout(() => {
+        if (
+          highlightedWidget === 'units' ||
+          highlightedWidget === 'assignments' ||
+          highlightedWidget === 'exams' ||
+          highlightedWidget === 'events' ||
+          highlightedWidget === 'todos'
+        ) {
+          setSectionHighlightActive(highlightedWidget);
+        }
+
+        // Scroll to appropriate widget
+        if (highlightedWidget === 'units' && unitsWidgetRef.current) {
+          unitsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (highlightedWidget === 'assignments' && assignmentsWidgetRef.current) {
+          assignmentsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (highlightedWidget === 'exams' && examsWidgetRef.current) {
+          examsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (highlightedWidget === 'events' && eventsWidgetRef.current) {
+          eventsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (highlightedWidget === 'todos' && todosWidgetRef.current) {
+          todosWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Trigger the appropriate add action after scroll
+        setTimeout(() => {
+          if (actionParam === 'add-unit') {
+            onAddUnit();
+          } else if (actionParam === 'add-assignment') {
+            onAddAssignment();
+          } else if (actionParam === 'add-exam') {
+            onAddExam();
+          } else if (actionParam === 'add-event') {
+            onAddEvent();
+          } else if (actionParam === 'add-todo' && onAddTodo) {
+            onAddTodo();
+          }
+        }, 300);
+      }, 100);
+
+      // Clear highlight after 3 seconds
+      const clearTimer = setTimeout(() => {
+        setSectionHighlightActive(null);
+        // Clean up URL params
+        const url = new URL(window.location.href);
+        url.searchParams.delete('highlightWidget');
+        url.searchParams.delete('action');
+        window.history.replaceState({}, '', url.toString());
+      }, 3000);
+
+      return () => {
+        clearTimeout(activateTimer);
+        clearTimeout(clearTimer);
+      };
+    }
+  }, [
+    highlightedWidget,
+    actionParam,
+    onAddUnit,
+    onAddAssignment,
+    onAddExam,
+    onAddEvent,
+    onAddTodo,
+    unitsWidgetRef,
+    assignmentsWidgetRef,
+  ]);
+
   return (
     <div className="space-y-4 lg:space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
@@ -240,7 +318,7 @@ export default function CalendarWidgets({
           onDeleteExam={onDeleteExam}
           highlightedDeadlineId={highlightedDeadlineId}
           widgetRef={examsWidgetRef}
-          deadlineHighlightActive={deadlineHighlightActive}
+          deadlineHighlightActive={deadlineHighlightActive || examsHighlightActive}
         />
 
         <UnitsWidget
@@ -250,7 +328,7 @@ export default function CalendarWidgets({
           onDeleteUnit={onDeleteUnit}
           highlightedUnitId={highlightedUnitId}
           widgetRef={unitsWidgetRef}
-          highlightedWidget={highlightedWidget}
+          highlightedWidget={unitsHighlightActive ? 'units' : highlightedWidget}
         />
 
         <EventsWidget

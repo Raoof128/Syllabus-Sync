@@ -478,7 +478,7 @@ export default function CalendarClient() {
                 onClick={handleToggleFilters}
                 className="gap-2 whitespace-nowrap"
               >
-                <Calendar className="h-4 w-4" />
+                <Calendar className="h-4 w-4 text-mq-content" />
                 {t('filter')}
               </Button>
             </div>

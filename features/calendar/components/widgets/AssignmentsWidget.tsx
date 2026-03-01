@@ -64,8 +64,9 @@ export default function AssignmentsWidget({
     <MagicCard
       isLiquidEnhanced
       className={
-        highlightedDeadlineId &&
-        deadlines.find((d) => d.id === highlightedDeadlineId)?.type === 'Assignment'
+        deadlineHighlightActive ||
+        (highlightedDeadlineId &&
+          deadlines.find((d) => d.id === highlightedDeadlineId)?.type === 'Assignment')
           ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
           : ''
       }
@@ -119,7 +120,7 @@ export default function AssignmentsWidget({
                         className={cn(
                           'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border transition-all cursor-pointer w-full bg-mq-background-secondary hover:bg-mq-surface hover:shadow-sm',
                           assignment.completed && 'opacity-60 grayscale',
-                          isOverdue && 'bg-red-500/5',
+                          isOverdue && 'opacity-70 bg-red-500/5',
                           isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
                         )}
                         style={{
@@ -154,7 +155,7 @@ export default function AssignmentsWidget({
                             <h4
                               className={cn(
                                 'font-medium text-sm truncate',
-                                assignment.completed &&
+                                (assignment.completed || isOverdue) &&
                                   'line-through decoration-mq-content-tertiary',
                               )}
                             >
@@ -164,13 +165,17 @@ export default function AssignmentsWidget({
                               className={cn(
                                 PRIORITY_COLORS[assignment.priority],
                                 'ml-2 text-[10px] h-4 px-1',
+                                isOverdue && 'opacity-70',
                               )}
                               variant="neutral"
                             >
-                              {t(`priority_${assignment.priority}` as TranslationKey)}
+                              {isOverdue ? t('overdue' as TranslationKey) : t(`priority_${assignment.priority}` as TranslationKey)}
                             </Badge>
                           </div>
-                          <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
+                          <p className={cn(
+                            "text-[11px] text-mq-content-secondary truncate mt-0.5",
+                            isOverdue && "text-red-600 dark:text-red-400"
+                          )}>
                             {assignment.unitCode} • {formatMonthDayTime(due.toDate())}
                           </p>
                         </div>

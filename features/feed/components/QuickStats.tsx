@@ -370,16 +370,16 @@ function EventCard({ event, onClick, expanded }: EventCardProps) {
       )}
       <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-mq-content-secondary">
         <div className="flex items-center gap-1.5">
-          <Calendar className="h-4 w-4" aria-hidden="true" />
+          <Calendar className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
           <span>{formatDate(event.startAt)}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Clock className="h-4 w-4" aria-hidden="true" />
+          <Clock className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
           <span>{getTimeRange()}</span>
         </div>
         {event.location && (
           <div className="flex items-center gap-1.5">
-            <MapPin className="h-4 w-4" aria-hidden="true" />
+            <MapPin className="h-4 w-4 text-mq-content-secondary" aria-hidden="true" />
             <span>{event.location}</span>
           </div>
         )}

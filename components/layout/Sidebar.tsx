@@ -254,7 +254,7 @@ const Sidebar = memo(() => {
         aria-modal={mobileMenuOpen ? 'true' : undefined}
         aria-label={t('mainNavigation')}
         className={cn(
-          'md:hidden fixed left-0 top-0 w-64 h-screen p-4 pt-20 flex flex-col bg-mq-background border-r border-mq-border transition-transform duration-300 ease-out overflow-y-auto',
+          'md:hidden fixed left-0 top-0 w-64 h-dvh p-4 pt-20 flex flex-col bg-mq-background border-r border-mq-border transition-transform duration-300 ease-out overflow-y-auto overscroll-contain -webkit-overflow-scrolling-touch',
           mobileMenuOpen ? 'z-[58] translate-x-0' : 'z-40 -translate-x-full',
         )}
       >

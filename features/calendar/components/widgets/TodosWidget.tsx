@@ -140,7 +140,7 @@ export default function TodosWidget({
                       className={cn(
                         'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
                         todo.completed && 'opacity-60 grayscale',
-                        isOverdue && 'bg-red-500/5',
+                        isOverdue && 'opacity-70 bg-red-500/5',
                         isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
                       )}
                       style={{
@@ -181,7 +181,7 @@ export default function TodosWidget({
                           <h4
                             className={cn(
                               'font-medium text-sm truncate',
-                              todo.completed && 'line-through decoration-mq-content-tertiary',
+                              (todo.completed || isOverdue) && 'line-through decoration-mq-content-tertiary',
                             )}
                           >
                             {todo.title}
@@ -190,13 +190,17 @@ export default function TodosWidget({
                             className={cn(
                               PRIORITY_COLORS[todo.priority],
                               'ml-2 text-[10px] h-4 px-1',
+                              isOverdue && 'opacity-70',
                             )}
                             variant="neutral"
                           >
-                            {t(`priority_${todo.priority}` as TranslationKey)}
+                            {isOverdue ? t('overdue' as TranslationKey) : t(`priority_${todo.priority}` as TranslationKey)}
                           </Badge>
                         </div>
-                        <p className="text-[11px] text-mq-content-secondary truncate mt-0.5">
+                        <p className={cn(
+                          "text-[11px] text-mq-content-secondary truncate mt-0.5",
+                          isOverdue && "text-red-600 dark:text-red-400"
+                        )}>
                           {formatMonthDayTime(due.toDate())}
                         </p>
                       </div>

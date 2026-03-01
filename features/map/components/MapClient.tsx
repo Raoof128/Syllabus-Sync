@@ -387,10 +387,10 @@ export default function MapClient() {
       >
         {/* Skip Link - Keyboard Accessibility (only visible when focused) */}
         <a
-          href="#map-search-input"
+          href="#map-container"
           className="absolute -top-[9999px] -left-[9999px] focus:top-2 focus:left-2 focus:z-[2000] px-4 py-2 bg-mq-primary text-white font-bold rounded-mq-lg shadow-lg transition-all focus:outline-none"
         >
-          {t('skipToSearch')}
+          {t('skipToMainContent')}
         </a>
 
         {/* Route Announcer for Screen Readers */}
@@ -568,6 +568,7 @@ export default function MapClient() {
           </div>
 
           <div
+            id="map-container"
             ref={mapContainerRef}
             className="relative h-[65svh] min-h-[400px] sm:h-[75svh] md:h-[clamp(500px,70vh,800px)] lg:h-[clamp(600px,80vh,900px)] landscape:h-[75svh] landscape:min-h-[350px] w-full bg-mq-background-secondary overflow-hidden"
           >
@@ -614,7 +615,7 @@ export default function MapClient() {
                 )}
               </>
             ) : (
-              <div className="absolute inset-0 z-[50]">
+              <div className="absolute inset-0 z-10">
                 <GoogleMapIntegration
                   ref={googleMapRef}
                   onNavStateChange={setNavState}

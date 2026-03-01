@@ -13,7 +13,17 @@ import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal'
 import { LazyMotion, m, domAnimation } from 'framer-motion';
 
 import { DEMO_USER } from '@/lib/config';
-import { Info, Plus, BookOpen, Eye, Pencil } from 'lucide-react';
+import {
+  Info,
+  Plus,
+  BookOpen,
+  Eye,
+  Pencil,
+  GraduationCap,
+  FileText,
+  Calendar,
+  ListTodo,
+} from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
@@ -78,19 +88,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         {/* Header */}
         <ScrollReveal>
           <header className="mb-6" role="banner">
-            <WelcomeHeader name={displayName} fallbackName={DEMO_USER.name}>
-              {hasHydrated && (
-                <Button
-                  asChild
-                  className="gap-2 rounded-full shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <Link href="/calendar?action=add-deadline">
-                    <Plus className="h-4 w-4" />
-                    <span>{t('addTask')}</span>
-                  </Link>
-                </Button>
-              )}
-            </WelcomeHeader>
+            <WelcomeHeader name={displayName} fallbackName={DEMO_USER.name} />
           </header>
         </ScrollReveal>
 
@@ -272,7 +270,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         </section>
 
         {/* Floating Action Button (FAB) for Quick Actions */}
-        <div className="fixed bottom-6 right-6 z-50 md:hidden">
+        <div className="fixed bottom-6 right-6 z-50">
           <div className="relative">
             {/* FAB Menu */}
             {fabOpen && (
@@ -287,24 +285,60 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                   variant="secondary"
                   className="shadow-lg flex items-center gap-2 whitespace-nowrap"
                   onClick={() => {
-                    router.push('/calendar?action=add-unit');
+                    router.push('/calendar?highlightWidget=units&action=add-unit');
                     setFabOpen(false);
                   }}
                 >
-                  <BookOpen className="h-4 w-4" />
-                  {t('addUnit')}
+                  <BookOpen className="h-4 w-4 text-mq-content" />
+                  {t('addUnitClass')}
                 </Button>
                 <Button
                   size="sm"
                   variant="secondary"
                   className="shadow-lg flex items-center gap-2 whitespace-nowrap"
                   onClick={() => {
-                    router.push('/calendar?action=add-deadline');
+                    router.push('/calendar?highlightWidget=exams&action=add-exam');
                     setFabOpen(false);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
-                  {t('addDeadline')}
+                  <GraduationCap className="h-4 w-4 text-mq-content" />
+                  {t('addExam')}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                  onClick={() => {
+                    router.push('/calendar?highlightWidget=assignments&action=add-assignment');
+                    setFabOpen(false);
+                  }}
+                >
+                  <FileText className="h-4 w-4 text-mq-content" />
+                  {t('addAssignment')}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                  onClick={() => {
+                    router.push('/calendar?highlightWidget=events&action=add-event');
+                    setFabOpen(false);
+                  }}
+                >
+                  <Calendar className="h-4 w-4 text-mq-content" />
+                  {t('addEvent')}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                  onClick={() => {
+                    router.push('/calendar?highlightWidget=todos&action=add-todo');
+                    setFabOpen(false);
+                  }}
+                >
+                  <ListTodo className="h-4 w-4 text-mq-content" />
+                  {t('addTodo')}
                 </Button>
               </m.div>
             )}
