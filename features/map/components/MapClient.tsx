@@ -41,7 +41,7 @@ import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
 import { MapViewToggle, type MapView } from './MapViewToggle';
-import { GoogleMapEmbed, type GoogleMapRef } from './GoogleMapEmbed';
+import { GoogleMapIntegration, type GoogleMapRef } from './GoogleMapIntegration';
 
 import { triggerHaptic } from '@/lib/utils/haptics';
 
@@ -615,33 +615,27 @@ export default function MapClient() {
               </>
             ) : (
               <div className="absolute inset-0 z-[50]">
-                <GoogleMapEmbed
+                <GoogleMapIntegration
                   ref={googleMapRef}
-                  selectedBuilding={selectedBuilding}
-                  destinationLabel={
-                    selectedBuilding ? t(selectedBuilding.translationKey) : UNIVERSITY_CONFIG.name
-                  }
                   onNavStateChange={setNavState}
                 />
               </div>
             )}
 
-            {/* HUD overlays - loaded immediately, sits on top */}
-            <CampusMapHUD
-              selectedBuilding={selectedBuilding}
-              buildings={sidebarBuildings}
-              buildingSearch={buildingSearch}
-              setBuildingSearch={setBuildingSearch}
-              onCopyShare={copyShareableURL}
-              onExport={mapView === 'campus' ? handleExport : undefined}
-              onStartNavigation={
-                mapView === 'campus'
-                  ? () => campusMapRef.current?.startNavigation()
-                  : () => googleMapRef.current?.startNavigation()
-              }
-              isNavigating={navState?.isNavigating || false}
-              isGoogleMode={mapView === 'google'}
-            />
+            {/* HUD overlays - only show for campus map (Google Maps has its own UI) */}
+            {mapView === 'campus' && (
+              <CampusMapHUD
+                selectedBuilding={selectedBuilding}
+                buildings={sidebarBuildings}
+                buildingSearch={buildingSearch}
+                setBuildingSearch={setBuildingSearch}
+                onCopyShare={copyShareableURL}
+                onExport={handleExport}
+                onStartNavigation={() => campusMapRef.current?.startNavigation()}
+                isNavigating={navState?.isNavigating || false}
+                isGoogleMode={false}
+              />
+            )}
           </div>
         </div>
       </section>
