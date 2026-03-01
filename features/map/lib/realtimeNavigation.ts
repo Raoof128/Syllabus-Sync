@@ -97,13 +97,13 @@ export const OFF_ROUTE_THRESHOLD = 25;
 export const INSTRUCTION_ADVANCE_THRESHOLD = 15;
 
 /** Minimum distance change to trigger route recalculation (meters) */
-export const RECALCULATION_THRESHOLD = 50;
+export const RECALCULATION_THRESHOLD = 30;
 
 /** Arrival threshold (meters) */
 export const ARRIVAL_THRESHOLD = 10;
 
 /** Kalman filter process noise */
-const KALMAN_Q = 2; // Process noise (m²) - tuned for smoother campus walking
+const KALMAN_Q = 3; // Process noise (m²) - responsive to direction changes while walking
 
 /** Kalman filter measurement noise base */
 const KALMAN_R_BASE = 10; // Base measurement noise (m²)
@@ -176,8 +176,8 @@ class KalmanFilter1D {
     const predictedX = this.state.x + this.state.v * clampedDt;
     const predictedP = this.state.p + this.state.pv * clampedDt * clampedDt + Q;
 
-    // Measurement noise
-    const stationaryPenalty = qMultiplier < 0.1 ? 5.0 : 1.0;
+    // Measurement noise — lower penalty so filter recovers faster when user starts moving
+    const stationaryPenalty = qMultiplier < 0.1 ? 2.0 : 1.0;
     const R = (KALMAN_R_BASE + accuracy * accuracy * 0.0001) * stationaryPenalty;
 
     // Update step
@@ -753,7 +753,12 @@ export class NavigationStateManager {
   updatePosition(position: GpsPosition): SmoothedPosition {
     const smoothed = this.positionSmoother.update(position);
 
-    if (this.state.status === 'navigating' && this.state.routeCoordinates.length > 0) {
+    const activeStatuses: NavigationState['status'][] = [
+      'navigating',
+      'off-route',
+      'recalculating',
+    ];
+    if (activeStatuses.includes(this.state.status) && this.state.routeCoordinates.length > 0) {
       this.updateNavigationState(smoothed);
     }
 
@@ -852,13 +857,16 @@ export class NavigationStateManager {
       return false;
     }
 
-    // Check if we've moved significantly since last recalculation
+    // Check if we've moved enough since last recalculation to justify a new
+    // route request.  Use half the recalculation threshold so the user doesn't
+    // have to walk far before the route updates after a direction change.
+    const minMoveSinceRecalc = RECALCULATION_THRESHOLD / 2;
     if (this.lastRecalculationPosition) {
       const distanceSinceRecalc = calculateDistance(
         { lat: position.smoothedLat, lng: position.smoothedLng },
         this.lastRecalculationPosition,
       );
-      if (distanceSinceRecalc < RECALCULATION_THRESHOLD) {
+      if (distanceSinceRecalc < minMoveSinceRecalc) {
         return false;
       }
     }

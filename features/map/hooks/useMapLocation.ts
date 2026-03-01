@@ -311,14 +311,29 @@ export function useMapLocation({
               if (iconElement) {
                 const isMoving = gpsSpeed !== null && gpsSpeed > MOVEMENT_THRESHOLD;
 
+                // Resolve heading: prefer device GPS heading, fall back to
+                // movement-derived heading from position history so the arrow
+                // still tracks direction on devices that report null heading.
+                let effectiveHeading = gpsHeading;
+                if (
+                  (effectiveHeading === null || isNaN(effectiveHeading)) &&
+                  positionSmootherRef.current
+                ) {
+                  effectiveHeading = positionSmootherRef.current.calculateMovementHeading();
+                }
+
                 // Motion Arrow
-                if (isMoving && typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
+                if (
+                  isMoving &&
+                  typeof effectiveHeading === 'number' &&
+                  !isNaN(effectiveHeading)
+                ) {
                   iconElement.classList.add('is-moving');
                   const arrowElement = iconElement.querySelector(
                     '.user-motion-arrow',
                   ) as HTMLElement;
                   if (arrowElement) {
-                    arrowElement.style.transform = `translate(-50%, -50%) rotate(${gpsHeading - 45}deg)`;
+                    arrowElement.style.transform = `translate(-50%, -50%) rotate(${effectiveHeading - 45}deg)`;
                   }
                 } else {
                   iconElement.classList.remove('is-moving');
@@ -329,8 +344,8 @@ export function useMapLocation({
                   '.user-heading-flash',
                 ) as HTMLElement;
                 if (flashElement) {
-                  if (typeof gpsHeading === 'number' && !isNaN(gpsHeading)) {
-                    flashElement.style.transform = `rotate(${gpsHeading}deg)`;
+                  if (typeof effectiveHeading === 'number' && !isNaN(effectiveHeading)) {
+                    flashElement.style.transform = `rotate(${effectiveHeading}deg)`;
                     flashElement.style.opacity = '1';
                   } else {
                     flashElement.style.opacity = '0';
@@ -416,7 +431,7 @@ export function useMapLocation({
       {
         enableHighAccuracy: true,
         timeout: LOCATION_TIMEOUT,
-        maximumAge: 2000,
+        maximumAge: 1000,
       },
     );
 
