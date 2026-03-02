@@ -1,4 +1,22 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Full Audit — Live/Realtime Navigation Accuracy + 2026 Docs Cross-Check
+Summary: Completed a full campus-map audit after cross-checking current official docs (Google Maps Embed API, Leaflet, React-Leaflet, MDN Geolocation, ORS directions). Verified live navigation pipeline end-to-end (`useMapLocation` geolocation watch + Kalman smoothing + motion-aware heading fallback -> `NavigationStateManager` off-route/recalculate/ETA/instruction progression -> `useMapNavigation` reroute + route refresh). Confirmed ORS coordinate order handling `[lng, lat]` is consistent in API request/response and downstream parsing. Confirmed embedded Google map mode remains active and wired. Also fixed map-test lint quality issues found during audit (`@ts-expect-error` policy compliance and React test lint warnings).
+Files Changed: `tests/map/mapUtils.test.ts`, `tests/map/GoogleMapBuildingSearch.test.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/ tests/map/` ✅, `npm run test -- tests/map` ✅ (104/104), `npm run test -- tests/map/useMapLocation.test.ts tests/map/useMapNavigation.test.ts tests/map/realtimeNavigation.test.ts` ✅ (28/28), `npm run typecheck` ✅.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Audit — Test Lint Compliance Fix (Step 2)
+Summary: Fixed React lint warnings in `tests/map/GoogleMapBuildingSearch.test.tsx` by removing a useless fragment in the `AnimatePresence` mock and using shorthand boolean prop syntax (`isNavigating`).
+Files Changed: `tests/map/GoogleMapBuildingSearch.test.tsx`
+Verification: Pending (running full map lint/test/typecheck verification next).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Audit — Test Lint Compliance Fix (Step 1)
+Summary: Replaced `@ts-ignore` directives with explicit `@ts-expect-error` plus rationale comments in `tests/map/mapUtils.test.ts` to comply with TypeScript lint policy and preserve intentional mock typing boundaries in map utility tests.
+Files Changed: `tests/map/mapUtils.test.ts`
+Verification: Pending (full map lint/test/typecheck rerun after remaining map test lint fixes).
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Google Maps Embedded Presence Audit — Read-Only Verification
 Summary: Performed a full verification audit to ensure embedded Google Maps was not removed. Confirmed live path remains intact: `MapClient` renders `GoogleMapIntegration` in Google view, and `GoogleMapIntegration` delegates to `GoogleMapEmbed`, which renders iframe-based maps/directions for both API-key and no-key fallback modes (`maps/embed/v1/*` and `google.com/maps?output=embed`). Verified env/docs references for `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` and operational setup runbook availability.
 Files Changed: None (read-only audit)
@@ -1287,3 +1305,15 @@ Scope: Presentation Artifact Export (PPTX)
 Summary: Generated a distributable PowerPoint presentation from the repository-backed slide source using Pandoc so the deck can be presented directly in stakeholder sessions.
 Files: Added `docs/presentations/syllabus-sync-industry-presentation.pptx`.
 Verification: Export completed successfully; PPTX archive contains 15 slides.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Live Navigation Accuracy — Heading Fusion + GPS Outlier Handling (Implementation)
+Summary: Implemented runtime fixes for campus-map live tracking accuracy. Added heading fusion pipeline in `useMapLocation` using GPS heading (when moving), movement-derived heading from smoother, and device orientation compass fallback with circular smoothing and stale-heading guards. Added adaptive raw/smoothed position blending for user marker responsiveness while preserving stability, outlier GPS sample rejection for large low-accuracy jumps, and faster origin refresh threshold (5m) to improve reroute freshness. Updated navigation manager feed to use fused heading. In `realtimeNavigation`, made off-route/recalculation thresholds accuracy-aware to reduce false reroutes under poor GPS precision and improved movement heading derivation window/threshold.
+Files Changed: `features/map/hooks/useMapLocation.ts`, `features/map/lib/realtimeNavigation.ts`, `tests/map/realtimeNavigation.test.ts`
+Verification: Pending (running map lint/tests/typecheck next).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Live Navigation Accuracy — Final Verification
+Summary: Verified the live-navigation accuracy implementation end-to-end. Confirmed heading fusion/outlier handling/adaptive marker smoothing path compiles and remains test-clean; confirmed accuracy-aware off-route thresholds via new regression test.
+Files Changed: None (verification + test runs)
+Verification: `npm run test -- tests/map/realtimeNavigation.test.ts tests/map/useMapLocation.test.ts` ✅ (21/21), `npm run test -- tests/map` ✅ (105/105), `npx eslint --config config/eslint/eslint.config.mjs features/map/ tests/map/` ✅, `npm run typecheck` ✅.

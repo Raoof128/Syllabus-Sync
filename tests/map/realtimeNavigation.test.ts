@@ -256,6 +256,43 @@ describe('NavigationStateManager', () => {
     const state = manager.getState();
     expect(state.status).toBe('idle');
   });
+
+  it('should avoid false off-route state when GPS accuracy is poor', () => {
+    const route: [number, number][] = [
+      [151.112, -33.7737],
+      [151.113, -33.7737],
+    ];
+
+    manager.startNavigation(route, [], 100);
+
+    // ~33m north of the route but with poor GPS accuracy.
+    manager.updatePosition({
+      lat: -33.7734,
+      lng: 151.1125,
+      accuracy: 55,
+      heading: null,
+      speed: 1.3,
+      timestamp: 1000,
+    });
+
+    const lowAccuracyState = manager.getState();
+    expect(lowAccuracyState.isOffRoute).toBe(false);
+    expect(lowAccuracyState.status).toBe('navigating');
+
+    // Same location with high accuracy should now be flagged off-route.
+    manager.updatePosition({
+      lat: -33.7734,
+      lng: 151.1125,
+      accuracy: 5,
+      heading: null,
+      speed: 1.3,
+      timestamp: 2000,
+    });
+
+    const highAccuracyState = manager.getState();
+    expect(highAccuracyState.isOffRoute).toBe(true);
+    expect(['off-route', 'recalculating']).toContain(highAccuracyState.status);
+  });
 });
 
 describe('generateNavigationText', () => {

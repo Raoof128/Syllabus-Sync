@@ -114,6 +114,7 @@ const MAX_POSITION_HISTORY = 10;
 /** Walking speed bounds for validation (m/s) */
 const MIN_WALKING_SPEED = 0.3; // ~1 km/h (very slow walk)
 const MAX_WALKING_SPEED = 3.0; // ~11 km/h (running)
+const MAX_ACCURACY_BUFFER_METERS = 20;
 
 // ============================================
 // KALMAN FILTER FOR GPS SMOOTHING
@@ -302,10 +303,10 @@ export class GpsPositionSmoother {
    * Calculate heading from recent positions
    * More reliable than device heading for slow movement
    */
-  calculateMovementHeading(): number | null {
+  calculateMovementHeading(minDistanceMeters: number = 1): number | null {
     if (this.positionHistory.length < 2) return null;
 
-    const recent = this.positionHistory.slice(-3);
+    const recent = this.positionHistory.slice(-5);
     if (recent.length < 2) return null;
 
     const first = recent[0];
@@ -328,8 +329,8 @@ export class GpsPositionSmoother {
       { lat: last.lat, lng: last.lng },
     );
 
-    // Only return heading if moved at least 2 meters
-    return distance >= 2 ? heading : null;
+    // Only return heading if moved at least the configured threshold.
+    return distance >= minDistanceMeters ? heading : null;
   }
 
   /**
@@ -777,9 +778,12 @@ export class NavigationStateManager {
 
     this.state.distanceFromRoute = closest.distance;
 
+    const accuracyBuffer = Math.min(position.accuracy * 0.5, MAX_ACCURACY_BUFFER_METERS);
+    const offRouteThreshold = OFF_ROUTE_THRESHOLD + accuracyBuffer;
+
     // Check if off-route
     const wasOffRoute = this.state.isOffRoute;
-    this.state.isOffRoute = closest.distance > OFF_ROUTE_THRESHOLD;
+    this.state.isOffRoute = closest.distance > offRouteThreshold;
 
     if (this.state.isOffRoute && !wasOffRoute) {
       this.state.status = 'off-route';
@@ -852,8 +856,11 @@ export class NavigationStateManager {
   }
 
   private shouldRecalculate(position: SmoothedPosition): boolean {
+    const accuracyBuffer = Math.min(position.accuracy * 0.5, MAX_ACCURACY_BUFFER_METERS);
+    const recalculationThreshold = RECALCULATION_THRESHOLD + accuracyBuffer;
+
     // Don't recalculate if not off-route significantly
-    if (this.state.distanceFromRoute < RECALCULATION_THRESHOLD) {
+    if (this.state.distanceFromRoute < recalculationThreshold) {
       return false;
     }
 

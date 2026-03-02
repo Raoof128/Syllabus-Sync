@@ -1,4 +1,22 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Full Audit — Live/Realtime Navigation Accuracy + 2026 Docs Cross-Check
+Summary: Completed full campus-map audit with official docs cross-check (Google Maps Embed API, Leaflet, React-Leaflet, MDN Geolocation, ORS directions). Verified live/realtime navigation flow integrity and coordinate-order correctness for ORS (`[lng, lat]`) across proxy, parsing, and route state management. Confirmed embedded Google map mode remains active. Fixed map-test lint quality issues discovered during audit.
+Files: Modified `tests/map/mapUtils.test.ts`, `tests/map/GoogleMapBuildingSearch.test.tsx`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/ tests/map/` ✅; `npm run test -- tests/map` ✅ (104/104); `npm run test -- tests/map/useMapLocation.test.ts tests/map/useMapNavigation.test.ts tests/map/realtimeNavigation.test.ts` ✅ (28/28); `npm run typecheck` ✅.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Audit — Test Lint Compliance Fix (Step 2)
+Summary: Resolved map test React lint warnings in `tests/map/GoogleMapBuildingSearch.test.tsx` by removing a useless fragment mock wrapper and using shorthand boolean prop syntax.
+Files: Modified `tests/map/GoogleMapBuildingSearch.test.tsx`.
+Verification: Pending (full map lint/test/typecheck run next).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Audit — Test Lint Compliance Fix (Step 1)
+Summary: Updated `tests/map/mapUtils.test.ts` to replace `@ts-ignore` with `@ts-expect-error` and explicit rationale comments, aligning map test code with lint policy requirements.
+Files: Modified `tests/map/mapUtils.test.ts`.
+Verification: Pending (final map lint/test/typecheck pass after remaining map test lint cleanup).
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Google Maps Embedded Presence Audit — Read-Only Verification
 Summary: Completed a full read-only audit to confirm embedded Google Maps is still present. Verified runtime chain `MapClient` -> `GoogleMapIntegration` -> `GoogleMapEmbed` remains active, iframe embed URLs are still used for both keyed and keyless fallback modes, and `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` setup/docs remain in place.
 Files: None (read-only audit).
@@ -4172,3 +4190,15 @@ Scope: Export Industry Deck to PowerPoint
 Summary: Converted the Markdown presentation deck into a presentation-ready `.pptx` artifact for direct use in demos, stakeholder reviews, and interviews.
 Files: Added `docs/presentations/syllabus-sync-industry-presentation.pptx`.
 Verification: PPTX export successful and validated with 15 slide XML entries.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Live Navigation Accuracy — Heading Fusion + GPS Outlier Handling (Implementation)
+Summary: Improved live navigation accuracy and user-direction rendering by fusing GPS, movement-based, and compass headings with smoothing/freshness guards; added adaptive marker position blending and low-confidence GPS outlier rejection; reduced origin refresh threshold to 5m for fresher reroute origins; and made off-route/recalculation thresholds accuracy-aware to prevent false reroutes in noisy GPS conditions. Added regression coverage for accuracy-aware off-route behavior.
+Files: Modified `features/map/hooks/useMapLocation.ts`, `features/map/lib/realtimeNavigation.ts`, `tests/map/realtimeNavigation.test.ts`.
+Verification: Pending (map tests + lint + typecheck running after this entry).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Campus Map Live Navigation Accuracy — Final Verification
+Summary: Completed validation for the live navigation/pointer accuracy patch set and confirmed no regressions across map tests, lint, and typecheck.
+Files: None (validation only).
+Verification: `npm run test -- tests/map/realtimeNavigation.test.ts tests/map/useMapLocation.test.ts` ✅ (21/21); `npm run test -- tests/map` ✅ (105/105); `npx eslint --config config/eslint/eslint.config.mjs features/map/ tests/map/` ✅; `npm run typecheck` ✅.

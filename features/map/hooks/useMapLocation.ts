@@ -5,6 +5,7 @@ import { errorHandler } from '@/lib/utils/errorHandling';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { GPS_CAMPUS_BOUNDS } from '@/features/map/lib/constants';
 import { gpsToCrsSimple } from '@/features/map/lib/geospatialCalibration';
+import { calculateDistance } from '@/features/map/lib/navigationHelpers';
 import {
   GpsPositionSmoother,
   type SmoothedPosition,
@@ -19,12 +20,104 @@ const LOCATION_TIMEOUT = 15000;
 const SPEED_CALC_THRESHOLD = 0.5; // seconds
 const WALKING_SPEED_LIMIT = 10; // m/s
 const MOVEMENT_THRESHOLD = 0.2; // m/s
+const ORIGIN_REFRESH_THRESHOLD_METERS = 5; // Lower threshold for quicker route refreshes
+const OUTLIER_DISTANCE_THRESHOLD_METERS = 35; // Ignore large low-confidence GPS jumps
+const OUTLIER_ACCURACY_THRESHOLD_METERS = 35;
+const OUTLIER_SPEED_THRESHOLD_MS = 4.5;
+const COMPASS_STALE_THRESHOLD_MS = 5000;
+const COMPASS_SMOOTHING_ALPHA = 0.35;
+const HEADING_SMOOTHING_ALPHA = 0.4;
+const MOTION_ARROW_ROTATION_OFFSET = 45; // Tear-drop icon points top-right before rotation offset
 
 // Logger
 const mapLog = devLog.map;
 
 const NAVIGATION_ACTIVE_STATUSES: Array<ReturnType<NavigationStateManager['getState']>['status']> =
   ['navigating', 'off-route', 'recalculating'];
+
+type CompassOrientationEvent = DeviceOrientationEvent & {
+  webkitCompassHeading?: number;
+  webkitCompassAccuracy?: number;
+};
+
+function normalizeHeading(heading: number): number {
+  return ((heading % 360) + 360) % 360;
+}
+
+function smoothCircularHeading(previous: number, next: number, alpha: number): number {
+  const prevNorm = normalizeHeading(previous);
+  const nextNorm = normalizeHeading(next);
+  let delta = nextNorm - prevNorm;
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
+  return normalizeHeading(prevNorm + delta * alpha);
+}
+
+function getCompassHeading(event: DeviceOrientationEvent): number | null {
+  const orientationEvent = event as CompassOrientationEvent;
+
+  if (typeof orientationEvent.webkitCompassHeading === 'number') {
+    const accuracy = orientationEvent.webkitCompassAccuracy;
+    if (typeof accuracy === 'number' && accuracy > 50) return null;
+    return normalizeHeading(orientationEvent.webkitCompassHeading);
+  }
+
+  if (!event.absolute || typeof event.alpha !== 'number') return null;
+
+  let screenAngle = 0;
+  if (typeof window !== 'undefined') {
+    if (typeof window.screen?.orientation?.angle === 'number') {
+      screenAngle = window.screen.orientation.angle;
+    } else if (typeof (window as Window & { orientation?: number }).orientation === 'number') {
+      screenAngle = (window as Window & { orientation: number }).orientation;
+    }
+  }
+
+  return normalizeHeading(360 - event.alpha + screenAngle);
+}
+
+function shouldIgnoreOutlierSample(
+  previous: { lat: number; lng: number; time: number } | null,
+  current: { lat: number; lng: number; time: number },
+  accuracy: number,
+  speed: number | null,
+): boolean {
+  if (!previous) return false;
+
+  const dt = (current.time - previous.time) / 1000;
+  if (dt <= 0 || dt > 6) return false;
+
+  const distance = calculateDistance(previous, current);
+  const derivedSpeed = speed ?? distance / dt;
+
+  return (
+    accuracy >= OUTLIER_ACCURACY_THRESHOLD_METERS &&
+    distance >= OUTLIER_DISTANCE_THRESHOLD_METERS &&
+    derivedSpeed >= OUTLIER_SPEED_THRESHOLD_MS
+  );
+}
+
+function getDisplayPosition(
+  raw: { lat: number; lng: number },
+  smoothed: { lat: number; lng: number; accuracy: number },
+  speed: number | null,
+): { lat: number; lng: number } {
+  const speedValue = speed ?? 0;
+  let rawWeight = 0.4;
+
+  if (smoothed.accuracy <= 8 || speedValue >= 1.5) {
+    rawWeight = 0.8;
+  } else if (smoothed.accuracy <= 15 || speedValue >= 0.9) {
+    rawWeight = 0.65;
+  } else if (smoothed.accuracy >= 30) {
+    rawWeight = 0.25;
+  }
+
+  return {
+    lat: smoothed.lat * (1 - rawWeight) + raw.lat * rawWeight,
+    lng: smoothed.lng * (1 - rawWeight) + raw.lng * rawWeight,
+  };
+}
 
 interface UseMapLocationProps {
   mapInstance: LeafletMap | null;
@@ -61,6 +154,9 @@ export function useMapLocation({
   const offCampusToastShown = useRef(false);
   const locationErrorToastShown = useRef(false);
   const safeTRef = useRef(safeT);
+  const compassHeadingRef = useRef<number | null>(null);
+  const compassHeadingUpdatedAtRef = useRef<number>(0);
+  const fusedHeadingRef = useRef<number | null>(null);
 
   // Update refs
   useEffect(() => {
@@ -157,6 +253,52 @@ export function useMapLocation({
     };
   }, [navManagerRef]);
 
+  // Compass / Device orientation heading for better walking direction tracking.
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.DeviceOrientationEvent) return;
+
+    let cleanedUp = false;
+
+    const onOrientation = (event: DeviceOrientationEvent) => {
+      const heading = getCompassHeading(event);
+      if (heading === null) return;
+
+      const previousHeading = compassHeadingRef.current;
+      compassHeadingRef.current =
+        previousHeading === null
+          ? heading
+          : smoothCircularHeading(previousHeading, heading, COMPASS_SMOOTHING_ALPHA);
+      compassHeadingUpdatedAtRef.current = Date.now();
+    };
+
+    const addOrientationListener = () => {
+      if (cleanedUp) return;
+      window.addEventListener('deviceorientation', onOrientation, { passive: true });
+    };
+
+    // iOS requires explicit permission request.
+    const DOE = DeviceOrientationEvent as unknown as {
+      requestPermission?: () => Promise<'granted' | 'denied'>;
+    };
+
+    if (typeof DOE.requestPermission === 'function') {
+      DOE.requestPermission()
+        .then((permission) => {
+          if (permission === 'granted') addOrientationListener();
+        })
+        .catch(() => {
+          addOrientationListener();
+        });
+    } else {
+      addOrientationListener();
+    }
+
+    return () => {
+      cleanedUp = true;
+      window.removeEventListener('deviceorientation', onOrientation);
+    };
+  }, []);
+
   // Geolocation Effect
   useEffect(() => {
     const geolocation = typeof navigator !== 'undefined' ? navigator.geolocation : undefined;
@@ -212,6 +354,22 @@ export function useMapLocation({
           }
         }
 
+        const previousPosition = lastPositionRef.current;
+        if (
+          shouldIgnoreOutlierSample(
+            previousPosition,
+            { lat: gpsLat, lng: gpsLng, time: currentTime },
+            pos.coords.accuracy,
+            gpsSpeed,
+          )
+        ) {
+          mapLog.log('Ignoring outlier GPS sample', {
+            accuracy: pos.coords.accuracy,
+            speed: gpsSpeed,
+          });
+          return;
+        }
+
         lastPositionRef.current = {
           lat: gpsLat,
           lng: gpsLng,
@@ -221,6 +379,8 @@ export function useMapLocation({
         // Kalman Smoothing
         let smoothedLat = gpsLat;
         let smoothedLng = gpsLng;
+        let movementHeading: number | null = null;
+        let effectiveHeadingForDisplay: number | null = fusedHeadingRef.current;
 
         if (positionSmootherRef.current) {
           const smoothed = positionSmootherRef.current.update({
@@ -236,9 +396,50 @@ export function useMapLocation({
 
           // Use smoothed coordinates for marker placement after initial warm-up
           if (positionSmootherRef.current.getHistory().length > 1) {
-            smoothedLat = smoothed.smoothedLat;
-            smoothedLng = smoothed.smoothedLng;
+            const displayPosition = getDisplayPosition(
+              { lat: gpsLat, lng: gpsLng },
+              {
+                lat: smoothed.smoothedLat,
+                lng: smoothed.smoothedLng,
+                accuracy: pos.coords.accuracy,
+              },
+              gpsSpeed,
+            );
+            smoothedLat = displayPosition.lat;
+            smoothedLng = displayPosition.lng;
           }
+
+          movementHeading = positionSmootherRef.current.calculateMovementHeading(1);
+
+          const isMoving = gpsSpeed !== null && gpsSpeed > MOVEMENT_THRESHOLD;
+          const hasFreshCompassHeading =
+            Date.now() - compassHeadingUpdatedAtRef.current <= COMPASS_STALE_THRESHOLD_MS;
+          const compassHeading = hasFreshCompassHeading ? compassHeadingRef.current : null;
+          const gpsHeadingValid = typeof gpsHeading === 'number' && !isNaN(gpsHeading);
+
+          let effectiveHeading: number | null = null;
+          if (isMoving && gpsHeadingValid) {
+            effectiveHeading = gpsHeading;
+          } else if (isMoving && movementHeading !== null) {
+            effectiveHeading = movementHeading;
+          } else if (compassHeading !== null) {
+            effectiveHeading = compassHeading;
+          } else if (movementHeading !== null) {
+            effectiveHeading = movementHeading;
+          } else if (fusedHeadingRef.current !== null) {
+            effectiveHeading = fusedHeadingRef.current;
+          }
+
+          if (effectiveHeading !== null) {
+            const previousHeading = fusedHeadingRef.current;
+            fusedHeadingRef.current =
+              previousHeading === null
+                ? normalizeHeading(effectiveHeading)
+                : smoothCircularHeading(previousHeading, effectiveHeading, HEADING_SMOOTHING_ALPHA);
+            effectiveHeading = fusedHeadingRef.current;
+          }
+
+          effectiveHeadingForDisplay = fusedHeadingRef.current ?? movementHeading;
 
           // Update navigation manager
           const navManager = navManagerRef.current;
@@ -251,7 +452,7 @@ export function useMapLocation({
               lat: gpsLat,
               lng: gpsLng,
               accuracy: pos.coords.accuracy,
-              heading: gpsHeading,
+              heading: effectiveHeading,
               speed: gpsSpeed,
               timestamp: currentTime,
             });
@@ -262,10 +463,8 @@ export function useMapLocation({
         locationErrorToastShown.current = false;
         setOrigin((prev) => {
           if (!prev) return { lat: gpsLat, lng: gpsLng };
-          const dx = prev.lat - gpsLat;
-          const dy = prev.lng - gpsLng;
-          // Throttle origin updates (used for route fetching) to ~20-25m threshold
-          if (dx * dx + dy * dy > 0.00000004) return { lat: gpsLat, lng: gpsLng };
+          const distance = calculateDistance(prev, { lat: gpsLat, lng: gpsLng });
+          if (distance >= ORIGIN_REFRESH_THRESHOLD_METERS) return { lat: gpsLat, lng: gpsLng };
           return prev;
         });
 
@@ -287,7 +486,7 @@ export function useMapLocation({
           offCampusToastShown.current = false;
         }
 
-        // Update Markers (Pixel Coordinates) - uses Kalman-smoothed positions for visual stability
+        // Update Markers (Pixel Coordinates) - uses adaptive blended positions
         try {
           // gpsToCrsSimple returns { lat, lng } which are CRS.Simple coordinates (pixel-based but labeled lat/lng)
           const crsPos = gpsToCrsSimple(smoothedLat, smoothedLng);
@@ -311,25 +510,18 @@ export function useMapLocation({
               if (iconElement) {
                 const isMoving = gpsSpeed !== null && gpsSpeed > MOVEMENT_THRESHOLD;
 
-                // Resolve heading: prefer device GPS heading, fall back to
-                // movement-derived heading from position history so the arrow
-                // still tracks direction on devices that report null heading.
-                let effectiveHeading = gpsHeading;
-                if (
-                  (effectiveHeading === null || isNaN(effectiveHeading)) &&
-                  positionSmootherRef.current
-                ) {
-                  effectiveHeading = positionSmootherRef.current.calculateMovementHeading();
-                }
-
                 // Motion Arrow
-                if (isMoving && typeof effectiveHeading === 'number' && !isNaN(effectiveHeading)) {
+                if (
+                  isMoving &&
+                  typeof effectiveHeadingForDisplay === 'number' &&
+                  !isNaN(effectiveHeadingForDisplay)
+                ) {
                   iconElement.classList.add('is-moving');
                   const arrowElement = iconElement.querySelector(
                     '.user-motion-arrow',
                   ) as HTMLElement;
                   if (arrowElement) {
-                    arrowElement.style.transform = `translate(-50%, -50%) rotate(${effectiveHeading - 45}deg)`;
+                    arrowElement.style.transform = `translate(-50%, -50%) rotate(${effectiveHeadingForDisplay - MOTION_ARROW_ROTATION_OFFSET}deg)`;
                   }
                 } else {
                   iconElement.classList.remove('is-moving');
@@ -340,8 +532,11 @@ export function useMapLocation({
                   '.user-heading-flash',
                 ) as HTMLElement;
                 if (flashElement) {
-                  if (typeof effectiveHeading === 'number' && !isNaN(effectiveHeading)) {
-                    flashElement.style.transform = `rotate(${effectiveHeading}deg)`;
+                  if (
+                    typeof effectiveHeadingForDisplay === 'number' &&
+                    !isNaN(effectiveHeadingForDisplay)
+                  ) {
+                    flashElement.style.transform = `rotate(${effectiveHeadingForDisplay}deg)`;
                     flashElement.style.opacity = '1';
                   } else {
                     flashElement.style.opacity = '0';
@@ -523,7 +718,7 @@ export function useMapLocation({
               iconElement.classList.add('is-moving');
               const arrowElement = iconElement.querySelector('.user-motion-arrow') as HTMLElement;
               if (arrowElement) {
-                arrowElement.style.transform = `translate(-50%, -50%) rotate(${heading - 45}deg)`;
+                arrowElement.style.transform = `translate(-50%, -50%) rotate(${heading - MOTION_ARROW_ROTATION_OFFSET}deg)`;
               }
             }
           }

@@ -17,15 +17,15 @@ describe('mapUtils', () => {
 
   describe('createMarkerIcon', () => {
     it('should create a new icon if not in cache', () => {
-      // @ts-ignore
+      // @ts-expect-error - unit test mock only implements Icon constructor used by createMarkerIcon
       createMarkerIcon(mockL, false, 'test-class');
       expect(mockIconConstructor).toHaveBeenCalledTimes(1);
     });
 
     it('should return cached icon if called with same parameters', () => {
-      // @ts-ignore
+      // @ts-expect-error - unit test mock only implements Icon constructor used by createMarkerIcon
       const icon1 = createMarkerIcon(mockL, true, 'cached-class');
-      // @ts-ignore
+      // @ts-expect-error - unit test mock only implements Icon constructor used by createMarkerIcon
       const icon2 = createMarkerIcon(mockL, true, 'cached-class');
 
       expect(mockIconConstructor).toHaveBeenCalledTimes(1); // Still 1, meaning 2nd call used cache
@@ -33,11 +33,11 @@ describe('mapUtils', () => {
     });
 
     it('should create different icons for different parameters', () => {
-      // @ts-ignore
+      // @ts-expect-error - unit test mock only implements Icon constructor used by createMarkerIcon
       createMarkerIcon(mockL, false, 'class-a');
-      // @ts-ignore
+      // @ts-expect-error - unit test mock only implements Icon constructor used by createMarkerIcon
       createMarkerIcon(mockL, true, 'class-a'); // different selected state
-      // @ts-ignore
+      // @ts-expect-error - unit test mock only implements Icon constructor used by createMarkerIcon
       createMarkerIcon(mockL, false, 'class-b'); // different class
 
       // 1 from previous test (global cache persistence in module scope during test run)
@@ -57,9 +57,9 @@ describe('mapUtils', () => {
       // So we expect 3 NEW calls.
       const initialCalls = mockIconConstructor.mock.calls.length;
 
-      // @ts-ignore
+      // @ts-expect-error - unit test mock only implements Icon constructor used by createMarkerIcon
       createMarkerIcon(mockL, false, 'unique-1');
-      // @ts-ignore
+      // @ts-expect-error - unit test mock only implements Icon constructor used by createMarkerIcon
       createMarkerIcon(mockL, false, 'unique-2');
 
       expect(mockIconConstructor).toHaveBeenCalledTimes(initialCalls + 2);

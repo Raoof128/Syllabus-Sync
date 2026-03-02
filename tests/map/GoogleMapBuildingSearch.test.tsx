@@ -6,7 +6,7 @@ import type { Building } from '@/features/map/lib/buildings';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
   m: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div {...props}>{children}</div>
@@ -268,7 +268,7 @@ describe('GoogleMapBuildingSearch', () => {
         <GoogleMapBuildingSearch
           buildings={mockBuildings}
           selectedBuilding={mockBuildings[0]}
-          isNavigating={true}
+          isNavigating
         />,
       );
 
