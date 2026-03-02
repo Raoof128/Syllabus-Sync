@@ -8,7 +8,9 @@ import type { Building } from '@/features/map/lib/buildings';
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   m: {
-    div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{children}</div>,
+    div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div {...props}>{children}</div>
+    ),
   },
   useReducedMotion: () => false,
 }));
@@ -16,7 +18,9 @@ vi.mock('framer-motion', () => ({
 // Mock next/link
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
-    <a href={href} {...props}>{children}</a>
+    <a href={href} {...props}>
+      {children}
+    </a>
   ),
 }));
 
@@ -218,10 +222,7 @@ describe('GoogleMapBuildingSearch', () => {
       });
 
       render(
-        <GoogleMapBuildingSearch
-          buildings={mockBuildings}
-          onNavigateToBuilding={onNavigate}
-        />
+        <GoogleMapBuildingSearch buildings={mockBuildings} onNavigateToBuilding={onNavigate} />,
       );
 
       const libraryButton = screen.getByRole('button', { name: /LIB/i });
@@ -244,10 +245,7 @@ describe('GoogleMapBuildingSearch', () => {
       });
 
       render(
-        <GoogleMapBuildingSearch
-          buildings={mockBuildings}
-          selectedBuilding={mockBuildings[0]}
-        />
+        <GoogleMapBuildingSearch buildings={mockBuildings} selectedBuilding={mockBuildings[0]} />,
       );
 
       // Should show selected building details
@@ -271,7 +269,7 @@ describe('GoogleMapBuildingSearch', () => {
           buildings={mockBuildings}
           selectedBuilding={mockBuildings[0]}
           isNavigating={true}
-        />
+        />,
       );
 
       // Selected building card should be hidden during navigation
@@ -294,10 +292,7 @@ describe('GoogleMapBuildingSearch', () => {
       });
 
       render(
-        <GoogleMapBuildingSearch
-          buildings={mockBuildings}
-          selectedBuilding={mockBuildings[0]}
-        />
+        <GoogleMapBuildingSearch buildings={mockBuildings} selectedBuilding={mockBuildings[0]} />,
       );
 
       const navigateButton = screen.getByRole('button', { name: 'Navigate' });
@@ -308,7 +303,7 @@ describe('GoogleMapBuildingSearch', () => {
       expect(windowOpen).toHaveBeenCalledWith(
         expect.stringContaining('google.com/maps/dir'),
         '_blank',
-        'noopener,noreferrer'
+        'noopener,noreferrer',
       );
 
       windowOpen.mockRestore();
@@ -328,10 +323,7 @@ describe('GoogleMapBuildingSearch', () => {
       });
 
       render(
-        <GoogleMapBuildingSearch
-          buildings={mockBuildings}
-          selectedBuilding={mockBuildings[0]}
-        />
+        <GoogleMapBuildingSearch buildings={mockBuildings} selectedBuilding={mockBuildings[0]} />,
       );
 
       const externalButton = screen.getByTitle('Open in Google Maps');
@@ -342,11 +334,10 @@ describe('GoogleMapBuildingSearch', () => {
       expect(windowOpen).toHaveBeenCalledWith(
         expect.stringContaining('google.com/maps/search'),
         '_blank',
-        'noopener,noreferrer'
+        'noopener,noreferrer',
       );
 
       windowOpen.mockRestore();
     });
   });
 });
-

@@ -157,7 +157,8 @@ export default function ExamsWidget({
                             <h4
                               className={cn(
                                 'font-medium text-sm truncate',
-                                (exam.completed || isOverdue) && 'line-through decoration-mq-content-tertiary',
+                                (exam.completed || isOverdue) &&
+                                  'line-through decoration-mq-content-tertiary',
                               )}
                             >
                               {exam.title}
@@ -170,13 +171,17 @@ export default function ExamsWidget({
                               )}
                               variant="neutral"
                             >
-                              {isOverdue ? t('overdue' as TranslationKey) : t(`priority_${exam.priority}` as TranslationKey)}
+                              {isOverdue
+                                ? t('overdue' as TranslationKey)
+                                : t(`priority_${exam.priority}` as TranslationKey)}
                             </Badge>
                           </div>
-                          <p className={cn(
-                            "text-[11px] text-mq-content-secondary truncate mt-0.5",
-                            isOverdue && "text-red-600 dark:text-red-400"
-                          )}>
+                          <p
+                            className={cn(
+                              'text-[11px] text-mq-content-secondary truncate mt-0.5',
+                              isOverdue && 'text-red-600 dark:text-red-400',
+                            )}
+                          >
                             {exam.unitCode} • {formatMonthDayTime(due.toDate())}
                           </p>
                         </div>

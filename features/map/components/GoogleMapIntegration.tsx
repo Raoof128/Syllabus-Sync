@@ -1,19 +1,7 @@
 'use client';
 
-import {
-  useEffect,
-  useState,
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useMemo,
-} from 'react';
-import {
-  Navigation,
-  ArrowLeft,
-  Building2,
-  MapPin,
-} from 'lucide-react';
+import { useEffect, useState, forwardRef, useImperativeHandle, useRef, useMemo } from 'react';
+import { Navigation, ArrowLeft, Building2, MapPin } from 'lucide-react';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
 import { CAMPUS_CENTRE_GPS } from '@/features/map/lib/constants';
@@ -27,7 +15,6 @@ const MQ_CENTER = { lat: CAMPUS_CENTRE_GPS.lat, lng: CAMPUS_CENTRE_GPS.lng };
 const getEmbedApiKey = () => process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY ?? '';
 
 type MapMode = 'view' | 'directions';
-
 
 export interface GoogleMapRef {
   startNavigation: () => void;
@@ -65,7 +52,10 @@ const buildEmbedViewUrl = (building?: Building) => {
   return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${encodeURIComponent(UNIVERSITY_CONFIG.name)}&center=${MQ_CENTER.lat},${MQ_CENTER.lng}&zoom=16`;
 };
 
-const buildEmbedDirectionsUrl = (origin?: { lat: number; lng: number } | null, building?: Building) => {
+const buildEmbedDirectionsUrl = (
+  origin?: { lat: number; lng: number } | null,
+  building?: Building,
+) => {
   const key = getEmbedApiKey();
   const resolvedOrigin = origin ?? MQ_CENTER;
   const originStr = `${resolvedOrigin.lat},${resolvedOrigin.lng}`;
@@ -113,7 +103,7 @@ export const GoogleMapIntegration = forwardRef<GoogleMapRef, GoogleMapIntegratio
             setUserLoc({ lat: newLat, lng: newLng });
           },
           (err) => console.warn('GoogleMapIntegration geolocation error:', err),
-          { enableHighAccuracy: true, maximumAge: 5000, timeout: 5000 }
+          { enableHighAccuracy: true, maximumAge: 5000, timeout: 5000 },
         );
       }
       return () => {
@@ -167,9 +157,7 @@ export const GoogleMapIntegration = forwardRef<GoogleMapRef, GoogleMapIntegratio
             ) : (
               <Building2 className="h-4 w-4 text-mq-content shrink-0" />
             )}
-            <span className="text-sm font-semibold text-mq-content truncate">
-              {displayName}
-            </span>
+            <span className="text-sm font-semibold text-mq-content truncate">{displayName}</span>
             <span className="hidden text-xs text-mq-content-secondary sm:inline shrink-0">
               · {t('googleMaps')}
             </span>
@@ -201,14 +189,15 @@ export const GoogleMapIntegration = forwardRef<GoogleMapRef, GoogleMapIntegratio
           className="h-full w-full flex-1 border-0"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          aria-label={mode === 'directions' ? t('directionsIframeLabel') : t('googleMapsIframeLabel')}
+          aria-label={
+            mode === 'directions' ? t('directionsIframeLabel') : t('googleMapsIframeLabel')
+          }
           allowFullScreen
           allow="geolocation"
         />
       </div>
     );
-  }
+  },
 );
 
 GoogleMapIntegration.displayName = 'GoogleMapIntegration';
-

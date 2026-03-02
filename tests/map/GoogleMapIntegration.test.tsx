@@ -37,7 +37,7 @@ const TEST_API_KEY = 'test-api-key-456';
 
 describe('GoogleMapIntegration', () => {
   const installGeolocationMock = (
-    watchImpl?: (success: PositionCallback, error?: PositionErrorCallback) => number
+    watchImpl?: (success: PositionCallback, error?: PositionErrorCallback) => number,
   ) => {
     const originalGeolocation = navigator.geolocation;
     const clearWatch = vi.fn();
@@ -112,7 +112,6 @@ describe('GoogleMapIntegration', () => {
     expect(iframe.getAttribute('src')).toContain(`key=${TEST_EMBED_KEY}`);
   });
 
-
   it('switches to directions mode via ref', () => {
     const ref = React.createRef<GoogleMapRef>();
     render(<GoogleMapIntegration ref={ref} />);
@@ -125,7 +124,7 @@ describe('GoogleMapIntegration', () => {
     const iframe = screen.getByTitle('Directions to Macquarie University');
     expect(iframe.getAttribute('src')).toContain('maps/embed/v1/directions');
     expect(iframe.getAttribute('src')).toContain(
-      `origin=${encodeURIComponent(`${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`)}`
+      `origin=${encodeURIComponent(`${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`)}`,
     );
     expect(iframe.getAttribute('src')).toContain('mode=walking');
   });
@@ -160,7 +159,7 @@ describe('GoogleMapIntegration', () => {
     const ref = React.createRef<GoogleMapRef>();
 
     const { unmount } = render(
-      <GoogleMapIntegration ref={ref} onNavStateChange={onNavStateChange} />
+      <GoogleMapIntegration ref={ref} onNavStateChange={onNavStateChange} />,
     );
 
     act(() => {
@@ -228,4 +227,3 @@ describe('GoogleMapIntegration', () => {
     });
   });
 });
-

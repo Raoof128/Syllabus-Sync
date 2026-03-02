@@ -234,7 +234,7 @@ const TodaySchedule = memo(() => {
                       : cls.status === 'done'
                         ? 'bg-mq-background-secondary opacity-60'
                         : 'bg-mq-background-secondary hover:bg-mq-hover-background'
-                }`}
+                } focus:bg-mq-primary/10 focus:border-mq-primary/40 focus:shadow-sm`}
                 aria-label={`${cls.code} - ${cls.name}, ${formatScheduleTime(cls.startTime, language)} - ${formatScheduleTime(cls.endTime, language)} at ${formatLocation(cls.location.building, cls.location.room, t('room'))}, ${cls.status}`}
               >
                 {/* Progress bar for "now" status */}

@@ -171,7 +171,7 @@ const TodosWidget = memo(() => {
                 <div
                   key={todo.id}
                   className={cn(
-                    'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer',
+                    'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 focus:ring-offset-mq-card-background focus:bg-mq-primary/10 focus:border-mq-primary/40 focus:shadow-sm',
                     'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
                   onClick={() =>

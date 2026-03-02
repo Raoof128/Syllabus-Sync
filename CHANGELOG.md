@@ -1,3 +1,45 @@
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Selection Highlight Parity (Final Verification)
+Summary: Completed homepage selected-card highlight parity rollout. Interactive cards in `TodaySchedule`, `UpcomingDeadlines`, `TodosWidget`, `UserEventsWidget`, and `EventsFeed` now consistently show red-accent selected/focus state aligned with other pages.
+Files: Modified `features/home/components/TodaySchedule.tsx`, `features/home/components/UpcomingDeadlines.tsx`, `features/home/components/TodosWidget.tsx`, `features/home/components/UserEventsWidget.tsx`, `features/home/components/EventsFeed.tsx`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/home/components/TodaySchedule.tsx features/home/components/UpcomingDeadlines.tsx features/home/components/TodosWidget.tsx features/home/components/UserEventsWidget.tsx features/home/components/EventsFeed.tsx` ✅; `npm run test -- tests/TodaySchedule.test.tsx tests/EventsFeed.spec.tsx` ✅ (4/4); `npm run typecheck` ✅.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 5)
+Summary: Finished homepage selected-card highlight parity by updating `EventsFeed` cards with red-accent selected/focus styling (ring + border + subtle background) to match interaction behavior on other pages.
+Files: Modified `features/home/components/EventsFeed.tsx`.
+Verification: Pending (targeted lint/tests executing next).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 4)
+Summary: Applied Home selected-card visual parity to `UserEventsWidget`. Interactive event rows now render red-accent selected/focus styling (ring + border + soft background) to match other page card-selection behavior.
+Files: Modified `features/home/components/UserEventsWidget.tsx`.
+Verification: Pending (consolidated verification after final homepage widget update).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 3)
+Summary: Extended Home selected-card highlight consistency to `TodosWidget`. Interactive todo rows now show red-accent selected/focus styling (ring + border + soft background) consistent with other pages.
+Files: Modified `features/home/components/TodosWidget.tsx`.
+Verification: Pending (final validation after remaining widget updates).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Accessibility Correction During Highlight Rollout
+Summary: Removed unsupported `aria-selected` on Home `UpcomingDeadlines` row elements (role=`button`) to keep ARIA usage valid while preserving the new red selected/focus highlight behavior.
+Files: Modified `features/home/components/UpcomingDeadlines.tsx`.
+Verification: Pending (full validation after remaining homepage updates).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 2)
+Summary: Applied the selected-card red highlight pattern to Home `UpcomingDeadlines` rows. Interactive deadline cards now show visible red selection/focus state (ring + border + subtle background) consistent with other pages.
+Files: Modified `features/home/components/UpcomingDeadlines.tsx`.
+Verification: Pending (batched validation after remaining homepage widget updates).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 1)
+Summary: Started homepage interaction consistency pass and implemented the first fix for selected-card highlighting on Home. `TodaySchedule` interactive class rows now show a red-accent selected/focus state (`focus:bg-mq-primary/10`, `focus:border-mq-primary/40`, `focus:shadow-sm`) aligned with selection patterns used on other pages.
+Files: Modified `features/home/components/TodaySchedule.tsx`.
+Verification: Pending (to be executed after completing all related homepage card updates).
+
 Agent: 2026-03-02 (Australia/Sydney)
 Scope: Google Maps View — Building Search Integration
 Summary: Implemented building search functionality for the Google Maps view, matching the campus map's search capability but with Google Maps styling and navigation integration. Created `GoogleMapBuildingSearch` component with Google Maps-inspired design (white cards, shadows, blue accents). Features include: expandable search panel, keyboard shortcut (⌘K), building filtering by name/code/address/tags, selected building info card with direct Google Maps navigation buttons. Updated `GoogleMapIntegration` to accept `selectedBuilding` prop and dynamically update the iframe to center on or navigate to the selected building. Added comprehensive test coverage for the new component.

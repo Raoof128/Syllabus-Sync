@@ -129,7 +129,7 @@ const EventsFeed = memo(() => {
               );
 
               const baseClassName =
-                'group block p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)]';
+                'group block p-3 bg-mq-background-secondary rounded-lg border border-mq-border hover:bg-mq-hover-background transition-all duration-300 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 focus:ring-offset-mq-card-background focus:bg-mq-primary/10 focus:border-mq-primary/40 focus:shadow-sm';
 
               return (
                 <button

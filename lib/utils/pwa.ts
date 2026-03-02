@@ -15,7 +15,8 @@ export function isRunningAsPWA(): boolean {
 
   // iOS Safari standalone mode
   const isIOSStandalone =
-    'standalone' in window.navigator && (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+    'standalone' in window.navigator &&
+    (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
 
   // Check for display-mode: standalone (works for most browsers)
   const isStandaloneDisplayMode =
@@ -29,6 +30,7 @@ export function isRunningAsPWA(): boolean {
   const isMinimalUIDisplayMode =
     window.matchMedia?.('(display-mode: minimal-ui)')?.matches ?? false;
 
-  return isIOSStandalone || isStandaloneDisplayMode || isFullscreenDisplayMode || isMinimalUIDisplayMode;
+  return (
+    isIOSStandalone || isStandaloneDisplayMode || isFullscreenDisplayMode || isMinimalUIDisplayMode
+  );
 }
-

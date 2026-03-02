@@ -95,15 +95,12 @@ export function GoogleMapBuildingSearch({
     });
   }, [buildings, searchQuery, t]);
 
-  const buildMapHref = useCallback(
-    (buildingId?: string) => {
-      const params = new URLSearchParams();
-      params.set('view', 'google');
-      if (buildingId) params.set('building', buildingId);
-      return `/map?${params.toString()}`;
-    },
-    []
-  );
+  const buildMapHref = useCallback((buildingId?: string) => {
+    const params = new URLSearchParams();
+    params.set('view', 'google');
+    if (buildingId) params.set('building', buildingId);
+    return `/map?${params.toString()}`;
+  }, []);
 
   const handleBuildingSelect = useCallback(
     (building: Building) => {
@@ -112,7 +109,7 @@ export function GoogleMapBuildingSearch({
       setSearchQuery('');
       onNavigateToBuilding?.(building);
     },
-    [onNavigateToBuilding]
+    [onNavigateToBuilding],
   );
 
   const openInGoogleMaps = useCallback((building: Building) => {
@@ -142,7 +139,7 @@ export function GoogleMapBuildingSearch({
         className={cn(
           'pointer-events-auto rounded-lg bg-white shadow-lg transition-all duration-200',
           'dark:bg-[#202124] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]',
-          isExpanded && 'shadow-xl dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)]'
+          isExpanded && 'shadow-xl dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
         )}
       >
         {/* Search Header */}
@@ -158,7 +155,7 @@ export function GoogleMapBuildingSearch({
           className={cn(
             'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors',
             'hover:bg-gray-50 dark:hover:bg-[#303134]',
-            isExpanded && 'border-b border-gray-200 dark:border-gray-700'
+            isExpanded && 'border-b border-gray-200 dark:border-gray-700',
           )}
           aria-expanded={isExpanded}
           aria-controls="google-map-building-search"
@@ -168,11 +165,7 @@ export function GoogleMapBuildingSearch({
             {t('searchBuildingsPlaceholder')}
           </span>
           <span className="text-gray-400 dark:text-gray-500">
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </span>
         </button>
 
@@ -205,7 +198,7 @@ export function GoogleMapBuildingSearch({
                       'placeholder:text-gray-500 dark:placeholder:text-gray-400',
                       'border-2 border-transparent transition-all',
                       'focus:outline-none focus:bg-white dark:focus:bg-[#202124]',
-                      'focus:border-[#4285f4] focus:shadow-sm'
+                      'focus:border-[#4285f4] focus:shadow-sm',
                     )}
                   />
                   {searchQuery && (
@@ -244,13 +237,14 @@ export function GoogleMapBuildingSearch({
                             className={cn(
                               'w-full flex items-start gap-3 px-4 py-3 text-left transition-colors',
                               'hover:bg-gray-50 dark:hover:bg-[#303134]',
-                              isSelected && 'bg-blue-50 dark:bg-[#303134] border-l-4 border-[#4285f4]'
+                              isSelected &&
+                                'bg-blue-50 dark:bg-[#303134] border-l-4 border-[#4285f4]',
                             )}
                           >
                             <MapPin
                               className={cn(
                                 'h-5 w-5 mt-0.5 shrink-0',
-                                isSelected ? 'text-[#4285f4]' : 'text-[#ea4335]'
+                                isSelected ? 'text-[#4285f4]' : 'text-[#ea4335]',
                               )}
                             />
                             <div className="flex-1 min-w-0">
@@ -259,7 +253,7 @@ export function GoogleMapBuildingSearch({
                                   'text-sm font-medium truncate',
                                   isSelected
                                     ? 'text-[#4285f4]'
-                                    : 'text-gray-900 dark:text-gray-100'
+                                    : 'text-gray-900 dark:text-gray-100',
                                 )}
                               >
                                 {building.id}
@@ -334,7 +328,7 @@ export function GoogleMapBuildingSearch({
                   className={cn(
                     'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full',
                     'bg-[#4285f4] hover:bg-[#3367d6] text-white',
-                    'text-sm font-medium transition-colors'
+                    'text-sm font-medium transition-colors',
                   )}
                 >
                   <Navigation className="h-4 w-4" />
@@ -347,7 +341,7 @@ export function GoogleMapBuildingSearch({
                     'flex items-center justify-center gap-2 px-4 py-2.5 rounded-full',
                     'bg-gray-100 hover:bg-gray-200 dark:bg-[#303134] dark:hover:bg-[#3c4043]',
                     'text-gray-700 dark:text-gray-200',
-                    'text-sm font-medium transition-colors'
+                    'text-sm font-medium transition-colors',
                   )}
                   title={t('openInGoogleMaps')}
                 >
@@ -361,4 +355,3 @@ export function GoogleMapBuildingSearch({
     </div>
   );
 }
-

@@ -1,3 +1,45 @@
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Selection Highlight Parity (Final Verification)
+Summary: Finalized homepage audit for card selection consistency. Confirmed red-accent selected/focus highlight parity across all interactive Home list cards (`TodaySchedule`, `UpcomingDeadlines`, `TodosWidget`, `UserEventsWidget`, `EventsFeed`) while keeping existing behavior intact.
+Files Changed: `features/home/components/TodaySchedule.tsx`, `features/home/components/UpcomingDeadlines.tsx`, `features/home/components/TodosWidget.tsx`, `features/home/components/UserEventsWidget.tsx`, `features/home/components/EventsFeed.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/home/components/TodaySchedule.tsx features/home/components/UpcomingDeadlines.tsx features/home/components/TodosWidget.tsx features/home/components/UserEventsWidget.tsx features/home/components/EventsFeed.tsx` ✅, `npm run test -- tests/TodaySchedule.test.tsx tests/EventsFeed.spec.tsx` ✅ (4/4), `npm run typecheck` ✅.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 5)
+Summary: Completed homepage selected-card highlight rollout by updating `EventsFeed` event cards to include red selected/focus styling (primary ring, border, subtle background) matching selection UX across other pages.
+Files Changed: `features/home/components/EventsFeed.tsx`
+Verification: Pending (running targeted lint/tests after this final widget update).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 4)
+Summary: Applied selected/focus red highlight parity to Home `UserEventsWidget` interactive event rows. Event rows now visibly indicate selection/focus with primary ring/background/border to align with app-wide selected-card behavior.
+Files Changed: `features/home/components/UserEventsWidget.tsx`
+Verification: Pending (final consolidated validation after remaining Home widget update).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 3)
+Summary: Applied red selected/focus highlight treatment to Home `TodosWidget` interactive rows. Todo cards now surface clear selected state with primary ring/background/border parity to other app card-selection interactions.
+Files Changed: `features/home/components/TodosWidget.tsx`
+Verification: Pending (batched verification after all homepage highlight updates complete).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Accessibility Correction During Highlight Rollout
+Summary: Removed unsupported `aria-selected` usage from `UpcomingDeadlines` rows (role=`button`) during the homepage highlight consistency pass to keep ARIA semantics valid while retaining new selected/focus visual behavior.
+Files Changed: `features/home/components/UpcomingDeadlines.tsx`
+Verification: Pending (full lint + targeted tests after all homepage updates).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 2)
+Summary: Extended red selection/focus highlight behavior to `UpcomingDeadlines` interactive rows for parity with other page card-selection UX. Added focus ring/background/border selected styling on keyboard and click focus paths to surface explicit card selection on Home.
+Files Changed: `features/home/components/UpcomingDeadlines.tsx`
+Verification: Pending (batched verification to run after all homepage card-list updates are complete).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home Page Audit — Card Selection Highlight Consistency (Phase 1)
+Summary: Started homepage interaction audit and applied first consistency fix so selected/focused class cards visually match the red-accent selection pattern used elsewhere. Updated `TodaySchedule` class cards to include explicit selected/focus red highlight (`focus:bg-mq-primary/10`, `focus:border-mq-primary/40`, `focus:shadow-sm`) while preserving existing status colors (`now`, `next`, `done`).
+Files Changed: `features/home/components/TodaySchedule.tsx`
+Verification: Pending (full targeted verification runs after all homepage card updates complete).
+
 Raouf: 2026-03-01 (Australia/Sydney)
 Scope: Notification System Full Audit & Flow Trace
 Summary: Comprehensive audit of the entire notification system — 17 source files, 3 test suites (46 notification-specific tests), 4 API routes, 3 Zustand stores, 1 service singleton, 1 service worker. Traced complete notification flow end-to-end: (1) **Creation path**: User action (e.g. set reminder in ReminderModal) → notificationsStore.addNotification() → optimistic insert with temp-ID → POST /api/notifications → Supabase insert → server response replaces temp-ID with real UUID; handles 409 conflict by reloading. (2) **Display path**: Header mount → loadNotifications() → GET /api/notifications (paginated, soft-delete filtered, 3-min stale window) → Zustand state → bell icon badge + dropdown list with type-colored icons (Clock/Calendar/BookOpen/Info). (3) **Push notification path**: useNotificationScheduler reads deadlines/classes/events → notificationPreferencesStore schedules setTimeout reminders → at fire time, notificationService.sendNotification() → Service Worker showNotification (with fallback to Notification API) → click handler navigates to notification link. (4) **Reminder persistence**: remindersStore persists to localStorage; notificationPreferencesStore persists pendingReminders; on page reload reschedulePending() restores in-flight timers. (5) **Mutation path**: markAsRead/markAllAsRead/removeNotification/clearAll all use optimistic UI with rollback on API failure; DELETE uses soft-delete (sets deleted_at); all queries filter `.is('deleted_at', null)`. Architecture: Well-separated — API routes (server persistence + auth + rate-limiting), Zustand stores (UI state + scheduling), notificationService (browser API abstraction), SW (caching only, no push handler). Security: All API routes use requireAuth/requireAuthWithRateLimit middleware, CSRF validated on mutations, no PII leakage. Tests: 46 notification tests pass (4 API soft-delete consistency + 5 store CRUD + 4 store-critical state management + 13 NotificationSettings UI + 20 scattered in stores.test.ts).

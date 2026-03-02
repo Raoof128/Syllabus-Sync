@@ -169,13 +169,17 @@ export default function AssignmentsWidget({
                               )}
                               variant="neutral"
                             >
-                              {isOverdue ? t('overdue' as TranslationKey) : t(`priority_${assignment.priority}` as TranslationKey)}
+                              {isOverdue
+                                ? t('overdue' as TranslationKey)
+                                : t(`priority_${assignment.priority}` as TranslationKey)}
                             </Badge>
                           </div>
-                          <p className={cn(
-                            "text-[11px] text-mq-content-secondary truncate mt-0.5",
-                            isOverdue && "text-red-600 dark:text-red-400"
-                          )}>
+                          <p
+                            className={cn(
+                              'text-[11px] text-mq-content-secondary truncate mt-0.5',
+                              isOverdue && 'text-red-600 dark:text-red-400',
+                            )}
+                          >
                             {assignment.unitCode} • {formatMonthDayTime(due.toDate())}
                           </p>
                         </div>

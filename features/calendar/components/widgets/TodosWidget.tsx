@@ -181,7 +181,8 @@ export default function TodosWidget({
                           <h4
                             className={cn(
                               'font-medium text-sm truncate',
-                              (todo.completed || isOverdue) && 'line-through decoration-mq-content-tertiary',
+                              (todo.completed || isOverdue) &&
+                                'line-through decoration-mq-content-tertiary',
                             )}
                           >
                             {todo.title}
@@ -194,13 +195,17 @@ export default function TodosWidget({
                             )}
                             variant="neutral"
                           >
-                            {isOverdue ? t('overdue' as TranslationKey) : t(`priority_${todo.priority}` as TranslationKey)}
+                            {isOverdue
+                              ? t('overdue' as TranslationKey)
+                              : t(`priority_${todo.priority}` as TranslationKey)}
                           </Badge>
                         </div>
-                        <p className={cn(
-                          "text-[11px] text-mq-content-secondary truncate mt-0.5",
-                          isOverdue && "text-red-600 dark:text-red-400"
-                        )}>
+                        <p
+                          className={cn(
+                            'text-[11px] text-mq-content-secondary truncate mt-0.5',
+                            isOverdue && 'text-red-600 dark:text-red-400',
+                          )}
+                        >
                           {formatMonthDayTime(due.toDate())}
                         </p>
                       </div>
