@@ -12,6 +12,7 @@ This folder contains presentation-grade project documentation for the Macquarie 
 ## Operations Entry Points
 
 - Resend + Vercel email setup: `/docs/operations/resend-vercel-setup.md`
+- Google Maps Embed API setup: `/docs/operations/google-maps-embed-setup.md`
 
 ## Policy Entry Points
 

@@ -1,4 +1,76 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Embedded Presence Audit — Read-Only Verification
+Summary: Performed a full verification audit to ensure embedded Google Maps was not removed. Confirmed live path remains intact: `MapClient` renders `GoogleMapIntegration` in Google view, and `GoogleMapIntegration` delegates to `GoogleMapEmbed`, which renders iframe-based maps/directions for both API-key and no-key fallback modes (`maps/embed/v1/*` and `google.com/maps?output=embed`). Verified env/docs references for `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` and operational setup runbook availability.
+Files Changed: None (read-only audit)
+Verification: `npm run test -- tests/map` ✅ (104/104), `npm run typecheck` ✅, `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapEmbed.tsx features/map/components/GoogleMapIntegration.tsx tests/map/GoogleMapEmbed.test.tsx tests/map/GoogleMapIntegration.test.tsx` ✅.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Final Consolidation & Verification
+Summary: Completed end-to-end Google Maps audit and production hardening. Consolidated `GoogleMapIntegration` to the canonical `GoogleMapEmbed` path to remove duplicate embed URL logic and keep key/no-key behavior consistent. Updated integration tests to match canonical behavior, hardened Google Maps env templates, added README quick-start guidance, added an operations runbook for API key setup/security restrictions, and indexed the runbook in docs.
+Files Changed: `features/map/components/GoogleMapIntegration.tsx`, `tests/map/GoogleMapIntegration.test.tsx`, `.env.example`, `.env.local.example`, `README.md`, `docs/README.md`, `docs/operations/google-maps-embed-setup.md`
+Verification: `npm run test -- tests/map` ✅ (104/104), `npm run test -- tests/map/GoogleMapIntegration.test.tsx tests/map/GoogleMapEmbed.test.tsx tests/map/GoogleMapBuildingSearch.test.tsx` ✅ (30/30), `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapIntegration.tsx tests/map/GoogleMapIntegration.test.tsx` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Type Fix (Step 9)
+Summary: Resolved TypeScript import/type shadowing in `GoogleMapIntegration` by exporting `GoogleMapRef` as an alias to `GoogleMapEmbed` ref type instead of redeclaring it locally.
+Files Changed: `features/map/components/GoogleMapIntegration.tsx`
+Verification: Pending (rerunning typecheck + map verification).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Lint Cleanup (Step 8b)
+Summary: Removed an unused `makePosition` helper from `GoogleMapIntegration` tests to keep map test suite lint-clean after consolidation.
+Files Changed: `tests/map/GoogleMapIntegration.test.tsx`
+Verification: Pending (final lint/typecheck + map test rerun next).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Lint Cleanup (Step 8a)
+Summary: Removed an unused `MapMode` type alias from the consolidated `GoogleMapIntegration` wrapper after refactor.
+Files Changed: `features/map/components/GoogleMapIntegration.tsx`
+Verification: Pending (final lint/typecheck verification after remaining cleanup).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Docs Index Wiring (Step 7)
+Summary: Added Google Maps Embed setup runbook link to the documentation index operations entry points for discoverability.
+Files Changed: `docs/README.md`
+Verification: Pending (full map-focused lint/test/typecheck validation next).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Operations Runbook Added (Step 6)
+Summary: Added a dedicated operational runbook for Google Maps Embed API setup including key creation, API enablement, security restrictions (HTTP referrer + API restriction), local/Vercel configuration commands, verification flow, and troubleshooting.
+Files Changed: `docs/operations/google-maps-embed-setup.md`
+Verification: Pending (final validation after docs index wiring and map test/lint/typecheck run).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — README Setup Coverage (Step 5)
+Summary: Expanded README environment/setup guidance with a Google Maps Embed quick-setup checklist and direct link to the new operations runbook path for API key configuration.
+Files Changed: `README.md`
+Verification: Pending (final docs/link + test validation after runbook addition).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Local Env Template Hardening (Step 4)
+Summary: Updated `.env.local.example` Google Maps section to align with runtime behavior: key marked as recommended for production consistency and fallback clarified as keyless in-iframe mode.
+Files Changed: `.env.local.example`
+Verification: Pending (full map+docs validation after remaining documentation edits).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Env Template Hardening (Step 3)
+Summary: Updated `.env.example` Google Maps section for production clarity: marked embed key as recommended for stable deploys, corrected fallback description to in-iframe keyless behavior, and removed unused `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` entry to avoid configuration drift.
+Files Changed: `.env.example`
+Verification: Pending (map-focused validation continues after documentation updates).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Test Alignment (Step 2)
+Summary: Updated `GoogleMapIntegration` tests to match the consolidated embed implementation: removed unused API env var expectations, aligned no-key fallback assertion to `google.com/maps?output=embed`, and validated selected-building iframe destination via encoded coordinates.
+Files Changed: `tests/map/GoogleMapIntegration.test.tsx`
+Verification: Pending (full map test suite to run after remaining audit documentation/config updates).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps Full Audit — Component Consolidation (Step 1)
+Summary: Started Google Maps production audit remediation by removing duplicate embed logic in `GoogleMapIntegration` and delegating to the canonical `GoogleMapEmbed` implementation. This eliminates divergence between two parallel iframe URL builders and keeps navigation/view behavior consistent across map modes.
+Files Changed: `features/map/components/GoogleMapIntegration.tsx`
+Verification: Pending (targeted map tests + lint + typecheck after remaining audit updates).
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Home Page Audit — Selection Highlight Parity (Final Verification)
 Summary: Finalized homepage audit for card selection consistency. Confirmed red-accent selected/focus highlight parity across all interactive Home list cards (`TodaySchedule`, `UpcomingDeadlines`, `TodosWidget`, `UserEventsWidget`, `EventsFeed`) while keeping existing behavior intact.
 Files Changed: `features/home/components/TodaySchedule.tsx`, `features/home/components/UpcomingDeadlines.tsx`, `features/home/components/TodosWidget.tsx`, `features/home/components/UserEventsWidget.tsx`, `features/home/components/EventsFeed.tsx`

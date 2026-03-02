@@ -33,7 +33,6 @@ vi.mock('@/lib/hooks/useSafeTranslation', () => ({
 }));
 
 const TEST_EMBED_KEY = 'test-embed-key-123';
-const TEST_API_KEY = 'test-api-key-456';
 
 describe('GoogleMapIntegration', () => {
   const installGeolocationMock = (
@@ -80,28 +79,12 @@ describe('GoogleMapIntegration', () => {
     };
   };
 
-  const makePosition = (lat: number, lng: number): GeolocationPosition =>
-    ({
-      coords: {
-        latitude: lat,
-        longitude: lng,
-        accuracy: 5,
-        altitude: null,
-        altitudeAccuracy: null,
-        heading: null,
-        speed: null,
-      },
-      timestamp: Date.now(),
-    }) as GeolocationPosition;
-
   beforeEach(() => {
     process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY = TEST_EMBED_KEY;
-    process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY = TEST_API_KEY;
   });
 
   afterEach(() => {
     delete process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
-    delete process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   });
 
   it('renders the iframe in view mode by default', () => {
@@ -185,15 +168,16 @@ describe('GoogleMapIntegration', () => {
   describe('fallback (no API key)', () => {
     beforeEach(() => {
       delete process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
-      delete process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     });
 
     it('renders fallback embedded view iframe when no API key', () => {
       render(<GoogleMapIntegration />);
       const iframe = screen.getByTitle('Google Maps — Macquarie University');
       expect(iframe).toBeTruthy();
-      // Check that it uses the fallback URL format
-      expect(iframe.getAttribute('src')).toContain('google.com/maps/embed');
+      expect(iframe.getAttribute('src')).toContain('google.com/maps?output=embed');
+      expect(iframe.getAttribute('src')).toContain(
+        `q=${encodeURIComponent(`${CAMPUS_CENTRE_GPS.lat},${CAMPUS_CENTRE_GPS.lng}`)}`,
+      );
     });
   });
 
@@ -223,7 +207,9 @@ describe('GoogleMapIntegration', () => {
 
       render(<GoogleMapIntegration selectedBuilding={testBuilding} />);
       const iframe = document.querySelector('iframe');
-      expect(iframe?.getAttribute('src')).toContain('Waranara');
+      expect(iframe?.getAttribute('src')).toContain(
+        encodeURIComponent(`${testBuilding.location.lat},${testBuilding.location.lng}`),
+      );
     });
   });
 });

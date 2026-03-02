@@ -199,7 +199,15 @@ Email (Resend) + Vercel notes:
 - Google embedded map mode should use `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` in every deployed environment
   to guarantee consistent in-app iframe behavior.
 - Setup guide: `docs/operations/resend-vercel-setup.md`
+- Google Maps Embed setup guide: `docs/operations/google-maps-embed-setup.md`
 - OAuth setup: `docs/operations/supabase-oauth-setup.md`
+
+Google Maps Embed quick setup:
+
+1. In Google Cloud, enable **Maps Embed API**.
+2. Create an API key and restrict it to your app domains (HTTP referrers).
+3. Add `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` to `.env.local` (local) and Vercel envs (preview/production).
+4. Restart the app and open `/map?view=google` to verify map + directions iframe rendering.
 
 If you deploy to Vercel using the CLI, the repo includes pinned scripts:
 
