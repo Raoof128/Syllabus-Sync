@@ -280,16 +280,10 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3
-                    className="text-2xl font-bold tracking-tight"
-                    style={{ color: '#ffffff' }}
-                  >
+                  <h3 className="text-overlay-white text-2xl font-bold tracking-tight">
                     {dev.name}
                   </h3>
-                  <p
-                    className="mt-1 text-sm font-medium"
-                    style={{ color: 'rgba(255,255,255,0.8)' }}
-                  >
+                  <p className="text-overlay-white-muted mt-1 text-sm font-medium">
                     {dev.role}
                   </p>
                 </div>

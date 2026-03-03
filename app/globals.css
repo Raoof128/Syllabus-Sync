@@ -220,6 +220,18 @@
 }
 
 /* ============================================
+   FORCE WHITE TEXT (photo overlay cards)
+   ============================================ */
+.text-overlay-white {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+.text-overlay-white-muted {
+  color: rgba(255, 255, 255, 0.8) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* ============================================
    CUSTOM SCROLLBAR STYLES
    ============================================ */
 .scrollbar-thin {
