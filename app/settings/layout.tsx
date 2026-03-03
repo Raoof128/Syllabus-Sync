@@ -56,7 +56,6 @@ const SECTIONS: {
   },
 ];
 
-export const SETTINGS_SECTION_PATHS = SECTIONS.map((section) => section.path);
 
 function SettingsLayout({ children }: { children?: React.ReactNode }) {
   const isClient = useHydration();

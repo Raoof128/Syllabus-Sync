@@ -7,11 +7,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { Home, Calendar, Newspaper, Map, Users } from 'lucide-react';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { QUICK_ACTION_LINKS } from '@/features/settings/constants';
 
 type QuickActionsProps = {
   t: (key: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
+// Map icon keys to icon components
+const iconMap = {
+  Home,
+  Calendar,
+  Newspaper,
+  Map,
+  Users,
+} as const;
+
+/**
+ * @deprecated Use QUICK_ACTION_LINKS from '@/features/settings/constants' instead
+ */
 export const quickActionLinks: {
   href: string;
   labelKey: TranslationKey;
@@ -36,7 +49,8 @@ const QuickActions = memo(({ t }: QuickActionsProps) => {
           role="navigation"
           aria-labelledby="quick-actions-heading"
         >
-          {quickActionLinks.map(({ href, labelKey, icon: Icon }) => {
+          {QUICK_ACTION_LINKS.map(({ href, labelKey, iconKey }) => {
+            const Icon = iconMap[iconKey];
             // Remove emoji from the label if present
             const label = t(labelKey).replace(
               /^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]\s*/u,

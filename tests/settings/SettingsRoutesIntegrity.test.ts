@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { SETTINGS_SECTION_PATHS } from '@/app/settings/layout';
-import { quickActionLinks } from '@/features/settings/components/QuickActions';
+import { SETTINGS_SECTION_PATHS, QUICK_ACTION_LINKS } from '@/features/settings/constants';
 import { GAMIFICATION_SETTINGS_ROUTE } from '@/components/layout/Sidebar';
 
 function routeHasPageFile(route: string): boolean {
@@ -19,7 +18,7 @@ describe('Settings route integrity', () => {
   });
 
   it('all quick action routes map to app page files', () => {
-    for (const { href } of quickActionLinks) {
+    for (const { href } of QUICK_ACTION_LINKS) {
       expect(routeHasPageFile(href)).toBe(true);
     }
   });

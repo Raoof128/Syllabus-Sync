@@ -126,7 +126,7 @@ export const usePublicEventsStore = create<PublicEventsState>()(
 
           // Check which events user has already added
           await get().checkUserEvents();
-        } catch (error) {
+        } catch (_error) {
           // Network/other error — use fallback sample events
           const now = new Date();
           const fallback = SAMPLE_PUBLIC_EVENTS.filter((e) => e.startAt >= now);
