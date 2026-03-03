@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import TodaySchedule from '@/features/home/components/TodaySchedule';
 import UpcomingDeadlines from '@/features/home/components/UpcomingDeadlines';
@@ -56,6 +57,11 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   useHomeEventListeners();
 
   const [fabOpen, setFabOpen] = useState(false);
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setPortalTarget(document.body);
+  }, []);
 
   if (hasError) {
     return (
@@ -269,99 +275,105 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
           </ScrollReveal>
         </section>
 
-        {/* Floating Action Button (FAB) for Quick Actions */}
-        <m.div
-          className="fixed z-50 right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] sm:right-[max(1.5rem,env(safe-area-inset-right))] sm:bottom-[max(1.5rem,env(safe-area-inset-bottom))]"
-          initial={{ scale: 0.96, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-        >
-          <div className="relative">
-            {/* FAB Menu */}
-            {fabOpen && (
-              <m.div
-                initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                className="absolute bottom-16 right-0 flex flex-col gap-2 items-end max-w-[calc(100vw-2rem)]"
-              >
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                  onClick={() => {
-                    router.push('/calendar?highlightWidget=units&action=add-unit');
-                    setFabOpen(false);
-                  }}
-                >
-                  <BookOpen className="h-4 w-4 text-mq-content" />
-                  {t('addUnitClass')}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                  onClick={() => {
-                    router.push('/calendar?highlightWidget=exams&action=add-exam');
-                    setFabOpen(false);
-                  }}
-                >
-                  <GraduationCap className="h-4 w-4 text-mq-content" />
-                  {t('addExam')}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                  onClick={() => {
-                    router.push('/calendar?highlightWidget=assignments&action=add-assignment');
-                    setFabOpen(false);
-                  }}
-                >
-                  <FileText className="h-4 w-4 text-mq-content" />
-                  {t('addAssignment')}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                  onClick={() => {
-                    router.push('/calendar?highlightWidget=events&action=add-event');
-                    setFabOpen(false);
-                  }}
-                >
-                  <Calendar className="h-4 w-4 text-mq-content" />
-                  {t('addEvent')}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                  onClick={() => {
-                    router.push('/calendar?highlightWidget=todos&action=add-todo');
-                    setFabOpen(false);
-                  }}
-                >
-                  <ListTodo className="h-4 w-4 text-mq-content" />
-                  {t('addTodo')}
-                </Button>
-              </m.div>
-            )}
+        {/* Floating Action Button (FAB) - rendered via portal to escape overflow:auto clipping */}
+        {portalTarget &&
+          createPortal(
+            <div className="fixed bottom-6 right-6 z-[9999]">
+              <LazyMotion features={domAnimation}>
+                <div className="relative">
+                  {/* FAB Menu */}
+                  {fabOpen && (
+                    <m.div
+                      initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                      className="absolute bottom-16 right-0 flex flex-col gap-2 items-end"
+                    >
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => {
+                          router.push('/calendar?highlightWidget=units&action=add-unit');
+                          setFabOpen(false);
+                        }}
+                      >
+                        <BookOpen className="h-4 w-4 text-mq-content" />
+                        {t('addUnitClass')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => {
+                          router.push('/calendar?highlightWidget=exams&action=add-exam');
+                          setFabOpen(false);
+                        }}
+                      >
+                        <GraduationCap className="h-4 w-4 text-mq-content" />
+                        {t('addExam')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => {
+                          router.push(
+                            '/calendar?highlightWidget=assignments&action=add-assignment',
+                          );
+                          setFabOpen(false);
+                        }}
+                      >
+                        <FileText className="h-4 w-4 text-mq-content" />
+                        {t('addAssignment')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => {
+                          router.push('/calendar?highlightWidget=events&action=add-event');
+                          setFabOpen(false);
+                        }}
+                      >
+                        <Calendar className="h-4 w-4 text-mq-content" />
+                        {t('addEvent')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                        onClick={() => {
+                          router.push('/calendar?highlightWidget=todos&action=add-todo');
+                          setFabOpen(false);
+                        }}
+                      >
+                        <ListTodo className="h-4 w-4 text-mq-content" />
+                        {t('addTodo')}
+                      </Button>
+                    </m.div>
+                  )}
 
-            {/* Main FAB Button */}
-            <Button
-              size="lg"
-              className="h-14 w-14 rounded-full shadow-lg p-0"
-              onClick={() => setFabOpen(!fabOpen)}
-              aria-expanded={fabOpen}
-              aria-label={t('quickActions')}
-            >
-              <m.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
-                <Plus className="h-6 w-6" />
-              </m.div>
-            </Button>
-          </div>
-        </m.div>
+                  {/* Main FAB Button */}
+                  <Button
+                    size="lg"
+                    className="h-14 w-14 rounded-full shadow-lg p-0"
+                    onClick={() => setFabOpen(!fabOpen)}
+                    aria-expanded={fabOpen}
+                    aria-label={t('quickActions')}
+                  >
+                    <m.div
+                      animate={{ rotate: fabOpen ? 45 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Plus className="h-6 w-6" />
+                    </m.div>
+                  </Button>
+                </div>
+              </LazyMotion>
+            </div>,
+            portalTarget,
+          )}
       </section>
     </LazyMotion>
   );

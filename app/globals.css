@@ -239,3 +239,24 @@
   background: var(--mq-border);
   border-radius: 3px;
 }
+
+/* ============================================
+   ACTION BUTTON VISIBILITY
+   ============================================
+   In light mode: hidden until hover (group-hover)
+   In dark mode: always visible
+*/
+.action-buttons-auto {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.group:hover .action-buttons-auto {
+  opacity: 1;
+}
+
+:root.dark .action-buttons-auto,
+.dark .action-buttons-auto {
+  opacity: 1 !important;
+}
+

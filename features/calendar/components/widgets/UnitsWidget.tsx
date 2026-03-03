@@ -131,7 +131,7 @@ export default function UnitsWidget({
                       onToggleNotification={() => toggleUnitNotification(unit.id)}
                       variant="compact"
                       stopPropagation
-                      className="opacity-0 group-hover:opacity-100 dark:opacity-100 transition-opacity"
+                      className="action-buttons-auto"
                     />
                   </div>
                 ))}
