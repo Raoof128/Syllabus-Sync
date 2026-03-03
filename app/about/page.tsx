@@ -79,17 +79,17 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-mq-background">
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden border-b border-mq-border bg-gradient-to-br from-[#002A45] via-[#0d3356] to-[#001a30]">
+      <section className="relative overflow-hidden border-b border-mq-border bg-gradient-to-br from-[#8B1525] via-[#A6192E] to-[#76232f]">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          className="pointer-events-none absolute inset-0 opacity-[0.05]"
           style={{
             backgroundImage:
               'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
             backgroundSize: '32px 32px',
           }}
         />
-        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-mq-primary/8 blur-[100px]" />
-        <div className="pointer-events-none absolute -bottom-16 -left-16 h-72 w-72 rounded-full bg-[#FFB81C]/8 blur-[80px]" />
+        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/5 blur-[100px]" />
+        <div className="pointer-events-none absolute -bottom-16 -left-16 h-72 w-72 rounded-full bg-[#FFB81C]/10 blur-[80px]" />
 
         <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-14 sm:px-6 lg:flex-row lg:items-center lg:gap-14 lg:px-8 lg:py-20">
           <div className="flex-1 space-y-5">
@@ -119,10 +119,10 @@ export default function AboutPage() {
             >
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 rounded-mq-lg bg-white px-5 py-2.5 text-sm font-semibold text-[#002A45] shadow-lg shadow-black/10 transition hover:bg-white/90"
+                className="inline-flex items-center gap-2 rounded-mq-lg bg-white px-5 py-2.5 text-sm font-semibold text-mq-primary shadow-lg shadow-black/15 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-xl hover:shadow-black/20"
               >
                 Get Started
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
               <a
                 href={EXTERNAL_LINKS.documentation}
@@ -147,7 +147,7 @@ export default function AboutPage() {
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#002A45]/50 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#76232f]/50 via-transparent to-transparent" />
           </div>
         </div>
       </section>

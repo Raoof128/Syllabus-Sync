@@ -38,17 +38,17 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-mq-background">
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden border-b border-mq-border bg-gradient-to-br from-[#002A45] via-[#0d3356] to-[#001a30]">
+      <section className="relative overflow-hidden border-b border-mq-border bg-gradient-to-br from-[#8B1525] via-[#A6192E] to-[#76232f]">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          className="pointer-events-none absolute inset-0 opacity-[0.05]"
           style={{
             backgroundImage:
               'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
             backgroundSize: '32px 32px',
           }}
         />
-        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-mq-primary/8 blur-[100px]" />
-        <div className="pointer-events-none absolute -bottom-16 -left-16 h-72 w-72 rounded-full bg-[#FFB81C]/8 blur-[80px]" />
+        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/5 blur-[100px]" />
+        <div className="pointer-events-none absolute -bottom-16 -left-16 h-72 w-72 rounded-full bg-[#FFB81C]/10 blur-[80px]" />
 
         <div className="relative mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
           <p
