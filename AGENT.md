@@ -1,4 +1,22 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Git Push Rebase Conflict Resolution (main -> origin/main)
+Summary: Resolved non-fast-forward push failure by rebasing local `main` onto `origin/main` and manually fixing the `app/home/HomeClient.tsx` FAB wrapper conflict while preserving safe-area hardened positioning + motion wrapper semantics.
+Files Changed: `app/home/HomeClient.tsx`
+Verification: Rebase conflict resolved; push verification pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home FAB Viewport Bounds Hardening
+Summary: Hardened Home FAB positioning to prevent going outside visible page bounds by switching to safe-area aware fixed offsets (`env(safe-area-inset-right/bottom)`) and constraining quick-action menu width with `max-w-[calc(100vw-2rem)]`.
+Files Changed: `app/home/HomeClient.tsx`
+Verification: eslint (app/home/HomeClient.tsx, config/eslint/eslint.config.mjs) passed; typecheck passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home FAB Sticky Scroll Follow Fix
+Summary: Removed scroll-direction hide/reveal logic from Home FAB so the red plus button stays fixed/sticky and visible while users scroll both up and down. Kept a lightweight mount animation only.
+Files Changed: `app/home/HomeClient.tsx`
+Verification: eslint (app/home/HomeClient.tsx, config/eslint/eslint.config.mjs) passed; typecheck passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Calendar Widget Dark Mode Action Visibility (Final Verification)
 Summary: Applied dark-mode visibility fix across all calendar widget cards so action controls (edit, navigate, reminder, delete) no longer require hover in dark theme. Added `dark:opacity-100` to action-button containers in Assignments, Exams, Events, Todos, and Units widgets while preserving light-mode hover behavior.
 Files Changed: `features/calendar/components/widgets/AssignmentsWidget.tsx`, `features/calendar/components/widgets/ExamsWidget.tsx`, `features/calendar/components/widgets/EventsWidget.tsx`, `features/calendar/components/widgets/TodosWidget.tsx`, `features/calendar/components/widgets/UnitsWidget.tsx`

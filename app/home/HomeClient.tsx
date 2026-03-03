@@ -270,7 +270,12 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         </section>
 
         {/* Floating Action Button (FAB) for Quick Actions */}
-        <div className="fixed bottom-6 right-6 z-50">
+        <m.div
+          className="fixed z-50 right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] sm:right-[max(1.5rem,env(safe-area-inset-right))] sm:bottom-[max(1.5rem,env(safe-area-inset-bottom))]"
+          initial={{ scale: 0.96, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
           <div className="relative">
             {/* FAB Menu */}
             {fabOpen && (
@@ -278,7 +283,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                 initial={{ opacity: 0, y: 20, scale: 0.8 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                className="absolute bottom-16 right-0 flex flex-col gap-2 items-end"
+                className="absolute bottom-16 right-0 flex flex-col gap-2 items-end max-w-[calc(100vw-2rem)]"
               >
                 <Button
                   size="sm"
@@ -356,7 +361,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
               </m.div>
             </Button>
           </div>
-        </div>
+        </m.div>
       </section>
     </LazyMotion>
   );
