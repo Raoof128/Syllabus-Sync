@@ -104,23 +104,34 @@ export function usePublicFeed() {
     return filteredEvents.filter((e) => !featuredIds.has(e.id));
   }, [filteredEvents, featuredEvents]);
 
-  // Category counts - include ALL events (featured + non-featured) to match QuickStats
-  // Featured events are shown in the carousel, non-featured in the grid
+  // Category counts - count only gridEvents (non-featured) to match what's displayed in the grid
+  // Featured events are shown in the carousel, not in the grid
   const categoryCounts = useMemo(() => {
+    // Get all non-featured events (before filtering by category/search/time)
+    const featuredIds = new Set(
+      Array.isArray(allFeaturedEvents)
+        ? allFeaturedEvents.filter(e => e && e.id).map(e => e.id)
+        : []
+    );
+    const nonFeaturedEvents = (Array.isArray(events)
+      ? events.filter(e => e && typeof e.category === 'string' && e.startAt)
+      : []
+    ).filter(e => !featuredIds.has(e.id));
+
     const counts: Record<CategoryFilter, number> = {
-      All: events.length,
+      All: nonFeaturedEvents.length,
       Career: 0,
       Social: 0,
       Academic: 0,
       'Free Food': 0,
     };
-    events.forEach((e) => {
+    nonFeaturedEvents.forEach((e) => {
       if (e.category in counts) {
         counts[e.category as Exclude<CategoryFilter, 'All'>]++;
       }
     });
     return counts;
-  }, [events]);
+  }, [events, allFeaturedEvents]);
 
   // Handle add to calendar
   const handleAddToCalendar = useCallback(
