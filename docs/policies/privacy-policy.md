@@ -81,7 +81,7 @@ Evidence:
 | Supabase                                  | Authentication, database, storage   | Account identifiers, app data, security/audit records needed by features |
 | Resend                                    | Transactional email verification    | User email address and verification message content                      |
 | OpenRouteService                          | Route generation for map navigation | Route coordinates submitted by user action                               |
-| Open-Meteo                                | Weather retrieval                   | Coordinates used for weather lookup                                      |
+| Google Weather API                        | Weather retrieval                   | Coordinates used for weather lookup                                      |
 | Upstash Redis / Vercel KV (if configured) | Distributed rate-limit counters     | Derived request identifiers and counter state                            |
 | Sentry (if enabled)                       | Error and performance monitoring    | Runtime diagnostic metadata and error context                            |
 

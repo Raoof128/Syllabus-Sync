@@ -4,15 +4,23 @@ This folder contains presentation-grade project documentation for the Macquarie 
 
 ## Sections
 
+- `docs/architecture/`: System architecture and design overview.
+- `docs/api/`: REST API reference documentation.
 - `docs/operations/`: Operational runbooks and deployment guidance.
 - `docs/policies/`: Security, privacy, and governance policy documents.
 - `docs/database/`: Database reference artifacts and schema snapshots.
 - `docs/project/`: Internal project planning material and design sketches.
+- `docs/security/`: Security posture reports and evidence index.
 
 ## Operations Entry Points
 
 - Resend + Vercel email setup: `/docs/operations/resend-vercel-setup.md`
 - Google Maps Embed API setup: `/docs/operations/google-maps-embed-setup.md`
+
+## Architecture & API
+
+- Architecture overview: `/docs/architecture/ARCHITECTURE.md`
+- API reference: `/docs/api/API_REFERENCE.md`
 
 ## Policy Entry Points
 

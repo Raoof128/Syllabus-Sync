@@ -33,13 +33,11 @@ export default defineConfig({
         'sentry.*.config.ts',
         'app/api/_lib/versioning.ts', // Minimal utility
       ],
-      // Coverage thresholds - starting points based on current coverage
-      // TODO: Gradually increase these as more tests are added
       thresholds: {
-        statements: 35,
-        branches: 30,
-        functions: 35,
-        lines: 35,
+        statements: 50,
+        branches: 45,
+        functions: 50,
+        lines: 50,
       },
     },
   },

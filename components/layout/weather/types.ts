@@ -14,7 +14,7 @@ export interface WeatherData {
   windSpeed?: number;
   condition: string;
   location: string;
-  locationType?: 'gps' | 'building' | 'saved' | 'approx';
+  locationType?: 'gps' | 'saved' | 'approx';
   vibe: Vibe;
   isDay: boolean;
   timestamp?: number;

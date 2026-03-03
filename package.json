@@ -37,7 +37,8 @@
     "vercel:env:pull": "vercel env pull .env.local",
     "vercel:env:check": "node tools/vercel/check-required-env.mjs",
     "vercel:deploy:preview": "node tools/vercel/deploy.mjs",
-    "vercel:deploy:prod": "node tools/vercel/deploy.mjs --prod"
+    "vercel:deploy:prod": "node tools/vercel/deploy.mjs --prod",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -101,9 +102,11 @@
     "dotenv": "^17.2.3",
     "eslint": "^9.18.0",
     "eslint-config-next": "^16.1.6",
+    "husky": "^9.1.7",
     "jsdom": "^28.1.0",
     "kill-port": "^2.0.1",
     "lhci": "^4.1.1",
+    "lint-staged": "^16.3.2",
     "postcss": "^8.5.6",
     "prettier": "^3.3.3",
     "tailwindcss": "^4.1.18",
@@ -143,6 +146,15 @@
     "serialize-javascript": "^7.0.3",
     "path-to-regexp": "^8.3.0",
     "tar": "^7.5.9"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --config config/eslint/eslint.config.mjs --fix",
+      "prettier --config config/prettier/.prettierrc.json --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --config config/prettier/.prettierrc.json --write"
+    ]
   },
   "config": {
     "commitizen": {

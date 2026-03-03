@@ -189,7 +189,8 @@ cp .env.example .env.local
 
 # Configure your environment variables
 # Required: Supabase URL, Anon Key, Service Role Key, Google Maps Embed API key
-# Optional: Redis URL, OpenWeather API Key, ORS API Key
+# Optional: Redis URL, ORS API Key
+# Required for weather: GOOGLE_WEATHER_API_KEY (server-side only)
 ```
 
 Email (Resend) + Vercel notes:
@@ -380,7 +381,7 @@ Our platform maintains a defense-in-depth security architecture:
 ### **Leadership**
 
 - **Pouya Alavi** - _Frontend Architect_ (UI/UX Design, Component Architecture, State Management)
-- **Roauf Abedini** - _Backend Engineer_ (API Development, Database Design, Security & Infrastructure)
+- **Raouf Abedini** - _Backend Engineer_ (API Development, Database Design, Security & Infrastructure)
 
 ### **Contributors**
 
