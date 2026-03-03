@@ -10,7 +10,7 @@ export function usePublicFeed() {
   // Store
   const {
     events,
-    featuredEvents,
+    featuredEvents: allFeaturedEvents,
     isLoading,
     isAddingToCalendar,
     addedToCalendar,
@@ -29,6 +29,15 @@ export function usePublicFeed() {
   useEffect(() => {
     fetchPublicEvents();
   }, [fetchPublicEvents]);
+
+  // Filter featured events based on category filter (but not search/time)
+  // This allows the banner to show relevant featured events when filtering
+  const featuredEvents = useMemo(() => {
+    if (categoryFilter === 'All') {
+      return allFeaturedEvents;
+    }
+    return allFeaturedEvents.filter((e) => e.category === categoryFilter);
+  }, [allFeaturedEvents, categoryFilter]);
 
   // Filter and sort events
   const filteredEvents = useMemo(() => {
@@ -85,24 +94,23 @@ export function usePublicFeed() {
     return filteredEvents.filter((e) => !featuredIds.has(e.id));
   }, [filteredEvents, featuredEvents]);
 
-  // Category counts - exclude featured events to match what's shown in the grid
+  // Category counts - include ALL events (featured + non-featured) to match QuickStats
+  // Featured events are shown in the carousel, non-featured in the grid
   const categoryCounts = useMemo(() => {
-    const featuredIds = new Set(featuredEvents.map((e) => e.id));
-    const nonFeatured = events.filter((e) => !featuredIds.has(e.id));
     const counts: Record<CategoryFilter, number> = {
-      All: nonFeatured.length,
+      All: events.length,
       Career: 0,
       Social: 0,
       Academic: 0,
       'Free Food': 0,
     };
-    nonFeatured.forEach((e) => {
+    events.forEach((e) => {
       if (e.category in counts) {
         counts[e.category as Exclude<CategoryFilter, 'All'>]++;
       }
     });
     return counts;
-  }, [events, featuredEvents]);
+  }, [events]);
 
   // Handle add to calendar
   const handleAddToCalendar = useCallback(
