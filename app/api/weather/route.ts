@@ -3,14 +3,15 @@ import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
-import { OpenMeteoProvider } from '@/lib/weather/providers/openMeteoProvider';
+import { GoogleWeatherProvider } from '@/lib/weather/providers/googleWeatherProvider';
 import { z } from 'zod';
 import { WeatherResult } from '@/lib/weather/types';
 
 /**
  * Weather API Proxy Endpoint
  *
- * SECURITY: Proxies requests to Open-Meteo API.
+ * SECURITY: Proxies requests to Google Weather API.
+ * The API key is kept server-side only (not NEXT_PUBLIC_).
  */
 
 // Cache weather data for 5 minutes (current) to 15 minutes (hourly)
@@ -18,7 +19,11 @@ const weatherCache = new Map<string, { data: WeatherResult; timestamp: number }>
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes standard ttl
 const EDGE_CACHE_CONTROL = 'public, max-age=0, s-maxage=300, stale-while-revalidate=60';
 
-const provider = new OpenMeteoProvider();
+const apiKey = process.env.GOOGLE_WEATHER_API_KEY;
+if (!apiKey) {
+  throw new Error('GOOGLE_WEATHER_API_KEY environment variable is required');
+}
+const provider = new GoogleWeatherProvider(apiKey);
 
 // 4.1 Validate response schema (Sanity Checks)
 const WeatherResultSchema = z.object({
@@ -119,7 +124,7 @@ export async function GET(request: NextRequest) {
 
     // Logging for observability (6.1)
     logger.info('Weather fetched successfully', {
-      source: 'Open-Meteo',
+      source: 'Google-Weather',
       model: validatedData.modelUsed,
       lat: roundedLat,
       lon: roundedLon,

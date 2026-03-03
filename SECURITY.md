@@ -30,7 +30,7 @@ Syllabus Sync implements a multi-layered security model:
 - **CSP (Content Security Policy)**: Strict policy enforced globally. Inline scripts for theme and RTL are validated using pre-computed SHA-256 hashes, eliminating the need for `'unsafe-inline'`.
 - **Enumeration Prevention**: Authentication endpoints (Signup/Signin) return generic success/error messages to prevent user account enumeration.
 - **X-Powered-By Disabled**: Server technology identification is disabled to reduce attack surface.
-- **API Key Proxying**: Third-party API keys (e.g., OpenWeather) are proxied through server-side endpoints, never exposed to clients.
+- **API Key Proxying**: Third-party API keys (e.g., Google Weather) are proxied through server-side endpoints, never exposed to clients.
 
 ### 3. Database Security
 
@@ -65,7 +65,7 @@ This ensures security features (CSRF, rate limiting, dev bypasses) cannot be cir
 | `NEXT_PUBLIC_SUPABASE_URL`      | Yes      | Database connection          |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes      | Client-side database access  |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Yes      | Server-side admin operations |
-| `OPENWEATHER_API_KEY`           | Optional | Weather functionality        |
+| `GOOGLE_WEATHER_API_KEY`        | Yes      | Google Weather API access    |
 
 ## Development vs Production
 
