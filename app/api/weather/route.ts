@@ -19,11 +19,16 @@ const weatherCache = new Map<string, { data: WeatherResult; timestamp: number }>
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes standard ttl
 const EDGE_CACHE_CONTROL = 'public, max-age=0, s-maxage=300, stale-while-revalidate=60';
 
-const apiKey = process.env.GOOGLE_WEATHER_API_KEY;
-if (!apiKey) {
-  throw new Error('GOOGLE_WEATHER_API_KEY environment variable is required');
+// Lazy-init provider at runtime (not build time) to avoid breaking page collection
+let _provider: GoogleWeatherProvider | null = null;
+function getProvider(): GoogleWeatherProvider {
+  if (!_provider) {
+    const key = process.env.GOOGLE_WEATHER_API_KEY;
+    if (!key) throw new Error('GOOGLE_WEATHER_API_KEY environment variable is required');
+    _provider = new GoogleWeatherProvider(key);
+  }
+  return _provider;
 }
-const provider = new GoogleWeatherProvider(apiKey);
 
 // 4.1 Validate response schema (Sanity Checks)
 const WeatherResultSchema = z.object({
@@ -108,7 +113,7 @@ export async function GET(request: NextRequest) {
   try {
     const start = Date.now();
 
-    const weatherData = await provider.getWeather({
+    const weatherData = await getProvider().getWeather({
       lat: roundedLat,
       lon: roundedLon,
     });
