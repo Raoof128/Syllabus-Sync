@@ -80,7 +80,7 @@ export const FeedEventCard = memo(
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-mq-content-tertiary dark:text-mq-content/60 hover:text-mq-content"
+                      className="h-8 w-8 text-mq-content-tertiary dark:text-white/60 hover:text-mq-content"
                     >
                       <MoreVertical className="h-4 w-4" />
                       <span className="sr-only">{t('actions')}</span>

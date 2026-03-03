@@ -226,7 +226,7 @@ export function GoogleMapBuildingSearch({
                         setSearchQuery('');
                         searchInputRef.current?.focus();
                       }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-mq-content-tertiary dark:text-mq-content/60 hover:text-mq-content hover:bg-mq-hover-background transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-mq-content-tertiary dark:text-white/60 hover:text-mq-content hover:bg-mq-hover-background transition-colors"
                       aria-label={t('clearSearch')}
                     >
                       <X className="h-3.5 w-3.5" />
@@ -324,7 +324,7 @@ export function GoogleMapBuildingSearch({
                 </div>
                 <Link
                   href={buildMapHref(undefined)}
-                  className="p-1.5 rounded-full text-mq-content-tertiary dark:text-mq-content/60 hover:text-mq-content hover:bg-mq-hover-background transition-colors"
+                  className="p-1.5 rounded-full text-mq-content-tertiary dark:text-white/60 hover:text-mq-content hover:bg-mq-hover-background transition-colors"
                   aria-label={t('close')}
                 >
                   <X className="h-5 w-5" />

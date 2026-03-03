@@ -60,8 +60,11 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   const lastScrollY = useRef(0);
 
   useEffect(() => {
+    // The app scrolls on .layout-main (overflow-y-auto container), not window
+    const scrollContainer = document.querySelector('.layout-main') || document.documentElement;
+
     const handleScroll = () => {
-      const currentY = window.scrollY;
+      const currentY = scrollContainer.scrollTop;
       // Show FAB when scrolling up or near top, hide when scrolling down
       if (currentY < 100) {
         setFabVisible(true);
@@ -74,8 +77,8 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
       lastScrollY.current = currentY;
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
   }, []);
 
   if (hasError) {

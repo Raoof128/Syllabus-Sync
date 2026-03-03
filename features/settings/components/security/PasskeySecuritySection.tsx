@@ -389,7 +389,7 @@ export function PasskeySecuritySection({ t }: PasskeySecuritySectionProps) {
                         setDeleteTarget(cred);
                         setShowDeletePasskeyDialog(true);
                       }}
-                      className="h-8 w-8 p-0 text-mq-content-tertiary dark:text-mq-content/60 hover:text-red-500 hover:bg-red-500/10 rounded-full"
+                      className="h-8 w-8 p-0 text-mq-content-tertiary dark:text-white/60 hover:text-red-500 hover:bg-red-500/10 rounded-full"
                       aria-label={`${t("delete")} ${cred.deviceName}`}
                     >
                       <Trash2 className="h-4 w-4" />

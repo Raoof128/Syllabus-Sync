@@ -331,7 +331,7 @@ const Header = memo(() => {
                 title={unreadCount > 0 ? t('notificationsBellHint') : t('notifications')}
               >
                 <Bell
-                  className={`w-4 h-4 sm:w-5 sm:h-5 text-mq-content-secondary dark:text-mq-content/80 transition-transform duration-300 group-hover:scale-110 group-active:scale-95 ${unreadCount > 0 ? 'animate-wiggle' : ''}`}
+                  className={`w-4 h-4 sm:w-5 sm:h-5 text-mq-content-secondary dark:text-white/80 transition-transform duration-300 group-hover:scale-110 group-active:scale-95 ${unreadCount > 0 ? 'animate-wiggle' : ''}`}
                   aria-hidden="true"
                 />
                 {unreadCount > 0 && (
@@ -504,7 +504,7 @@ const Header = memo(() => {
                                   event.stopPropagation();
                                   removeNotification(notification.id);
                                 }}
-                                className="flex h-7 w-7 items-center justify-center rounded-full text-mq-content-tertiary dark:text-mq-content/60 transition-colors hover:bg-mq-error/10 hover:text-mq-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
+                                className="flex h-7 w-7 items-center justify-center rounded-full text-mq-content-tertiary dark:text-white/60 transition-colors hover:bg-mq-error/10 hover:text-mq-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
                                 aria-label={t('deleteNotification')}
                                 title={t('deleteNotification')}
                               >

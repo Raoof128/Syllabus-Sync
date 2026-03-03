@@ -1,4 +1,10 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: FAB Scroll-Hide Fix + Dark Mode Icon Color Fix
+Summary: (1) Fixed FAB scroll-hide: was listening on `window` but app scrolls in `.layout-main` container. Now targets correct scroll element. (2) Fixed dark mode icon visibility: `dark:text-mq-content/80` opacity modifiers don't work with hex CSS variables in Tailwind v4. Replaced with `dark:text-white/80` and `dark:text-white/60` across all 9 affected files.
+Files: Modified `app/home/HomeClient.tsx`, `features/calendar/components/ItemActionButtons.tsx`, `components/layout/Header.tsx`, `components/layout/Sidebar.tsx`, `components/ProfileCard.tsx`, `features/map/components/CampusMap.tsx`, `features/map/components/CampusMapHUD.tsx`, `features/map/components/GoogleMapBuildingSearch.tsx`, `features/feed/components/FeedEventCard.tsx`, `features/settings/components/security/PasskeySecuritySection.tsx`.
+Verification: `npx eslint` ✅; `npm run typecheck` ✅; 49/49 tests passing.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Notification System Audit + Overdue Visual Treatment
 Summary: Full notification system audit confirmed architecture integrity. Added overdue visual treatment: Header notification dropdown shows "OVERDUE" badge + strikethrough + red icon for past-due deadline/event notifications (cross-references relatedId against stores). UpcomingDeadlines widget now shows "OVERDUE" badge + strikethrough title. TodosWidget now shows red bg + "OVERDUE" badge + strikethrough title for overdue items.
 Files: Modified `components/layout/Header.tsx`, `features/home/components/UpcomingDeadlines.tsx`, `features/home/components/TodosWidget.tsx`.
