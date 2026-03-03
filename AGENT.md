@@ -1,4 +1,16 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: App-Wide Dark Mode Icon Button Visibility — Full Sweep
+Summary: Extended dark mode icon-button visibility fix across the entire app. Added `dark:text-mq-content/80` (primary actions) or `dark:text-mq-content/60` (tertiary/subtle actions) to all icon-only buttons that used `text-mq-content-secondary` or `text-mq-content-tertiary` without dark mode overrides, making them visible without hover. 10 buttons fixed across 8 files: Header bell icon + notification delete X, Sidebar hamburger trigger, ProfileCard edit + use buttons, CampusMap stop-navigation X, CampusMapHUD clear-search X, GoogleMapBuildingSearch clear + close X buttons, FeedEventCard more-actions menu trigger, PasskeySecuritySection delete passkey button.
+Files Changed: `components/layout/Header.tsx`, `components/layout/Sidebar.tsx`, `components/ProfileCard.tsx`, `features/map/components/CampusMap.tsx`, `features/map/components/CampusMapHUD.tsx`, `features/map/components/GoogleMapBuildingSearch.tsx`, `features/feed/components/FeedEventCard.tsx`, `features/settings/components/security/PasskeySecuritySection.tsx`
+Verification: `npx eslint` ✅, `npm run typecheck` ✅, `npm run test -- tests/map/GoogleMapBuildingSearch.test.tsx tests/settings/QuickActions.test.tsx` ✅ (19/19).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home FAB Scroll-Hide + Dark Mode Icon Button Visibility Fix
+Summary: Two UI fixes: (1) Home page FAB (Quick Actions +) now hides when scrolling down and reappears when scrolling up, using scroll direction detection with a 10px dead-zone and auto-close of the menu on hide. Animated with framer-motion `m.div` for smooth slide-out/fade. (2) Calendar `ItemActionButtons` icon buttons (edit, delete, navigate, bell) were nearly invisible in dark mode — added `dark:bg-white/10` subtle background tint and `dark:text-mq-content/80` default brightness so icons are visible without hover, with `dark:hover:bg-white/20` for stronger hover feedback.
+Files Changed: `app/home/HomeClient.tsx`, `features/calendar/components/ItemActionButtons.tsx`
+Verification: `npx eslint` ✅, `npm run typecheck` ✅, `npm run test -- tests/settings/QuickActions.test.tsx` ✅ (7/7).
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Campus Map Full Audit — Live/Realtime Navigation Accuracy + 2026 Docs Cross-Check
 Summary: Completed a full campus-map audit after cross-checking current official docs (Google Maps Embed API, Leaflet, React-Leaflet, MDN Geolocation, ORS directions). Verified live navigation pipeline end-to-end (`useMapLocation` geolocation watch + Kalman smoothing + motion-aware heading fallback -> `NavigationStateManager` off-route/recalculate/ETA/instruction progression -> `useMapNavigation` reroute + route refresh). Confirmed ORS coordinate order handling `[lng, lat]` is consistent in API request/response and downstream parsing. Confirmed embedded Google map mode remains active and wired. Also fixed map-test lint quality issues found during audit (`@ts-expect-error` policy compliance and React test lint warnings).
 Files Changed: `tests/map/mapUtils.test.ts`, `tests/map/GoogleMapBuildingSearch.test.tsx`
@@ -1359,3 +1371,15 @@ Scope: Log Maintenance Cleanup
 Summary: Removed temporary operational entries from project logs per user request and kept current technical change history intact.
 Files Changed: `AGENT.md`, `CHANGELOG.md`
 Verification: Targeted log entries removed from both files.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps API Key Rotation (User-Provided)
+Summary: Updated local runtime Google Maps Embed API key in `.env.local` to the latest user-provided key value.
+Files Changed: `.env.local`
+Verification: `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` updated locally; syncing to Vercel envs and redeploying next.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Vercel Google Maps Key Sync + Production Redeploy (New User Key)
+Summary: Synced the latest user-provided `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` to Vercel `production`, `preview`, and `development` environments and completed a production redeploy.
+Files Changed: None (deployment/env operation)
+Verification: Deployment `dpl_5p5ExMw98WRw7c2zwwPA3fCs1MYj` is `Ready`; production alias `https://syllabus-sync-ashy.vercel.app` points to `https://syllabus-sync-jby7fie5f-perkycoders.vercel.app`.

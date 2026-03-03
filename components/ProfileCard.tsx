@@ -115,7 +115,7 @@ const ProfileCard = React.memo(
                   variant="ghost"
                   size="sm"
                   onClick={() => onEdit(profile)}
-                  className="h-8 w-8 p-0 text-mq-content-secondary hover:text-mq-primary"
+                  className="h-8 w-8 p-0 text-mq-content-secondary dark:text-mq-content/80 hover:text-mq-primary"
                   aria-label={t('editProfileAria', { name: profile.name })}
                 >
                   <Edit className="w-4 h-4" />
@@ -125,7 +125,7 @@ const ProfileCard = React.memo(
                 variant="ghost"
                 size="sm"
                 onClick={() => onSetCurrent(profile.id)}
-                className="h-8 w-8 p-0 text-mq-content-secondary hover:text-mq-success"
+                className="h-8 w-8 p-0 text-mq-content-secondary dark:text-mq-content/80 hover:text-mq-success"
                 aria-label={t('useProfileAria', { name: profile.name })}
               >
                 <Check className="w-4 h-4" />

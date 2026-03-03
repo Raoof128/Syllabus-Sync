@@ -228,7 +228,7 @@ export default function CampusMapHUD({
                       <button
                         type="button"
                         onClick={() => setBuildingSearch('')}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-mq-content-secondary hover:text-mq-content hover:bg-mq-hover-background transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-mq-content-secondary dark:text-mq-content/80 hover:text-mq-content hover:bg-mq-hover-background transition-colors"
                         aria-label={t('clearSearch')}
                         title={t('clearSearch')}
                       >

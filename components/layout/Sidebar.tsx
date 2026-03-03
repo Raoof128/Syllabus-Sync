@@ -372,7 +372,7 @@ const Sidebar = memo(() => {
             ---------------------------------------------------------------------- */}
         <button
           type="button"
-          className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-background text-mq-content-secondary z-50 cursor-pointer select-none sidebar-trigger"
+          className="hidden md:flex absolute left-0 top-0 h-full w-12 items-center justify-center border-r border-mq-border bg-mq-background text-mq-content-secondary dark:text-mq-content/80 z-50 cursor-pointer select-none sidebar-trigger"
           aria-label={pinnedOpen ? t('closeMenu') : t('openMenu')}
           aria-pressed={pinnedOpen}
           aria-expanded={pinnedOpen}

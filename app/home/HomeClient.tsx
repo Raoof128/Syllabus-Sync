@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import TodaySchedule from '@/features/home/components/TodaySchedule';
 import UpcomingDeadlines from '@/features/home/components/UpcomingDeadlines';
@@ -56,6 +56,27 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   useHomeEventListeners();
 
   const [fabOpen, setFabOpen] = useState(false);
+  const [fabVisible, setFabVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      // Show FAB when scrolling up or near top, hide when scrolling down
+      if (currentY < 100) {
+        setFabVisible(true);
+      } else if (currentY < lastScrollY.current) {
+        setFabVisible(true);
+      } else if (currentY > lastScrollY.current + 10) {
+        setFabVisible(false);
+        setFabOpen(false);
+      }
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   if (hasError) {
     return (
@@ -270,7 +291,15 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         </section>
 
         {/* Floating Action Button (FAB) for Quick Actions */}
-        <div className="fixed bottom-6 right-6 z-50">
+        <m.div
+          className="fixed bottom-6 right-6 z-50"
+          initial={{ y: 0, opacity: 1 }}
+          animate={{
+            y: fabVisible ? 0 : 100,
+            opacity: fabVisible ? 1 : 0,
+          }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+        >
           <div className="relative">
             {/* FAB Menu */}
             {fabOpen && (
@@ -356,7 +385,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
               </m.div>
             </Button>
           </div>
-        </div>
+        </m.div>
       </section>
     </LazyMotion>
   );

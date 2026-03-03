@@ -1,4 +1,16 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: App-Wide Dark Mode Icon Button Visibility — Full Sweep
+Summary: Extended dark mode icon-button visibility fix to all remaining icon-only buttons app-wide: Header bell + notification delete, Sidebar hamburger, ProfileCard edit/use, CampusMap stop-nav, CampusMapHUD/GoogleMapBuildingSearch clear/close, FeedEventCard more-actions, PasskeySecuritySection delete. Added `dark:text-mq-content/80` or `/60` so icons are visible without hover.
+Files: Modified `components/layout/Header.tsx`, `components/layout/Sidebar.tsx`, `components/ProfileCard.tsx`, `features/map/components/CampusMap.tsx`, `features/map/components/CampusMapHUD.tsx`, `features/map/components/GoogleMapBuildingSearch.tsx`, `features/feed/components/FeedEventCard.tsx`, `features/settings/components/security/PasskeySecuritySection.tsx`.
+Verification: `npx eslint` ✅; `npm run typecheck` ✅; `npm run test -- tests/map/GoogleMapBuildingSearch.test.tsx tests/settings/QuickActions.test.tsx` ✅ (19/19).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home FAB Scroll-Hide + Dark Mode Icon Button Visibility Fix
+Summary: (1) Home page FAB now hides on scroll-down and reappears on scroll-up with smooth framer-motion animation. (2) Calendar action icon buttons (edit/delete/navigate/bell) given a subtle background tint and brighter text in dark mode so they are visible without hover.
+Files: Modified `app/home/HomeClient.tsx`, `features/calendar/components/ItemActionButtons.tsx`.
+Verification: `npx eslint` ✅; `npm run typecheck` ✅; `npm run test -- tests/settings/QuickActions.test.tsx` ✅ (7/7).
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Campus Map Full Audit — Live/Realtime Navigation Accuracy + 2026 Docs Cross-Check
 Summary: Completed full campus-map audit with official docs cross-check (Google Maps Embed API, Leaflet, React-Leaflet, MDN Geolocation, ORS directions). Verified live/realtime navigation flow integrity and coordinate-order correctness for ORS (`[lng, lat]`) across proxy, parsing, and route state management. Confirmed embedded Google map mode remains active. Fixed map-test lint quality issues discovered during audit.
 Files: Modified `tests/map/mapUtils.test.ts`, `tests/map/GoogleMapBuildingSearch.test.tsx`.
@@ -4244,3 +4256,15 @@ Scope: Log Maintenance Cleanup
 Summary: Removed temporary operational log entries on request while preserving development and deployment audit history.
 Files: Modified `AGENT.md`, `CHANGELOG.md`.
 Verification: Requested log sections removed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps API Key Rotation (User-Provided)
+Summary: Rotated local `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` to the user-provided key in `.env.local`.
+Files: Modified `.env.local`.
+Verification: Local env value updated; Vercel sync + redeploy in progress.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Vercel Google Maps Key Sync + Production Redeploy (New User Key)
+Summary: Updated Vercel env `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` with the new provided key across all environments and redeployed production.
+Files: None (infrastructure operation).
+Verification: Deployment `dpl_5p5ExMw98WRw7c2zwwPA3fCs1MYj` status `Ready`; alias `https://syllabus-sync-ashy.vercel.app` active.
