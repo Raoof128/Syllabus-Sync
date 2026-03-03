@@ -27,7 +27,7 @@ import SyncConflictDialog from '@/components/sync/SyncConflictDialog';
 import { isRunningAsPWA } from '@/lib/utils/pwa';
 
 const AUTH_ROUTES = ['/login', '/signup', '/reset-password'] as const;
-const PUBLIC_ROUTES = ['/terms', '/privacy', '/verify'] as const;
+const PUBLIC_ROUTES = ['/terms', '/privacy', '/verify', '/about'] as const;
 const POST_AUTH_ROUTES = ['/onboarding'] as const;
 
 if (typeof window !== 'undefined') {

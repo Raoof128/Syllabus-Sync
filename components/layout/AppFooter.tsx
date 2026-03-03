@@ -23,6 +23,12 @@ export default function AppFooter({ className }: AppFooterProps) {
           {t('copyright', { year: currentYear })}
         </p>
         <div className="flex items-center gap-2 text-xs text-mq-content-secondary sm:text-sm">
+          <Link href="/about" className="transition-colors hover:text-mq-primary hover:underline">
+            {t('settings_about')}
+          </Link>
+          <span aria-hidden="true" className="text-mq-border">
+            ·
+          </span>
           <Link href="/terms" className="transition-colors hover:text-mq-primary hover:underline">
             {t('termsFooter')}
           </Link>

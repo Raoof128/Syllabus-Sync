@@ -1,4 +1,28 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Public About Page + Footer Integration (Final Verification)
+Summary: Delivered new public `/about` page modeled after the shared reference structure and integrated it into global footer navigation. Route accessibility was finalized by adding `/about` to public-route handling.
+Files Changed: `app/about/page.tsx`, `components/layout/AppFooter.tsx`, `app/client-layout.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs app/about/page.tsx components/layout/AppFooter.tsx app/client-layout.tsx` passed; `npm run typecheck` passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Public About Page + Footer Integration (Step 3)
+Summary: Added `/about` to `PUBLIC_ROUTES` in `ClientLayout` so guest users can open the new about page without authenticated-route checks.
+Files Changed: `app/client-layout.tsx`
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Public About Page + Footer Integration (Step 2)
+Summary: Extended shared global footer navigation with an `About` link (`/about`) so the about page is discoverable consistently across all app pages.
+Files Changed: `components/layout/AppFooter.tsx`
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Public About Page + Footer Integration (Step 1)
+Summary: Added new public `/about` page with hero, values, and student-success sections inspired by the shared reference layout, aligned to existing MQ theme tokens and brand style.
+Files Changed: `app/about/page.tsx`
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Global Symmetric Footer Rollout (Final Verification)
 Summary: Completed app-wide footer standardization with a shared `AppFooter`, visible across authenticated and non-auth shells, and removed duplicate per-page footer blocks from Login, Signup, Terms, and Privacy pages for consistent centered year/text presentation.
 Files Changed: `components/layout/AppFooter.tsx`, `app/client-layout.tsx`, `app/login/LoginClient.tsx`, `app/signup/SignupClient.tsx`, `app/terms/page.tsx`, `app/privacy/page.tsx`
