@@ -1,4 +1,10 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: About & Contact Page Design Parity Audit
+Summary: Full visual redesign of About and Contact pages — decorative hero textures, serif headings, staggered animations, icon circles, magazine-style developer cards, refined form inputs, consistent design token usage.
+Files: Modified `app/about/page.tsx`, `app/contact/page.tsx`.
+Verification: `eslint` and `typecheck` passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: About Page Developer Photos & Roles Update
 Summary: Replaced developer photos with new images and updated roles: Pouya to "Front-End & UI/UX Developer", Raouf to "Back-End & Cyber Security Developer".
 Files: Updated `public/images/team/pouya.jpg`, `public/images/team/raouf.jpg`, `app/about/page.tsx`.
