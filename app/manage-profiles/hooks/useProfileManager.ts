@@ -131,7 +131,7 @@ export function useProfileManager() {
       // Sync the permanent store
       const updatedProfile = await updateStoreProfile(currentProfile.id, data);
       if (!updatedProfile) {
-        toastUtils.error(t('error'), 'Failed to persist profile changes');
+        // Store already shows the specific error toast — just reset the form
         form.reset({
           name: currentProfile.name || '',
           studentId: normalizeStudentId(currentProfile.studentId),

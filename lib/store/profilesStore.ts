@@ -273,6 +273,9 @@ export const useProfilesStore = create<ProfilesState>()(
        * Note: This only removes from local state, not from Supabase
        */
       deleteProfile: async (id) => {
+        // Check if this is the current (authenticated) profile BEFORE updating state
+        const isCurrentProfile = get().currentProfileId === id;
+
         set((state) => {
           const newProfiles = state.profiles.filter((p) => p.id !== id);
           const newCurrentProfileId = state.currentProfileId === id ? null : state.currentProfileId;
@@ -282,7 +285,8 @@ export const useProfilesStore = create<ProfilesState>()(
           };
         });
 
-        if (get().currentProfileId !== id) return;
+        // Only call API delete for the authenticated user's profile
+        if (!isCurrentProfile) return;
 
         try {
           await apiRequest<{ id: string }>('/api/profiles', {
@@ -448,11 +452,14 @@ export const useProfilesStore = create<ProfilesState>()(
               profiles: state.profiles.map((p) => (p.id === id ? currentProfile : p)),
             }));
 
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('[ProfilesStore] Update failed:', errorMessage);
             errorHandler.logError(
               error instanceof Error ? error : new Error('Failed to update profile'),
               'ProfilesStore.updateProfile',
               'high',
             );
+            toastUtils.error('Update failed', errorMessage);
             return null;
           }
         }

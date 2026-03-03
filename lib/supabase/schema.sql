@@ -627,12 +627,7 @@ GRANT EXECUTE ON FUNCTION create_user_profile TO authenticated;
 CREATE OR REPLACE FUNCTION protect_profile_fields()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Prevent changing student_id after initial set
-  IF OLD.student_id IS NOT NULL AND NEW.student_id IS DISTINCT FROM OLD.student_id THEN
-    RAISE EXCEPTION 'Cannot modify student_id after it has been set';
-  END IF;
-
-  -- Prevent changing email directly
+  -- Prevent changing email directly (must use the authentication flow)
   IF NEW.email IS DISTINCT FROM OLD.email THEN
     RAISE EXCEPTION 'Cannot modify email directly. Use the authentication flow.';
   END IF;

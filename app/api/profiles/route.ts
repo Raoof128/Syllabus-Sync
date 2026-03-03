@@ -22,7 +22,7 @@ import { logger } from '@/lib/logger';
 
 const UpdateProfileSchema = z.object({
   full_name: z.string().min(1).max(100).optional(),
-  student_id: z.string().min(1).max(20).optional(),
+  student_id: z.string().min(1).max(20).nullable().optional(),
   faculty: z.string().max(100).nullable().optional(),
   course: z.string().max(100).nullable().optional(),
   year: z.string().max(20).nullable().optional(),
@@ -124,6 +124,8 @@ export async function PUT(request: Request) {
 
     const validation = UpdateProfileSchema.safeParse(body);
     if (!validation.success) {
+      logger.error('Profile validation failed:', JSON.stringify(validation.error.flatten().fieldErrors));
+      logger.error('Profile body was:', JSON.stringify(body));
       return jsonError('Invalid profile data', 400, 'VALIDATION_ERROR', {
         errors: validation.error.flatten().fieldErrors,
       });
@@ -150,12 +152,12 @@ export async function PUT(request: Request) {
       .single();
 
     if (updateError) {
-      logger.error('Profile update error:', updateError);
+      logger.error('Profile update error:', updateError.message, updateError.code, updateError.details);
       // Check for protected field modification
       if (updateError.message?.includes('Cannot modify')) {
         return jsonError('Cannot modify protected fields', 403);
       }
-      return jsonError('Failed to update profile', 500);
+      return jsonError(`Failed to update profile: ${updateError.message}`, 500);
     }
 
     return jsonSuccess(profile);
