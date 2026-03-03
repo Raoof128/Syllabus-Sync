@@ -59,6 +59,19 @@ const FEATURE_CARDS = [
   },
 ] as const;
 
+const DEVELOPERS = [
+  {
+    name: 'Pouya',
+    role: 'First Developer',
+    photo: '/images/team/pouya.jpg',
+  },
+  {
+    name: 'Raouf',
+    role: 'Second Developer',
+    photo: '/images/team/raouf.jpg',
+  },
+] as const;
+
 export default function AboutPage() {
   const { t } = useTypedTranslation();
 
@@ -148,6 +161,35 @@ export default function AboutPage() {
               <p className="mt-1.5 text-sm leading-relaxed text-mq-content-secondary">
                 {item.description}
               </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
+        <h2 className="text-2xl font-bold text-mq-content sm:text-3xl">Our Developers</h2>
+        <p className="mt-2 max-w-3xl text-sm text-mq-content-secondary sm:text-base">
+          Built by students for students.
+        </p>
+        <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+          {DEVELOPERS.map((developer) => (
+            <article
+              key={developer.name}
+              className="overflow-hidden rounded-xl border border-mq-border bg-mq-card-background"
+            >
+              <div className="relative h-[420px] w-full bg-mq-background-secondary">
+                <Image
+                  src={developer.photo}
+                  alt={`${developer.name} portrait`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-mq-content">{developer.name}</h3>
+                <p className="text-sm text-mq-content-secondary">{developer.role}</p>
+              </div>
             </article>
           ))}
         </div>
