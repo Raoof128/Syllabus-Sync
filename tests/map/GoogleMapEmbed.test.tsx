@@ -102,7 +102,7 @@ describe('GoogleMapEmbed', () => {
     render(<GoogleMapEmbed />);
     const iframe = screen.getByTitle('Google Maps — Macquarie University');
     expect(iframe).toBeTruthy();
-    expect(iframe.getAttribute('src')).toContain('maps/embed/v1/place');
+    expect(iframe.getAttribute('src')).toContain('maps/embed/v1/search');
     expect(iframe.getAttribute('src')).toContain(`key=${TEST_API_KEY}`);
   });
 

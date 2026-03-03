@@ -20,7 +20,8 @@ const getEmbedApiKey = () => process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY ?? ''
 const buildViewUrl = (query: string) => {
   const key = getEmbedApiKey();
   if (key) {
-    return `https://www.google.com/maps/embed/v1/place?key=${key}&q=${encodeURIComponent(query)}&zoom=17`;
+    // Use 'search' mode for richer map experience (closer to Google Maps website)
+    return `https://www.google.com/maps/embed/v1/search?key=${key}&q=${encodeURIComponent(query)}&zoom=17&maptype=roadmap`;
   }
 
   // Keep users inside the in-app map iframe when API key is not configured.
@@ -32,7 +33,7 @@ const buildDirectionsUrl = (destination: string, origin?: { lat: number; lng: nu
   const resolvedOrigin = origin ?? CAMPUS_CENTRE_GPS;
   const originStr = `${resolvedOrigin.lat},${resolvedOrigin.lng}`;
   if (key) {
-    return `https://www.google.com/maps/embed/v1/directions?key=${key}&origin=${encodeURIComponent(originStr)}&destination=${encodeURIComponent(destination)}&mode=walking`;
+    return `https://www.google.com/maps/embed/v1/directions?key=${key}&origin=${encodeURIComponent(originStr)}&destination=${encodeURIComponent(destination)}&mode=walking&maptype=roadmap`;
   }
 
   // Keep directions embedded even without API key.

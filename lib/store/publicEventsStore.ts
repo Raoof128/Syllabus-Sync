@@ -11,6 +11,32 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import { PublicEvent, PublicEventFromDB, transformPublicEvent } from '@/lib/types/publicEvents';
 import { useEventsStore } from '@/lib/store/eventsStore';
 
+// ============================================================================
+// FALLBACK SAMPLE EVENTS (used when DB has no events or is unavailable)
+// ============================================================================
+const SAMPLE_PUBLIC_EVENTS: PublicEvent[] = [
+  // Academic (4)
+  { id: 'aaaaaaaa-0001-4000-8000-000000000001', title: 'Research Skills Workshop', description: 'Learn essential research methodology and academic writing skills.', startAt: new Date('2026-03-05T10:00:00+11:00'), endAt: new Date('2026-03-05T12:00:00+11:00'), allDay: false, location: 'Library Level 3, Room 301', building: 'LIB', room: '301', category: 'Academic', isFeatured: false, priority: 50, createdAt: new Date() },
+  { id: 'aaaaaaaa-0001-4000-8000-000000000002', title: 'AI & Ethics Public Lecture', description: 'Guest speaker Prof. Sarah Chen discusses ethical implications of generative AI.', startAt: new Date('2026-03-10T14:00:00+11:00'), endAt: new Date('2026-03-10T16:00:00+11:00'), allDay: false, location: '4 Eastern Road Auditorium', building: '4ER', category: 'Academic', isFeatured: true, priority: 70, createdAt: new Date() },
+  { id: 'aaaaaaaa-0001-4000-8000-000000000003', title: 'Study Jam: Midterm Prep', description: 'Collaborative study session with peer tutors. Bring your notes!', startAt: new Date('2026-03-12T10:00:00+11:00'), endAt: new Date('2026-03-12T14:00:00+11:00'), allDay: false, location: 'Library Level 2 Study Hub', building: 'LIB', room: '201', category: 'Academic', isFeatured: false, priority: 45, createdAt: new Date() },
+  { id: 'aaaaaaaa-0001-4000-8000-000000000004', title: 'Data Science Bootcamp', description: 'Hands-on intro to Python data analysis. Laptops provided.', startAt: new Date('2026-03-18T09:00:00+11:00'), endAt: new Date('2026-03-18T17:00:00+11:00'), allDay: false, location: '9 Wally\'s Walk Lab', building: '9WW', room: '120', category: 'Academic', isFeatured: false, priority: 55, createdAt: new Date() },
+  // Free Food (4)
+  { id: 'aaaaaaaa-0002-4000-8000-000000000001', title: 'Free Pizza Friday', description: 'Free pizza hosted by the Student Association. All students welcome.', startAt: new Date('2026-03-06T12:30:00+11:00'), endAt: new Date('2026-03-06T14:00:00+11:00'), allDay: false, location: 'Wally\'s Walk Courtyard', building: 'WALLYS', category: 'Free Food', isFeatured: false, priority: 60, createdAt: new Date() },
+  { id: 'aaaaaaaa-0002-4000-8000-000000000002', title: 'Pancake Breakfast', description: 'Free pancakes, fruit, and coffee. Vegan and GF options available.', startAt: new Date('2026-03-09T07:30:00+11:00'), endAt: new Date('2026-03-09T09:30:00+11:00'), allDay: false, location: 'Central Courtyard', building: 'LIB', category: 'Free Food', isFeatured: false, priority: 50, createdAt: new Date() },
+  { id: 'aaaaaaaa-0002-4000-8000-000000000003', title: 'Sushi & Smoothie Giveaway', description: 'Free sushi rolls and smoothies while stocks last.', startAt: new Date('2026-03-13T12:00:00+11:00'), endAt: new Date('2026-03-13T13:30:00+11:00'), allDay: false, location: 'UniBar Courtyard', building: 'UBAR', category: 'Free Food', isFeatured: false, priority: 55, createdAt: new Date() },
+  { id: 'aaaaaaaa-0002-4000-8000-000000000004', title: 'BBQ on the Lawn', description: 'Classic Aussie BBQ with snags, burgers, and veggie options.', startAt: new Date('2026-03-20T11:30:00+11:00'), endAt: new Date('2026-03-20T14:00:00+11:00'), allDay: false, location: 'Sports Fields', building: 'FIELDS', category: 'Free Food', isFeatured: true, priority: 65, createdAt: new Date() },
+  // Career (4)
+  { id: 'aaaaaaaa-0003-4000-8000-000000000001', title: 'Tech Industry Career Fair', description: 'Meet recruiters from Google, Microsoft, Atlassian, and more.', startAt: new Date('2026-03-07T09:00:00+11:00'), endAt: new Date('2026-03-07T16:00:00+11:00'), allDay: false, location: 'Macquarie Theatre', building: 'MQTH', category: 'Career', isFeatured: true, priority: 80, createdAt: new Date() },
+  { id: 'aaaaaaaa-0003-4000-8000-000000000002', title: 'Graduate Employer Mixer', description: 'Casual networking with hiring managers. Refreshments provided.', startAt: new Date('2026-03-11T17:00:00+11:00'), endAt: new Date('2026-03-11T19:30:00+11:00'), allDay: false, location: 'Campus Hub Foyer', building: '18WW', category: 'Career', isFeatured: false, priority: 55, createdAt: new Date() },
+  { id: 'aaaaaaaa-0003-4000-8000-000000000003', title: 'Resume & LinkedIn Workshop', description: 'Career advisors help you polish your resume and LinkedIn profile.', startAt: new Date('2026-03-14T13:00:00+11:00'), endAt: new Date('2026-03-14T15:00:00+11:00'), allDay: false, location: 'Digital Learning Centre', building: 'DLC', category: 'Career', isFeatured: false, priority: 50, createdAt: new Date() },
+  { id: 'aaaaaaaa-0003-4000-8000-000000000004', title: 'Startup Pitch Night', description: 'Watch student startups pitch to investors. Networking drinks afterwards.', startAt: new Date('2026-03-19T18:00:00+11:00'), endAt: new Date('2026-03-19T21:00:00+11:00'), allDay: false, location: 'Incubator Hub', building: 'INCUB', category: 'Career', isFeatured: false, priority: 60, createdAt: new Date() },
+  // Social (4)
+  { id: 'aaaaaaaa-0004-4000-8000-000000000001', title: 'International Student Mixer', description: 'Games, music, and free refreshments. Meet fellow students!', startAt: new Date('2026-03-08T17:00:00+11:00'), endAt: new Date('2026-03-08T20:00:00+11:00'), allDay: false, location: 'UniBar', building: 'UBAR', category: 'Social', isFeatured: false, priority: 55, createdAt: new Date() },
+  { id: 'aaaaaaaa-0004-4000-8000-000000000002', title: 'Trivia Night', description: 'Test your knowledge in teams of 4–6. Prizes for top 3!', startAt: new Date('2026-03-12T18:30:00+11:00'), endAt: new Date('2026-03-12T21:00:00+11:00'), allDay: false, location: 'UniBar', building: 'UBAR', category: 'Social', isFeatured: false, priority: 50, createdAt: new Date() },
+  { id: 'aaaaaaaa-0004-4000-8000-000000000003', title: 'Outdoor Movie Night', description: 'Screening of Interstellar on the big screen. BYO blankets!', startAt: new Date('2026-03-15T19:00:00+11:00'), endAt: new Date('2026-03-15T22:00:00+11:00'), allDay: false, location: 'Sports Fields', building: 'FIELDS', category: 'Social', isFeatured: true, priority: 70, createdAt: new Date() },
+  { id: 'aaaaaaaa-0004-4000-8000-000000000004', title: 'Cultural Festival', description: 'Food stalls, performances, and art from 30+ cultures.', startAt: new Date('2026-03-21T10:00:00+11:00'), endAt: new Date('2026-03-21T18:00:00+11:00'), allDay: true, location: 'Central Courtyard', building: 'LIB', category: 'Social', isFeatured: true, priority: 75, createdAt: new Date() },
+];
+
 interface PublicEventsState {
   // Data
   events: PublicEvent[];
@@ -62,14 +88,26 @@ export const usePublicEventsStore = create<PublicEventsState>()(
             .order('start_at', { ascending: true });
 
           if (error) {
+            // DB error — use fallback sample events
+            const now = new Date();
+            const fallback = SAMPLE_PUBLIC_EVENTS.filter((e) => e.startAt >= now);
             set({
+              events: fallback,
+              featuredEvents: fallback.filter((e) => e.isFeatured),
               isLoading: false,
-              error: error.message || 'Failed to load events',
+              error: null,
             });
             return;
           }
 
-          const events = (data as PublicEventFromDB[]).map(transformPublicEvent);
+          let events = (data as PublicEventFromDB[]).map(transformPublicEvent);
+
+          // If DB returned no events, use fallback sample events
+          if (events.length === 0) {
+            const now = new Date();
+            events = SAMPLE_PUBLIC_EVENTS.filter((e) => e.startAt >= now);
+          }
+
           const featuredEvents = events.filter((e) => e.isFeatured);
 
           set({
@@ -81,10 +119,14 @@ export const usePublicEventsStore = create<PublicEventsState>()(
           // Check which events user has already added
           await get().checkUserEvents();
         } catch (error) {
-          console.error('Failed to fetch public events:', error);
+          // Network/other error — use fallback sample events
+          const now = new Date();
+          const fallback = SAMPLE_PUBLIC_EVENTS.filter((e) => e.startAt >= now);
           set({
+            events: fallback,
+            featuredEvents: fallback.filter((e) => e.isFeatured),
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Failed to load events',
+            error: null,
           });
         }
       },

@@ -132,7 +132,7 @@ export default function EventsWidget({
                       key={event.id}
                       className={cn(
                         'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
-                        isOverdue && 'opacity-60 grayscale bg-red-500/5',
+                        isOverdue && 'opacity-70 bg-red-500/5',
                         isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
                       )}
                       style={{
