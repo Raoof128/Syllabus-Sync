@@ -1,10 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import AppFooter from '@/components/layout/AppFooter';
 
 const SECTION_TITLES = [
   'terms_s1_title',
@@ -21,20 +20,19 @@ const SECTION_TITLES = [
 
 export default function TermsPage() {
   const { t } = useTypedTranslation();
-  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-mq-background">
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-[#8B1525] via-[#A6192E] to-[#76232f] border-b border-white/10">
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-          <button
-            onClick={() => router.back()}
-            className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors mb-6"
+          <Link
+            href="/home"
+            className="inline-flex items-center gap-1.5 rounded-mq-lg border border-white/20 bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white backdrop-blur-sm transition-all duration-200 hover:border-white/35 hover:bg-white/20 mb-6"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {t('terms_back_to', { appName: APP_CONFIG.name })}
-          </button>
+          </Link>
 
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
@@ -51,8 +49,8 @@ export default function TermsPage() {
             </div>
           </div>
 
-          {/* Red accent bar */}
-          <div className="mt-6 h-0.5 w-12 rounded-full bg-mq-primary" />
+          {/* Accent bar */}
+          <div className="mt-6 h-0.5 w-12 rounded-full bg-[#FFB81C]" />
         </div>
       </div>
 
@@ -272,7 +270,6 @@ export default function TermsPage() {
               </p>
             </section>
 
-            <AppFooter className="mt-6 rounded-xl" />
           </div>
         </div>
       </div>

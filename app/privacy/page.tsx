@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { ArrowLeft, Lock } from 'lucide-react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import AppFooter from '@/components/layout/AppFooter';
 
 const SECTION_KEYS = [
   'privacy_s1_title',
@@ -26,20 +24,19 @@ const SECTION_KEYS = [
 
 export default function PrivacyPolicyPage() {
   const { t } = useTypedTranslation();
-  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-mq-background">
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-[#8B1525] via-[#A6192E] to-[#76232f] border-b border-white/10">
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-          <button
-            onClick={() => router.back()}
-            className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors mb-6"
+          <Link
+            href="/home"
+            className="inline-flex items-center gap-1.5 rounded-mq-lg border border-white/20 bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white backdrop-blur-sm transition-all duration-200 hover:border-white/35 hover:bg-white/20 mb-6"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {t('privacy_back_to', { appName: APP_CONFIG.name })}
-          </button>
+          </Link>
 
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
@@ -56,8 +53,8 @@ export default function PrivacyPolicyPage() {
             </div>
           </div>
 
-          {/* Red accent bar */}
-          <div className="mt-6 h-0.5 w-12 rounded-full bg-mq-primary" />
+          {/* Accent bar */}
+          <div className="mt-6 h-0.5 w-12 rounded-full bg-[#FFB81C]" />
         </div>
       </div>
 
@@ -594,29 +591,6 @@ export default function PrivacyPolicyPage() {
               </p>
             </section>
 
-            {/* Contact card */}
-            <section className="rounded-xl border border-mq-primary/20 bg-mq-primary/5 p-5 space-y-3">
-              <h2 className="text-base font-bold text-mq-content flex items-center gap-2">
-                <span className="h-1.5 w-4 rounded-full bg-mq-primary" />
-                {t('privacy_contact_title')}
-              </h2>
-              <p className="text-sm text-mq-content-secondary leading-relaxed">
-                {t('privacy_contact_p1')}
-              </p>
-              <div className="bg-mq-card-background border border-mq-border rounded-xl p-4 space-y-1 text-sm text-mq-content-secondary">
-                <p>
-                  <strong className="text-mq-content">{APP_CONFIG.name}</strong>
-                </p>
-                <p>
-                  {t('privacy_contact_email', {
-                    supportEmail: UNIVERSITY_CONFIG.supportEmail,
-                  })}
-                </p>
-                <p>{UNIVERSITY_CONFIG.name}</p>
-              </div>
-            </section>
-
-            <AppFooter className="mt-6 rounded-xl" />
           </div>
         </div>
       </div>
