@@ -104,20 +104,22 @@ export function usePublicFeed() {
     return filteredEvents.filter((e) => !featuredIds.has(e.id));
   }, [filteredEvents, featuredEvents]);
 
-  // Category counts - count only gridEvents (non-featured) to match what's displayed in the grid
-  // Featured events are shown in the carousel, not in the grid
-  const categoryCounts = useMemo(() => {
-    // Get all non-featured events (before filtering by category/search/time)
+  // All non-featured events (before filtering by category/search/time) for QuickStats
+  const nonFeaturedEvents = useMemo(() => {
     const featuredIds = new Set(
       Array.isArray(allFeaturedEvents)
         ? allFeaturedEvents.filter(e => e && e.id).map(e => e.id)
         : []
     );
-    const nonFeaturedEvents = (Array.isArray(events)
+    return (Array.isArray(events)
       ? events.filter(e => e && typeof e.category === 'string' && e.startAt)
       : []
     ).filter(e => !featuredIds.has(e.id));
+  }, [events, allFeaturedEvents]);
 
+  // Category counts - count only non-featured events to match what's displayed in the grid
+  // Featured events are shown in the carousel, not in the grid
+  const categoryCounts = useMemo(() => {
     const counts: Record<CategoryFilter, number> = {
       All: nonFeaturedEvents.length,
       Career: 0,
@@ -131,7 +133,7 @@ export function usePublicFeed() {
       }
     });
     return counts;
-  }, [events, allFeaturedEvents]);
+  }, [nonFeaturedEvents]);
 
   // Handle add to calendar
   const handleAddToCalendar = useCallback(
@@ -155,6 +157,7 @@ export function usePublicFeed() {
     events,
     featuredEvents,
     gridEvents,
+    nonFeaturedEvents,
     isLoading,
     error,
     isAddingToCalendar,

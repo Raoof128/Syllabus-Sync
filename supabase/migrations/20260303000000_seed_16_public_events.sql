@@ -113,7 +113,7 @@ INSERT INTO public.public_events (
   'Outdoor Movie Night',
   'Screening of Interstellar on the big screen. BYO blankets and snacks!',
   '2026-03-15 19:00:00+11', '2026-03-15 22:00:00+11', false,
-  'Sports Fields', 'FIELDS', NULL, 'Social', true, 70, NULL
+  'Sports Fields', 'FIELDS', NULL, 'Social', false, 70, NULL
 ),
 (
   'aaaaaaaa-0004-4000-8000-000000000004',

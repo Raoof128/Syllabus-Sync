@@ -26,9 +26,9 @@ export default function PublicFeedClient() {
 
   // Custom hook for feed logic
   const {
-    events,
     featuredEvents,
     gridEvents,
+    nonFeaturedEvents,
     isLoading,
     error,
     isAddingToCalendar,
@@ -144,7 +144,7 @@ export default function PublicFeedClient() {
             {/* Quick Stats */}
             <MagicCard isLiquidEnhanced>
               <div className="p-4">
-                <QuickStats events={events} />
+                <QuickStats events={nonFeaturedEvents} />
               </div>
             </MagicCard>
 
