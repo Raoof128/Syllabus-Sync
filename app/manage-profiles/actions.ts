@@ -2,11 +2,7 @@
 
 import { profileSchema, ProfileFormValues } from './schema';
 import { revalidatePath } from 'next/cache';
-import { logger } from '@/lib/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
-
-// Mock DB delay - remove this in production
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export async function updateProfileAction(profileId: string, data: ProfileFormValues) {
   // 0. SECURITY: Rate Limiting
@@ -24,18 +20,12 @@ export async function updateProfileAction(profileId: string, data: ProfileFormVa
   }
 
   try {
-    // 2. DB OPERATION: Replace this with your actual DB call
-    // await prisma.userProfile.update({ where: { id: profileId }, data: parsed.data });
-
-    await delay(500); // Fake delay
-    logger.info('Server saving:', parsed.data);
-
-    // 3. CACHE: Refresh the page data
+    // 2. CACHE: Refresh the page data after the store persists via API
     revalidatePath('/manage-profiles');
 
     return { success: true, message: 'Profile updated successfully' };
   } catch (error) {
-    logger.error('Database update failed:', error);
-    return { success: false, message: 'Database connection failed' };
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return { success: false, message: `Validation failed: ${message}` };
   }
 }

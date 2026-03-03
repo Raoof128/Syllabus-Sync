@@ -1,4 +1,10 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Manage Profiles — Student ID Fix & Auto-Reload
+Summary: Full audit of manage-profiles page. Fixed student ID save flow: removed normalizeStudentId blanking of non-8-digit IDs (now preserves all values), relaxed Zod schema from exact 8-digit regex to max 20 chars, removed mocked server action (delay + logger.info), fixed mapClientToDb to send null for empty student IDs (allows clearing). Added auto-reload: fetchProfile() runs after successful save, exposed reloadProfile function, added "Reload Changes" button to page UI.
+Files Changed: `app/manage-profiles/hooks/useProfileManager.ts`, `app/manage-profiles/schema.ts`, `app/manage-profiles/actions.ts`, `lib/store/profilesStore.ts`, `app/manage-profiles/page.tsx`
+Verification: `eslint` passed; `typecheck` passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: About & Contact Page Design Parity Audit
 Summary: Full visual redesign of About and Contact pages to match the project design system. Added decorative hero backgrounds (dot pattern, color blurs), serif headings (Source Serif Pro), staggered fade-in animations, icon circles with primary/10 backgrounds, section label accents, magazine-style developer portrait cards with gradient overlay and hover zoom, refined contact form spacing and input styling, consistent gold accent for university label.
 Files Changed: `app/about/page.tsx`, `app/contact/page.tsx`

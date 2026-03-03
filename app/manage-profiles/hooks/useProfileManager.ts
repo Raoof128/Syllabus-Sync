@@ -29,10 +29,7 @@ function normalizeYear(year: string | undefined | null): string {
 
 function normalizeStudentId(studentId: string | undefined | null): string {
   if (!studentId) return '';
-  const trimmed = studentId.trim();
-  // Legacy accounts may contain non-standard IDs; keep form valid so other
-  // fields (like course/year) can still be edited.
-  return /^\d{8}$/.test(trimmed) ? trimmed : '';
+  return studentId.trim();
 }
 
 export function useProfileManager() {
@@ -147,6 +144,8 @@ export function useProfileManager() {
       toastUtils.success('Saved', t('profileUpdatedMsg') || 'Profile updated successfully');
       // Reset form to clean "dirty" state
       form.reset(data);
+      // Re-fetch from DB so the UI reflects the persisted values
+      await fetchProfile();
     } else {
       // Handle server validation failures or messages
       let errorMessage = 'Validation failed';
@@ -166,6 +165,11 @@ export function useProfileManager() {
     }
   };
 
+  const reloadProfile = async () => {
+    await fetchProfile();
+    toastUtils.success('Refreshed', 'Profile reloaded from server');
+  };
+
   return {
     // Return the OPTIMISTIC profile to the UI, not the raw store profile
     currentProfile: optimisticProfile,
@@ -176,5 +180,6 @@ export function useProfileManager() {
     isDirty: form.formState.isDirty, // True if user changed something
     isProfileLoading,
     hasLoaded,
+    reloadProfile,
   };
 }

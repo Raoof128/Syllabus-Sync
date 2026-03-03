@@ -187,9 +187,7 @@ function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
   }
   if (updates.studentId !== undefined) {
     const trimmed = updates.studentId.trim();
-    if (trimmed) {
-      dbUpdates.student_id = trimmed;
-    }
+    dbUpdates.student_id = trimmed || null;
   }
   if (updates.faculty !== undefined) {
     dbUpdates.faculty = updates.faculty || null;

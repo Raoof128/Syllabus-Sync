@@ -5,7 +5,7 @@ export const profileSchema = z.object({
 
   studentId: z
     .string()
-    .regex(/^\d{8}$/, 'Student ID must be exactly 8 digits')
+    .max(20, 'Student ID is too long')
     .optional()
     .or(z.literal('')), // Allows empty string if they haven't set it yet
 

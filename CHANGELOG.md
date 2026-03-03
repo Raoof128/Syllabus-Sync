@@ -1,4 +1,10 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Manage Profiles — Student ID Fix & Auto-Reload
+Summary: Fixed student ID editing for all accounts: removed normalizeStudentId blanking, relaxed schema validation, removed mocked server action, fixed mapClientToDb to allow clearing IDs. Added auto-reload after save and "Reload Changes" button.
+Files: Modified `app/manage-profiles/hooks/useProfileManager.ts`, `app/manage-profiles/schema.ts`, `app/manage-profiles/actions.ts`, `lib/store/profilesStore.ts`, `app/manage-profiles/page.tsx`.
+Verification: `eslint` and `typecheck` passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: About & Contact Page Design Parity Audit
 Summary: Full visual redesign of About and Contact pages — decorative hero textures, serif headings, staggered animations, icon circles, magazine-style developer cards, refined form inputs, consistent design token usage.
 Files: Modified `app/about/page.tsx`, `app/contact/page.tsx`.

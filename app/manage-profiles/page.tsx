@@ -8,7 +8,7 @@ import { ReminderSettings } from './components/ReminderSettings';
 import { SecurityCard } from './components/SecurityCard';
 import { useProfileManager } from './hooks/useProfileManager';
 import { Button } from '@/components/ui/mq/button';
-import { Save, Loader2, User as UserIcon, ArrowLeft } from 'lucide-react'; // Renamed User to UserIcon to avoid conflict
+import { Save, Loader2, User as UserIcon, ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ import { ProfileSkeleton } from './components/ProfileSkeleton';
 export default function ManageProfilesPage() {
   const { t } = useTypedTranslation();
   const router = useRouter();
-  const { currentProfile, form, saveProfile, isSaving, isDirty, isValid, hasLoaded } =
+  const { currentProfile, form, saveProfile, isSaving, isDirty, isValid, hasLoaded, reloadProfile, isProfileLoading } =
     useProfileManager();
 
   // Show skeleton until the DB fetch completes — prevents stale localStorage data from flashing
@@ -87,6 +87,20 @@ export default function ManageProfilesPage() {
             </Button>
           </div>
         )}
+
+        {/* Reload button — always visible at the bottom */}
+        <div className="flex justify-center pt-2 pb-4">
+          <Button
+            variant="outline"
+            onClick={reloadProfile}
+            disabled={isProfileLoading || isSaving}
+            size="sm"
+            className="flex items-center gap-2 text-mq-content-secondary"
+          >
+            <RefreshCw className={`h-4 w-4 ${isProfileLoading ? 'animate-spin' : ''}`} />
+            {isProfileLoading ? 'Reloading…' : 'Reload Changes'}
+          </Button>
+        </div>
       </div>
     </div>
   );
