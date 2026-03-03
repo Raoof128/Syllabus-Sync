@@ -13,6 +13,7 @@ import { useEventsStore } from '@/lib/store/eventsStore';
 import { Event } from '@/lib/types';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
 import { formatLocalizedDate } from '@/lib/utils/locale';
+import { isPast } from 'date-fns';
 
 interface EventsWidgetProps {
   onAddEvent: () => void;
@@ -118,11 +119,20 @@ export default function EventsWidget({
                   const isFromPublicFeed = Boolean(event.sourcePublicEventId);
                   const isHighlighted = eventHighlightActive && highlightedEventId === event.id;
 
+                  // Check if event is overdue (past its start time)
+                  const eventStartDate = event.startAt
+                    ? event.startAt instanceof Date
+                      ? event.startAt
+                      : new Date(event.startAt)
+                    : null;
+                  const isOverdue = eventStartDate ? isPast(eventStartDate) : false;
+
                   return (
                     <div
                       key={event.id}
                       className={cn(
                         'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
+                        isOverdue && 'opacity-60 grayscale bg-red-500/5',
                         isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
                       )}
                       style={{
@@ -135,7 +145,24 @@ export default function EventsWidget({
                       tabIndex={0}
                     >
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{event.title}</h4>
+                        <div className="flex items-center gap-2">
+                          <h4
+                            className={cn(
+                              'font-medium text-sm truncate',
+                              isOverdue && 'line-through decoration-mq-content-tertiary',
+                            )}
+                          >
+                            {event.title}
+                          </h4>
+                          {isOverdue && (
+                            <Badge
+                              variant="brand"
+                              className="text-[9px] px-1 py-0 h-4 uppercase bg-red-500"
+                            >
+                              {tOr('overdue', 'Overdue')}
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-[11px] text-mq-content-secondary truncate">
                           {event.startAt
                             ? formatMonthDayTime(

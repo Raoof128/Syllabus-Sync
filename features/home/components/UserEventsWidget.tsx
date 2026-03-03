@@ -6,7 +6,7 @@ import { useEventsStore } from '@/lib/store/eventsStore';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
 import { Calendar, ExternalLink, Clock, MapPin, Eye } from 'lucide-react';
-import { isToday, format, isValid, endOfMonth, isBefore, startOfDay } from 'date-fns';
+import { isToday, format, isValid, endOfMonth, isBefore, startOfDay, isPast } from 'date-fns';
 import { enAU, es, faIR } from 'date-fns/locale';
 import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
@@ -168,6 +168,7 @@ const UserEventsWidget = memo(() => {
                   : null;
               const eventIsToday = eventStartDate ? isToday(eventStartDate) : false;
               const eventDateStr = eventStartDate ? format(eventStartDate, 'yyyy-MM-dd') : '';
+              const isOverdue = eventStartDate ? isPast(eventStartDate) : false;
 
               return (
                 <div
@@ -175,6 +176,7 @@ const UserEventsWidget = memo(() => {
                   className={cn(
                     'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 focus:ring-offset-mq-card-background focus:bg-mq-primary/10 focus:border-mq-primary/40 focus:shadow-sm',
                     'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
+                    isOverdue && 'opacity-60 grayscale bg-red-500/5',
                   )}
                   style={{
                     borderLeftColor: eventColor,
@@ -201,12 +203,23 @@ const UserEventsWidget = memo(() => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <h4
-                        className="text-mq-sm font-medium text-mq-content truncate"
+                        className={cn(
+                          'text-mq-sm font-medium text-mq-content truncate',
+                          isOverdue && 'line-through decoration-mq-content-tertiary',
+                        )}
                         title={event.title}
                       >
                         {event.title}
                       </h4>
-                      {eventIsToday && (
+                      {isOverdue && (
+                        <Badge
+                          variant="brand"
+                          className="text-[9px] px-1 py-0 h-4 uppercase shrink-0 bg-red-500"
+                        >
+                          {tOr('overdue', 'Overdue')}
+                        </Badge>
+                      )}
+                      {!isOverdue && eventIsToday && (
                         <Badge
                           variant="neutral"
                           className="text-[10px] px-1.5 py-0.5 font-medium shrink-0 bg-mq-background-secondary text-mq-content-secondary"

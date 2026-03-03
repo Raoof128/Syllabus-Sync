@@ -91,9 +91,9 @@ export default function ReminderModal({
           setCustomTime(existing.customTime || '09:00');
           setExistingReminderId(existing.id);
         } else {
-          // Reset to defaults
+          // Reset to defaults - default timing is 1 hour before
           setEnabled(false);
-          setTiming('1day');
+          setTiming('1hour');
           setCustomDate('');
           setCustomTime('09:00');
           setExistingReminderId(null);
@@ -102,16 +102,20 @@ export default function ReminderModal({
     }
   }, [open, itemId, itemType, getReminderForItem]);
 
-  // Set default custom date based on item date
+  // Set default custom date and time based on item date when switching to custom timing
   useEffect(() => {
-    if (open && itemDate && !customDate) {
+    if (open && itemDate && timing === 'custom') {
       startTransition(() => {
-        const defaultDate = new Date(itemDate);
-        defaultDate.setDate(defaultDate.getDate() - 1); // Default to 1 day before
-        setCustomDate(format(defaultDate, 'yyyy-MM-dd'));
+        // If no custom date set yet, default to 1 hour before the item date
+        if (!customDate) {
+          const defaultDate = new Date(itemDate);
+          defaultDate.setHours(defaultDate.getHours() - 1);
+          setCustomDate(format(defaultDate, 'yyyy-MM-dd'));
+          setCustomTime(format(defaultDate, 'HH:mm'));
+        }
       });
     }
-  }, [open, itemDate, customDate]);
+  }, [open, itemDate, timing, customDate]);
 
   const handleSave = useCallback(() => {
     if (enabled) {
@@ -306,6 +310,7 @@ export default function ReminderModal({
                       type="date"
                       value={customDate}
                       onChange={(e) => setCustomDate(e.target.value)}
+                      min={format(new Date(), 'yyyy-MM-dd')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -320,7 +325,7 @@ export default function ReminderModal({
                 </div>
               )}
 
-              {/* Preview */}
+              {/* Preview for preset timing */}
               {itemDate && timing !== 'custom' && (
                 <div className="p-3 rounded-lg bg-mq-primary/5 border border-mq-primary/20">
                   <div className="flex items-center gap-2 text-sm">
@@ -328,6 +333,21 @@ export default function ReminderModal({
                     <span className="text-mq-content">
                       {t('youWillBeNotified') || "You'll be notified"}{' '}
                       <span className="font-medium">{getTimingLabel(timing)}</span>
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Preview for custom timing */}
+              {timing === 'custom' && customDate && customTime && (
+                <div className="p-3 rounded-lg bg-mq-primary/5 border border-mq-primary/20">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock className="h-4 w-4 text-mq-primary" />
+                    <span className="text-mq-content">
+                      {t('youWillBeNotified') || "You'll be notified"}{' '}
+                      <span className="font-medium">
+                        {format(new Date(`${customDate}T${customTime}`), 'PPP p')}
+                      </span>
                     </span>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TodaySchedule from '@/features/home/components/TodaySchedule';
 import UpcomingDeadlines from '@/features/home/components/UpcomingDeadlines';
@@ -56,36 +56,6 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   useHomeEventListeners();
 
   const [fabOpen, setFabOpen] = useState(false);
-  const [fabVisible, setFabVisible] = useState(true);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    // The app scrolls on .layout-main (overflow-y-auto container), not window
-    const scrollContainer = document.querySelector('.layout-main') || document.documentElement;
-    lastScrollY.current = scrollContainer.scrollTop;
-
-    const SCROLL_DIRECTION_THRESHOLD = 8;
-
-    const handleScroll = () => {
-      const currentY = scrollContainer.scrollTop;
-      const deltaY = currentY - lastScrollY.current;
-
-      // Keep FAB visible near the top; elsewhere only reveal on upward scroll.
-      if (currentY <= 100) {
-        setFabVisible(true);
-      } else if (deltaY < -SCROLL_DIRECTION_THRESHOLD) {
-        setFabVisible(true);
-      } else if (deltaY > SCROLL_DIRECTION_THRESHOLD) {
-        setFabVisible(false);
-        setFabOpen(false);
-      }
-
-      lastScrollY.current = currentY;
-    };
-
-    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
-    return () => scrollContainer.removeEventListener('scroll', handleScroll);
-  }, []);
 
   if (hasError) {
     return (
@@ -300,15 +270,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         </section>
 
         {/* Floating Action Button (FAB) for Quick Actions */}
-        <m.div
-          className="fixed bottom-6 right-6 z-50"
-          initial={{ y: 0, opacity: 1 }}
-          animate={{
-            y: fabVisible ? 0 : 100,
-            opacity: fabVisible ? 1 : 0,
-          }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-        >
+        <div className="fixed bottom-6 right-6 z-50">
           <div className="relative">
             {/* FAB Menu */}
             {fabOpen && (
@@ -394,7 +356,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
               </m.div>
             </Button>
           </div>
-        </m.div>
+        </div>
       </section>
     </LazyMotion>
   );

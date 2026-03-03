@@ -98,7 +98,7 @@
     "browserslist": "^4.28.1",
     "caniuse-lite": "^1.0.30001767",
     "dotenv": "^17.2.3",
-    "eslint": "^9.39.3",
+    "eslint": "^9.18.0",
     "eslint-config-next": "^16.1.6",
     "jsdom": "^28.1.0",
     "kill-port": "^2.0.1",

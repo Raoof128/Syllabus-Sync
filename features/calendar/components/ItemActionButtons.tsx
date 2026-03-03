@@ -134,7 +134,7 @@ export default function ItemActionButtons({
     'p-0 inline-flex items-center justify-center rounded-lg transition-all duration-200',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background',
     'text-mq-content-secondary hover:text-mq-content',
-    'dark:bg-white/10 dark:text-white/80 dark:hover:bg-white/20 dark:hover:text-white',
+    'dark:bg-white/15 dark:text-mq-content dark:hover:bg-white/25 dark:hover:text-mq-content',
     buttonSizeClass,
   );
 
