@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/mq/button';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { PublicEvent } from '@/lib/types/publicEvents';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { useHydration } from '@/lib/hooks';
 
 // Components
 import { FeaturedEventsBanner } from './FeaturedEventsBanner';
@@ -21,6 +22,7 @@ import { usePublicFeed } from '../hooks/usePublicFeed';
 export default function PublicFeedClient() {
   const { t, language } = useTypedTranslation();
   const locale = language === 'en' ? 'en-AU' : language;
+  const isHydrated = useHydration();
 
   // Custom hook for feed logic
   const {
@@ -48,10 +50,12 @@ export default function PublicFeedClient() {
   const [selectedEvent, setSelectedEvent] = useState<PublicEvent | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Handle event click
+  // Handle event click - only if event is valid
   const handleEventClick = useCallback((event: PublicEvent) => {
-    setSelectedEvent(event);
-    setIsModalOpen(true);
+    if (event && event.id) {
+      setSelectedEvent(event);
+      setIsModalOpen(true);
+    }
   }, []);
 
   // Handle modal close
@@ -75,22 +79,22 @@ export default function PublicFeedClient() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Column - Events */}
           <div className="flex-1 min-w-0">
-            {/* Loading State */}
-            {isLoading && <FeedSkeletons />}
+            {/* Loading State - show during initial load or before hydration */}
+            {(!isHydrated || isLoading) && <FeedSkeletons />}
 
             {/* Error State */}
-            {error && !isLoading && (
+            {isHydrated && error && !isLoading && (
               <MagicCard className="p-8 text-center">
                 <p className="text-mq-error mb-4">{error}</p>
                 <Button onClick={() => fetchPublicEvents()}>{t('tryAgain')}</Button>
               </MagicCard>
             )}
 
-            {/* Content */}
-            {!isLoading && !error && (
+            {/* Content - only render after hydration */}
+            {isHydrated && !isLoading && !error && (
               <>
-                {/* Featured Events Banner */}
-                {featuredEvents.length > 0 && (
+                {/* Featured Events Banner - only render if we have valid featured events */}
+                {featuredEvents && featuredEvents.length > 0 && featuredEvents[0]?.category && (
                   <FeaturedEventsBanner events={featuredEvents} onEventClick={handleEventClick} />
                 )}
 

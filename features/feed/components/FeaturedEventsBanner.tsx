@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/mq/badge';
 import { cn } from '@/lib/utils';
 import { PublicEvent } from '@/lib/types/publicEvents';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { useHydration } from '@/lib/hooks';
 
 const categoryGradients: Record<string, string> = {
   Career: 'from-blue-600 to-blue-800',
@@ -31,15 +32,19 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
   const { t, language } = useTypedTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const isHydrated = useHydration();
 
   const getLocaleString = language === 'en' ? 'en-AU' : language;
+
+  // Compute safe index to handle when events array shrinks (e.g., category filter changes)
+  const safeIndex = events.length > 0 ? Math.min(Math.max(0, currentIndex), events.length - 1) : 0;
 
   // Auto-rotate every 5 seconds
   useEffect(() => {
     if (!isAutoPlaying || events.length <= 1) return;
 
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % events.length);
+      setCurrentIndex((prev) => (prev + 1) % Math.max(1, events.length));
     }, 5000);
 
     return () => clearInterval(timer);
@@ -47,17 +52,58 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
 
   const goToPrevious = useCallback(() => {
     setIsAutoPlaying(false);
-    setCurrentIndex((prev) => (prev - 1 + events.length) % events.length);
+    setCurrentIndex((prev) => {
+      const length = Math.max(1, events.length);
+      return (prev - 1 + length) % length;
+    });
   }, [events.length]);
 
   const goToNext = useCallback(() => {
     setIsAutoPlaying(false);
-    setCurrentIndex((prev) => (prev + 1) % events.length);
+    setCurrentIndex((prev) => {
+      const length = Math.max(1, events.length);
+      return (prev + 1) % length;
+    });
   }, [events.length]);
 
-  if (events.length === 0) return null;
+  // Early return if no events or not hydrated yet
+  if (!isHydrated || !events || events.length === 0) return null;
 
-  const currentEvent = events[currentIndex];
+  // Get current event using safe index
+  const currentEvent = events[safeIndex];
+
+  // Additional safety check - if event is somehow undefined, skip rendering
+  if (!currentEvent || typeof currentEvent.category !== 'string') return null;
+
+  // Format date safely to avoid hydration mismatch
+  const formatDate = (date: Date | string | undefined) => {
+    if (!date) return '';
+    try {
+      const d = date instanceof Date ? date : new Date(date);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString(getLocaleString, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+      });
+    } catch {
+      return '';
+    }
+  };
+
+  const formatTime = (date: Date | string | undefined) => {
+    if (!date) return '';
+    try {
+      const d = date instanceof Date ? date : new Date(date);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleTimeString(getLocaleString, {
+        hour: 'numeric',
+        minute: '2-digit',
+      });
+    } catch {
+      return '';
+    }
+  };
 
   return (
     <div className="relative mb-8">
@@ -76,7 +122,7 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
           onClick={() => onEventClick(currentEvent)}
           className={cn(
             'w-full text-left relative overflow-hidden bg-linear-to-r p-6 md:p-8 min-h-50 md:min-h-60 transition-all duration-500 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/50',
-            categoryGradients[currentEvent.category],
+            categoryGradients[currentEvent.category] || categoryGradients.Academic,
           )}
         >
           {/* Decorative Pattern */}
@@ -89,7 +135,7 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
           <div className="relative z-10 max-w-2xl">
             {/* Category Badge */}
             <Badge className="mb-3 bg-white/20 text-white border-white/30 backdrop-blur-sm">
-              <span className="mr-1">{categoryIcons[currentEvent.category]}</span>
+              <span className="mr-1">{categoryIcons[currentEvent.category] || '📋'}</span>
               {currentEvent.category}
             </Badge>
 
@@ -107,26 +153,17 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
             <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
               <div className="flex items-center gap-1.5">
                 <Calendar className="h-4 w-4 text-white/80" />
-                <span>
-                  {currentEvent.startAt.toLocaleDateString(getLocaleString, {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                  })}
-                </span>
+                <span>{formatDate(currentEvent.startAt)}</span>
                 {!currentEvent.allDay && (
                   <span>
                     {' • '}
-                    {currentEvent.startAt.toLocaleTimeString(getLocaleString, {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    })}
+                    {formatTime(currentEvent.startAt)}
                   </span>
                 )}
               </div>
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-4 w-4" />
-                <span className="truncate max-w-50">{currentEvent.location}</span>
+                <span className="truncate max-w-50">{currentEvent.location || 'TBA'}</span>
               </div>
             </div>
           </div>
@@ -178,7 +215,7 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
                 }}
                 className={cn(
                   'w-2 h-2 rounded-full transition-all duration-300',
-                  index === currentIndex ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60',
+                  index === safeIndex ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60',
                 )}
                 aria-label={`Go to event ${index + 1}`}
               />

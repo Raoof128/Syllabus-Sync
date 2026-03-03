@@ -18,7 +18,7 @@ INSERT INTO public.public_events (
   'aaaaaaaa-0001-4000-8000-000000000002',
   'AI & Ethics Public Lecture',
   'Guest speaker Prof. Sarah Chen discusses ethical implications of generative AI in education.',
-  '2026-03-10 14:00:00+11', '2026-03-10 16:00:00+11', false,
+  '2026-03-04 14:00:00+11', '2026-03-04 16:00:00+11', false,
   '4 Eastern Road Auditorium', '4ER', NULL, 'Academic', true, 70, NULL
 ),
 (

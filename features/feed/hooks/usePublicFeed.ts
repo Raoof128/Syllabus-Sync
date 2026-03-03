@@ -33,15 +33,25 @@ export function usePublicFeed() {
   // Filter featured events based on category filter (but not search/time)
   // This allows the banner to show relevant featured events when filtering
   const featuredEvents = useMemo(() => {
+    // Safety check - ensure allFeaturedEvents is a valid array with valid events
+    const safeEvents = Array.isArray(allFeaturedEvents)
+      ? allFeaturedEvents.filter(e => e && typeof e.category === 'string' && e.startAt)
+      : [];
+
     if (categoryFilter === 'All') {
-      return allFeaturedEvents;
+      return safeEvents;
     }
-    return allFeaturedEvents.filter((e) => e.category === categoryFilter);
+    return safeEvents.filter((e) => e.category === categoryFilter);
   }, [allFeaturedEvents, categoryFilter]);
 
   // Filter and sort events
   const filteredEvents = useMemo(() => {
-    let result = [...events];
+    // Safety check - ensure events is a valid array with valid events
+    const safeEvents = Array.isArray(events)
+      ? events.filter(e => e && typeof e.category === 'string' && e.startAt)
+      : [];
+
+    let result = [...safeEvents];
 
     // Search filter
     if (searchQuery.trim()) {

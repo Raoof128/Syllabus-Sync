@@ -38,48 +38,72 @@ const UserEventsWidget = memo(() => {
     }
   }, [language]);
 
-  // Get ALL events from today until end of current month
+  // Get events: upcoming (until end of month) + overdue events
+  // Upcoming events first (sorted by date ascending), then overdue (sorted by date descending)
   const monthEndEvents = useMemo(() => {
     const now = new Date();
     const today = startOfDay(now);
     const monthEnd = endOfMonth(now);
 
-    return events
-      .filter((event) => {
-        // Handle both Date objects and string dates from API/persistence
-        let eventDate: Date;
-        if (event.startAt) {
-          eventDate = event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
-        } else if (event.date) {
-          eventDate = event.date instanceof Date ? event.date : new Date(event.date);
-        } else {
-          return false;
-        }
-        if (!isValid(eventDate)) return false;
+    const getEventDate = (event: typeof events[0]): Date | null => {
+      if (event.startAt) {
+        return event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
+      }
+      if (event.date) {
+        return event.date instanceof Date ? event.date : new Date(event.date);
+      }
+      return null;
+    };
 
-        // Show events from today until end of current month (no past events)
-        const eventDay = startOfDay(eventDate);
-        // Event must be today or in the future, AND before or on the last day of the month
-        return !isBefore(eventDay, today) && !isBefore(monthEnd, eventDay);
-      })
-      .sort((a, b) => {
-        const dateA = a.startAt
-          ? a.startAt instanceof Date
-            ? a.startAt
-            : new Date(a.startAt)
-          : a.date instanceof Date
-            ? a.date
-            : new Date(a.date);
-        const dateB = b.startAt
-          ? b.startAt instanceof Date
-            ? b.startAt
-            : new Date(b.startAt)
-          : b.date instanceof Date
-            ? b.date
-            : new Date(b.date);
-        return dateA.getTime() - dateB.getTime();
-      });
+    // Filter to include: upcoming events (today to month end) AND overdue events
+    const filtered = events.filter((event) => {
+      const eventDate = getEventDate(event);
+      if (!eventDate || !isValid(eventDate)) return false;
+
+      const eventDay = startOfDay(eventDate);
+      const isOverdue = isBefore(eventDay, today);
+      const isUpcoming = !isBefore(eventDay, today) && !isBefore(monthEnd, eventDay);
+
+      return isUpcoming || isOverdue;
+    });
+
+    // Sort: upcoming first (date ascending), then overdue (date descending)
+    return filtered.sort((a, b) => {
+      const dateA = getEventDate(a) || new Date();
+      const dateB = getEventDate(b) || new Date();
+      const dayA = startOfDay(dateA);
+      const dayB = startOfDay(dateB);
+      const aIsOverdue = isBefore(dayA, today);
+      const bIsOverdue = isBefore(dayB, today);
+
+      // Upcoming events come first
+      if (!aIsOverdue && bIsOverdue) return -1;
+      if (aIsOverdue && !bIsOverdue) return 1;
+
+      // Within same group, sort by date
+      if (!aIsOverdue && !bIsOverdue) {
+        return dateA.getTime() - dateB.getTime(); // Upcoming: ascending
+      }
+      return dateB.getTime() - dateA.getTime(); // Overdue: descending (most recent first)
+    });
   }, [events]);
+
+  // Count overdue events for the badge
+  const overdueCount = useMemo(() => {
+    const today = startOfDay(new Date());
+    return monthEndEvents.filter((event) => {
+      const eventDate = event.startAt
+        ? event.startAt instanceof Date
+          ? event.startAt
+          : new Date(event.startAt)
+        : event.date
+          ? event.date instanceof Date
+            ? event.date
+            : new Date(event.date)
+          : null;
+      return eventDate && isBefore(startOfDay(eventDate), today);
+    }).length;
+  }, [monthEndEvents]);
 
   const formatEventTime = (event: { startAt: Date; date: Date; time?: string }) => {
     const startDate = event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
@@ -113,7 +137,10 @@ const UserEventsWidget = memo(() => {
               variant="neutral"
               className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
             >
-              {monthEndEvents.length} {tOr('upcoming', 'upcoming')}
+              {monthEndEvents.length} {tOr('eventsLabel', 'events')}
+              {overdueCount > 0 && (
+                <span className="text-red-500 ml-1">({overdueCount} {tOr('overdue', 'overdue')})</span>
+              )}
             </Badge>
           )}
           {/* View Only Badge */}

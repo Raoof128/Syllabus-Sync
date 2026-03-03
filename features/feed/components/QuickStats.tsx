@@ -31,19 +31,22 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
   const [selectedEvent, setSelectedEvent] = useState<PublicEvent | null>(null);
 
   const stats = useMemo(() => {
+    // Safety check - ensure events is a valid array
+    const safeEvents = Array.isArray(events) ? events.filter(e => e && typeof e.category === 'string') : [];
+
     const now = new Date();
     const endOfWeek = new Date(now);
     endOfWeek.setDate(now.getDate() + (7 - now.getDay()));
 
-    const thisWeekEvents = events.filter((e) => e.startAt <= endOfWeek);
-    const freeFood = events.filter((e) => e.category === 'Free Food');
-    const career = events.filter((e) => e.category === 'Career');
-    const social = events.filter((e) => e.category === 'Social');
-    const academic = events.filter((e) => e.category === 'Academic');
+    const thisWeekEvents = safeEvents.filter((e) => e.startAt && e.startAt <= endOfWeek);
+    const freeFood = safeEvents.filter((e) => e.category === 'Free Food');
+    const career = safeEvents.filter((e) => e.category === 'Career');
+    const social = safeEvents.filter((e) => e.category === 'Social');
+    const academic = safeEvents.filter((e) => e.category === 'Academic');
 
     return {
-      total: events.length,
-      totalEvents: events,
+      total: safeEvents.length,
+      totalEvents: safeEvents,
       thisWeek: thisWeekEvents.length,
       thisWeekEvents,
       freeFood: freeFood.length,
