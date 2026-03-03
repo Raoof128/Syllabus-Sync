@@ -654,20 +654,6 @@ export default function LoginClient() {
                 {t('loginWithGoogle')}
               </Button>
 
-              <div className="pt-4 text-center text-xs text-mq-content font-medium space-y-1">
-                <div>
-                  &copy; {new Date().getFullYear()} {UNIVERSITY_CONFIG.name}
-                </div>
-                <div className="text-mq-content-secondary">
-                  <Link href="/privacy" className="hover:underline hover:text-mq-primary">
-                    {t('privacyPolicy')}
-                  </Link>
-                  {' · '}
-                  <Link href="/terms" className="hover:underline hover:text-mq-primary">
-                    {t('termsOfService')}
-                  </Link>
-                </div>
-              </div>
             </form>
           )}
         </div>

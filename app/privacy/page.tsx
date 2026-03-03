@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Lock } from 'lucide-react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import AppFooter from '@/components/layout/AppFooter';
 
 const SECTION_KEYS = [
   'privacy_s1_title',
@@ -27,7 +27,6 @@ const SECTION_KEYS = [
 export default function PrivacyPolicyPage() {
   const { t } = useTypedTranslation();
   const router = useRouter();
-  const currentYear = new Date().getFullYear();
 
   return (
     <div className="min-h-screen bg-mq-background">
@@ -617,33 +616,7 @@ export default function PrivacyPolicyPage() {
               </div>
             </section>
 
-            {/* Footer */}
-            <div className="pt-6 border-t border-mq-border flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/MQ_Logo_Final.png"
-                  alt={t('mqLogoAlt')}
-                  width={32}
-                  height={32}
-                  className="object-contain opacity-70"
-                />
-                <p className="text-xs text-mq-content-secondary">
-                  {t('terms_footer_copy', {
-                    year: currentYear,
-                    appName: APP_CONFIG.name,
-                  })}
-                </p>
-              </div>
-              <div className="flex items-center gap-3 text-xs text-mq-content-secondary">
-                <Link href="/terms" className="hover:text-mq-primary transition-colors">
-                  {t('termsFooter')}
-                </Link>
-                <span className="text-mq-border">·</span>
-                <Link href="/privacy" className="text-mq-primary font-medium">
-                  {t('privacyFooter')}
-                </Link>
-              </div>
-            </div>
+            <AppFooter className="mt-6 rounded-xl" />
           </div>
         </div>
       </div>

@@ -1,4 +1,34 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Global Symmetric Footer Rollout (Final Verification)
+Summary: Completed app-wide footer standardization with a shared `AppFooter`, visible across authenticated and non-auth shells, and removed duplicate per-page footer blocks from Login, Signup, Terms, and Privacy pages for consistent centered year/text presentation.
+Files: Added `components/layout/AppFooter.tsx`; modified `app/client-layout.tsx`, `app/login/LoginClient.tsx`, `app/signup/SignupClient.tsx`, `app/terms/page.tsx`, `app/privacy/page.tsx`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs app/client-layout.tsx app/login/LoginClient.tsx app/signup/SignupClient.tsx app/terms/page.tsx app/privacy/page.tsx components/layout/AppFooter.tsx` passed; `npm run typecheck` passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Global Symmetric Footer Rollout (Step 4)
+Summary: Fixed type regression by restoring `next/link` import in `LoginClient` (links are used in account support and navigation CTAs outside the removed inline footer block).
+Files: Modified `app/login/LoginClient.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Global Symmetric Footer Rollout (Step 3)
+Summary: Removed duplicate inline footers from login/signup and replaced custom Terms/Privacy footer blocks with the shared `AppFooter` to enforce one consistent centered footer style across pages.
+Files: Modified `app/login/LoginClient.tsx`, `app/signup/SignupClient.tsx`, `app/terms/page.tsx`, `app/privacy/page.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Global Symmetric Footer Rollout (Step 2)
+Summary: Integrated `AppFooter` into `ClientLayout` for both authenticated and non-auth route shells; replaced prior screen-reader-only footer with visible centered footer output.
+Files: Modified `app/client-layout.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Global Symmetric Footer Rollout (Step 1)
+Summary: Added reusable `AppFooter` layout component with centered copyright year text and Terms/Privacy links to standardize footer presentation across pages.
+Files: Added `components/layout/AppFooter.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Git Push Rebase Conflict Resolution (main -> origin/main)
 Summary: Resolved non-fast-forward push failure by rebasing local `main` onto `origin/main` and manually fixing the `app/home/HomeClient.tsx` FAB wrapper conflict while preserving safe-area hardened positioning + motion wrapper semantics.
 Files: Modified `app/home/HomeClient.tsx`.

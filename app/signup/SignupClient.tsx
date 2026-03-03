@@ -698,19 +698,6 @@ export default function SignupClient() {
                 </div>
               )}
 
-              {/* Footer */}
-              <div className="pt-2 text-center text-xs text-mq-content-secondary space-y-1">
-                <div>{t('copyright', { year: new Date().getFullYear() })}</div>
-                <div>
-                  <Link href="/privacy" className="hover:underline hover:text-mq-primary">
-                    {t('privacyPolicy')}
-                  </Link>
-                  {' · '}
-                  <Link href="/terms" className="hover:underline hover:text-mq-primary">
-                    {t('termsOfService')}
-                  </Link>
-                </div>
-              </div>
             </div>
           </div>
         </div>

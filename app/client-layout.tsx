@@ -4,6 +4,7 @@ import React, { useEffect, useState, memo, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
+import AppFooter from '@/components/layout/AppFooter';
 import ThemeProvider from '@/components/theme/ThemeProvider';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -195,10 +196,11 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   if (isAuthRoute || isPostAuthRoute || !isAuthenticated) {
     return (
       <ThemeProvider>
-        <div className="flex min-h-screen bg-mq-background">
+        <div className="flex min-h-screen flex-col bg-mq-background">
           <main className="flex-1" role="main">
             {children}
           </main>
+          <AppFooter />
           <Toaster />
         </div>
       </ThemeProvider>
@@ -218,9 +220,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
             <main id="main-content" className="flex-1" role="main" aria-label={t('mainContent')}>
               <ErrorBoundary>{children}</ErrorBoundary>
             </main>
-            <footer role="contentinfo" className="sr-only" aria-label={t('footer')}>
-              <p>{t('copyright', { year: new Date().getFullYear() })}</p>
-            </footer>
+            <AppFooter />
             <OfflineIndicator />
 
             {/* PWA Install Prompt */}
