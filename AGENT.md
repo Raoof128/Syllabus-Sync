@@ -1,4 +1,10 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Home FAB Sticky-Up Scroll Behavior Adjustment
+Summary: Updated homepage red plus FAB behavior to follow upward scrolling only and stay hidden on downward scrolling with a direction threshold. Initialized scroll baseline from `.layout-main` current scroll position to avoid incorrect first-scroll state and kept FAB visible near the top.
+Files Changed: `app/home/HomeClient.tsx`
+Verification: eslint (app/home/HomeClient.tsx, config/eslint/eslint.config.mjs) passed; typecheck passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: FAB Scroll-Hide Fix + Dark Mode Icon Color Fix
 Summary: Fixed two issues from previous session: (1) FAB scroll-hide was listening on `window.scrollY` but the app scrolls inside `.layout-main` (`overflow-y-auto` container in `client-layout.tsx`). Updated to query `.layout-main` via `document.querySelector` and attach scroll listener there. (2) Dark mode icon buttons still invisible because `dark:text-mq-content/80` opacity modifiers don't work with hex-based CSS variables (`--alabaster: #edeade`) in Tailwind v4 — the `/80` alpha channel requires color formats like `oklch`/`hsl`/`rgb`. Replaced all instances of `dark:text-mq-content/80` → `dark:text-white/80` and `dark:text-mq-content/60` → `dark:text-white/60` across 9 component files, which Tailwind can properly resolve with alpha.
 Files Changed: `app/home/HomeClient.tsx`, `features/calendar/components/ItemActionButtons.tsx`, `components/layout/Header.tsx`, `components/layout/Sidebar.tsx`, `components/ProfileCard.tsx`, `features/map/components/CampusMap.tsx`, `features/map/components/CampusMapHUD.tsx`, `features/map/components/GoogleMapBuildingSearch.tsx`, `features/feed/components/FeedEventCard.tsx`, `features/settings/components/security/PasskeySecuritySection.tsx`
