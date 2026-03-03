@@ -29,16 +29,19 @@ export default function AppFooter({ className }: AppFooterProps) {
           <span aria-hidden="true" className="text-mq-border">
             ·
           </span>
+          <Link href="/contact" className="transition-colors hover:text-mq-primary hover:underline">
+            {t('privacy_contact_title')}
+          </Link>
+          <span aria-hidden="true" className="text-mq-border">
+            ·
+          </span>
           <Link href="/terms" className="transition-colors hover:text-mq-primary hover:underline">
             {t('termsFooter')}
           </Link>
           <span aria-hidden="true" className="text-mq-border">
             ·
           </span>
-          <Link
-            href="/privacy"
-            className="transition-colors hover:text-mq-primary hover:underline"
-          >
+          <Link href="/privacy" className="transition-colors hover:text-mq-primary hover:underline">
             {t('privacyFooter')}
           </Link>
         </div>

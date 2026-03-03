@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import TodaySchedule from '@/features/home/components/TodaySchedule';
@@ -57,11 +57,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   useHomeEventListeners();
 
   const [fabOpen, setFabOpen] = useState(false);
-  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    setPortalTarget(document.body);
-  }, []);
+  const portalTarget = typeof document === 'undefined' ? null : document.body;
 
   if (hasError) {
     return (
@@ -362,10 +358,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                     aria-expanded={fabOpen}
                     aria-label={t('quickActions')}
                   >
-                    <m.div
-                      animate={{ rotate: fabOpen ? 45 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                    <m.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
                       <Plus className="h-6 w-6" />
                     </m.div>
                   </Button>

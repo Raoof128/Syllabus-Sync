@@ -2,7 +2,15 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShieldCheck, Sparkles, Target, Users, CalendarCheck, BarChart3, Download } from 'lucide-react';
+import {
+  ShieldCheck,
+  Sparkles,
+  Target,
+  Users,
+  CalendarCheck,
+  BarChart3,
+  Download,
+} from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
@@ -123,7 +131,9 @@ export default function AboutPage() {
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
-        <h2 className="text-2xl font-bold text-mq-content sm:text-3xl">Built for Student Success</h2>
+        <h2 className="text-2xl font-bold text-mq-content sm:text-3xl">
+          Built for Student Success
+        </h2>
         <p className="mt-2 max-w-3xl text-sm text-mq-content-secondary sm:text-base">
           Feature design focused on practical student productivity and day-to-day academic control.
         </p>

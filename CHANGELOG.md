@@ -1,4 +1,34 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: npm run check Remediation (Final Verification)
+Summary: Ran full project quality gate and resolved the only blocker (`react-hooks/set-state-in-effect` in Home FAB portal setup). Full `npm run check` now passes end-to-end after contact/footer updates and portal lint remediation.
+Files: Modified `app/home/HomeClient.tsx`, `app/contact/page.tsx`, `components/layout/AppFooter.tsx`, `app/client-layout.tsx`.
+Verification: `npm run check` passed (check:secrets, format:check, typecheck, lint, test, build).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: npm run check Remediation (Step 1)
+Summary: Fixed lint failure `react-hooks/set-state-in-effect` in Home FAB portal setup by removing effect-driven state assignment and deriving `portalTarget` directly from `document` at render time.
+Files: Modified `app/home/HomeClient.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Public Contact Page + Footer Integration (Final Verification)
+Summary: Completed `/contact` page delivery (support channels + feedback form) and integrated `Contact us` into global footer navigation with guest accessibility through public-route handling.
+Files: Added `app/contact/page.tsx`; modified `components/layout/AppFooter.tsx`, `app/client-layout.tsx`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs app/contact/page.tsx components/layout/AppFooter.tsx app/client-layout.tsx` passed; `npm run typecheck` passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Public Contact Page + Footer Integration (Step 1)
+Summary: Added a new public `/contact` page with support channels and a feedback form that opens a prefilled `mailto:` draft to the configured support email, matching the requested structure and style direction.
+Files: Added `app/contact/page.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Public Contact Page + Footer Integration (Step 2)
+Summary: Added `Contact us` link to the shared app footer and updated route guarding to include `/contact` in `PUBLIC_ROUTES` so guests can access it directly.
+Files: Modified `components/layout/AppFooter.tsx`, `app/client-layout.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Public About Page + Footer Integration (Final Verification)
 Summary: Delivered new public `/about` page modeled after the shared reference structure and integrated it into global footer navigation. Route accessibility was finalized by adding `/about` to public-route handling.
 Files: Added `app/about/page.tsx`; modified `components/layout/AppFooter.tsx`, `app/client-layout.tsx`.

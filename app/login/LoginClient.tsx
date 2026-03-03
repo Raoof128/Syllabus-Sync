@@ -653,7 +653,6 @@ export default function LoginClient() {
                 )}
                 {t('loginWithGoogle')}
               </Button>
-
             </form>
           )}
         </div>

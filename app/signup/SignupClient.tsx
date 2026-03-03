@@ -697,7 +697,6 @@ export default function SignupClient() {
                   </p>
                 </div>
               )}
-
             </div>
           </div>
         </div>

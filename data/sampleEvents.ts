@@ -31,7 +31,8 @@ export const sampleEvents: Omit<Event, 'id' | 'date' | 'time'>[] = [
   // Academic Events
   {
     title: 'Research Skills Workshop',
-    description: 'Learn essential research methodology and academic writing skills. Perfect for thesis students and researchers.',
+    description:
+      'Learn essential research methodology and academic writing skills. Perfect for thesis students and researchers.',
     startAt: createDate(1, 10, 0), // March 5, 10:00 AM
     endAt: createDate(1, 12, 0),
     location: 'Library Level 3, Room 301',
@@ -60,7 +61,8 @@ export const sampleEvents: Omit<Event, 'id' | 'date' | 'time'>[] = [
   // Career Events
   {
     title: 'Tech Industry Career Fair',
-    description: 'Meet recruiters from top tech companies including Google, Microsoft, and Atlassian. Bring your resume!',
+    description:
+      'Meet recruiters from top tech companies including Google, Microsoft, and Atlassian. Bring your resume!',
     startAt: createDate(3, 9, 0), // March 7, 9:00 AM
     endAt: createDate(3, 16, 0),
     location: 'Macquarie Theatre',
@@ -74,7 +76,8 @@ export const sampleEvents: Omit<Event, 'id' | 'date' | 'time'>[] = [
   // Social Events
   {
     title: 'International Student Mixer',
-    description: 'Meet fellow international students! Games, music, and free refreshments. A great way to make new friends.',
+    description:
+      'Meet fellow international students! Games, music, and free refreshments. A great way to make new friends.',
     startAt: createDate(4, 17, 0), // March 8, 5:00 PM
     endAt: createDate(4, 20, 0),
     location: 'UniBar',
@@ -87,4 +90,3 @@ export const sampleEvents: Omit<Event, 'id' | 'date' | 'time'>[] = [
 ];
 
 export default sampleEvents;
-
