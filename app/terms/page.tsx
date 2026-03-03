@@ -1,7 +1,8 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Shield } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
@@ -45,7 +46,7 @@ export default function TermsPage() {
               <p className="text-sm text-white/50">{t('terms_last_updated')}</p>
             </div>
             <div className="hidden sm:flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-white/10 border border-white/15">
-              <Shield className="h-6 w-6 text-[#FFB81C]" />
+              <Image src="/images/shield-icon.svg" alt="" width={28} height={28} aria-hidden="true" />
             </div>
           </div>
 
