@@ -1,4 +1,10 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: About Page Developer Photos & Roles Update
+Summary: Replaced developer photos with new images from Downloads and updated roles: Pouya -> "Front-End & UI/UX Developer", Raouf -> "Back-End & Cyber Security Developer".
+Files Changed: `public/images/team/pouya.jpg`, `public/images/team/raouf.jpg`, `app/about/page.tsx`
+Verification: Files copied and roles updated.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: About Page Developer Photos Update
 Summary: Replaced developer photos on About page with updated images from Desktop: Pouya.jpg and Raouf.jpg copied to `public/images/team/`.
 Files Changed: `public/images/team/pouya.jpg`, `public/images/team/raouf.jpg`

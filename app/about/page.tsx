@@ -62,12 +62,12 @@ const FEATURE_CARDS = [
 const DEVELOPERS = [
   {
     name: 'Pouya',
-    role: 'First Developer',
+    role: 'Front-End & UI/UX Developer',
     photo: '/images/team/pouya.jpg',
   },
   {
     name: 'Raouf',
-    role: 'Second Developer',
+    role: 'Back-End & Cyber Security Developer',
     photo: '/images/team/raouf.jpg',
   },
 ] as const;
