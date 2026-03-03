@@ -160,7 +160,7 @@ export default function EventsWidget({
                         onToggleNotification={() => toggleEventNotification(event.id)}
                         variant="compact"
                         stopPropagation
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 dark:opacity-100 transition-opacity"
                       />
                     </div>
                   );

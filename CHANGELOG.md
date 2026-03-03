@@ -1,4 +1,40 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Calendar Widget Dark Mode Action Visibility (Final Verification)
+Summary: Applied dark-mode visibility fix across all calendar widget cards so action controls (edit, navigate, reminder, delete) no longer require hover in dark theme. Added `dark:opacity-100` to action-button containers in Assignments, Exams, Events, Todos, and Units widgets while preserving light-mode hover behavior.
+Files: Modified `features/calendar/components/widgets/AssignmentsWidget.tsx`, `features/calendar/components/widgets/ExamsWidget.tsx`, `features/calendar/components/widgets/EventsWidget.tsx`, `features/calendar/components/widgets/TodosWidget.tsx`, `features/calendar/components/widgets/UnitsWidget.tsx`.
+Verification: eslint (targeted widgets) passed; typecheck passed.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Calendar Widget Dark Mode Action Visibility (Step 5)
+Summary: Updated Units widget card action-group visibility to stay visible in dark mode by adding `dark:opacity-100` while preserving hover reveal behavior in light mode.
+Files: Modified `features/calendar/components/widgets/UnitsWidget.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Calendar Widget Dark Mode Action Visibility (Step 4)
+Summary: Updated Todos widget card action-group visibility to stay visible in dark mode by adding `dark:opacity-100` while preserving hover reveal behavior in light mode.
+Files: Modified `features/calendar/components/widgets/TodosWidget.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Calendar Widget Dark Mode Action Visibility (Step 3)
+Summary: Updated Events widget card action-group visibility to stay visible in dark mode by adding `dark:opacity-100` while preserving hover reveal behavior in light mode.
+Files: Modified `features/calendar/components/widgets/EventsWidget.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Calendar Widget Dark Mode Action Visibility (Step 2)
+Summary: Updated Exams widget card action-group visibility to stay visible in dark mode by adding `dark:opacity-100` while preserving hover reveal behavior in light mode.
+Files: Modified `features/calendar/components/widgets/ExamsWidget.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Calendar Widget Dark Mode Action Visibility (Step 1)
+Summary: Updated Assignments widget card action-group visibility to stay visible in dark mode by adding `dark:opacity-100` while preserving hover reveal behavior in light mode.
+Files: Modified `features/calendar/components/widgets/AssignmentsWidget.tsx`.
+Verification: Pending.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Home FAB Sticky-Up Scroll Behavior Adjustment
 Summary: Updated homepage red plus FAB behavior to follow upward scrolling only and stay hidden on downward scrolling with a direction threshold. Initialized scroll baseline from `.layout-main` current scroll position to avoid incorrect first-scroll state and kept FAB visible near the top.
 Files: Modified `app/home/HomeClient.tsx`.
