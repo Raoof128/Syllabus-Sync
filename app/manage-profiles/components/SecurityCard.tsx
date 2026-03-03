@@ -3,7 +3,6 @@
 import { memo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { Shield, Lock, Laptop } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
@@ -17,24 +16,26 @@ export const SecurityCard = memo(() => {
   return (
     <>
       <MagicCard isLiquidEnhanced>
-        <Card className="mq-magic-card-content bg-mq-card-background border border-mq-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-mq-primary" aria-hidden="true" />
-              <span>{t('security')}</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
+          {/* Section Header */}
+          <div className="flex items-center gap-3 p-5 sm:p-6 pb-0">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-mq-primary/10">
+              <Shield className="h-4 w-4 text-mq-primary" aria-hidden="true" />
+            </div>
+            <h2 className="text-lg font-semibold text-mq-content">{t('security')}</h2>
+          </div>
+
+          <div className="p-5 sm:p-6 pt-4 space-y-3">
             {/* Change Password */}
-            <div className="p-4 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="p-3.5 rounded-mq border border-mq-border/60 hover:border-mq-border transition-colors">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2 rounded-full bg-mq-primary/10 text-mq-primary shrink-0">
-                    <Lock className="h-5 w-5" aria-hidden="true" />
+                  <div className="p-2 rounded-lg bg-mq-primary/8 shrink-0">
+                    <Lock className="h-4 w-4 text-mq-primary" aria-hidden="true" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-mq-content">{t('changePassword')}</h3>
-                    <p className="text-mq-sm text-mq-content-secondary">
+                    <h3 className="text-sm font-semibold text-mq-content">{t('changePassword')}</h3>
+                    <p className="text-xs text-mq-content-tertiary leading-relaxed">
                       {t('changePasswordDesc')}
                     </p>
                   </div>
@@ -51,15 +52,17 @@ export const SecurityCard = memo(() => {
             </div>
 
             {/* Manage Sessions */}
-            <div className="p-4 bg-mq-card-background rounded-mq-lg border border-mq-border hover:shadow-[0_0_15px_rgba(166,25,46,0.1)] transition-all duration-300">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="p-3.5 rounded-mq border border-mq-border/60 hover:border-mq-border transition-colors">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2 rounded-full bg-mq-primary/10 text-mq-primary shrink-0">
-                    <Laptop className="h-5 w-5" aria-hidden="true" />
+                  <div className="p-2 rounded-lg bg-mq-primary/8 shrink-0">
+                    <Laptop className="h-4 w-4 text-mq-primary" aria-hidden="true" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-mq-content">{t('manageSessions')}</h3>
-                    <p className="text-mq-sm text-mq-content-secondary">
+                    <h3 className="text-sm font-semibold text-mq-content">
+                      {t('manageSessions')}
+                    </h3>
+                    <p className="text-xs text-mq-content-tertiary leading-relaxed">
                       {t('manageSessionsDesc')}
                     </p>
                   </div>
@@ -74,8 +77,8 @@ export const SecurityCard = memo(() => {
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </MagicCard>
 
       <SessionsList open={showSessionsDialog} onOpenChange={setShowSessionsDialog} t={t} />

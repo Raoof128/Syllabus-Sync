@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/card';
 import { GraduationCap } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
@@ -58,86 +57,92 @@ export function AcademicInfoCard({ form, disabled }: Props) {
   }, [watchedCourse, setValue]);
 
   return (
-    <MagicCard isLiquidEnhanced className="mb-4 sm:mb-6">
-      <div className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border">
-        <Card className="border border-mq-border bg-mq-card-background">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5" /> {t('academicInfo')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Faculty */}
-            <div className="space-y-2">
-              <Label htmlFor="faculty">{t('faculty')}</Label>
-              <Controller
-                name="faculty"
-                control={control}
-                render={({ field }) => (
-                  <FacultySelect
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    placeholder={t('selectFaculty')}
-                  />
-                )}
-              />
-              {errors.faculty && <p className="text-red-500 text-xs">{errors.faculty.message}</p>}
-            </div>
+    <MagicCard isLiquidEnhanced>
+      <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
+        {/* Section Header */}
+        <div className="flex items-center gap-3 p-5 sm:p-6 pb-0">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#FFB81C]/15">
+            <GraduationCap className="h-4 w-4 text-[#c08c00]" />
+          </div>
+          <h2 className="text-lg font-semibold text-mq-content">{t('academicInfo')}</h2>
+        </div>
 
-            {/* Course — searchable combobox */}
-            <div className="space-y-2">
-              <Label htmlFor="course">{t('course')}</Label>
-              <Controller
-                name="course"
-                control={control}
-                render={({ field }) => (
-                  <CourseCombobox
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    disabled={disabled || !watchedFaculty}
-                    error={!!errors.course}
-                    facultyFilter={watchedFaculty}
-                  />
-                )}
-              />
-              {errors.course && <p className="text-red-500 text-xs">{errors.course.message}</p>}
-            </div>
+        {/* Fields */}
+        <div className="p-5 sm:p-6 pt-4 space-y-4">
+          {/* Faculty */}
+          <div className="space-y-1.5">
+            <Label htmlFor="faculty" className="text-sm font-medium text-mq-content-secondary">
+              {t('faculty')}
+            </Label>
+            <Controller
+              name="faculty"
+              control={control}
+              render={({ field }) => (
+                <FacultySelect
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  placeholder={t('selectFaculty')}
+                />
+              )}
+            />
+            {errors.faculty && <p className="text-red-500 text-xs">{errors.faculty.message}</p>}
+          </div>
 
-            {/* Year Select — dynamic based on course */}
-            <div className="space-y-2">
-              <Label>{t('year')}</Label>
-              <Controller
-                name="year"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value ?? ''}
-                    onValueChange={field.onChange}
-                    disabled={disabled || !watchedCourse}
-                  >
-                    <SelectTrigger className={errors.year ? 'border-red-500' : ''}>
-                      <SelectValue
-                        placeholder={watchedCourse ? t('yearPlaceholder') : t('selectCourseFirst')}
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="bg-mq-card-background border-mq-border">
-                      {yearOptions.map((y) => (
-                        <SelectItem
-                          key={y}
-                          value={String(y)}
-                          className="cursor-pointer hover:bg-mq-hover-background focus:bg-mq-hover-background focus:text-mq-primary"
-                        >
-                          {t('yearNumber', { year: y })}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.year && <p className="text-red-500 text-xs">{errors.year.message}</p>}
-            </div>
-          </CardContent>
-        </Card>
+          {/* Course — searchable combobox */}
+          <div className="space-y-1.5">
+            <Label htmlFor="course" className="text-sm font-medium text-mq-content-secondary">
+              {t('course')}
+            </Label>
+            <Controller
+              name="course"
+              control={control}
+              render={({ field }) => (
+                <CourseCombobox
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  disabled={disabled || !watchedFaculty}
+                  error={!!errors.course}
+                  facultyFilter={watchedFaculty}
+                />
+              )}
+            />
+            {errors.course && <p className="text-red-500 text-xs">{errors.course.message}</p>}
+          </div>
+
+          {/* Year Select — dynamic based on course */}
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-mq-content-secondary">{t('year')}</Label>
+            <Controller
+              name="year"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value ?? ''}
+                  onValueChange={field.onChange}
+                  disabled={disabled || !watchedCourse}
+                >
+                  <SelectTrigger className={errors.year ? 'border-red-500' : ''}>
+                    <SelectValue
+                      placeholder={watchedCourse ? t('yearPlaceholder') : t('selectCourseFirst')}
+                    />
+                  </SelectTrigger>
+                  <SelectContent className="bg-mq-card-background border-mq-border">
+                    {yearOptions.map((y) => (
+                      <SelectItem
+                        key={y}
+                        value={String(y)}
+                        className="cursor-pointer hover:bg-mq-hover-background focus:bg-mq-hover-background focus:text-mq-primary"
+                      >
+                        {t('yearNumber', { year: y })}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.year && <p className="text-red-500 text-xs">{errors.year.message}</p>}
+          </div>
+        </div>
       </div>
     </MagicCard>
   );

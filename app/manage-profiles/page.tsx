@@ -17,8 +17,17 @@ import { ProfileSkeleton } from './components/ProfileSkeleton';
 export default function ManageProfilesPage() {
   const { t } = useTypedTranslation();
   const router = useRouter();
-  const { currentProfile, form, saveProfile, isSaving, isDirty, isValid, hasLoaded, reloadProfile, isProfileLoading } =
-    useProfileManager();
+  const {
+    currentProfile,
+    form,
+    saveProfile,
+    isSaving,
+    isDirty,
+    isValid,
+    hasLoaded,
+    reloadProfile,
+    isProfileLoading,
+  } = useProfileManager();
 
   // Show skeleton until the DB fetch completes — prevents stale localStorage data from flashing
   if (!hasLoaded) return <ProfileSkeleton />;
@@ -59,7 +68,7 @@ export default function ManageProfilesPage() {
         </Link>
       </div>
 
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-4 sm:space-y-5">
         <ProfileHeader profile={currentProfile} isSaving={isSaving} />
 
         {/* Pass the FORM object down to cards */}
@@ -73,35 +82,55 @@ export default function ManageProfilesPage() {
         {/* Account Security & Sessions */}
         <SecurityCard />
 
-        {/* Save Button only shows if form is dirty (changed) */}
-        {isDirty && (
-          <div className="flex justify-center pt-2 animate-in fade-in slide-in-from-bottom-4">
-            <Button
-              onClick={saveProfile}
-              disabled={isSaving || !isValid}
-              size="lg"
-              className="w-full sm:w-auto shadow-lg flex items-center gap-2"
-            >
-              {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
-              {isSaving ? t('saving') : t('saveChanges')}
-            </Button>
-          </div>
-        )}
-
-        {/* Reload button — always visible at the bottom */}
-        <div className="flex justify-center pt-2 pb-4">
-          <Button
-            variant="outline"
+        {/* Reload button — subtle at the bottom */}
+        <div className="flex justify-center pt-1 pb-16">
+          <button
             onClick={reloadProfile}
             disabled={isProfileLoading || isSaving}
-            size="sm"
-            className="flex items-center gap-2 text-mq-content-secondary"
+            className="flex items-center gap-1.5 text-xs text-mq-content-tertiary hover:text-mq-content-secondary transition-colors disabled:opacity-40"
           >
-            <RefreshCw className={`h-4 w-4 ${isProfileLoading ? 'animate-spin' : ''}`} />
-            {isProfileLoading ? 'Reloading…' : 'Reload Changes'}
-          </Button>
+            <RefreshCw className={`h-3 w-3 ${isProfileLoading ? 'animate-spin' : ''}`} />
+            {isProfileLoading ? 'Reloading…' : 'Reload from server'}
+          </button>
         </div>
       </div>
+
+      {/* Sticky Save Bar — appears when form has changes */}
+      {isDirty && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="bg-mq-card-background/95 backdrop-blur-md border-t border-mq-border shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+            <div className="container mx-auto max-w-4xl px-4 py-3 flex items-center justify-between gap-3">
+              <p className="text-sm text-mq-content-secondary hidden sm:block">
+                You have unsaved changes
+              </p>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => form.reset()}
+                  disabled={isSaving}
+                  className="flex-1 sm:flex-none"
+                >
+                  Discard
+                </Button>
+                <Button
+                  onClick={saveProfile}
+                  disabled={isSaving || !isValid}
+                  size="sm"
+                  className="flex-1 sm:flex-none flex items-center gap-2 shadow-md"
+                >
+                  {isSaving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  {isSaving ? t('saving') : t('saveChanges')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
