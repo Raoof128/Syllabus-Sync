@@ -31,7 +31,7 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-mq-background">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#002A45] to-[#001a30] border-b border-white/10">
+      <div className="bg-gradient-to-r from-[#8B1525] via-[#A6192E] to-[#76232f] border-b border-white/10">
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
           <button
             onClick={() => router.back()}
@@ -43,7 +43,7 @@ export default function PrivacyPolicyPage() {
 
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-[0.2em] text-mq-primary font-semibold">
+              <p className="text-xs uppercase tracking-[0.2em] text-[#FFB81C] font-semibold">
                 {t('terms_legal_doc')}
               </p>
               <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
@@ -52,7 +52,7 @@ export default function PrivacyPolicyPage() {
               <p className="text-sm text-white/50">{t('privacy_last_updated')}</p>
             </div>
             <div className="hidden sm:flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-white/10 border border-white/15">
-              <Lock className="h-6 w-6 text-mq-primary" />
+              <Lock className="h-6 w-6 text-[#FFB81C]" />
             </div>
           </div>
 

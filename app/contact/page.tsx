@@ -2,16 +2,19 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Mail,
   FileText,
   ShieldCheck,
+  ArrowLeft,
   ArrowRight,
   Send,
 } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS, UNIVERSITY_CONFIG } from '@/lib/config';
 
 export default function ContactPage() {
+  const router = useRouter();
   const [contactEmail, setContactEmail] = useState('');
   const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
@@ -51,6 +54,14 @@ export default function ContactPage() {
         <div className="pointer-events-none absolute -bottom-16 -left-16 h-72 w-72 rounded-full bg-[#FFB81C]/10 blur-[80px]" />
 
         <div className="relative mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+          <button
+            onClick={() => router.back()}
+            className="animate-fade-in mb-5 inline-flex items-center gap-1.5 text-sm text-white/70 transition-colors hover:text-white"
+            style={{ animationFillMode: 'both' }}
+          >
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+            Back to {APP_CONFIG.name}
+          </button>
           <p
             className="animate-fade-in text-[11px] font-bold uppercase tracking-[0.22em] text-[#FFB81C]"
             style={{ animationFillMode: 'both' }}

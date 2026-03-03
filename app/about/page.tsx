@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ShieldCheck,
   Sparkles,
@@ -10,6 +11,7 @@ import {
   CalendarCheck,
   BarChart3,
   Download,
+  ArrowLeft,
   ArrowRight,
 } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS, UNIVERSITY_CONFIG } from '@/lib/config';
@@ -75,6 +77,7 @@ const DEVELOPERS = [
 
 export default function AboutPage() {
   const { t } = useTypedTranslation();
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-mq-background">
@@ -93,6 +96,14 @@ export default function AboutPage() {
 
         <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-14 sm:px-6 lg:flex-row lg:items-center lg:gap-14 lg:px-8 lg:py-20">
           <div className="flex-1 space-y-5">
+            <button
+              onClick={() => router.back()}
+              className="animate-fade-in inline-flex items-center gap-1.5 text-sm text-white/70 transition-colors hover:text-white"
+              style={{ animationFillMode: 'both' }}
+            >
+              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+              Back to {APP_CONFIG.name}
+            </button>
             <p
               className="animate-fade-in text-[11px] font-bold uppercase tracking-[0.22em] text-[#FFB81C]"
               style={{ animationFillMode: 'both' }}
@@ -271,10 +282,16 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="text-2xl font-bold tracking-tight text-white">
+                  <h3
+                    className="text-2xl font-bold tracking-tight"
+                    style={{ color: '#ffffff' }}
+                  >
                     {dev.name}
                   </h3>
-                  <p className="mt-1 text-sm font-medium text-white/75">
+                  <p
+                    className="mt-1 text-sm font-medium"
+                    style={{ color: 'rgba(255,255,255,0.8)' }}
+                  >
                     {dev.role}
                   </p>
                 </div>
