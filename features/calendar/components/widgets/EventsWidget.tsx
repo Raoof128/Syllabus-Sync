@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { Plus, PartyPopper } from 'lucide-react';
@@ -13,7 +13,7 @@ import { useEventsStore } from '@/lib/store/eventsStore';
 import { Event } from '@/lib/types';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
 import { formatLocalizedDate } from '@/lib/utils/locale';
-import { isPast } from 'date-fns';
+import { isPast, startOfDay } from 'date-fns';
 
 interface EventsWidgetProps {
   onAddEvent: () => void;
@@ -42,6 +42,42 @@ export default function EventsWidget({
     const value = t(key as TranslationKey);
     return value === key ? fallback : value;
   };
+
+  // Sort events: upcoming events first (by date ascending), then overdue events (by date descending)
+  // This ensures upcoming events are shown prominently, matching the Home page widget behavior
+  const sortedEvents = useMemo(() => {
+    const now = new Date();
+    const today = startOfDay(now);
+
+    const getEventDate = (event: Event): Date => {
+      if (event.startAt) {
+        return event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
+      }
+      if (event.date) {
+        return event.date instanceof Date ? event.date : new Date(event.date);
+      }
+      return new Date();
+    };
+
+    return [...events].sort((a, b) => {
+      const dateA = getEventDate(a);
+      const dateB = getEventDate(b);
+      const aIsOverdue = startOfDay(dateA) < today;
+      const bIsOverdue = startOfDay(dateB) < today;
+
+      // Upcoming events come first
+      if (!aIsOverdue && bIsOverdue) return -1;
+      if (aIsOverdue && !bIsOverdue) return 1;
+
+      // Within same group, sort by date
+      // Upcoming: ascending (nearest first)
+      // Overdue: descending (most recent first)
+      if (!aIsOverdue && !bIsOverdue) {
+        return dateA.getTime() - dateB.getTime();
+      }
+      return dateB.getTime() - dateA.getTime();
+    });
+  }, [events]);
 
   const formatMonthDayTime = (date: Date) =>
     formatLocalizedDate(date, language, {
@@ -105,7 +141,7 @@ export default function EventsWidget({
                   <p className="text-xs">{t('noEventsYet' as TranslationKey)}</p>
                 </div>
               ) : (
-                events.slice(0, 5).map((event) => {
+                sortedEvents.slice(0, 5).map((event) => {
                   // Get category color
                   const categoryColors: Record<string, string> = {
                     Career: '#3B82F6',

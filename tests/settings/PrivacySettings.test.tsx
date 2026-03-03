@@ -192,7 +192,7 @@ describe('PrivacySettings', () => {
   });
 
   // Basic rendering tests
-  it('renders privacy settings card', () => {
+  it('renders privacy settings card', async () => {
     // Mock MFA status fetch
     mockFetch.mockResolvedValueOnce({
       ok: true,
@@ -201,11 +201,13 @@ describe('PrivacySettings', () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    expect(screen.getByTestId('privacy-settings')).toBeInTheDocument();
-    expect(screen.getByText('Security')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('privacy-settings')).toBeInTheDocument();
+      expect(screen.getByText('Security')).toBeInTheDocument();
+    });
   });
 
-  it('renders export data button', () => {
+  it('renders export data button', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -213,43 +215,57 @@ describe('PrivacySettings', () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
+    });
   });
 
   // Export dialog tests
-  it('opens export dialog when export button is clicked', () => {
+  it('opens export dialog when export button is clicked', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
     });
 
     render(<PrivacySettings {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
+    });
 
     fireEvent.click(screen.getByTestId('export-data-button'));
 
     expect(screen.getByTestId('export-dialog')).toBeInTheDocument();
   });
 
-  it('shows export warning in dialog', () => {
+  it('shows export warning in dialog', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
     });
 
     render(<PrivacySettings {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
+    });
 
     fireEvent.click(screen.getByTestId('export-data-button'));
 
     expect(screen.getByText('This file may contain sensitive information')).toBeInTheDocument();
   });
 
-  it('triggers download when confirm export is clicked', () => {
+  it('triggers download when confirm export is clicked', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
     });
 
     render(<PrivacySettings {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('export-data-button')).toBeInTheDocument();
+    });
 
     fireEvent.click(screen.getByTestId('export-data-button'));
     fireEvent.click(screen.getByTestId('confirm-export-button'));
@@ -259,7 +275,7 @@ describe('PrivacySettings', () => {
   });
 
   // Accessibility tests
-  it('has proper region role for accessibility', () => {
+  it('has proper region role for accessibility', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -267,10 +283,12 @@ describe('PrivacySettings', () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    expect(screen.getByRole('region', { name: 'Security' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('region', { name: 'Security' })).toBeInTheDocument();
+    });
   });
 
-  it('renders section headings as h3 elements', () => {
+  it('renders section headings as h3 elements', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true, data: { factors: [] } }),
@@ -278,7 +296,9 @@ describe('PrivacySettings', () => {
 
     render(<PrivacySettings {...defaultProps} />);
 
-    const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings.length).toBeGreaterThanOrEqual(1);
+    await waitFor(() => {
+      const headings = screen.getAllByRole('heading', { level: 3 });
+      expect(headings.length).toBeGreaterThanOrEqual(1);
+    });
   });
 });

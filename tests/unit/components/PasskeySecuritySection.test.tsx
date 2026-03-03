@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { PasskeySecuritySection } from '@/features/settings/components/security/PasskeySecuritySection';
 import { vi, describe, it, expect } from 'vitest';
 
@@ -15,27 +15,40 @@ vi.mock('@/lib/hooks/useBiometrics', () => ({
   }),
 }));
 
+// Mock fetch globally for credentials API
+const mockFetch = vi.fn().mockResolvedValue({
+  ok: true,
+  json: () => Promise.resolve({ credentials: [] }),
+});
+globalThis.fetch = mockFetch;
+
 describe('PasskeySecuritySection', () => {
   const mockT = (key: string) => key;
 
-  it('shows enabled state correctly', () => {
+  it('shows enabled state correctly', async () => {
     render(<PasskeySecuritySection t={mockT} />);
-    // Component uses ToggleControl (role="switch") instead of a button
-    const toggle = screen.getByRole('switch', { name: 'biometricLogin' });
-    expect(toggle).toBeInTheDocument();
-    expect(toggle).toHaveAttribute('aria-checked', 'false');
+    await waitFor(() => {
+      const toggle = screen.getByRole('switch', { name: 'biometricLogin' });
+      expect(toggle).toBeInTheDocument();
+      expect(toggle).toHaveAttribute('aria-checked', 'false');
+    });
   });
 
-  it('calls toggle function when clicked', () => {
+  it('calls toggle function when clicked', async () => {
     render(<PasskeySecuritySection t={mockT} />);
+    await waitFor(() => {
+      expect(screen.getByRole('switch', { name: 'biometricLogin' })).toBeInTheDocument();
+    });
     const toggle = screen.getByRole('switch', { name: 'biometricLogin' });
     fireEvent.click(toggle);
     // It should open the enable dialog
     expect(screen.getByText('enableBiometricDesc')).toBeInTheDocument();
   });
 
-  it('renders passkeys list header', () => {
+  it('renders passkeys list header', async () => {
     render(<PasskeySecuritySection t={mockT} />);
-    expect(screen.getByText('registeredDevicesAndKeys')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('registeredDevicesAndKeys')).toBeInTheDocument();
+    });
   });
 });
