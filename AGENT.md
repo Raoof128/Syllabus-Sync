@@ -1317,3 +1317,45 @@ Scope: Campus Map Live Navigation Accuracy — Final Verification
 Summary: Verified the live-navigation accuracy implementation end-to-end. Confirmed heading fusion/outlier handling/adaptive marker smoothing path compiles and remains test-clean; confirmed accuracy-aware off-route thresholds via new regression test.
 Files Changed: None (verification + test runs)
 Verification: `npm run test -- tests/map/realtimeNavigation.test.ts tests/map/useMapLocation.test.ts` ✅ (21/21), `npm run test -- tests/map` ✅ (105/105), `npx eslint --config config/eslint/eslint.config.mjs features/map/ tests/map/` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps API Key Injection (User-Provided Key)
+Summary: Added user-provided Google Maps Embed API key to local runtime environment so in-app Google embed map/directions use authenticated Embed API v1 mode.
+Files Changed: `.env.local`
+Verification: Confirmed `.env.local` includes `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` and `GoogleMapEmbed` reads `process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Vercel Production Redeploy + Google Maps Embed Key Propagation
+Summary: Added `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` to Vercel project environments (`production`, `preview`, `development`) and performed a production redeploy via Vercel CLI. Deployment completed and is Ready with production aliases updated.
+Files Changed: None (deployment/infrastructure operation)
+Verification: `vercel env ls` confirms variable is present; `vercel deploy --prod --yes` completed; `vercel inspect syllabus-sync-ashy.vercel.app` status `Ready` for deployment `dpl_EH16eiLn7FbingHTDVkNxkcmJHhR`.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Vercel Env Rollback Reversal (Restore Google Maps Key)
+Summary: Reversed the temporary key-removal action and restored `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` in Vercel for all environments (`production`, `preview`, `development`) using the same user-provided value.
+Files Changed: None (infrastructure env operation only)
+Verification: `vercel env ls` shows `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` present in Production, Preview, and Development.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Map UX Fix — Light Mode Building Selection + Embedded Google Navigation
+Summary: Fixed two map UX issues. (1) Updated `GoogleMapBuildingSearch` styling to use MQ token-based surfaces/text/hover states so selected-building/search cards match app light mode and no longer appear dark in light theme. (2) Changed Google search-card "Navigate" action to prefer in-app embedded navigation via callback (`onStartNavigation`) instead of forcing external Google Maps; retained external URL fallback when callback is unavailable. Wired callback from `MapClient` to `googleMapRef.current?.startNavigation()`. Added regression test for embedded navigation callback path.
+Files Changed: `features/map/components/GoogleMapBuildingSearch.tsx`, `features/map/components/MapClient.tsx`, `tests/map/GoogleMapBuildingSearch.test.tsx`
+Verification: Pending (running map tests/lint/typecheck next).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Map UX Fix — Final Verification
+Summary: Verified light-mode style alignment and embedded Google navigation behavior changes. Confirmed Google building-search Navigate action now supports in-app embed navigation callback path and test coverage passes.
+Files Changed: None (verification only)
+Verification: `npm run test -- tests/map/GoogleMapBuildingSearch.test.tsx tests/map/GoogleMapEmbed.test.tsx tests/map/GoogleMapIntegration.test.tsx` ✅ (31/31), `npm run test -- tests/map` ✅ (106/106), `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapBuildingSearch.tsx features/map/components/MapClient.tsx tests/map/GoogleMapBuildingSearch.test.tsx` ✅, `npm run typecheck` ✅.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Production Redeploy — Map UX Fixes (Light Mode + Embedded Google Nav)
+Summary: Deployed map UX fixes to Vercel production. New build includes light-mode matched building selection styles in Google map search UI and embedded in-app navigation callback path for Google map Navigate action.
+Files Changed: None (deployment operation)
+Verification: `vercel deploy --prod --yes` completed; deployment `dpl_4zvYNZvwdUmHGnty5DKi1hhUSC2Y` status `Ready`; alias `https://syllabus-sync-ashy.vercel.app` active.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Log Maintenance Cleanup
+Summary: Removed temporary operational entries from project logs per user request and kept current technical change history intact.
+Files Changed: `AGENT.md`, `CHANGELOG.md`
+Verification: Targeted log entries removed from both files.

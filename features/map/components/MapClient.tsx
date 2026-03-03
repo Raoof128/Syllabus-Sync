@@ -633,6 +633,9 @@ export default function MapClient() {
                     const newUrl = `${window.location.pathname}?${params.toString()}`;
                     window.history.pushState({}, '', newUrl);
                   }}
+                  onStartNavigation={() => {
+                    googleMapRef.current?.startNavigation();
+                  }}
                   isNavigating={navState?.isNavigating || false}
                 />
               </div>

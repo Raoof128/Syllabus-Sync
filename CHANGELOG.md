@@ -4202,3 +4202,45 @@ Scope: Campus Map Live Navigation Accuracy — Final Verification
 Summary: Completed validation for the live navigation/pointer accuracy patch set and confirmed no regressions across map tests, lint, and typecheck.
 Files: None (validation only).
 Verification: `npm run test -- tests/map/realtimeNavigation.test.ts tests/map/useMapLocation.test.ts` ✅ (21/21); `npm run test -- tests/map` ✅ (105/105); `npx eslint --config config/eslint/eslint.config.mjs features/map/ tests/map/` ✅; `npm run typecheck` ✅.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Google Maps API Key Injection (User-Provided Key)
+Summary: Configured local env with `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` using the user-provided API key to enable authenticated Google Maps Embed API behavior.
+Files: Modified `.env.local`.
+Verification: Variable presence confirmed in `.env.local`; map runtime source reads same env variable in `features/map/components/GoogleMapEmbed.tsx`.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Vercel Production Redeploy + Google Maps Embed Key Propagation
+Summary: Configured Vercel env variable `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` for `production`, `preview`, and `development`, then redeployed production using Vercel CLI.
+Files: None (no source-code edits).
+Verification: Deployment `dpl_EH16eiLn7FbingHTDVkNxkcmJHhR` is `Ready`; production URL `https://syllabus-sync-3jwspailj-perkycoders.vercel.app`; alias `https://syllabus-sync-ashy.vercel.app` active.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Vercel Env Rollback Reversal (Restore Google Maps Key)
+Summary: Restored `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` on Vercel after user interruption/request, across `production`, `preview`, and `development`.
+Files: None (environment configuration only).
+Verification: `vercel env ls` confirms key exists for all three environments.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Map UX Fix — Light Mode Building Selection + Embedded Google Navigation
+Summary: Aligned Google map building-selection UI with light theme tokens (no dark-looking card in light mode). Updated "Navigate" in Google building card to start embedded in-app directions when available, with external directions fallback retained. Added test coverage for embedded navigation callback behavior.
+Files: Modified `features/map/components/GoogleMapBuildingSearch.tsx`, `features/map/components/MapClient.tsx`, `tests/map/GoogleMapBuildingSearch.test.tsx`.
+Verification: Pending (map test + lint + typecheck in progress).
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Map UX Fix — Final Verification
+Summary: Completed validation for light-mode building-selection styling fix and in-app embedded Google navigation callback flow.
+Files: None (verification only).
+Verification: Map-focused tests/lint/typecheck all pass.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Production Redeploy — Map UX Fixes (Light Mode + Embedded Google Nav)
+Summary: Redeployed production with fixes for light-mode building selection styling and in-app embedded Google navigation initiation from building card.
+Files: None (deployment only).
+Verification: Deployment `dpl_4zvYNZvwdUmHGnty5DKi1hhUSC2Y` is Ready; production alias `https://syllabus-sync-ashy.vercel.app` points to the new build.
+
+Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Log Maintenance Cleanup
+Summary: Removed temporary operational log entries on request while preserving development and deployment audit history.
+Files: Modified `AGENT.md`, `CHANGELOG.md`.
+Verification: Requested log sections removed.

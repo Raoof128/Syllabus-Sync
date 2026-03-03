@@ -14,6 +14,7 @@ interface GoogleMapBuildingSearchProps {
   buildings: Building[];
   selectedBuilding?: Building;
   onNavigateToBuilding?: (building: Building) => void;
+  onStartNavigation?: (building: Building) => void;
   isNavigating?: boolean;
 }
 
@@ -27,6 +28,7 @@ export function GoogleMapBuildingSearch({
   buildings,
   selectedBuilding,
   onNavigateToBuilding,
+  onStartNavigation,
   isNavigating,
 }: GoogleMapBuildingSearchProps) {
   const { t } = useTypedTranslation();
@@ -127,6 +129,23 @@ export function GoogleMapBuildingSearch({
     triggerHaptic('tap', 'medium');
   }, []);
 
+  const handleNavigate = useCallback(
+    (building: Building) => {
+      // Always keep selected destination in sync before starting nav.
+      onNavigateToBuilding?.(building);
+
+      if (onStartNavigation) {
+        triggerHaptic('tap', 'medium');
+        onStartNavigation(building);
+        return;
+      }
+
+      // Fallback for standalone usage where embed navigation callback isn't provided.
+      getDirectionsInGoogleMaps(building);
+    },
+    [getDirectionsInGoogleMaps, onNavigateToBuilding, onStartNavigation],
+  );
+
   return (
     <div className="absolute left-3 top-16 z-[1100] pointer-events-none w-[min(320px,calc(100vw-24px))]">
       {/* Screen reader announcement */}
@@ -137,9 +156,8 @@ export function GoogleMapBuildingSearch({
       {/* Search Card - Google Maps Style */}
       <div
         className={cn(
-          'pointer-events-auto rounded-lg bg-white shadow-lg transition-all duration-200',
-          'dark:bg-[#202124] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]',
-          isExpanded && 'shadow-xl dark:shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
+          'pointer-events-auto rounded-lg border border-mq-border bg-mq-card-background shadow-lg transition-all duration-200',
+          isExpanded && 'shadow-xl',
         )}
       >
         {/* Search Header */}
@@ -154,17 +172,17 @@ export function GoogleMapBuildingSearch({
           }}
           className={cn(
             'w-full flex items-center gap-3 px-4 py-3 text-left transition-colors',
-            'hover:bg-gray-50 dark:hover:bg-[#303134]',
-            isExpanded && 'border-b border-gray-200 dark:border-gray-700',
+            'hover:bg-mq-hover-background',
+            isExpanded && 'border-b border-mq-border',
           )}
           aria-expanded={isExpanded}
           aria-controls="google-map-building-search"
         >
           <Search className="h-5 w-5 text-[#4285f4] shrink-0" />
-          <span className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-100">
+          <span className="flex-1 text-sm font-medium text-mq-content">
             {t('searchBuildingsPlaceholder')}
           </span>
-          <span className="text-gray-400 dark:text-gray-500">
+          <span className="text-mq-content-tertiary">
             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </span>
         </button>
@@ -181,9 +199,9 @@ export function GoogleMapBuildingSearch({
               className="overflow-hidden"
             >
               {/* Search Input */}
-              <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+              <div className="px-4 py-3 border-b border-mq-border/60">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary" />
                   <input
                     ref={searchInputRef}
                     type="text"
@@ -193,12 +211,12 @@ export function GoogleMapBuildingSearch({
                     aria-label={t('filterBuildings')}
                     className={cn(
                       'w-full pl-10 pr-10 py-2.5 rounded-full text-sm',
-                      'bg-gray-100 dark:bg-[#303134]',
-                      'text-gray-900 dark:text-gray-100',
-                      'placeholder:text-gray-500 dark:placeholder:text-gray-400',
+                      'bg-mq-background-secondary',
+                      'text-mq-content',
+                      'placeholder:text-mq-content-tertiary',
                       'border-2 border-transparent transition-all',
-                      'focus:outline-none focus:bg-white dark:focus:bg-[#202124]',
-                      'focus:border-[#4285f4] focus:shadow-sm',
+                      'focus:outline-none focus:bg-mq-card-background',
+                      'focus:border-mq-primary focus:shadow-sm',
                     )}
                   />
                   {searchQuery && (
@@ -208,14 +226,14 @@ export function GoogleMapBuildingSearch({
                         setSearchQuery('');
                         searchInputRef.current?.focus();
                       }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-mq-content-tertiary hover:text-mq-content hover:bg-mq-hover-background transition-colors"
                       aria-label={t('clearSearch')}
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
                   )}
                   {!searchQuery && (
-                    <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono text-gray-400 bg-gray-200 dark:bg-gray-700 rounded">
+                    <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono text-mq-content-tertiary bg-mq-background-secondary rounded">
                       <span>⌘</span>
                       <span>K</span>
                     </kbd>
@@ -236,9 +254,9 @@ export function GoogleMapBuildingSearch({
                             onClick={() => handleBuildingSelect(building)}
                             className={cn(
                               'w-full flex items-start gap-3 px-4 py-3 text-left transition-colors',
-                              'hover:bg-gray-50 dark:hover:bg-[#303134]',
+                              'hover:bg-mq-hover-background',
                               isSelected &&
-                                'bg-blue-50 dark:bg-[#303134] border-l-4 border-[#4285f4]',
+                                'bg-mq-primary/10 border-l-4 border-mq-primary',
                             )}
                           >
                             <MapPin
@@ -252,17 +270,17 @@ export function GoogleMapBuildingSearch({
                                 className={cn(
                                   'text-sm font-medium truncate',
                                   isSelected
-                                    ? 'text-[#4285f4]'
-                                    : 'text-gray-900 dark:text-gray-100',
+                                    ? 'text-mq-primary'
+                                    : 'text-mq-content',
                                 )}
                               >
                                 {building.id}
                               </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                              <p className="text-xs text-mq-content-secondary truncate">
                                 {t(building.translationKey)}
                               </p>
                               {building.address && (
-                                <p className="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
+                                <p className="text-xs text-mq-content-tertiary truncate mt-0.5">
                                   {building.address}
                                 </p>
                               )}
@@ -274,8 +292,8 @@ export function GoogleMapBuildingSearch({
                   </ul>
                 ) : (
                   <div className="px-4 py-8 text-center">
-                    <MapPin className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <MapPin className="h-8 w-8 mx-auto mb-2 text-mq-content-tertiary/70" />
+                    <p className="text-sm text-mq-content-secondary">
                       {t('noMatchingBuildings')}
                     </p>
                   </div>
@@ -294,26 +312,26 @@ export function GoogleMapBuildingSearch({
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: prefersReducedMotion ? 0 : 10, opacity: 0 }}
             transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
-            className="pointer-events-auto mt-3 rounded-lg bg-white shadow-lg dark:bg-[#202124] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]"
+            className="pointer-events-auto mt-3 rounded-lg border border-mq-border bg-mq-card-background shadow-lg"
           >
             <div className="p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                  <h3 className="text-base font-semibold text-mq-content">
                     {selectedBuilding.id}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                  <p className="text-sm text-mq-content-secondary truncate">
                     {t(selectedBuilding.translationKey)}
                   </p>
                   {selectedBuilding.address && (
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    <p className="text-xs text-mq-content-tertiary mt-1">
                       {selectedBuilding.address}
                     </p>
                   )}
                 </div>
                 <Link
                   href={buildMapHref(undefined)}
-                  className="p-1.5 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-1.5 rounded-full text-mq-content-tertiary hover:text-mq-content hover:bg-mq-hover-background transition-colors"
                   aria-label={t('close')}
                 >
                   <X className="h-5 w-5" />
@@ -324,7 +342,7 @@ export function GoogleMapBuildingSearch({
               <div className="flex gap-2 mt-4">
                 <button
                   type="button"
-                  onClick={() => getDirectionsInGoogleMaps(selectedBuilding)}
+                  onClick={() => handleNavigate(selectedBuilding)}
                   className={cn(
                     'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full',
                     'bg-[#4285f4] hover:bg-[#3367d6] text-white',
@@ -339,8 +357,8 @@ export function GoogleMapBuildingSearch({
                   onClick={() => openInGoogleMaps(selectedBuilding)}
                   className={cn(
                     'flex items-center justify-center gap-2 px-4 py-2.5 rounded-full',
-                    'bg-gray-100 hover:bg-gray-200 dark:bg-[#303134] dark:hover:bg-[#3c4043]',
-                    'text-gray-700 dark:text-gray-200',
+                    'bg-mq-background-secondary hover:bg-mq-hover-background',
+                    'text-mq-content',
                     'text-sm font-medium transition-colors',
                   )}
                   title={t('openInGoogleMaps')}

@@ -278,6 +278,46 @@ describe('GoogleMapBuildingSearch', () => {
   });
 
   describe('Google Maps integration', () => {
+    it('starts in-app embedded navigation when callback is provided', async () => {
+      const onStartNavigation = vi.fn();
+      const onNavigate = vi.fn();
+      const windowOpen = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+      Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: vi.fn().mockImplementation((query: string) => ({
+          matches: true,
+          media: query,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        })),
+      });
+
+      render(
+        <GoogleMapBuildingSearch
+          buildings={mockBuildings}
+          selectedBuilding={mockBuildings[0]}
+          onNavigateToBuilding={onNavigate}
+          onStartNavigation={onStartNavigation}
+        />,
+      );
+
+      const navigateButton = screen.getByRole('button', { name: 'Navigate' });
+      await act(async () => {
+        fireEvent.click(navigateButton);
+      });
+
+      expect(onNavigate).toHaveBeenCalledWith(mockBuildings[0]);
+      expect(onStartNavigation).toHaveBeenCalledWith(mockBuildings[0]);
+      expect(windowOpen).not.toHaveBeenCalledWith(
+        expect.stringContaining('google.com/maps/dir'),
+        '_blank',
+        'noopener,noreferrer',
+      );
+
+      windowOpen.mockRestore();
+    });
+
     it('opens Google Maps directions when Navigate is clicked', async () => {
       const windowOpen = vi.spyOn(window, 'open').mockImplementation(() => null);
 
