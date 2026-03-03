@@ -172,7 +172,9 @@ const TodosWidget = memo(() => {
                   key={todo.id}
                   className={cn(
                     'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 focus:ring-offset-mq-card-background focus:bg-mq-primary/10 focus:border-mq-primary/40 focus:shadow-sm',
-                    'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
+                    isOverdue
+                      ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
+                      : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
                   )}
                   onClick={() =>
                     router.push(`/calendar?date=${todoDateStr}&highlightTodo=${todo.id}`)
@@ -223,21 +225,29 @@ const TodosWidget = memo(() => {
                           className={cn(
                             'text-mq-sm font-medium text-mq-content truncate',
                             todo.completed && 'line-through text-mq-content-tertiary',
+                            isOverdue && !todo.completed && 'line-through text-mq-content-tertiary',
                           )}
                           title={todo.title}
                         >
                           {todo.title}
                         </h4>
                       </div>
-                      <Badge
-                        className={cn(
-                          PRIORITY_COLORS[todo.priority],
-                          'text-[10px] px-1.5 py-0.5 font-medium shrink-0',
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {isOverdue && (
+                          <span className="text-[10px] font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/40 px-1.5 py-0.5 rounded">
+                            {tOr('overdueLabel', 'Overdue')}
+                          </span>
                         )}
-                        variant="neutral"
-                      >
-                        {t(`priority_${todo.priority}` as TranslationKey)}
-                      </Badge>
+                        <Badge
+                          className={cn(
+                            PRIORITY_COLORS[todo.priority],
+                            'text-[10px] px-1.5 py-0.5 font-medium shrink-0',
+                          )}
+                          variant="neutral"
+                        >
+                          {t(`priority_${todo.priority}` as TranslationKey)}
+                        </Badge>
+                      </div>
                     </div>
                     {dueDate && (
                       <div className="flex items-center gap-1 text-sm text-mq-content-secondary">

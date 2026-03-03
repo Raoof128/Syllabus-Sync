@@ -28,6 +28,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import {
+  AlertCircle,
   Bell,
   Check,
   User,
@@ -42,10 +43,12 @@ import {
 } from 'lucide-react';
 import { APP_CONFIG, BRAND_COLORS, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useEventsStore } from '@/lib/store/eventsStore';
 import { useThemeStore } from '@/lib/store/themeStore';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { apiRequest } from '@/lib/utils/api';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, isPast } from 'date-fns';
 import { getLocaleString } from '@/lib/utils/locale';
 import { clearAllClientStorage, resetAllStores } from '@/lib/utils/clientStorage';
 import {
@@ -79,6 +82,28 @@ const Header = memo(() => {
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
   const removeNotification = useNotificationsStore((state) => state.removeNotification);
+
+  const deadlines = useDeadlinesStore((state) => state.deadlines);
+  const events = useEventsStore((state) => state.events);
+
+  // Check if a notification's related deadline/event is overdue
+  const isNotificationOverdue = (notification: (typeof notifications)[0]): boolean => {
+    if (notification.type === 'deadline' && notification.relatedId) {
+      const deadline = deadlines.find((d) => d.id === notification.relatedId);
+      if (deadline && !deadline.completed) {
+        const dueDate = new Date(deadline.dueDate);
+        return isPast(dueDate);
+      }
+    }
+    if (notification.type === 'event' && notification.relatedId) {
+      const event = events.find((e) => e.id === notification.relatedId);
+      if (event) {
+        const eventDate = new Date(event.startAt);
+        return isPast(eventDate);
+      }
+    }
+    return false;
+  };
 
   const [hasSeeded, setHasSeeded] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -368,11 +393,16 @@ const Header = memo(() => {
                 ) : (
                   recentNotifications.map((notification) => {
                     const Icon = notificationIcons[notification.type];
+                    const overdue = isNotificationOverdue(notification);
                     return (
                       <DropdownMenuItem
                         key={notification.id}
                         className={`p-0 border-b border-mq-border last:border-0 ${
-                          !notification.read ? 'bg-mq-info/10' : ''
+                          overdue
+                            ? 'bg-red-50/60 dark:bg-red-950/20'
+                            : !notification.read
+                              ? 'bg-mq-info/10'
+                              : ''
                         }`}
                       >
                         <div className="flex w-full items-start gap-1">
@@ -388,35 +418,50 @@ const Header = memo(() => {
                             <div className="flex gap-3">
                               <div
                                 className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                                  notification.type === 'deadline'
-                                    ? 'bg-mq-warning/20'
-                                    : notification.type === 'event'
-                                      ? 'bg-mq-purple/20'
-                                      : notification.type === 'class'
-                                        ? 'bg-mq-info/20'
-                                        : 'bg-mq-background-secondary'
+                                  overdue
+                                    ? 'bg-red-100 dark:bg-red-950/40'
+                                    : notification.type === 'deadline'
+                                      ? 'bg-mq-warning/20'
+                                      : notification.type === 'event'
+                                        ? 'bg-mq-purple/20'
+                                        : notification.type === 'class'
+                                          ? 'bg-mq-info/20'
+                                          : 'bg-mq-background-secondary'
                                 }`}
                                 aria-hidden="true"
                               >
-                                <Icon
-                                  className={`w-4 h-4 ${
-                                    notification.type === 'deadline'
-                                      ? 'text-mq-warning'
-                                      : notification.type === 'event'
-                                        ? 'text-mq-purple'
-                                        : notification.type === 'class'
-                                          ? 'text-mq-info'
-                                          : 'text-mq-content-secondary'
-                                  }`}
-                                />
+                                {overdue ? (
+                                  <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                ) : (
+                                  <Icon
+                                    className={`w-4 h-4 ${
+                                      notification.type === 'deadline'
+                                        ? 'text-mq-warning'
+                                        : notification.type === 'event'
+                                          ? 'text-mq-purple'
+                                          : notification.type === 'class'
+                                            ? 'text-mq-info'
+                                            : 'text-mq-content-secondary'
+                                    }`}
+                                  />
+                                )}
                               </div>
                               <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <p
+                                    className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} ${overdue ? 'line-through text-mq-content-tertiary' : 'text-mq-content'} truncate`}
+                                  >
+                                    {notification.title}
+                                  </p>
+                                  {overdue && (
+                                    <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/40 px-1.5 py-0.5 rounded">
+                                      {t('overdueLabel')}
+                                    </span>
+                                  )}
+                                </div>
                                 <p
-                                  className={`text-sm ${!notification.read ? 'font-semibold' : 'font-medium'} text-mq-content truncate`}
+                                  className={`text-xs ${overdue ? 'line-through text-mq-content-tertiary' : 'text-mq-content-secondary'} line-clamp-2`}
                                 >
-                                  {notification.title}
-                                </p>
-                                <p className="text-xs text-mq-content-secondary line-clamp-2">
                                   {notification.message}
                                 </p>
                                 <p className="text-xs text-mq-content-tertiary mt-1">
@@ -425,7 +470,7 @@ const Header = memo(() => {
                                   })}
                                 </p>
                               </div>
-                              {!notification.read && (
+                              {!notification.read && !overdue && (
                                 <div
                                   className="w-2 h-2 bg-mq-info rounded-full shrink-0 mt-2"
                                   aria-label={t('unread')}

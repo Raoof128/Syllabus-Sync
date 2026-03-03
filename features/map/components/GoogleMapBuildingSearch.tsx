@@ -255,8 +255,7 @@ export function GoogleMapBuildingSearch({
                             className={cn(
                               'w-full flex items-start gap-3 px-4 py-3 text-left transition-colors',
                               'hover:bg-mq-hover-background',
-                              isSelected &&
-                                'bg-mq-primary/10 border-l-4 border-mq-primary',
+                              isSelected && 'bg-mq-primary/10 border-l-4 border-mq-primary',
                             )}
                           >
                             <MapPin
@@ -269,9 +268,7 @@ export function GoogleMapBuildingSearch({
                               <p
                                 className={cn(
                                   'text-sm font-medium truncate',
-                                  isSelected
-                                    ? 'text-mq-primary'
-                                    : 'text-mq-content',
+                                  isSelected ? 'text-mq-primary' : 'text-mq-content',
                                 )}
                               >
                                 {building.id}
@@ -293,9 +290,7 @@ export function GoogleMapBuildingSearch({
                 ) : (
                   <div className="px-4 py-8 text-center">
                     <MapPin className="h-8 w-8 mx-auto mb-2 text-mq-content-tertiary/70" />
-                    <p className="text-sm text-mq-content-secondary">
-                      {t('noMatchingBuildings')}
-                    </p>
+                    <p className="text-sm text-mq-content-secondary">{t('noMatchingBuildings')}</p>
                   </div>
                 )}
               </div>
@@ -317,9 +312,7 @@ export function GoogleMapBuildingSearch({
             <div className="p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold text-mq-content">
-                    {selectedBuilding.id}
-                  </h3>
+                  <h3 className="text-base font-semibold text-mq-content">{selectedBuilding.id}</h3>
                   <p className="text-sm text-mq-content-secondary truncate">
                     {t(selectedBuilding.translationKey)}
                   </p>

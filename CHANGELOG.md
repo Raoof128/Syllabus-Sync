@@ -1,4 +1,10 @@
 Raouf: 2026-03-03 (Australia/Sydney)
+Scope: Notification System Audit + Overdue Visual Treatment
+Summary: Full notification system audit confirmed architecture integrity. Added overdue visual treatment: Header notification dropdown shows "OVERDUE" badge + strikethrough + red icon for past-due deadline/event notifications (cross-references relatedId against stores). UpcomingDeadlines widget now shows "OVERDUE" badge + strikethrough title. TodosWidget now shows red bg + "OVERDUE" badge + strikethrough title for overdue items.
+Files: Modified `components/layout/Header.tsx`, `features/home/components/UpcomingDeadlines.tsx`, `features/home/components/TodosWidget.tsx`.
+Verification: `npx eslint` ✅; `npm run typecheck` ✅; 46/46 tests passing.
+
+Raouf: 2026-03-03 (Australia/Sydney)
 Scope: App-Wide Dark Mode Icon Button Visibility — Full Sweep
 Summary: Extended dark mode icon-button visibility fix to all remaining icon-only buttons app-wide: Header bell + notification delete, Sidebar hamburger, ProfileCard edit/use, CampusMap stop-nav, CampusMapHUD/GoogleMapBuildingSearch clear/close, FeedEventCard more-actions, PasskeySecuritySection delete. Added `dark:text-mq-content/80` or `/60` so icons are visible without hover.
 Files: Modified `components/layout/Header.tsx`, `components/layout/Sidebar.tsx`, `components/ProfileCard.tsx`, `features/map/components/CampusMap.tsx`, `features/map/components/CampusMapHUD.tsx`, `features/map/components/GoogleMapBuildingSearch.tsx`, `features/feed/components/FeedEventCard.tsx`, `features/settings/components/security/PasskeySecuritySection.tsx`.
