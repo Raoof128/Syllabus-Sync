@@ -1,17 +1,17 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Event } from '@/lib/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/mq/badge';
 import { MapPin, Clock, CalendarDays, Navigation, Tag, PartyPopper } from 'lucide-react';
-import Link from 'next/link';
 import { format, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { CATEGORY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
+import { NavigationPreferenceDialog } from '@/components/ui/NavigationPreferenceDialog';
 
 interface EventDetailPanelProps {
   event: Event | null;
@@ -29,6 +29,11 @@ export default function EventDetailPanel({
   onDelete,
 }: EventDetailPanelProps) {
   const { t } = useTypedTranslation();
+
+  // Navigation dialog state
+  const [navDialogOpen, setNavDialogOpen] = useState(false);
+  const [navBuildingId, setNavBuildingId] = useState('');
+  const [navRoom, setNavRoom] = useState<string | undefined>(undefined);
 
   // Get the color (from event custom color or category default)
   const color = useMemo(() => {
@@ -58,6 +63,12 @@ export default function EventDetailPanel({
     }
     return null;
   }, [event]);
+
+  const handleNavigationClick = (buildingId: string, room?: string) => {
+    setNavBuildingId(buildingId);
+    setNavRoom(room);
+    setNavDialogOpen(true);
+  };
 
   // Early return after all hooks
   if (!event) return null;
@@ -216,13 +227,14 @@ export default function EventDetailPanel({
                   <MapPin className="h-3.5 w-3.5" />
                   Event Location
                 </div>
-                <Link
-                  href={`/map?building=${event.building.toLowerCase()}&autonav=true`}
+                <button
+                  type="button"
+                  onClick={() => handleNavigationClick(event.building!, event.room)}
                   className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
                   aria-label={`Navigate to ${event.building} on campus map`}
                 >
                   <Navigation className="h-4 w-4" aria-hidden="true" />
-                </Link>
+                </button>
               </div>
               <div className="flex items-center gap-3 mt-2">
                 <div className="w-4 h-4 rounded shrink-0" style={{ backgroundColor: color }} />
@@ -244,6 +256,14 @@ export default function EventDetailPanel({
           </div>
         </div>
       </DialogContent>
+
+      {/* Navigation Preference Dialog */}
+      <NavigationPreferenceDialog
+        open={navDialogOpen}
+        onOpenChange={setNavDialogOpen}
+        buildingId={navBuildingId}
+        room={navRoom}
+      />
     </Dialog>
   );
 }

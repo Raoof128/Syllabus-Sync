@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Deadline } from '@/lib/types';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
@@ -16,13 +16,13 @@ import {
   BookOpen,
   Navigation,
 } from 'lucide-react';
-import Link from 'next/link';
 import { format, isPast, differenceInDays, differenceInHours } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { PRIORITY_COLORS } from '@/lib/constants';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
+import { NavigationPreferenceDialog } from '@/components/ui/NavigationPreferenceDialog';
 
 interface AssignmentDetailPanelProps {
   assignment: Deadline | null;
@@ -46,6 +46,10 @@ export default function AssignmentDetailPanel({
   const units = useUnitsStore((state) => state.units);
   const { t } = useTypedTranslation();
 
+  // Navigation dialog state
+  const [navDialogOpen, setNavDialogOpen] = useState(false);
+  const [navBuildingId, setNavBuildingId] = useState('');
+
   // Find the associated unit for color and additional info
   const unit = useMemo(() => {
     if (!assignment) return null;
@@ -59,6 +63,11 @@ export default function AssignmentDetailPanel({
     if (unit?.color) return unit.color;
     return '#3B82F6';
   }, [assignment, unit]);
+
+  const handleNavigationClick = (buildingId: string) => {
+    setNavBuildingId(buildingId);
+    setNavDialogOpen(true);
+  };
 
   if (!assignment) return null;
 
@@ -255,16 +264,19 @@ export default function AssignmentDetailPanel({
                   {t('associatedUnit' as TranslationKey)}
                 </div>
                 {unit.location?.building && (
-                  <Link
-                    href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}
-                    onClick={(e) => e.stopPropagation()}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNavigationClick(unit.location!.building!);
+                    }}
                     className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
                     aria-label={t('navigateToBuildingAria', {
                       building: unit.location.building,
                     })}
                   >
                     <Navigation className="h-4 w-4" aria-hidden="true" />
-                  </Link>
+                  </button>
                 )}
               </div>
               <div className="flex items-center gap-3">
@@ -304,6 +316,13 @@ export default function AssignmentDetailPanel({
           </div>
         </div>
       </DialogContent>
+
+      {/* Navigation Preference Dialog */}
+      <NavigationPreferenceDialog
+        open={navDialogOpen}
+        onOpenChange={setNavDialogOpen}
+        buildingId={navBuildingId}
+      />
     </Dialog>
   );
 }

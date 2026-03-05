@@ -1,13 +1,13 @@
 'use client';
 
 import { useMemo, useCallback, useState } from 'react';
-import Link from 'next/link';
 import { Navigation, Edit2, Trash2, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import ReminderModal from '@/components/ui/ReminderModal';
 import { useRemindersStore, ReminderItemType } from '@/lib/store/remindersStore';
+import { NavigationPreferenceDialog } from '@/components/ui/NavigationPreferenceDialog';
 
 export type ItemType = 'assignment' | 'exam' | 'event' | 'unit' | 'todo';
 
@@ -65,6 +65,7 @@ export default function ItemActionButtons({
 }: ItemActionButtonsProps) {
   const { t } = useTypedTranslation();
   const [reminderModalOpen, setReminderModalOpen] = useState(false);
+  const [navDialogOpen, setNavDialogOpen] = useState(false);
   const { getReminderForItem } = useRemindersStore();
 
   // Map ItemType to ReminderItemType
@@ -84,15 +85,14 @@ export default function ItemActionButtons({
     return isNaN(parsed.getTime()) ? undefined : parsed;
   }, [dateTime]);
 
-  // Navigation URL
-  const navigationUrl = useMemo(() => {
-    if (!building) return null;
-    const params = new URLSearchParams();
-    params.set('building', building.toLowerCase());
-    if (room) params.set('room', room);
-    params.set('autonav', 'true');
-    return `/map?${params.toString()}`;
-  }, [building, room]);
+  // Handle navigate button click - open navigation preference dialog
+  const handleNavigateClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (stopPropagation) e.stopPropagation();
+      setNavDialogOpen(true);
+    },
+    [stopPropagation],
+  );
 
   // Handle notify button click - open reminder modal
   // Always stop propagation for bell to prevent parent dialog interference
@@ -119,13 +119,6 @@ export default function ItemActionButtons({
     [stopPropagation, onDelete],
   );
 
-  const handleNavLinkClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (stopPropagation) e.stopPropagation();
-    },
-    [stopPropagation],
-  );
-
   // Button size classes based on variant
   const buttonSizeClass = variant === 'detail' ? 'h-9 w-9' : 'h-8 w-8';
   const iconSizeClass = variant === 'detail' ? 'h-4.5 w-4.5' : 'h-4 w-4';
@@ -141,10 +134,10 @@ export default function ItemActionButtons({
   return (
     <div className={cn('flex items-center gap-1', className)}>
       {/* Navigate Button - only shown when building is set */}
-      {building && navigationUrl && (
-        <Link
-          href={navigationUrl}
-          onClick={handleNavLinkClick}
+      {building && (
+        <button
+          type="button"
+          onClick={handleNavigateClick}
           className={cn(
             baseButtonClass,
             'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400',
@@ -156,7 +149,7 @@ export default function ItemActionButtons({
           }
         >
           <Navigation className={iconSizeClass} aria-hidden="true" />
-        </Link>
+        </button>
       )}
 
       {/* Edit Button */}
@@ -242,6 +235,16 @@ export default function ItemActionButtons({
           unitSchedule={unitSchedule}
         />
       </div>
+
+      {/* Navigation Preference Dialog */}
+      {building && (
+        <NavigationPreferenceDialog
+          open={navDialogOpen}
+          onOpenChange={setNavDialogOpen}
+          buildingId={building}
+          room={room || undefined}
+        />
+      )}
     </div>
   );
 }

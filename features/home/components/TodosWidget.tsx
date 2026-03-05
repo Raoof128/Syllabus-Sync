@@ -188,14 +188,15 @@ const TodosWidget = memo(() => {
                     }
                   }}
                 >
-                  {/* Color indicator based on priority */}
+                  {/* Color indicator - use custom color if set, otherwise priority-based */}
                   <div
-                    className={cn(
-                      'w-1.5 self-stretch rounded-full shrink-0',
-                      todo.priority === 'High' && 'bg-red-500',
-                      todo.priority === 'Medium' && 'bg-amber-500',
-                      todo.priority === 'Low' && 'bg-green-500',
-                    )}
+                    className="w-1.5 self-stretch rounded-full shrink-0"
+                    style={{
+                      backgroundColor: todo.color || (
+                        todo.priority === 'High' ? '#ef4444' :
+                        todo.priority === 'Medium' ? '#f59e0b' : '#22c55e'
+                      )
+                    }}
                   />
 
                   {/* Todo info */}

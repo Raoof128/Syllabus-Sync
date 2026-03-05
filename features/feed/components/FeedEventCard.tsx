@@ -1,5 +1,4 @@
-import { memo } from 'react';
-import Link from 'next/link';
+import { memo, useState } from 'react';
 import { Calendar, Clock, MapPin, Navigation, Bell, Check, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
@@ -14,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { NavigationPreferenceDialog } from '@/components/ui/NavigationPreferenceDialog';
 
 const categoryColors: Record<string, string> = {
   Career: 'bg-mq-info/10 text-mq-info border-mq-info/20',
@@ -45,8 +45,10 @@ export const FeedEventCard = memo(
     getLocaleString,
   }: FeedEventCardProps) => {
     const { t } = useTypedTranslation();
+    const [navDialogOpen, setNavDialogOpen] = useState(false);
 
     return (
+      <>
       <MagicCard isLiquidEnhanced className="h-full">
         <article
           className={cn(
@@ -168,24 +170,31 @@ export const FeedEventCard = memo(
 
             {event.building && (
               <Button
-                asChild
                 variant="ghost"
                 size="icon"
                 className="shrink-0 text-mq-content-secondary hover:text-mq-primary hover:bg-mq-primary/10"
+                onClick={() => setNavDialogOpen(true)}
+                aria-label={t('navigateToBuildingAria', {
+                  building: event.building,
+                })}
               >
-                <Link
-                  href={`/map?building=${encodeURIComponent(event.building)}${event.room ? `&room=${encodeURIComponent(event.room)}` : ''}&autonav=true`}
-                  aria-label={t('navigateToBuildingAria', {
-                    building: event.building,
-                  })}
-                >
-                  <Navigation className="h-4 w-4" />
-                </Link>
+                <Navigation className="h-4 w-4" />
               </Button>
             )}
           </div>
         </article>
       </MagicCard>
+
+      {/* Navigation Preference Dialog */}
+      {event.building && (
+        <NavigationPreferenceDialog
+          open={navDialogOpen}
+          onOpenChange={setNavDialogOpen}
+          buildingId={event.building}
+          room={event.room}
+        />
+      )}
+      </>
     );
   },
 );

@@ -544,6 +544,14 @@ export const useProfilesStore = create<ProfilesState>()(
         })),
         currentProfileId: state.currentProfileId,
       }),
+      // Ensure hasLoaded stays false after rehydration so fetchProfile can update it
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // Reset hasLoaded to false after rehydration
+          // This ensures the manage-profiles page waits for fresh DB data
+          state.hasLoaded = false;
+        }
+      },
     },
   ),
 );

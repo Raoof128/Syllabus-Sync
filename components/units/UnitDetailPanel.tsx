@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Unit, Deadline } from '@/lib/types';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -15,12 +15,12 @@ import {
   AlertCircle,
   Navigation,
 } from 'lucide-react';
-import Link from 'next/link';
 import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
+import { NavigationPreferenceDialog } from '@/components/ui/NavigationPreferenceDialog';
 
 interface UnitDetailPanelProps {
   unit: Unit | null;
@@ -43,6 +43,11 @@ export default function UnitDetailPanel({
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const toggleComplete = useDeadlinesStore((state) => state.toggleComplete);
   const { t, language } = useTypedTranslation();
+
+  // Navigation dialog state
+  const [navDialogOpen, setNavDialogOpen] = useState(false);
+  const [navBuildingId, setNavBuildingId] = useState('');
+  const [navRoom, setNavRoom] = useState<string | undefined>(undefined);
 
   // Filter deadlines for this unit
   const unitDeadlines = useMemo(() => {
@@ -80,6 +85,12 @@ export default function UnitDetailPanel({
       overdue: all.filter((d) => !d.completed && isPast(new Date(d.dueDate))).length,
     };
   }, [unitDeadlines.all, unit]);
+
+  const handleNavigationClick = (buildingId: string, room?: string) => {
+    setNavBuildingId(buildingId);
+    setNavRoom(room);
+    setNavDialogOpen(true);
+  };
 
   if (!unit) return null;
 
@@ -255,13 +266,14 @@ export default function UnitDetailPanel({
                 <MapPin className="h-3.5 w-3.5" />
                 Unit Location
               </div>
-              <Link
-                href={`/map?building=${unit.location.building.toLowerCase()}&autonav=true`}
+              <button
+                type="button"
+                onClick={() => handleNavigationClick(unit.location!.building!, unit.location!.room)}
                 className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
                 aria-label={`Navigate to ${unit.location.building} on campus map`}
               >
                 <Navigation className="h-4 w-4" aria-hidden="true" />
-              </Link>
+              </button>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 rounded shrink-0" style={{ backgroundColor: unit.color }} />
@@ -401,6 +413,14 @@ export default function UnitDetailPanel({
           </div>
         )}
       </DialogContent>
+
+      {/* Navigation Preference Dialog */}
+      <NavigationPreferenceDialog
+        open={navDialogOpen}
+        onOpenChange={setNavDialogOpen}
+        buildingId={navBuildingId}
+        room={navRoom}
+      />
     </Dialog>
   );
 }

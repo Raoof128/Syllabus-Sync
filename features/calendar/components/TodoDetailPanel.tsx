@@ -36,9 +36,10 @@ export default function TodoDetailPanel({
     return value === key ? fallback : value;
   };
 
-  // Priority-based color
+  // Use custom color if set, otherwise fall back to priority colors
   const color = useMemo(() => {
     if (!todo) return '#6B7280';
+    if (todo.color) return todo.color;
     const priorityColors: Record<string, string> = {
       High: '#EF4444',
       Medium: '#F59E0B',

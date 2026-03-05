@@ -120,12 +120,37 @@ export function useCalendarView() {
   // Derived: Mobile Selected Day
   const mobileSelectedDay = weekDays[mobileSelectedDayIndex] || weekDays[0];
 
+  // Check if currently viewing current week
+  const isCurrentWeek = useMemo(() => {
+    const today = dayjs();
+    const currentWeekStartDay = dayjs(currentWeekStart);
+    return today.startOf('isoWeek').isSame(currentWeekStartDay, 'day');
+  }, [currentWeekStart]);
+
+  // Check if currently viewing today (for day view)
+  const isToday = useMemo(() => {
+    const today = dayjs();
+    const selectedDay = weekDays[mobileSelectedDayIndex];
+    return selectedDay ? dayjs(selectedDay).isSame(today, 'day') : false;
+  }, [weekDays, mobileSelectedDayIndex]);
+
   // Navigation Handlers
   const goToPreviousWeek = () =>
     setCurrentWeekStart(dayjs(currentWeekStart).subtract(1, 'week').toDate());
   const goToNextWeek = () => setCurrentWeekStart(dayjs(currentWeekStart).add(1, 'week').toDate());
+
+  // Go to today (for day view - navigates to today's date)
   const goToToday = () => {
     setCurrentWeekStart(dayjs().startOf('isoWeek').toDate());
+    const today = dayjs();
+    const weekStart = dayjs().startOf('isoWeek');
+    setMobileSelectedDayIndex(today.diff(weekStart, 'day'));
+  };
+
+  // Go to this week (for week/agenda views - navigates to current week)
+  const goToThisWeek = () => {
+    setCurrentWeekStart(dayjs().startOf('isoWeek').toDate());
+    // Also update day index to today
     const today = dayjs();
     const weekStart = dayjs().startOf('isoWeek');
     setMobileSelectedDayIndex(today.diff(weekStart, 'day'));
@@ -208,11 +233,14 @@ export function useCalendarView() {
     mobileSelectedDayIndex,
     mobileSelectedDay,
     currentTimePosition,
+    isCurrentWeek,
+    isToday,
     handleViewChange,
     handleDateChange,
     goToNextWeek,
     goToPreviousWeek,
     goToToday,
+    goToThisWeek,
     goToNextDay,
     goToPreviousDay,
     handleKeyDown,

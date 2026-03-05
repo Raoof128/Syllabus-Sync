@@ -1,7 +1,6 @@
 'use client';
 
-import { memo } from 'react';
-import Link from 'next/link';
+import { memo, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
@@ -10,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { PublicEvent } from '@/lib/types/publicEvents';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { buildings } from '@/features/map/lib/buildings';
+import { NavigationPreferenceDialog } from '@/components/ui/NavigationPreferenceDialog';
 
 const categoryStyles: Record<string, { gradient: string; icon: string }> = {
   Career: { gradient: 'from-blue-500 to-blue-700', icon: '💼' },
@@ -39,6 +39,7 @@ export const EventDetailModal = memo(
     locale = 'en-AU',
   }: EventDetailModalProps) => {
     const { t } = useTypedTranslation();
+    const [navDialogOpen, setNavDialogOpen] = useState(false);
 
     if (!event) return null;
 
@@ -74,6 +75,7 @@ export const EventDetailModal = memo(
     };
 
     return (
+      <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent className="max-w-lg p-0 overflow-hidden">
           {/* Header with Gradient */}
@@ -162,17 +164,13 @@ export const EventDetailModal = memo(
               </div>
               {event.building && (
                 <Button
-                  asChild
                   variant="ghost"
                   size="sm"
                   className="shrink-0 text-mq-primary hover:bg-mq-primary/10"
+                  onClick={() => setNavDialogOpen(true)}
                 >
-                  <Link
-                    href={`/map?building=${encodeURIComponent(event.building)}${event.room ? `&room=${encodeURIComponent(event.room)}` : ''}&autonav=true`}
-                  >
-                    <Navigation className="h-4 w-4 mr-1.5" />
-                    {t('navigate') || 'Navigate'}
-                  </Link>
+                  <Navigation className="h-4 w-4 mr-1.5" />
+                  {t('navigate') || 'Navigate'}
                 </Button>
               )}
             </div>
@@ -218,6 +216,17 @@ export const EventDetailModal = memo(
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Navigation Preference Dialog */}
+      {event.building && (
+        <NavigationPreferenceDialog
+          open={navDialogOpen}
+          onOpenChange={setNavDialogOpen}
+          buildingId={event.building}
+          room={event.room}
+        />
+      )}
+      </>
     );
   },
 );

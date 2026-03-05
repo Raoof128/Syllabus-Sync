@@ -134,6 +134,15 @@ export default function TodosWidget({
                   const isOverdue = !todo.completed && due.isBefore(dayjs());
                   const isHighlighted = todoHighlightActive && highlightedTodoId === todo.id;
 
+                  // Use custom color if set, otherwise fall back to priority colors
+                  const todoColor = todo.color || (
+                    todo.priority === 'High'
+                      ? '#ef4444'
+                      : todo.priority === 'Medium'
+                        ? '#f59e0b'
+                        : '#3b82f6'
+                  );
+
                   return (
                     <div
                       key={todo.id}
@@ -144,12 +153,7 @@ export default function TodosWidget({
                         isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
                       )}
                       style={{
-                        borderLeftColor:
-                          todo.priority === 'High'
-                            ? '#ef4444'
-                            : todo.priority === 'Medium'
-                              ? '#f59e0b'
-                              : '#3b82f6',
+                        borderLeftColor: todoColor,
                         borderLeftWidth: '4px',
                       }}
                       onClick={(e) => {
