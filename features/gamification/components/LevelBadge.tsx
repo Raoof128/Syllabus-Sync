@@ -15,7 +15,7 @@ interface LevelBadgeProps {
 
 /**
  * Level Badge Component
- * Displays the user's current level with optional title
+ * Displays the user's current commitment title with optional numeric tier
  */
 export function LevelBadge({ size = 'md', showTitle = false, className }: LevelBadgeProps) {
   const { profile, loadProfile, hasLoaded, isLoading, getLevelTitle } = useGamificationStore();
@@ -88,8 +88,8 @@ export function LevelBadge({ size = 'md', showTitle = false, className }: LevelB
       {/* Optional Title */}
       {showTitle && (
         <div className="flex flex-col">
-          <span className={cn(config.title, 'font-semibold text-mq-content')}>Lv. {level}</span>
-          <span className="text-xs text-mq-content-secondary">{title}</span>
+          <span className={cn(config.title, 'font-semibold text-mq-content')}>{title}</span>
+          <span className="text-xs text-mq-content-secondary">Level {level}</span>
         </div>
       )}
     </div>

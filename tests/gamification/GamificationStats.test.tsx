@@ -82,6 +82,13 @@ describe('GamificationStats - Compact Variant', () => {
     expect(screen.getByTestId('level-badge')).toBeInTheDocument();
   });
 
+  it('shows commitment title instead of raw level label in compact variant', () => {
+    render(<GamificationStats />);
+
+    expect(screen.getByText('Rising Star')).toBeInTheDocument();
+    expect(screen.queryByText('Level 3')).not.toBeInTheDocument();
+  });
+
   it('shows streak badge when streak > 0 and showStreak is true', () => {
     render(<GamificationStats showStreak />);
 

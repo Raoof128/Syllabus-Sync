@@ -54,8 +54,8 @@ describe('LevelBadge', () => {
   it('shows title text when showTitle is true', () => {
     render(<LevelBadge showTitle />);
 
-    expect(screen.getByText('Lv. 3')).toBeInTheDocument();
     expect(screen.getByText('Rising Star')).toBeInTheDocument();
+    expect(screen.getByText('Level 3')).toBeInTheDocument();
   });
 
   it('hides title text when showTitle is false', () => {

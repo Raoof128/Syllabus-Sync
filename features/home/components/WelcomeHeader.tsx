@@ -14,7 +14,7 @@
 //    demos, lectures, and judge evaluations while still feeling human.
 // 4. Campus-specific messaging (walking distances, building codes) adds
 //    authentic Macquarie flavour without referencing specific staff or units.
-// 5. Gamification stats (Level, XP, Streak) provide motivation and progression.
+// 5. Gamification stats (commitment title, XP, streak) provide motivation and progression.
 // ============================================
 
 'use client';
@@ -34,7 +34,7 @@ interface WelcomeHeaderProps {
   fallbackName?: string;
   /** Optional CSS class for the container */
   className?: string;
-  /** Show gamification stats (level, streak) */
+  /** Show gamification stats (commitment title, streak) */
   showGamification?: boolean;
   children?: ReactNode;
 }

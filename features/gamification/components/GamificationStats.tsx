@@ -113,9 +113,10 @@ export function GamificationStats({
   className,
 }: GamificationStatsProps) {
   const { t } = useTypedTranslation();
-  const { loadProfile, hasLoaded, isLoading, isDemo } = useGamificationStore();
+  const { loadProfile, hasLoaded, isLoading, isDemo, getLevelTitle } = useGamificationStore();
   const { currentXP, level, xpToNext, progress } = useXPProgress();
   const { days, longest: longestStreak } = useStreak();
+  const levelTitle = getLevelTitle();
 
   // Load profile on mount
   useEffect(() => {
@@ -148,7 +149,7 @@ export function GamificationStats({
 
     return (
       <div className={cn('flex items-center gap-2 flex-wrap', className)}>
-        {/* Level Badge with XP display */}
+        {/* Commitment title with XP display */}
         <div
           className={cn(
             'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold shadow-md transition-all duration-200 hover:shadow-lg cursor-default',
@@ -161,10 +162,7 @@ export function GamificationStats({
           title={levelTooltip}
           data-testid="level-badge"
         >
-          {/* Level text with XP */}
-          <span className="whitespace-nowrap">
-            {t('level')} {level}
-          </span>
+          <span className="whitespace-nowrap">{levelTitle}</span>
           <span className="opacity-70">•</span>
           <span className="whitespace-nowrap tabular-nums">{currentXP.toLocaleString()} XP</span>
 

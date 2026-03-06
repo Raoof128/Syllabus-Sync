@@ -66,9 +66,10 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4" aria-hidden="true" />
                   <div>
-                    <p className="text-mq-sm text-mq-content-secondary">{t('level')}</p>
-                    <p className="font-semibold text-mq-content">
-                      {profile?.level ?? 1} - {getLevelTitle()}
+                    <p className="text-mq-sm text-mq-content-secondary">{t('commitment')}</p>
+                    <p className="font-semibold text-mq-content">{getLevelTitle()}</p>
+                    <p className="text-xs text-mq-content-tertiary">
+                      {t('level')} {profile?.level ?? 1}
                     </p>
                   </div>
                 </div>
