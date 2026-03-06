@@ -1,4 +1,13 @@
 Raouf: 2026-03-07 (Australia/Sydney)
+Scope: i18n — Full repository-wide translation audit and completion
+Summary: Comprehensive i18n audit across all 35 locales (en + 34 translations). Found and fixed two categories of missing keys:
+**20 keys used in code but missing from en.json:** Navigation/map strings used via `safeT()` with inline fallbacks (`centerOnLocation`, `followRoute`, `googleMapUnavailable`, `myLocation`, `locationNotAvailable`, `routeUnavailable`, `routePlanner`, `loadingRoute`, `meters`, `kilometers`, `arrived`, `navigationError`, `tooManyReroutes`, `noRouteAvailable`, `navigationStarted`, `destinationChanged`, `navigationUpdate`, `restartNavigationForNewDestination`, `accountSecurity`, `verify`). Added all to en.json with their canonical English values.
+**10 keys in en.json but missing from other locales:** `addUnitClass`, `campusMapDesc`, `centerOnCampus`, `chooseNavigationMethod`, `commitment`, `googleMapsDesc`, `navigationPreference`, `openInApp`, `searchGoogleMaps`, `searchOnGoogleMaps`.
+All 30 missing keys were translated into all 34 non-English locales (1017 key-value pairs added total). All locales now have identical key sets (2210 keys each). Translations are natural and professional, preserving placeholders (`{{distance}}`, `{{minutes}}`) exactly.
+Files Changed: `locales/en/translations.json` + all 34 locale `translations.json` files
+Verification: `npx tsc --noEmit` ✅; `npx next build` ✅; key-count verification script confirms 0 missing keys across all locales.
+
+Raouf: 2026-03-07 (Australia/Sydney)
 Scope: Google Maps — Fix view toggle + mobile navigation panel overlap
 Summary: Fixed two bugs causing the map to be stuck:
 **MapClient.tsx (critical fix):** `handleMapViewChange` called `window.history.replaceState` without dispatching `PopStateEvent`, so `useSearchParams()` never re-rendered — clicking the Campus/Google toggle changed the URL but the view never switched. Added missing `window.dispatchEvent(new PopStateEvent('popstate'))` matching the pattern already used by `handleSelectBuilding` and `handleSelectPlace`.
