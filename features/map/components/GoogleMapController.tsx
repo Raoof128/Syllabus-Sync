@@ -333,11 +333,19 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       };
     }, []);
 
-    // Initial route computation when navigation starts or destination/mode changes
+    // Auto-compute route when destination or travel mode changes (shows preview before navigation)
     useEffect(() => {
-      if (!isNavigating) return;
+      if (!destination) return;
       void computeRoute();
-    }, [destination?.lat, destination?.lng, isNavigating, travelMode]);
+    }, [destination?.lat, destination?.lng, travelMode]);
+
+    // Re-trigger route computation when navigation starts (in case it failed earlier)
+    useEffect(() => {
+      if (!isNavigating || !destination) return;
+      if (!route && !isLoadingRoute) {
+        void computeRoute(true);
+      }
+    }, [isNavigating]);
 
     // Live route recalculation when user moves significantly during navigation
     useEffect(() => {

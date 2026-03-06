@@ -698,8 +698,6 @@ export default function MapClient() {
                 }
                 isNavigating={navState?.isNavigating || false}
                 isGoogleMode={mapView === 'google'}
-                travelMode={mapView === 'google' ? googleTravelMode : undefined}
-                onTravelModeChange={mapView === 'google' ? setGoogleTravelMode : undefined}
                 placeSuggestions={mapView === 'google' ? placeSuggestions : undefined}
                 isLoadingPlaces={mapView === 'google' ? isLoadingPlaces : undefined}
                 onSelectPlace={mapView === 'google' ? handleSelectPlace : undefined}
