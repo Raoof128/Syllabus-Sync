@@ -280,6 +280,7 @@ export default function MapClient() {
       }
       const newUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`;
       window.history.replaceState({}, '', newUrl);
+      window.dispatchEvent(new PopStateEvent('popstate'));
     },
     [searchParams],
   );

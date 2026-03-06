@@ -1,4 +1,12 @@
 Raouf: 2026-03-07 (Australia/Sydney)
+Scope: Google Maps — Fix view toggle + mobile navigation panel overlap
+Summary: Fixed two bugs causing the map to be stuck:
+**MapClient.tsx (critical fix):** `handleMapViewChange` called `window.history.replaceState` without dispatching `PopStateEvent`, so `useSearchParams()` never re-rendered — clicking the Campus/Google toggle changed the URL but the view never switched. Added missing `window.dispatchEvent(new PopStateEvent('popstate'))` matching the pattern already used by `handleSelectBuilding` and `handleSelectPlace`.
+**CampusMapHUD.tsx (mobile fix):** In Google mode, both the HUD's bottom building info card and `GoogleRoutePanel` rendered at `bottom-20 z-[1100]` — on mobile the HUD card completely covered the route panel, hiding travel mode selector and start navigation button. Fixed by not rendering the HUD bottom card in Google mode (`!isGoogleMode` gate), since `GoogleRoutePanel` already displays the destination and navigation controls.
+Files Changed: `features/map/components/MapClient.tsx`, `features/map/components/CampusMapHUD.tsx`
+Verification: `npx tsc --noEmit` ✅; `npx next build` ✅.
+
+Raouf: 2026-03-07 (Australia/Sydney)
 Scope: Header UX — Inline Language Selector Between Theme and Profile
 Summary: Added a dedicated `HeaderLanguageSelector` to the top navigation and placed it between the existing theme toggle and profile menu. The selector reuses the app’s lazy-loaded i18n flow from `useTypedTranslation`, surfaces all supported languages in a compact dropdown, preserves the existing MQ header interaction styling, and emits the same language-change toast pattern already used in settings. Also added focused UI coverage for the new selector so the header language switch path is exercised without coupling tests to the full auth/notification header shell.
 Files Changed: `components/layout/Header.tsx`, `components/layout/HeaderLanguageSelector.tsx` (NEW), `tests/layout/HeaderLanguageSelector.test.tsx` (NEW)

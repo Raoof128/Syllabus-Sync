@@ -417,7 +417,7 @@ export default function CampusMapHUD({
 
       {/* Bottom-right card (Selected Building or External Place) */}
       <AnimatePresence>
-        {(selectedBuilding || selectedPlaceLabel) && !isNavigating && (
+        {(selectedBuilding || selectedPlaceLabel) && !isNavigating && !isGoogleMode && (
           <m.div
             className="absolute bottom-20 sm:bottom-6 right-3 w-[calc(100vw-24px)] sm:w-[300px] pointer-events-auto"
             initial={{ y: prefersReducedMotion ? 0 : 20, opacity: 0 }}
