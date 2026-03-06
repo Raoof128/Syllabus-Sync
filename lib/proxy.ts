@@ -42,6 +42,7 @@ function isPublicApiPath(path: string): boolean {
   return (
     path.startsWith('/api/auth/') ||
     path.startsWith('/api/health') ||
+    path.startsWith('/api/maps/') ||
     path.startsWith('/api/weather')
   );
 }
