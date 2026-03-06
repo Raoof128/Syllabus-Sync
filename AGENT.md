@@ -1,4 +1,12 @@
 Raouf: 2026-03-07 (Australia/Sydney)
+Scope: Google Maps Phase 5 — Deep client-side audit + hardening
+Summary: Deep audit of the full Google Maps navigation stack after APIs were confirmed working via curl but navigation still non-functional on the client. Fixed 3 issues:
+**routes/route.ts (2 fixes):** (1) Used local `isValidOrigin` function instead of project's `isTrustedOrigin` — inconsistent with place-search and place-details routes and had different (weaker) fallback behavior. Replaced with `isTrustedOrigin` from `@/lib/security/ip`. (2) Used bare `request.json()` without body size limits — replaced with `parseJsonBody` from `@/app/api/_lib/response` for DoS protection, matching the other two map routes.
+**MapClient.tsx (2 fixes):** (3) `GoogleMapController` had no error boundary — any runtime JS error in the Google Map components would crash silently with a white screen. Wrapped in `<TranslatedMapErrorBoundary>` matching the campus map pattern. (4) `onSelectBuilding` was an inline arrow function recreated every render — caused building markers in `GoogleMapCanvas` to be destroyed and recreated on every MapClient render (performance + flicker). Extracted to a stable `useCallback` with empty deps using `window.location.search` directly for URL reads.
+Files Changed: `app/api/maps/routes/route.ts`, `features/map/components/MapClient.tsx`
+Verification: `npx tsc --noEmit` ✅; `npx next build` ✅.
+
+Raouf: 2026-03-07 (Australia/Sydney)
 Scope: Google Maps Phase 5 Full Audit — 9 issues fixed across API endpoints, HUD, and hooks
 Summary: Comprehensive audit of all Phase 5 Places Search code. Fixed 9 issues across 4 files:
 **CampusMapHUD (2 bugs):** (1) `externalDestination` not cleared when building selected via sidebar Link — stale red marker lingered on map. (2) Close button (X) on external place card was a no-op because it never called `setExternalDestination(null)`. Fix: Added `onClearExternalPlace` callback prop invoked on both building Link click and close button click. (3) "Loading....." rendered with double ellipsis — `t('loading')` already contains `"..."`, removed hardcoded trailing `...`.

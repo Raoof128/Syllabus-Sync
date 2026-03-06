@@ -1,8 +1,8 @@
 import { createHash } from 'crypto';
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
-import { getClientIP } from '@/lib/security/ip';
+import { jsonError, jsonSuccess, ERROR_CODES, parseJsonBody } from '@/app/api/_lib/response';
+import { getClientIP, isTrustedOrigin } from '@/lib/security/ip';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { logger } from '@/lib/logger';
 import { GOOGLE_ROUTES_FIELD_MASK } from '@/lib/maps/google/fieldMasks';
@@ -205,41 +205,8 @@ function buildComputeRoutesBody(
   return body;
 }
 
-function isValidOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get('origin');
-  const referer = request.headers.get('referer');
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
-
-  // Allow same-origin requests (no origin header = same-origin in most browsers)
-  if (!origin && !referer) return true;
-
-  // In development, allow localhost
-  if (process.env.NODE_ENV === 'development') return true;
-
-  // Check origin matches our app URL
-  if (appUrl) {
-    const appHost = new URL(appUrl).host;
-    if (origin) {
-      try {
-        return new URL(origin).host === appHost;
-      } catch {
-        return false;
-      }
-    }
-    if (referer) {
-      try {
-        return new URL(referer).host === appHost;
-      } catch {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
 export async function POST(request: NextRequest) {
-  if (!isValidOrigin(request)) {
+  if (!isTrustedOrigin(request)) {
     return jsonError('Forbidden.', 403, ERROR_CODES.FORBIDDEN);
   }
 
@@ -265,7 +232,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const { data: body, error: bodyError } = await parseJsonBody(request);
+    if (bodyError) return bodyError;
     const parsed = requestSchema.safeParse(body);
 
     if (!parsed.success) {

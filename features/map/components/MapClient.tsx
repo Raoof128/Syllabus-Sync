@@ -361,6 +361,17 @@ export default function MapClient() {
     [searchParams, t],
   );
 
+  // Stable callback for Google Map building marker clicks
+  const handleSelectBuilding = useCallback((building: { id: string }) => {
+    setExternalDestination(null);
+    const params = new URLSearchParams(window.location.search);
+    params.set('building', building.id);
+    params.set('view', 'google');
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, '', newUrl);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }, []);
+
   // Ensure a non-empty document title for accessibility scanners
   useEffect(() => {
     try {
@@ -656,25 +667,18 @@ export default function MapClient() {
               </>
             ) : (
               <div className="absolute inset-0 z-10">
-                <GoogleMapController
-                  ref={googleMapRef}
-                  buildings={buildings}
-                  onNavStateChange={setNavState}
-                  selectedBuilding={selectedBuilding}
-                  externalDestination={externalDestination}
-                  travelMode={googleTravelMode}
-                  onTravelModeChange={setGoogleTravelMode}
-                  onSelectBuilding={(building) => {
-                    setExternalDestination(null);
-                    const params = new URLSearchParams(searchParams.toString());
-                    params.set('building', building.id);
-                    params.set('view', 'google');
-                    const newUrl = `${window.location.pathname}?${params.toString()}`;
-                    window.history.replaceState({}, '', newUrl);
-                    // Force Next.js to pick up the change by triggering a shallow navigation
-                    window.dispatchEvent(new PopStateEvent('popstate'));
-                  }}
-                />
+                <TranslatedMapErrorBoundary>
+                  <GoogleMapController
+                    ref={googleMapRef}
+                    buildings={buildings}
+                    onNavStateChange={setNavState}
+                    selectedBuilding={selectedBuilding}
+                    externalDestination={externalDestination}
+                    travelMode={googleTravelMode}
+                    onTravelModeChange={setGoogleTravelMode}
+                    onSelectBuilding={handleSelectBuilding}
+                  />
+                </TranslatedMapErrorBoundary>
               </div>
             )}
 
