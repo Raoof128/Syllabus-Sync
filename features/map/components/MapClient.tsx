@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  Suspense,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  startTransition,
-} from 'react';
+import { Suspense, useEffect, useCallback, useRef, useState, startTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import ReactDOM from 'react-dom';
@@ -41,9 +33,17 @@ import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
 import { MapViewToggle, type MapView } from './MapViewToggle';
-import { GoogleMapController, type GoogleMapRef } from './GoogleMapController';
+import {
+  GoogleMapController,
+  type GoogleMapRef,
+  type ExternalDestination,
+} from './GoogleMapController';
 import type { GoogleTravelMode } from '@/lib/maps/google/types';
-import { searchCampusBuildings } from '@/lib/maps/buildings/buildingSearch';
+import { useCampusBuildingSearch } from '@/features/map/hooks/useCampusBuildingSearch';
+import {
+  useGooglePlacesSearch,
+  type GooglePlaceSuggestion,
+} from '@/features/map/hooks/useGooglePlacesSearch';
 
 import { triggerHaptic } from '@/lib/utils/haptics';
 
@@ -107,6 +107,7 @@ export default function MapClient() {
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
   const [googleTravelMode, setGoogleTravelMode] = useState<GoogleTravelMode>('WALK');
+  const [externalDestination, setExternalDestination] = useState<ExternalDestination | null>(null);
   const hasAutoNavigatedRef = useRef(false);
 
   const handleCampusMapReady = useCallback(() => {
@@ -270,6 +271,7 @@ export default function MapClient() {
 
   const handleMapViewChange = useCallback(
     (nextView: MapView) => {
+      setExternalDestination(null);
       const params = new URLSearchParams(searchParams.toString());
       if (nextView === 'google') {
         params.set('view', 'google');
@@ -295,12 +297,69 @@ export default function MapClient() {
     }
   }, [t]);
 
-  // Buildings sidebar - filtered and searched
-  const sidebarBuildings = useMemo(() => {
-    return searchCampusBuildings(buildings, buildingSearch, (building) =>
-      t(building.translationKey),
-    );
-  }, [buildingSearch, t]);
+  // Buildings sidebar - filtered and searched with campus-first ranking
+  const getTranslatedName = useCallback(
+    (building: { translationKey: Parameters<typeof t>[0] }) => t(building.translationKey),
+    [t],
+  );
+  const { results: sidebarBuildings, hasStrongMatch } = useCampusBuildingSearch(
+    buildings,
+    buildingSearch,
+    getTranslatedName,
+  );
+
+  // Secondary Google Places search (only when Google mode + no strong campus match)
+  const { suggestions: placeSuggestions, isLoading: isLoadingPlaces } = useGooglePlacesSearch(
+    buildingSearch,
+    {
+      enabled: mapView === 'google' && !hasStrongMatch && buildingSearch.trim().length >= 3,
+    },
+  );
+
+  // Handle external place selection via Place Details API
+  const handleSelectPlace = useCallback(
+    async (place: GooglePlaceSuggestion) => {
+      try {
+        const response = await fetch('/api/maps/place-details', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ placeId: place.placeId }),
+        });
+        const json = (await response.json()) as {
+          success: boolean;
+          data?: {
+            placeId: string;
+            displayName: string;
+            lat: number;
+            lng: number;
+          };
+          error?: { message: string };
+        };
+        if (!json.success || !json.data) {
+          toastUtils.error(t('error'), json.error?.message ?? t('tryAgain'));
+          return;
+        }
+
+        // Clear any selected building and set external destination
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete('building');
+        params.set('view', 'google');
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState({}, '', newUrl);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+
+        setExternalDestination({
+          placeId: json.data.placeId,
+          label: json.data.displayName,
+          lat: json.data.lat,
+          lng: json.data.lng,
+        });
+      } catch {
+        toastUtils.error(t('error'), t('tryAgain'));
+      }
+    },
+    [searchParams, t],
+  );
 
   // Ensure a non-empty document title for accessibility scanners
   useEffect(() => {
@@ -602,9 +661,11 @@ export default function MapClient() {
                   buildings={buildings}
                   onNavStateChange={setNavState}
                   selectedBuilding={selectedBuilding}
+                  externalDestination={externalDestination}
                   travelMode={googleTravelMode}
                   onTravelModeChange={setGoogleTravelMode}
                   onSelectBuilding={(building) => {
+                    setExternalDestination(null);
                     const params = new URLSearchParams(searchParams.toString());
                     params.set('building', building.id);
                     params.set('view', 'google');
@@ -639,6 +700,11 @@ export default function MapClient() {
                 isGoogleMode={mapView === 'google'}
                 travelMode={mapView === 'google' ? googleTravelMode : undefined}
                 onTravelModeChange={mapView === 'google' ? setGoogleTravelMode : undefined}
+                placeSuggestions={mapView === 'google' ? placeSuggestions : undefined}
+                isLoadingPlaces={mapView === 'google' ? isLoadingPlaces : undefined}
+                onSelectPlace={mapView === 'google' ? handleSelectPlace : undefined}
+                onClearExternalPlace={() => setExternalDestination(null)}
+                selectedPlaceLabel={externalDestination?.label}
               />
             )}
           </div>

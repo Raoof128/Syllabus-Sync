@@ -192,10 +192,13 @@ const TodosWidget = memo(() => {
                   <div
                     className="w-1.5 self-stretch rounded-full shrink-0"
                     style={{
-                      backgroundColor: todo.color || (
-                        todo.priority === 'High' ? '#ef4444' :
-                        todo.priority === 'Medium' ? '#f59e0b' : '#22c55e'
-                      )
+                      backgroundColor:
+                        todo.color ||
+                        (todo.priority === 'High'
+                          ? '#ef4444'
+                          : todo.priority === 'Medium'
+                            ? '#f59e0b'
+                            : '#22c55e'),
                     }}
                   />
 

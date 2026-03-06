@@ -362,29 +362,27 @@ export default function CalendarClient() {
             {formatMonthYear(dayjs(currentWeekStart).add(mobileSelectedDayIndex, 'day').toDate())}
           </h1>
           <div className="flex shrink-0 gap-2">
-            <Button variant="ghost" size="icon" onClick={view === 'day' ? goToPreviousDay : goToPreviousWeek}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={view === 'day' ? goToPreviousDay : goToPreviousWeek}
+            >
               <ChevronLeft className="h-5 w-5 text-mq-content" />
             </Button>
             {view === 'day' ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={goToToday}
-                disabled={isToday}
-              >
+              <Button variant="outline" size="sm" onClick={goToToday} disabled={isToday}>
                 {t('today')}
               </Button>
             ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={goToThisWeek}
-                disabled={isCurrentWeek}
-              >
+              <Button variant="outline" size="sm" onClick={goToThisWeek} disabled={isCurrentWeek}>
                 {t('thisWeek') || 'This Week'}
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={view === 'day' ? goToNextDay : goToNextWeek}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={view === 'day' ? goToNextDay : goToNextWeek}
+            >
               <ChevronRight className="h-5 w-5 text-mq-content" />
             </Button>
           </div>
@@ -456,16 +454,15 @@ export default function CalendarClient() {
               </div>
 
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="icon" onClick={view === 'day' ? goToPreviousDay : goToPreviousWeek}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={view === 'day' ? goToPreviousDay : goToPreviousWeek}
+                >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 {view === 'day' ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={goToToday}
-                    disabled={isToday}
-                  >
+                  <Button variant="outline" size="sm" onClick={goToToday} disabled={isToday}>
                     {t('today')}
                   </Button>
                 ) : (
@@ -478,7 +475,11 @@ export default function CalendarClient() {
                     {t('thisWeek') || 'This Week'}
                   </Button>
                 )}
-                <Button variant="outline" size="icon" onClick={view === 'day' ? goToNextDay : goToNextWeek}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={view === 'day' ? goToNextDay : goToNextWeek}
+                >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>

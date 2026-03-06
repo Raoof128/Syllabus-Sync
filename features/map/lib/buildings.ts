@@ -237,6 +237,8 @@ export const buildings: Building[] = [
     category: 'services',
     // Keep this aligned to 18WW Service Connect geocode, not Central Courtyard.
     location: { lat: -33.7739781, lng: 151.1126116, osmId: 205588336 }, // OSM Nominatim verified 2026-02-26
+    entranceLocation: { lat: -33.77388, lng: 151.11275 }, // Ground-floor entrance facing Wally's Walk
+    googlePlaceId: 'ChIJ1-VKYet6kWsRMUE4VYvdBK4',
     levels: 4,
   },
   {
@@ -252,6 +254,8 @@ export const buildings: Building[] = [
     address: '16 Macquarie Walk',
     category: 'academic',
     location: { lat: -33.7756994, lng: 151.1131306, osmId: 141281549 }, // Google Maps MCP verified 2026-01-24
+    entranceLocation: { lat: -33.7754, lng: 151.11325 }, // Main ground-floor entrance facing Macquarie Walk
+    googlePlaceId: 'ChIJZUF9Xut6kWsRFApfJUMU9gk',
     levels: 8,
   },
   {
@@ -384,6 +388,8 @@ export const buildings: Building[] = [
     address: "12 Wally's Walk",
     category: 'academic',
     location: { lat: -33.7742542, lng: 151.1146649 }, // Google Maps geocoded 2026-01-10
+    entranceLocation: { lat: -33.7742, lng: 151.11475 }, // Main entrance from Wally's Walk
+    googlePlaceId: 'ChIJo7_ByOt6kWsRG3j_0x7XALM',
   },
   {
     id: '6WW',
@@ -949,6 +955,8 @@ export const buildings: Building[] = [
     address: '1 Central Courtyard',
     category: 'services',
     location: { lat: -33.7738842, lng: 151.1135164, osmId: 914350786 }, // Google Maps verified (Central Courtyard)
+    entranceLocation: { lat: -33.77395, lng: 151.11365 }, // Main entrance from Central Courtyard plaza
+    googlePlaceId: 'ChIJ79q0w-t6kWsRD6lLJV1tWfo',
   },
 
   {
@@ -1042,6 +1050,8 @@ export const buildings: Building[] = [
     address: '14 Sir Christopher Ondaatje Ave',
     category: 'academic',
     location: { lat: -33.773899, lng: 151.114706, osmId: 157975716 },
+    entranceLocation: { lat: -33.77395, lng: 151.11485 }, // Main entrance facing Sir Christopher Ondaatje Ave
+    googlePlaceId: 'ChIJP8Z8but6kWsRcH59b0xPlls',
     levels: 7,
   },
   {
@@ -2191,6 +2201,8 @@ export const buildings: Building[] = [
     address: 'Central Courtyard',
     category: 'academic',
     location: { lat: -33.774058, lng: 151.112639 },
+    entranceLocation: { lat: -33.774, lng: 151.1127 }, // Main entrance from courtyard walkway
+    googlePlaceId: 'ChIJ14sUZOt6kWsR3HjC-Nx_Mlw',
   },
 
   // SPORTS

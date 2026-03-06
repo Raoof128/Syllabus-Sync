@@ -27,9 +27,18 @@ export interface GoogleMapRef {
   isNavigating: boolean;
 }
 
+/** External (non-building) destination from Google Places */
+export interface ExternalDestination {
+  placeId: string;
+  label: string;
+  lat: number;
+  lng: number;
+}
+
 interface GoogleMapControllerProps {
   buildings: Building[];
   selectedBuilding?: Building;
+  externalDestination?: ExternalDestination | null;
   travelMode: GoogleTravelMode;
   onTravelModeChange: (mode: GoogleTravelMode) => void;
   onSelectBuilding?: (building: Building) => void;
@@ -66,6 +75,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
     {
       buildings,
       selectedBuilding,
+      externalDestination,
       travelMode,
       onTravelModeChange,
       onSelectBuilding,
@@ -90,17 +100,26 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
     const routesConfigurationFailedRef = useRef(false);
 
     const destination = useMemo(() => {
-      if (!selectedBuilding) return null;
-      const location =
-        selectedBuilding.entranceLocation ??
-        selectedBuilding.location ??
-        getBuildingGps(selectedBuilding);
-      return {
-        label: selectedBuilding.id,
-        lat: location.lat,
-        lng: location.lng,
-      };
-    }, [selectedBuilding]);
+      if (selectedBuilding) {
+        const location =
+          selectedBuilding.entranceLocation ??
+          selectedBuilding.location ??
+          getBuildingGps(selectedBuilding);
+        return {
+          label: selectedBuilding.id,
+          lat: location.lat,
+          lng: location.lng,
+        };
+      }
+      if (externalDestination) {
+        return {
+          label: externalDestination.label,
+          lat: externalDestination.lat,
+          lng: externalDestination.lng,
+        };
+      }
+      return null;
+    }, [selectedBuilding, externalDestination]);
 
     const ensureUserLocation = useCallback(async (): Promise<MapLatLng> => {
       if (lastUserLocationRef.current) {
@@ -206,8 +225,8 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
     });
 
     const startNavigation = useCallback(() => {
-      if (!selectedBuilding) {
-        setRouteError(safeT('selectBuildingToNavigate', 'Select a building to navigate.'));
+      if (!selectedBuilding && !externalDestination) {
+        setRouteError(safeT('selectBuildingToNavigate', 'Select a destination to navigate.'));
         return;
       }
 
@@ -216,7 +235,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       lastRouteLocationRef.current = null;
       setHasArrived(false);
       setIsNavigating(true);
-    }, [safeT, selectedBuilding]);
+    }, [safeT, selectedBuilding, externalDestination]);
 
     const stopNavigation = useCallback(() => {
       setIsNavigating(false);
@@ -354,12 +373,12 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       lastRouteRequestKeyRef.current = null;
     }, [destination?.lat, destination?.lng, travelMode]);
 
-    // Stop navigation when building is deselected
+    // Stop navigation when both building and external destination are cleared
     useEffect(() => {
-      if (!selectedBuilding) {
+      if (!selectedBuilding && !externalDestination) {
         stopNavigation();
       }
-    }, [selectedBuilding, stopNavigation]);
+    }, [selectedBuilding, externalDestination, stopNavigation]);
 
     // Notify parent of navigation state changes
     useEffect(() => {
@@ -387,6 +406,8 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       routeError,
     ]);
 
+    const activeDestinationLabel = selectedBuilding?.id ?? externalDestination?.label;
+
     return (
       <div className="relative h-full w-full">
         <GoogleMapCanvas
@@ -397,10 +418,11 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
           route={route}
           isNavigating={isNavigating}
           onSelectBuilding={onSelectBuilding}
+          externalDestination={externalDestination}
         />
-        {selectedBuilding && (
+        {activeDestinationLabel && (
           <GoogleRoutePanel
-            selectedBuildingLabel={selectedBuilding.id}
+            selectedBuildingLabel={activeDestinationLabel}
             route={route}
             travelMode={travelMode}
             isLoading={isLoadingRoute}

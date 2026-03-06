@@ -8,6 +8,7 @@ import { getBuildingGps } from '@/features/map/lib/buildings';
 import { loadGoogleMaps } from '@/lib/maps/google/loader';
 import { decodePolyline } from '@/lib/maps/google/decodePolyline';
 import type { GoogleComputedRoute, MapLatLng } from '@/lib/maps/google/types';
+import type { ExternalDestination } from './GoogleMapController';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 
 type GoogleCanvasMarker = google.maps.Marker | google.maps.marker.AdvancedMarkerElement;
@@ -17,6 +18,7 @@ const FALLBACK_GOOGLE_MAP_ID = 'DEMO_MAP_ID';
 interface GoogleMapCanvasProps {
   buildings: Building[];
   selectedBuilding?: Building;
+  externalDestination?: ExternalDestination | null;
   userLocation: MapLatLng | null;
   userHeading: number | null;
   route: GoogleComputedRoute | null;
@@ -27,6 +29,7 @@ interface GoogleMapCanvasProps {
 export function GoogleMapCanvas({
   buildings,
   selectedBuilding,
+  externalDestination,
   userLocation,
   userHeading,
   route,
@@ -40,6 +43,7 @@ export function GoogleMapCanvas({
   const userMarkerRef = useRef<GoogleCanvasMarker | null>(null);
   const userAccuracyCircleRef = useRef<google.maps.Circle | null>(null);
   const buildingMarkersRef = useRef<Map<string, GoogleCanvasMarker>>(new Map());
+  const externalMarkerRef = useRef<GoogleCanvasMarker | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [useAdvancedMarkers, setUseAdvancedMarkers] = useState(true);
   const googleMapId = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID ?? FALLBACK_GOOGLE_MAP_ID;
@@ -113,6 +117,8 @@ export function GoogleMapCanvas({
       userAccuracyCircleRef.current = null;
       clearMarker(userMarkerRef.current);
       userMarkerRef.current = null;
+      clearMarker(externalMarkerRef.current);
+      externalMarkerRef.current = null;
       buildingMarkers.forEach((marker) => {
         clearMarker(marker);
       });
@@ -305,7 +311,40 @@ export function GoogleMapCanvas({
     };
   }, [safeT, useAdvancedMarkers, userLocation, userHeading]);
 
-  // Pan/zoom logic: route, selected building, or user location
+  // Sync external destination marker
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    clearMarker(externalMarkerRef.current);
+    externalMarkerRef.current = null;
+
+    if (!externalDestination) return;
+
+    const position = { lat: externalDestination.lat, lng: externalDestination.lng };
+    const title = externalDestination.label;
+
+    // Use a distinct red marker for external destinations
+    externalMarkerRef.current = new google.maps.Marker({
+      map: mapRef.current,
+      position,
+      title,
+      label: {
+        text: '\u2691', // flag
+        fontSize: '16px',
+        color: '#ffffff',
+      },
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 20,
+        fillColor: '#d24140',
+        fillOpacity: 1,
+        strokeColor: '#b51f2a',
+        strokeWeight: 2,
+      },
+    });
+  }, [externalDestination]);
+
+  // Pan/zoom logic: route, selected building, external destination, or user location
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -342,10 +381,17 @@ export function GoogleMapCanvas({
       return;
     }
 
+    if (externalDestination) {
+      mapRef.current.panTo({ lat: externalDestination.lat, lng: externalDestination.lng });
+      mapRef.current.setZoom(16);
+      hasUserInteractedRef.current = false;
+      return;
+    }
+
     if (userLocation && !hasUserInteractedRef.current) {
       mapRef.current.panTo(userLocation);
     }
-  }, [route, selectedBuilding, userLocation]);
+  }, [route, selectedBuilding, externalDestination, userLocation]);
 
   // During navigation, follow user location unless user panned away
   useEffect(() => {

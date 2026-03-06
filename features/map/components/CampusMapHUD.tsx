@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import type { Building } from '@/features/map/lib/buildings';
 import type { GoogleTravelMode } from '@/lib/maps/google/types';
+import type { GooglePlaceSuggestion } from '@/features/map/hooks/useGooglePlacesSearch';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { cn } from '@/lib/utils';
 import { triggerHaptic } from '@/lib/utils/haptics';
@@ -35,6 +36,14 @@ type Props = {
   isGoogleMode?: boolean;
   travelMode?: GoogleTravelMode;
   onTravelModeChange?: (mode: GoogleTravelMode) => void;
+  /** Secondary Google Places suggestions (shown when no strong campus match) */
+  placeSuggestions?: GooglePlaceSuggestion[];
+  isLoadingPlaces?: boolean;
+  onSelectPlace?: (place: GooglePlaceSuggestion) => void;
+  /** Clear the currently selected external place */
+  onClearExternalPlace?: () => void;
+  /** Label for the currently selected external place */
+  selectedPlaceLabel?: string;
 };
 
 import { LayeredCard } from './LayeredCard';
@@ -52,6 +61,11 @@ export default function CampusMapHUD({
   isGoogleMode,
   travelMode,
   onTravelModeChange,
+  placeSuggestions,
+  isLoadingPlaces,
+  onSelectPlace,
+  onClearExternalPlace,
+  selectedPlaceLabel,
 }: Props) {
   const { t } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
@@ -314,6 +328,7 @@ export default function CampusMapHUD({
                           onClick={() => {
                             triggerHaptic('tap', 'medium');
                             setIsPlacesPanelExpanded(false);
+                            onClearExternalPlace?.();
                           }}
                           className="flex items-center justify-between p-2.5"
                         >
@@ -337,12 +352,75 @@ export default function CampusMapHUD({
                       </m.div>
                     );
                   })}
-                  {visibleBuildings.length === 0 && (
-                    <div className="p-8 text-center text-sm text-mq-content-tertiary">
-                      <Building2 className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                      {t('noMatchingBuildings')}
+                  {/* Google Places suggestions (secondary search) */}
+                  {isGoogleMode &&
+                    placeSuggestions &&
+                    placeSuggestions.length > 0 &&
+                    buildingSearch.trim().length >= 3 && (
+                      <>
+                        <div className="px-2 pt-3 pb-1">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-mq-content-tertiary">
+                            {t('places')}
+                          </span>
+                        </div>
+                        {placeSuggestions.map((place) => (
+                          <m.div
+                            key={place.placeId}
+                            variants={{
+                              hidden: {
+                                opacity: 0,
+                                x: prefersReducedMotion ? 0 : -10,
+                              },
+                              visible: { opacity: 1, x: 0 },
+                            }}
+                            whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                            whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                            className="rounded-mq-lg hover:bg-mq-hover-background border border-transparent transition-colors duration-200"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => {
+                                onSelectPlace?.(place);
+                                triggerHaptic('tap', 'medium');
+                                setIsPlacesPanelExpanded(false);
+                              }}
+                              className="flex items-center justify-between p-2.5 w-full text-left"
+                            >
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-sm font-medium text-mq-content truncate">
+                                  {place.mainText}
+                                </span>
+                                <span className="text-xs text-mq-content-secondary truncate max-w-[48vw] sm:max-w-[180px]">
+                                  {place.secondaryText}
+                                </span>
+                              </div>
+                              {place.distanceMeters != null && (
+                                <span className="text-[10px] text-mq-content-tertiary whitespace-nowrap ml-2">
+                                  {place.distanceMeters >= 1000
+                                    ? `${(place.distanceMeters / 1000).toFixed(1)} km`
+                                    : `${Math.round(place.distanceMeters)} m`}
+                                </span>
+                              )}
+                            </button>
+                          </m.div>
+                        ))}
+                      </>
+                    )}
+
+                  {/* Loading indicator for Google Places search */}
+                  {isGoogleMode && isLoadingPlaces && buildingSearch.trim().length >= 3 && (
+                    <div className="p-3 text-center text-xs text-mq-content-tertiary">
+                      {t('loading')}
                     </div>
                   )}
+
+                  {visibleBuildings.length === 0 &&
+                    (!placeSuggestions || placeSuggestions.length === 0) && (
+                      <div className="p-8 text-center text-sm text-mq-content-tertiary">
+                        <Building2 className="h-8 w-8 mx-auto mb-2 opacity-20" />
+                        {t('noMatchingBuildings')}
+                      </div>
+                    )}
                 </m.div>
               </m.div>
             )}
@@ -350,9 +428,9 @@ export default function CampusMapHUD({
         </LayeredCard>
       </div>
 
-      {/* Bottom-right card (Selected Building) */}
+      {/* Bottom-right card (Selected Building or External Place) */}
       <AnimatePresence>
-        {selectedBuilding && (!isNavigating || isGoogleMode) && (
+        {(selectedBuilding || selectedPlaceLabel) && (!isNavigating || isGoogleMode) && (
           <m.div
             className="absolute bottom-20 sm:bottom-6 right-3 w-[calc(100vw-24px)] sm:w-[300px] pointer-events-auto"
             initial={{ y: prefersReducedMotion ? 0 : 20, opacity: 0 }}
@@ -363,13 +441,21 @@ export default function CampusMapHUD({
             <LayeredCard interactive={false} className="rounded-mq-xl border-mq-border p-4">
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="font-bold text-mq-content text-lg">{selectedBuilding.id}</h3>
-                  <p className="text-sm text-mq-content-secondary line-clamp-1">
-                    {t(selectedBuilding.translationKey)}
-                  </p>
+                  <h3 className="font-bold text-mq-content text-lg">
+                    {selectedBuilding ? selectedBuilding.id : selectedPlaceLabel}
+                  </h3>
+                  {selectedBuilding && (
+                    <p className="text-sm text-mq-content-secondary line-clamp-1">
+                      {t(selectedBuilding.translationKey)}
+                    </p>
+                  )}
+                  {!selectedBuilding && selectedPlaceLabel && (
+                    <p className="text-xs text-mq-content-tertiary">{t('places')}</p>
+                  )}
                 </div>
                 <Link
                   href={buildMapHref(undefined)}
+                  onClick={() => onClearExternalPlace?.()}
                   className="text-mq-content-tertiary hover:text-mq-content transition-colors p-1 hover:bg-mq-background-secondary rounded-full"
                 >
                   <span className="sr-only">{t('close')}</span>
@@ -378,7 +464,7 @@ export default function CampusMapHUD({
               </div>
 
               <div className="space-y-2 mt-3">
-                {selectedBuilding.category && (
+                {selectedBuilding?.category && (
                   <Badge variant="neutral" className="bg-mq-background/50 text-xs">
                     {selectedBuilding.category.charAt(0).toUpperCase() +
                       selectedBuilding.category.slice(1)}

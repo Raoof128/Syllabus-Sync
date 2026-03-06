@@ -135,13 +135,13 @@ export default function TodosWidget({
                   const isHighlighted = todoHighlightActive && highlightedTodoId === todo.id;
 
                   // Use custom color if set, otherwise fall back to priority colors
-                  const todoColor = todo.color || (
-                    todo.priority === 'High'
+                  const todoColor =
+                    todo.color ||
+                    (todo.priority === 'High'
                       ? '#ef4444'
                       : todo.priority === 'Medium'
                         ? '#f59e0b'
-                        : '#3b82f6'
-                  );
+                        : '#3b82f6');
 
                   return (
                     <div
