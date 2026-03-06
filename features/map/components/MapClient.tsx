@@ -73,19 +73,20 @@ export default function MapClient() {
   const googleMapRef = useRef<GoogleMapRef>(null);
   const overlayToggleButtonRef = useRef<HTMLButtonElement | null>(null);
   const wasOverlayOpenRef = useRef(false);
+  const mapView: MapView = searchParams.get('view') === 'google' ? 'google' : 'campus';
 
   // Preload critical map image for better LCP (Largest Contentful Paint).
   // Keep this in an effect to avoid side effects during render.
   const hasPreloadedCampusImageRef = useRef(false);
   useEffect(() => {
-    if (hasPreloadedCampusImageRef.current) return;
+    if (mapView !== 'campus' || hasPreloadedCampusImageRef.current) return;
     hasPreloadedCampusImageRef.current = true;
     try {
       ReactDOM.preload(CAMPUS_IMAGE_URL, { as: 'image' });
     } catch {
       // Ignore: preload is a progressive enhancement.
     }
-  }, []);
+  }, [mapView]);
 
   // Location status from CampusMap
   const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
@@ -106,7 +107,6 @@ export default function MapClient() {
   const [buildingSearch, setBuildingSearch] = useState('');
   const [googleTravelMode, setGoogleTravelMode] = useState<GoogleTravelMode>('WALK');
   const hasAutoNavigatedRef = useRef(false);
-  const mapView: MapView = searchParams.get('view') === 'google' ? 'google' : 'campus';
 
   const handleCampusMapReady = useCallback(() => {
     setMapLoadTimedOut(false);

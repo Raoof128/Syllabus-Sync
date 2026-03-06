@@ -12,7 +12,6 @@ import type {
   GoogleTravelMode,
 } from '@/lib/maps/google/types';
 
-const GOOGLE_ROUTES_API_KEY = process.env.GOOGLE_ROUTES_API_KEY;
 const GOOGLE_ROUTES_URL = 'https://routes.googleapis.com/directions/v2:computeRoutes';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const MAX_CACHE_SIZE = 300;
@@ -192,6 +191,7 @@ function buildComputeRoutesBody(
 }
 
 export async function POST(request: NextRequest) {
+  const googleRoutesApiKey = process.env.GOOGLE_ROUTES_API_KEY;
   const clientIP = getClientIP(request);
   const { allowed, remaining, resetIn } = await apiLimiter(`google-routes:${clientIP}`);
 
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!GOOGLE_ROUTES_API_KEY) {
+  if (!googleRoutesApiKey) {
     return jsonError(
       'Google Routes API is not configured on the server.',
       503,
@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Goog-Api-Key': GOOGLE_ROUTES_API_KEY,
+        'X-Goog-Api-Key': googleRoutesApiKey,
         'X-Goog-FieldMask': GOOGLE_ROUTES_FIELD_MASK,
       },
       body: JSON.stringify(buildComputeRoutesBody(origin, destination, travelMode)),

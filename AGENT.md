@@ -1,4 +1,25 @@
 Raouf: 2026-03-06 (Australia/Sydney)
+Scope: Google Maps Console Noise Remediation
+Summary: Reduced the remaining Google map console noise to the app-controlled minimum. `GoogleMapCanvas` now uses Google’s `DEMO_MAP_ID` fallback when a project-specific `NEXT_PUBLIC_GOOGLE_MAP_ID` is absent, which keeps the JavaScript map on vector rendering with `AdvancedMarkerElement` and removes the deprecation path through `google.maps.Marker`. `GoogleMapController` now computes routes through a `useEffectEvent` flow with request-key deduplication and a configuration-failure latch so a missing or failing routes backend does not hammer `/api/maps/routes` on every rerender. `MapClient` now preloads the campus raster image only in campus view, avoiding the unnecessary preload warning when users open Google mode. Also added `GOOGLE_ROUTES_API_KEY` to local `.env.local`, synced it to Vercel `development`/`preview`/`production`, and redeployed production.
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/GoogleMapController.tsx`, `features/map/components/MapClient.tsx`, `app/api/maps/routes/route.ts`, `.env.local`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapCanvas.tsx features/map/components/GoogleMapController.tsx features/map/components/MapClient.tsx app/api/maps/routes/route.ts` ✅; `npm run typecheck` ✅; `npm run test -- tests/api/maps/routes.test.ts tests/map/decodePolyline.test.ts` ✅; `vercel env ls` confirmed `GOOGLE_ROUTES_API_KEY` in development/preview/production; `npm run vercel:deploy:prod` ✅ and production re-aliased to `https://syllabus-sync-ashy.vercel.app`.
+Follow-ups: Browser-extension errors such as `Frame with ID ... was removed` and ad-blocker/CSP probe blocks like `mapsjs/gen_204?csp_test=true net::ERR_BLOCKED_BY_CLIENT` are external to the app and cannot be fixed in repo code. If Google Routes upstream rejects the reused key because of API restrictions, replace `GOOGLE_ROUTES_API_KEY` in Vercel with a dedicated server-side key that has the Routes API enabled.
+
+Raouf: 2026-03-06 (Australia/Sydney)
+Scope: Google Map ID Fallback Messaging Polish
+Summary: Softened the in-map fallback notice shown when `NEXT_PUBLIC_GOOGLE_MAP_ID` is absent. The map already renders correctly without a Map ID using standard markers, so `GoogleMapCanvas` now distinguishes that reduced-feature state from a true load failure. Missing Map ID shows a non-blocking “limited features” warning, while the “Google Map unavailable” heading is reserved for real JavaScript Maps load errors.
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapCanvas.tsx` ✅; `npm run typecheck` ✅.
+Follow-ups: Add a real `NEXT_PUBLIC_GOOGLE_MAP_ID` in local/Vercel when you want vector styling and Advanced Markers; until then the map remains functional with the softer fallback notice.
+
+Raouf: 2026-03-06 (Australia/Sydney)
+Scope: Google Maps Browser Key Environment Remediation
+Summary: Investigated the runtime error `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not configured` by checking local env files and the linked Vercel project with the Vercel CLI. Root cause was an env-name mismatch left over from the iframe implementation: local and Vercel still had `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`, while the new JavaScript Google Maps path expects `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`. Added the new browser key name to local `.env.local`, created/overrode `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in Vercel for `development`, `preview`, and `production`, and triggered a fresh production deployment so the live app would rebuild against the corrected env set.
+Files Changed: `.env.local`
+Verification: `rg -n "GOOGLE|MAP" .env.local .env.example .env.local.example` confirmed the local mismatch; `vercel env ls` confirmed the new `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` exists in development/preview/production; `npm run vercel:deploy:prod` completed and re-aliased production to `https://syllabus-sync-ashy.vercel.app`.
+Follow-ups: `GOOGLE_ROUTES_API_KEY` is still not configured in Vercel, so map rendering is fixed but turn-by-turn route calculation in Google mode will require that server-side key before navigation requests can succeed.
+
+Raouf: 2026-03-06 (Australia/Sydney)
 Scope: Google Map Availability Hotfix — Missing Map ID Fallback
 Summary: Fixed the new Google map canvas so it no longer hard-fails when `NEXT_PUBLIC_GOOGLE_MAP_ID` is absent. `GoogleMapCanvas` now initializes a standard Google JavaScript map without a Map ID, falls back from `AdvancedMarkerElement` to legacy `google.maps.Marker` for campus/user markers, and only shows a soft informational banner instead of blocking the entire map experience. This restores map availability immediately in environments where the browser key is configured but the Map ID has not been added yet.
 Files Changed: `features/map/components/GoogleMapCanvas.tsx`

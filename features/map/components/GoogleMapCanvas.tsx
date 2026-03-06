@@ -12,6 +12,8 @@ import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 
 type GoogleCanvasMarker = google.maps.Marker | google.maps.marker.AdvancedMarkerElement;
 
+const FALLBACK_GOOGLE_MAP_ID = 'DEMO_MAP_ID';
+
 interface GoogleMapCanvasProps {
   buildings: Building[];
   selectedBuilding?: Building;
@@ -34,8 +36,8 @@ export function GoogleMapCanvas({
   const userMarkerRef = useRef<GoogleCanvasMarker | null>(null);
   const buildingMarkersRef = useRef<Map<string, GoogleCanvasMarker>>(new Map());
   const [error, setError] = useState<string | null>(null);
-  const googleMapId = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID;
-  const supportsAdvancedMarkers = Boolean(googleMapId);
+  const googleMapId = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID ?? FALLBACK_GOOGLE_MAP_ID;
+  const supportsAdvancedMarkers = true;
 
   const sortedBuildings = useMemo(
     () => [...buildings].sort((left, right) => left.id.localeCompare(right.id)),
@@ -58,7 +60,7 @@ export function GoogleMapCanvas({
         mapRef.current = new Map(containerRef.current, {
           center: selectedBuilding ? getBuildingGps(selectedBuilding) : CAMPUS_CENTRE_GPS,
           zoom: selectedBuilding ? 17 : 16,
-          ...(googleMapId ? { mapId: googleMapId } : {}),
+          mapId: googleMapId,
           fullscreenControl: true,
           streetViewControl: false,
           mapTypeControl: false,
@@ -66,14 +68,7 @@ export function GoogleMapCanvas({
           gestureHandling: 'greedy',
         });
 
-        setError(
-          googleMapId
-            ? null
-            : safeT(
-                'googleMapIdMissingFallback',
-                'Google Map ID is not configured. Rendering with standard markers until the Map ID is added.',
-              ),
-        );
+        setError(null);
       } catch (initialiseError) {
         const message =
           initialiseError instanceof Error
@@ -128,17 +123,11 @@ export function GoogleMapCanvas({
               ),
               gmpClickable: true,
             })
-          : new google.maps.Marker({
-              map: mapRef.current,
-              position: getBuildingGps(building),
-              title: `${building.id} ${building.name}`.trim(),
-              label: {
-                text: building.id,
-                color: building.id === selectedBuilding?.id ? '#ffffff' : '#1e293b',
-                fontWeight: '700',
-              },
-              icon: createLegacyMarkerIcon(building.id === selectedBuilding?.id),
-            });
+          : null;
+
+        if (!marker) {
+          return;
+        }
 
         if (marker instanceof google.maps.Marker) {
           marker.addListener('click', () => {
@@ -177,51 +166,30 @@ export function GoogleMapCanvas({
         return;
       }
 
-      if (supportsAdvancedMarkers) {
-        const { AdvancedMarkerElement } = (await googleMaps.importLibrary(
-          'marker',
-        )) as google.maps.MarkerLibrary;
+      const { AdvancedMarkerElement } = (await googleMaps.importLibrary(
+        'marker',
+      )) as google.maps.MarkerLibrary;
 
-        const content = createUserMarkerElement();
+      const content = createUserMarkerElement();
 
-        if (!userMarkerRef.current) {
-          userMarkerRef.current = new AdvancedMarkerElement({
-            map: mapRef.current,
-            position: userLocation,
-            title: safeT('myLocation', 'My Location'),
-            content,
-          });
-        } else if (userMarkerRef.current instanceof google.maps.Marker) {
-          clearMarker(userMarkerRef.current);
-          userMarkerRef.current = new AdvancedMarkerElement({
-            map: mapRef.current,
-            position: userLocation,
-            title: safeT('myLocation', 'My Location'),
-            content,
-          });
-        } else {
-          userMarkerRef.current.position = userLocation;
-          userMarkerRef.current.content = content;
-        }
+      if (!userMarkerRef.current) {
+        userMarkerRef.current = new AdvancedMarkerElement({
+          map: mapRef.current,
+          position: userLocation,
+          title: safeT('myLocation', 'My Location'),
+          content,
+        });
+      } else if (userMarkerRef.current instanceof google.maps.Marker) {
+        clearMarker(userMarkerRef.current);
+        userMarkerRef.current = new AdvancedMarkerElement({
+          map: mapRef.current,
+          position: userLocation,
+          title: safeT('myLocation', 'My Location'),
+          content,
+        });
       } else {
-        if (!userMarkerRef.current || !(userMarkerRef.current instanceof google.maps.Marker)) {
-          clearMarker(userMarkerRef.current);
-          userMarkerRef.current = new google.maps.Marker({
-            map: mapRef.current,
-            position: userLocation,
-            title: safeT('myLocation', 'My Location'),
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 8,
-              fillColor: '#2563eb',
-              fillOpacity: 1,
-              strokeColor: '#ffffff',
-              strokeWeight: 3,
-            },
-          });
-        } else {
-          userMarkerRef.current.setPosition(userLocation);
-        }
+        userMarkerRef.current.position = userLocation;
+        userMarkerRef.current.content = content;
       }
     }
 
@@ -299,17 +267,6 @@ function clearMarker(marker: GoogleCanvasMarker | null): void {
     return;
   }
   marker.map = null;
-}
-
-function createLegacyMarkerIcon(selected: boolean): google.maps.Symbol {
-  return {
-    path: google.maps.SymbolPath.CIRCLE,
-    scale: selected ? 12 : 10,
-    fillColor: selected ? '#d24140' : '#ffffff',
-    fillOpacity: 1,
-    strokeColor: selected ? '#b51f2a' : '#475569',
-    strokeWeight: selected ? 2 : 1,
-  };
 }
 
 function createBuildingMarkerElement(label: string, selected: boolean): HTMLDivElement {

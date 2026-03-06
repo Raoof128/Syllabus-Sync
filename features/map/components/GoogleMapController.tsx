@@ -4,6 +4,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useEffectEvent,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -63,6 +64,8 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
     const [isNavigating, setIsNavigating] = useState(false);
     const geolocationWatchRef = useRef<number | null>(null);
     const lastUserLocationRef = useRef<MapLatLng | null>(null);
+    const lastRouteRequestKeyRef = useRef<string | null>(null);
+    const routesConfigurationFailedRef = useRef(false);
 
     const destination = useMemo(() => {
       if (!selectedBuilding) return null;
@@ -109,18 +112,34 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       });
     }, [safeT]);
 
-    const computeRoute = useCallback(async () => {
+    const computeRoute = useEffectEvent(async () => {
       if (!destination) {
         setRoute(null);
         setRouteError(null);
         return;
       }
 
-      setIsLoadingRoute(true);
-      setRouteError(null);
-
       try {
         const origin = await ensureUserLocation();
+        const requestKey = [
+          travelMode,
+          origin.lat.toFixed(5),
+          origin.lng.toFixed(5),
+          destination.lat.toFixed(5),
+          destination.lng.toFixed(5),
+        ].join(':');
+
+        if (
+          routesConfigurationFailedRef.current ||
+          (lastRouteRequestKeyRef.current === requestKey && (route !== null || routeError !== null))
+        ) {
+          return;
+        }
+
+        lastRouteRequestKeyRef.current = requestKey;
+        setIsLoadingRoute(true);
+        setRouteError(null);
+
         const response = await fetch('/api/maps/routes', {
           method: 'POST',
           headers: {
@@ -138,9 +157,14 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
 
         const json = (await response.json()) as RouteApiResponse;
         if (!response.ok || !json.success || !json.data) {
-          throw new Error(json.error?.message || safeT('routeUnavailable', 'Route unavailable.'));
+          const message = json.error?.message || safeT('routeUnavailable', 'Route unavailable.');
+          if (response.status === 503) {
+            routesConfigurationFailedRef.current = true;
+          }
+          throw new Error(message);
         }
 
+        routesConfigurationFailedRef.current = false;
         setRoute(json.data);
       } catch (error) {
         setRoute(null);
@@ -150,7 +174,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       } finally {
         setIsLoadingRoute(false);
       }
-    }, [destination, ensureUserLocation, safeT, travelMode]);
+    });
 
     const startNavigation = useCallback(() => {
       if (!selectedBuilding) {
@@ -158,6 +182,8 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
         return;
       }
 
+      routesConfigurationFailedRef.current = false;
+      lastRouteRequestKeyRef.current = null;
       setIsNavigating(true);
     }, [safeT, selectedBuilding]);
 
@@ -165,6 +191,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       setIsNavigating(false);
       setRoute(null);
       setRouteError(null);
+      lastRouteRequestKeyRef.current = null;
     }, []);
 
     useImperativeHandle(
@@ -225,7 +252,12 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
     useEffect(() => {
       if (!isNavigating) return;
       void computeRoute();
-    }, [computeRoute, isNavigating]);
+    }, [destination?.lat, destination?.lng, isNavigating, travelMode]);
+
+    useEffect(() => {
+      routesConfigurationFailedRef.current = false;
+      lastRouteRequestKeyRef.current = null;
+    }, [destination?.lat, destination?.lng, travelMode]);
 
     useEffect(() => {
       if (!selectedBuilding) {
