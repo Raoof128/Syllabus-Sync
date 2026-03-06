@@ -59,6 +59,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import WeatherWidget from './WeatherWidget';
+import HeaderLanguageSelector from './HeaderLanguageSelector';
 
 const notificationIcons = {
   deadline: Clock,
@@ -68,7 +69,7 @@ const notificationIcons = {
 };
 
 const Header = memo(() => {
-  const { t, language } = useTypedTranslation();
+  const { t, language, setLanguage, isLoadingTranslations } = useTypedTranslation();
   const router = useRouter();
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -527,6 +528,7 @@ const Header = memo(() => {
         {isClient && (
           <button
             onClick={toggleTheme}
+            type="button"
             className="group relative flex items-center justify-center p-1.5 sm:p-2 rounded-lg transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus focus-visible:ring-offset-2 focus-visible:ring-offset-mq-background hover:bg-mq-red hover:-translate-y-0.5 hover:shadow-lg active:scale-95 min-h-10 min-w-10 sm:min-h-11 sm:min-w-11"
             aria-label={t(resolvedTheme === 'dark' ? 'switchToLight' : 'switchToDark')}
             aria-pressed={resolvedTheme === 'dark'}
@@ -550,6 +552,15 @@ const Header = memo(() => {
               />
             </div>
           </button>
+        )}
+
+        {isClient && (
+          <HeaderLanguageSelector
+            language={language}
+            setLanguage={setLanguage}
+            isLoading={isLoadingTranslations}
+            t={t}
+          />
         )}
 
         {isClient && (

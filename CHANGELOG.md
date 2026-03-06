@@ -1,3 +1,10 @@
+Raouf: 2026-03-07 (Australia/Sydney)
+Scope: Header UX — Inline Language Selector Between Theme and Profile
+Summary: Added a new language selector to the header action row and positioned it between the theme toggle and profile menu as requested. Implemented the selector as a dedicated `HeaderLanguageSelector` component backed by the existing lazy-loading translation hook so language changes use the same persisted store and on-demand locale loading already used elsewhere in the app. The control uses a compact dropdown with the full supported language list, current-language context, consistent MQ header styling, and toast feedback on language changes. Added focused tests covering trigger state, changing to a new language, and avoiding redundant no-op selections.
+Files Changed: `components/layout/Header.tsx`, `components/layout/HeaderLanguageSelector.tsx` (NEW), `tests/layout/HeaderLanguageSelector.test.tsx` (NEW)
+Verification: `npx eslint --config config/eslint/eslint.config.mjs components/layout/Header.tsx components/layout/HeaderLanguageSelector.tsx tests/layout/HeaderLanguageSelector.test.tsx` ✅; `npm run test -- tests/layout/HeaderLanguageSelector.test.tsx` ✅ (3/3); `npm run typecheck` ✅.
+Follow-ups: None required for this task.
+
 Raouf: 2026-03-06 (Australia/Sydney)
 Scope: Google Maps Full Audit + Live Navigation Overhaul
 Summary: Full audit and overhaul of Google Maps. Fixed 12 issues: removed dead wrapper component, fixed map reinit on building change, added marker fallbacks, added live route recalculation, fixed loader retry cleanup, fixed prod CSP missing Google Maps domains, improved route cache eviction, translated travel mode labels, fixed Next.js state sync on building selection, cleaned up marker styles, fixed user marker DOM recreation, added CSRF origin check on routes API. Added full live navigation: user heading indicator, accuracy circle, arrival detection, ETA display, recenter button, start/stop controls in route panel.

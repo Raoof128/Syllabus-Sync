@@ -1,4 +1,11 @@
 Raouf: 2026-03-07 (Australia/Sydney)
+Scope: Header UX — Inline Language Selector Between Theme and Profile
+Summary: Added a dedicated `HeaderLanguageSelector` to the top navigation and placed it between the existing theme toggle and profile menu. The selector reuses the app’s lazy-loaded i18n flow from `useTypedTranslation`, surfaces all supported languages in a compact dropdown, preserves the existing MQ header interaction styling, and emits the same language-change toast pattern already used in settings. Also added focused UI coverage for the new selector so the header language switch path is exercised without coupling tests to the full auth/notification header shell.
+Files Changed: `components/layout/Header.tsx`, `components/layout/HeaderLanguageSelector.tsx` (NEW), `tests/layout/HeaderLanguageSelector.test.tsx` (NEW)
+Verification: `npx eslint --config config/eslint/eslint.config.mjs components/layout/Header.tsx components/layout/HeaderLanguageSelector.tsx tests/layout/HeaderLanguageSelector.test.tsx` ✅; `npm run test -- tests/layout/HeaderLanguageSelector.test.tsx` ✅ (3/3); `npm run typecheck` ✅.
+Follow-ups: Consider reusing `HeaderLanguageSelector` inside settings or extracting shared language-selector metadata if you want the header and settings language UIs to share a single presentation layer.
+
+Raouf: 2026-03-07 (Australia/Sydney)
 Scope: Google Maps Phase 5 — Deep client-side audit + hardening
 Summary: Deep audit of the full Google Maps navigation stack after APIs were confirmed working via curl but navigation still non-functional on the client. Fixed 3 issues:
 **routes/route.ts (2 fixes):** (1) Used local `isValidOrigin` function instead of project's `isTrustedOrigin` — inconsistent with place-search and place-details routes and had different (weaker) fallback behavior. Replaced with `isTrustedOrigin` from `@/lib/security/ip`. (2) Used bare `request.json()` without body size limits — replaced with `parseJsonBody` from `@/app/api/_lib/response` for DoS protection, matching the other two map routes.
