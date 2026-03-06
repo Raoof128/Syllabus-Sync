@@ -61,7 +61,22 @@ function getCachedRoute(key: string): GoogleComputedRoute | null {
   return cached.data;
 }
 
+function evictStaleEntries(): void {
+  const now = Date.now();
+  for (const [key, entry] of routeCache) {
+    if (now - entry.createdAt > CACHE_TTL_MS) {
+      routeCache.delete(key);
+    }
+  }
+}
+
 function setCachedRoute(key: string, data: GoogleComputedRoute): void {
+  // Evict stale entries before inserting
+  if (routeCache.size >= MAX_CACHE_SIZE) {
+    evictStaleEntries();
+  }
+
+  // If still at capacity after eviction, remove oldest
   if (routeCache.size >= MAX_CACHE_SIZE) {
     const oldestKey = routeCache.keys().next().value;
     if (oldestKey) {
@@ -190,7 +205,44 @@ function buildComputeRoutesBody(
   return body;
 }
 
+function isValidOrigin(request: NextRequest): boolean {
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+  // Allow same-origin requests (no origin header = same-origin in most browsers)
+  if (!origin && !referer) return true;
+
+  // In development, allow localhost
+  if (process.env.NODE_ENV === 'development') return true;
+
+  // Check origin matches our app URL
+  if (appUrl) {
+    const appHost = new URL(appUrl).host;
+    if (origin) {
+      try {
+        return new URL(origin).host === appHost;
+      } catch {
+        return false;
+      }
+    }
+    if (referer) {
+      try {
+        return new URL(referer).host === appHost;
+      } catch {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 export async function POST(request: NextRequest) {
+  if (!isValidOrigin(request)) {
+    return jsonError('Forbidden.', 403, ERROR_CODES.FORBIDDEN);
+  }
+
   const googleRoutesApiKey = process.env.GOOGLE_ROUTES_API_KEY;
   const clientIP = getClientIP(request);
   const { allowed, remaining, resetIn } = await apiLimiter(`google-routes:${clientIP}`);

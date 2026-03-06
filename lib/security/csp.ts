@@ -262,9 +262,8 @@ export function buildProdCSP(): string {
   // allow other inline scripts. This is a temporary workaround.
   const directives = [
     "default-src 'self'",
-    // Scripts: Allow self + unsafe-inline for Next.js hydration scripts
-    // The hashes are kept for documentation but 'unsafe-inline' takes precedence
-    "script-src 'self' 'unsafe-inline'",
+    // Scripts: Allow self + unsafe-inline for Next.js hydration scripts + Google Maps
+    "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com",
     // Styles: Allow inline for Tailwind/CSS-in-JS
     "style-src 'self' 'unsafe-inline'",
     // Images: Allow self, data URIs, blobs, and HTTPS

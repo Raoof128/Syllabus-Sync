@@ -1,4 +1,10 @@
 Raouf: 2026-03-06 (Australia/Sydney)
+Scope: Google Maps Full Audit + Live Navigation Overhaul
+Summary: Full audit and overhaul of Google Maps. Fixed 12 issues: removed dead wrapper component, fixed map reinit on building change, added marker fallbacks, added live route recalculation, fixed loader retry cleanup, fixed prod CSP missing Google Maps domains, improved route cache eviction, translated travel mode labels, fixed Next.js state sync on building selection, cleaned up marker styles, fixed user marker DOM recreation, added CSRF origin check on routes API. Added full live navigation: user heading indicator, accuracy circle, arrival detection, ETA display, recenter button, start/stop controls in route panel.
+Files: Modified `GoogleMapCanvas.tsx`, `GoogleMapController.tsx`, `GoogleRoutePanel.tsx`, `MapClient.tsx`, `loader.ts`, `csp.ts`, `route.ts`; deleted `GoogleMapIntegration.tsx`.
+Verification: TypeScript ✅; ESLint ✅; 503/503 tests ✅; build ✅.
+
+Raouf: 2026-03-06 (Australia/Sydney)
 Scope: Google Maps Console Noise Remediation
 Summary: Reduced the remaining Google map console noise to the app-controlled minimum. `GoogleMapCanvas` now uses Google’s `DEMO_MAP_ID` fallback when a project-specific `NEXT_PUBLIC_GOOGLE_MAP_ID` is absent, which keeps the JavaScript map on vector rendering with `AdvancedMarkerElement` and removes the deprecation path through `google.maps.Marker`. `GoogleMapController` now computes routes through a `useEffectEvent` flow with request-key deduplication and a configuration-failure latch so a missing or failing routes backend does not hammer `/api/maps/routes` on every rerender. `MapClient` now preloads the campus raster image only in campus view, avoiding the unnecessary preload warning when users open Google mode. Also added `GOOGLE_ROUTES_API_KEY` to local `.env.local`, synced it to Vercel `development`/`preview`/`production`, and redeployed production.
 Files: Modified `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/GoogleMapController.tsx`, `features/map/components/MapClient.tsx`, `app/api/maps/routes/route.ts`, `.env.local`; synchronized `GOOGLE_ROUTES_API_KEY` in Vercel.

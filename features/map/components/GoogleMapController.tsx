@@ -17,6 +17,10 @@ import { GoogleRoutePanel } from './GoogleRoutePanel';
 import type { GoogleComputedRoute, GoogleTravelMode, MapLatLng } from '@/lib/maps/google/types';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 
+const ARRIVAL_THRESHOLD_METERS = 30;
+const ROUTE_RECALC_DISTANCE_METERS = 50;
+const ROUTE_RECALC_INTERVAL_MS = 15_000;
+
 export interface GoogleMapRef {
   startNavigation: () => void;
   stopNavigation: () => void;
@@ -31,8 +35,9 @@ interface GoogleMapControllerProps {
   onSelectBuilding?: (building: Building) => void;
   onNavStateChange?: (state: {
     isNavigating: boolean;
-    status: 'idle' | 'navigating' | 'recalculating' | 'error';
+    status: 'idle' | 'navigating' | 'recalculating' | 'arrived' | 'error';
     remainingDistance?: number;
+    etaSeconds?: number;
   }) => void;
 }
 
@@ -42,6 +47,18 @@ interface RouteApiResponse {
   error?: {
     message: string;
   };
+}
+
+function haversineDistance(a: MapLatLng, b: MapLatLng): number {
+  const R = 6371000;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const sinLat = Math.sin(dLat / 2);
+  const sinLng = Math.sin(dLng / 2);
+  const h =
+    sinLat * sinLat +
+    Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * sinLng * sinLng;
+  return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
 
 export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerProps>(
@@ -58,13 +75,18 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
   ) => {
     const { safeT } = useSafeTranslation();
     const [userLocation, setUserLocation] = useState<MapLatLng | null>(null);
+    const [userHeading, setUserHeading] = useState<number | null>(null);
     const [route, setRoute] = useState<GoogleComputedRoute | null>(null);
     const [routeError, setRouteError] = useState<string | null>(null);
     const [isLoadingRoute, setIsLoadingRoute] = useState(false);
     const [isNavigating, setIsNavigating] = useState(false);
+    const [hasArrived, setHasArrived] = useState(false);
     const geolocationWatchRef = useRef<number | null>(null);
+    const headingWatchRef = useRef<{ remove: () => void } | null>(null);
     const lastUserLocationRef = useRef<MapLatLng | null>(null);
     const lastRouteRequestKeyRef = useRef<string | null>(null);
+    const lastRouteLocationRef = useRef<MapLatLng | null>(null);
+    const lastRouteTimeRef = useRef<number>(0);
     const routesConfigurationFailedRef = useRef(false);
 
     const destination = useMemo(() => {
@@ -112,7 +134,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       });
     }, [safeT]);
 
-    const computeRoute = useEffectEvent(async () => {
+    const computeRoute = useEffectEvent(async (forceRecalc = false) => {
       if (!destination) {
         setRoute(null);
         setRouteError(null);
@@ -129,14 +151,20 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
           destination.lng.toFixed(5),
         ].join(':');
 
-        if (
-          routesConfigurationFailedRef.current ||
-          (lastRouteRequestKeyRef.current === requestKey && (route !== null || routeError !== null))
-        ) {
-          return;
+        // Check if we should skip this request
+        if (!forceRecalc) {
+          if (routesConfigurationFailedRef.current) return;
+          if (
+            lastRouteRequestKeyRef.current === requestKey &&
+            (route !== null || routeError !== null)
+          ) {
+            return;
+          }
         }
 
         lastRouteRequestKeyRef.current = requestKey;
+        lastRouteLocationRef.current = origin;
+        lastRouteTimeRef.current = Date.now();
         setIsLoadingRoute(true);
         setRouteError(null);
 
@@ -166,6 +194,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
 
         routesConfigurationFailedRef.current = false;
         setRoute(json.data);
+        setHasArrived(false);
       } catch (error) {
         setRoute(null);
         setRouteError(
@@ -184,6 +213,8 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
 
       routesConfigurationFailedRef.current = false;
       lastRouteRequestKeyRef.current = null;
+      lastRouteLocationRef.current = null;
+      setHasArrived(false);
       setIsNavigating(true);
     }, [safeT, selectedBuilding]);
 
@@ -191,7 +222,9 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       setIsNavigating(false);
       setRoute(null);
       setRouteError(null);
+      setHasArrived(false);
       lastRouteRequestKeyRef.current = null;
+      lastRouteLocationRef.current = null;
     }, []);
 
     useImperativeHandle(
@@ -206,6 +239,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       [isNavigating, startNavigation, stopNavigation],
     );
 
+    // Geolocation watch — always active to show user's position
     useEffect(() => {
       if (typeof navigator === 'undefined' || !navigator.geolocation) {
         return;
@@ -229,6 +263,11 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
 
           lastUserLocationRef.current = nextLocation;
           setUserLocation(nextLocation);
+
+          // Update heading from position if available
+          if (position.coords.heading !== null && Number.isFinite(position.coords.heading)) {
+            setUserHeading(position.coords.heading);
+          }
         },
         () => {
           setRouteError(
@@ -237,7 +276,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
         },
         {
           enableHighAccuracy: true,
-          maximumAge: 5000,
+          maximumAge: 3000,
           timeout: 10000,
         },
       );
@@ -249,35 +288,104 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       };
     }, [safeT]);
 
+    // Device orientation for compass heading (mobile)
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+
+      const handleOrientation = (event: DeviceOrientationEvent) => {
+        // Use webkitCompassHeading for iOS, alpha for Android
+        const heading =
+          (event as DeviceOrientationEvent & { webkitCompassHeading?: number })
+            .webkitCompassHeading ?? (event.alpha !== null ? (360 - event.alpha) % 360 : null);
+
+        if (heading !== null && Number.isFinite(heading)) {
+          setUserHeading(heading);
+        }
+      };
+
+      window.addEventListener('deviceorientation', handleOrientation, true);
+      headingWatchRef.current = {
+        remove: () => window.removeEventListener('deviceorientation', handleOrientation, true),
+      };
+
+      return () => {
+        headingWatchRef.current?.remove();
+        headingWatchRef.current = null;
+      };
+    }, []);
+
+    // Initial route computation when navigation starts or destination/mode changes
     useEffect(() => {
       if (!isNavigating) return;
       void computeRoute();
     }, [destination?.lat, destination?.lng, isNavigating, travelMode]);
 
+    // Live route recalculation when user moves significantly during navigation
+    useEffect(() => {
+      if (!isNavigating || !userLocation || !destination || hasArrived) return;
+
+      // Check arrival
+      const distToDestination = haversineDistance(userLocation, {
+        lat: destination.lat,
+        lng: destination.lng,
+      });
+
+      if (distToDestination < ARRIVAL_THRESHOLD_METERS) {
+        setHasArrived(true);
+        return;
+      }
+
+      // Check if we need to recalculate: user moved far enough and enough time passed
+      const lastRouteLocation = lastRouteLocationRef.current;
+      const timeSinceLastRoute = Date.now() - lastRouteTimeRef.current;
+
+      if (lastRouteLocation && timeSinceLastRoute > ROUTE_RECALC_INTERVAL_MS) {
+        const distFromLastRoute = haversineDistance(userLocation, lastRouteLocation);
+        if (distFromLastRoute > ROUTE_RECALC_DISTANCE_METERS) {
+          lastRouteRequestKeyRef.current = null; // Force new request
+          void computeRoute(true);
+        }
+      }
+    }, [userLocation, isNavigating, destination, hasArrived]);
+
+    // Reset configuration-failed ref when destination or travel mode changes
     useEffect(() => {
       routesConfigurationFailedRef.current = false;
       lastRouteRequestKeyRef.current = null;
     }, [destination?.lat, destination?.lng, travelMode]);
 
+    // Stop navigation when building is deselected
     useEffect(() => {
       if (!selectedBuilding) {
         stopNavigation();
       }
     }, [selectedBuilding, stopNavigation]);
 
+    // Notify parent of navigation state changes
     useEffect(() => {
       onNavStateChange?.({
         isNavigating,
-        status: routeError
-          ? 'error'
-          : isLoadingRoute
-            ? 'recalculating'
-            : isNavigating
-              ? 'navigating'
-              : 'idle',
+        status: hasArrived
+          ? 'arrived'
+          : routeError
+            ? 'error'
+            : isLoadingRoute
+              ? 'recalculating'
+              : isNavigating
+                ? 'navigating'
+                : 'idle',
         remainingDistance: route?.distanceMeters,
+        etaSeconds: route?.durationSeconds,
       });
-    }, [isLoadingRoute, isNavigating, onNavStateChange, route?.distanceMeters, routeError]);
+    }, [
+      hasArrived,
+      isLoadingRoute,
+      isNavigating,
+      onNavStateChange,
+      route?.distanceMeters,
+      route?.durationSeconds,
+      routeError,
+    ]);
 
     return (
       <div className="relative h-full w-full">
@@ -285,7 +393,9 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
           buildings={buildings}
           selectedBuilding={selectedBuilding}
           userLocation={userLocation}
+          userHeading={userHeading}
           route={route}
+          isNavigating={isNavigating}
           onSelectBuilding={onSelectBuilding}
         />
         {selectedBuilding && (
@@ -295,6 +405,9 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
             travelMode={travelMode}
             isLoading={isLoadingRoute}
             error={routeError}
+            hasArrived={hasArrived}
+            isNavigating={isNavigating}
+            onStartNavigation={startNavigation}
             onTravelModeChange={onTravelModeChange}
             onStopNavigation={stopNavigation}
           />

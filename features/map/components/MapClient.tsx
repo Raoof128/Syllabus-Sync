@@ -41,7 +41,7 @@ import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
 import { MapViewToggle, type MapView } from './MapViewToggle';
-import { GoogleMapIntegration, type GoogleMapRef } from './GoogleMapIntegration';
+import { GoogleMapController, type GoogleMapRef } from './GoogleMapController';
 import type { GoogleTravelMode } from '@/lib/maps/google/types';
 import { searchCampusBuildings } from '@/lib/maps/buildings/buildingSearch';
 
@@ -95,6 +95,7 @@ export default function MapClient() {
   const [navState, setNavState] = useState<{
     isNavigating: boolean;
     remainingDistance?: number;
+    etaSeconds?: number;
     status?: 'idle' | 'navigating' | 'arrived' | 'off-route' | 'recalculating' | 'error';
   } | null>(null);
 
@@ -596,7 +597,7 @@ export default function MapClient() {
               </>
             ) : (
               <div className="absolute inset-0 z-10">
-                <GoogleMapIntegration
+                <GoogleMapController
                   ref={googleMapRef}
                   buildings={buildings}
                   onNavStateChange={setNavState}
@@ -606,8 +607,11 @@ export default function MapClient() {
                   onSelectBuilding={(building) => {
                     const params = new URLSearchParams(searchParams.toString());
                     params.set('building', building.id);
+                    params.set('view', 'google');
                     const newUrl = `${window.location.pathname}?${params.toString()}`;
-                    window.history.pushState({}, '', newUrl);
+                    window.history.replaceState({}, '', newUrl);
+                    // Force Next.js to pick up the change by triggering a shallow navigation
+                    window.dispatchEvent(new PopStateEvent('popstate'));
                   }}
                 />
               </div>

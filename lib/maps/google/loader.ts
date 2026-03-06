@@ -70,6 +70,7 @@ export async function loadGoogleMaps(): Promise<typeof google.maps> {
       script.defer = true;
       script.onerror = () => {
         googleMapsLoaderPromise = null;
+        delete window.__syllabusSyncGoogleMapsInit;
         reject(new Error('Failed to load Google Maps JavaScript API.'));
       };
 
