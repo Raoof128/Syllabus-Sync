@@ -35,7 +35,7 @@ export function usePublicFeed() {
   const featuredEvents = useMemo(() => {
     // Safety check - ensure allFeaturedEvents is a valid array with valid events
     const safeEvents = Array.isArray(allFeaturedEvents)
-      ? allFeaturedEvents.filter(e => e && typeof e.category === 'string' && e.startAt)
+      ? allFeaturedEvents.filter((e) => e && typeof e.category === 'string' && e.startAt)
       : [];
 
     if (categoryFilter === 'All') {
@@ -48,7 +48,7 @@ export function usePublicFeed() {
   const filteredEvents = useMemo(() => {
     // Safety check - ensure events is a valid array with valid events
     const safeEvents = Array.isArray(events)
-      ? events.filter(e => e && typeof e.category === 'string' && e.startAt)
+      ? events.filter((e) => e && typeof e.category === 'string' && e.startAt)
       : [];
 
     let result = [...safeEvents];
@@ -108,13 +108,14 @@ export function usePublicFeed() {
   const nonFeaturedEvents = useMemo(() => {
     const featuredIds = new Set(
       Array.isArray(allFeaturedEvents)
-        ? allFeaturedEvents.filter(e => e && e.id).map(e => e.id)
-        : []
+        ? allFeaturedEvents.filter((e) => e && e.id).map((e) => e.id)
+        : [],
     );
-    return (Array.isArray(events)
-      ? events.filter(e => e && typeof e.category === 'string' && e.startAt)
-      : []
-    ).filter(e => !featuredIds.has(e.id));
+    return (
+      Array.isArray(events)
+        ? events.filter((e) => e && typeof e.category === 'string' && e.startAt)
+        : []
+    ).filter((e) => !featuredIds.has(e.id));
   }, [events, allFeaturedEvents]);
 
   // Category counts - count only non-featured events to match what's displayed in the grid

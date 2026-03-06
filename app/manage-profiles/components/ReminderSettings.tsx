@@ -224,9 +224,7 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
                 <div className="flex items-start gap-3 min-w-0">
                   <BookOpen className="h-4.5 w-4.5 text-mq-content-tertiary flex-shrink-0 mt-0.5" />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-mq-content">
-                      {t('deadlineReminders')}
-                    </p>
+                    <p className="text-sm font-medium text-mq-content">{t('deadlineReminders')}</p>
                     <p className="text-xs text-mq-content-tertiary break-words leading-relaxed">
                       {t('deadlineRemindersDesc')}
                     </p>

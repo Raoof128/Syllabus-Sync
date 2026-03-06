@@ -1,26 +1,44 @@
 'use client';
 
 import { forwardRef } from 'react';
-import { UNIVERSITY_CONFIG } from '@/lib/config';
 import type { Building } from '@/features/map/lib/buildings';
-import { GoogleMapEmbed, type GoogleMapRef as GoogleMapEmbedRef } from './GoogleMapEmbed';
-
-export type GoogleMapRef = GoogleMapEmbedRef;
+import type { GoogleTravelMode } from '@/lib/maps/google/types';
+import { GoogleMapController, type GoogleMapRef } from './GoogleMapController';
+export type { GoogleMapRef } from './GoogleMapController';
 
 interface GoogleMapIntegrationProps {
-  onNavStateChange?: (state: { isNavigating: boolean; status: 'idle' | 'navigating' }) => void;
+  buildings: Building[];
   selectedBuilding?: Building;
+  travelMode: GoogleTravelMode;
+  onTravelModeChange: (mode: GoogleTravelMode) => void;
+  onSelectBuilding?: (building: Building) => void;
+  onNavStateChange?: (state: {
+    isNavigating: boolean;
+    status: 'idle' | 'navigating' | 'recalculating' | 'error';
+    remainingDistance?: number;
+  }) => void;
 }
 
 export const GoogleMapIntegration = forwardRef<GoogleMapRef, GoogleMapIntegrationProps>(
-  ({ onNavStateChange, selectedBuilding }, ref) => {
-    const displayName = selectedBuilding ? selectedBuilding.id : UNIVERSITY_CONFIG.name;
-
+  (
+    {
+      buildings,
+      onNavStateChange,
+      onSelectBuilding,
+      onTravelModeChange,
+      selectedBuilding,
+      travelMode,
+    },
+    ref,
+  ) => {
     return (
-      <GoogleMapEmbed
+      <GoogleMapController
         ref={ref}
+        buildings={buildings}
         selectedBuilding={selectedBuilding}
-        destinationLabel={displayName}
+        travelMode={travelMode}
+        onTravelModeChange={onTravelModeChange}
+        onSelectBuilding={onSelectBuilding}
         onNavStateChange={onNavStateChange}
       />
     );

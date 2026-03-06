@@ -159,12 +159,16 @@ Cached for 5 minutes. Powered by Google Weather API (server-side proxy).
 
 ### Navigation
 
-| Method | Path            | Auth | Description                      |
-| ------ | --------------- | ---- | -------------------------------- |
-| POST   | `/api/navigate` | No   | Get walking route between points |
+| Method | Path               | Auth | Description                                          |
+| ------ | ------------------ | ---- | ---------------------------------------------------- |
+| POST   | `/api/navigate`    | No   | Get campus-raster walking route between points       |
+| POST   | `/api/maps/routes` | No   | Get Google-mode route between origin and destination |
 
-**Body:** `{ start: [lon, lat], end: [lon, lat] }`
-Proxied through OpenRouteService. API key stays server-side.
+**`/api/navigate` Body:** `{ start: { lat, lng }, end: { lat, lng } }`
+Campus mode only. Proxied through OpenRouteService with server-side key handling.
+
+**`/api/maps/routes` Body:** `{ origin: { lat, lng }, destination: { lat, lng }, travelMode?: 'WALK' | 'DRIVE' | 'BICYCLE' | 'TRANSIT' }`
+Google-mode routing endpoint. Proxied through the Google Routes API with field-masked responses and server-side key handling.
 
 ---
 

@@ -591,7 +591,6 @@ export default function PrivacyPolicyPage() {
                 {t('privacy_s14_p1')}
               </p>
             </section>
-
           </div>
         </div>
       </div>

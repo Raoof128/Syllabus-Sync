@@ -124,7 +124,10 @@ export async function PUT(request: Request) {
 
     const validation = UpdateProfileSchema.safeParse(body);
     if (!validation.success) {
-      logger.error('Profile validation failed:', JSON.stringify(validation.error.flatten().fieldErrors));
+      logger.error(
+        'Profile validation failed:',
+        JSON.stringify(validation.error.flatten().fieldErrors),
+      );
       logger.error('Profile body was:', JSON.stringify(body));
       return jsonError('Invalid profile data', 400, 'VALIDATION_ERROR', {
         errors: validation.error.flatten().fieldErrors,
@@ -152,7 +155,12 @@ export async function PUT(request: Request) {
       .single();
 
     if (updateError) {
-      logger.error('Profile update error:', updateError.message, updateError.code, updateError.details);
+      logger.error(
+        'Profile update error:',
+        updateError.message,
+        updateError.code,
+        updateError.details,
+      );
       // Check for protected field modification
       if (updateError.message?.includes('Cannot modify')) {
         return jsonError('Cannot modify protected fields', 403);

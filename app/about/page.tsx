@@ -84,8 +84,7 @@ export default function AboutPage() {
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.05]"
           style={{
-            backgroundImage:
-              'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
             backgroundSize: '32px 32px',
           }}
         />
@@ -118,9 +117,8 @@ export default function AboutPage() {
               className="animate-fade-in max-w-xl text-[15px] leading-relaxed text-white/75 sm:text-base"
               style={{ animationDelay: '0.2s', animationFillMode: 'both' }}
             >
-              {APP_CONFIG.name} helps students organise assessments, schedules, and study
-              priorities with clarity. We build practical tools that support real semester
-              workflows.
+              {APP_CONFIG.name} helps students organise assessments, schedules, and study priorities
+              with clarity. We build practical tools that support real semester workflows.
             </p>
             <div
               className="animate-fade-in flex flex-wrap items-center gap-3 pt-1"
@@ -131,7 +129,10 @@ export default function AboutPage() {
                 className="inline-flex items-center gap-2 rounded-mq-lg bg-white px-5 py-2.5 text-sm font-semibold text-mq-primary shadow-lg shadow-black/15 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-xl hover:shadow-black/20"
               >
                 Get Started
-                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />
+                <ArrowRight
+                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
               </Link>
               <a
                 href={EXTERNAL_LINKS.documentation}
@@ -186,14 +187,9 @@ export default function AboutPage() {
               }}
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-mq-primary/10 transition-colors duration-300 group-hover:bg-mq-primary/15">
-                <item.icon
-                  className="h-5 w-5 text-mq-primary"
-                  aria-hidden="true"
-                />
+                <item.icon className="h-5 w-5 text-mq-primary" aria-hidden="true" />
               </div>
-              <h3 className="mt-4 text-base font-semibold text-mq-content">
-                {item.title}
-              </h3>
+              <h3 className="mt-4 text-base font-semibold text-mq-content">{item.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-mq-content-secondary">
                 {item.description}
               </p>
@@ -215,8 +211,8 @@ export default function AboutPage() {
             Built for Student Success
           </h2>
           <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-mq-content-secondary">
-            Feature design focused on practical student productivity and day-to-day
-            academic control.
+            Feature design focused on practical student productivity and day-to-day academic
+            control.
           </p>
           <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
             {FEATURE_CARDS.map((item, i) => (
@@ -229,14 +225,9 @@ export default function AboutPage() {
                 }}
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-mq-primary/10 transition-colors duration-300 group-hover:bg-mq-primary/15">
-                  <item.icon
-                    className="h-5 w-5 text-mq-primary"
-                    aria-hidden="true"
-                  />
+                  <item.icon className="h-5 w-5 text-mq-primary" aria-hidden="true" />
                 </div>
-                <h3 className="mt-4 text-base font-semibold text-mq-content">
-                  {item.title}
-                </h3>
+                <h3 className="mt-4 text-base font-semibold text-mq-content">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-mq-content-secondary">
                   {item.description}
                 </p>
@@ -283,9 +274,7 @@ export default function AboutPage() {
                   <h3 className="text-overlay-white text-2xl font-bold tracking-tight">
                     {dev.name}
                   </h3>
-                  <p className="text-overlay-white-muted mt-1 text-sm font-medium">
-                    {dev.role}
-                  </p>
+                  <p className="text-overlay-white-muted mt-1 text-sm font-medium">{dev.role}</p>
                 </div>
               </div>
             </article>

@@ -17,6 +17,7 @@ import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import type { Building } from '@/features/map/lib/buildings';
+import type { GoogleTravelMode } from '@/lib/maps/google/types';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { cn } from '@/lib/utils';
 import { triggerHaptic } from '@/lib/utils/haptics';
@@ -32,6 +33,8 @@ type Props = {
   onStopNavigation?: () => void;
   isNavigating?: boolean;
   isGoogleMode?: boolean;
+  travelMode?: GoogleTravelMode;
+  onTravelModeChange?: (mode: GoogleTravelMode) => void;
 };
 
 import { LayeredCard } from './LayeredCard';
@@ -44,9 +47,11 @@ export default function CampusMapHUD({
   onCopyShare,
   onExport,
   onStartNavigation,
-  onStopNavigation: _onStopNavigation,
+  onStopNavigation,
   isNavigating,
   isGoogleMode,
+  travelMode,
+  onTravelModeChange,
 }: Props) {
   const { t } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
@@ -107,6 +112,14 @@ export default function CampusMapHUD({
   const visibleBuildings = useMemo(() => {
     return buildingSearch.trim() ? buildings : buildings.slice(0, 15);
   }, [buildings, buildingSearch]);
+
+  const travelModes: GoogleTravelMode[] = ['WALK', 'DRIVE', 'BICYCLE', 'TRANSIT'];
+  const travelModeLabels: Record<GoogleTravelMode, string> = {
+    WALK: 'Walk',
+    DRIVE: 'Drive',
+    BICYCLE: 'Bike',
+    TRANSIT: 'Transit',
+  };
 
   return (
     <div className="absolute inset-0 z-[1100] pointer-events-none">
@@ -372,6 +385,28 @@ export default function CampusMapHUD({
                   </Badge>
                 )}
 
+                {isGoogleMode && onTravelModeChange && travelMode && (
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {travelModes.map((mode) => {
+                      const active = mode === travelMode;
+                      return (
+                        <button
+                          key={mode}
+                          type="button"
+                          onClick={() => onTravelModeChange(mode)}
+                          className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
+                            active
+                              ? 'border-mq-primary bg-mq-primary text-white'
+                              : 'border-mq-border bg-mq-background-secondary text-mq-content hover:bg-mq-hover-background'
+                          }`}
+                        >
+                          {travelModeLabels[mode]}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
                 {/* Navigation Buttons - consistent for both Campus and Google views */}
                 <div className="flex flex-col gap-2 pt-2">
                   {onStartNavigation && !isNavigating && (
@@ -385,6 +420,17 @@ export default function CampusMapHUD({
                     >
                       <Navigation className="h-4 w-4" />
                       {isGoogleMode ? t('navigate') : t('navigateOnCampus')}
+                    </Button>
+                  )}
+                  {onStopNavigation && isNavigating && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full gap-2"
+                      onClick={onStopNavigation}
+                    >
+                      <Navigation className="h-4 w-4" />
+                      Stop
                     </Button>
                   )}
                 </div>

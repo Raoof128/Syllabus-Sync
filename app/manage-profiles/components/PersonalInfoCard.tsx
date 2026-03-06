@@ -81,9 +81,7 @@ export function PersonalInfoCard({ form, email, disabled }: Props) {
               className={errors.studentId ? 'border-red-500' : ''}
               aria-invalid={!!errors.studentId}
             />
-            {errors.studentId && (
-              <p className="text-red-500 text-xs">{errors.studentId.message}</p>
-            )}
+            {errors.studentId && <p className="text-red-500 text-xs">{errors.studentId.message}</p>}
           </div>
         </div>
       </div>

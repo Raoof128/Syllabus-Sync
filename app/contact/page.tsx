@@ -2,14 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
-import {
-  Mail,
-  FileText,
-  ShieldCheck,
-  ArrowLeft,
-  ArrowRight,
-  Send,
-} from 'lucide-react';
+import { Mail, FileText, ShieldCheck, ArrowLeft, ArrowRight, Send } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS, UNIVERSITY_CONFIG } from '@/lib/config';
 
 export default function ContactPage() {
@@ -43,8 +36,7 @@ export default function ContactPage() {
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.05]"
           style={{
-            backgroundImage:
-              'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
             backgroundSize: '32px 32px',
           }}
         />
@@ -96,9 +88,7 @@ export default function ContactPage() {
                 Reach Out
               </p>
             </div>
-            <h2 className="mt-3 font-serif text-2xl font-bold text-mq-content">
-              Support Channels
-            </h2>
+            <h2 className="mt-3 font-serif text-2xl font-bold text-mq-content">Support Channels</h2>
           </div>
 
           <article className="group rounded-xl border border-mq-border bg-mq-card-background p-5 transition-all duration-300 hover:border-mq-primary/25 hover:shadow-lg hover:shadow-mq-primary/5">
@@ -133,7 +123,10 @@ export default function ContactPage() {
                     className="inline-flex items-center gap-1 text-sm text-mq-content-secondary transition-colors hover:text-mq-primary"
                   >
                     Documentation
-                    <ArrowRight className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
+                    <ArrowRight
+                      className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100"
+                      aria-hidden="true"
+                    />
                   </a>
                   <Link
                     href="/about"
@@ -227,9 +220,7 @@ export default function ContactPage() {
               />
             </div>
 
-            {error && (
-              <p className="animate-fade-in text-sm font-medium text-mq-danger">{error}</p>
-            )}
+            {error && <p className="animate-fade-in text-sm font-medium text-mq-danger">{error}</p>}
             {submitted && (
               <p className="animate-fade-in text-sm font-medium text-mq-success">
                 Your email draft has been opened. Review and send it when ready.

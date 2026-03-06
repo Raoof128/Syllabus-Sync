@@ -35,7 +35,7 @@ flowchart TD
         UI[MQ Design System UI]:::frontend
         State[Zustand Stores]:::frontend
         Auth[Supabase Auth Client]:::frontend
-        Navigation[Hybrid Map Engine\nLeaflet + Google]:::frontend
+        Navigation[Campus Map + Google Maps JS]:::frontend
         SW[Service Workers / PWA]:::frontend
     end
 
@@ -48,13 +48,14 @@ flowchart TD
     subgraph BE ["⚙️ Backend Services (Server Components & Routes)"]
         API_Routes[REST API Endpoints]:::backend
         Auth_Handler[WebAuthn / Passkeys]:::backend
-        Map_Proxy[OpenRouteService Proxy]:::backend
+        Map_Proxy[Routing Providers]:::backend
         Sync_Engine[Academic Sync Engine]:::backend
     end
 
     subgraph Services ["☁️ External Providers"]
         Supabase[(PostgreSQL + RLS)]:::db
-        ORS[OpenRouteService Core]:::external
+        GoogleMaps[Google Maps Platform\nMaps JS + Routes API]:::external
+        ORS[OpenRouteService Core\nCampus mode only]:::external
         Resend[Resend Email Delivery]:::external
         Vercel[Vercel Edge & Cron]:::external
     end
@@ -77,7 +78,8 @@ flowchart TD
 
     Auth_Handler ===>|JWT Verification| Supabase
     Sync_Engine ===>|Strict RLS Queries| Supabase
-    Map_Proxy ===>|Geospatial Queries| ORS
+    Map_Proxy ===>|Google mode routing| GoogleMaps
+    Map_Proxy ===>|Campus mode routing| ORS
     API_Routes ===>|Transactional Auth| Resend
     Vercel -.->|Automated Sync Triggers| Sync_Engine
 ```
@@ -115,9 +117,9 @@ flowchart TD
 
 ### 🗺️ **Campus Navigation Platform**
 
-- **Precision Wayfinding System:** Dual-engine architecture featuring an advanced in-house Leaflet-based renderer alongside dynamic Google Maps integration with precise coordinate tracking.
+- **Precision Wayfinding System:** Dual-mode architecture featuring an in-house Leaflet campus renderer alongside a full Google Maps JavaScript canvas for Google mode, both driven by the same campus building registry and HUD flow.
 - **Real-Time GPS Engine:** High-frequency tracker utilizing `navigator.geolocation.watchPosition` enriched by sensor-fusion, Kalman filtering, and spatial threshold debouncing (~20m bounds) to completely eliminate map-flashing and UI jitter during active roaming.
-- **Turn-by-Turn Telemetry:** Resilient routing subsystem powered by OpenRouteService with built-in crash-hardening, graceful missing-instruction handlers, and dynamic off-route recalibration capabilities.
+- **Turn-by-Turn Telemetry:** Google mode uses the Google Routes API for route computation and in-app polyline rendering, while the campus raster mode retains ORS-backed campus routing with off-route recalibration.
 - **Comprehensive Building Directory:** Highly curated geospatial layer containing 100+ campus structures, dynamic visual overlays (parking, events), and accessibility status vectors.
 
 ### 🎮 **Academic Gamification Framework**
@@ -188,8 +190,8 @@ npm install
 cp .env.example .env.local
 
 # Configure your environment variables
-# Required: Supabase URL, Anon Key, Service Role Key, Google Maps Embed API key
-# Optional: Redis URL, ORS API Key
+# Required: Supabase URL, Anon Key, Service Role Key, Google Maps JS API key, Google Map ID, Google Routes API key
+# Optional: Redis URL, ORS API Key (campus raster mode)
 # Required for weather: GOOGLE_WEATHER_API_KEY (server-side only)
 ```
 
@@ -197,18 +199,19 @@ Email (Resend) + Vercel notes:
 
 - Transactional email (verification) is sent via **Resend** using `RESEND_API_KEY` and `VERIFICATION_EMAIL_FROM`.
 - Vercel Cron endpoints are protected by `CRON_SECRET`.
-- Google embedded map mode should use `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` in every deployed environment
-  to guarantee consistent in-app iframe behavior.
+- Google JS map mode requires `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_GOOGLE_MAP_ID`,
+  and server-side `GOOGLE_ROUTES_API_KEY`.
 - Setup guide: `docs/operations/resend-vercel-setup.md`
-- Google Maps Embed setup guide: `docs/operations/google-maps-embed-setup.md`
+- Google Maps Platform setup guide: `docs/operations/google-maps-platform-setup.md`
 - OAuth setup: `docs/operations/supabase-oauth-setup.md`
 
-Google Maps Embed quick setup:
+Google Maps Platform quick setup:
 
-1. In Google Cloud, enable **Maps Embed API**.
-2. Create an API key and restrict it to your app domains (HTTP referrers).
-3. Add `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` to `.env.local` (local) and Vercel envs (preview/production).
-4. Restart the app and open `/map?view=google` to verify map + directions iframe rendering.
+1. In Google Cloud, enable **Maps JavaScript API** and **Routes API**.
+2. Create a browser key for `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` and restrict it to your app domains.
+3. Create a server key for `GOOGLE_ROUTES_API_KEY` and restrict it to the Routes API.
+4. Create a vector **Map ID** and set `NEXT_PUBLIC_GOOGLE_MAP_ID`.
+5. Restart the app and open `/map?view=google` to verify the JavaScript map, campus markers, and routed polyline rendering.
 
 If you deploy to Vercel using the CLI, the repo includes pinned scripts:
 

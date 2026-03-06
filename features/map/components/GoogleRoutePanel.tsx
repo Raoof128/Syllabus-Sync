@@ -1,0 +1,150 @@
+'use client';
+
+import { Car, Bike, Bus, Footprints, Loader2, Navigation, RouteIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/mq/badge';
+import { Button } from '@/components/ui/mq/button';
+import type { GoogleComputedRoute, GoogleTravelMode } from '@/lib/maps/google/types';
+import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
+
+interface GoogleRoutePanelProps {
+  selectedBuildingLabel?: string;
+  route: GoogleComputedRoute | null;
+  travelMode: GoogleTravelMode;
+  isLoading: boolean;
+  error: string | null;
+  onTravelModeChange: (mode: GoogleTravelMode) => void;
+  onStopNavigation: () => void;
+}
+
+const TRAVEL_MODES: Array<{
+  mode: GoogleTravelMode;
+  label: string;
+  Icon: typeof Footprints;
+}> = [
+  { mode: 'WALK', label: 'Walk', Icon: Footprints },
+  { mode: 'DRIVE', label: 'Drive', Icon: Car },
+  { mode: 'BICYCLE', label: 'Bike', Icon: Bike },
+  { mode: 'TRANSIT', label: 'Transit', Icon: Bus },
+];
+
+export function GoogleRoutePanel({
+  selectedBuildingLabel,
+  route,
+  travelMode,
+  isLoading,
+  error,
+  onTravelModeChange,
+  onStopNavigation,
+}: GoogleRoutePanelProps) {
+  const { safeT } = useSafeTranslation();
+
+  return (
+    <div className="absolute bottom-20 left-3 right-3 z-[1100] pointer-events-none sm:right-auto sm:w-[360px]">
+      <div className="pointer-events-auto rounded-mq-xl border border-mq-border bg-mq-card-background/95 p-4 shadow-xl backdrop-blur-sm">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <RouteIcon className="h-4 w-4 text-mq-primary" />
+              <p className="text-sm font-semibold text-mq-content">
+                {safeT('routePlanner', 'Route Planner')}
+              </p>
+            </div>
+            <p className="mt-1 text-xs text-mq-content-secondary">
+              {selectedBuildingLabel
+                ? `${safeT('navigateTo', 'Navigate to')} ${selectedBuildingLabel}`
+                : safeT('selectBuildingToNavigate', 'Select a building to navigate.')}
+            </p>
+          </div>
+          {route && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2"
+              onClick={onStopNavigation}
+              aria-label={safeT('stopNavigation', 'Stop navigation')}
+            >
+              <Navigation className="h-4 w-4" />
+              {safeT('stopNavigation', 'Stop')}
+            </Button>
+          )}
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {TRAVEL_MODES.map(({ mode, label, Icon }) => {
+            const active = mode === travelMode;
+            return (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => onTravelModeChange(mode)}
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  active
+                    ? 'border-mq-primary bg-mq-primary text-white'
+                    : 'border-mq-border bg-mq-background-secondary text-mq-content hover:bg-mq-hover-background'
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {isLoading && (
+          <div className="mt-4 flex items-center gap-2 rounded-mq-lg bg-mq-background-secondary px-3 py-3 text-sm text-mq-content-secondary">
+            <Loader2 className="h-4 w-4 animate-spin text-mq-primary" />
+            {safeT('loadingRoute', 'Loading route...')}
+          </div>
+        )}
+
+        {error && !isLoading && (
+          <div className="mt-4 rounded-mq-lg border border-mq-danger/20 bg-mq-danger/5 px-3 py-3 text-sm text-mq-content">
+            {error}
+          </div>
+        )}
+
+        {route && !isLoading && !error && (
+          <>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Badge variant="neutral">{formatDistance(route.distanceMeters)}</Badge>
+              <Badge variant="neutral">{formatDuration(route.durationSeconds)}</Badge>
+            </div>
+
+            <ol className="mt-4 max-h-48 space-y-2 overflow-y-auto pr-1">
+              {route.steps.slice(0, 6).map((step, index) => (
+                <li
+                  key={`${step.instruction}-${index}`}
+                  className="rounded-mq-lg bg-mq-background-secondary px-3 py-2"
+                >
+                  <p className="text-sm font-medium text-mq-content">{step.instruction}</p>
+                  <p className="mt-1 text-xs text-mq-content-secondary">
+                    {formatDistance(step.distanceMeters)} · {formatDuration(step.durationSeconds)}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function formatDistance(distanceMeters: number): string {
+  if (distanceMeters >= 1000) {
+    return `${(distanceMeters / 1000).toFixed(1)} km`;
+  }
+
+  return `${Math.round(distanceMeters)} m`;
+}
+
+function formatDuration(durationSeconds: number): string {
+  const minutes = Math.max(1, Math.round(durationSeconds / 60));
+  if (minutes >= 60) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+  }
+
+  return `${minutes} min`;
+}

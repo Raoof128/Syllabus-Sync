@@ -42,15 +42,10 @@ import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
 import { MapViewToggle, type MapView } from './MapViewToggle';
 import { GoogleMapIntegration, type GoogleMapRef } from './GoogleMapIntegration';
-import { GoogleMapBuildingSearch } from './GoogleMapBuildingSearch';
+import type { GoogleTravelMode } from '@/lib/maps/google/types';
+import { searchCampusBuildings } from '@/lib/maps/buildings/buildingSearch';
 
 import { triggerHaptic } from '@/lib/utils/haptics';
-
-const normalizeForSearch = (value: string): string =>
-  value
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
 
 // Map overlay icons
 const OVERLAY_ICONS: Record<MapOverlayId, React.ComponentType<{ className?: string }>> = {
@@ -109,6 +104,7 @@ export default function MapClient() {
 
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
+  const [googleTravelMode, setGoogleTravelMode] = useState<GoogleTravelMode>('WALK');
   const hasAutoNavigatedRef = useRef(false);
   const mapView: MapView = searchParams.get('view') === 'google' ? 'google' : 'campus';
 
@@ -300,26 +296,9 @@ export default function MapClient() {
 
   // Buildings sidebar - filtered and searched
   const sidebarBuildings = useMemo(() => {
-    const query = buildingSearch.trim();
-    if (!query) return [...buildings];
-
-    const normalizedQuery = normalizeForSearch(query);
-
-    return buildings.filter((building) => {
-      const searchableFields = [
-        building.id,
-        building.name,
-        t(building.translationKey),
-        building.description,
-        building.gridRef,
-        building.address,
-        ...(building.tags ?? []),
-      ]
-        .filter(Boolean)
-        .map((value) => normalizeForSearch(String(value)));
-
-      return searchableFields.some((field) => field.includes(normalizedQuery));
-    });
+    return searchCampusBuildings(buildings, buildingSearch, (building) =>
+      t(building.translationKey),
+    );
   }, [buildingSearch, t]);
 
   // Ensure a non-empty document title for accessibility scanners
@@ -619,30 +598,22 @@ export default function MapClient() {
               <div className="absolute inset-0 z-10">
                 <GoogleMapIntegration
                   ref={googleMapRef}
+                  buildings={buildings}
                   onNavStateChange={setNavState}
                   selectedBuilding={selectedBuilding}
-                />
-                {/* Building Search Overlay for Google Maps */}
-                <GoogleMapBuildingSearch
-                  buildings={sidebarBuildings}
-                  selectedBuilding={selectedBuilding}
-                  onNavigateToBuilding={(building) => {
-                    // Update URL with selected building
+                  travelMode={googleTravelMode}
+                  onTravelModeChange={setGoogleTravelMode}
+                  onSelectBuilding={(building) => {
                     const params = new URLSearchParams(searchParams.toString());
                     params.set('building', building.id);
                     const newUrl = `${window.location.pathname}?${params.toString()}`;
                     window.history.pushState({}, '', newUrl);
                   }}
-                  onStartNavigation={() => {
-                    googleMapRef.current?.startNavigation();
-                  }}
-                  isNavigating={navState?.isNavigating || false}
                 />
               </div>
             )}
 
-            {/* HUD overlays - only show for campus map (Google Maps has its own UI) */}
-            {mapView === 'campus' && (
+            {(mapView === 'campus' || mapView === 'google') && (
               <CampusMapHUD
                 selectedBuilding={selectedBuilding}
                 buildings={sidebarBuildings}
@@ -650,9 +621,20 @@ export default function MapClient() {
                 setBuildingSearch={setBuildingSearch}
                 onCopyShare={copyShareableURL}
                 onExport={handleExport}
-                onStartNavigation={() => campusMapRef.current?.startNavigation()}
+                onStartNavigation={() =>
+                  mapView === 'google'
+                    ? googleMapRef.current?.startNavigation()
+                    : campusMapRef.current?.startNavigation()
+                }
+                onStopNavigation={() =>
+                  mapView === 'google'
+                    ? googleMapRef.current?.stopNavigation()
+                    : campusMapRef.current?.stopNavigation()
+                }
                 isNavigating={navState?.isNavigating || false}
-                isGoogleMode={false}
+                isGoogleMode={mapView === 'google'}
+                travelMode={mapView === 'google' ? googleTravelMode : undefined}
+                onTravelModeChange={mapView === 'google' ? setGoogleTravelMode : undefined}
               />
             )}
           </div>

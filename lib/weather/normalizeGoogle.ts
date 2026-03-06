@@ -114,7 +114,13 @@ interface GoogleCurrentConditions {
 
 interface GoogleForecastHour {
   interval?: { startTime?: string; endTime?: string };
-  displayDateTime?: { year?: number; month?: number; day?: number; hours?: number; utcOffset?: string };
+  displayDateTime?: {
+    year?: number;
+    month?: number;
+    day?: number;
+    hours?: number;
+    utcOffset?: string;
+  };
   isDaytime?: boolean;
   weatherCondition?: GoogleWeatherCondition;
   temperature?: GoogleTemperature;
@@ -130,7 +136,10 @@ interface GoogleHourlyResponse {
 
 // --- Normalizers ---
 
-export function normalizeGoogleCurrent(data: unknown): { current: WeatherCurrent; timezone: string } {
+export function normalizeGoogleCurrent(data: unknown): {
+  current: WeatherCurrent;
+  timezone: string;
+} {
   const d = data as GoogleCurrentConditions;
 
   const wmoCode = toWmoCode(d.weatherCondition?.type);
@@ -168,10 +177,7 @@ export function normalizeGoogleHourly(data: unknown): WeatherHourly | undefined 
   };
 }
 
-export function normalizeGoogleResponse(
-  currentData: unknown,
-  hourlyData: unknown,
-): WeatherResult {
+export function normalizeGoogleResponse(currentData: unknown, hourlyData: unknown): WeatherResult {
   const { current, timezone } = normalizeGoogleCurrent(currentData);
   const hourly = normalizeGoogleHourly(hourlyData);
 

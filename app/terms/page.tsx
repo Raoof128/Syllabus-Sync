@@ -46,7 +46,13 @@ export default function TermsPage() {
               <p className="text-sm text-white/50">{t('terms_last_updated')}</p>
             </div>
             <div className="hidden sm:flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-white/10 border border-white/15">
-              <Image src="/images/shield-icon.svg" alt="" width={28} height={28} aria-hidden="true" />
+              <Image
+                src="/images/shield-icon.svg"
+                alt=""
+                width={28}
+                height={28}
+                aria-hidden="true"
+              />
             </div>
           </div>
 
@@ -270,7 +276,6 @@ export default function TermsPage() {
                 </a>
               </p>
             </section>
-
           </div>
         </div>
       </div>

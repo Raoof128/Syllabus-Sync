@@ -13,12 +13,17 @@ export type Building = {
   position: [number, number]; // [x, y] pixel coordinates for map placement
   description?: string;
   tags?: string[];
+  aliases?: string[];
+  searchTokens?: string[];
   translationKey: TranslationKey;
   descriptionKey: TranslationKey;
   gridRef?: string; // Campus map grid reference (e.g., 'N16', 'O22')
   address?: string; // Physical address on campus
   category?: BuildingCategory;
   location?: GeoLocation; // Real-world GPS coordinates from OSM
+  entranceLocation?: GeoLocation; // Preferred Google/native routing destination
+  accessibilityEntranceLocation?: GeoLocation;
+  googlePlaceId?: string;
   levels?: number; // Number of floors
   wheelchair?: boolean; // Wheelchair accessible
 };

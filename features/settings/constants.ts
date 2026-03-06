@@ -38,4 +38,3 @@ export const QUICK_ACTION_LINKS: {
   { href: '/map', labelKey: 'campusMap', iconKey: 'Map' },
   { href: '/manage-profiles', labelKey: 'manageProfiles', iconKey: 'Users' },
 ];
-

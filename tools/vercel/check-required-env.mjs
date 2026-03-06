@@ -26,8 +26,10 @@ const REQUIRED_KEYS = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   'SUPABASE_SERVICE_ROLE_KEY',
-  // Google Maps Embed (required for consistent in-app map embedding across environments)
-  'NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY',
+  // Google Maps JavaScript + Routes stack
+  'NEXT_PUBLIC_GOOGLE_MAPS_API_KEY',
+  'NEXT_PUBLIC_GOOGLE_MAP_ID',
+  'GOOGLE_ROUTES_API_KEY',
   // Distributed rate limiting (required for production)
   'KV_REST_API_URL',
   'KV_REST_API_TOKEN',

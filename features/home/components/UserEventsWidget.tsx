@@ -45,7 +45,7 @@ const UserEventsWidget = memo(() => {
     const today = startOfDay(now);
     const monthEnd = endOfMonth(now);
 
-    const getEventDate = (event: typeof events[0]): Date | null => {
+    const getEventDate = (event: (typeof events)[0]): Date | null => {
       if (event.startAt) {
         return event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
       }
@@ -139,7 +139,9 @@ const UserEventsWidget = memo(() => {
             >
               {monthEndEvents.length} {tOr('eventsLabel', 'events')}
               {overdueCount > 0 && (
-                <span className="text-red-500 ml-1">({overdueCount} {tOr('overdue', 'overdue')})</span>
+                <span className="text-red-500 ml-1">
+                  ({overdueCount} {tOr('overdue', 'overdue')})
+                </span>
               )}
             </Badge>
           )}

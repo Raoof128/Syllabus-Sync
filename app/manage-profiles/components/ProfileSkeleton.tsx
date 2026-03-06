@@ -64,7 +64,10 @@ export function ProfileSkeleton() {
             <div className="h-5 w-44 rounded bg-mq-border animate-pulse" />
           </div>
           {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center justify-between p-3 rounded-mq border border-mq-border/50">
+            <div
+              key={i}
+              className="flex items-center justify-between p-3 rounded-mq border border-mq-border/50"
+            >
               <div className="flex items-center gap-3">
                 <div className="h-5 w-5 rounded bg-mq-border/50 animate-pulse" />
                 <div className="space-y-1">

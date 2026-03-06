@@ -56,7 +56,6 @@ const SECTIONS: {
   },
 ];
 
-
 function SettingsLayout({ children }: { children?: React.ReactNode }) {
   const isClient = useHydration();
   const router = useRouter();

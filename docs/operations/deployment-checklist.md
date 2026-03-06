@@ -53,7 +53,9 @@ cp .env.example .env.local
 # Required variables:
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-key
-NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY=your-google-maps-embed-api-key
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-js-browser-key
+NEXT_PUBLIC_GOOGLE_MAP_ID=your-google-map-id
+GOOGLE_ROUTES_API_KEY=your-google-routes-server-key
 ```
 
 ### **Step 4: Deploy Application**

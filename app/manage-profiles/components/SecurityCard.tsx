@@ -59,9 +59,7 @@ export const SecurityCard = memo(() => {
                     <Laptop className="h-4 w-4 text-mq-primary" aria-hidden="true" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-semibold text-mq-content">
-                      {t('manageSessions')}
-                    </h3>
+                    <h3 className="text-sm font-semibold text-mq-content">{t('manageSessions')}</h3>
                     <p className="text-xs text-mq-content-tertiary leading-relaxed">
                       {t('manageSessionsDesc')}
                     </p>

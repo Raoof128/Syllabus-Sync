@@ -32,14 +32,18 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
 
   const stats = useMemo(() => {
     // Safety check - ensure events is a valid array
-    const safeEvents = Array.isArray(events) ? events.filter(e => e && typeof e.category === 'string') : [];
+    const safeEvents = Array.isArray(events)
+      ? events.filter((e) => e && typeof e.category === 'string')
+      : [];
 
     const now = new Date();
     const endOfWeek = new Date(now);
     endOfWeek.setDate(now.getDate() + (7 - now.getDay()));
     endOfWeek.setHours(23, 59, 59, 999);
 
-    const thisWeekEvents = safeEvents.filter((e) => e.startAt && e.startAt >= now && e.startAt <= endOfWeek);
+    const thisWeekEvents = safeEvents.filter(
+      (e) => e.startAt && e.startAt >= now && e.startAt <= endOfWeek,
+    );
     const freeFood = safeEvents.filter((e) => e.category === 'Free Food');
     const career = safeEvents.filter((e) => e.category === 'Career');
     const social = safeEvents.filter((e) => e.category === 'Social');

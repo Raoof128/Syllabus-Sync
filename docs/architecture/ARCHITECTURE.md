@@ -16,7 +16,8 @@
 │  Zod Validation · Auth Middleware · Proxy Layer              │
 ├──────────────────────────────────────────────────────────────┤
 │  External Services                                           │
-│  Supabase (Postgres+RLS) · Resend · Google Weather · ORS    │
+│  Supabase (Postgres+RLS) · Resend · Google Maps Platform    │
+│  Google Weather · ORS (campus mode only)                    │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -45,7 +46,7 @@ Business logic is co-located in `features/` by domain (map, calendar, auth, gami
 
 - **Server Components** handle data fetching and sensitive operations.
 - **Client Components** (`"use client"`) handle interactivity, state, and browser APIs.
-- **API Routes** proxy third-party keys (Google Weather, ORS) so secrets never reach the browser.
+- **API Routes** proxy third-party keys (Google Weather, Google Routes, ORS) so secrets never reach the browser.
 
 ### 3. State Management (Zustand)
 
@@ -62,7 +63,14 @@ Each domain has a dedicated Zustand store (`lib/store/`). Stores use `persist` m
 
 Third-party integrations (weather, routing) implement a common `Provider` interface, making them swappable without client-side changes.
 
-### 6. MQ Design System
+### 6. Campus-First Maps Architecture
+
+- `building.ts` remains the canonical registry for campus destinations, aliases, and routing coordinates.
+- The Leaflet campus renderer remains available for the local raster experience.
+- Google mode now uses the Maps JavaScript API for map rendering and the Google Routes API for walk/drive/bike/transit route computation.
+- `MapClient` still owns the layout shell, URL state, and shared HUD.
+
+### 7. MQ Design System
 
 Custom Tailwind tokens (`mq-*` prefix) encode Macquarie University brand colours, typography, and spacing. Dark mode via class strategy.
 
