@@ -181,12 +181,12 @@ function buildComputeRoutesBody(
   const body: Record<string, unknown> = {
     origin: {
       location: {
-        latLng: origin,
+        latLng: { latitude: origin.lat, longitude: origin.lng },
       },
     },
     destination: {
       location: {
-        latLng: destination,
+        latLng: { latitude: destination.lat, longitude: destination.lng },
       },
     },
     travelMode,
