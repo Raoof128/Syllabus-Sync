@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Bài kiểm tra đã được cập nhật",
+  "examAdded": "Bài kiểm tra đã được thêm",
+  "examDeleted": "Bài kiểm tra đã bị xóa",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Đăng ký",
   "category_recess": "Nghỉ",
   "eventsLabel": "sự kiện",
-  "contact_helpfulLinks": "Liên kết hữu ích"
+  "contact_helpfulLinks": "Liên kết hữu ích",
+  "examUpdatedDesc": "\"{{title}}\" đã được cập nhật thành công.",
+  "examAddedDesc": "\"{{title}}\" đã được thêm thành công.",
+  "examDeletedDesc": "\"{{title}}\" đã bị xóa.",
+  "viewEventAria": "Xem sự kiện: {{title}}"
 }

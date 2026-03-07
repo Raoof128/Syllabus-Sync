@@ -73,7 +73,7 @@ export const PublicEventCard = memo(
     };
 
     const getTimeRange = () => {
-      if (event.allDay) return 'All Day';
+      if (event.allDay) return t('allDay');
       const start = formatTime(event.startAt);
       if (event.endAt) {
         const end = formatTime(event.endAt);
@@ -129,7 +129,7 @@ export const PublicEventCard = memo(
 
               {event.isFeatured && (
                 <Badge className="bg-linear-to-r from-amber-400 to-orange-500 text-white border-0 text-[10px] uppercase tracking-wide font-semibold">
-                  ✨ Featured
+                  ✨ {t('featured')}
                 </Badge>
               )}
             </div>
@@ -201,9 +201,7 @@ export const PublicEventCard = memo(
               ) : (
                 <Plus className="h-4 w-4" />
               )}
-              {isAdded
-                ? t('addedToCalendar') || 'Added to Calendar'
-                : t('addToCalendar') || 'Add to Calendar'}
+              {isAdded ? t('addedToCalendar') : t('addToCalendar')}
             </Button>
 
             {event.building && (
@@ -216,7 +214,7 @@ export const PublicEventCard = memo(
               >
                 <Link
                   href={`/map?building=${encodeURIComponent(event.building)}${event.room ? `&room=${encodeURIComponent(event.room)}` : ''}`}
-                  aria-label={`Navigate to ${event.building}`}
+                  aria-label={t('navigateTo', { location: event.building })}
                 >
                   <Navigation className="h-4 w-4" />
                 </Link>

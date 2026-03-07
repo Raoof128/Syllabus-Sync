@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Іспит оновлено",
+  "examAdded": "Іспит додано",
+  "examDeleted": "Іспит видалено",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Зарахування",
   "category_recess": "Перерва",
   "eventsLabel": "події",
-  "contact_helpfulLinks": "Корисні посилання"
+  "contact_helpfulLinks": "Корисні посилання",
+  "examUpdatedDesc": "«{{title}}» успішно оновлено.",
+  "examAddedDesc": "«{{title}}» успішно додано.",
+  "examDeletedDesc": "«{{title}}» видалено.",
+  "viewEventAria": "Переглянути подію: {{title}}"
 }

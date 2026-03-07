@@ -65,7 +65,7 @@ export const EventDetailModal = memo(
     };
 
     const getTimeRange = () => {
-      if (event.allDay) return 'All Day';
+      if (event.allDay) return t('allDay');
       const start = formatTime(event.startAt);
       if (event.endAt) {
         const end = formatTime(event.endAt);
@@ -110,7 +110,7 @@ export const EventDetailModal = memo(
               {/* Description */}
               <div>
                 <h4 className="text-sm font-semibold text-mq-content-tertiary uppercase tracking-wide mb-2">
-                  {t('description') || 'Description'}
+                  {t('description')}
                 </h4>
                 <p className="text-mq-content leading-relaxed">{event.description}</p>
               </div>
@@ -123,7 +123,7 @@ export const EventDetailModal = memo(
                   </div>
                   <div>
                     <p className="text-xs text-mq-content-tertiary font-medium uppercase">
-                      {t('date') || 'Date'}
+                      {t('date')}
                     </p>
                     <p className="text-sm font-semibold text-mq-content">
                       {formatFullDate(event.startAt)}
@@ -137,7 +137,7 @@ export const EventDetailModal = memo(
                   </div>
                   <div>
                     <p className="text-xs text-mq-content-tertiary font-medium uppercase">
-                      {t('time') || 'Time'}
+                      {t('time')}
                     </p>
                     <p className="text-sm font-semibold text-mq-content">{getTimeRange()}</p>
                   </div>
@@ -151,14 +151,18 @@ export const EventDetailModal = memo(
                 </div>
                 <div className="flex-1">
                   <p className="text-xs text-mq-content-tertiary font-medium uppercase mb-1">
-                    {t('location') || 'Location'}
+                    {t('location')}
                   </p>
                   <p className="text-sm font-semibold text-mq-content mb-1">{event.location}</p>
                   {buildingInfo && (
                     <div className="flex items-center gap-2 text-xs text-mq-content-secondary">
                       <Building2 className="h-3.5 w-3.5" />
                       <span>{buildingInfo.name}</span>
-                      {event.room && <span>• Room {event.room}</span>}
+                      {event.room && (
+                        <span>
+                          • {t('room')} {event.room}
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -170,7 +174,7 @@ export const EventDetailModal = memo(
                     onClick={() => setNavDialogOpen(true)}
                   >
                     <Navigation className="h-4 w-4 mr-1.5" />
-                    {t('navigate') || 'Navigate'}
+                    {t('navigate')}
                   </Button>
                 )}
               </div>
@@ -191,25 +195,24 @@ export const EventDetailModal = memo(
                   {isAdding ? (
                     <>
                       <Loader2 className="h-5 w-5 animate-spin" />
-                      {t('adding') || 'Adding...'}
+                      {t('adding')}
                     </>
                   ) : isAdded ? (
                     <>
                       <Check className="h-5 w-5" />
-                      {t('addedToCalendar') || 'Added to Your Calendar'}
+                      {t('addedToCalendar')}
                     </>
                   ) : (
                     <>
                       <Plus className="h-5 w-5" />
-                      {t('addToMyCalendar') || 'Add to My Calendar'}
+                      {t('addToMyCalendar')}
                     </>
                   )}
                 </Button>
 
                 {isAdded && (
                   <p className="text-xs text-mq-content-tertiary text-center mt-2">
-                    {t('eventAddedInfo') ||
-                      'This event has been added to your personal calendar. You can view it in the Calendar tab.'}
+                    {t('eventAddedInfo')}
                   </p>
                 )}
               </div>

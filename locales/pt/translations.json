@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Exame atualizado",
+  "examAdded": "Exame adicionado",
+  "examDeleted": "Exame excluído",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Matrícula",
   "category_recess": "Recesso",
   "eventsLabel": "eventos",
-  "contact_helpfulLinks": "Links úteis"
+  "contact_helpfulLinks": "Links úteis",
+  "examUpdatedDesc": "\"{{title}}\" foi atualizado com sucesso.",
+  "examAddedDesc": "\"{{title}}\" foi adicionado com sucesso.",
+  "examDeletedDesc": "\"{{title}}\" foi eliminado.",
+  "viewEventAria": "Ver evento: {{title}}"
 }

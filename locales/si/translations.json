@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "විභාගය යාවත්කාලීන කරන ලදි",
+  "examAdded": "විභාගය එකතු කරන ලදි",
+  "examDeleted": "විභාගය මකා දමන ලදි",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "ලියාපදිංචිය",
   "category_recess": "විවේකය",
   "eventsLabel": "සිදුවීම්",
-  "contact_helpfulLinks": "ප්‍රයෝජනවත් සබැඳි"
+  "contact_helpfulLinks": "ප්‍රයෝජනවත් සබැඳි",
+  "examUpdatedDesc": "\"{{title}}\" සාර්ථකව යාවත්කාලීන කරන ලදී.",
+  "examAddedDesc": "\"{{title}}\" සාර්ථකව එකතු කරන ලදී.",
+  "examDeletedDesc": "\"{{title}}\" මකා දමන ලදී.",
+  "viewEventAria": "සිදුවීම බලන්න: {{title}}"
 }

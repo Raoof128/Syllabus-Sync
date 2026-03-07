@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "தேர்வு புதுப்பிக்கப்பட்டது",
+  "examAdded": "தேர்வு சேர்க்கப்பட்டது",
+  "examDeleted": "தேர்வு நீக்கப்பட்டது",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "சேர்க்கை",
   "category_recess": "ஓய்வு",
   "eventsLabel": "நிகழ்வுகள்",
-  "contact_helpfulLinks": "பயனுள்ள இணைப்புகள்"
+  "contact_helpfulLinks": "பயனுள்ள இணைப்புகள்",
+  "examUpdatedDesc": "\"{{title}}\" வெற்றிகரமாக புதுப்பிக்கப்பட்டது.",
+  "examAddedDesc": "\"{{title}}\" வெற்றிகரமாக சேர்க்கப்பட்டது.",
+  "examDeletedDesc": "\"{{title}}\" நீக்கப்பட்டது.",
+  "viewEventAria": "நிகழ்வைக் காண்க: {{title}}"
 }

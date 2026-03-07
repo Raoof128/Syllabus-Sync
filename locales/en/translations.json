@@ -2359,5 +2359,6 @@
   "assignmentDeletedDesc": "\"{{title}}\" has been deleted.",
   "examUpdatedDesc": "\"{{title}}\" has been updated successfully.",
   "examAddedDesc": "\"{{title}}\" has been added successfully.",
-  "examDeletedDesc": "\"{{title}}\" has been deleted."
+  "examDeletedDesc": "\"{{title}}\" has been deleted.",
+  "viewEventAria": "View event: {{title}}"
 }

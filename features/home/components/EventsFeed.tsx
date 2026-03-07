@@ -60,7 +60,7 @@ const EventsFeed = memo(() => {
   };
 
   const getTimeRange = (event: PublicEvent) => {
-    if (event.allDay) return 'All Day';
+    if (event.allDay) return t('allDay');
     const start = formatTime(event.startAt);
     if (event.endAt) {
       const end = formatTime(event.endAt);
@@ -137,7 +137,7 @@ const EventsFeed = memo(() => {
                   type="button"
                   onClick={() => handleEventClick(event)}
                   className={`${baseClassName} cursor-pointer text-left w-full`}
-                  aria-label={`View event: ${event.title}`}
+                  aria-label={t('viewEventAria', { title: event.title })}
                 >
                   {eventContent}
                 </button>

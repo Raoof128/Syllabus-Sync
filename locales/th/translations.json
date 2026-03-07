@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "อัปเดตการสอบแล้ว",
+  "examAdded": "เพิ่มการสอบแล้ว",
+  "examDeleted": "ลบการสอบแล้ว",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "การลงทะเบียน",
   "category_recess": "พักการเรียน",
   "eventsLabel": "กิจกรรม",
-  "contact_helpfulLinks": "ลิงก์ที่เป็นประโยชน์"
+  "contact_helpfulLinks": "ลิงก์ที่เป็นประโยชน์",
+  "examUpdatedDesc": "\"{{title}}\" อัปเดตสำเร็จแล้ว",
+  "examAddedDesc": "\"{{title}}\" เพิ่มสำเร็จแล้ว",
+  "examDeletedDesc": "\"{{title}}\" ถูกลบแล้ว",
+  "viewEventAria": "ดูเหตุการณ์: {{title}}"
 }

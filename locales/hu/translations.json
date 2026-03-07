@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "A vizsga frissítve",
+  "examAdded": "A vizsga hozzáadva",
+  "examDeleted": "A vizsga törölve",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Beiratkozás",
   "category_recess": "Szünet",
   "eventsLabel": "események",
-  "contact_helpfulLinks": "Hasznos linkek"
+  "contact_helpfulLinks": "Hasznos linkek",
+  "examUpdatedDesc": "„{{title}}\" sikeresen frissítve.",
+  "examAddedDesc": "„{{title}}\" sikeresen hozzáadva.",
+  "examDeletedDesc": "„{{title}}\" törölve.",
+  "viewEventAria": "Esemény megtekintése: {{title}}"
 }

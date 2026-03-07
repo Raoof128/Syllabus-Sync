@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "امتحان کو اپ ڈیٹ کیا گیا",
+  "examAdded": "امتحان شامل کیا گیا",
+  "examDeleted": "امتحان حذف کیا گیا",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "داخلہ",
   "category_recess": "وقفہ",
   "eventsLabel": "تقریبات",
-  "contact_helpfulLinks": "مفید روابط"
+  "contact_helpfulLinks": "مفید روابط",
+  "examUpdatedDesc": "\"{{title}}\" کامیابی سے اپ ڈیٹ ہو گیا۔",
+  "examAddedDesc": "\"{{title}}\" کامیابی سے شامل ہو گیا۔",
+  "examDeletedDesc": "\"{{title}}\" حذف ہو گیا۔",
+  "viewEventAria": "تقریب دیکھیں: {{title}}"
 }

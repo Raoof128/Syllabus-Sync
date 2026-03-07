@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "تم تحديث الامتحان",
+  "examAdded": "تمت إضافة الامتحان",
+  "examDeleted": "تم حذف الامتحان",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "التسجيل",
   "category_recess": "استراحة",
   "eventsLabel": "أحداث",
-  "contact_helpfulLinks": "روابط مفيدة"
+  "contact_helpfulLinks": "روابط مفيدة",
+  "examUpdatedDesc": "\"{{title}}\" تم تحديثه بنجاح.",
+  "examAddedDesc": "\"{{title}}\" تم إضافته بنجاح.",
+  "examDeletedDesc": "\"{{title}}\" تم حذفه.",
+  "viewEventAria": "عرض الحدث: {{title}}"
 }

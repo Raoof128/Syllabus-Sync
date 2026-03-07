@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Peperiksaan dikemaskini",
+  "examAdded": "Peperiksaan ditambah",
+  "examDeleted": "Peperiksaan dipadam",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Pendaftaran",
   "category_recess": "Rehat",
   "eventsLabel": "acara",
-  "contact_helpfulLinks": "Pautan berguna"
+  "contact_helpfulLinks": "Pautan berguna",
+  "examUpdatedDesc": "\"{{title}}\" berjaya dikemaskini.",
+  "examAddedDesc": "\"{{title}}\" berjaya ditambahkan.",
+  "examDeletedDesc": "\"{{title}}\" telah dipadam.",
+  "viewEventAria": "Lihat acara: {{title}}"
 }

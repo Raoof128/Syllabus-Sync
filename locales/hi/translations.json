@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "परीक्षा अपडेट हुई",
+  "examAdded": "परीक्षा जोड़ी गई",
+  "examDeleted": "परीक्षा हटाई गई",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "नामांकन",
   "category_recess": "अवकाश",
   "eventsLabel": "कार्यक्रम",
-  "contact_helpfulLinks": "उपयोगी लिंक"
+  "contact_helpfulLinks": "उपयोगी लिंक",
+  "examUpdatedDesc": "\"{{title}}\" सफलतापूर्वक अपडेट किया गया।",
+  "examAddedDesc": "\"{{title}}\" सफलतापूर्वक जोड़ा गया।",
+  "examDeletedDesc": "\"{{title}}\" हटा दिया गया।",
+  "viewEventAria": "इवेंट देखें: {{title}}"
 }

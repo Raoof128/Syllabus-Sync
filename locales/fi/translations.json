@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Tentti päivitetty",
+  "examAdded": "Tentti lisätty",
+  "examDeleted": "Tentti poistettu",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Ilmoittautuminen",
   "category_recess": "Tauko",
   "eventsLabel": "tapahtumat",
-  "contact_helpfulLinks": "Hyödylliset linkit"
+  "contact_helpfulLinks": "Hyödylliset linkit",
+  "examUpdatedDesc": "\"{{title}}\" päivitettiin onnistuneesti.",
+  "examAddedDesc": "\"{{title}}\" lisättiin onnistuneesti.",
+  "examDeletedDesc": "\"{{title}}\" poistettiin.",
+  "viewEventAria": "Näytä tapahtuma: {{title}}"
 }

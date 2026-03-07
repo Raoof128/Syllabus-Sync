@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "시험이 업데이트되었습니다",
+  "examAdded": "시험이 추가되었습니다",
+  "examDeleted": "시험이 삭제되었습니다",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "수강신청",
   "category_recess": "휴식",
   "eventsLabel": "이벤트",
-  "contact_helpfulLinks": "유용한 링크"
+  "contact_helpfulLinks": "유용한 링크",
+  "examUpdatedDesc": "\"{{title}}\"이(가) 성공적으로 업데이트되었습니다.",
+  "examAddedDesc": "\"{{title}}\"이(가) 성공적으로 추가되었습니다.",
+  "examDeletedDesc": "\"{{title}}\"이(가) 삭제되었습니다.",
+  "viewEventAria": "이벤트 보기: {{title}}"
 }

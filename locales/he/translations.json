@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "הבחינה עודכנה",
+  "examAdded": "הבחינה נוספה",
+  "examDeleted": "הבחינה נמחקה",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "רישום",
   "category_recess": "הפסקה",
   "eventsLabel": "אירועים",
-  "contact_helpfulLinks": "קישורים שימושיים"
+  "contact_helpfulLinks": "קישורים שימושיים",
+  "examUpdatedDesc": "«{{title}}» עודכן בהצלחה.",
+  "examAddedDesc": "«{{title}}» נוסף בהצלחה.",
+  "examDeletedDesc": "«{{title}}» נמחק.",
+  "viewEventAria": "הצג אירוע: {{title}}"
 }

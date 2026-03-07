@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "পরীক্ষা আপডেট হয়েছে",
+  "examAdded": "পরীক্ষা যোগ করা হয়েছে",
+  "examDeleted": "পরীক্ষা মুছে ফেলা হয়েছে",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "নথিভুক্তি",
   "category_recess": "বিরতি",
   "eventsLabel": "ইভেন্টগুলি",
-  "contact_helpfulLinks": "সহায়ক লিঙ্ক"
+  "contact_helpfulLinks": "সহায়ক লিঙ্ক",
+  "examUpdatedDesc": "\"{{title}}\" সফলভাবে আপডেট করা হয়েছে।",
+  "examAddedDesc": "\"{{title}}\" সফলভাবে যোগ করা হয়েছে।",
+  "examDeletedDesc": "\"{{title}}\" মুছে ফেলা হয়েছে।",
+  "viewEventAria": "ইভেন্ট দেখুন: {{title}}"
 }

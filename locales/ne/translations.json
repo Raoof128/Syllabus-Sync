@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "परीक्षा अद्यावधिक भयो",
+  "examAdded": "परीक्षा थपियो",
+  "examDeleted": "परीक्षा मेटियो",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "भर्ना",
   "category_recess": "विश्राम",
   "eventsLabel": "कार्यक्रमहरू",
-  "contact_helpfulLinks": "उपयोगी लिंकहरू"
+  "contact_helpfulLinks": "उपयोगी लिंकहरू",
+  "examUpdatedDesc": "\"{{title}}\" सफलतापूर्वक अपडेट गरियो।",
+  "examAddedDesc": "\"{{title}}\" सफलतापूर्वक थपियो।",
+  "examDeletedDesc": "\"{{title}}\" मेटाइयो।",
+  "viewEventAria": "कार्यक्रम हेर्नुहोस्: {{title}}"
 }

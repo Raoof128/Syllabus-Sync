@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Toets bijgewerkt",
+  "examAdded": "Toets toegevoegd",
+  "examDeleted": "Toets verwijderd",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Inschrijving",
   "category_recess": "Pauze",
   "eventsLabel": "evenementen",
-  "contact_helpfulLinks": "Nuttige links"
+  "contact_helpfulLinks": "Nuttige links",
+  "examUpdatedDesc": "\"{{title}}\" is succesvol bijgewerkt.",
+  "examAddedDesc": "\"{{title}}\" is succesvol toegevoegd.",
+  "examDeletedDesc": "\"{{title}}\" is verwijderd.",
+  "viewEventAria": "Bekijk evenement: {{title}}"
 }

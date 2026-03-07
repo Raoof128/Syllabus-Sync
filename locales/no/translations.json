@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Eksamen oppdatert",
+  "examAdded": "Eksamen lagt til",
+  "examDeleted": "Eksamen slettet",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Påmelding",
   "category_recess": "Pause",
   "eventsLabel": "arrangementer",
-  "contact_helpfulLinks": "Nyttige lenker"
+  "contact_helpfulLinks": "Nyttige lenker",
+  "examUpdatedDesc": "\"{{title}}\" ble oppdatert.",
+  "examAddedDesc": "\"{{title}}\" ble lagt til.",
+  "examDeletedDesc": "\"{{title}}\" ble slettet.",
+  "viewEventAria": "Se arrangement: {{title}}"
 }

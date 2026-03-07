@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Examen actualizat",
+  "examAdded": "Examen adăugat",
+  "examDeleted": "Examen șters",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Înscriere",
   "category_recess": "Pauză",
   "eventsLabel": "evenimente",
-  "contact_helpfulLinks": "Linkuri utile"
+  "contact_helpfulLinks": "Linkuri utile",
+  "examUpdatedDesc": "\"{{title}}\" a fost actualizat cu succes.",
+  "examAddedDesc": "\"{{title}}\" a fost adăugat cu succes.",
+  "examDeletedDesc": "\"{{title}}\" a fost șters.",
+  "viewEventAria": "Vizualizați evenimentul: {{title}}"
 }

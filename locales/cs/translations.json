@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Zkouška aktualizována",
+  "examAdded": "Zkouška přidána",
+  "examDeleted": "Zkouška smazána",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Zápis",
   "category_recess": "Přestávka",
   "eventsLabel": "události",
-  "contact_helpfulLinks": "Užitečné odkazy"
+  "contact_helpfulLinks": "Užitečné odkazy",
+  "examUpdatedDesc": "„{{title}}\" byl úspěšně aktualizován.",
+  "examAddedDesc": "„{{title}}\" byl úspěšně přidán.",
+  "examDeletedDesc": "„{{title}}\" byl smazán.",
+  "viewEventAria": "Zobrazit událost: {{title}}"
 }

@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "試験が更新されました",
+  "examAdded": "試験が追加されました",
+  "examDeleted": "試験が削除されました",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "履修登録",
   "category_recess": "休暇",
   "eventsLabel": "イベント",
-  "contact_helpfulLinks": "役立つリンク"
+  "contact_helpfulLinks": "役立つリンク",
+  "examUpdatedDesc": "「{{title}}」が正常に更新されました。",
+  "examAddedDesc": "「{{title}}」が正常に追加されました。",
+  "examDeletedDesc": "「{{title}}」が削除されました。",
+  "viewEventAria": "イベントを見る：{{title}}"
 }

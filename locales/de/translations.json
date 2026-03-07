@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Prüfung aktualisiert",
+  "examAdded": "Prüfung hinzugefügt",
+  "examDeleted": "Prüfung gelöscht",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Einschreibung",
   "category_recess": "Pause",
   "eventsLabel": "Veranstaltungen",
-  "contact_helpfulLinks": "Hilfreiche Links"
+  "contact_helpfulLinks": "Hilfreiche Links",
+  "examUpdatedDesc": "„{{title}}\" wurde erfolgreich aktualisiert.",
+  "examAddedDesc": "„{{title}}\" wurde erfolgreich hinzugefügt.",
+  "examDeletedDesc": "„{{title}}\" wurde gelöscht.",
+  "viewEventAria": "Veranstaltung anzeigen: {{title}}"
 }

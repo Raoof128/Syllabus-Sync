@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "Η εξέταση ενημερώθηκε",
+  "examAdded": "Η εξέταση προστέθηκε",
+  "examDeleted": "Η εξέταση διαγράφηκε",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "Εγγραφή",
   "category_recess": "Διάλειμμα",
   "eventsLabel": "εκδηλώσεις",
-  "contact_helpfulLinks": "Χρήσιμοι σύνδεσμοι"
+  "contact_helpfulLinks": "Χρήσιμοι σύνδεσμοι",
+  "examUpdatedDesc": "«{{title}}» ενημερώθηκε επιτυχώς.",
+  "examAddedDesc": "«{{title}}» προστέθηκε επιτυχώς.",
+  "examDeletedDesc": "«{{title}}» διαγράφηκε.",
+  "viewEventAria": "Προβολή εκδήλωσης: {{title}}"
 }

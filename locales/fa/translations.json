@@ -714,9 +714,9 @@
   "examDate": "Exam Date",
   "examTime": "Exam Time",
   "examTitlePlaceholder": "e.g., Final Exam",
-  "examUpdated": "Exam Updated",
-  "examAdded": "Exam Added",
-  "examDeleted": "Exam Deleted",
+  "examUpdated": "آزمون به‌روزرسانی شد",
+  "examAdded": "آزمون اضافه شد",
+  "examDeleted": "آزمون حذف شد",
   "editExam": "Edit Exam",
   "updateExamDetails": "Update the exam details below.",
   "fillExamDetails": "Fill in the exam details below.",
@@ -2356,5 +2356,9 @@
   "category_enrollment": "ثبت‌نام",
   "category_recess": "تعطیلات",
   "eventsLabel": "رویدادها",
-  "contact_helpfulLinks": "پیوندهای مفید"
+  "contact_helpfulLinks": "پیوندهای مفید",
+  "examUpdatedDesc": "«{{title}}» با موفقیت به‌روزرسانی شد.",
+  "examAddedDesc": "«{{title}}» با موفقیت اضافه شد.",
+  "examDeletedDesc": "«{{title}}» حذف شد.",
+  "viewEventAria": "مشاهده رویداد: {{title}}"
 }
