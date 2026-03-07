@@ -237,9 +237,13 @@ export function useCalendarHighlights(
 
   // 5. Highlighted Widget
   const highlightedWidget = useMemo(() => searchParams.get('highlightWidget'), [searchParams]);
+  // When an `action` param is also present, the FAB quick-add flow is active and
+  // CalendarWidgets handles highlight + scroll + form open. Skip here to avoid
+  // conflicting replaceState calls that can cancel CalendarWidgets' timers.
+  const actionParam = useMemo(() => searchParams.get('action'), [searchParams]);
 
   useEffect(() => {
-    if (!highlightedWidget) return;
+    if (!highlightedWidget || actionParam) return;
 
     const scrollTimer = window.setTimeout(() => {
       if (highlightedWidget === 'units') {
@@ -257,7 +261,7 @@ export function useCalendarHighlights(
       clearTimeout(scrollTimer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedWidget, scrollIfNotVisible]);
+  }, [highlightedWidget, actionParam, scrollIfNotVisible]);
 
   return {
     unitsWidgetRef,

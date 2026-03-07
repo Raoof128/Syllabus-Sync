@@ -240,6 +240,19 @@ export default function CalendarWidgets({
     onAddTodoRef.current = onAddTodo;
   }, [onAddUnit, onAddAssignment, onAddExam, onAddEvent, onAddTodo]);
 
+  // Refs to hold timer IDs — kept outside the effect so that re-renders triggered
+  // by replaceState (Next.js 16 syncs replaceState → router → re-render) do NOT
+  // cancel the in-flight scroll/highlight/open-form work.
+  const fabTimersRef = React.useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Cleanup all FAB timers on unmount only
+  useEffect(() => {
+    return () => {
+      fabTimersRef.current.forEach(clearTimeout);
+      fabTimersRef.current = [];
+    };
+  }, []);
+
   useEffect(() => {
     if (!highlightedWidget || !actionParam) return;
     if (hasProcessedActionRef.current === actionParam) return;
@@ -247,15 +260,13 @@ export default function CalendarWidgets({
     // Mark as consumed immediately — this is the one-shot guard
     hasProcessedActionRef.current = actionParam;
 
-    // Immediately strip both action AND highlightWidget from URL to prevent any re-trigger
-    const url = new URL(window.location.href);
-    url.searchParams.delete('action');
-    url.searchParams.delete('highlightWidget');
-    window.history.replaceState({}, '', url.toString());
-
     // Capture values for use inside timers (independent of future renders)
     const widget = highlightedWidget;
     const action = actionParam;
+
+    // Clear any previous FAB timers
+    fabTimersRef.current.forEach(clearTimeout);
+    fabTimersRef.current = [];
 
     // Scroll to the appropriate widget (only if not visible) and activate highlight
     const activateTimer = setTimeout(() => {
@@ -283,7 +294,7 @@ export default function CalendarWidgets({
       }
 
       // Trigger the appropriate add action after scroll
-      setTimeout(() => {
+      const actionTimer = setTimeout(() => {
         if (action === 'add-unit') {
           onAddUnitRef.current();
         } else if (action === 'add-assignment') {
@@ -295,18 +306,27 @@ export default function CalendarWidgets({
         } else if (action === 'add-todo') {
           onAddTodoRef.current?.();
         }
+
+        // Strip URL params AFTER the action has been triggered (not before).
+        // This avoids the re-render/cleanup race that would cancel our timers.
+        const url = new URL(window.location.href);
+        url.searchParams.delete('action');
+        url.searchParams.delete('highlightWidget');
+        window.history.replaceState({}, '', url.toString());
       }, 300);
+      fabTimersRef.current.push(actionTimer);
     }, 100);
+    fabTimersRef.current.push(activateTimer);
 
     // Clear highlight after 3 seconds (highlight is visual-only, action already consumed)
     const clearTimer = setTimeout(() => {
       setSectionHighlightActive(null);
     }, 3000);
+    fabTimersRef.current.push(clearTimer);
 
-    return () => {
-      clearTimeout(activateTimer);
-      clearTimeout(clearTimer);
-    };
+    // Do NOT return a cleanup that cancels timers — the timers are managed via
+    // fabTimersRef and cleaned up on unmount only. This prevents the Next.js 16
+    // replaceState → re-render → effect-cleanup chain from cancelling our work.
   }, [highlightedWidget, actionParam, unitsWidgetRef, assignmentsWidgetRef, scrollIfNotVisible]);
 
   return (
