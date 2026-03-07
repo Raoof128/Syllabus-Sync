@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "„{{title}}\" wurde erfolgreich aktualisiert.",
   "examAddedDesc": "„{{title}}\" wurde erfolgreich hinzugefügt.",
   "examDeletedDesc": "„{{title}}\" wurde gelöscht.",
-  "viewEventAria": "Veranstaltung anzeigen: {{title}}"
+  "viewEventAria": "Veranstaltung anzeigen: {{title}}",
+  "reloading": "Wird neu geladen...",
+  "reloadFromServer": "Vom Server neu laden",
+  "unsavedChanges": "Sie haben ungespeicherte Änderungen",
+  "discard": "Verwerfen",
+  "reminder_15minBefore": "15 Minuten vorher",
+  "reminder_30minBefore": "30 Minuten vorher",
+  "reminder_1hourBefore": "1 Stunde vorher",
+  "reminder_2hoursBefore": "2 Stunden vorher",
+  "reminder_1dayBefore": "1 Tag vorher",
+  "reminder_2daysBefore": "2 Tage vorher",
+  "reminder_1weekBefore": "1 Woche vorher",
+  "reminder_customDateTime": "Benutzerdefiniertes Datum & Uhrzeit"
 }

@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" päivitettiin onnistuneesti.",
   "examAddedDesc": "\"{{title}}\" lisättiin onnistuneesti.",
   "examDeletedDesc": "\"{{title}}\" poistettiin.",
-  "viewEventAria": "Näytä tapahtuma: {{title}}"
+  "viewEventAria": "Näytä tapahtuma: {{title}}",
+  "reloading": "Ladataan uudelleen...",
+  "reloadFromServer": "Lataa uudelleen palvelimelta",
+  "unsavedChanges": "Sinulla on tallentamattomia muutoksia",
+  "discard": "Hylkää",
+  "reminder_15minBefore": "15 minuuttia ennen",
+  "reminder_30minBefore": "30 minuuttia ennen",
+  "reminder_1hourBefore": "1 tunti ennen",
+  "reminder_2hoursBefore": "2 tuntia ennen",
+  "reminder_1dayBefore": "1 päivä ennen",
+  "reminder_2daysBefore": "2 päivää ennen",
+  "reminder_1weekBefore": "1 viikko ennen",
+  "reminder_customDateTime": "Mukautettu päivämäärä ja aika"
 }

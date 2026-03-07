@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "«{{title}}» успішно оновлено.",
   "examAddedDesc": "«{{title}}» успішно додано.",
   "examDeletedDesc": "«{{title}}» видалено.",
-  "viewEventAria": "Переглянути подію: {{title}}"
+  "viewEventAria": "Переглянути подію: {{title}}",
+  "reloading": "Перезавантаження...",
+  "reloadFromServer": "Перезавантажити з сервера",
+  "unsavedChanges": "У вас є незбережені зміни",
+  "discard": "Скасувати",
+  "reminder_15minBefore": "За 15 хвилин",
+  "reminder_30minBefore": "За 30 хвилин",
+  "reminder_1hourBefore": "За 1 годину",
+  "reminder_2hoursBefore": "За 2 години",
+  "reminder_1dayBefore": "За 1 день",
+  "reminder_2daysBefore": "За 2 дні",
+  "reminder_1weekBefore": "За 1 тиждень",
+  "reminder_customDateTime": "Налаштовані дата та час"
 }

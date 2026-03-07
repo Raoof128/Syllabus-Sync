@@ -90,7 +90,7 @@ export default function ManageProfilesPage() {
             className="flex items-center gap-1.5 text-xs text-mq-content-tertiary hover:text-mq-content-secondary transition-colors disabled:opacity-40"
           >
             <RefreshCw className={`h-3 w-3 ${isProfileLoading ? 'animate-spin' : ''}`} />
-            {isProfileLoading ? 'Reloading…' : 'Reload from server'}
+            {isProfileLoading ? t('reloading') : t('reloadFromServer')}
           </button>
         </div>
       </div>
@@ -101,7 +101,7 @@ export default function ManageProfilesPage() {
           <div className="bg-mq-card-background/95 backdrop-blur-md border-t border-mq-border shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
             <div className="container mx-auto max-w-4xl px-4 py-3 flex items-center justify-between gap-3">
               <p className="text-sm text-mq-content-secondary hidden sm:block">
-                You have unsaved changes
+                {t('unsavedChanges')}
               </p>
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Button
@@ -111,7 +111,7 @@ export default function ManageProfilesPage() {
                   disabled={isSaving}
                   className="flex-1 sm:flex-none"
                 >
-                  Discard
+                  {t('discard')}
                 </Button>
                 <Button
                   onClick={saveProfile}

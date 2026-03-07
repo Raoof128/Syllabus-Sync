@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" a fost actualizat cu succes.",
   "examAddedDesc": "\"{{title}}\" a fost adăugat cu succes.",
   "examDeletedDesc": "\"{{title}}\" a fost șters.",
-  "viewEventAria": "Vizualizați evenimentul: {{title}}"
+  "viewEventAria": "Vizualizați evenimentul: {{title}}",
+  "reloading": "Se reîncarcă...",
+  "reloadFromServer": "Reîncarcă de pe server",
+  "unsavedChanges": "Aveți modificări nesalvate",
+  "discard": "Renunțați",
+  "reminder_15minBefore": "Cu 15 minute înainte",
+  "reminder_30minBefore": "Cu 30 de minute înainte",
+  "reminder_1hourBefore": "Cu 1 oră înainte",
+  "reminder_2hoursBefore": "Cu 2 ore înainte",
+  "reminder_1dayBefore": "Cu 1 zi înainte",
+  "reminder_2daysBefore": "Cu 2 zile înainte",
+  "reminder_1weekBefore": "Cu 1 săptămână înainte",
+  "reminder_customDateTime": "Dată și oră personalizate"
 }

@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" ble oppdatert.",
   "examAddedDesc": "\"{{title}}\" ble lagt til.",
   "examDeletedDesc": "\"{{title}}\" ble slettet.",
-  "viewEventAria": "Se arrangement: {{title}}"
+  "viewEventAria": "Se arrangement: {{title}}",
+  "reloading": "Laster inn på nytt...",
+  "reloadFromServer": "Last inn på nytt fra server",
+  "unsavedChanges": "Du har ulagrede endringer",
+  "discard": "Forkast",
+  "reminder_15minBefore": "15 minutter før",
+  "reminder_30minBefore": "30 minutter før",
+  "reminder_1hourBefore": "1 time før",
+  "reminder_2hoursBefore": "2 timer før",
+  "reminder_1dayBefore": "1 dag før",
+  "reminder_2daysBefore": "2 dager før",
+  "reminder_1weekBefore": "1 uke før",
+  "reminder_customDateTime": "Egendefinert dato og klokkeslett"
 }

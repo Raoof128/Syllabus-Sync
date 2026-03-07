@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" সফলভাবে আপডেট করা হয়েছে।",
   "examAddedDesc": "\"{{title}}\" সফলভাবে যোগ করা হয়েছে।",
   "examDeletedDesc": "\"{{title}}\" মুছে ফেলা হয়েছে।",
-  "viewEventAria": "ইভেন্ট দেখুন: {{title}}"
+  "viewEventAria": "ইভেন্ট দেখুন: {{title}}",
+  "reloading": "পুনরায় লোড হচ্ছে...",
+  "reloadFromServer": "সার্ভার থেকে পুনরায় লোড করুন",
+  "unsavedChanges": "আপনার অসংরক্ষিত পরিবর্তন আছে",
+  "discard": "বাতিল করুন",
+  "reminder_15minBefore": "১৫ মিনিট আগে",
+  "reminder_30minBefore": "৩০ মিনিট আগে",
+  "reminder_1hourBefore": "১ ঘন্টা আগে",
+  "reminder_2hoursBefore": "২ ঘন্টা আগে",
+  "reminder_1dayBefore": "১ দিন আগে",
+  "reminder_2daysBefore": "২ দিন আগে",
+  "reminder_1weekBefore": "১ সপ্তাহ আগে",
+  "reminder_customDateTime": "কাস্টম তারিখ ও সময়"
 }

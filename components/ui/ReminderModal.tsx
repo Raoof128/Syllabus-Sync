@@ -46,15 +46,17 @@ interface ReminderModalProps {
   unitSchedule?: Array<{ day: string; startTime: string; endTime: string }>;
 }
 
-const TIMING_OPTIONS: { value: ReminderTiming; label: string }[] = [
-  { value: '15min', label: '15 minutes before' },
-  { value: '30min', label: '30 minutes before' },
-  { value: '1hour', label: '1 hour before' },
-  { value: '2hours', label: '2 hours before' },
-  { value: '1day', label: '1 day before' },
-  { value: '2days', label: '2 days before' },
-  { value: '1week', label: '1 week before' },
-  { value: 'custom', label: 'Custom date & time' },
+type TimingOption = { value: ReminderTiming; labelKey: string };
+
+const TIMING_OPTIONS: TimingOption[] = [
+  { value: '15min', labelKey: 'reminder_15minBefore' },
+  { value: '30min', labelKey: 'reminder_30minBefore' },
+  { value: '1hour', labelKey: 'reminder_1hourBefore' },
+  { value: '2hours', labelKey: 'reminder_2hoursBefore' },
+  { value: '1day', labelKey: 'reminder_1dayBefore' },
+  { value: '2days', labelKey: 'reminder_2daysBefore' },
+  { value: '1week', labelKey: 'reminder_1weekBefore' },
+  { value: 'custom', labelKey: 'reminder_customDateTime' },
 ];
 
 export default function ReminderModal({
@@ -68,8 +70,6 @@ export default function ReminderModal({
   unitSchedule,
 }: ReminderModalProps) {
   const { t } = useTypedTranslation();
-  // Helper for translation keys not yet added to the typed schema
-  const tStr = t as (key: string) => string;
   const { addReminder, updateReminder, removeReminder, getReminderForItem } = useRemindersStore();
   const { addNotification } = useNotificationsStore();
 
@@ -137,14 +137,14 @@ export default function ReminderModal({
 
       if (existingReminderId) {
         updateReminder(existingReminderId, reminderData);
-        toastUtils.success(t('success'), t('reminderUpdated') || 'Reminder updated');
+        toastUtils.success(t('success'), t('reminderUpdated'));
       } else {
         const newReminder = addReminder(reminderData);
         setExistingReminderId(newReminder.id);
 
         // Create a notification to show the reminder was set
         addNotification({
-          title: t('reminderSet') || 'Reminder Set',
+          title: t('reminderSet'),
           message: `${getTimingLabel(timing)} for "${itemTitle}"`,
           type: 'system',
           read: false,
@@ -152,7 +152,7 @@ export default function ReminderModal({
           relatedId: itemId,
         });
 
-        toastUtils.success(t('success'), t('reminderSet') || 'Reminder set successfully');
+        toastUtils.success(t('success'), t('reminderSet'));
       }
     } else if (existingReminderId) {
       // Disable/remove reminder
@@ -161,7 +161,7 @@ export default function ReminderModal({
 
       // Create a notification to show the reminder was removed
       addNotification({
-        title: tStr('reminderRemoved') || 'Reminder Removed',
+        title: t('reminderRemoved'),
         message: `Reminder for "${itemTitle}" has been removed`,
         type: 'system',
         read: false,
@@ -169,7 +169,7 @@ export default function ReminderModal({
         relatedId: itemId,
       });
 
-      toastUtils.success(t('success'), tStr('reminderRemoved') || 'Reminder removed');
+      toastUtils.success(t('success'), t('reminderRemoved'));
     }
 
     onOpenChange(false);
@@ -188,21 +188,20 @@ export default function ReminderModal({
     addNotification,
     onOpenChange,
     t,
-    tStr,
   ]);
 
   const getItemTypeLabel = (type: ReminderItemType): string => {
     switch (type) {
       case 'unit':
-        return t('class') || 'Class';
+        return t('class');
       case 'exam':
-        return t('exam') || 'Exam';
+        return t('exam');
       case 'assignment':
-        return t('assignment') || 'Assignment';
+        return t('assignment');
       case 'event':
-        return t('event') || 'Event';
+        return t('event');
       case 'todo':
-        return t('todo') || 'To-Do';
+        return t('todo');
       default:
         return type;
     }
@@ -218,11 +217,9 @@ export default function ReminderModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5 text-mq-primary" />
-            {t('setReminder') || 'Set Reminder'}
+            {t('setReminder')}
           </DialogTitle>
-          <DialogDescription>
-            {t('setReminderDesc') || 'Get notified before this item is due'}
-          </DialogDescription>
+          <DialogDescription>{t('setReminderDesc')}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -242,7 +239,7 @@ export default function ReminderModal({
             {itemType === 'unit' && unitSchedule && unitSchedule.length > 0 && (
               <div className="mt-2 space-y-1">
                 <div className="text-xs text-mq-content-tertiary uppercase font-medium">
-                  {tStr('classSchedule') || 'Class Schedule'}
+                  {t('classSchedule')}
                 </div>
                 {unitSchedule.map((schedule, idx) => (
                   <div
@@ -275,7 +272,7 @@ export default function ReminderModal({
                 <BellOff className="h-4 w-4 text-mq-content-tertiary" />
               )}
               <Label htmlFor="reminder-enabled" className="font-medium">
-                {t('enableReminder') || 'Enable reminder'}
+                {t('enableReminder')}
               </Label>
             </div>
             <Switch id="reminder-enabled" checked={enabled} onCheckedChange={setEnabled} />
@@ -285,15 +282,15 @@ export default function ReminderModal({
             <>
               {/* Timing Selection */}
               <div className="space-y-2">
-                <Label htmlFor="reminder-timing">{t('remindMe') || 'Remind me'}</Label>
+                <Label htmlFor="reminder-timing">{t('remindMe')}</Label>
                 <Select value={timing} onValueChange={(v) => setTiming(v as ReminderTiming)}>
                   <SelectTrigger id="reminder-timing">
-                    <SelectValue placeholder={t('selectTiming') || 'Select timing'} />
+                    <SelectValue placeholder={t('selectTiming')} />
                   </SelectTrigger>
                   <SelectContent>
                     {TIMING_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.labelKey as import('@/lib/i18n/translations').TranslationKey)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -331,7 +328,7 @@ export default function ReminderModal({
                   <div className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-mq-primary" />
                     <span className="text-mq-content">
-                      {t('youWillBeNotified') || "You'll be notified"}{' '}
+                      {t('youWillBeNotified')}{' '}
                       <span className="font-medium">{getTimingLabel(timing)}</span>
                     </span>
                   </div>
@@ -344,7 +341,7 @@ export default function ReminderModal({
                   <div className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-mq-primary" />
                     <span className="text-mq-content">
-                      {t('youWillBeNotified') || "You'll be notified"}{' '}
+                      {t('youWillBeNotified')}{' '}
                       <span className="font-medium">
                         {format(new Date(`${customDate}T${customTime}`), 'PPP p')}
                       </span>
@@ -361,11 +358,7 @@ export default function ReminderModal({
             {t('cancel')}
           </Button>
           <Button onClick={handleSave}>
-            {enabled
-              ? existingReminderId
-                ? t('update')
-                : t('setReminder') || 'Set Reminder'
-              : t('removeReminder') || 'Remove Reminder'}
+            {enabled ? (existingReminderId ? t('update') : t('setReminder')) : t('removeReminder')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -393,6 +386,7 @@ export function ReminderBellButton({
   className,
   size = 'sm',
 }: ReminderBellButtonProps) {
+  const { t } = useTypedTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const { getReminderForItem } = useRemindersStore();
   const hasReminder = !!getReminderForItem(itemId, itemType);
@@ -416,8 +410,8 @@ export function ReminderBellButton({
             : 'bg-mq-background-secondary text-mq-content-tertiary hover:text-mq-content hover:bg-mq-hover-background',
           className,
         )}
-        title={hasReminder ? 'Edit reminder' : 'Set reminder'}
-        aria-label={hasReminder ? 'Edit reminder' : 'Set reminder'}
+        title={hasReminder ? t('editReminder') : t('setReminder')}
+        aria-label={hasReminder ? t('editReminder') : t('setReminder')}
       >
         {hasReminder ? (
           <Bell className={cn(iconSize, 'fill-current')} />

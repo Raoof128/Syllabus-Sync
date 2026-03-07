@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" کامیابی سے اپ ڈیٹ ہو گیا۔",
   "examAddedDesc": "\"{{title}}\" کامیابی سے شامل ہو گیا۔",
   "examDeletedDesc": "\"{{title}}\" حذف ہو گیا۔",
-  "viewEventAria": "تقریب دیکھیں: {{title}}"
+  "viewEventAria": "تقریب دیکھیں: {{title}}",
+  "reloading": "دوبارہ لوڈ ہو رہا ہے...",
+  "reloadFromServer": "سرور سے دوبارہ لوڈ کریں",
+  "unsavedChanges": "آپ کے پاس غیر محفوظ تبدیلیاں ہیں",
+  "discard": "ضائع کریں",
+  "reminder_15minBefore": "15 منٹ پہلے",
+  "reminder_30minBefore": "30 منٹ پہلے",
+  "reminder_1hourBefore": "1 گھنٹہ پہلے",
+  "reminder_2hoursBefore": "2 گھنٹے پہلے",
+  "reminder_1dayBefore": "1 دن پہلے",
+  "reminder_2daysBefore": "2 دن پہلے",
+  "reminder_1weekBefore": "1 ہفتہ پہلے",
+  "reminder_customDateTime": "حسب ضرورت تاریخ اور وقت"
 }

@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "«{{title}}» успешно обновлено.",
   "examAddedDesc": "«{{title}}» успешно добавлено.",
   "examDeletedDesc": "«{{title}}» удалено.",
-  "viewEventAria": "Просмотр события: {{title}}"
+  "viewEventAria": "Просмотр события: {{title}}",
+  "reloading": "Перезагрузка...",
+  "reloadFromServer": "Перезагрузить с сервера",
+  "unsavedChanges": "У вас есть несохранённые изменения",
+  "discard": "Отменить",
+  "reminder_15minBefore": "За 15 минут",
+  "reminder_30minBefore": "За 30 минут",
+  "reminder_1hourBefore": "За 1 час",
+  "reminder_2hoursBefore": "За 2 часа",
+  "reminder_1dayBefore": "За 1 день",
+  "reminder_2daysBefore": "За 2 дня",
+  "reminder_1weekBefore": "За 1 неделю",
+  "reminder_customDateTime": "Настраиваемые дата и время"
 }

@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" تم تحديثه بنجاح.",
   "examAddedDesc": "\"{{title}}\" تم إضافته بنجاح.",
   "examDeletedDesc": "\"{{title}}\" تم حذفه.",
-  "viewEventAria": "عرض الحدث: {{title}}"
+  "viewEventAria": "عرض الحدث: {{title}}",
+  "reloading": "جارٍ إعادة التحميل...",
+  "reloadFromServer": "إعادة التحميل من الخادم",
+  "unsavedChanges": "لديك تغييرات غير محفوظة",
+  "discard": "تجاهل",
+  "reminder_15minBefore": "قبل ١٥ دقيقة",
+  "reminder_30minBefore": "قبل ٣٠ دقيقة",
+  "reminder_1hourBefore": "قبل ساعة",
+  "reminder_2hoursBefore": "قبل ساعتين",
+  "reminder_1dayBefore": "قبل يوم",
+  "reminder_2daysBefore": "قبل يومين",
+  "reminder_1weekBefore": "قبل أسبوع",
+  "reminder_customDateTime": "تاريخ ووقت مخصص"
 }

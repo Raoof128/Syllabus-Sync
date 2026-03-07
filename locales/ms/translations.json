@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" berjaya dikemaskini.",
   "examAddedDesc": "\"{{title}}\" berjaya ditambahkan.",
   "examDeletedDesc": "\"{{title}}\" telah dipadam.",
-  "viewEventAria": "Lihat acara: {{title}}"
+  "viewEventAria": "Lihat acara: {{title}}",
+  "reloading": "Memuatkan semula...",
+  "reloadFromServer": "Muat semula dari pelayan",
+  "unsavedChanges": "Anda mempunyai perubahan yang belum disimpan",
+  "discard": "Buang",
+  "reminder_15minBefore": "15 minit sebelum",
+  "reminder_30minBefore": "30 minit sebelum",
+  "reminder_1hourBefore": "1 jam sebelum",
+  "reminder_2hoursBefore": "2 jam sebelum",
+  "reminder_1dayBefore": "1 hari sebelum",
+  "reminder_2daysBefore": "2 hari sebelum",
+  "reminder_1weekBefore": "1 minggu sebelum",
+  "reminder_customDateTime": "Tarikh & masa tersuai"
 }

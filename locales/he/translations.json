@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "«{{title}}» עודכן בהצלחה.",
   "examAddedDesc": "«{{title}}» נוסף בהצלחה.",
   "examDeletedDesc": "«{{title}}» נמחק.",
-  "viewEventAria": "הצג אירוע: {{title}}"
+  "viewEventAria": "הצג אירוע: {{title}}",
+  "reloading": "טוען מחדש...",
+  "reloadFromServer": "טען מחדש מהשרת",
+  "unsavedChanges": "יש לך שינויים שלא נשמרו",
+  "discard": "בטל",
+  "reminder_15minBefore": "15 דקות לפני",
+  "reminder_30minBefore": "30 דקות לפני",
+  "reminder_1hourBefore": "שעה לפני",
+  "reminder_2hoursBefore": "2 שעות לפני",
+  "reminder_1dayBefore": "יום לפני",
+  "reminder_2daysBefore": "2 ימים לפני",
+  "reminder_1weekBefore": "שבוע לפני",
+  "reminder_customDateTime": "תאריך ושעה מותאמים אישית"
 }

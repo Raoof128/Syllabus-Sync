@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\"已成功更新。",
   "examAddedDesc": "\"{{title}}\"已成功添加。",
   "examDeletedDesc": "\"{{title}}\"已被删除。",
-  "viewEventAria": "查看活动：{{title}}"
+  "viewEventAria": "查看活动：{{title}}",
+  "reloading": "正在重新加载...",
+  "reloadFromServer": "从服务器重新加载",
+  "unsavedChanges": "您有未保存的更改",
+  "discard": "放弃",
+  "reminder_15minBefore": "提前15分钟",
+  "reminder_30minBefore": "提前30分钟",
+  "reminder_1hourBefore": "提前1小时",
+  "reminder_2hoursBefore": "提前2小时",
+  "reminder_1dayBefore": "提前1天",
+  "reminder_2daysBefore": "提前2天",
+  "reminder_1weekBefore": "提前1周",
+  "reminder_customDateTime": "自定义日期和时间"
 }

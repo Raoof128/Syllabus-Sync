@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "„{{title}}\" sikeresen frissítve.",
   "examAddedDesc": "„{{title}}\" sikeresen hozzáadva.",
   "examDeletedDesc": "„{{title}}\" törölve.",
-  "viewEventAria": "Esemény megtekintése: {{title}}"
+  "viewEventAria": "Esemény megtekintése: {{title}}",
+  "reloading": "Újratöltés...",
+  "reloadFromServer": "Újratöltés a szerverről",
+  "unsavedChanges": "Nem mentett változtatásaid vannak",
+  "discard": "Elvetés",
+  "reminder_15minBefore": "15 perccel korábban",
+  "reminder_30minBefore": "30 perccel korábban",
+  "reminder_1hourBefore": "1 órával korábban",
+  "reminder_2hoursBefore": "2 órával korábban",
+  "reminder_1dayBefore": "1 nappal korábban",
+  "reminder_2daysBefore": "2 nappal korábban",
+  "reminder_1weekBefore": "1 héttel korábban",
+  "reminder_customDateTime": "Egyéni dátum és idő"
 }

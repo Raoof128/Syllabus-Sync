@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" is succesvol bijgewerkt.",
   "examAddedDesc": "\"{{title}}\" is succesvol toegevoegd.",
   "examDeletedDesc": "\"{{title}}\" is verwijderd.",
-  "viewEventAria": "Bekijk evenement: {{title}}"
+  "viewEventAria": "Bekijk evenement: {{title}}",
+  "reloading": "Opnieuw laden...",
+  "reloadFromServer": "Opnieuw laden van server",
+  "unsavedChanges": "U heeft niet-opgeslagen wijzigingen",
+  "discard": "Verwijderen",
+  "reminder_15minBefore": "15 minuten eerder",
+  "reminder_30minBefore": "30 minuten eerder",
+  "reminder_1hourBefore": "1 uur eerder",
+  "reminder_2hoursBefore": "2 uur eerder",
+  "reminder_1dayBefore": "1 dag eerder",
+  "reminder_2daysBefore": "2 dagen eerder",
+  "reminder_1weekBefore": "1 week eerder",
+  "reminder_customDateTime": "Aangepaste datum en tijd"
 }

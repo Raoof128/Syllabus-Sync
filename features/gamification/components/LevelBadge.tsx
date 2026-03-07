@@ -136,6 +136,7 @@ interface LevelBadgeInlineProps {
  * Inline level badge for use in text or compact areas
  */
 export function LevelBadgeInline({ className }: LevelBadgeInlineProps) {
+  const { t } = useTypedTranslation();
   const profile = useGamificationStore((state) => state.profile);
   const level = profile?.level ?? 1;
 
@@ -147,8 +148,8 @@ export function LevelBadgeInline({ className }: LevelBadgeInlineProps) {
         'bg-mq-primary text-white',
         className,
       )}
-      title={`Level ${level}`}
-      aria-label={`Level ${level}`}
+      title={`${t('level')} ${level}`}
+      aria-label={`${t('level')} ${level}`}
     >
       Lv.{level}
     </span>

@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" อัปเดตสำเร็จแล้ว",
   "examAddedDesc": "\"{{title}}\" เพิ่มสำเร็จแล้ว",
   "examDeletedDesc": "\"{{title}}\" ถูกลบแล้ว",
-  "viewEventAria": "ดูเหตุการณ์: {{title}}"
+  "viewEventAria": "ดูเหตุการณ์: {{title}}",
+  "reloading": "กำลังโหลดใหม่...",
+  "reloadFromServer": "โหลดใหม่จากเซิร์ฟเวอร์",
+  "unsavedChanges": "คุณมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก",
+  "discard": "ยกเลิก",
+  "reminder_15minBefore": "15 นาทีก่อน",
+  "reminder_30minBefore": "30 นาทีก่อน",
+  "reminder_1hourBefore": "1 ชั่วโมงก่อน",
+  "reminder_2hoursBefore": "2 ชั่วโมงก่อน",
+  "reminder_1dayBefore": "1 วันก่อน",
+  "reminder_2daysBefore": "2 วันก่อน",
+  "reminder_1weekBefore": "1 สัปดาห์ก่อน",
+  "reminder_customDateTime": "วันที่และเวลาที่กำหนดเอง"
 }

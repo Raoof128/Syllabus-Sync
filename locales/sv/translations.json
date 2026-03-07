@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" har uppdaterats.",
   "examAddedDesc": "\"{{title}}\" har lagts till.",
   "examDeletedDesc": "\"{{title}}\" har tagits bort.",
-  "viewEventAria": "Visa evenemang: {{title}}"
+  "viewEventAria": "Visa evenemang: {{title}}",
+  "reloading": "Laddar om...",
+  "reloadFromServer": "Ladda om från server",
+  "unsavedChanges": "Du har osparade ändringar",
+  "discard": "Kasta bort",
+  "reminder_15minBefore": "15 minuter innan",
+  "reminder_30minBefore": "30 minuter innan",
+  "reminder_1hourBefore": "1 timme innan",
+  "reminder_2hoursBefore": "2 timmar innan",
+  "reminder_1dayBefore": "1 dag innan",
+  "reminder_2daysBefore": "2 dagar innan",
+  "reminder_1weekBefore": "1 vecka innan",
+  "reminder_customDateTime": "Anpassat datum och tid"
 }

@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\"이(가) 성공적으로 업데이트되었습니다.",
   "examAddedDesc": "\"{{title}}\"이(가) 성공적으로 추가되었습니다.",
   "examDeletedDesc": "\"{{title}}\"이(가) 삭제되었습니다.",
-  "viewEventAria": "이벤트 보기: {{title}}"
+  "viewEventAria": "이벤트 보기: {{title}}",
+  "reloading": "다시 로딩 중...",
+  "reloadFromServer": "서버에서 다시 로드",
+  "unsavedChanges": "저장되지 않은 변경 사항이 있습니다",
+  "discard": "버리기",
+  "reminder_15minBefore": "15분 전",
+  "reminder_30minBefore": "30분 전",
+  "reminder_1hourBefore": "1시간 전",
+  "reminder_2hoursBefore": "2시간 전",
+  "reminder_1dayBefore": "1일 전",
+  "reminder_2daysBefore": "2일 전",
+  "reminder_1weekBefore": "1주일 전",
+  "reminder_customDateTime": "사용자 지정 날짜 및 시간"
 }

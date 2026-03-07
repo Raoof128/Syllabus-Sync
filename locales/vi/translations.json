@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" đã được cập nhật thành công.",
   "examAddedDesc": "\"{{title}}\" đã được thêm thành công.",
   "examDeletedDesc": "\"{{title}}\" đã bị xóa.",
-  "viewEventAria": "Xem sự kiện: {{title}}"
+  "viewEventAria": "Xem sự kiện: {{title}}",
+  "reloading": "Đang tải lại...",
+  "reloadFromServer": "Tải lại từ máy chủ",
+  "unsavedChanges": "Bạn có các thay đổi chưa được lưu",
+  "discard": "Loại bỏ",
+  "reminder_15minBefore": "15 phút trước",
+  "reminder_30minBefore": "30 phút trước",
+  "reminder_1hourBefore": "1 giờ trước",
+  "reminder_2hoursBefore": "2 giờ trước",
+  "reminder_1dayBefore": "1 ngày trước",
+  "reminder_2daysBefore": "2 ngày trước",
+  "reminder_1weekBefore": "1 tuần trước",
+  "reminder_customDateTime": "Ngày giờ tùy chỉnh"
 }

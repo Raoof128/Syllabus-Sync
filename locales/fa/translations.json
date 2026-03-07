@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "«{{title}}» با موفقیت به‌روزرسانی شد.",
   "examAddedDesc": "«{{title}}» با موفقیت اضافه شد.",
   "examDeletedDesc": "«{{title}}» حذف شد.",
-  "viewEventAria": "مشاهده رویداد: {{title}}"
+  "viewEventAria": "مشاهده رویداد: {{title}}",
+  "reloading": "در حال بارگذاری مجدد...",
+  "reloadFromServer": "بارگذاری مجدد از سرور",
+  "unsavedChanges": "شما تغییرات ذخیره‌نشده دارید",
+  "discard": "رد کردن",
+  "reminder_15minBefore": "۱۵ دقیقه قبل",
+  "reminder_30minBefore": "۳۰ دقیقه قبل",
+  "reminder_1hourBefore": "۱ ساعت قبل",
+  "reminder_2hoursBefore": "۲ ساعت قبل",
+  "reminder_1dayBefore": "۱ روز قبل",
+  "reminder_2daysBefore": "۲ روز قبل",
+  "reminder_1weekBefore": "۱ هفته قبل",
+  "reminder_customDateTime": "تاریخ و زمان سفارشی"
 }

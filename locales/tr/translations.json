@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" başarıyla güncellendi.",
   "examAddedDesc": "\"{{title}}\" başarıyla eklendi.",
   "examDeletedDesc": "\"{{title}}\" silindi.",
-  "viewEventAria": "Etkinliği görüntüle: {{title}}"
+  "viewEventAria": "Etkinliği görüntüle: {{title}}",
+  "reloading": "Yeniden yükleniyor...",
+  "reloadFromServer": "Sunucudan yeniden yükle",
+  "unsavedChanges": "Kaydedilmemiş değişiklikleriniz var",
+  "discard": "At",
+  "reminder_15minBefore": "15 dakika önce",
+  "reminder_30minBefore": "30 dakika önce",
+  "reminder_1hourBefore": "1 saat önce",
+  "reminder_2hoursBefore": "2 saat önce",
+  "reminder_1dayBefore": "1 gün önce",
+  "reminder_2daysBefore": "2 gün önce",
+  "reminder_1weekBefore": "1 hafta önce",
+  "reminder_customDateTime": "Özel tarih ve saat"
 }

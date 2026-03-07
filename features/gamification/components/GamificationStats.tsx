@@ -187,7 +187,7 @@ export function GamificationStats({
               🔥
             </span>
             <span className="tabular-nums">
-              {days} day{days !== 1 ? 's' : ''}
+              {days} {days !== 1 ? t('days') : t('day')}
             </span>
           </div>
         )}

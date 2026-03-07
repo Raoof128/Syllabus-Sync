@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "„{{title}}\" byl úspěšně aktualizován.",
   "examAddedDesc": "„{{title}}\" byl úspěšně přidán.",
   "examDeletedDesc": "„{{title}}\" byl smazán.",
-  "viewEventAria": "Zobrazit událost: {{title}}"
+  "viewEventAria": "Zobrazit událost: {{title}}",
+  "reloading": "Načítám...",
+  "reloadFromServer": "Znovu načíst ze serveru",
+  "unsavedChanges": "Máte neuložené změny",
+  "discard": "Zahodit",
+  "reminder_15minBefore": "15 minut před",
+  "reminder_30minBefore": "30 minut před",
+  "reminder_1hourBefore": "1 hodinu před",
+  "reminder_2hoursBefore": "2 hodiny před",
+  "reminder_1dayBefore": "1 den před",
+  "reminder_2daysBefore": "2 dny před",
+  "reminder_1weekBefore": "1 týden před",
+  "reminder_customDateTime": "Vlastní datum a čas"
 }

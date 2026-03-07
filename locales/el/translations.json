@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "«{{title}}» ενημερώθηκε επιτυχώς.",
   "examAddedDesc": "«{{title}}» προστέθηκε επιτυχώς.",
   "examDeletedDesc": "«{{title}}» διαγράφηκε.",
-  "viewEventAria": "Προβολή εκδήλωσης: {{title}}"
+  "viewEventAria": "Προβολή εκδήλωσης: {{title}}",
+  "reloading": "Επαναφόρτωση...",
+  "reloadFromServer": "Επαναφόρτωση από διακομιστή",
+  "unsavedChanges": "Έχετε μη αποθηκευμένες αλλαγές",
+  "discard": "Απόρριψη",
+  "reminder_15minBefore": "15 λεπτά πριν",
+  "reminder_30minBefore": "30 λεπτά πριν",
+  "reminder_1hourBefore": "1 ώρα πριν",
+  "reminder_2hoursBefore": "2 ώρες πριν",
+  "reminder_1dayBefore": "1 ημέρα πριν",
+  "reminder_2daysBefore": "2 ημέρες πριν",
+  "reminder_1weekBefore": "1 εβδομάδα πριν",
+  "reminder_customDateTime": "Προσαρμοσμένη ημερομηνία και ώρα"
 }

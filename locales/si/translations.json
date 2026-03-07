@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "\"{{title}}\" සාර්ථකව යාවත්කාලීන කරන ලදී.",
   "examAddedDesc": "\"{{title}}\" සාර්ථකව එකතු කරන ලදී.",
   "examDeletedDesc": "\"{{title}}\" මකා දමන ලදී.",
-  "viewEventAria": "සිදුවීම බලන්න: {{title}}"
+  "viewEventAria": "සිදුවීම බලන්න: {{title}}",
+  "reloading": "නැවත පූරණය වෙමින්...",
+  "reloadFromServer": "සේවාදායකයෙන් නැවත පූරණය කරන්න",
+  "unsavedChanges": "ඔබට සුරැකීමට නොලත් වෙනස්කම් ඇත",
+  "discard": "ඉවත දමන්න",
+  "reminder_15minBefore": "මිනිත්තු 15 කට පෙර",
+  "reminder_30minBefore": "මිනිත්තු 30 කට පෙර",
+  "reminder_1hourBefore": "පැයකට පෙර",
+  "reminder_2hoursBefore": "පැය 2 කට පෙර",
+  "reminder_1dayBefore": "දිනකට පෙර",
+  "reminder_2daysBefore": "දින 2 කට පෙර",
+  "reminder_1weekBefore": "සතියකට පෙර",
+  "reminder_customDateTime": "අභිරුචි දිනය සහ වේලාව"
 }

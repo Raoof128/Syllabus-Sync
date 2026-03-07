@@ -2360,5 +2360,17 @@
   "examUpdatedDesc": "„{{title}}\" er blevet opdateret.",
   "examAddedDesc": "„{{title}}\" er blevet tilføjet.",
   "examDeletedDesc": "„{{title}}\" er blevet slettet.",
-  "viewEventAria": "Vis begivenhed: {{title}}"
+  "viewEventAria": "Vis begivenhed: {{title}}",
+  "reloading": "Genindlæser...",
+  "reloadFromServer": "Genindlæs fra server",
+  "unsavedChanges": "Du har ugemte ændringer",
+  "discard": "Kasser",
+  "reminder_15minBefore": "15 minutter før",
+  "reminder_30minBefore": "30 minutter før",
+  "reminder_1hourBefore": "1 time før",
+  "reminder_2hoursBefore": "2 timer før",
+  "reminder_1dayBefore": "1 dag før",
+  "reminder_2daysBefore": "2 dage før",
+  "reminder_1weekBefore": "1 uge før",
+  "reminder_customDateTime": "Brugerdefineret dato og tid"
 }
