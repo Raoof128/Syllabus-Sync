@@ -152,7 +152,6 @@ export default function CalendarClient() {
     eventDialogOpen,
     setEventDialogOpen,
     editEvent,
-    setEditEvent,
     unitDialogOpen,
     setUnitDialogOpen,
     editingUnit,
@@ -224,6 +223,7 @@ export default function CalendarClient() {
     openAssignmentDetail,
     openAddExam,
     openEditExam,
+    openAddEvent,
     handleEventClick,
     openEditEvent,
     openAddTodo,
@@ -820,10 +820,7 @@ export default function CalendarClient() {
               setUnitDetailOpen(true);
             }}
             onDeleteUnit={handleDeleteUnit}
-            onAddEvent={() => {
-              setEditEvent(null);
-              setEventDialogOpen(true);
-            }}
+            onAddEvent={openAddEvent}
             onEditEvent={openEditEvent}
             onOpenEventDetail={handleEventClick}
             onDeleteEvent={handleDeleteEvent}

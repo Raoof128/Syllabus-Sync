@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { format } from 'date-fns';
-import translations from '@/locales/en/translations.json';
+import translations from '../locales/en/translations.json';
 
 // Use vi.hoisted to ensure mock state is available when vi.mock factories run
 const { deadlinesState, unitsState, eventsState, todosState } = vi.hoisted(() => ({

@@ -226,82 +226,88 @@ export default function CalendarWidgets({
   }, [highlightSection, sectionHighlight]);
 
   // Handle highlightWidget + action params from FAB menu
+  // Store callbacks in refs so they never trigger effect re-runs
+  const onAddUnitRef = React.useRef(onAddUnit);
+  const onAddAssignmentRef = React.useRef(onAddAssignment);
+  const onAddExamRef = React.useRef(onAddExam);
+  const onAddEventRef = React.useRef(onAddEvent);
+  const onAddTodoRef = React.useRef(onAddTodo);
   useEffect(() => {
-    if (highlightedWidget && actionParam && hasProcessedActionRef.current !== actionParam) {
-      hasProcessedActionRef.current = actionParam;
+    onAddUnitRef.current = onAddUnit;
+    onAddAssignmentRef.current = onAddAssignment;
+    onAddExamRef.current = onAddExam;
+    onAddEventRef.current = onAddEvent;
+    onAddTodoRef.current = onAddTodo;
+  }, [onAddUnit, onAddAssignment, onAddExam, onAddEvent, onAddTodo]);
 
-      // Immediately consume the action param from URL so it cannot re-trigger
-      const url = new URL(window.location.href);
-      url.searchParams.delete('action');
-      window.history.replaceState({}, '', url.toString());
+  useEffect(() => {
+    if (!highlightedWidget || !actionParam) return;
+    if (hasProcessedActionRef.current === actionParam) return;
 
-      // Scroll to the appropriate widget (only if not visible) and activate highlight
-      const activateTimer = setTimeout(() => {
-        if (
-          highlightedWidget === 'units' ||
-          highlightedWidget === 'assignments' ||
-          highlightedWidget === 'exams' ||
-          highlightedWidget === 'events' ||
-          highlightedWidget === 'todos'
-        ) {
-          setSectionHighlightActive(highlightedWidget);
+    // Mark as consumed immediately — this is the one-shot guard
+    hasProcessedActionRef.current = actionParam;
+
+    // Immediately strip both action AND highlightWidget from URL to prevent any re-trigger
+    const url = new URL(window.location.href);
+    url.searchParams.delete('action');
+    url.searchParams.delete('highlightWidget');
+    window.history.replaceState({}, '', url.toString());
+
+    // Capture values for use inside timers (independent of future renders)
+    const widget = highlightedWidget;
+    const action = actionParam;
+
+    // Scroll to the appropriate widget (only if not visible) and activate highlight
+    const activateTimer = setTimeout(() => {
+      if (
+        widget === 'units' ||
+        widget === 'assignments' ||
+        widget === 'exams' ||
+        widget === 'events' ||
+        widget === 'todos'
+      ) {
+        setSectionHighlightActive(widget);
+      }
+
+      // Scroll to appropriate widget ONLY if not already visible
+      if (widget === 'units' && unitsWidgetRef.current) {
+        scrollIfNotVisible(unitsWidgetRef.current);
+      } else if (widget === 'assignments' && assignmentsWidgetRef.current) {
+        scrollIfNotVisible(assignmentsWidgetRef.current);
+      } else if (widget === 'exams' && examsWidgetRef.current) {
+        scrollIfNotVisible(examsWidgetRef.current);
+      } else if (widget === 'events' && eventsWidgetRef.current) {
+        scrollIfNotVisible(eventsWidgetRef.current);
+      } else if (widget === 'todos' && todosWidgetRef.current) {
+        scrollIfNotVisible(todosWidgetRef.current);
+      }
+
+      // Trigger the appropriate add action after scroll
+      setTimeout(() => {
+        if (action === 'add-unit') {
+          onAddUnitRef.current();
+        } else if (action === 'add-assignment') {
+          onAddAssignmentRef.current();
+        } else if (action === 'add-exam') {
+          onAddExamRef.current();
+        } else if (action === 'add-event') {
+          onAddEventRef.current();
+        } else if (action === 'add-todo') {
+          onAddTodoRef.current?.();
         }
+      }, 300);
+    }, 100);
 
-        // Scroll to appropriate widget ONLY if not already visible
-        if (highlightedWidget === 'units' && unitsWidgetRef.current) {
-          scrollIfNotVisible(unitsWidgetRef.current);
-        } else if (highlightedWidget === 'assignments' && assignmentsWidgetRef.current) {
-          scrollIfNotVisible(assignmentsWidgetRef.current);
-        } else if (highlightedWidget === 'exams' && examsWidgetRef.current) {
-          scrollIfNotVisible(examsWidgetRef.current);
-        } else if (highlightedWidget === 'events' && eventsWidgetRef.current) {
-          scrollIfNotVisible(eventsWidgetRef.current);
-        } else if (highlightedWidget === 'todos' && todosWidgetRef.current) {
-          scrollIfNotVisible(todosWidgetRef.current);
-        }
+    // Clear highlight after 3 seconds (highlight is visual-only, action already consumed)
+    const clearTimer = setTimeout(() => {
+      setSectionHighlightActive(null);
+    }, 3000);
 
-        // Trigger the appropriate add action after scroll
-        setTimeout(() => {
-          if (actionParam === 'add-unit') {
-            onAddUnit();
-          } else if (actionParam === 'add-assignment') {
-            onAddAssignment();
-          } else if (actionParam === 'add-exam') {
-            onAddExam();
-          } else if (actionParam === 'add-event') {
-            onAddEvent();
-          } else if (actionParam === 'add-todo' && onAddTodo) {
-            onAddTodo();
-          }
-        }, 300);
-      }, 100);
-
-      // Clear highlight after 3 seconds (highlight is visual-only, action already consumed)
-      const clearTimer = setTimeout(() => {
-        setSectionHighlightActive(null);
-        // Also clean up highlightWidget from URL
-        const cleanUrl = new URL(window.location.href);
-        cleanUrl.searchParams.delete('highlightWidget');
-        window.history.replaceState({}, '', cleanUrl.toString());
-      }, 3000);
-
-      return () => {
-        clearTimeout(activateTimer);
-        clearTimeout(clearTimer);
-      };
-    }
-  }, [
-    highlightedWidget,
-    actionParam,
-    onAddUnit,
-    onAddAssignment,
-    onAddExam,
-    onAddEvent,
-    onAddTodo,
-    unitsWidgetRef,
-    assignmentsWidgetRef,
-    scrollIfNotVisible,
-  ]);
+    return () => {
+      clearTimeout(activateTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [highlightedWidget, actionParam, unitsWidgetRef, assignmentsWidgetRef, scrollIfNotVisible]);
 
   return (
     <div className="space-y-4 lg:space-y-6">

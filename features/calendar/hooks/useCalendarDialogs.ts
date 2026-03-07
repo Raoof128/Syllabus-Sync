@@ -97,6 +97,11 @@ export function useCalendarDialogs() {
     setExamDialogOpen(true);
   }, []);
 
+  const openAddEvent = useCallback(() => {
+    setEditEvent(null);
+    setEventDialogOpen(true);
+  }, []);
+
   const handleEventClick = useCallback((event: Event) => {
     setSelectedEvent(event);
     setEventDetailOpen(true);
@@ -240,6 +245,7 @@ export function useCalendarDialogs() {
     openAssignmentDetail,
     openAddExam,
     openEditExam,
+    openAddEvent,
     handleEventClick,
     openEditEvent,
     openAddTodo,
