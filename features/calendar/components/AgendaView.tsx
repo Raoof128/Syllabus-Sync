@@ -8,8 +8,17 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { formatLocalizedDate } from '@/lib/utils/locale';
 import { Card, CardContent } from '@/components/ui/mq/card';
 import { Badge } from '@/components/ui/mq/badge';
-import { Clock, MapPin, AlertCircle } from 'lucide-react';
+import { Clock, MapPin, AlertCircle, GraduationCap } from 'lucide-react';
 import { parseTimeRange, getEventColors, getDeadlineColor } from '@/lib/calendar-utils';
+import {
+  getMQKeyDatesForDay,
+  MQ_DATE_COLORS,
+  PROGRAM_STYLES,
+  PROGRAM_LABELS,
+  MQProgram,
+  MQKeyDate,
+} from '@/data/mqKeyDates';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 interface AgendaViewProps {
   date: Date; // The start date (usually start of week)
@@ -20,6 +29,8 @@ interface AgendaViewProps {
   onUnitClick: (unit: Unit) => void;
   onDeadlineClick: (deadline: Deadline) => void;
   onEventClick: (event: Event) => void;
+  showMQKeyDates?: boolean;
+  mqProgramFilter?: MQProgram[];
 }
 
 export default function AgendaView({
@@ -31,6 +42,8 @@ export default function AgendaView({
   onUnitClick,
   onDeadlineClick,
   onEventClick,
+  showMQKeyDates = true,
+  mqProgramFilter,
 }: AgendaViewProps) {
   const { t, language } = useTypedTranslation();
   const startDate = dayjs(date);
@@ -83,8 +96,21 @@ export default function AgendaView({
         };
       });
 
-    // Combine and sort by time
-    const allItems = [...dayUnits, ...dayDeadlines, ...dayEvents].sort(
+    // MQ Key Dates (filtered by program)
+    const dayMQDates = showMQKeyDates
+      ? getMQKeyDatesForDay(day.toDate())
+          .filter((d) => d.category !== 'classes')
+          .filter((d) => !mqProgramFilter || mqProgramFilter.includes(d.program))
+          .map((d) => ({
+            item: d,
+            agendaType: 'mqdate' as const,
+            sortTime: 0, // MQ dates appear at the top (all-day events)
+            id: `mqdate-${d.id}`,
+          }))
+      : [];
+
+    // Combine and sort by time (MQ dates first as they're all-day)
+    const allItems = [...dayMQDates, ...dayUnits, ...dayDeadlines, ...dayEvents].sort(
       (a, b) => a.sortTime - b.sortTime,
     );
 
@@ -144,6 +170,62 @@ export default function AgendaView({
                 </p>
               ) : (
                 items.map((entry, idx) => {
+                  // Render MQ Key Dates
+                  if (entry.agendaType === 'mqdate') {
+                    const mqDate = entry.item as MQKeyDate;
+                    const categoryColors = MQ_DATE_COLORS[mqDate.category];
+                    const programStyle = PROGRAM_STYLES[mqDate.program];
+                    const categoryLabel =
+                      t(`mqCat_${mqDate.category}` as TranslationKey) || mqDate.category;
+
+                    return (
+                      <Card
+                        key={entry.id}
+                        className={cn(
+                          'border-l-4 border-t-0 border-b-0 border-r-0 rounded-none shadow-sm',
+                          programStyle.bgLight,
+                        )}
+                        style={{ borderLeftColor: programStyle.border.replace('border-', '') }}
+                      >
+                        <CardContent className="p-3 flex items-center gap-4">
+                          <div className="flex-col w-16 text-center hidden sm:flex">
+                            <span className="text-lg" aria-hidden="true">
+                              {programStyle.icon}
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <Badge
+                                className={cn(
+                                  'text-[10px] px-1.5 py-0 h-4',
+                                  categoryColors.bg,
+                                  categoryColors.text,
+                                )}
+                              >
+                                {categoryLabel}
+                              </Badge>
+                              <h4 className={cn('font-semibold text-sm', programStyle.text)}>
+                                {mqDate.event}
+                              </h4>
+                            </div>
+                            <div className="flex items-center gap-3 mt-1 text-[10px] text-mq-content-tertiary flex-wrap">
+                              <span className="flex items-center gap-1">
+                                <GraduationCap className="w-3 h-3" />{' '}
+                                {PROGRAM_LABELS[mqDate.program]}
+                              </span>
+                              <span>{mqDate.term}</span>
+                            </div>
+                            {mqDate.description && (
+                              <p className="text-[10px] text-mq-content-secondary mt-1 line-clamp-2">
+                                {mqDate.description}
+                              </p>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  }
+
                   // Render logic based on type
                   if (entry.agendaType === 'class') {
                     // Unit

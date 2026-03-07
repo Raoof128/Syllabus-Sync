@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { CalendarFilters } from '@/features/calendar/components/FilterPanel';
+import { CalendarFilters, ALL_MQ_PROGRAMS } from '@/features/calendar/components/FilterPanel';
 import { Unit, Deadline, Event } from '@/lib/types';
 
 export function useCalendarFiltering(units: Unit[], deadlines: Deadline[], events: Event[]) {
@@ -9,6 +9,8 @@ export function useCalendarFiltering(units: Unit[], deadlines: Deadline[], event
     showDeadlines: true,
     showEvents: true,
     showCompleted: false,
+    showMQKeyDates: true,
+    mqPrograms: [...ALL_MQ_PROGRAMS],
   });
 
   const filteredUnits = useMemo(() => {

@@ -27,6 +27,7 @@ import AgendaView from '@/features/calendar/components/AgendaView';
 import FilterPanel from '@/features/calendar/components/FilterPanel';
 import dynamic from 'next/dynamic';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_STYLES } from '@/data/mqKeyDates';
 
 // Hooks
 import { useCalendarData } from '@/features/calendar/hooks/useCalendarData';
@@ -545,6 +546,15 @@ export default function CalendarClient() {
                     const dayUnits = getUnitsForDay(date);
                     const isToday = dayjs(date).isSame(dayjs(), 'day');
 
+                    // Get MQ key dates for this day (filtered by program)
+                    const dayMQDates = filters.showMQKeyDates
+                      ? getMQKeyDatesForDay(date)
+                          .filter((d) => d.category !== 'classes')
+                          .filter(
+                            (d) => !filters.mqPrograms || filters.mqPrograms.includes(d.program),
+                          )
+                      : [];
+
                     return (
                       <div
                         key={index}
@@ -570,6 +580,55 @@ export default function CalendarClient() {
                         </div>
 
                         <div className="flex-1 flex flex-col gap-2">
+                          {/* MQ Key Dates */}
+                          {dayMQDates.map((mqDate) => {
+                            const categoryColors = MQ_DATE_COLORS[mqDate.category];
+                            const programStyle = PROGRAM_STYLES[mqDate.program];
+                            const categoryLabel =
+                              t(`mqCat_${mqDate.category}` as TranslationKey) || mqDate.category;
+                            return (
+                              <div
+                                key={mqDate.id}
+                                className={cn(
+                                  'text-xs p-2 rounded-lg border-l-[3px]',
+                                  programStyle.bgLight,
+                                )}
+                                style={{
+                                  borderLeftColor: programStyle.bg.replace('bg-', '').includes('-')
+                                    ? `var(--${programStyle.bg.replace('bg-', '')})`
+                                    : undefined,
+                                }}
+                                title={mqDate.description || `${mqDate.event} - ${mqDate.term}`}
+                              >
+                                <div className="flex items-center gap-1 mb-1">
+                                  <span className="text-sm" aria-hidden="true">
+                                    {programStyle.icon}
+                                  </span>
+                                  <span
+                                    className={cn(
+                                      'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
+                                      categoryColors.bg,
+                                      categoryColors.text,
+                                    )}
+                                  >
+                                    {categoryLabel}
+                                  </span>
+                                </div>
+                                <div className={cn('font-medium truncate', programStyle.text)}>
+                                  {mqDate.event}
+                                </div>
+                                <div
+                                  className={cn(
+                                    'text-[10px] opacity-70 truncate',
+                                    programStyle.text,
+                                  )}
+                                >
+                                  {mqDate.term}
+                                </div>
+                              </div>
+                            );
+                          })}
+
                           {/* Units */}
                           {dayUnits.map((item) => (
                             <div
@@ -710,6 +769,8 @@ export default function CalendarClient() {
               }}
               onEventClick={handleEventClick}
               onGoToToday={goToToday}
+              showMQKeyDates={filters.showMQKeyDates}
+              mqProgramFilter={filters.mqPrograms}
             />
           )}
 
@@ -734,6 +795,8 @@ export default function CalendarClient() {
                 }
               }}
               onEventClick={handleEventClick}
+              showMQKeyDates={filters.showMQKeyDates}
+              mqProgramFilter={filters.mqPrograms}
             />
           )}
         </div>

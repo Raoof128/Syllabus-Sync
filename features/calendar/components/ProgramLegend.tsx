@@ -34,7 +34,18 @@ const CATEGORY_LABELS: Record<MQDateCategory, string> = {
 };
 
 export default function ProgramLegend({
-  programs = ['general', 'business-school', 'college', 'global-mba'],
+  programs = [
+    'general',
+    'business-school',
+    'college',
+    'global-mba',
+    'fmhhs',
+    'oua',
+    'exchange',
+    'online-degree',
+    'muic',
+    'elc',
+  ],
   showCategories = true,
   className,
 }: ProgramLegendProps) {

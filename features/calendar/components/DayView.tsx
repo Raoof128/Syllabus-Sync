@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { TranslationKey } from '@/lib/i18n/translations';
 import { formatLocation, formatScheduleTime } from '@/lib/utils/locale';
-import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_STYLES } from '@/data/mqKeyDates';
+import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_STYLES, MQProgram } from '@/data/mqKeyDates';
 import { CalendarClock } from 'lucide-react';
 
 interface DayViewProps {
@@ -30,6 +30,8 @@ interface DayViewProps {
   onDeadlineClick: (deadline: Deadline) => void;
   onEventClick: (event: Event) => void;
   onGoToToday?: () => void;
+  showMQKeyDates?: boolean;
+  mqProgramFilter?: MQProgram[];
 }
 
 export default function DayView({
@@ -41,6 +43,8 @@ export default function DayView({
   onDeadlineClick,
   onEventClick,
   onGoToToday,
+  showMQKeyDates = true,
+  mqProgramFilter,
 }: DayViewProps) {
   const { t } = useTypedTranslation();
   const dayDate = dayjs(date);
@@ -127,7 +131,13 @@ export default function DayView({
   });
 
   const overlapInfo = calculateOverlapGroups(calendarItems);
-  const mqKeyDates = getMQKeyDatesForDay(date).filter((d) => d.category !== 'classes');
+
+  // Filter MQ key dates based on showMQKeyDates and mqProgramFilter
+  const mqKeyDates = showMQKeyDates
+    ? getMQKeyDatesForDay(date)
+        .filter((d) => d.category !== 'classes')
+        .filter((d) => !mqProgramFilter || mqProgramFilter.includes(d.program))
+    : [];
 
   // Calculate current time position for the red line
   const now = new Date();
