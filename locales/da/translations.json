@@ -2380,5 +2380,9 @@
   "mapSatellite": "Satellite",
   "mqKeyDates": "MQ Key Dates",
   "filterByProgramCalendar": "Filter by Program/Calendar",
-  "activeCollaboratorsCount": "{{count}} active collaborators"
+  "activeCollaboratorsCount": "{{count}} active collaborators",
+  "gettingLocation": "Getting location...",
+  "searchBuilding": "Search for a building...",
+  "typeToSearchBuildings": "Type to search buildings...",
+  "selectColorAria": "Select color {{color}}"
 }

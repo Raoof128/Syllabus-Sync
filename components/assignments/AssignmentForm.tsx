@@ -230,15 +230,13 @@ export default function AssignmentForm({
           <DialogHeader className="mb-4">
             <DialogTitle>
               {editAssignment
-                ? t('editAssignment' as TranslationKey) || 'Edit Assignment'
-                : t('addAssignment' as TranslationKey) || 'Add Assignment'}
+                ? t('editAssignment' as TranslationKey)
+                : t('addAssignment' as TranslationKey)}
             </DialogTitle>
             <DialogDescription>
               {editAssignment
-                ? t('updateAssignmentDetails' as TranslationKey) ||
-                  'Update the assignment details below.'
-                : t('fillAssignmentDetails' as TranslationKey) ||
-                  'Fill in the assignment details below.'}
+                ? t('updateAssignmentDetails' as TranslationKey)
+                : t('fillAssignmentDetails' as TranslationKey)}
             </DialogDescription>
           </DialogHeader>
 
@@ -250,10 +248,7 @@ export default function AssignmentForm({
               </Label>
               <Input
                 id="assignment-title"
-                placeholder={
-                  t('assignmentTitlePlaceholder' as TranslationKey) ||
-                  'e.g., Essay on Climate Change'
-                }
+                placeholder={t('assignmentTitlePlaceholder' as TranslationKey)}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={Boolean(errors.title)}
@@ -353,7 +348,7 @@ export default function AssignmentForm({
 
             {/* Color Selection */}
             <div className="space-y-2">
-              <Label>{t('color' as TranslationKey) || 'Color'}</Label>
+              <Label>{t('color' as TranslationKey)}</Label>
 
               {/* Unit Color Inheritance Toggle */}
               <div className="flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-surface/50">
@@ -427,10 +422,10 @@ export default function AssignmentForm({
             </Button>
             <Button onClick={handleSave} disabled={units.length === 0 || isSaving}>
               {isSaving
-                ? t('savingChanges' as TranslationKey) || 'Saving...'
+                ? t('savingChanges' as TranslationKey)
                 : editAssignment
                   ? t('saveChanges')
-                  : t('addAssignment' as TranslationKey) || 'Add Assignment'}
+                  : t('addAssignment' as TranslationKey)}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -440,13 +435,8 @@ export default function AssignmentForm({
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {t('deleteAssignment' as TranslationKey) || 'Delete Assignment'}
-            </DialogTitle>
-            <DialogDescription>
-              {t('deleteAssignmentConfirm' as TranslationKey) ||
-                'Are you sure you want to delete this assignment? This action cannot be undone.'}
-            </DialogDescription>
+            <DialogTitle>{t('deleteAssignment' as TranslationKey)}</DialogTitle>
+            <DialogDescription>{t('deleteAssignmentConfirm' as TranslationKey)}</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>

@@ -111,13 +111,13 @@ export default function EventDetailPanel({
   const getCategoryLabel = (category: Event['category']) => {
     switch (category) {
       case 'Career':
-        return t('category_Career' as TranslationKey) || 'Career';
+        return t('category_Career' as TranslationKey);
       case 'Social':
-        return t('category_Social' as TranslationKey) || 'Social';
+        return t('category_Social' as TranslationKey);
       case 'Academic':
-        return t('category_Academic' as TranslationKey) || 'Academic';
+        return t('category_Academic' as TranslationKey);
       case 'Free Food':
-        return t('category_FreeFood' as TranslationKey) || 'Free Food';
+        return t('category_FreeFood' as TranslationKey);
       default:
         return category;
     }
@@ -166,7 +166,7 @@ export default function EventDetailPanel({
             <div className="p-3 rounded-lg bg-mq-background-secondary border border-mq-border">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <Tag className="h-3.5 w-3.5" />
-                {t('category' as TranslationKey) || 'Category'}
+                {t('category' as TranslationKey)}
               </div>
               <Badge className={cn(CATEGORY_COLORS[event.category], 'mt-0.5')}>
                 {getCategoryLabel(event.category)}
@@ -177,7 +177,7 @@ export default function EventDetailPanel({
             <div className="p-3 rounded-lg bg-mq-background-secondary border border-mq-border">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <Clock className="h-3.5 w-3.5" />
-                {t('status' as TranslationKey) || 'Status'}
+                {t('status' as TranslationKey)}
               </div>
               <p
                 className={cn(
@@ -195,7 +195,7 @@ export default function EventDetailPanel({
             <div className="p-3 rounded-lg bg-mq-background-secondary border border-mq-border">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <CalendarDays className="h-3.5 w-3.5" />
-                {t('date' as TranslationKey) || 'Date'}
+                {t('date' as TranslationKey)}
               </div>
               <p className="font-medium text-sm">{format(eventDate, 'MMM d, yyyy')}</p>
               {!event.allDay && (
@@ -207,7 +207,7 @@ export default function EventDetailPanel({
             <div className="p-3 rounded-lg bg-mq-background-secondary border border-mq-border">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <MapPin className="h-3.5 w-3.5" />
-                {t('location' as TranslationKey) || 'Location'}
+                {t('location' as TranslationKey)}
               </div>
               <p className="font-medium text-sm">
                 {locationDisplay || t('notSpecified' as TranslationKey)}

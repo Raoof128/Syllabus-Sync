@@ -38,11 +38,6 @@ export default function EventsWidget({
   const events = useEventsStore((state) => state.events);
   const toggleEventNotification = useEventsStore((state) => state.toggleNotification);
 
-  const tOr = (key: TranslationKey | string, fallback: string) => {
-    const value = t(key as TranslationKey);
-    return value === key ? fallback : value;
-  };
-
   // Sort events: upcoming events first (by date ascending), then overdue events (by date descending)
   // This ensures upcoming events are shown prominently, matching the Home page widget behavior
   const sortedEvents = useMemo(() => {
@@ -120,7 +115,9 @@ export default function EventsWidget({
               <div className="flex items-center gap-2">
                 <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
                   {events.length}{' '}
-                  {events.length === 1 ? tOr('event', 'event') : tOr('eventsLabel', 'events')}
+                  {events.length === 1
+                    ? t('event' as TranslationKey)
+                    : t('eventsLabel' as TranslationKey)}
                 </Badge>
                 <Button
                   size="icon"
@@ -195,7 +192,7 @@ export default function EventsWidget({
                               variant="brand"
                               className="text-[9px] px-1 py-0 h-4 uppercase bg-red-500"
                             >
-                              {tOr('overdue', 'Overdue')}
+                              {t('overdue' as TranslationKey)}
                             </Badge>
                           )}
                         </div>

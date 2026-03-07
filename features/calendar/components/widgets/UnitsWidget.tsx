@@ -36,11 +36,6 @@ export default function UnitsWidget({
   const units = useUnitsStore((state) => state.units);
   const toggleUnitNotification = useUnitsStore((state) => state.toggleNotification);
 
-  const tOr = (key: TranslationKey | string, fallback: string) => {
-    const value = t(key as TranslationKey);
-    return value === key ? fallback : value;
-  };
-
   const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -74,7 +69,7 @@ export default function UnitsWidget({
               <div className="flex items-center gap-2">
                 <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
                   {units.length}{' '}
-                  {units.length === 1 ? tOr('unit', 'unit') : tOr('unitsLabel', 'units')}
+                  {units.length === 1 ? t('unit') : t('unitsLabel' as TranslationKey)}
                 </Badge>
                 <Button
                   size="icon"

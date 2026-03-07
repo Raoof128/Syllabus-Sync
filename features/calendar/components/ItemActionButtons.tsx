@@ -196,13 +196,13 @@ export default function ItemActionButtons({
         )}
         title={
           isNotificationActive
-            ? t('editReminder' as TranslationKey) || 'Edit reminder'
-            : t('setReminder' as TranslationKey) || 'Set reminder'
+            ? t('editReminder' as TranslationKey)
+            : t('setReminder' as TranslationKey)
         }
         aria-label={
           isNotificationActive
-            ? t('editReminder' as TranslationKey) || 'Edit reminder'
-            : t('setReminder' as TranslationKey) || 'Set reminder'
+            ? t('editReminder' as TranslationKey)
+            : t('setReminder' as TranslationKey)
         }
       >
         {isNotificationActive ? (

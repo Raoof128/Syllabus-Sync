@@ -23,16 +23,6 @@ interface ProgramLegendProps {
   className?: string;
 }
 
-const CATEGORY_LABELS: Record<MQDateCategory, string> = {
-  classes: 'Classes',
-  exams: 'Exams',
-  admin: 'Admin',
-  results: 'Results',
-  payment: 'Payment',
-  enrollment: 'Enrollment',
-  recess: 'Recess/Break',
-};
-
 export default function ProgramLegend({
   programs = [
     'general',
@@ -52,11 +42,6 @@ export default function ProgramLegend({
   const { t } = useTypedTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const tOr = (key: TranslationKey | string, fallback: string) => {
-    const value = t(key as TranslationKey);
-    return value === key ? fallback : value;
-  };
-
   return (
     <div className={cn('w-full', className)}>
       {/* Desktop: Always visible inline legend */}
@@ -65,7 +50,7 @@ export default function ProgramLegend({
           {/* Program Legend */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-medium text-mq-content-secondary">
-              {tOr('programKey', 'Program')}:
+              {t('programKey')}:
             </span>
             {programs.map((program) => {
               const style = PROGRAM_STYLES[program];
@@ -93,7 +78,7 @@ export default function ProgramLegend({
           {showCategories && (
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-medium text-mq-content-secondary">
-                {tOr('categoryKey', 'Category')}:
+                {t('categoryKey')}:
               </span>
               {(Object.keys(MQ_DATE_COLORS) as MQDateCategory[]).map((category) => {
                 const colors = MQ_DATE_COLORS[category];
@@ -106,7 +91,7 @@ export default function ProgramLegend({
                       colors.text,
                     )}
                   >
-                    {tOr(`category_${category}`, CATEGORY_LABELS[category])}
+                    {t(`category_${category}` as TranslationKey)}
                   </div>
                 );
               })}
@@ -126,7 +111,7 @@ export default function ProgramLegend({
         >
           <span className="flex items-center gap-2 text-sm font-medium">
             <Info className="h-4 w-4" />
-            {tOr('programLegend', 'Program Legend')}
+            {t('programLegend')}
           </span>
           {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
@@ -136,7 +121,7 @@ export default function ProgramLegend({
             {/* Program Legend */}
             <div>
               <span className="text-xs font-medium text-mq-content-secondary block mb-2">
-                {tOr('programKey', 'Program Key')}
+                {t('programKey')}
               </span>
               <div className="flex flex-wrap gap-2">
                 {programs.map((program) => {
@@ -166,7 +151,7 @@ export default function ProgramLegend({
             {showCategories && (
               <div>
                 <span className="text-xs font-medium text-mq-content-secondary block mb-2">
-                  {tOr('categoryKey', 'Category')}
+                  {t('categoryKey')}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {(Object.keys(MQ_DATE_COLORS) as MQDateCategory[]).map((category) => {
@@ -180,7 +165,7 @@ export default function ProgramLegend({
                           colors.text,
                         )}
                       >
-                        {tOr(`category_${category}`, CATEGORY_LABELS[category])}
+                        {t(`category_${category}` as TranslationKey)}
                       </div>
                     );
                   })}

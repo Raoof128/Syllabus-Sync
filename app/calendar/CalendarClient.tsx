@@ -83,10 +83,6 @@ const TodoDetailPanel = dynamic(() => import('@/features/calendar/components/Tod
 
 export default function CalendarClient() {
   const { t } = useTypedTranslation();
-  const tOr = (key: TranslationKey, fallback: string) => {
-    const value = t(key);
-    return value === key ? fallback : value;
-  };
 
   // Todo form saving state
   const [todoSaving, setTodoSaving] = useState(false);
@@ -939,14 +935,13 @@ export default function CalendarClient() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
-                  {t('deleteAssignmentConfirm' as TranslationKey) || 'Delete Assignment?'}
+                  {t('deleteAssignmentConfirm' as TranslationKey)}
                 </h3>
                 <p className="text-sm text-mq-content-secondary">{assignmentToDelete.title}</p>
               </div>
             </div>
             <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteAssignmentConfirmDesc' as TranslationKey) ||
-                'This action cannot be undone. Are you sure you want to delete this assignment?'}
+              {t('deleteAssignmentConfirmDesc' as TranslationKey)}
             </p>
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
@@ -980,14 +975,13 @@ export default function CalendarClient() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
-                  {t('deleteExamConfirm' as TranslationKey) || 'Delete Exam?'}
+                  {t('deleteExamConfirm' as TranslationKey)}
                 </h3>
                 <p className="text-sm text-mq-content-secondary">{examToDelete.title}</p>
               </div>
             </div>
             <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteExamConfirmDesc' as TranslationKey) ||
-                'This action cannot be undone. Are you sure you want to delete this exam?'}
+              {t('deleteExamConfirmDesc' as TranslationKey)}
             </p>
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
@@ -1021,14 +1015,13 @@ export default function CalendarClient() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
-                  {t('deleteDeadlineConfirm' as TranslationKey) || 'Delete Deadline?'}
+                  {t('deleteDeadlineConfirm' as TranslationKey)}
                 </h3>
                 <p className="text-sm text-mq-content-secondary">{deadlineToDelete.title}</p>
               </div>
             </div>
             <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteDeadlineConfirmDesc' as TranslationKey) ||
-                'This action cannot be undone. Are you sure you want to delete this deadline?'}
+              {t('deleteDeadlineConfirmDesc' as TranslationKey)}
             </p>
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
@@ -1062,14 +1055,13 @@ export default function CalendarClient() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-mq-content">
-                  {t('deleteEventConfirm' as TranslationKey) || 'Delete Event?'}
+                  {t('deleteEventConfirm' as TranslationKey)}
                 </h3>
                 <p className="text-sm text-mq-content-secondary">{eventToDelete.title}</p>
               </div>
             </div>
             <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteEventConfirmDesc' as TranslationKey) ||
-                'This action cannot be undone. Are you sure you want to delete this event?'}
+              {t('deleteEventConfirmDesc' as TranslationKey)}
             </p>
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
@@ -1102,18 +1094,11 @@ export default function CalendarClient() {
                 <Trash2 className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-mq-content">
-                  {tOr('deleteTodoConfirm', 'Delete Task?')}
-                </h3>
+                <h3 className="text-lg font-semibold text-mq-content">{t('deleteTodoConfirm')}</h3>
                 <p className="text-sm text-mq-content-secondary">{todoToDelete.title}</p>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">
-              {tOr(
-                'deleteTodoConfirmDesc',
-                'This action cannot be undone. Are you sure you want to delete this task?',
-              )}
-            </p>
+            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteTodoConfirmDesc')}</p>
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <Button
                 variant="outline"
@@ -1158,7 +1143,7 @@ export default function CalendarClient() {
               <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/30 flex items-center justify-center">
                 <Edit2 className="h-5 w-5 text-emerald-600" />
               </div>
-              {editingTodo ? tOr('editTodo', 'Edit Task') : tOr('addTodo', 'Add Task')}
+              {editingTodo ? t('editTodo') : t('addTodo')}
             </DialogTitle>
           </DialogHeader>
           <form
@@ -1212,14 +1197,14 @@ export default function CalendarClient() {
                 htmlFor="edit-todo-title"
                 className="block text-sm font-medium text-mq-content mb-1"
               >
-                {tOr('taskTitle', 'Task Title')} <span className="text-mq-error">*</span>
+                {t('taskTitle')} <span className="text-mq-error">*</span>
               </label>
               <input
                 id="edit-todo-title"
                 type="text"
                 value={editTodoTitle}
                 onChange={(e) => setEditTodoTitle(e.target.value)}
-                placeholder={tOr('enterTaskTitle', 'Enter task title...')}
+                placeholder={t('enterTaskTitle')}
                 className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 autoFocus
                 required
@@ -1232,7 +1217,7 @@ export default function CalendarClient() {
                 htmlFor="edit-todo-priority"
                 className="block text-sm font-medium text-mq-content mb-1"
               >
-                {tOr('priority', 'Priority')}
+                {t('priority')}
               </label>
               <select
                 id="edit-todo-priority"
@@ -1245,16 +1230,16 @@ export default function CalendarClient() {
                   editTodoPriority === 'Low' && 'text-emerald-600 dark:text-emerald-400',
                 )}
               >
-                <option value="High">{tOr('priorityHigh', 'High')}</option>
-                <option value="Medium">{tOr('priorityMedium', 'Medium')}</option>
-                <option value="Low">{tOr('priorityLow', 'Low')}</option>
+                <option value="High">{t('priorityHigh')}</option>
+                <option value="Medium">{t('priorityMedium')}</option>
+                <option value="Low">{t('priorityLow')}</option>
               </select>
             </div>
 
             {/* Due Date and Time - Required */}
             <div className="space-y-3">
               <label className="block text-sm font-medium text-mq-content">
-                {tOr('dueDateTime', 'Due Date & Time')} <span className="text-mq-error">*</span>
+                {t('dueDateTime')} <span className="text-mq-error">*</span>
               </label>
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="flex items-center gap-2 w-full sm:w-40">
@@ -1264,7 +1249,7 @@ export default function CalendarClient() {
                     value={editTodoDueDate}
                     onChange={(e) => setEditTodoDueDate(e.target.value)}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    aria-label={tOr('selectDueDate', 'Select due date')}
+                    aria-label={t('selectDueDate')}
                     required
                   />
                 </div>
@@ -1275,7 +1260,7 @@ export default function CalendarClient() {
                     value={editTodoDueTime}
                     onChange={(e) => setEditTodoDueTime(e.target.value)}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-mq-border bg-mq-background focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    aria-label={tOr('selectDueTime', 'Select due time')}
+                    aria-label={t('selectDueTime')}
                   />
                 </div>
               </div>
@@ -1283,9 +1268,7 @@ export default function CalendarClient() {
 
             {/* Color Picker */}
             <div>
-              <label className="block text-sm font-medium text-mq-content mb-2">
-                {tOr('color', 'Color')}
-              </label>
+              <label className="block text-sm font-medium text-mq-content mb-2">{t('color')}</label>
               <div className="flex gap-2 overflow-x-auto pb-2 px-2 pt-2 scrollbar-thin scrollbar-thumb-mq-border">
                 {UNIT_COLORS.map((colorOption) => (
                   <button
@@ -1299,7 +1282,9 @@ export default function CalendarClient() {
                         : 'border-transparent',
                     )}
                     style={{ backgroundColor: colorOption.value }}
-                    aria-label={`Select color ${colorOption.name}`}
+                    aria-label={t('selectColorAria', {
+                      color: t(colorOption.translationKey as TranslationKey),
+                    })}
                   />
                 ))}
               </div>
@@ -1321,11 +1306,11 @@ export default function CalendarClient() {
               <Button type="submit" variant="outline" disabled={todoSaving}>
                 {todoSaving
                   ? editingTodo
-                    ? tOr('saving', 'Saving...')
-                    : tOr('adding', 'Adding...')
+                    ? t('saving')
+                    : t('adding')
                   : editingTodo
-                    ? tOr('saveChanges', 'Save Changes')
-                    : tOr('addTodo', 'Add Task')}
+                    ? t('saveChanges')
+                    : t('addTodo')}
               </Button>
             </div>
           </form>

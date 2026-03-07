@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/mq/button';
 import { buildings, type Building } from '@/features/map/lib/buildings';
 import { searchBuildings } from '@/lib/utils/buildingValidation';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
 
 interface BuildingAutocompleteProps {
   /** Current value (building ID) */
@@ -46,11 +45,6 @@ export default function BuildingAutocomplete({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const tOr = (key: TranslationKey | string, fallback: string) => {
-    const value = t(key as TranslationKey);
-    return value === key ? fallback : value;
-  };
 
   // Find the selected building from the imported buildings array
   const selectedBuilding = useMemo(() => {
@@ -210,7 +204,7 @@ export default function BuildingAutocomplete({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               onFocus={() => setIsOpen(true)}
-              placeholder={placeholder || tOr('searchBuilding', 'Search for a building...')}
+              placeholder={placeholder || t('searchBuilding')}
               disabled={disabled}
               className={cn('pl-10', error && 'border-red-500')}
             />
@@ -226,9 +220,7 @@ export default function BuildingAutocomplete({
           >
             {searchResults.length === 0 ? (
               <li className="px-3 py-4 text-center text-sm text-mq-content-secondary">
-                {query.length > 0
-                  ? tOr('noBuildingsFound', 'No buildings found')
-                  : tOr('typeToSearchBuildings', 'Type to search buildings...')}
+                {query.length > 0 ? t('noBuildingsFound', { query }) : t('typeToSearchBuildings')}
               </li>
             ) : (
               searchResults.map((building, index) => (

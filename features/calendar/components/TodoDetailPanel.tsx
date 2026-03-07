@@ -31,11 +31,6 @@ export default function TodoDetailPanel({
   const toggleComplete = useTodosStore((state) => state.toggleComplete);
   const { t } = useTypedTranslation();
 
-  const tOr = (key: TranslationKey | string, fallback: string) => {
-    const value = t(key as TranslationKey);
-    return value === key ? fallback : value;
-  };
-
   // Use custom color if set, otherwise fall back to priority colors
   const color = useMemo(() => {
     if (!todo) return '#6B7280';
@@ -67,23 +62,23 @@ export default function TodoDetailPanel({
   const status = getStatus();
 
   const getTimeRemaining = () => {
-    if (todo.completed) return tOr('completed', 'Completed');
-    if (!dueDate) return tOr('noDueDate', 'No due date');
+    if (todo.completed) return t('completed' as TranslationKey);
+    if (!dueDate) return t('noDueDate' as TranslationKey);
     if (isPastDue) {
       const daysPast = Math.abs(daysUntil || 0);
-      if (daysPast === 0) return tOr('overdueToday', 'Overdue (today)');
-      if (daysPast === 1) return tOr('oneDayOverdue', '1 day overdue');
+      if (daysPast === 0) return t('overdueToday' as TranslationKey);
+      if (daysPast === 1) return t('oneDayOverdue' as TranslationKey);
       return t('daysOverdue' as TranslationKey, { count: daysPast });
     }
     if (hoursUntil !== null && hoursUntil < 24) {
-      if (hoursUntil <= 1) return tOr('dueWithinHour', 'Due within an hour');
-      return `${tOr('dueIn', 'Due in')} ${hoursUntil} ${tOr('hours', 'hours')}`;
+      if (hoursUntil <= 1) return t('dueWithinHour' as TranslationKey);
+      return `${t('dueIn' as TranslationKey)} ${hoursUntil} ${t('hours' as TranslationKey)}`;
     }
-    if (daysUntil === 1) return tOr('dueTomorrow', 'Due tomorrow');
+    if (daysUntil === 1) return t('dueTomorrow' as TranslationKey);
     if (daysUntil !== null && daysUntil <= 7)
-      return `${tOr('dueIn', 'Due in')} ${daysUntil} ${tOr('days', 'days')}`;
+      return `${t('dueIn' as TranslationKey)} ${daysUntil} ${t('days' as TranslationKey)}`;
     return daysUntil !== null
-      ? `${tOr('dueIn', 'Due in')} ${daysUntil} ${tOr('days', 'days')}`
+      ? `${t('dueIn' as TranslationKey)} ${daysUntil} ${t('days' as TranslationKey)}`
       : '';
   };
 
@@ -107,8 +102,8 @@ export default function TodoDetailPanel({
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-mq-hover-background transition-colors"
                 aria-label={
                   todo.completed
-                    ? tOr('markIncomplete', 'Mark incomplete')
-                    : tOr('markAsCompleted', 'Mark as completed')
+                    ? t('markIncomplete' as TranslationKey)
+                    : t('markAsCompleted' as TranslationKey)
                 }
               >
                 {todo.completed ? (
@@ -126,10 +121,10 @@ export default function TodoDetailPanel({
                   )}
                 >
                   {todo.completed
-                    ? tOr('completed', 'Completed')
+                    ? t('completed' as TranslationKey)
                     : status === 'overdue'
-                      ? tOr('overdue', 'Overdue')
-                      : tOr('markComplete', 'Mark complete')}
+                      ? t('overdue' as TranslationKey)
+                      : t('markComplete' as TranslationKey)}
                 </span>
               </button>
             </div>
@@ -154,7 +149,7 @@ export default function TodoDetailPanel({
             <div className="p-3 rounded-lg bg-mq-background-secondary border border-mq-border">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <AlertCircle className="h-3.5 w-3.5" />
-                {tOr('priority', 'Priority')}
+                {t('priority' as TranslationKey)}
               </div>
               <Badge className={cn(PRIORITY_COLORS[todo.priority], 'mt-0.5')}>
                 {t(`priority_${todo.priority}` as TranslationKey)}
@@ -165,7 +160,7 @@ export default function TodoDetailPanel({
             <div className="p-3 rounded-lg bg-mq-background-secondary border border-mq-border">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                 <Clock className="h-3.5 w-3.5" />
-                {tOr('status', 'Status')}
+                {t('status' as TranslationKey)}
               </div>
               <p
                 className={cn(
@@ -185,7 +180,7 @@ export default function TodoDetailPanel({
               <div className="col-span-1 rounded-lg border border-mq-border bg-mq-background-secondary p-3 sm:col-span-2">
                 <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-1">
                   <CalendarDays className="h-3.5 w-3.5" />
-                  {tOr('dueDate', 'Due Date')}
+                  {t('dueDate' as TranslationKey)}
                 </div>
                 <p className="font-medium text-sm">{format(dueDate, 'EEEE, MMMM d, yyyy')}</p>
                 <p className="text-xs text-mq-content-secondary">{format(dueDate, 'h:mm a')}</p>
@@ -198,7 +193,7 @@ export default function TodoDetailPanel({
             <div className="p-4 rounded-lg border border-mq-border bg-mq-card-background">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-2">
                 <CheckSquare className="h-3.5 w-3.5" />
-                {tOr('description', 'Description')}
+                {t('description' as TranslationKey)}
               </div>
               <p className="text-sm text-mq-content whitespace-pre-wrap">{todo.description}</p>
             </div>
@@ -208,11 +203,11 @@ export default function TodoDetailPanel({
           {todo.createdAt && (
             <div className="pt-2 border-t border-mq-border">
               <p className="text-xs text-mq-content-tertiary">
-                {tOr('created', 'Created')} {format(new Date(todo.createdAt), 'MMM d, yyyy')}
+                {t('created' as TranslationKey)} {format(new Date(todo.createdAt), 'MMM d, yyyy')}
               </p>
               {todo.completedAt && (
                 <p className="text-xs text-mq-content-tertiary mt-1">
-                  {tOr('completedOn', 'Completed on')}{' '}
+                  {t('completedOn' as TranslationKey)}{' '}
                   {format(new Date(todo.completedAt), 'MMM d, yyyy')}
                 </p>
               )}

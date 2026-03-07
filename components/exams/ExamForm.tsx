@@ -140,11 +140,9 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       title: validationRules.required(t('title')),
       unitCode: validationRules.required(t('unit')),
       dueDate: validationRules.required(t('dueDate')),
-      dueTime: validationRules.required(t('time' as TranslationKey) || 'Time'),
+      dueTime: validationRules.required(t('time' as TranslationKey)),
       building: (value) => {
-        const requiredError = validationRules.required(
-          t('building' as TranslationKey) || 'Building',
-        )(value);
+        const requiredError = validationRules.required(t('building' as TranslationKey))(value);
         if (requiredError) return requiredError;
         // Validate building strictly against map data - exact match only
         const validatedBuilding = validateBuildingStrict(value as string);
@@ -254,14 +252,12 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editExam
-                ? t('editExam' as TranslationKey) || 'Edit Exam'
-                : t('addExam' as TranslationKey) || 'Add Exam'}
+              {editExam ? t('editExam' as TranslationKey) : t('addExam' as TranslationKey)}
             </DialogTitle>
             <DialogDescription>
               {editExam
-                ? t('updateExamDetails' as TranslationKey) || 'Update the exam details below.'
-                : t('fillExamDetails' as TranslationKey) || 'Fill in the exam details below.'}
+                ? t('updateExamDetails' as TranslationKey)
+                : t('fillExamDetails' as TranslationKey)}
             </DialogDescription>
           </DialogHeader>
 
@@ -273,7 +269,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
               </Label>
               <Input
                 id="exam-title"
-                placeholder={t('examTitlePlaceholder' as TranslationKey) || 'e.g., Final Exam'}
+                placeholder={t('examTitlePlaceholder' as TranslationKey)}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={Boolean(errors.title)}
@@ -322,8 +318,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="exam-building">
-                  {t('building' as TranslationKey) || 'Building'}{' '}
-                  <span className="text-mq-error">*</span>
+                  {t('building' as TranslationKey)} <span className="text-mq-error">*</span>
                 </Label>
                 <BuildingAutocomplete
                   value={building}
@@ -334,7 +329,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="exam-room">{t('room' as TranslationKey) || 'Room'}</Label>
+                <Label htmlFor="exam-room">{t('room' as TranslationKey)}</Label>
                 <Input
                   id="exam-room"
                   placeholder={t('roomPlaceholder')}
@@ -349,8 +344,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="exam-date">
-                  {t('examDate' as TranslationKey) || 'Exam Date'}{' '}
-                  <span className="text-mq-error">*</span>
+                  {t('examDate' as TranslationKey)} <span className="text-mq-error">*</span>
                 </Label>
                 <Input
                   id="exam-date"
@@ -370,8 +364,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
               </div>
               <div className="space-y-2">
                 <Label htmlFor="exam-time">
-                  {t('examTime' as TranslationKey) || 'Exam Time'}{' '}
-                  <span className="text-mq-error">*</span>
+                  {t('examTime' as TranslationKey)} <span className="text-mq-error">*</span>
                 </Label>
                 <Input
                   id="exam-time"
@@ -412,7 +405,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
 
             {/* Color Selection */}
             <div className="space-y-2">
-              <Label>{t('color' as TranslationKey) || 'Color'}</Label>
+              <Label>{t('color' as TranslationKey)}</Label>
 
               {/* Unit Color Inheritance Toggle */}
               <div className="flex items-center gap-3 p-2 rounded-lg border border-mq-border bg-mq-surface/50">
@@ -486,10 +479,10 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             </Button>
             <Button onClick={handleSave} disabled={units.length === 0 || isSaving}>
               {isSaving
-                ? t('savingChanges' as TranslationKey) || 'Saving...'
+                ? t('savingChanges' as TranslationKey)
                 : editExam
                   ? t('saveChanges')
-                  : t('addExam' as TranslationKey) || 'Add Exam'}
+                  : t('addExam' as TranslationKey)}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -499,11 +492,8 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t('deleteExam' as TranslationKey) || 'Delete Exam'}</DialogTitle>
-            <DialogDescription>
-              {t('deleteExamConfirm' as TranslationKey) ||
-                'Are you sure you want to delete this exam? This action cannot be undone.'}
-            </DialogDescription>
+            <DialogTitle>{t('deleteExam' as TranslationKey)}</DialogTitle>
+            <DialogDescription>{t('deleteExamConfirm' as TranslationKey)}</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2">
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>

@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
 import { searchMQUnits, getMQUnitByCode, type MQUnit } from '@/data/mqUnits';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
 
 interface UnitAutocompleteProps {
   /** Current unit code value */
@@ -52,11 +51,6 @@ export default function UnitAutocomplete({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const tOr = (key: TranslationKey | string, fallback: string) => {
-    const value = t(key as TranslationKey);
-    return value === key ? fallback : value;
-  };
 
   // Find if current code matches an MQ unit
   const selectedMQUnit = useMemo(() => {
@@ -233,10 +227,10 @@ export default function UnitAutocomplete({
             <div className="flex items-center gap-2">
               <span className="font-mono font-semibold text-sm">{codeValue}</span>
               <Badge variant="neutral" className="text-[10px] h-5">
-                {tOr('customUnit', 'Custom')}
+                {t('customUnit')}
               </Badge>
             </div>
-            <span className="block text-sm truncate">{nameValue || tOr('noName', 'No name')}</span>
+            <span className="block text-sm truncate">{nameValue || t('noName')}</span>
           </div>
           {!disabled && (
             <Button
@@ -264,9 +258,7 @@ export default function UnitAutocomplete({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsOpen(true)}
-            placeholder={
-              codePlaceholder || tOr('searchMQUnit', 'Search MQ units by code or name...')
-            }
+            placeholder={codePlaceholder || t('searchMQUnit')}
             disabled={disabled}
             className={cn('pl-10', error && 'border-red-500')}
           />
@@ -282,9 +274,7 @@ export default function UnitAutocomplete({
         >
           {searchResults.length === 0 ? (
             <li className="px-3 py-4 text-center text-sm text-mq-content-secondary">
-              {query.length > 0
-                ? tOr('noUnitsFound', 'No units found matching your search')
-                : tOr('typeToSearchUnits', 'Type to search MQ units...')}
+              {query.length > 0 ? t('noUnitsFound') : t('typeToSearchUnits')}
             </li>
           ) : (
             searchResults.map((unit, index) => (
@@ -330,10 +320,7 @@ export default function UnitAutocomplete({
           {/* Option to enter custom unit if allowed */}
           {allowCustom && query.length > 0 && (
             <li className="border-t border-mq-border px-3 py-2 text-xs text-mq-content-secondary">
-              {tOr(
-                'customUnitHint',
-                "Can't find your unit? Enter the code and name manually below.",
-              )}
+              {t('customUnitHint')}
             </li>
           )}
         </ul>

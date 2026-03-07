@@ -101,11 +101,9 @@ export function NavigationPreferenceDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Map className="h-5 w-5 text-mq-primary" />
-            {t('navigationPreference') || 'Navigation Options'}
+            {t('navigationPreference')}
           </DialogTitle>
-          <DialogDescription>
-            {t('chooseNavigationMethod') || 'Which map would you like to use for navigation?'}
-          </DialogDescription>
+          <DialogDescription>{t('chooseNavigationMethod')}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-3 pt-4">
@@ -119,10 +117,8 @@ export function NavigationPreferenceDialog({
               <Map className="h-5 w-5 text-mq-primary" />
             </div>
             <div className="text-left">
-              <p className="font-semibold">{t('campusMap') || 'Show in Campus Map'}</p>
-              <p className="text-xs text-mq-content-secondary">
-                {t('campusMapDesc') || 'Navigate using the built-in campus map'}
-              </p>
+              <p className="font-semibold">{t('campusMap')}</p>
+              <p className="text-xs text-mq-content-secondary">{t('campusMapDesc')}</p>
             </div>
           </Button>
 
@@ -141,13 +137,9 @@ export function NavigationPreferenceDialog({
             </div>
             <div className="text-left">
               <p className="font-semibold">
-                {isGettingLocation
-                  ? t('loading') || 'Getting location...'
-                  : t('googleMaps') || 'Navigate with Google Maps'}
+                {isGettingLocation ? t('gettingLocation') : t('googleMaps')}
               </p>
-              <p className="text-xs text-mq-content-secondary">
-                {t('googleMapsDesc') || 'Open in Google Maps for directions'}
-              </p>
+              <p className="text-xs text-mq-content-secondary">{t('googleMapsDesc')}</p>
             </div>
           </Button>
         </div>
