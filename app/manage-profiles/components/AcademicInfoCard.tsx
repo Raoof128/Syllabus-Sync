@@ -29,32 +29,48 @@ export function AcademicInfoCard({ form, disabled }: Props) {
     control,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = form;
 
   const watchedFaculty = watch('faculty');
   const watchedCourse = watch('course');
   const yearOptions = watchedCourse ? getYearOptions(watchedCourse) : [];
 
-  // Skip reset on initial hydration so we don't wipe loaded profile data
-  const isInitialMount = useRef(true);
+  // Track previous values to detect actual user changes
+  const prevFacultyRef = useRef<string>(watchedFaculty || '');
+  const prevCourseRef = useRef<string>(watchedCourse || '');
 
-  // Reset course & year when faculty changes
+  // Reset course & year when faculty changes (only when user actually changed it)
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    setValue('course', '');
-    setValue('year', '');
-  }, [watchedFaculty, setValue]);
+    const currentFaculty = watchedFaculty || '';
 
-  // Reset year when course changes
-  useEffect(() => {
-    if (!watchedCourse) {
+    // Only reset if:
+    // 1. Faculty value actually changed
+    // 2. AND the faculty field has been dirtied (user touched it)
+    if (prevFacultyRef.current !== currentFaculty && dirtyFields.faculty) {
+      setValue('course', '');
       setValue('year', '');
     }
-  }, [watchedCourse, setValue]);
+
+    // Always update the ref to track current value
+    prevFacultyRef.current = currentFaculty;
+  }, [watchedFaculty, dirtyFields.faculty, setValue]);
+
+  // Reset year when course changes (only when user actually changed it)
+  useEffect(() => {
+    const currentCourse = watchedCourse || '';
+
+    // Only reset year if:
+    // 1. Course value actually changed
+    // 2. AND the course field has been dirtied (user touched it)
+    // 3. AND course is now empty
+    if (prevCourseRef.current !== currentCourse && dirtyFields.course && !currentCourse) {
+      setValue('year', '');
+    }
+
+    // Always update the ref to track current value
+    prevCourseRef.current = currentCourse;
+  }, [watchedCourse, dirtyFields.course, setValue]);
 
   return (
     <MagicCard isLiquidEnhanced>

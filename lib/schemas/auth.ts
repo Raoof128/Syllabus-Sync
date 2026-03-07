@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import { SECURITY_CONFIG } from '@/lib/constants/config';
+import type { Translator } from '@/lib/types/translator';
 
 // Basic HTML tag stripper for client-side XSS prevention (layer 1)
 const stripHtmlTags = (val: string): string => {
@@ -7,7 +8,7 @@ const stripHtmlTags = (val: string): string => {
 };
 
 // Pass the translation function 't' into the schema generator
-export const createSignupSchema = (t: (key: string) => string) => {
+export const createSignupSchema = (t: Translator) => {
   return z
     .object({
       email: z.string().trim().toLowerCase().email(t('validation.invalidEmail')),

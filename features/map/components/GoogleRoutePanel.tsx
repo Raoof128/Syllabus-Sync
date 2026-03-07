@@ -52,7 +52,7 @@ export function GoogleRoutePanel({
   onTravelModeChange,
   onStopNavigation,
 }: GoogleRoutePanelProps) {
-  const { safeT } = useSafeTranslation();
+  const { t, safeT } = useSafeTranslation();
 
   const travelModes: Array<{ mode: GoogleTravelMode; labelKey: string; fallback: string }> = [
     { mode: 'WALK', labelKey: 'walk', fallback: 'Walk' },
@@ -83,7 +83,7 @@ export function GoogleRoutePanel({
               {hasArrived
                 ? selectedBuildingLabel
                 : selectedBuildingLabel
-                  ? `${safeT('navigateTo', 'Navigate to')} ${selectedBuildingLabel}`
+                  ? t('navigateTo', { location: selectedBuildingLabel })
                   : safeT('selectBuildingToNavigate', 'Select a building to navigate.')}
             </p>
           </div>
