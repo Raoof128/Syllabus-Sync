@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "Cu 1 zi înainte",
   "reminder_2daysBefore": "Cu 2 zile înainte",
   "reminder_1weekBefore": "Cu 1 săptămână înainte",
-  "reminder_customDateTime": "Dată și oră personalizate"
+  "reminder_customDateTime": "Dată și oră personalizate",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

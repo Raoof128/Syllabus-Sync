@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1일 전",
   "reminder_2daysBefore": "2일 전",
   "reminder_1weekBefore": "1주일 전",
-  "reminder_customDateTime": "사용자 지정 날짜 및 시간"
+  "reminder_customDateTime": "사용자 지정 날짜 및 시간",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

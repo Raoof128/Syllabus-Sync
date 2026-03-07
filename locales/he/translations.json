@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "יום לפני",
   "reminder_2daysBefore": "2 ימים לפני",
   "reminder_1weekBefore": "שבוע לפני",
-  "reminder_customDateTime": "תאריך ושעה מותאמים אישית"
+  "reminder_customDateTime": "תאריך ושעה מותאמים אישית",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 दिन पहले",
   "reminder_2daysBefore": "2 दिन पहले",
   "reminder_1weekBefore": "1 सप्ताह पहले",
-  "reminder_customDateTime": "कस्टम दिनांक और समय"
+  "reminder_customDateTime": "कस्टम दिनांक और समय",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

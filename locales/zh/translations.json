@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "提前1天",
   "reminder_2daysBefore": "提前2天",
   "reminder_1weekBefore": "提前1周",
-  "reminder_customDateTime": "自定义日期和时间"
+  "reminder_customDateTime": "自定义日期和时间",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 ngày trước",
   "reminder_2daysBefore": "2 ngày trước",
   "reminder_1weekBefore": "1 tuần trước",
-  "reminder_customDateTime": "Ngày giờ tùy chỉnh"
+  "reminder_customDateTime": "Ngày giờ tùy chỉnh",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

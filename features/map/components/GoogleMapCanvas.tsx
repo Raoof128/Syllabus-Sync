@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, X } from 'lucide-react';
 import type { Building } from '@/features/map/lib/buildings';
 import { CAMPUS_CENTRE_GPS } from '@/features/map/lib/constants';
 import { getBuildingGps } from '@/features/map/lib/buildings';
@@ -38,7 +38,9 @@ export function GoogleMapCanvas({
 }: GoogleMapCanvasProps) {
   const { safeT } = useSafeTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const streetViewContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const panoramaRef = useRef<google.maps.StreetViewPanorama | null>(null);
   const routePolylineRef = useRef<google.maps.Polyline | null>(null);
   const userMarkerRef = useRef<GoogleCanvasMarker | null>(null);
   const userAccuracyCircleRef = useRef<google.maps.Circle | null>(null);
@@ -46,6 +48,7 @@ export function GoogleMapCanvas({
   const externalMarkerRef = useRef<GoogleCanvasMarker | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [useAdvancedMarkers, setUseAdvancedMarkers] = useState(true);
+  const [showStreetView, setShowStreetView] = useState(false);
   const googleMapId = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID ?? FALLBACK_GOOGLE_MAP_ID;
   const hasUserInteractedRef = useRef(false);
 
@@ -78,11 +81,28 @@ export function GoogleMapCanvas({
           zoom: 16,
           mapId: googleMapId,
           fullscreenControl: true,
-          streetViewControl: false,
-          mapTypeControl: false,
+          streetViewControl: true,
+          mapTypeControl: true,
+          mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+            position: google.maps.ControlPosition.TOP_RIGHT,
+          },
           clickableIcons: false,
           gestureHandling: 'greedy',
         });
+
+        // Initialize Street View panorama linked to the map
+        if (streetViewContainerRef.current) {
+          const panorama = new google.maps.StreetViewPanorama(streetViewContainerRef.current, {
+            enableCloseButton: false,
+            addressControl: true,
+            linksControl: true,
+            panControl: true,
+            zoomControl: true,
+          });
+          map.setStreetView(panorama);
+          panoramaRef.current = panorama;
+        }
 
         // Track user map interactions
         map.addListener('dragstart', markUserInteraction);
@@ -115,6 +135,7 @@ export function GoogleMapCanvas({
       routePolylineRef.current = null;
       userAccuracyCircleRef.current?.setMap(null);
       userAccuracyCircleRef.current = null;
+      panoramaRef.current = null;
       clearMarker(userMarkerRef.current);
       userMarkerRef.current = null;
       clearMarker(externalMarkerRef.current);
@@ -311,38 +332,70 @@ export function GoogleMapCanvas({
     };
   }, [safeT, useAdvancedMarkers, userLocation, userHeading]);
 
-  // Sync external destination marker
+  // Sync external destination marker (AdvancedMarkerElement with fallback)
   useEffect(() => {
     if (!mapRef.current) return;
 
-    clearMarker(externalMarkerRef.current);
-    externalMarkerRef.current = null;
+    let cancelled = false;
 
-    if (!externalDestination) return;
+    async function syncExternalMarker() {
+      clearMarker(externalMarkerRef.current);
+      externalMarkerRef.current = null;
 
-    const position = { lat: externalDestination.lat, lng: externalDestination.lng };
-    const title = externalDestination.label;
+      if (!externalDestination || cancelled || !mapRef.current) return;
 
-    // Use a distinct red marker for external destinations
-    externalMarkerRef.current = new google.maps.Marker({
-      map: mapRef.current,
-      position,
-      title,
-      label: {
-        text: '\u2691', // flag
-        fontSize: '16px',
-        color: '#ffffff',
-      },
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 20,
-        fillColor: '#d24140',
-        fillOpacity: 1,
-        strokeColor: '#b51f2a',
-        strokeWeight: 2,
-      },
-    });
-  }, [externalDestination]);
+      const position = { lat: externalDestination.lat, lng: externalDestination.lng };
+      const title = externalDestination.label;
+
+      const googleMaps = await loadGoogleMaps();
+      if (cancelled || !mapRef.current) return;
+
+      let markerLibrary: google.maps.MarkerLibrary | null = null;
+      if (useAdvancedMarkers) {
+        try {
+          markerLibrary = (await googleMaps.importLibrary('marker')) as google.maps.MarkerLibrary;
+        } catch {
+          // Fall back silently
+        }
+      }
+
+      if (cancelled || !mapRef.current) return;
+
+      if (markerLibrary?.AdvancedMarkerElement) {
+        externalMarkerRef.current = new markerLibrary.AdvancedMarkerElement({
+          map: mapRef.current,
+          position,
+          title,
+          content: createExternalDestinationMarkerElement(externalDestination.label),
+        });
+      } else {
+        externalMarkerRef.current = new google.maps.Marker({
+          map: mapRef.current,
+          position,
+          title,
+          label: {
+            text: '\u2691',
+            fontSize: '16px',
+            color: '#ffffff',
+          },
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 20,
+            fillColor: '#d24140',
+            fillOpacity: 1,
+            strokeColor: '#b51f2a',
+            strokeWeight: 2,
+          },
+        });
+      }
+    }
+
+    syncExternalMarker();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [externalDestination, useAdvancedMarkers]);
 
   // Pan/zoom logic: route, selected building, external destination, or user location
   useEffect(() => {
@@ -399,6 +452,31 @@ export function GoogleMapCanvas({
     mapRef.current.panTo(userLocation);
   }, [isNavigating, userLocation]);
 
+  // Street View: update panorama position when toggling on
+  useEffect(() => {
+    if (!showStreetView || !panoramaRef.current) return;
+
+    // Determine position for Street View: destination > selected building > user location > campus centre
+    let svPosition: google.maps.LatLngLiteral = CAMPUS_CENTRE_GPS;
+    if (externalDestination) {
+      svPosition = { lat: externalDestination.lat, lng: externalDestination.lng };
+    } else if (selectedBuilding) {
+      svPosition = getBuildingGps(selectedBuilding);
+    } else if (userLocation) {
+      svPosition = userLocation;
+    }
+
+    panoramaRef.current.setPosition(svPosition);
+    panoramaRef.current.setVisible(true);
+  }, [showStreetView, externalDestination, selectedBuilding, userLocation]);
+
+  // Hide panorama when Street View is closed
+  useEffect(() => {
+    if (!showStreetView && panoramaRef.current) {
+      panoramaRef.current.setVisible(false);
+    }
+  }, [showStreetView]);
+
   const handleRecenter = useCallback(() => {
     if (!mapRef.current || !userLocation) return;
     hasUserInteractedRef.current = false;
@@ -406,37 +484,90 @@ export function GoogleMapCanvas({
     mapRef.current.setZoom(17);
   }, [userLocation]);
 
+  const handleToggleStreetView = useCallback(() => {
+    setShowStreetView((prev) => !prev);
+  }, []);
+
   return (
     <div className="relative h-full w-full bg-mq-card-background">
+      {/* Main map container */}
       <div
         ref={containerRef}
-        className="h-full w-full"
+        className={`h-full w-full ${showStreetView ? 'hidden' : ''}`}
         aria-label={safeT('googleMaps', 'Google Maps')}
       />
 
-      {/* Recenter button - shown when user has panned away during navigation */}
-      {isNavigating && userLocation && (
+      {/* Street View panorama container */}
+      <div
+        ref={streetViewContainerRef}
+        className={`h-full w-full ${showStreetView ? '' : 'hidden'}`}
+        aria-label={safeT('streetView', 'Street View')}
+      />
+
+      {/* Street View close button */}
+      {showStreetView && (
         <button
           type="button"
-          onClick={handleRecenter}
-          className="absolute bottom-24 right-3 z-[1050] flex h-11 w-11 items-center justify-center rounded-full border border-mq-border bg-mq-card-background/95 shadow-lg backdrop-blur-sm transition-transform hover:scale-105 active:scale-95"
-          aria-label={safeT('myLocation', 'My Location')}
-          title={safeT('myLocation', 'My Location')}
+          onClick={handleToggleStreetView}
+          className="absolute top-3 left-3 z-[1050] flex items-center gap-2 rounded-full border border-mq-border bg-mq-card-background/95 px-3 py-2 text-sm font-medium text-mq-content shadow-lg backdrop-blur-sm transition-transform hover:scale-105 active:scale-95"
+          aria-label={safeT('closeStreetView', 'Close Street View')}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-5 w-5 text-mq-primary"
-          >
-            <circle cx="12" cy="12" r="3" />
-            <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
-          </svg>
+          <X className="h-4 w-4" />
+          {safeT('closeStreetView', 'Close Street View')}
         </button>
+      )}
+
+      {/* Right-side map controls */}
+      {!showStreetView && (
+        <div className="absolute bottom-24 right-3 z-[1050] flex flex-col gap-2">
+          {/* Street View toggle */}
+          <button
+            type="button"
+            onClick={handleToggleStreetView}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-mq-border bg-mq-card-background/95 shadow-lg backdrop-blur-sm transition-transform hover:scale-105 active:scale-95"
+            aria-label={safeT('streetView', 'Street View')}
+            title={safeT('streetView', 'Street View')}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5 text-mq-content"
+            >
+              <circle cx="12" cy="5" r="3" />
+              <path d="M12 8v8M8 21l4-5 4 5M6 13l6-2 6 2" />
+            </svg>
+          </button>
+
+          {/* My Location / Recenter button - always visible when location available */}
+          {userLocation && (
+            <button
+              type="button"
+              onClick={handleRecenter}
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-mq-border bg-mq-card-background/95 shadow-lg backdrop-blur-sm transition-transform hover:scale-105 active:scale-95"
+              aria-label={safeT('myLocation', 'My Location')}
+              title={safeT('myLocation', 'My Location')}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-5 w-5 text-mq-primary"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
+              </svg>
+            </button>
+          )}
+        </div>
       )}
 
       {error && (
@@ -485,6 +616,53 @@ function createBuildingMarkerElement(label: string, selected: boolean): HTMLDivE
   });
   el.textContent = label;
   return el;
+}
+
+function createExternalDestinationMarkerElement(label: string): HTMLDivElement {
+  const wrapper = document.createElement('div');
+  Object.assign(wrapper.style, {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  });
+
+  // Pin head
+  const pin = document.createElement('div');
+  Object.assign(pin.style, {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '48px',
+    height: '36px',
+    padding: '0 12px',
+    borderRadius: '999px',
+    background: '#d24140',
+    border: '2px solid #b51f2a',
+    color: '#ffffff',
+    fontSize: '12px',
+    fontWeight: '700',
+    boxShadow: '0 4px 12px rgba(210, 65, 64, 0.4)',
+    whiteSpace: 'nowrap',
+    maxWidth: '160px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  });
+  pin.textContent = label.length > 20 ? `${label.substring(0, 18)}...` : label;
+  wrapper.appendChild(pin);
+
+  // Pin tail (triangle)
+  const tail = document.createElement('div');
+  Object.assign(tail.style, {
+    width: '0',
+    height: '0',
+    borderLeft: '6px solid transparent',
+    borderRight: '6px solid transparent',
+    borderTop: '8px solid #b51f2a',
+    marginTop: '-1px',
+  });
+  wrapper.appendChild(tail);
+
+  return wrapper;
 }
 
 function createUserMarkerElement(heading: number | null): HTMLDivElement {

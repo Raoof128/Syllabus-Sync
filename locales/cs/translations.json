@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 den před",
   "reminder_2daysBefore": "2 dny před",
   "reminder_1weekBefore": "1 týden před",
-  "reminder_customDateTime": "Vlastní datum a čas"
+  "reminder_customDateTime": "Vlastní datum a čas",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

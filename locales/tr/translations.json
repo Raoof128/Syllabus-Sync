@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 gün önce",
   "reminder_2daysBefore": "2 gün önce",
   "reminder_1weekBefore": "1 hafta önce",
-  "reminder_customDateTime": "Özel tarih ve saat"
+  "reminder_customDateTime": "Özel tarih ve saat",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

@@ -437,6 +437,10 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
             error={routeError}
             hasArrived={hasArrived}
             isNavigating={isNavigating}
+            userLocation={userLocation}
+            destinationLocation={
+              destination ? { lat: destination.lat, lng: destination.lng } : null
+            }
             onStartNavigation={startNavigation}
             onTravelModeChange={onTravelModeChange}
             onStopNavigation={stopNavigation}

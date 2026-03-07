@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "දිනකට පෙර",
   "reminder_2daysBefore": "දින 2 කට පෙර",
   "reminder_1weekBefore": "සතියකට පෙර",
-  "reminder_customDateTime": "අභිරුචි දිනය සහ වේලාව"
+  "reminder_customDateTime": "අභිරුචි දිනය සහ වේලාව",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

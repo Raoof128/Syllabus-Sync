@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1日前",
   "reminder_2daysBefore": "2日前",
   "reminder_1weekBefore": "1週間前",
-  "reminder_customDateTime": "カスタム日時"
+  "reminder_customDateTime": "カスタム日時",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 dag innan",
   "reminder_2daysBefore": "2 dagar innan",
   "reminder_1weekBefore": "1 vecka innan",
-  "reminder_customDateTime": "Anpassat datum och tid"
+  "reminder_customDateTime": "Anpassat datum och tid",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 วันก่อน",
   "reminder_2daysBefore": "2 วันก่อน",
   "reminder_1weekBefore": "1 สัปดาห์ก่อน",
-  "reminder_customDateTime": "วันที่และเวลาที่กำหนดเอง"
+  "reminder_customDateTime": "วันที่และเวลาที่กำหนดเอง",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "За 1 день",
   "reminder_2daysBefore": "За 2 дня",
   "reminder_1weekBefore": "За 1 неделю",
-  "reminder_customDateTime": "Настраиваемые дата и время"
+  "reminder_customDateTime": "Настраиваемые дата и время",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

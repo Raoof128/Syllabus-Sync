@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 நாளுக்கு முன்",
   "reminder_2daysBefore": "2 நாட்களுக்கு முன்",
   "reminder_1weekBefore": "1 வாரத்திற்கு முன்",
-  "reminder_customDateTime": "தனிப்பயன் தேதி மற்றும் நேரம்"
+  "reminder_customDateTime": "தனிப்பயன் தேதி மற்றும் நேரம்",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

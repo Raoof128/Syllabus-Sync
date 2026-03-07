@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 hari sebelum",
   "reminder_2daysBefore": "2 hari sebelum",
   "reminder_1weekBefore": "1 minggu sebelum",
-  "reminder_customDateTime": "Tarikh & masa tersuai"
+  "reminder_customDateTime": "Tarikh & masa tersuai",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

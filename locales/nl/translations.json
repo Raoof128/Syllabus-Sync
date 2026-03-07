@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 dag eerder",
   "reminder_2daysBefore": "2 dagen eerder",
   "reminder_1weekBefore": "1 week eerder",
-  "reminder_customDateTime": "Aangepaste datum en tijd"
+  "reminder_customDateTime": "Aangepaste datum en tijd",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

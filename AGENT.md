@@ -1,4 +1,16 @@
 Raouf: 2026-03-07 (Australia/Sydney)
+Scope: Google Maps — Street View, Controls, Maps URL Handoff, Marker Upgrade
+Summary: Enhanced the Google Maps JS implementation with four professional-grade features:
+**Street View integration:** Added `StreetViewPanorama` linked to the map with a dedicated panorama container. Enabled Pegman (built-in Street View drag control) on the map. Added a custom Street View toggle button that opens panorama at the destination/selected building/user location. Panorama replaces map view with a close button to return. The panorama is initialized once during map setup and reused across toggles.
+**"Open in Google Maps" handoff:** Added a Maps URL button in `GoogleRoutePanel` that constructs a proper `https://www.google.com/maps/dir/` URL with `api=1`, origin (user location), destination coordinates, and travel mode mapped to Google's URL format (`WALK->walking`, `DRIVE->driving`, `BICYCLE->bicycling`, `TRANSIT->transit`). Opens in new tab — on mobile this launches the Google Maps app if installed.
+**Enhanced map controls:** Enabled `mapTypeControl` (dropdown menu, top-right) for satellite/terrain switching. Made the My Location/recenter button always visible when user location is available (previously only shown during active navigation). Grouped controls in a vertical stack (Street View toggle + My Location) at bottom-right.
+**External destination marker upgrade:** Migrated external destination markers from legacy `google.maps.Marker` to `AdvancedMarkerElement` with a custom pin design (red pill with label + triangular tail). Falls back to legacy Marker when AdvancedMarkerElement is unavailable.
+Added 6 new i18n keys (`streetView`, `closeStreetView`, `streetViewUnavailable`, `openInGoogleMaps`, `openInGoogleMapsDesc`, `mapSatellite`) to all 35 locales.
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/GoogleRoutePanel.tsx`, `features/map/components/GoogleMapController.tsx`, `locales/en/translations.json` + 34 locale `translations.json` files
+Verification: `npm run check` -- all gates passed (check:secrets, format:check, typecheck, lint, test 507/507, build all passed).
+Follow-ups: Consider adding custom interior panoramas for campus buildings where Google Street View coverage is weak. Could add a "Preview in Street View" button on building detail cards. The Maps URL handoff could detect mobile via `navigator.userAgent` to show a more prominent CTA on phones.
+
+Raouf: 2026-03-07 (Australia/Sydney)
 Scope: i18n — Full repository-wide translation audit and completion
 Summary: Comprehensive i18n audit across all 35 locales (en + 34 translations). Found and fixed two categories of missing keys:
 **20 keys used in code but missing from en.json:** Navigation/map strings used via `safeT()` with inline fallbacks (`centerOnLocation`, `followRoute`, `googleMapUnavailable`, `myLocation`, `locationNotAvailable`, `routeUnavailable`, `routePlanner`, `loadingRoute`, `meters`, `kilometers`, `arrived`, `navigationError`, `tooManyReroutes`, `noRouteAvailable`, `navigationStarted`, `destinationChanged`, `navigationUpdate`, `restartNavigationForNewDestination`, `accountSecurity`, `verify`). Added all to en.json with their canonical English values.

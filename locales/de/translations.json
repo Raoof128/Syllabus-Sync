@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 Tag vorher",
   "reminder_2daysBefore": "2 Tage vorher",
   "reminder_1weekBefore": "1 Woche vorher",
-  "reminder_customDateTime": "Benutzerdefiniertes Datum & Uhrzeit"
+  "reminder_customDateTime": "Benutzerdefiniertes Datum & Uhrzeit",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }

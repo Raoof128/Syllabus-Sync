@@ -9,10 +9,11 @@ import {
   Navigation,
   RouteIcon,
   CheckCircle2,
+  ExternalLink,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
-import type { GoogleComputedRoute, GoogleTravelMode } from '@/lib/maps/google/types';
+import type { GoogleComputedRoute, GoogleTravelMode, MapLatLng } from '@/lib/maps/google/types';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 
 interface GoogleRoutePanelProps {
@@ -23,6 +24,8 @@ interface GoogleRoutePanelProps {
   error: string | null;
   hasArrived: boolean;
   isNavigating: boolean;
+  userLocation: MapLatLng | null;
+  destinationLocation: { lat: number; lng: number } | null;
   onStartNavigation: () => void;
   onTravelModeChange: (mode: GoogleTravelMode) => void;
   onStopNavigation: () => void;
@@ -43,6 +46,8 @@ export function GoogleRoutePanel({
   error,
   hasArrived,
   isNavigating,
+  userLocation,
+  destinationLocation,
   onStartNavigation,
   onTravelModeChange,
   onStopNavigation,
@@ -168,7 +173,7 @@ export function GoogleRoutePanel({
               <Badge variant="neutral">{formatDuration(route.durationSeconds)}</Badge>
               {isNavigating && (
                 <Badge variant="neutral" className="bg-mq-primary/10 text-mq-primary">
-                  ETA {formatEta(route.durationSeconds)}
+                  {safeT('eta', 'ETA')} {formatEta(route.durationSeconds)}
                 </Badge>
               )}
             </div>
@@ -187,6 +192,19 @@ export function GoogleRoutePanel({
               ))}
             </ol>
           </>
+        )}
+
+        {/* Open in Google Maps - mobile handoff */}
+        {destinationLocation && (
+          <a
+            href={buildGoogleMapsUrl(userLocation, destinationLocation, travelMode)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-mq-lg border border-mq-border bg-mq-background-secondary px-3 py-2 text-xs font-medium text-mq-content-secondary transition-colors hover:bg-mq-hover-background hover:text-mq-content"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            {safeT('openInGoogleMaps', 'Open in Google Maps')}
+          </a>
         )}
       </div>
     </div>
@@ -215,4 +233,25 @@ function formatDuration(durationSeconds: number): string {
 function formatEta(durationSeconds: number): string {
   const arrival = new Date(Date.now() + durationSeconds * 1000);
   return arrival.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+const TRAVEL_MODE_URL_MAP: Record<GoogleTravelMode, string> = {
+  WALK: 'walking',
+  DRIVE: 'driving',
+  BICYCLE: 'bicycling',
+  TRANSIT: 'transit',
+};
+
+function buildGoogleMapsUrl(
+  origin: MapLatLng | null,
+  destination: { lat: number; lng: number },
+  travelMode: GoogleTravelMode,
+): string {
+  const params = new URLSearchParams({ api: '1' });
+  if (origin) {
+    params.set('origin', `${origin.lat},${origin.lng}`);
+  }
+  params.set('destination', `${destination.lat},${destination.lng}`);
+  params.set('travelmode', TRAVEL_MODE_URL_MAP[travelMode]);
+  return `https://www.google.com/maps/dir/?${params.toString()}`;
 }

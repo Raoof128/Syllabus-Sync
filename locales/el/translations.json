@@ -2372,5 +2372,10 @@
   "reminder_1dayBefore": "1 ημέρα πριν",
   "reminder_2daysBefore": "2 ημέρες πριν",
   "reminder_1weekBefore": "1 εβδομάδα πριν",
-  "reminder_customDateTime": "Προσαρμοσμένη ημερομηνία και ώρα"
+  "reminder_customDateTime": "Προσαρμοσμένη ημερομηνία και ώρα",
+  "streetView": "Street View",
+  "closeStreetView": "Close Street View",
+  "streetViewUnavailable": "Street View not available here",
+  "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
+  "mapSatellite": "Satellite"
 }
