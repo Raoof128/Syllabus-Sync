@@ -1,4 +1,11 @@
 Raouf: 2026-03-08 (Australia/Sydney)
+Scope: Calendar i18n Audit — Remove Hardcoded Filter and Header Copy
+Summary: Audited the calendar page surface and removed the remaining hardcoded user-facing strings from the interactive calendar flow. Replaced inline `This Week` fallbacks and the collaborator status `aria-label` in `CalendarClient` with translation keys, and moved the filter-panel labels for MQ key dates and program filtering into i18n. Added the missing keys `mqKeyDates`, `filterByProgramCalendar`, and `activeCollaboratorsCount` across all 35 locale files so the calendar page no longer depends on hardcoded English for those controls.
+Files Changed: `app/calendar/CalendarClient.tsx`, `features/calendar/components/FilterPanel.tsx`, `locales/en/translations.json` + 34 locale `translations.json` files
+Verification: `npx eslint --config config/eslint/eslint.config.mjs app/calendar/CalendarClient.tsx features/calendar/components/FilterPanel.tsx` ✅; `npm run typecheck` ✅; `npm run check:i18n` ✅ (35 locales validated).
+Follow-ups: A broader calendar localization pass should standardize the remaining English-only locale values already present in some non-English translation files, but the hardcoded calendar-page copy is now removed from code.
+
+Raouf: 2026-03-08 (Australia/Sydney)
 Scope: Home i18n — Remove Raw Stress-Level Tokens From Homepage Flow
 Summary: Replaced homepage stress-level fallback literals with a shared `STRESS_LEVELS` constant so the Home KPI strip no longer embeds raw English tokens in component logic. The same shared constants now back `deadlinesStore.getStressLevel()`, keeping the homepage rendering path and deadline stress scoring aligned while preserving the existing translated labels (`stressLow`, `stressBusy`, `stressHigh`) shown to users.
 Files Changed: `features/home/components/HomeKpiStrip.tsx`, `lib/store/deadlinesStore.ts`, `lib/constants/index.ts`

@@ -2294,7 +2294,6 @@
   "streetView": "Street View",
   "closeStreetView": "Close Street View",
   "streetViewUnavailable": "Street View not available here",
-  "openInGoogleMaps": "Open in Google Maps",
   "openInGoogleMapsDesc": "Get full navigation in Google Maps app",
   "mapSatellite": "Satellite",
   "restartNavigationForNewDestination": "Navigation stopped. Tap navigate again for the new destination.",
@@ -2378,5 +2377,8 @@
   "reminder_1dayBefore": "1 day before",
   "reminder_2daysBefore": "2 days before",
   "reminder_1weekBefore": "1 week before",
-  "reminder_customDateTime": "Custom date & time"
+  "reminder_customDateTime": "Custom date & time",
+  "mqKeyDates": "MQ Key Dates",
+  "filterByProgramCalendar": "Filter by Program/Calendar",
+  "activeCollaboratorsCount": "{{count}} active collaborators"
 }

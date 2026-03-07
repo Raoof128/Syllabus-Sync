@@ -376,7 +376,7 @@ export default function CalendarClient() {
               </Button>
             ) : (
               <Button variant="outline" size="sm" onClick={goToThisWeek} disabled={isCurrentWeek}>
-                {t('thisWeek') || 'This Week'}
+                {t('thisWeek')}
               </Button>
             )}
             <Button
@@ -473,7 +473,7 @@ export default function CalendarClient() {
                     onClick={goToThisWeek}
                     disabled={isCurrentWeek}
                   >
-                    {t('thisWeek') || 'This Week'}
+                    {t('thisWeek')}
                   </Button>
                 )}
                 <Button
@@ -489,7 +489,7 @@ export default function CalendarClient() {
               {activeUsers.length > 0 && (
                 <div
                   className="flex items-center gap-1"
-                  aria-label={`${activeUsers.length} active collaborators`}
+                  aria-label={t('activeCollaboratorsCount', { count: activeUsers.length })}
                 >
                   <div className="flex -space-x-2">
                     {activeUsers.slice(0, 4).map((user) => (

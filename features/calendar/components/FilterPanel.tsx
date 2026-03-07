@@ -174,7 +174,7 @@ export default function FilterPanel({
 
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-bold text-mq-content-secondary uppercase tracking-wider">
-                  MQ Key Dates
+                  {t('mqKeyDates')}
                 </span>
                 <div className="flex items-center gap-2">
                   <Switch
@@ -186,7 +186,7 @@ export default function FilterPanel({
                     htmlFor="filter-mq-dates"
                     className="text-sm font-medium flex items-center gap-2 cursor-pointer select-none"
                   >
-                    <GraduationCap className="w-4 h-4 text-mq-primary" /> Show Key Dates
+                    <GraduationCap className="w-4 h-4 text-mq-primary" /> {t('mqKeyDates')}
                   </label>
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default function FilterPanel({
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-bold text-mq-content-secondary uppercase tracking-wider">
-                    Filter by Program/Calendar
+                    {t('filterByProgramCalendar')}
                   </span>
                   <div className="flex gap-2">
                     <Button
@@ -222,7 +222,7 @@ export default function FilterPanel({
                       onClick={selectAllPrograms}
                       className="text-xs h-6 px-2"
                     >
-                      Select All
+                      {t('all')}
                     </Button>
                     <Button
                       variant="ghost"
