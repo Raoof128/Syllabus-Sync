@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/mq/badge';
 import { cn } from '@/lib/utils';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import {
   Dialog,
   DialogContent,
@@ -51,29 +52,7 @@ const typeStyles = {
 };
 
 // Static announcements - could be fetched from DB in the future
-const staticAnnouncements: Announcement[] = [
-  {
-    id: '0',
-    title: 'Add Events to Your Calendar',
-    message:
-      'Click "Add to Calendar" on any event to save it to your personal calendar. View and manage all your events in the Calendar tab.',
-    type: 'highlight',
-  },
-  {
-    id: '1',
-    title: 'Semester 1 Enrolment Open',
-    message:
-      'Course enrolment for Semester 1, 2026 is now open. Check your student portal for available units.',
-    type: 'new',
-  },
-  {
-    id: '2',
-    title: 'Library Extended Hours',
-    message:
-      'During exam period, the library will be open 24/7. Additional study spaces available in Building C3C.',
-    type: 'info',
-  },
-];
+// Defined inside the component to support translation (see below)
 
 interface AnnouncementsSectionProps {
   announcements?: Announcement[];
@@ -81,8 +60,30 @@ interface AnnouncementsSectionProps {
 }
 
 export const AnnouncementsSection = memo(
-  ({ announcements = staticAnnouncements, className }: AnnouncementsSectionProps) => {
+  ({ announcements, className }: AnnouncementsSectionProps) => {
     const { t } = useTypedTranslation();
+
+    const staticAnnouncements: Announcement[] = [
+      {
+        id: '0',
+        title: t('ann0Title' as TranslationKey),
+        message: t('ann0Msg' as TranslationKey),
+        type: 'highlight',
+      },
+      {
+        id: '1',
+        title: t('ann1Title' as TranslationKey),
+        message: t('ann1Msg' as TranslationKey),
+        type: 'new',
+      },
+      {
+        id: '2',
+        title: t('ann2Title' as TranslationKey),
+        message: t('ann2Msg' as TranslationKey),
+        type: 'info',
+      },
+    ];
+    const resolvedAnnouncements = announcements ?? staticAnnouncements;
     const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
 
     const openAnnouncement = useCallback((announcement: Announcement) => {
@@ -105,7 +106,7 @@ export const AnnouncementsSection = memo(
 
         {/* Announcements List */}
         <div className="space-y-3">
-          {announcements.map((announcement) => {
+          {resolvedAnnouncements.map((announcement) => {
             const style = typeStyles[announcement.type];
             const Icon = style.icon;
 

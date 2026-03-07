@@ -13,7 +13,11 @@ vi.mock('@/lib/services/rateLimitService', () => ({
   apiLimiter: (...args: Parameters<typeof apiLimiterMock>) => apiLimiterMock(...args),
 }));
 
+const isTrustedOriginMock = vi.fn();
+
 vi.mock('@/lib/security/ip', () => ({
+  isTrustedOrigin: (...args: Parameters<typeof isTrustedOriginMock>) =>
+    isTrustedOriginMock(...args),
   getClientIP: (...args: Parameters<typeof getClientIPMock>) => getClientIPMock(...args),
 }));
 
@@ -29,6 +33,7 @@ describe('POST /api/maps/routes', () => {
     vi.restoreAllMocks();
     apiLimiterMock.mockResolvedValue({ allowed: true, remaining: 9, resetIn: 60 });
     getClientIPMock.mockReturnValue('127.0.0.1');
+    isTrustedOriginMock.mockReturnValue(true);
     global.fetch = vi.fn();
   });
 

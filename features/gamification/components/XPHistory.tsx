@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/mq/car
 import { Badge } from '@/components/ui/mq/badge';
 import { useGamificationStore, type XPEvent } from '@/lib/store/gamificationStore';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import { cn } from '@/lib/utils';
 
 // ============================================================================
@@ -49,7 +50,7 @@ interface EventTypeConfig {
   icon: React.ComponentType<{ className?: string }>;
   colorClass: string;
   bgClass: string;
-  label: string;
+  labelKey: string;
 }
 
 const EVENT_TYPE_CONFIGS: Record<string, EventTypeConfig> = {
@@ -57,61 +58,61 @@ const EVENT_TYPE_CONFIGS: Record<string, EventTypeConfig> = {
     icon: CheckCircle,
     colorClass: 'text-mq-success',
     bgClass: 'bg-mq-success/10',
-    label: 'Deadline Completed',
+    labelKey: 'xp_deadline_completed',
   },
   deadline_early: {
     icon: Clock,
     colorClass: 'text-mq-info',
     bgClass: 'bg-mq-info/10',
-    label: 'Early Completion',
+    labelKey: 'xp_deadline_early',
   },
   daily_login: {
     icon: Calendar,
     colorClass: 'text-mq-purple',
     bgClass: 'bg-mq-purple/10',
-    label: 'Daily Login',
+    labelKey: 'xp_daily_login',
   },
   streak_bonus: {
     icon: Flame,
     colorClass: 'text-mq-warning',
     bgClass: 'bg-mq-warning/10',
-    label: 'Streak Bonus',
+    labelKey: 'xp_streak_bonus',
   },
   unit_added: {
     icon: BookOpen,
     colorClass: 'text-mq-info',
     bgClass: 'bg-mq-info/10',
-    label: 'Unit Added',
+    labelKey: 'xp_unit_added',
   },
   event_attended: {
     icon: Star,
     colorClass: 'text-mq-purple',
     bgClass: 'bg-mq-purple/10',
-    label: 'Event Attended',
+    labelKey: 'xp_event_attended',
   },
   profile_completed: {
     icon: UserCheck,
     colorClass: 'text-mq-success',
     bgClass: 'bg-mq-success/10',
-    label: 'Profile Completed',
+    labelKey: 'xp_profile_completed',
   },
   first_deadline: {
     icon: Target,
     colorClass: 'text-mq-primary',
     bgClass: 'bg-mq-primary/10',
-    label: 'First Deadline',
+    labelKey: 'xp_first_deadline',
   },
   weekly_goal: {
     icon: Trophy,
     colorClass: 'text-mq-warning',
     bgClass: 'bg-mq-warning/10',
-    label: 'Weekly Goal',
+    labelKey: 'xp_weekly_goal',
   },
   level_up_bonus: {
     icon: Zap,
     colorClass: 'text-mq-primary',
     bgClass: 'bg-mq-primary/10',
-    label: 'Level Up Bonus',
+    labelKey: 'xp_level_up_bonus',
   },
 };
 
@@ -119,7 +120,7 @@ const DEFAULT_CONFIG: EventTypeConfig = {
   icon: Star,
   colorClass: 'text-mq-content-secondary',
   bgClass: 'bg-mq-background-secondary',
-  label: 'XP Event',
+  labelKey: 'xp_event',
 };
 
 // ============================================================================
@@ -130,7 +131,7 @@ function getEventConfig(eventType: string): EventTypeConfig {
   return EVENT_TYPE_CONFIGS[eventType] || DEFAULT_CONFIG;
 }
 
-function formatRelativeTime(dateString: string, locale: string): string {
+function formatRelativeTime(dateString: string, locale: string, justNowLabel: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -142,7 +143,7 @@ function formatRelativeTime(dateString: string, locale: string): string {
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
 
   if (diffMinutes < 1) {
-    return 'Just now';
+    return justNowLabel;
   } else if (diffMinutes < 60) {
     return rtf.format(-diffMinutes, 'minute');
   } else if (diffHours < 24) {
@@ -167,17 +168,22 @@ interface XPEventItemProps {
 }
 
 const XPEventItem = memo(({ event, locale }: XPEventItemProps) => {
+  const { t } = useTypedTranslation();
   const config = getEventConfig(event.eventType);
   const Icon = config.icon;
 
+  const justNow = t('justNow' as TranslationKey);
   const relativeTime = useMemo(
-    () => formatRelativeTime(event.createdAt, locale),
-    [event.createdAt, locale],
+    () => formatRelativeTime(event.createdAt, locale, justNow),
+
+    [event.createdAt, locale, justNow],
   );
 
   // Extract title from metadata if available
   const title =
-    (event.metadata?.title as string) || (event.metadata?.unitCode as string) || config.label;
+    (event.metadata?.title as string) ||
+    (event.metadata?.unitCode as string) ||
+    t(config.labelKey as TranslationKey);
 
   return (
     <div className="flex items-start gap-3 py-3 border-b border-mq-border last:border-b-0">
@@ -322,7 +328,7 @@ interface XPHistoryCompactProps {
 }
 
 export const XPHistoryCompact = memo(({ maxEvents = 5, className }: XPHistoryCompactProps) => {
-  const { language } = useTypedTranslation();
+  const { t, language } = useTypedTranslation();
   const recentEvents = useGamificationStore((state) => state.recentEvents);
 
   const locale = useMemo(() => LOCALE_MAP[language] || DEFAULT_LOCALE, [language]);
@@ -344,7 +350,7 @@ export const XPHistoryCompact = memo(({ maxEvents = 5, className }: XPHistoryCom
             <Icon className={cn('h-3 w-3 flex-shrink-0', config.colorClass)} aria-hidden="true" />
             <span className="text-mq-content-secondary truncate flex-1">+{event.xpAmount} XP</span>
             <span className="text-mq-content-tertiary">
-              {formatRelativeTime(event.createdAt, locale)}
+              {formatRelativeTime(event.createdAt, locale, t('justNow' as TranslationKey))}
             </span>
           </div>
         );

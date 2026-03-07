@@ -15,61 +15,38 @@ import {
 } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
-const VALUE_CARDS = [
-  {
-    icon: Users,
-    title: 'Built by students, for students',
-    description:
-      'We understand how hard it is to juggle classes, assignments, exams, and campus life in one term.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Privacy-first by default',
-    description:
-      'Your academic planning data stays under your control, with transparent handling and no hidden tracking practices.',
-  },
-  {
-    icon: Sparkles,
-    title: 'Clear and transparent',
-    description:
-      'We use public university information and keep the product experience straightforward and easy to trust.',
-  },
-  {
-    icon: Target,
-    title: 'Focused on student outcomes',
-    description:
-      'Every feature is designed to reduce stress, improve planning, and help students stay ahead.',
-  },
-] as const;
+const VALUE_CARD_KEYS: {
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: 'true' }>;
+  titleKey: TranslationKey;
+  descKey: TranslationKey;
+}[] = [
+  { icon: Users, titleKey: 'about_value1Title', descKey: 'about_value1Desc' },
+  { icon: ShieldCheck, titleKey: 'about_value2Title', descKey: 'about_value2Desc' },
+  { icon: Sparkles, titleKey: 'about_value3Title', descKey: 'about_value3Desc' },
+  { icon: Target, titleKey: 'about_value4Title', descKey: 'about_value4Desc' },
+];
 
-const FEATURE_CARDS = [
-  {
-    icon: CalendarCheck,
-    title: 'Plan and manage assessments',
-    description: 'Capture deadlines, classes, and events in one structured workflow.',
-  },
-  {
-    icon: BarChart3,
-    title: 'Visualize study workload',
-    description: 'Use calendar insights and widgets to see busy periods before they hit.',
-  },
-  {
-    icon: Download,
-    title: 'Keep control of your data',
-    description: 'Export and manage your planning information with clear ownership.',
-  },
-] as const;
+const FEATURE_CARD_KEYS: {
+  icon: React.ComponentType<{ className?: string; 'aria-hidden'?: 'true' }>;
+  titleKey: TranslationKey;
+  descKey: TranslationKey;
+}[] = [
+  { icon: CalendarCheck, titleKey: 'about_feature1Title', descKey: 'about_feature1Desc' },
+  { icon: BarChart3, titleKey: 'about_feature2Title', descKey: 'about_feature2Desc' },
+  { icon: Download, titleKey: 'about_feature3Title', descKey: 'about_feature3Desc' },
+];
 
 const DEVELOPERS = [
   {
     name: 'Pouya',
-    role: 'Front-End & UI/UX Developer',
+    roleKey: 'about_devRoleFrontend' as TranslationKey,
     photo: '/images/team/pouya.jpg',
   },
   {
     name: 'Raouf',
-    role: 'Back-End & Cyber Security Developer',
+    roleKey: 'about_devRoleBackend' as TranslationKey,
     photo: '/images/team/raouf.jpg',
   },
 ] as const;
@@ -99,7 +76,7 @@ export default function AboutPage() {
               style={{ animationFillMode: 'both' }}
             >
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-              Back to {APP_CONFIG.name}
+              {t('backToApp', { appName: APP_CONFIG.name })}
             </Link>
             <p
               className="animate-fade-in text-[11px] font-bold uppercase tracking-[0.22em] text-[#FFB81C]"
@@ -117,8 +94,7 @@ export default function AboutPage() {
               className="animate-fade-in max-w-xl text-[15px] leading-relaxed text-white/75 sm:text-base"
               style={{ animationDelay: '0.2s', animationFillMode: 'both' }}
             >
-              {APP_CONFIG.name} helps students organise assessments, schedules, and study priorities
-              with clarity. We build practical tools that support real semester workflows.
+              {t('about_heroDesc', { appName: APP_CONFIG.name })}
             </p>
             <div
               className="animate-fade-in flex flex-wrap items-center gap-3 pt-1"
@@ -128,7 +104,7 @@ export default function AboutPage() {
                 href="/signup"
                 className="inline-flex items-center gap-2 rounded-mq-lg bg-white px-5 py-2.5 text-sm font-semibold text-mq-primary shadow-lg shadow-black/15 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-xl hover:shadow-black/20"
               >
-                Get Started
+                {t('getStarted')}
                 <ArrowRight
                   className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5"
                   aria-hidden="true"
@@ -140,7 +116,7 @@ export default function AboutPage() {
                 rel="noopener noreferrer"
                 className="rounded-mq-lg border border-white/25 px-5 py-2.5 text-sm font-semibold text-white transition hover:border-white/40 hover:bg-white/10"
               >
-                Documentation
+                {t('documentation')}
               </a>
             </div>
           </div>
@@ -151,7 +127,7 @@ export default function AboutPage() {
           >
             <Image
               src="/images/login-bg.png"
-              alt="Students collaborating on campus"
+              alt={t('about_heroImgAlt')}
               fill
               sizes="(max-width: 1024px) 100vw, 440px"
               className="object-cover"
@@ -167,19 +143,19 @@ export default function AboutPage() {
         <div className="flex items-center gap-3">
           <span className="block h-px w-8 bg-mq-primary" aria-hidden="true" />
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-mq-primary">
-            What We Stand For
+            {t('about_whatWeStandFor')}
           </p>
         </div>
         <h2 className="mt-3 font-serif text-3xl font-bold text-mq-content sm:text-4xl">
-          Our Values
+          {t('about_ourValues')}
         </h2>
         <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-mq-content-secondary">
-          The principles that guide how we design, build, and support student planning.
+          {t('about_valuesDesc')}
         </p>
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2">
-          {VALUE_CARDS.map((item, i) => (
+          {VALUE_CARD_KEYS.map((item, i) => (
             <article
-              key={item.title}
+              key={item.titleKey}
               className="animate-fade-in group rounded-xl border border-mq-border bg-mq-card-background p-6 transition-all duration-300 hover:-translate-y-1 hover:border-mq-primary/25 hover:shadow-lg hover:shadow-mq-primary/5"
               style={{
                 animationDelay: `${0.1 + i * 0.08}s`,
@@ -189,9 +165,9 @@ export default function AboutPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-mq-primary/10 transition-colors duration-300 group-hover:bg-mq-primary/15">
                 <item.icon className="h-5 w-5 text-mq-primary" aria-hidden="true" />
               </div>
-              <h3 className="mt-4 text-base font-semibold text-mq-content">{item.title}</h3>
+              <h3 className="mt-4 text-base font-semibold text-mq-content">{t(item.titleKey)}</h3>
               <p className="mt-2 text-sm leading-relaxed text-mq-content-secondary">
-                {item.description}
+                {t(item.descKey)}
               </p>
             </article>
           ))}
@@ -204,20 +180,19 @@ export default function AboutPage() {
           <div className="flex items-center gap-3">
             <span className="block h-px w-8 bg-mq-primary" aria-hidden="true" />
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-mq-primary">
-              What We Build
+              {t('about_whatWeBuild')}
             </p>
           </div>
           <h2 className="mt-3 font-serif text-3xl font-bold text-mq-content sm:text-4xl">
-            Built for Student Success
+            {t('about_builtForSuccess')}
           </h2>
           <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-mq-content-secondary">
-            Feature design focused on practical student productivity and day-to-day academic
-            control.
+            {t('about_featuresDesc')}
           </p>
           <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
-            {FEATURE_CARDS.map((item, i) => (
+            {FEATURE_CARD_KEYS.map((item, i) => (
               <article
-                key={item.title}
+                key={item.titleKey}
                 className="animate-fade-in group rounded-xl border border-mq-border bg-mq-card-background p-6 transition-all duration-300 hover:-translate-y-1 hover:border-mq-primary/25 hover:shadow-lg hover:shadow-mq-primary/5"
                 style={{
                   animationDelay: `${0.1 + i * 0.1}s`,
@@ -227,9 +202,9 @@ export default function AboutPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-mq-primary/10 transition-colors duration-300 group-hover:bg-mq-primary/15">
                   <item.icon className="h-5 w-5 text-mq-primary" aria-hidden="true" />
                 </div>
-                <h3 className="mt-4 text-base font-semibold text-mq-content">{item.title}</h3>
+                <h3 className="mt-4 text-base font-semibold text-mq-content">{t(item.titleKey)}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-mq-content-secondary">
-                  {item.description}
+                  {t(item.descKey)}
                 </p>
               </article>
             ))}
@@ -242,14 +217,14 @@ export default function AboutPage() {
         <div className="flex items-center gap-3">
           <span className="block h-px w-8 bg-mq-primary" aria-hidden="true" />
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-mq-primary">
-            The Team
+            {t('about_theTeam')}
           </p>
         </div>
         <h2 className="mt-3 font-serif text-3xl font-bold text-mq-content sm:text-4xl">
-          Our Developers
+          {t('about_ourDevelopers')}
         </h2>
         <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-mq-content-secondary">
-          Built with care by students who understand the challenge.
+          {t('about_developersDesc')}
         </p>
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
           {DEVELOPERS.map((dev, i) => (
@@ -264,7 +239,7 @@ export default function AboutPage() {
               <div className="relative h-[400px] w-full overflow-hidden sm:h-[440px]">
                 <Image
                   src={dev.photo}
-                  alt={`${dev.name} — ${dev.role}`}
+                  alt={`${dev.name} — ${t(dev.roleKey)}`}
                   fill
                   sizes="(max-width: 640px) 100vw, 50vw"
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
@@ -274,7 +249,9 @@ export default function AboutPage() {
                   <h3 className="text-overlay-white text-2xl font-bold tracking-tight">
                     {dev.name}
                   </h3>
-                  <p className="text-overlay-white-muted mt-1 text-sm font-medium">{dev.role}</p>
+                  <p className="text-overlay-white-muted mt-1 text-sm font-medium">
+                    {t(dev.roleKey)}
+                  </p>
                 </div>
               </div>
             </article>

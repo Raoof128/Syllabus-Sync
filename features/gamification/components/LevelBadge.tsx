@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 interface LevelBadgeProps {
   /** Size variant */
@@ -18,6 +19,7 @@ interface LevelBadgeProps {
  * Displays the user's current commitment title with optional numeric tier
  */
 export function LevelBadge({ size = 'md', showTitle = false, className }: LevelBadgeProps) {
+  const { t } = useTypedTranslation();
   const { profile, loadProfile, hasLoaded, isLoading, getLevelTitle } = useGamificationStore();
 
   useEffect(() => {
@@ -78,9 +80,9 @@ export function LevelBadge({ size = 'md', showTitle = false, className }: LevelB
           'transition-transform hover:scale-105',
           levelGradient,
         )}
-        title={`Level ${level}: ${title}`}
+        title={`${t('level')} ${level}: ${title}`}
         role="img"
-        aria-label={`Level ${level}: ${title}`}
+        aria-label={`${t('level')} ${level}: ${title}`}
       >
         {level}
       </div>
@@ -89,7 +91,9 @@ export function LevelBadge({ size = 'md', showTitle = false, className }: LevelB
       {showTitle && (
         <div className="flex flex-col">
           <span className={cn(config.title, 'font-semibold text-mq-content')}>{title}</span>
-          <span className="text-xs text-mq-content-secondary">Level {level}</span>
+          <span className="text-xs text-mq-content-secondary">
+            {t('level')} {level}
+          </span>
         </div>
       )}
     </div>

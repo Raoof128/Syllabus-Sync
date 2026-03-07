@@ -18,6 +18,7 @@ import {
 import { format, isPast, isFuture, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import { formatScheduleTime, formatLocation } from '@/lib/utils/locale';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
 import { NavigationPreferenceDialog } from '@/components/ui/NavigationPreferenceDialog';
@@ -107,10 +108,10 @@ export default function UnitDetailPanel({
     const d = new Date(date);
     const daysUntil = differenceInDays(d, new Date());
 
-    if (daysUntil === 0) return 'Due today';
-    if (daysUntil === 1) return 'Due tomorrow';
-    if (daysUntil < 0) return `${Math.abs(daysUntil)} days overdue`;
-    if (daysUntil <= 7) return `Due in ${daysUntil} days`;
+    if (daysUntil === 0) return t('dueToday');
+    if (daysUntil === 1) return t('dueTomorrow' as TranslationKey);
+    if (daysUntil < 0) return t('daysOverdue' as TranslationKey, { count: Math.abs(daysUntil) });
+    if (daysUntil <= 7) return t('dueInDays' as TranslationKey, { count: daysUntil });
 
     return format(d, 'MMM d, yyyy');
   };
@@ -169,7 +170,7 @@ export default function UnitDetailPanel({
                 textShadow: 'none',
               }}
             >
-              {deadline.type}
+              {t(`type_${deadline.type}` as TranslationKey)}
             </Badge>
           </div>
           <p
@@ -198,7 +199,7 @@ export default function UnitDetailPanel({
               'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
           )}
         >
-          {deadline.priority}
+          {t(`priority_${deadline.priority}` as TranslationKey)}
         </Badge>
       </div>
     );
@@ -252,8 +253,7 @@ export default function UnitDetailPanel({
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
             <Clock className="h-4 w-4 text-mq-content-secondary" />
             <span>
-              {unit.schedule.length} class
-              {unit.schedule.length !== 1 ? 'es' : ''}/week
+              {unit.schedule.length} {t('classesPerWeek')}
             </span>
           </div>
         </div>
@@ -264,13 +264,13 @@ export default function UnitDetailPanel({
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs">
                 <MapPin className="h-3.5 w-3.5" />
-                Unit Location
+                {t('unitLocation' as TranslationKey)}
               </div>
               <button
                 type="button"
                 onClick={() => handleNavigationClick(unit.location!.building!, unit.location!.room)}
                 className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
-                aria-label={`Navigate to ${unit.location.building} on campus map`}
+                aria-label={t('navigateToBuildingAria', { building: unit.location.building })}
               >
                 <Navigation className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -280,7 +280,9 @@ export default function UnitDetailPanel({
               <div>
                 <p className="font-semibold text-sm">{unit.location.building}</p>
                 {unit.location.room && (
-                  <p className="text-xs text-mq-content-secondary">Room {unit.location.room}</p>
+                  <p className="text-xs text-mq-content-secondary">
+                    {t('room')} {unit.location.room}
+                  </p>
                 )}
               </div>
             </div>

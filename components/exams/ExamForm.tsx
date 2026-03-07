@@ -207,13 +207,13 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
       if (result !== null) {
         if (editExam) {
           toastUtils.success(
-            t('examUpdated' as TranslationKey) || 'Exam Updated',
-            `"${examData.title}" has been updated successfully.`,
+            t('examUpdated' as TranslationKey),
+            t('examUpdatedDesc' as TranslationKey, { title: examData.title }),
           );
         } else {
           toastUtils.success(
-            t('examAdded' as TranslationKey) || 'Exam Added',
-            `"${examData.title}" has been added successfully.`,
+            t('examAdded' as TranslationKey),
+            t('examAddedDesc' as TranslationKey, { title: examData.title }),
           );
         }
         onOpenChange(false);
@@ -234,8 +234,8 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
     if (editExam) {
       removeDeadline(editExam.id);
       toastUtils.success(
-        t('examDeleted' as TranslationKey) || 'Exam Deleted',
-        `"${editExam.title}" ${t('deletedMsg')}`,
+        t('examDeleted' as TranslationKey),
+        t('examDeletedDesc' as TranslationKey, { title: editExam.title }),
       );
       onOpenChange(false);
       resetForm();
@@ -422,14 +422,16 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-mq-content">
-                    {useCustomColor ? 'Custom Color' : 'Inherits Unit Color'}
+                    {useCustomColor
+                      ? t('colorCustom' as TranslationKey)
+                      : t('colorInheritsUnit' as TranslationKey)}
                   </p>
                   <p className="text-xs text-mq-content-secondary truncate">
                     {useCustomColor
                       ? UNIT_COLORS.find((c) => c.value === color)?.name || color
                       : selectedUnit
-                        ? `From ${selectedUnit.code}`
-                        : 'Select a unit first'}
+                        ? t('colorFromUnit' as TranslationKey, { code: selectedUnit.code })
+                        : t('colorSelectUnitFirst' as TranslationKey)}
                   </p>
                 </div>
                 <button
@@ -442,7 +444,9 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
                   }}
                   className="text-xs px-2 py-1 rounded border border-mq-border hover:bg-mq-hover-background transition-colors"
                 >
-                  {useCustomColor ? 'Use Unit Color' : 'Customize'}
+                  {useCustomColor
+                    ? t('colorUseUnit' as TranslationKey)
+                    : t('colorCustomize' as TranslationKey)}
                 </button>
               </div>
 

@@ -92,17 +92,20 @@ export default function EventDetailPanel({
   const getTimeRemaining = () => {
     if (isPastEvent) {
       const daysPast = Math.abs(daysUntil);
-      if (daysPast === 0) return 'Earlier today';
-      if (daysPast === 1) return 'Yesterday';
-      return `${daysPast} days ago`;
+      if (daysPast === 0) return t('earlierToday' as TranslationKey);
+      if (daysPast === 1) return t('yesterday' as TranslationKey);
+      return t('ago_other' as TranslationKey, { count: daysPast });
     }
-    if (hoursUntil < 1) return 'Starting soon';
+    if (hoursUntil < 1) return t('startingSoon');
     if (hoursUntil < 24) {
-      return `In ${hoursUntil} hours`;
+      return t(hoursUntil === 1 ? 'inHours_one' : ('inHours_other' as TranslationKey), {
+        count: hoursUntil,
+      });
     }
-    if (daysUntil === 1) return 'Tomorrow';
-    if (daysUntil <= 7) return `In ${daysUntil} days`;
-    return `In ${daysUntil} days`;
+    if (daysUntil === 1) return t('tomorrow' as TranslationKey);
+    return t(daysUntil === 1 ? 'inDays_one' : ('inDays_other' as TranslationKey), {
+      count: daysUntil,
+    });
   };
 
   const getCategoryLabel = (category: Event['category']) => {
@@ -137,7 +140,7 @@ export default function EventDetailPanel({
               <div className="flex items-center gap-2 p-2 rounded-lg">
                 <PartyPopper className="h-5 w-5 text-mq-content-secondary" />
                 <span className="text-sm font-medium text-mq-content-secondary">
-                  {event.allDay ? 'All Day Event' : 'Event'}
+                  {event.allDay ? t('allDayEvent' as TranslationKey) : t('event')}
                 </span>
               </div>
             </div>
@@ -206,7 +209,9 @@ export default function EventDetailPanel({
                 <MapPin className="h-3.5 w-3.5" />
                 {t('location' as TranslationKey) || 'Location'}
               </div>
-              <p className="font-medium text-sm">{locationDisplay || 'Not specified'}</p>
+              <p className="font-medium text-sm">
+                {locationDisplay || t('notSpecified' as TranslationKey)}
+              </p>
             </div>
           </div>
 
@@ -225,13 +230,13 @@ export default function EventDetailPanel({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-mq-content-secondary text-xs">
                   <MapPin className="h-3.5 w-3.5" />
-                  Event Location
+                  {t('eventLocation' as TranslationKey)}
                 </div>
                 <button
                   type="button"
                   onClick={() => handleNavigationClick(event.building!, event.room)}
                   className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
-                  aria-label={`Navigate to ${event.building} on campus map`}
+                  aria-label={t('navigateToBuildingAria', { building: event.building })}
                 >
                   <Navigation className="h-4 w-4" aria-hidden="true" />
                 </button>
@@ -241,7 +246,9 @@ export default function EventDetailPanel({
                 <div>
                   <p className="font-semibold text-sm">{event.building}</p>
                   {event.room && (
-                    <p className="text-xs text-mq-content-secondary">Room {event.room}</p>
+                    <p className="text-xs text-mq-content-secondary">
+                      {t('room')} {event.room}
+                    </p>
                   )}
                 </div>
               </div>
@@ -251,7 +258,9 @@ export default function EventDetailPanel({
           {/* Created Info */}
           <div className="pt-2 border-t border-mq-border">
             <p className="text-xs text-mq-content-tertiary">
-              {event.userId ? 'Personal Event' : 'Campus Event'}
+              {event.userId
+                ? t('personalEvent' as TranslationKey)
+                : t('campusEvent' as TranslationKey)}
             </p>
           </div>
         </div>

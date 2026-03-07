@@ -4,8 +4,10 @@ import { FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { Mail, FileText, ShieldCheck, ArrowLeft, ArrowRight, Send } from 'lucide-react';
 import { APP_CONFIG, EXTERNAL_LINKS, UNIVERSITY_CONFIG } from '@/lib/config';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export default function ContactPage() {
+  const { t } = useTypedTranslation();
   const [contactEmail, setContactEmail] = useState('');
   const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
@@ -16,7 +18,7 @@ export default function ContactPage() {
 
     const trimmedFeedback = feedback.trim();
     if (trimmedFeedback.length < 10) {
-      setError('Please add a bit more detail so we can help properly.');
+      setError(t('contact_error_minLength'));
       return;
     }
 
@@ -50,26 +52,25 @@ export default function ContactPage() {
             style={{ animationFillMode: 'both' }}
           >
             <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-            Back to {APP_CONFIG.name}
+            {t('backToApp', { appName: APP_CONFIG.name })}
           </Link>
           <p
             className="animate-fade-in text-[11px] font-bold uppercase tracking-[0.22em] text-[#FFB81C]"
             style={{ animationFillMode: 'both' }}
           >
-            Support &amp; Feedback
+            {t('contact_supportFeedback')}
           </p>
           <h1
             className="animate-fade-in mt-3 font-serif text-4xl font-bold leading-[1.15] text-white sm:text-5xl"
             style={{ animationDelay: '0.1s', animationFillMode: 'both' }}
           >
-            Contact {APP_CONFIG.name}
+            {t('contact_pageTitle', { appName: APP_CONFIG.name })}
           </h1>
           <p
             className="animate-fade-in mt-4 max-w-2xl text-[15px] leading-relaxed text-white/75 sm:text-base"
             style={{ animationDelay: '0.2s', animationFillMode: 'both' }}
           >
-            Found a bug or have a suggestion? Share your feedback — it helps us improve the
-            experience for everyone.
+            {t('contact_heroDesc')}
           </p>
         </div>
       </section>
@@ -85,10 +86,12 @@ export default function ContactPage() {
             <div className="flex items-center gap-3">
               <span className="block h-px w-8 bg-mq-primary" aria-hidden="true" />
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-mq-primary">
-                Reach Out
+                {t('contact_reachOut')}
               </p>
             </div>
-            <h2 className="mt-3 font-serif text-2xl font-bold text-mq-content">Support Channels</h2>
+            <h2 className="mt-3 font-serif text-2xl font-bold text-mq-content">
+              {t('contact_supportChannels')}
+            </h2>
           </div>
 
           <article className="group rounded-xl border border-mq-border bg-mq-card-background p-5 transition-all duration-300 hover:border-mq-primary/25 hover:shadow-lg hover:shadow-mq-primary/5">
@@ -97,7 +100,7 @@ export default function ContactPage() {
                 <Mail className="h-4 w-4 text-mq-primary" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-mq-content">Email</p>
+                <p className="text-sm font-semibold text-mq-content">{t('email')}</p>
                 <a
                   href={`mailto:${UNIVERSITY_CONFIG.supportEmail}`}
                   className="mt-0.5 inline-block text-sm text-mq-content-secondary transition-colors hover:text-mq-primary"
@@ -114,7 +117,7 @@ export default function ContactPage() {
                 <FileText className="h-4 w-4 text-mq-primary" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-mq-content">Helpful Links</p>
+                <p className="text-sm font-semibold text-mq-content">{t('contact_helpfulLinks')}</p>
                 <div className="mt-1.5 flex flex-col gap-1.5">
                   <a
                     href={EXTERNAL_LINKS.documentation}
@@ -122,7 +125,7 @@ export default function ContactPage() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-sm text-mq-content-secondary transition-colors hover:text-mq-primary"
                   >
-                    Documentation
+                    {t('documentation')}
                     <ArrowRight
                       className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100"
                       aria-hidden="true"
@@ -132,13 +135,13 @@ export default function ContactPage() {
                     href="/about"
                     className="text-sm text-mq-content-secondary transition-colors hover:text-mq-primary"
                   >
-                    About
+                    {t('about')}
                   </Link>
                   <Link
                     href="/privacy"
                     className="text-sm text-mq-content-secondary transition-colors hover:text-mq-primary"
                   >
-                    Privacy Policy
+                    {t('privacyPolicy')}
                   </Link>
                 </div>
               </div>
@@ -151,9 +154,11 @@ export default function ContactPage() {
                 <ShieldCheck className="h-4 w-4 text-mq-primary" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-mq-content">Privacy Notice</p>
+                <p className="text-sm font-semibold text-mq-content">
+                  {t('contact_privacyNotice')}
+                </p>
                 <p className="mt-0.5 text-sm leading-relaxed text-mq-content-secondary">
-                  We only use your contact details to respond to your feedback.
+                  {t('contact_privacyNoticeDesc')}
                 </p>
               </div>
             </div>
@@ -168,14 +173,14 @@ export default function ContactPage() {
           <div className="flex items-center gap-3">
             <span className="block h-px w-8 bg-mq-primary" aria-hidden="true" />
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-mq-primary">
-              Get In Touch
+              {t('contact_getInTouch')}
             </p>
           </div>
           <h2 className="mt-3 font-serif text-2xl font-bold text-mq-content">
-            Contact &amp; Feedback
+            {t('contact_feedbackHeading')}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-mq-content-secondary">
-            Tell us what happened and what you would like improved.
+            {t('contact_formDesc')}
           </p>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -184,13 +189,13 @@ export default function ContactPage() {
                 htmlFor="contact-email"
                 className="block text-sm font-semibold text-mq-content"
               >
-                Contact email
+                {t('contact_emailFieldLabel')}
                 <span className="ml-1.5 text-xs font-normal text-mq-content-secondary">
-                  (optional)
+                  ({t('optional')})
                 </span>
               </label>
               <p className="mt-1 text-xs leading-relaxed text-mq-content-secondary">
-                We only use this if we need to follow up on your feedback.
+                {t('contact_emailFieldDesc')}
               </p>
               <input
                 id="contact-email"
@@ -207,13 +212,13 @@ export default function ContactPage() {
                 htmlFor="contact-feedback"
                 className="block text-sm font-semibold text-mq-content"
               >
-                Your feedback
+                {t('contact_feedbackFieldLabel')}
               </label>
               <textarea
                 id="contact-feedback"
                 value={feedback}
                 onChange={(event) => setFeedback(event.target.value)}
-                placeholder="Share details, steps, and what you expected."
+                placeholder={t('contact_feedbackPlaceholder')}
                 rows={7}
                 className="mt-2.5 w-full rounded-mq-lg border border-mq-border bg-mq-input-background px-4 py-3 text-sm text-mq-content shadow-sm outline-none transition-all duration-200 placeholder:text-mq-content-secondary/50 focus:border-mq-primary focus:ring-2 focus:ring-mq-primary/20"
                 required
@@ -223,7 +228,7 @@ export default function ContactPage() {
             {error && <p className="animate-fade-in text-sm font-medium text-mq-danger">{error}</p>}
             {submitted && (
               <p className="animate-fade-in text-sm font-medium text-mq-success">
-                Your email draft has been opened. Review and send it when ready.
+                {t('contact_emailDraftOpened')}
               </p>
             )}
 
@@ -232,7 +237,7 @@ export default function ContactPage() {
               className="inline-flex items-center gap-2.5 rounded-mq-lg bg-mq-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-mq-primary/90 hover:shadow-md"
             >
               <Send className="h-4 w-4" aria-hidden="true" />
-              Send feedback
+              {t('contact_sendFeedback')}
             </button>
           </form>
         </article>

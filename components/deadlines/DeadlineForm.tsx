@@ -182,12 +182,12 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
         if (editDeadline) {
           toastUtils.success(
             t('deadlineUpdated'),
-            `"${deadlineData.title}" has been updated successfully.`,
+            t('deadlineUpdatedDesc' as TranslationKey, { title: deadlineData.title }),
           );
         } else {
           toastUtils.success(
             t('deadlineAdded'),
-            `"${deadlineData.title}" has been added successfully.`,
+            t('deadlineAddedDesc' as TranslationKey, { title: deadlineData.title }),
           );
         }
         onOpenChange(false);
@@ -207,7 +207,10 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   const confirmDelete = () => {
     if (editDeadline) {
       removeDeadline(editDeadline.id);
-      toastUtils.success(t('deadlineDeleted'), `"${editDeadline.title}" ${t('deletedMsg')}`);
+      toastUtils.success(
+        t('deadlineDeleted'),
+        t('deadlineDeletedDesc' as TranslationKey, { title: editDeadline.title }),
+      );
       onOpenChange(false);
       resetForm();
     }

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/mq/badge';
 import { cn } from '@/lib/utils';
 import { PublicEvent } from '@/lib/types/publicEvents';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import { useHydration } from '@/lib/hooks';
 
 const categoryGradients: Record<string, string> = {
@@ -163,7 +164,9 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
               </div>
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-4 w-4" />
-                <span className="truncate max-w-50">{currentEvent.location || 'TBA'}</span>
+                <span className="truncate max-w-50">
+                  {currentEvent.location || t('tba' as TranslationKey)}
+                </span>
               </div>
             </div>
           </div>
@@ -217,7 +220,7 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
                   'w-2 h-2 rounded-full transition-all duration-300',
                   index === safeIndex ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60',
                 )}
-                aria-label={`Go to event ${index + 1}`}
+                aria-label={t('goToEventAria' as TranslationKey, { index: index + 1 })}
               />
             ))}
           </div>

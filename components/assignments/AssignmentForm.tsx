@@ -182,13 +182,13 @@ export default function AssignmentForm({
       if (result !== null) {
         if (editAssignment) {
           toastUtils.success(
-            t('assignmentUpdated' as TranslationKey) || 'Assignment Updated',
-            `"${assignmentData.title}" has been updated successfully.`,
+            t('assignmentUpdated' as TranslationKey),
+            t('assignmentUpdatedDesc' as TranslationKey, { title: assignmentData.title }),
           );
         } else {
           toastUtils.success(
-            t('assignmentAdded' as TranslationKey) || 'Assignment Added',
-            `"${assignmentData.title}" has been added successfully.`,
+            t('assignmentAdded' as TranslationKey),
+            t('assignmentAddedDesc' as TranslationKey, { title: assignmentData.title }),
           );
         }
         onOpenChange(false);
@@ -209,8 +209,8 @@ export default function AssignmentForm({
     if (editAssignment) {
       removeDeadline(editAssignment.id);
       toastUtils.success(
-        t('assignmentDeleted' as TranslationKey) || 'Assignment Deleted',
-        `"${editAssignment.title}" ${t('deletedMsg')}`,
+        t('assignmentDeleted' as TranslationKey),
+        t('assignmentDeletedDesc' as TranslationKey, { title: editAssignment.title }),
       );
       onOpenChange(false);
       resetForm();
@@ -363,14 +363,16 @@ export default function AssignmentForm({
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-mq-content">
-                    {useCustomColor ? 'Custom Color' : 'Inherits Unit Color'}
+                    {useCustomColor
+                      ? t('colorCustom' as TranslationKey)
+                      : t('colorInheritsUnit' as TranslationKey)}
                   </p>
                   <p className="text-xs text-mq-content-secondary truncate">
                     {useCustomColor
                       ? UNIT_COLORS.find((c) => c.value === color)?.name || color
                       : selectedUnit
-                        ? `From ${selectedUnit.code}`
-                        : 'Select a unit first'}
+                        ? t('colorFromUnit' as TranslationKey, { code: selectedUnit.code })
+                        : t('colorSelectUnitFirst' as TranslationKey)}
                   </p>
                 </div>
                 <button
@@ -383,7 +385,9 @@ export default function AssignmentForm({
                   }}
                   className="text-xs px-2 py-1 rounded border border-mq-border hover:bg-mq-hover-background transition-colors"
                 >
-                  {useCustomColor ? 'Use Unit Color' : 'Customize'}
+                  {useCustomColor
+                    ? t('colorUseUnit' as TranslationKey)
+                    : t('colorCustomize' as TranslationKey)}
                 </button>
               </div>
 

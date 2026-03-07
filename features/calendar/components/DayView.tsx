@@ -151,15 +151,7 @@ export default function DayView({
                 const categoryColors = MQ_DATE_COLORS[mqDate.category];
                 const programStyle = PROGRAM_STYLES[mqDate.program];
                 const categoryLabel =
-                  {
-                    exams: 'Exam',
-                    admin: 'Admin',
-                    results: 'Results',
-                    payment: 'Payment',
-                    enrollment: 'Enroll',
-                    recess: 'Break',
-                    classes: 'Class',
-                  }[mqDate.category] || mqDate.category;
+                  t(`mqCat_${mqDate.category}` as TranslationKey) || mqDate.category;
                 return (
                   <div
                     key={mqDate.id}

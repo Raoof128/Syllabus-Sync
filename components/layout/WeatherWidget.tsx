@@ -19,6 +19,7 @@ import {
 import { useWeather } from './weather/useWeather';
 import { SYDNEY_REGIONS } from './weather/constants';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 const WeatherWidget = memo(() => {
   const { t } = useTypedTranslation();
@@ -47,43 +48,43 @@ const WeatherWidget = memo(() => {
     sunny: {
       gradient: 'from-amber-400 via-orange-400 to-yellow-500',
       icon: <Sun className="w-4 h-4 drop-shadow-sm" />,
-      label: 'Sunny',
+      label: t('weather_sunny' as TranslationKey),
       textClass: 'text-amber-950',
     },
     cloudy: {
       gradient: 'from-slate-400 via-gray-400 to-zinc-500',
       icon: <Cloud className="w-4 h-4 drop-shadow-sm" />,
-      label: 'Cloudy',
+      label: t('weather_cloudy' as TranslationKey),
       textClass: 'text-slate-900',
     },
     rainy: {
       gradient: 'from-blue-500 via-indigo-500 to-cyan-500',
       icon: <CloudRain className="w-4 h-4 drop-shadow-sm" />,
-      label: 'Rainy',
+      label: t('weather_rainy' as TranslationKey),
       textClass: 'text-white',
     },
     thunder: {
       gradient: 'from-purple-800 via-slate-800 to-indigo-900',
       icon: <CloudLightning className="w-4 h-4 drop-shadow-[0_0_4px_rgba(253,224,71,0.6)]" />,
-      label: 'Stormy',
+      label: t('weather_stormy' as TranslationKey),
       textClass: 'text-white',
     },
     snowy: {
       gradient: 'from-blue-100 via-slate-100 to-indigo-200',
       icon: <Snowflake className="w-4 h-4" />,
-      label: 'Snowy',
+      label: t('weather_snowy' as TranslationKey),
       textClass: 'text-slate-800',
     },
     windy: {
       gradient: 'from-teal-400 via-emerald-400 to-cyan-500',
       icon: <Wind className="w-4 h-4" />,
-      label: 'Windy',
+      label: t('weather_windy' as TranslationKey),
       textClass: 'text-teal-950',
     },
     night: {
       gradient: 'from-indigo-900 via-purple-900 to-slate-900',
       icon: <Moon className="w-4 h-4 drop-shadow-[0_0_6px_rgba(199,210,254,0.4)]" />,
-      label: 'Night',
+      label: t('weather_night' as TranslationKey),
       textClass: 'text-white',
     },
   };
@@ -128,7 +129,11 @@ const WeatherWidget = memo(() => {
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mq-primary
         `}
         title={`${weatherData.condition} · ${weatherData.temp}°C · ${weatherData.location} ${t('clickToChangeLocation')}`}
-        aria-label={`Current weather in ${weatherData.location}: ${weatherData.condition}, ${weatherData.temp} degrees Celsius. Click to change location.`}
+        aria-label={t('weatherAriaLabel' as TranslationKey, {
+          location: weatherData.location,
+          condition: weatherData.condition,
+          temp: weatherData.temp,
+        })}
         aria-expanded={isDropdownOpen}
         aria-haspopup="listbox"
       >

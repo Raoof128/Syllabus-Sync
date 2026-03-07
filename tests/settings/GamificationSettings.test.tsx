@@ -108,7 +108,8 @@ describe('GamificationSettings', () => {
     render(<GamificationSettings t={mockT} />);
 
     expect(screen.getByText('Your Progress')).toBeInTheDocument();
-    expect(screen.getByText('3 - Rising Star')).toBeInTheDocument();
+    expect(screen.getByText('Rising Star')).toBeInTheDocument();
+    expect(screen.getByText('Level 3')).toBeInTheDocument();
     expect(screen.getByText('150 XP')).toBeInTheDocument();
   });
 

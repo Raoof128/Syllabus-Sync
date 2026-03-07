@@ -3,6 +3,8 @@
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useGamificationStore, useXPProgress } from '@/lib/store/gamificationStore';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 
 interface XPProgressBarProps {
   /** Show the XP numbers (e.g., "120 / 250 XP") */
@@ -25,6 +27,7 @@ export function XPProgressBar({
   className,
   animate = true,
 }: XPProgressBarProps) {
+  const { t } = useTypedTranslation();
   const { loadProfile, hasLoaded, isLoading } = useGamificationStore();
   const { level, progress, xpToNext, xpInLevel, xpNeededForLevel } = useXPProgress();
 
@@ -74,7 +77,7 @@ export function XPProgressBar({
         aria-valuenow={progress}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={`Level ${level} progress: ${progress}%`}
+        aria-label={t('levelProgressAria' as TranslationKey, { level, progress })}
       >
         <div
           className={cn(
@@ -93,7 +96,10 @@ export function XPProgressBar({
             {xpInLevel.toLocaleString()} / {xpNeededForLevel.toLocaleString()} XP
           </span>
           <span className="text-mq-content-tertiary">
-            {xpToNext.toLocaleString()} to Lv. {level + 1}
+            {t('xpToLevelShort' as TranslationKey, {
+              xp: xpToNext.toLocaleString(),
+              nextLevel: level + 1,
+            })}
           </span>
         </div>
       )}
@@ -109,6 +115,7 @@ interface XPProgressCompactProps {
  * Compact XP display for tight spaces (e.g., navbar, mobile)
  */
 export function XPProgressCompact({ className }: XPProgressCompactProps) {
+  const { t } = useTypedTranslation();
   const { loadProfile, hasLoaded } = useGamificationStore();
   const { currentXP, level, progress } = useXPProgress();
 
@@ -121,7 +128,10 @@ export function XPProgressCompact({ className }: XPProgressCompactProps) {
   return (
     <div className={cn('flex items-center gap-2', className)}>
       {/* Level Badge */}
-      <span className="text-xs font-bold text-mq-primary">Lv.{level}</span>
+      <span className="text-xs font-bold text-mq-primary">
+        {t('lvShort' as TranslationKey)}
+        {level}
+      </span>
 
       {/* Mini Progress Bar */}
       <div className="flex-1 min-w-[60px] h-1.5 bg-mq-background-secondary rounded-full overflow-hidden">
