@@ -116,6 +116,11 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
       if (authenticated && isAuthRoute && !isMfaUpgradeUrl && !isPasswordResetFlow) {
         router.push('/home');
       }
+
+      // Redirect unauthenticated users from protected routes to login
+      if (!authenticated && !isAuthRoute) {
+        router.replace('/login');
+      }
     } catch {
       // Keep optimistic state on error
     }
@@ -193,7 +198,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     },
   });
 
-  if (isAuthRoute || isPostAuthRoute || !isAuthenticated) {
+  if (isAuthRoute || isPostAuthRoute || isPublicRoute || !isAuthenticated) {
     return (
       <ThemeProvider>
         <div className="flex min-h-screen flex-col bg-mq-background">

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createLoginSchema = (t: (key: any) => string) =>
+export const createLoginSchema = (t: (key: string) => string) =>
   z.object({
     email: z.string().min(1, t('loginEmailRequired')).email(t('loginValidEmail')),
     password: z.string().min(1, t('loginPasswordRequired')),

@@ -9,9 +9,9 @@
   },
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "dev:safe": "next dev --no-turbopack",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "dev:turbo": "next dev",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint --config config/eslint/eslint.config.mjs \"app/**/*.{ts,tsx}\" \"components/**/*.{ts,tsx}\" \"features/**/*.{ts,tsx}\" \"lib/**/*.{ts,tsx}\" \"data/**/*.{ts,tsx}\" \"config/eslint/eslint.config.mjs\" \"next.config.ts\" && echo \"Lint OK\"",
     "test": "vitest run --config config/vitest/vitest.config.ts",
@@ -76,14 +76,14 @@
     "resend": "^6.9.2",
     "tailwind-merge": "^3.4.0",
     "uuid": "^13.0.0",
-    "vercel": "^50.25.4",
     "zod": "^4.3.6",
     "zustand": "^5.0.9",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/eslintrc": "^3.3.5",
     "@next/bundle-analyzer": "^16.1.6",
+    "@next/eslint-plugin-next": "^16.1.6",
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
@@ -94,6 +94,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.17",
     "autoprefixer": "^10.4.23",
@@ -102,15 +104,18 @@
     "dotenv": "^17.2.3",
     "eslint": "^9.18.0",
     "eslint-config-next": "^16.1.6",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "husky": "^9.1.7",
     "jsdom": "^28.1.0",
-    "kill-port": "^2.0.1",
     "lhci": "^4.1.1",
     "lint-staged": "^16.3.2",
     "postcss": "^8.5.6",
     "prettier": "^3.3.3",
     "tailwindcss": "^4.1.18",
     "typescript": "^5",
+    "vercel": "^50.28.0",
     "vite-tsconfig-paths": "^6.0.5",
     "vitest": "^4.0.16"
   },
@@ -142,12 +147,10 @@
   "license": "MIT",
   "overrides": {
     "undici": "^7.21.0",
-    "minimatch": "^10.2.1",
     "serialize-javascript": "^7.0.3",
     "path-to-regexp": "^8.3.0",
     "tar": "^7.5.9",
-    "@tootallnate/once": "^3.0.1",
-    "ajv": "^8.17.2"
+    "@tootallnate/once": "^3.0.1"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

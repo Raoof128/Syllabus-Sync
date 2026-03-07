@@ -7,8 +7,7 @@ const stripHtmlTags = (val: string): string => {
 };
 
 // Pass the translation function 't' into the schema generator
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createSignupSchema = (t: (key: any) => string) => {
+export const createSignupSchema = (t: (key: string) => string) => {
   return z
     .object({
       email: z.string().trim().toLowerCase().email(t('validation.invalidEmail')),

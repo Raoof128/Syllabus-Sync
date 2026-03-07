@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import StandaloneLanguageSelector from '@/components/layout/StandaloneLanguageSelector';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
 type ParagraphBlock = {
@@ -99,6 +100,9 @@ export default function TermsPage() {
 
   return (
     <div className="min-h-screen bg-mq-background">
+      {/* Language Selector */}
+      <StandaloneLanguageSelector />
+
       <div className="bg-gradient-to-r from-[#8B1525] via-[#A6192E] to-[#76232f] border-b border-white/10">
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
           <Link

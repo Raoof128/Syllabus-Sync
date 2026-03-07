@@ -337,6 +337,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
     useEffect(() => {
       if (!destination) return;
       void computeRoute();
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- Only recompute when lat/lng/travelMode changes, not destination object reference
     }, [destination?.lat, destination?.lng, travelMode]);
 
     // Re-trigger route computation when navigation starts (in case it failed earlier)
@@ -345,6 +346,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       if (!route && !isLoadingRoute) {
         void computeRoute(true);
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- Only trigger on navigation start, not on route/destination changes
     }, [isNavigating]);
 
     // Live route recalculation when user moves significantly during navigation

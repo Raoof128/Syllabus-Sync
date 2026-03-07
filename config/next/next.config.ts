@@ -39,11 +39,10 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // Empty turbopack config to acknowledge Turbopack usage
-  // Turbopack handles chunk splitting automatically in Next.js 16+
+  // Turbopack config - acknowledged but webpack is used by default due to Sentry compatibility
   turbopack: {},
 
-  // Webpack fallback for chunk loading issues (used when running with --no-turbopack)
+  // Webpack config for chunk splitting (default bundler since Turbopack has symlink issues with Sentry)
   webpack: (config, { isServer }) => {
     if (!sentryEnabled) {
       config.resolve = config.resolve || {};
