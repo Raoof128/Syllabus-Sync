@@ -247,13 +247,13 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
       if (editUnit) {
         toastUtils.success(
           t('unitUpdated'),
-          `${unitData.code} - ${unitData.name} has been updated successfully.`,
+          t('unitUpdatedDesc' as TranslationKey, { code: unitData.code, name: unitData.name }),
           { id: 'unit-updated-toast' },
         );
       } else {
         toastUtils.success(
           t('unitAdded'),
-          `${unitData.code} - ${unitData.name} has been added successfully.`,
+          t('unitAddedDesc' as TranslationKey, { code: unitData.code, name: unitData.name }),
           { id: 'unit-added-toast' },
         );
       }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import { UserProfile, useProfilesStore } from '@/lib/store/profilesStore';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { Camera, Mail, IdCard, Loader2 } from 'lucide-react';
@@ -27,7 +28,7 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
 
     // Security Check: 2MB Limit
     if (file.size > 2 * 1024 * 1024) {
-      toastUtils.error(t('error'), 'File size exceeds 2MB limit');
+      toastUtils.error(t('error'), t('fileSizeExceedsLimit' as TranslationKey));
       return;
     }
 

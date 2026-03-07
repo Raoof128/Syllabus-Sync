@@ -482,7 +482,7 @@ export default function CampusMapHUD({
                         onClick={onStopNavigation}
                       >
                         <Navigation className="h-4 w-4" />
-                        Stop
+                        {t('stop')}
                       </Button>
                     )}
                   </div>

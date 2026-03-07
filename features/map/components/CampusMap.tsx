@@ -445,7 +445,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                       </Badge>
                       {selectedBuilding.gridRef && (
                         <span className="text-xs text-mq-content-tertiary font-mono">
-                          Grid: {selectedBuilding.gridRef}
+                          {safeT('gridRef', 'Grid')}: {selectedBuilding.gridRef}
                         </span>
                       )}
                     </div>

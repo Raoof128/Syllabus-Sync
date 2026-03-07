@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/mq/switch';
 import { Button } from '@/components/ui/mq/button';
 import { Check, BookOpen, AlertCircle, Calendar as CalendarIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export interface CalendarFilters {
   showUnits: boolean;
@@ -26,7 +27,7 @@ export default function FilterPanel({
   filters,
   onFilterChange,
 }: FilterPanelProps) {
-  // Removed unused translation hook
+  const { t } = useTypedTranslation();
 
   const toggleFilter = (key: keyof CalendarFilters) => {
     onFilterChange({
@@ -56,7 +57,7 @@ export default function FilterPanel({
           <div className="p-4 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-center">
             <div className="flex flex-col gap-2">
               <span className="text-xs font-bold text-mq-content-secondary uppercase tracking-wider">
-                View Options
+                {t('filter_viewOptions')}
               </span>
               <div className="flex items-center gap-2">
                 <Switch
@@ -68,7 +69,7 @@ export default function FilterPanel({
                   htmlFor="filter-units"
                   className="text-sm font-medium flex items-center gap-2 cursor-pointer select-none"
                 >
-                  <BookOpen className="w-4 h-4 text-mq-primary" /> Units & Classes
+                  <BookOpen className="w-4 h-4 text-mq-primary" /> {t('filter_unitsAndClasses')}
                 </label>
               </div>
               <div className="flex items-center gap-2">
@@ -81,14 +82,14 @@ export default function FilterPanel({
                   htmlFor="filter-deadlines"
                   className="text-sm font-medium flex items-center gap-2 cursor-pointer select-none"
                 >
-                  <AlertCircle className="w-4 h-4 text-red-500" /> Assessment
+                  <AlertCircle className="w-4 h-4 text-red-500" /> {t('filter_assessment')}
                 </label>
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
               <span className="text-xs font-bold text-mq-content-secondary uppercase tracking-wider opacity-0 md:opacity-100">
-                Additional
+                {t('filter_additional')}
               </span>
               <div className="flex items-center gap-2">
                 <Switch
@@ -100,7 +101,7 @@ export default function FilterPanel({
                   htmlFor="filter-events"
                   className="text-sm font-medium flex items-center gap-2 cursor-pointer select-none"
                 >
-                  <CalendarIcon className="w-4 h-4 text-green-500" /> Events
+                  <CalendarIcon className="w-4 h-4 text-green-500" /> {t('events')}
                 </label>
               </div>
               <div className="flex items-center gap-2">
@@ -113,7 +114,7 @@ export default function FilterPanel({
                   htmlFor="filter-completed"
                   className="text-sm font-medium flex items-center gap-2 cursor-pointer select-none"
                 >
-                  <Check className="w-4 h-4 text-gray-500" /> Show Completed
+                  <Check className="w-4 h-4 text-gray-500" /> {t('filter_showCompleted')}
                 </label>
               </div>
             </div>
@@ -121,10 +122,10 @@ export default function FilterPanel({
             <div className="col-span-1 flex h-full items-end justify-start md:col-span-2 md:justify-end lg:col-span-4 xl:col-span-2">
               <div className="flex gap-2">
                 <Button variant="ghost" size="sm" onClick={resetFilters} className="text-xs">
-                  Reset
+                  {t('reset')}
                 </Button>
                 <Button variant="outline" size="sm" onClick={onClose} className="text-xs">
-                  Close
+                  {t('close')}
                 </Button>
               </div>
             </div>
