@@ -42,6 +42,13 @@ export const DAY_SHORT: Record<DayOfWeek, string> = {
 // Priority levels
 export const PRIORITY_LEVELS = ['Low', 'Medium', 'High', 'Urgent'] as const;
 
+// Internal stress-level tokens used by deadline scoring and homepage KPI rendering
+export const STRESS_LEVELS = {
+  LOW: 'Low',
+  BUSY: 'Busy',
+  HIGH: 'High',
+} as const;
+
 // Deadline types
 export const DEADLINE_TYPES = ['Assignment', 'Exam', 'Quiz', 'Presentation'] as const;
 

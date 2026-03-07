@@ -3,6 +3,7 @@
 import React, { useMemo, useEffect } from 'react';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { STRESS_LEVELS } from '@/lib/constants';
 import { CardSolid } from '@/features/home/components/HomeCard';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useHydration } from '@/lib/hooks';
@@ -60,33 +61,34 @@ export default function HomeKpiStrip() {
 
   // 3. Stress Level
   const stressLevel = useMemo(() => {
-    if (!isHydrated) return 'Low';
+    if (!isHydrated) return STRESS_LEVELS.LOW;
     try {
       return getStressLevel();
     } catch {
-      return 'Low';
+      return STRESS_LEVELS.LOW;
     }
   }, [isHydrated, getStressLevel]);
 
   const stressConfig = {
-    Low: {
+    [STRESS_LEVELS.LOW]: {
       color: 'text-emerald-600',
       bg: 'bg-emerald-100/50',
       label: t('stressLow'),
     },
-    Busy: {
+    [STRESS_LEVELS.BUSY]: {
       color: 'text-amber-600',
       bg: 'bg-amber-100/50',
       label: t('stressBusy'),
     },
-    High: {
+    [STRESS_LEVELS.HIGH]: {
       color: 'text-red-600',
       bg: 'bg-red-100/50',
       label: t('stressHigh'),
     },
   };
 
-  const currentStress = stressConfig[stressLevel as keyof typeof stressConfig] || stressConfig.Low;
+  const currentStress =
+    stressConfig[stressLevel as keyof typeof stressConfig] || stressConfig[STRESS_LEVELS.LOW];
 
   if (!isHydrated) {
     return (

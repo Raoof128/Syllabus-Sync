@@ -1,3 +1,10 @@
+Raouf: 2026-03-08 (Australia/Sydney)
+Scope: Home i18n — Remove Raw Stress-Level Tokens From Homepage Flow
+Summary: Replaced homepage stress-level fallback literals with a shared `STRESS_LEVELS` constant so the Home KPI strip no longer embeds raw English tokens in component logic. The same shared constants now back `deadlinesStore.getStressLevel()`, keeping the homepage rendering path and deadline stress scoring aligned while preserving the existing translated labels (`stressLow`, `stressBusy`, `stressHigh`) shown to users.
+Files Changed: `features/home/components/HomeKpiStrip.tsx`, `lib/store/deadlinesStore.ts`, `lib/constants/index.ts`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/home/components/HomeKpiStrip.tsx lib/store/deadlinesStore.ts lib/constants/index.ts` ✅; `npm run typecheck` ✅.
+Follow-ups: If you want the broader homepage i18n cleanup pass, the next step should replace remaining English-only internal ordering/category tokens in home widgets with shared enums/constants and localized date/time formatting where appropriate.
+
 Raouf: 2026-03-07 (Australia/Sydney)
 Scope: Google Maps — Street View, Controls, Maps URL Handoff, Marker Upgrade
 Summary: Enhanced the Google Maps JS implementation with four professional-grade features:

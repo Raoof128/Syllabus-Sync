@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { STRESS_LEVELS } from '@/lib/constants';
 import { Deadline, StressLevel } from '@/lib/types';
 import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
@@ -330,7 +331,7 @@ export const useDeadlinesStore = create<DeadlinesState>()(
         try {
           const upcoming = get().getUpcoming(20);
           const now = new Date();
-          if (isNaN(now.getTime())) return 'Low';
+          if (isNaN(now.getTime())) return STRESS_LEVELS.LOW;
 
           const priorityPoints: Record<Deadline['priority'], number> = {
             Urgent: 4,
@@ -364,11 +365,11 @@ export const useDeadlinesStore = create<DeadlinesState>()(
             }
           }, 0);
 
-          if (totalPoints >= 12) return 'High';
-          if (totalPoints >= 6) return 'Busy';
-          return 'Low';
+          if (totalPoints >= 12) return STRESS_LEVELS.HIGH;
+          if (totalPoints >= 6) return STRESS_LEVELS.BUSY;
+          return STRESS_LEVELS.LOW;
         } catch {
-          return 'Low';
+          return STRESS_LEVELS.LOW;
         }
       },
 

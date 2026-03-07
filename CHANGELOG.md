@@ -1,3 +1,10 @@
+Raouf: 2026-03-08 (Australia/Sydney)
+Scope: Home i18n — Remove Raw Stress-Level Tokens From Homepage Flow
+Summary: Replaced homepage stress-level fallback literals with a shared `STRESS_LEVELS` constant so the Home KPI strip no longer embeds raw English tokens in component logic. The same shared constants now back `deadlinesStore.getStressLevel()`, keeping the homepage rendering path and deadline stress scoring aligned while preserving the existing translated labels (`stressLow`, `stressBusy`, `stressHigh`) shown to users.
+Files Changed: `features/home/components/HomeKpiStrip.tsx`, `lib/store/deadlinesStore.ts`, `lib/constants/index.ts`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/home/components/HomeKpiStrip.tsx lib/store/deadlinesStore.ts lib/constants/index.ts` ✅; `npm run typecheck` ✅.
+Follow-ups: If you want the broader homepage i18n cleanup pass, the next step should replace remaining English-only internal ordering/category tokens in home widgets with shared enums/constants and localized date/time formatting where appropriate.
+
 Raouf: 2026-03-07 (Australia/Sydney)
 Scope: Gamification Naming Polish + Terms Numbering Cleanup
 Summary: Changed the main gamification UI to foreground the earned commitment title instead of leading with a plain level label. The compact gamification badge now shows the title (for example, `Rising Star`) as the primary visible label, `LevelBadge` now displays the title first when expanded, and the settings experience panel now labels that stat as `Commitment` while retaining the numeric level as secondary context. Also refactored the Terms page into a single section-data map and removed the duplicate numeric prefixes from the desktop sidebar navigation so the page keeps one clear numbering system in the section headers without repeated sidebar numbers.
