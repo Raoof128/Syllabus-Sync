@@ -2355,5 +2355,6 @@
   "category_payment": "Maksu",
   "category_enrollment": "Ilmoittautuminen",
   "category_recess": "Tauko",
-  "eventsLabel": "tapahtumat"
+  "eventsLabel": "tapahtumat",
+  "contact_helpfulLinks": "Hyödylliset linkit"
 }
