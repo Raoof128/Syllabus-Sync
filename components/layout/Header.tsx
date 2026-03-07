@@ -598,9 +598,9 @@ const Header = memo(() => {
                 </div>
                 <div
                   className="text-xs sm:text-sm font-medium text-mq-content-secondary hidden md:inline max-w-[80px] lg:max-w-[120px] truncate"
-                  title={displayName || t('guest')}
+                  title={displayName || ''}
                 >
-                  {displayName || t('guest')}
+                  {displayName || ''}
                 </div>
               </button>
             </DropdownMenuTrigger>

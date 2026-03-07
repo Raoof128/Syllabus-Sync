@@ -182,6 +182,8 @@ export default function MapClient() {
   const selectedBuildingId = searchParams.get('building');
   const selectedBuilding = selectedBuildingId ? getBuildingById(selectedBuildingId) : undefined;
   const autoNavigate = searchParams.get('autonav') === 'true';
+  // Focused mode: hide places panel, show only destination (used when navigating from calendar)
+  const isFocusedMode = searchParams.get('focused') === 'true';
 
   // Ref-based lock to prevent URL↔store feedback loops.
   // 'url' = URL just wrote to store (suppress store→URL echo)
@@ -708,6 +710,7 @@ export default function MapClient() {
                 onSelectPlace={mapView === 'google' ? handleSelectPlace : undefined}
                 onClearExternalPlace={() => setExternalDestination(null)}
                 selectedPlaceLabel={externalDestination?.label}
+                isFocusedMode={isFocusedMode}
               />
             )}
           </div>

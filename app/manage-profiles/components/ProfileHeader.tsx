@@ -124,7 +124,7 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
             {/* Profile Summary */}
             <div className="flex-1 min-w-0 text-center sm:text-left pb-0.5">
               <h1 className="text-xl sm:text-2xl font-bold text-mq-content mb-1.5 break-words">
-                {profile.name || t('guest')}
+                {profile.name || t('user')}
               </h1>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4">
                 <p className="text-mq-content-secondary flex items-center justify-center sm:justify-start gap-1.5 text-sm min-w-0">

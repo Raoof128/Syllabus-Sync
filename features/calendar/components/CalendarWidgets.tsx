@@ -230,7 +230,7 @@ export default function CalendarWidgets({
     if (highlightedWidget && actionParam && hasProcessedActionRef.current !== actionParam) {
       hasProcessedActionRef.current = actionParam;
 
-      // Scroll to the appropriate widget and activate highlight
+      // Scroll to the appropriate widget (only if not visible) and activate highlight
       const activateTimer = setTimeout(() => {
         if (
           highlightedWidget === 'units' ||
@@ -242,17 +242,17 @@ export default function CalendarWidgets({
           setSectionHighlightActive(highlightedWidget);
         }
 
-        // Scroll to appropriate widget
+        // Scroll to appropriate widget ONLY if not already visible
         if (highlightedWidget === 'units' && unitsWidgetRef.current) {
-          unitsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          scrollIfNotVisible(unitsWidgetRef.current);
         } else if (highlightedWidget === 'assignments' && assignmentsWidgetRef.current) {
-          assignmentsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          scrollIfNotVisible(assignmentsWidgetRef.current);
         } else if (highlightedWidget === 'exams' && examsWidgetRef.current) {
-          examsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          scrollIfNotVisible(examsWidgetRef.current);
         } else if (highlightedWidget === 'events' && eventsWidgetRef.current) {
-          eventsWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          scrollIfNotVisible(eventsWidgetRef.current);
         } else if (highlightedWidget === 'todos' && todosWidgetRef.current) {
-          todosWidgetRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          scrollIfNotVisible(todosWidgetRef.current);
         }
 
         // Trigger the appropriate add action after scroll
@@ -279,11 +279,15 @@ export default function CalendarWidgets({
         url.searchParams.delete('highlightWidget');
         url.searchParams.delete('action');
         window.history.replaceState({}, '', url.toString());
+        // Reset the ref so the same action can be triggered again from Home FAB
+        hasProcessedActionRef.current = null;
       }, 3000);
 
       return () => {
         clearTimeout(activateTimer);
         clearTimeout(clearTimer);
+        // Reset ref on cleanup so effect can run again
+        hasProcessedActionRef.current = null;
       };
     }
   }, [
@@ -296,6 +300,7 @@ export default function CalendarWidgets({
     onAddTodo,
     unitsWidgetRef,
     assignmentsWidgetRef,
+    scrollIfNotVisible,
   ]);
 
   return (
