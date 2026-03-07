@@ -9,6 +9,7 @@ import { useEventsStore } from '@/lib/store/eventsStore';
 import Link from 'next/link';
 import { CardSolid } from './HomeCard';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import type { TranslationKey } from '@/lib/i18n/translations';
 import { useHydration } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -145,9 +146,7 @@ export default function WeekHeatStrip() {
   return (
     <CardSolid className="p-4 sm:p-5 mb-6 overflow-visible">
       <div className="flex items-center justify-between mb-3 gap-2">
-        <h3 className="text-sm font-semibold text-mq-content shrink-0">
-          {t('weekAtAGlance') || 'Week Ahead'}
-        </h3>
+        <h3 className="text-sm font-semibold text-mq-content shrink-0">{t('weekAtAGlance')}</h3>
         <div className="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-[11px] text-mq-content-tertiary flex-wrap justify-end">
           <span className="hidden lg:inline-block text-mq-content-tertiary">
             {format(weekData[0]?.date || new Date(), 'MMM d')} –{' '}
@@ -158,14 +157,22 @@ export default function WeekHeatStrip() {
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
             <span className="hidden sm:inline">{totalClasses}</span>
             <span className="sm:hidden">{totalClasses}</span>
-            <span className="hidden sm:inline">{totalClasses === 1 ? 'class' : 'classes'}</span>
+            <span className="hidden sm:inline">
+              {totalClasses === 1
+                ? t('weekClass' as TranslationKey)
+                : t('weekClasses' as TranslationKey)}
+            </span>
           </span>
           {/* Exams */}
           {totalExams > 0 && (
             <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-800/40">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
               {totalExams}
-              <span className="hidden sm:inline">{totalExams === 1 ? 'exam' : 'exams'}</span>
+              <span className="hidden sm:inline">
+                {totalExams === 1
+                  ? t('weekExam' as TranslationKey)
+                  : t('weekExams' as TranslationKey)}
+              </span>
             </span>
           )}
           {/* Assignments */}
@@ -174,7 +181,9 @@ export default function WeekHeatStrip() {
               <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
               {totalAssignments}
               <span className="hidden md:inline">
-                {totalAssignments === 1 ? 'assignment' : 'assignments'}
+                {totalAssignments === 1
+                  ? t('weekAssignment' as TranslationKey)
+                  : t('weekAssignments' as TranslationKey)}
               </span>
             </span>
           )}
@@ -183,14 +192,18 @@ export default function WeekHeatStrip() {
             <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200/60 dark:border-green-800/40">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
               {totalEvents}
-              <span className="hidden md:inline">{totalEvents === 1 ? 'event' : 'events'}</span>
+              <span className="hidden md:inline">
+                {totalEvents === 1
+                  ? t('weekEvent' as TranslationKey)
+                  : t('weekEvents' as TranslationKey)}
+              </span>
             </span>
           )}
           {/* Other deadlines (quizzes, presentations) */}
           {totalDeadlines > totalExams + totalAssignments && (
             <span className="hidden lg:inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-mq-background-secondary text-mq-content-secondary border border-mq-border/60">
               <span className="w-1.5 h-1.5 rounded-full bg-mq-accent" />
-              {totalDeadlines - totalExams - totalAssignments} other
+              {totalDeadlines - totalExams - totalAssignments} {t('weekOther' as TranslationKey)}
             </span>
           )}
         </div>
@@ -202,7 +215,13 @@ export default function WeekHeatStrip() {
             key={i}
             href={`/calendar?date=${format(day.date, 'yyyy-MM-dd')}`}
             className="flex-1 flex flex-col justify-end items-center h-full group relative rounded-md hover:bg-mq-background-secondary/50 transition-colors focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background focus-visible:outline-none min-w-[40px]"
-            aria-label={`${day.fullDate}: ${day.classCount} classes, ${day.examCount} exams, ${day.assignmentCount} assignments, ${day.eventCount} events`}
+            aria-label={t('weekDayAriaLabel' as TranslationKey, {
+              date: day.fullDate,
+              classCount: day.classCount,
+              examCount: day.examCount,
+              assignmentCount: day.assignmentCount,
+              eventCount: day.eventCount,
+            })}
           >
             {/* Tooltip - positioned directly above the bar, centered */}
             <div
@@ -213,25 +232,39 @@ export default function WeekHeatStrip() {
             >
               <p className="font-bold whitespace-nowrap">{day.fullDate}</p>
               <p>
-                {day.classCount} {day.classCount === 1 ? 'class' : 'classes'}
+                {day.classCount}{' '}
+                {day.classCount === 1
+                  ? t('weekClass' as TranslationKey)
+                  : t('weekClasses' as TranslationKey)}
               </p>
               {day.examCount > 0 && (
                 <p className="text-red-300">
-                  {day.examCount} {day.examCount === 1 ? 'exam' : 'exams'}
+                  {day.examCount}{' '}
+                  {day.examCount === 1
+                    ? t('weekExam' as TranslationKey)
+                    : t('weekExams' as TranslationKey)}
                 </p>
               )}
               {day.assignmentCount > 0 && (
                 <p className="text-purple-300">
-                  {day.assignmentCount} {day.assignmentCount === 1 ? 'assignment' : 'assignments'}
+                  {day.assignmentCount}{' '}
+                  {day.assignmentCount === 1
+                    ? t('weekAssignment' as TranslationKey)
+                    : t('weekAssignments' as TranslationKey)}
                 </p>
               )}
               {day.eventCount > 0 && (
                 <p className="text-green-300">
-                  {day.eventCount} {day.eventCount === 1 ? 'event' : 'events'}
+                  {day.eventCount}{' '}
+                  {day.eventCount === 1
+                    ? t('weekEvent' as TranslationKey)
+                    : t('weekEvents' as TranslationKey)}
                 </p>
               )}
               {day.otherDeadlineCount > 0 && (
-                <p className="text-amber-300">{day.otherDeadlineCount} other</p>
+                <p className="text-amber-300">
+                  {day.otherDeadlineCount} {t('weekOther' as TranslationKey)}
+                </p>
               )}
             </div>
 
@@ -246,7 +279,12 @@ export default function WeekHeatStrip() {
                       day.isToday &&
                         'ring-2 ring-offset-2 ring-mq-primary ring-offset-mq-card-background',
                     )}
-                    aria-label={`${day.dayShort}: ${day.classCount} classes, ${day.examCount} exams, ${day.assignmentCount} assignments`}
+                    aria-label={t('weekBarAriaLabel' as TranslationKey, {
+                      day: day.dayShort,
+                      classCount: day.classCount,
+                      examCount: day.examCount,
+                      assignmentCount: day.assignmentCount,
+                    })}
                   />
                 </div>
               ) : (
@@ -267,7 +305,12 @@ export default function WeekHeatStrip() {
                       day.isToday &&
                         'ring-2 ring-offset-2 ring-mq-primary ring-offset-mq-card-background',
                     )}
-                    aria-label={`${day.dayShort}: ${day.classCount} classes, ${day.examCount} exams, ${day.assignmentCount} assignments`}
+                    aria-label={t('weekBarAriaLabel' as TranslationKey, {
+                      day: day.dayShort,
+                      classCount: day.classCount,
+                      examCount: day.examCount,
+                      assignmentCount: day.assignmentCount,
+                    })}
                   />
                 </div>
               )}

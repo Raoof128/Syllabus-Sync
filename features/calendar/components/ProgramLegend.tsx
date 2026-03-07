@@ -95,7 +95,7 @@ export default function ProgramLegend({
                       colors.text,
                     )}
                   >
-                    {CATEGORY_LABELS[category]}
+                    {tOr(`category_${category}`, CATEGORY_LABELS[category])}
                   </div>
                 );
               })}
@@ -169,7 +169,7 @@ export default function ProgramLegend({
                           colors.text,
                         )}
                       >
-                        {CATEGORY_LABELS[category]}
+                        {tOr(`category_${category}`, CATEGORY_LABELS[category])}
                       </div>
                     );
                   })}

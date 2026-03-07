@@ -73,7 +73,7 @@ export default function TodoDetailPanel({
       const daysPast = Math.abs(daysUntil || 0);
       if (daysPast === 0) return tOr('overdueToday', 'Overdue (today)');
       if (daysPast === 1) return tOr('oneDayOverdue', '1 day overdue');
-      return `${daysPast} days overdue`;
+      return t('daysOverdue' as TranslationKey, { count: daysPast });
     }
     if (hoursUntil !== null && hoursUntil < 24) {
       if (hoursUntil <= 1) return tOr('dueWithinHour', 'Due within an hour');
