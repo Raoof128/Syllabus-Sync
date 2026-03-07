@@ -230,6 +230,11 @@ export default function CalendarWidgets({
     if (highlightedWidget && actionParam && hasProcessedActionRef.current !== actionParam) {
       hasProcessedActionRef.current = actionParam;
 
+      // Immediately consume the action param from URL so it cannot re-trigger
+      const url = new URL(window.location.href);
+      url.searchParams.delete('action');
+      window.history.replaceState({}, '', url.toString());
+
       // Scroll to the appropriate widget (only if not visible) and activate highlight
       const activateTimer = setTimeout(() => {
         if (
@@ -271,23 +276,18 @@ export default function CalendarWidgets({
         }, 300);
       }, 100);
 
-      // Clear highlight after 3 seconds
+      // Clear highlight after 3 seconds (highlight is visual-only, action already consumed)
       const clearTimer = setTimeout(() => {
         setSectionHighlightActive(null);
-        // Clean up URL params
-        const url = new URL(window.location.href);
-        url.searchParams.delete('highlightWidget');
-        url.searchParams.delete('action');
-        window.history.replaceState({}, '', url.toString());
-        // Reset the ref so the same action can be triggered again from Home FAB
-        hasProcessedActionRef.current = null;
+        // Also clean up highlightWidget from URL
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete('highlightWidget');
+        window.history.replaceState({}, '', cleanUrl.toString());
       }, 3000);
 
       return () => {
         clearTimeout(activateTimer);
         clearTimeout(clearTimer);
-        // Reset ref on cleanup so effect can run again
-        hasProcessedActionRef.current = null;
       };
     }
   }, [

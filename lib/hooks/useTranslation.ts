@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import {
   translations,
   loadTranslations,
@@ -21,6 +21,8 @@ export function useTranslation() {
   // Use React 18+ useTransition for non-blocking loading state
   const [isPending, startTransition] = useTransition();
   const loadedRef = useRef<Set<Language>>(new Set(['en']));
+  // Counter to force re-render after async translation loading
+  const [, setLoadGeneration] = useState(0);
 
   // Trigger hydration on first client render
   useEffect(() => {
@@ -32,13 +34,18 @@ export function useTranslation() {
 
   // Load translations for the current language
   useEffect(() => {
-    if (!isLanguageLoaded(language) && !loadedRef.current.has(language)) {
-      loadedRef.current.add(language);
-      // Use startTransition to avoid cascading render warning
+    if (language === 'en') return;
+    if (isLanguageLoaded(language)) return;
+    if (loadedRef.current.has(language)) return;
+
+    loadedRef.current.add(language);
+
+    // Load asynchronously, then force a re-render so `t()` picks up the new cache
+    loadTranslations(language).then(() => {
       startTransition(() => {
-        loadTranslations(language);
+        setLoadGeneration((g) => g + 1);
       });
-    }
+    });
   }, [language]);
 
   const t = useCallback(

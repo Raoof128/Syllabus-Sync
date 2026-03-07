@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Deadline, Event, Unit, Todo } from '@/lib/types';
 import dayjs from 'dayjs';
 
@@ -66,48 +66,48 @@ export function useCalendarDialogs() {
     title: string;
   } | null>(null);
 
-  // Actions
-  const openEditDeadline = (deadline: Deadline) => {
+  // Actions — memoized to prevent effect re-triggers in consumers
+  const openEditDeadline = useCallback((deadline: Deadline) => {
     setEditDeadline(deadline);
     setDeadlineDialogOpen(true);
-  };
+  }, []);
 
-  const openAddAssignment = () => {
+  const openAddAssignment = useCallback(() => {
     setEditAssignment(null);
     setAssignmentDialogOpen(true);
-  };
+  }, []);
 
-  const openEditAssignment = (assignment: Deadline) => {
+  const openEditAssignment = useCallback((assignment: Deadline) => {
     setEditAssignment(assignment);
     setAssignmentDialogOpen(true);
-  };
+  }, []);
 
-  const openAssignmentDetail = (assignment: Deadline) => {
+  const openAssignmentDetail = useCallback((assignment: Deadline) => {
     setSelectedAssignment(assignment);
     setAssignmentDetailOpen(true);
-  };
+  }, []);
 
-  const openAddExam = () => {
+  const openAddExam = useCallback(() => {
     setEditExam(null);
     setExamDialogOpen(true);
-  };
+  }, []);
 
-  const openEditExam = (exam: Deadline) => {
+  const openEditExam = useCallback((exam: Deadline) => {
     setEditExam(exam);
     setExamDialogOpen(true);
-  };
+  }, []);
 
-  const handleEventClick = (event: Event) => {
+  const handleEventClick = useCallback((event: Event) => {
     setSelectedEvent(event);
     setEventDetailOpen(true);
-  };
+  }, []);
 
-  const openEditEvent = (event: Event) => {
+  const openEditEvent = useCallback((event: Event) => {
     setEditEvent(event);
     setEventDialogOpen(true);
-  };
+  }, []);
 
-  const openAddTodo = () => {
+  const openAddTodo = useCallback(() => {
     setEditingTodo(null);
     setEditTodoTitle('');
     setEditTodoPriority('Medium');
@@ -115,9 +115,9 @@ export function useCalendarDialogs() {
     setEditTodoDueTime('');
     setEditTodoColor('#10b981');
     setTodoDialogOpen(true);
-  };
+  }, []);
 
-  const openEditTodo = (todo: Todo) => {
+  const openEditTodo = useCallback((todo: Todo) => {
     setEditingTodo(todo);
     setEditTodoTitle(todo.title);
     setEditTodoPriority(todo.priority);
@@ -131,22 +131,22 @@ export function useCalendarDialogs() {
       setEditTodoDueTime('');
     }
     setTodoDialogOpen(true);
-  };
+  }, []);
 
-  const openAddUnit = () => {
+  const openAddUnit = useCallback(() => {
     setEditingUnit(null);
     setUnitDialogOpen(true);
-  };
+  }, []);
 
-  const openEditUnit = (unit: Unit) => {
+  const openEditUnit = useCallback((unit: Unit) => {
     setEditingUnit(unit);
     setUnitDialogOpen(true);
-  };
+  }, []);
 
-  const handleDeleteUnit = (unit: Unit) => {
+  const handleDeleteUnit = useCallback((unit: Unit) => {
     setUnitToDelete(unit);
     setDeleteConfirmOpen(true);
-  };
+  }, []);
 
   return {
     // Dialog states & setters

@@ -14,13 +14,8 @@ import {
   BUILDING_CATEGORY_LABELS,
   getBuildingCrsCoords,
 } from '@/features/map/lib/buildings';
-import { formatDistance, formatDuration } from '@/features/map/lib/navigationHelpers';
 import { createMarkerIcon, createUserLocationIcon } from '@/features/map/lib/mapUtils';
-import {
-  generateNavigationText,
-  formatETA,
-  NavigationStateManager,
-} from '@/features/map/lib/realtimeNavigation';
+import { NavigationStateManager } from '@/features/map/lib/realtimeNavigation';
 import { setHapticEnabledGetter } from '@/lib/utils/haptics';
 import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
 import { useLeafletLoader } from '@/features/map/hooks/useLeafletLoader';
@@ -28,9 +23,7 @@ import { devLog } from '@/lib/utils/devLog';
 import type { MapOverlayId } from '@/features/map/lib/mapOverlays';
 import { useMapStore } from '@/lib/store/mapStore';
 import { CAMPUS_CENTER_PIXEL, PIXEL_BOUNDS, CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
-import { gpsToCrsSimple } from '@/features/map/lib/geospatialCalibration';
 import { useMapLocation } from '../hooks/useMapLocation';
-import { useMapNavigation } from '../hooks/useMapNavigation';
 import { MapOverlays } from './MapOverlays';
 import { MapController } from './MapController';
 
@@ -63,7 +56,13 @@ interface CampusMapProps {
 
 const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
   (
-    { selectedBuilding, activeOverlays = [], onLocationStatusChange, onNavStateChange, onMapReady },
+    {
+      selectedBuilding,
+      activeOverlays = [],
+      onLocationStatusChange,
+      onNavStateChange: _onNavStateChange,
+      onMapReady,
+    },
     ref,
   ) => {
     const { t, safeT } = useSafeTranslation();
@@ -156,7 +155,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     // ============================================
 
     // 1. Location Logic
-    const { locationStatus, origin, isOffCampus, centerOnUser } = useMapLocation({
+    const { locationStatus, isOffCampus, centerOnUser } = useMapLocation({
       mapInstance,
       leafletModule,
       isMapReady,
@@ -164,44 +163,18 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       navManagerRef,
     });
 
-    // 2. Navigation Logic
-    const {
-      isNavigating,
-      routeCoords,
-      preview,
-      // routeError, // unused in minimal overlay
-      navState,
-      startNavigation,
-      stopNavigation,
-    } = useMapNavigation({
-      selectedBuilding,
-      origin,
-      isOffCampus,
-      navManagerRef,
-      gpsToCrsSimple,
-      getBuildingLatLng,
-    });
-
-    // Expose navigation control to parent
+    // Campus map is view-only — no navigation logic.
+    // Expose no-op navigation control to parent for interface compatibility.
     useImperativeHandle(ref, () => ({
-      startNavigation,
-      stopNavigation,
-      isNavigating,
+      startNavigation: () => {},
+      stopNavigation: () => {},
+      isNavigating: false,
     }));
 
     // Notify parent of location status
     useEffect(() => {
       onLocationStatusChange?.(locationStatus);
     }, [locationStatus, onLocationStatusChange]);
-
-    // Notify parent of navigation state changes (for RouteAnnouncer)
-    useEffect(() => {
-      onNavStateChange?.({
-        isNavigating,
-        remainingDistance: navState?.remainingDistance,
-        status: navState?.status,
-      });
-    }, [isNavigating, navState, onNavStateChange]);
 
     // ============================================
     // OVERLAYS READY EFFECT
@@ -316,21 +289,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       >
         {/* Screen Reader Announcements */}
         <div className="sr-only" aria-live="polite" aria-atomic="true">
-          {preview && selectedBuilding && (
-            <span>
-              {t('navigatingTo')}: {t(selectedBuilding.translationKey)}.{' '}
-              {formatDistance(preview.distanceMeters)}, {formatDuration(preview.durationSeconds)}.
-            </span>
-          )}
-          {isNavigating && navState && (
-            <span>
-              {t('navigationProgressAnnouncement', {
-                distance: formatDistance(navState.remainingDistance),
-                eta: formatETA(navState.eta),
-              })}
-            </span>
-          )}
-          {navState?.status === 'arrived' && <span>{t('navigationArrived')}</span>}
+          {selectedBuilding && <span>{t(selectedBuilding.translationKey)}</span>}
           {isOffCampus && (
             <span>{safeT('locationOutsideCampusTitle', 'Outside campus boundary')}</span>
           )}
@@ -400,19 +359,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               activeOverlays={activeOverlays}
               overlaysReady={overlaysReady}
             />
-
-            {/* Route Polyline */}
-            {overlaysReady && routeCoords.length >= 2 && (
-              <reactLeafletModule.Polyline
-                positions={routeCoords}
-                color="#4285F4"
-                weight={6}
-                opacity={0.9}
-                dashArray="1, 12"
-                lineCap="round"
-                className="animate-route-dash"
-              />
-            )}
 
             {/* Building Markers — only show marker for selected building */}
             {overlaysReady && selectedBuilding && selectedIcon && (
@@ -540,49 +486,6 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
             )}
           </svg>
         </button>
-
-        {/* Minimal Instructions Overlay (only when navigating) */}
-        {isNavigating && navState && (
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] w-full max-w-md px-4 pointer-events-none">
-            <div className="bg-mq-card-background border border-mq-border shadow-lg rounded-xl p-4 pointer-events-auto">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <div className="font-bold text-lg text-mq-content">
-                    {navState.instructions.length > 0
-                      ? generateNavigationText(
-                          navState.instructions[navState.currentInstructionIndex],
-                          navState.remainingDistance,
-                        )
-                      : safeT('followRoute', 'Follow the route to your destination')}
-                  </div>
-                  <div className="text-sm text-mq-content-secondary">
-                    {t('next')}:{' '}
-                    {navState.instructions[navState.currentInstructionIndex + 1]?.text ||
-                      t('arrive')}
-                  </div>
-                </div>
-                <button
-                  onClick={stopNavigation}
-                  className="p-1 rounded-full hover:bg-mq-background-secondary text-mq-content-secondary dark:text-white/80"
-                  aria-label={t('stopNavigation')}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <div className="flex gap-4 text-sm font-medium text-mq-content-secondary border-t border-mq-border pt-2 mt-2">
-                <span>{formatDistance(navState.remainingDistance)}</span>
-                <span>{formatETA(navState.eta)}</span>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   },

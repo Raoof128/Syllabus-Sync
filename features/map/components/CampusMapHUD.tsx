@@ -1,16 +1,7 @@
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
-import {
-  Search,
-  Share2,
-  Download,
-  Building2,
-  X,
-  Navigation,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { Search, Share2, Download, Building2, X, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
@@ -54,8 +45,8 @@ export default function CampusMapHUD({
   setBuildingSearch,
   onCopyShare,
   onExport,
-  onStartNavigation,
-  onStopNavigation,
+  onStartNavigation: _onStartNavigation,
+  onStopNavigation: _onStopNavigation,
   isNavigating,
   isGoogleMode,
   placeSuggestions,
@@ -461,36 +452,6 @@ export default function CampusMapHUD({
                     {selectedBuilding.category.charAt(0).toUpperCase() +
                       selectedBuilding.category.slice(1)}
                   </Badge>
-                )}
-
-                {/* In Google mode, travel mode + nav controls live in GoogleRoutePanel */}
-                {!isGoogleMode && (
-                  <div className="flex flex-col gap-2 pt-2">
-                    {onStartNavigation && !isNavigating && (
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        className="w-full gap-2"
-                        onClick={() => {
-                          onStartNavigation();
-                        }}
-                      >
-                        <Navigation className="h-4 w-4" />
-                        {t('navigateOnCampus')}
-                      </Button>
-                    )}
-                    {onStopNavigation && isNavigating && (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="w-full gap-2"
-                        onClick={onStopNavigation}
-                      >
-                        <Navigation className="h-4 w-4" />
-                        {t('stop')}
-                      </Button>
-                    )}
-                  </div>
                 )}
               </div>
             </LayeredCard>

@@ -8,6 +8,14 @@ declare global {
 
 let googleMapsLoaderPromise: Promise<typeof google.maps> | null = null;
 
+function isGoogleMapsReady(): boolean {
+  return (
+    typeof window.google !== 'undefined' &&
+    typeof window.google.maps !== 'undefined' &&
+    typeof window.google.maps.importLibrary === 'function'
+  );
+}
+
 function buildGoogleMapsScriptUrl(apiKey: string): string {
   const params = new URLSearchParams({
     key: apiKey,
@@ -24,11 +32,8 @@ export async function loadGoogleMaps(): Promise<typeof google.maps> {
     throw new Error('Google Maps can only be loaded in the browser.');
   }
 
-  if (
-    typeof window.google !== 'undefined' &&
-    typeof window.google.maps !== 'undefined' &&
-    typeof window.google.maps.importLibrary === 'function'
-  ) {
+  // Already fully loaded — return immediately
+  if (isGoogleMapsReady()) {
     return window.google.maps;
   }
 
@@ -39,27 +44,23 @@ export async function loadGoogleMaps(): Promise<typeof google.maps> {
     }
 
     googleMapsLoaderPromise = new Promise<typeof google.maps>((resolve, reject) => {
+      // Remove any stale/failed script element from previous attempts
       const existingScript = document.getElementById('google-maps-js');
-      if (
-        existingScript &&
-        typeof window.google !== 'undefined' &&
-        typeof window.google.maps !== 'undefined' &&
-        typeof window.google.maps.importLibrary === 'function'
-      ) {
-        resolve(window.google.maps);
-        return;
-      }
-
-      window.__syllabusSyncGoogleMapsInit = () => {
-        if (
-          typeof window.google !== 'undefined' &&
-          typeof window.google.maps !== 'undefined' &&
-          typeof window.google.maps.importLibrary === 'function'
-        ) {
+      if (existingScript) {
+        if (isGoogleMapsReady()) {
           resolve(window.google.maps);
           return;
         }
+        // Previous script failed — remove it so we can retry
+        existingScript.remove();
+      }
 
+      window.__syllabusSyncGoogleMapsInit = () => {
+        delete window.__syllabusSyncGoogleMapsInit;
+        if (isGoogleMapsReady()) {
+          resolve(window.google.maps);
+          return;
+        }
         reject(new Error('Google Maps loaded without importLibrary support.'));
       };
 
@@ -71,6 +72,8 @@ export async function loadGoogleMaps(): Promise<typeof google.maps> {
       script.onerror = () => {
         googleMapsLoaderPromise = null;
         delete window.__syllabusSyncGoogleMapsInit;
+        // Remove the failed script so future retries can start fresh
+        script.remove();
         reject(new Error('Failed to load Google Maps JavaScript API.'));
       };
 

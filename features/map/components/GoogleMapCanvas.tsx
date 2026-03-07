@@ -51,6 +51,7 @@ export function GoogleMapCanvas({
   const [showStreetView, setShowStreetView] = useState(false);
   const googleMapId = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID ?? FALLBACK_GOOGLE_MAP_ID;
   const hasUserInteractedRef = useRef(false);
+  const [initAttempt, setInitAttempt] = useState(0);
 
   const sortedBuildings = useMemo(
     () => [...buildings].sort((left, right) => left.id.localeCompare(right.id)),
@@ -60,6 +61,11 @@ export function GoogleMapCanvas({
   // Track user interaction with the map to avoid fighting auto-pan
   const markUserInteraction = useCallback(() => {
     hasUserInteractedRef.current = true;
+  }, []);
+
+  const handleRetry = useCallback(() => {
+    setError(null);
+    setInitAttempt((prev) => prev + 1);
   }, []);
 
   // Initialize the map once
@@ -146,7 +152,7 @@ export function GoogleMapCanvas({
       buildingMarkers.clear();
     };
     // Only reinit if mapId changes - NOT on selectedBuilding change
-  }, [googleMapId, safeT, markUserInteraction]);
+  }, [googleMapId, safeT, markUserInteraction, initAttempt]);
 
   // Sync building markers
   useEffect(() => {
@@ -573,12 +579,19 @@ export function GoogleMapCanvas({
       {error && (
         <div className="absolute inset-x-3 top-3 rounded-mq-xl border border-mq-danger/20 bg-mq-card-background/95 p-4 shadow-lg backdrop-blur-sm">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-5 w-5 text-mq-danger" />
-            <div>
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-mq-danger" />
+            <div className="flex-1">
               <p className="text-sm font-semibold text-mq-content">
                 {safeT('googleMapUnavailable', 'Google Map unavailable')}
               </p>
               <p className="mt-1 text-sm text-mq-content-secondary">{error}</p>
+              <button
+                type="button"
+                onClick={handleRetry}
+                className="mt-2 text-sm font-medium text-mq-primary hover:text-mq-primary/80 transition-colors"
+              >
+                {safeT('tryAgain', 'Try again')}
+              </button>
             </div>
           </div>
         </div>
