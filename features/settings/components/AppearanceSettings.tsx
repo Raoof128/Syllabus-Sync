@@ -159,7 +159,7 @@ const AppearanceSettings = memo(
                         className={`px-3 py-1 text-xs ${language === lang ? 'bg-mq-primary text-white' : 'text-mq-content-secondary'}`}
                       >
                         {LANGUAGE_NAMES[lang] || lang}
-                        {language === lang ? ` ${t('currentlySelected') || ''}` : ''}
+                        {language === lang ? ` ${t('currentlySelected')}` : ''}
                       </Button>
                     ))}
                   </div>
