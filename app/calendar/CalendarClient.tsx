@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import {
@@ -37,6 +37,7 @@ import { useCalendarDialogs } from '@/features/calendar/hooks/useCalendarDialogs
 import { useCalendarHighlights } from '@/features/calendar/hooks/useCalendarHighlights';
 import { useCalendarGetters } from '@/features/calendar/hooks/useCalendarGetters';
 import { useLiveCollaboration } from '@/features/calendar/hooks/useLiveCollaboration';
+import { usePendingCalendarIntent } from '@/features/calendar/hooks/usePendingCalendarIntent';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 
 dayjs.extend(isoWeek);
@@ -139,18 +140,23 @@ export default function CalendarClient() {
     deadlineDialogOpen,
     setDeadlineDialogOpen,
     editDeadline,
+    setEditDeadline,
     assignmentDialogOpen,
     setAssignmentDialogOpen,
     editAssignment,
+    setEditAssignment,
     examDialogOpen,
     setExamDialogOpen,
     editExam,
+    setEditExam,
     eventDialogOpen,
     setEventDialogOpen,
     editEvent,
+    setEditEvent,
     unitDialogOpen,
     setUnitDialogOpen,
     editingUnit,
+    setEditingUnit,
     todoDialogOpen,
     setTodoDialogOpen,
     editingTodo,
@@ -182,6 +188,7 @@ export default function CalendarClient() {
     eventDetailOpen,
     setEventDetailOpen,
     selectedEvent,
+    setSelectedEvent,
     todoDetailOpen,
     setTodoDetailOpen,
     selectedTodo,
@@ -232,6 +239,125 @@ export default function CalendarClient() {
   // 5. Highlights Hook
   const { unitsWidgetRef, assignmentsWidgetRef, deadlineRefs, highlightedDeadlineId } =
     useCalendarHighlights(units, deadlines, userEvents, todos, hasHydrated, dialogs, setView);
+
+  const examsWidgetRef = useRef<HTMLDivElement>(null);
+  const eventsWidgetRef = useRef<HTMLDivElement>(null);
+  const remindersWidgetRef = useRef<HTMLDivElement>(null);
+
+  const prepareForPendingIntent = useCallback(() => {
+    setDeadlineDialogOpen(false);
+    setEditDeadline(null);
+    setAssignmentDialogOpen(false);
+    setEditAssignment(null);
+    setExamDialogOpen(false);
+    setEditExam(null);
+    setEventDialogOpen(false);
+    setEditEvent(null);
+    setUnitDialogOpen(false);
+    setEditingUnit(null);
+    setTodoDialogOpen(false);
+    setEditingTodo(null);
+
+    setUnitDetailOpen(false);
+    setSelectedUnit(null);
+    setAssignmentDetailOpen(false);
+    setSelectedAssignment(null);
+    setExamDetailOpen(false);
+    setSelectedExam(null);
+    setEventDetailOpen(false);
+    setSelectedEvent(null);
+    setTodoDetailOpen(false);
+    setSelectedTodo(null);
+
+    setDeleteConfirmOpen(false);
+    setUnitToDelete(null);
+    setAssignmentDeleteConfirmOpen(false);
+    setAssignmentToDelete(null);
+    setExamDeleteConfirmOpen(false);
+    setExamToDelete(null);
+    setDeadlineDeleteConfirmOpen(false);
+    setDeadlineToDelete(null);
+    setEventDeleteConfirmOpen(false);
+    setEventToDelete(null);
+    setTodoDeleteConfirmOpen(false);
+    setTodoToDelete(null);
+  }, [
+    setAssignmentDeleteConfirmOpen,
+    setAssignmentDetailOpen,
+    setAssignmentDialogOpen,
+    setAssignmentToDelete,
+    setDeadlineDeleteConfirmOpen,
+    setDeadlineDialogOpen,
+    setDeadlineToDelete,
+    setDeleteConfirmOpen,
+    setEditAssignment,
+    setEditDeadline,
+    setEditEvent,
+    setEditExam,
+    setEditingTodo,
+    setEditingUnit,
+    setEventDeleteConfirmOpen,
+    setEventDetailOpen,
+    setEventDialogOpen,
+    setEventToDelete,
+    setExamDeleteConfirmOpen,
+    setExamDetailOpen,
+    setExamDialogOpen,
+    setExamToDelete,
+    setSelectedAssignment,
+    setSelectedEvent,
+    setSelectedExam,
+    setSelectedTodo,
+    setSelectedUnit,
+    setTodoDeleteConfirmOpen,
+    setTodoDetailOpen,
+    setTodoDialogOpen,
+    setTodoToDelete,
+    setUnitDetailOpen,
+    setUnitDialogOpen,
+    setUnitToDelete,
+  ]);
+
+  const calendarIntentWidgetRefs = useMemo(
+    () => ({
+      unit: unitsWidgetRef,
+      assignment: assignmentsWidgetRef,
+      exam: examsWidgetRef,
+      event: eventsWidgetRef,
+      reminder: remindersWidgetRef,
+    }),
+    [assignmentsWidgetRef, unitsWidgetRef],
+  );
+
+  const calendarIntentOpenStates = useMemo(
+    () => ({
+      unit: unitDialogOpen,
+      assignment: assignmentDialogOpen,
+      exam: examDialogOpen,
+      event: eventDialogOpen,
+      reminder: todoDialogOpen,
+    }),
+    [assignmentDialogOpen, eventDialogOpen, examDialogOpen, todoDialogOpen, unitDialogOpen],
+  );
+
+  const calendarIntentOpenForms = useMemo(
+    () => ({
+      unit: openAddUnit,
+      assignment: openAddAssignment,
+      exam: openAddExam,
+      event: openAddEvent,
+      reminder: openAddTodo,
+    }),
+    [openAddAssignment, openAddEvent, openAddExam, openAddTodo, openAddUnit],
+  );
+
+  const intentHighlightTarget = usePendingCalendarIntent({
+    hasHydrated,
+    widgetRefs: calendarIntentWidgetRefs,
+    openStates: calendarIntentOpenStates,
+    openForms: calendarIntentOpenForms,
+    prepareForIntent: prepareForPendingIntent,
+  });
 
   // 6. Getters Hook
   const { formatDayNumber, formatMonthYear, formatWeekRange, formatWeekdayShort, formatTimeShort } =
@@ -830,8 +956,12 @@ export default function CalendarClient() {
             }}
             onDeleteTodo={handleDeleteTodo}
             onNotifyTodo={handleNotifyTodo}
-            unitsWidgetRef={unitsWidgetRef as React.RefObject<HTMLDivElement>}
-            assignmentsWidgetRef={assignmentsWidgetRef as React.RefObject<HTMLDivElement>}
+            unitsWidgetRef={unitsWidgetRef}
+            assignmentsWidgetRef={assignmentsWidgetRef}
+            examsWidgetRef={examsWidgetRef}
+            eventsWidgetRef={eventsWidgetRef}
+            remindersWidgetRef={remindersWidgetRef}
+            intentHighlightTarget={intentHighlightTarget}
           />
         </CalendarSidebar>
       </div>

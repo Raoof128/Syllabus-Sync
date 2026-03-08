@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { Unit } from '@/lib/types';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
+import { CALENDAR_WIDGET_IDS } from '@/features/calendar/lib/calendarIntent';
 
 interface UnitsWidgetProps {
   onAddUnit: () => void;
@@ -48,11 +49,12 @@ export default function UnitsWidget({
       isLiquidEnhanced
       className={
         highlightedWidget === 'units'
-          ? 'ring-2 ring-mq-primary ring-offset-2 ring-offset-mq-background transition-all'
+          ? 'ring-2 ring-red-500/80 ring-offset-2 ring-offset-mq-background shadow-[0_0_0_4px_rgba(239,68,68,0.16),0_0_28px_rgba(239,68,68,0.35)] transition-all duration-300'
           : ''
       }
     >
       <div
+        id={CALENDAR_WIDGET_IDS.unit}
         className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
         ref={widgetRef}
       >

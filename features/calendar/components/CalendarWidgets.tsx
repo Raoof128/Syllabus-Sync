@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { Deadline, Event, Unit, Todo } from '@/lib/types';
+import type { CalendarIntentTarget } from '@/features/calendar/lib/calendarIntent';
 
 // Widgets
 import AssignmentsWidget from './widgets/AssignmentsWidget';
@@ -34,8 +35,12 @@ interface CalendarWidgetsProps {
   onOpenTodoDetail?: (todo: Todo) => void;
   onDeleteTodo?: (todo: Todo) => void;
   onNotifyTodo?: (todo: Todo) => void;
-  unitsWidgetRef?: React.RefObject<HTMLDivElement>;
-  assignmentsWidgetRef?: React.RefObject<HTMLDivElement>;
+  unitsWidgetRef?: React.RefObject<HTMLDivElement | null>;
+  assignmentsWidgetRef?: React.RefObject<HTMLDivElement | null>;
+  examsWidgetRef?: React.RefObject<HTMLDivElement | null>;
+  eventsWidgetRef?: React.RefObject<HTMLDivElement | null>;
+  remindersWidgetRef?: React.RefObject<HTMLDivElement | null>;
+  intentHighlightTarget?: CalendarIntentTarget | null;
 }
 
 export default function CalendarWidgets({
@@ -62,6 +67,10 @@ export default function CalendarWidgets({
   onNotifyTodo: _onNotifyTodo,
   unitsWidgetRef: externalUnitsRef,
   assignmentsWidgetRef: externalAssignmentsRef,
+  examsWidgetRef: externalExamsRef,
+  eventsWidgetRef: externalEventsRef,
+  remindersWidgetRef: externalRemindersRef,
+  intentHighlightTarget = null,
 }: CalendarWidgetsProps) {
   const searchParams = useSearchParams();
 
@@ -71,11 +80,14 @@ export default function CalendarWidgets({
   // Highlight Refs
   const internalUnitsRef = useRef<HTMLDivElement>(null);
   const internalAssignmentsRef = useRef<HTMLDivElement>(null);
+  const internalExamsRef = useRef<HTMLDivElement>(null);
+  const internalEventsRef = useRef<HTMLDivElement>(null);
+  const internalRemindersRef = useRef<HTMLDivElement>(null);
   const unitsWidgetRef = externalUnitsRef || internalUnitsRef;
   const assignmentsWidgetRef = externalAssignmentsRef || internalAssignmentsRef;
-  const examsWidgetRef = useRef<HTMLDivElement>(null);
-  const eventsWidgetRef = useRef<HTMLDivElement>(null);
-  const todosWidgetRef = useRef<HTMLDivElement>(null);
+  const examsWidgetRef = externalExamsRef || internalExamsRef;
+  const eventsWidgetRef = externalEventsRef || internalEventsRef;
+  const todosWidgetRef = externalRemindersRef || internalRemindersRef;
 
   // URL Highlights
   const highlightedDeadlineId = searchParams.get('highlightDeadline');
@@ -85,7 +97,6 @@ export default function CalendarWidgets({
   const highlightedWidget = searchParams.get('highlightWidget');
   const highlightSection = searchParams.get('section');
   const sectionHighlight = searchParams.get('highlight') === 'true';
-  const actionParam = searchParams.get('action');
 
   // State for section highlight that persists for 3 seconds
   const [sectionHighlightActive, setSectionHighlightActive] = useState<
@@ -97,16 +108,23 @@ export default function CalendarWidgets({
 
   // Track if we've processed the current URL params to prevent re-processing
   const hasProcessedCurrentHighlight = useRef(false);
-  const hasProcessedActionRef = useRef<string | null>(null);
 
   const deadlineHighlightActive =
-    Boolean(highlightedDeadlineId) || sectionHighlightActive === 'assignments';
-  const todoHighlightActive = Boolean(highlightedTodoId) || sectionHighlightActive === 'todos';
+    Boolean(highlightedDeadlineId) ||
+    sectionHighlightActive === 'assignments' ||
+    intentHighlightTarget === 'assignment';
+  const todoHighlightActive =
+    Boolean(highlightedTodoId) ||
+    sectionHighlightActive === 'todos' ||
+    intentHighlightTarget === 'reminder';
   const eventHighlightActive =
     (Boolean(highlightedEventId) && !eventHighlightDismissed) ||
-    sectionHighlightActive === 'events';
-  const examsHighlightActive = sectionHighlightActive === 'exams';
-  const unitsHighlightActive = sectionHighlightActive === 'units';
+    sectionHighlightActive === 'events' ||
+    intentHighlightTarget === 'event';
+  const examsHighlightActive =
+    sectionHighlightActive === 'exams' || intentHighlightTarget === 'exam';
+  const unitsHighlightActive =
+    sectionHighlightActive === 'units' || intentHighlightTarget === 'unit';
 
   // Helper function to check if element is visible in viewport
   const isElementInViewport = React.useCallback((el: HTMLElement | null): boolean => {
@@ -144,7 +162,7 @@ export default function CalendarWidgets({
         scrollIfNotVisible(targetRef);
       }, 100);
     }
-  }, [highlightedDeadlineId, deadlines, scrollIfNotVisible, assignmentsWidgetRef]);
+  }, [highlightedDeadlineId, deadlines, scrollIfNotVisible, assignmentsWidgetRef, examsWidgetRef]);
 
   useEffect(() => {
     if ((highlightedUnitId || highlightedWidget === 'units') && unitsWidgetRef.current) {
@@ -160,7 +178,7 @@ export default function CalendarWidgets({
         scrollIfNotVisible(todosWidgetRef.current);
       }, 100);
     }
-  }, [highlightedTodoId, scrollIfNotVisible]);
+  }, [highlightedTodoId, scrollIfNotVisible, todosWidgetRef]);
 
   useEffect(() => {
     if (highlightedEventId && eventsWidgetRef.current) {
@@ -168,7 +186,7 @@ export default function CalendarWidgets({
         scrollIfNotVisible(eventsWidgetRef.current);
       }, 100);
     }
-  }, [highlightedEventId, scrollIfNotVisible]);
+  }, [highlightedEventId, eventsWidgetRef, scrollIfNotVisible]);
 
   // Auto-dismiss individual event highlight after 3 seconds
   useEffect(() => {
@@ -223,111 +241,7 @@ export default function CalendarWidgets({
         hasProcessedCurrentHighlight.current = false;
       };
     }
-  }, [highlightSection, sectionHighlight]);
-
-  // Handle highlightWidget + action params from FAB menu
-  // Store callbacks in refs so they never trigger effect re-runs
-  const onAddUnitRef = React.useRef(onAddUnit);
-  const onAddAssignmentRef = React.useRef(onAddAssignment);
-  const onAddExamRef = React.useRef(onAddExam);
-  const onAddEventRef = React.useRef(onAddEvent);
-  const onAddTodoRef = React.useRef(onAddTodo);
-  useEffect(() => {
-    onAddUnitRef.current = onAddUnit;
-    onAddAssignmentRef.current = onAddAssignment;
-    onAddExamRef.current = onAddExam;
-    onAddEventRef.current = onAddEvent;
-    onAddTodoRef.current = onAddTodo;
-  }, [onAddUnit, onAddAssignment, onAddExam, onAddEvent, onAddTodo]);
-
-  // Refs to hold timer IDs — kept outside the effect so that re-renders triggered
-  // by replaceState (Next.js 16 syncs replaceState → router → re-render) do NOT
-  // cancel the in-flight scroll/highlight/open-form work.
-  const fabTimersRef = React.useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  // Cleanup all FAB timers on unmount only
-  useEffect(() => {
-    return () => {
-      fabTimersRef.current.forEach(clearTimeout);
-      fabTimersRef.current = [];
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!highlightedWidget || !actionParam) return;
-    if (hasProcessedActionRef.current === actionParam) return;
-
-    // Mark as consumed immediately — this is the one-shot guard
-    hasProcessedActionRef.current = actionParam;
-
-    // Capture values for use inside timers (independent of future renders)
-    const widget = highlightedWidget;
-    const action = actionParam;
-
-    // Clear any previous FAB timers
-    fabTimersRef.current.forEach(clearTimeout);
-    fabTimersRef.current = [];
-
-    // Scroll to the appropriate widget (only if not visible) and activate highlight
-    const activateTimer = setTimeout(() => {
-      if (
-        widget === 'units' ||
-        widget === 'assignments' ||
-        widget === 'exams' ||
-        widget === 'events' ||
-        widget === 'todos'
-      ) {
-        setSectionHighlightActive(widget);
-      }
-
-      // Scroll to appropriate widget ONLY if not already visible
-      if (widget === 'units' && unitsWidgetRef.current) {
-        scrollIfNotVisible(unitsWidgetRef.current);
-      } else if (widget === 'assignments' && assignmentsWidgetRef.current) {
-        scrollIfNotVisible(assignmentsWidgetRef.current);
-      } else if (widget === 'exams' && examsWidgetRef.current) {
-        scrollIfNotVisible(examsWidgetRef.current);
-      } else if (widget === 'events' && eventsWidgetRef.current) {
-        scrollIfNotVisible(eventsWidgetRef.current);
-      } else if (widget === 'todos' && todosWidgetRef.current) {
-        scrollIfNotVisible(todosWidgetRef.current);
-      }
-
-      // Trigger the appropriate add action after scroll
-      const actionTimer = setTimeout(() => {
-        if (action === 'add-unit') {
-          onAddUnitRef.current();
-        } else if (action === 'add-assignment') {
-          onAddAssignmentRef.current();
-        } else if (action === 'add-exam') {
-          onAddExamRef.current();
-        } else if (action === 'add-event') {
-          onAddEventRef.current();
-        } else if (action === 'add-todo') {
-          onAddTodoRef.current?.();
-        }
-
-        // Strip URL params AFTER the action has been triggered (not before).
-        // This avoids the re-render/cleanup race that would cancel our timers.
-        const url = new URL(window.location.href);
-        url.searchParams.delete('action');
-        url.searchParams.delete('highlightWidget');
-        window.history.replaceState({}, '', url.toString());
-      }, 300);
-      fabTimersRef.current.push(actionTimer);
-    }, 100);
-    fabTimersRef.current.push(activateTimer);
-
-    // Clear highlight after 3 seconds (highlight is visual-only, action already consumed)
-    const clearTimer = setTimeout(() => {
-      setSectionHighlightActive(null);
-    }, 3000);
-    fabTimersRef.current.push(clearTimer);
-
-    // Do NOT return a cleanup that cancels timers — the timers are managed via
-    // fabTimersRef and cleaned up on unmount only. This prevents the Next.js 16
-    // replaceState → re-render → effect-cleanup chain from cancelling our work.
-  }, [highlightedWidget, actionParam, unitsWidgetRef, assignmentsWidgetRef, scrollIfNotVisible]);
+  }, [eventsWidgetRef, highlightSection, sectionHighlight, todosWidgetRef]);
 
   return (
     <div className="space-y-4 lg:space-y-6">

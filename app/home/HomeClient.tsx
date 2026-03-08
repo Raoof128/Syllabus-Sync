@@ -41,6 +41,8 @@ import {
   useHomeErrorBoundary,
 } from '@/features/home/hooks';
 import { AuthUser } from '@/features/home/types';
+import { useCalendarIntentStore } from '@/lib/store/calendarIntentStore';
+import type { CalendarIntentTarget } from '@/features/calendar/lib/calendarIntent';
 
 interface HomeClientProps {
   initialUser?: AuthUser | null;
@@ -49,6 +51,7 @@ interface HomeClientProps {
 export default function HomeClient({ initialUser = null }: HomeClientProps) {
   const { t } = useTypedTranslation();
   const router = useRouter();
+  const queueCalendarIntent = useCalendarIntentStore((state) => state.queueCalendarIntent);
 
   const { hasError, errorMessage, handleErrorRecovery } = useHomeErrorBoundary();
   const { displayName, hasHydrated } = useHomeUser(initialUser);
@@ -58,6 +61,16 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
 
   const [fabOpen, setFabOpen] = useState(false);
   const portalTarget = typeof document === 'undefined' ? null : document.body;
+
+  const handleQuickCalendarAction = (target: CalendarIntentTarget) => {
+    queueCalendarIntent({
+      target,
+      highlight: true,
+      autoOpenForm: true,
+    });
+    router.push('/calendar');
+    setFabOpen(false);
+  };
 
   if (hasError) {
     return (
@@ -289,10 +302,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                         size="sm"
                         variant="secondary"
                         className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => {
-                          router.push('/calendar?highlightWidget=units&action=add-unit');
-                          setFabOpen(false);
-                        }}
+                        onClick={() => handleQuickCalendarAction('unit')}
                       >
                         <BookOpen className="h-4 w-4 text-mq-content" />
                         {t('addUnitClass')}
@@ -301,10 +311,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                         size="sm"
                         variant="secondary"
                         className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => {
-                          router.push('/calendar?highlightWidget=exams&action=add-exam');
-                          setFabOpen(false);
-                        }}
+                        onClick={() => handleQuickCalendarAction('exam')}
                       >
                         <GraduationCap className="h-4 w-4 text-mq-content" />
                         {t('addExam')}
@@ -313,12 +320,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                         size="sm"
                         variant="secondary"
                         className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => {
-                          router.push(
-                            '/calendar?highlightWidget=assignments&action=add-assignment',
-                          );
-                          setFabOpen(false);
-                        }}
+                        onClick={() => handleQuickCalendarAction('assignment')}
                       >
                         <FileText className="h-4 w-4 text-mq-content" />
                         {t('addAssignment')}
@@ -327,10 +329,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                         size="sm"
                         variant="secondary"
                         className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => {
-                          router.push('/calendar?highlightWidget=events&action=add-event');
-                          setFabOpen(false);
-                        }}
+                        onClick={() => handleQuickCalendarAction('event')}
                       >
                         <Calendar className="h-4 w-4 text-mq-content" />
                         {t('addEvent')}
@@ -339,10 +338,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
                         size="sm"
                         variant="secondary"
                         className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => {
-                          router.push('/calendar?highlightWidget=todos&action=add-todo');
-                          setFabOpen(false);
-                        }}
+                        onClick={() => handleQuickCalendarAction('reminder')}
                       >
                         <ListTodo className="h-4 w-4 text-mq-content" />
                         {t('addTodo')}
