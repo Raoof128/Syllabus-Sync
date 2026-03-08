@@ -35,7 +35,7 @@ export function useMapNavigation({
   gpsToCrsSimple,
   getBuildingLatLng,
 }: UseMapNavigationProps) {
-  const { safeT } = useSafeTranslation();
+  const { t } = useSafeTranslation();
 
   // State
   const [isNavigating, setIsNavigating] = useState(false);
@@ -76,7 +76,7 @@ export function useMapNavigation({
       setNavState(state);
       if (state.status === 'arrived' && isNavigatingRef.current) {
         mapLog.log('User arrived at destination!');
-        toastUtils.success(safeT('arrived', 'Arrived!'), selectedBuildingRef.current?.name || '');
+        toastUtils.success(t('arrived'), selectedBuildingRef.current?.name || '');
         setIsNavigating(false);
         rerouteCountRef.current = 0;
       }
@@ -88,10 +88,7 @@ export function useMapNavigation({
           setRerouteTrigger((prev) => prev + 1);
         } else {
           mapLog.log('Max reroute attempts reached, stopping navigation');
-          toastUtils.warning(
-            safeT('navigationError', 'Navigation stopped'),
-            safeT('tooManyReroutes', 'Unable to find route. Please try again.'),
-          );
+          toastUtils.warning(t('navigationError'), t('tooManyReroutes'));
           stopNavigationRef.current();
         }
       }
@@ -102,17 +99,11 @@ export function useMapNavigation({
   // Start Navigation
   const startNavigation = useCallback(() => {
     if (isOffCampus) {
-      toastUtils.warning(
-        safeT('locationOutsideCampusTitle', 'Outside campus boundary'),
-        safeT(
-          'locationOutsideCampusMessage',
-          'Navigation is disabled while you are outside campus.',
-        ),
-      );
+      toastUtils.warning(t('locationOutsideCampusTitle'), t('locationOutsideCampusMessage'));
       return;
     }
     if (!gpsRouteCoords.length || !preview || !navManagerRef.current) {
-      toastUtils.warning(safeT('noRouteAvailable', 'No route available'));
+      toastUtils.warning(t('noRouteAvailable'));
       return;
     }
 
@@ -132,7 +123,7 @@ export function useMapNavigation({
     });
 
     toastUtils.success(
-      safeT('navigationStarted', 'Navigation started'),
+      t('navigationStarted'),
       `${formatDistance(preview.distanceMeters)} • ${formatDuration(preview.durationSeconds)}`,
     );
   }, [
@@ -142,7 +133,7 @@ export function useMapNavigation({
     navManagerRef,
     routeInstructions,
     selectedBuilding?.id,
-    safeT,
+    t,
   ]);
 
   const stopNavigation = useCallback(() => {
@@ -171,25 +162,16 @@ export function useMapNavigation({
 
     stopNavigationRef.current();
     if (nextDestinationId) {
-      toastUtils.info(
-        safeT('destinationChanged', 'Destination changed'),
-        safeT(
-          'restartNavigationForNewDestination',
-          'Navigation stopped. Tap navigate again for the new destination.',
-        ),
-      );
+      toastUtils.info(t('destinationChanged'), t('restartNavigationForNewDestination'));
     }
-  }, [selectedBuilding?.id, safeT]);
+  }, [selectedBuilding?.id, t]);
 
   // Campus-mode navigation must stop immediately once user leaves campus bounds.
   useEffect(() => {
     if (!isOffCampus || !isNavigatingRef.current) return;
     stopNavigationRef.current();
-    toastUtils.warning(
-      safeT('locationOutsideCampusTitle', 'Outside campus boundary'),
-      safeT('locationOutsideCampusMessage', 'Navigation is disabled while you are outside campus.'),
-    );
-  }, [isOffCampus, safeT]);
+    toastUtils.warning(t('locationOutsideCampusTitle'), t('locationOutsideCampusMessage'));
+  }, [isOffCampus, t]);
 
   // Reroute Effect: re-fetch route when user goes significantly off-route
   useEffect(() => {
@@ -305,7 +287,7 @@ export function useMapNavigation({
         setPreview(routeData);
         setRouteInstructions(orsData ? parseRouteInstructions(orsData) : []);
       } else {
-        setRouteError(error || 'Unknown error');
+        setRouteError(error || t('unexpectedError'));
         setRouteCoords([]);
         setGpsRouteCoords([]);
         setPreview(null);
@@ -319,7 +301,7 @@ export function useMapNavigation({
       controller.abort();
       clearTimeout(timer);
     };
-  }, [selectedBuilding, origin, isOffCampus, gpsToCrsSimple, getBuildingLatLng]);
+  }, [selectedBuilding, origin, isOffCampus, gpsToCrsSimple, getBuildingLatLng, t]);
 
   return {
     isNavigating,

@@ -65,7 +65,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
     },
     ref,
   ) => {
-    const { t, safeT } = useSafeTranslation();
+    const { t } = useSafeTranslation();
 
     const { hapticFeedbackEnabled } = useMapStore();
 
@@ -290,22 +290,13 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
         {/* Screen Reader Announcements */}
         <div className="sr-only" aria-live="polite" aria-atomic="true">
           {selectedBuilding && <span>{t(selectedBuilding.translationKey)}</span>}
-          {isOffCampus && (
-            <span>{safeT('locationOutsideCampusTitle', 'Outside campus boundary')}</span>
-          )}
+          {isOffCampus && <span>{t('locationOutsideCampusTitle')}</span>}
         </div>
 
         {showOffCampusWarning && (
           <div className="absolute bottom-3 left-3 right-3 md:right-auto z-[1000] rounded-mq-lg bg-mq-warning px-4 py-3 text-sm text-white shadow flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-2">
-            <span className="font-semibold">
-              {safeT('locationOutsideCampusTitle', 'Outside campus boundary')}
-            </span>
-            <span className="text-white/90">
-              {safeT(
-                'locationOutsideCampusMessage',
-                'You appear to be outside campus bounds. Navigation is disabled until you return.',
-              )}
-            </span>
+            <span className="font-semibold">{t('locationOutsideCampusTitle')}</span>
+            <span className="text-white/90">{t('locationOutsideCampusMessage')}</span>
           </div>
         )}
 
@@ -391,7 +382,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                       </Badge>
                       {selectedBuilding.gridRef && (
                         <span className="text-xs text-mq-content-tertiary font-mono">
-                          {safeT('gridRef', 'Grid')}: {selectedBuilding.gridRef}
+                          {t('gridRef')}: {selectedBuilding.gridRef}
                         </span>
                       )}
                     </div>
@@ -453,7 +444,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               ? 'bottom-[280px] right-4 sm:bottom-[140px] sm:right-4'
               : 'bottom-[140px] right-4',
           )}
-          aria-label={safeT('centerOnLocation', 'Center on my location')}
+          aria-label={t('centerOnLocation')}
         >
           <svg
             className="w-6 h-6"

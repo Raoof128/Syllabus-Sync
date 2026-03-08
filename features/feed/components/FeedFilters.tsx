@@ -49,7 +49,7 @@ export function FeedFilters({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-mq-content-tertiary pointer-events-none" />
           <Input
-            placeholder={t('searchEventsPlaceholder') || 'Search events...'}
+            placeholder={t('searchEventsPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-9 bg-mq-background-secondary border-mq-border"
@@ -62,8 +62,8 @@ export function FeedFilters({
               <SelectValue placeholder={t('sortBy')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="soonest">{t('sortSoonest') || 'Soonest'}</SelectItem>
-              <SelectItem value="newest">{t('sortNewest') || 'Newest'}</SelectItem>
+              <SelectItem value="soonest">{t('sortSoonest')}</SelectItem>
+              <SelectItem value="newest">{t('sortNewest')}</SelectItem>
               {/* <SelectItem value="popular">{t('sortPopular') || "Popular"}</SelectItem> */}
             </SelectContent>
           </Select>
@@ -80,8 +80,7 @@ export function FeedFilters({
                     : 'text-mq-content-secondary hover:text-mq-content',
                 )}
               >
-                {t(`timeRange_${range}` as TranslationKey) ||
-                  range.charAt(0).toUpperCase() + range.slice(1)}
+                {t(`timeRange_${range}` as TranslationKey)}
               </button>
             ))}
           </div>
@@ -103,7 +102,7 @@ export function FeedFilters({
                   : 'bg-mq-background-secondary border-mq-border text-mq-content-secondary hover:border-mq-border-secondary',
               )}
             >
-              <span>{t(`category_${filter.replace(/ /g, '')}` as TranslationKey) || filter}</span>
+              <span>{t(`category_${filter.replace(/ /g, '')}` as TranslationKey)}</span>
               <span
                 className={cn(
                   'ml-1 text-[10px] px-1.5 py-0.5 rounded-full',

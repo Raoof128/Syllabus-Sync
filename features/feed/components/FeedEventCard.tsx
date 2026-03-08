@@ -165,7 +165,7 @@ export const FeedEventCard = memo(
                 ) : (
                   <Bell className="h-3 w-3 mr-2" />
                 )}
-                {isReminded ? t('reminderSet') || 'Reminder Set' : t('remindMe')}
+                {isReminded ? t('reminderSet') : t('remindMe')}
               </Button>
 
               {event.building && (

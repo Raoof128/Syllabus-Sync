@@ -70,7 +70,7 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
               <div className="pt-2 border-t border-mq-border space-y-3">
                 <h3 className="text-sm font-medium text-mq-content-secondary flex items-center gap-2">
                   <KeyRound className="h-4 w-4" aria-hidden="true" />
-                  {t('accountSecurity' as TranslationKey) || 'Account Security'}
+                  {t('accountSecurity' as TranslationKey)}
                 </h3>
                 <Button
                   variant="outline"
@@ -78,7 +78,7 @@ const SecuritySettings = memo(({ t }: SecuritySettingsProps) => {
                   onClick={() => router.push('/login?redirectTo=/settings/security')}
                 >
                   <LogIn className="h-4 w-4" aria-hidden="true" />
-                  {t('changePassword' as TranslationKey) || 'Change Password'}
+                  {t('changePassword' as TranslationKey)}
                 </Button>
               </div>
             </>

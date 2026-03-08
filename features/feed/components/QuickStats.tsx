@@ -80,66 +80,66 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
       {/* Header */}
       <div className="flex items-center gap-2">
         <TrendingUp className="h-5 w-5 text-mq-primary" />
-        <h3 className="font-bold text-mq-content">{t('thisWeek') || 'This Week'}</h3>
+        <h3 className="font-bold text-mq-content">{t('thisWeek')}</h3>
       </div>
 
       {/* Stats Cards */}
       <div className="space-y-2">
         <StatCard
           icon={Calendar}
-          label={t('totalEvents') || 'Total Events'}
+          label={t('totalEvents')}
           value={stats.total}
           color="text-mq-primary"
           bgColor="bg-mq-primary/10"
-          onClick={() => openDialog(t('totalEvents') || 'Total Events', stats.totalEvents)}
+          onClick={() => openDialog(t('totalEvents'), stats.totalEvents)}
         />
         <StatCard
           icon={Users}
-          label={t('thisWeek') || 'This Week'}
+          label={t('thisWeek')}
           value={stats.thisWeek}
           color="text-purple-500"
           bgColor="bg-purple-500/10"
-          onClick={() => openDialog(t('thisWeek') || 'This Week', stats.thisWeekEvents)}
+          onClick={() => openDialog(t('thisWeek'), stats.thisWeekEvents)}
         />
       </div>
 
       {/* Category Breakdown */}
       <div className="pt-4 border-t border-mq-border">
         <p className="text-xs font-semibold text-mq-content-tertiary uppercase tracking-wide mb-3">
-          {t('byCategory') || 'By Category'}
+          {t('byCategory')}
         </p>
         <div className="space-y-2">
           <CategoryBar
             icon="💼"
-            label={t('career') || 'Career'}
+            label={t('career')}
             count={stats.career}
             total={stats.total}
             color="bg-blue-500"
-            onClick={() => openDialog(t('career') || 'Career', stats.careerEvents)}
+            onClick={() => openDialog(t('career'), stats.careerEvents)}
           />
           <CategoryBar
             icon="📚"
-            label={t('academic') || 'Academic'}
+            label={t('academic')}
             count={stats.academic}
             total={stats.total}
             color="bg-emerald-500"
-            onClick={() => openDialog(t('academic') || 'Academic', stats.academicEvents)}
+            onClick={() => openDialog(t('academic'), stats.academicEvents)}
           />
           <CategoryBar
             icon="🎉"
-            label={t('social') || 'Social'}
+            label={t('social')}
             count={stats.social}
             total={stats.total}
             color="bg-purple-500"
-            onClick={() => openDialog(t('social') || 'Social', stats.socialEvents)}
+            onClick={() => openDialog(t('social'), stats.socialEvents)}
           />
           <CategoryBar
             icon="🍕"
-            label={t('freeFood') || 'Free Food'}
+            label={t('freeFood')}
             count={stats.freeFood}
             total={stats.total}
             color="bg-amber-500"
-            onClick={() => openDialog(t('freeFood') || 'Free Food', stats.freeFoodEvents)}
+            onClick={() => openDialog(t('freeFood'), stats.freeFoodEvents)}
           />
         </div>
       </div>
@@ -167,7 +167,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
                 </div>
                 <div className="flex justify-between mt-4">
                   <Button variant="outline" onClick={() => setSelectedEvent(null)}>
-                    {t('back') || 'Back'}
+                    {t('back')}
                   </Button>
                   <Button variant="outline" onClick={closeDialog}>
                     {t('close')}
@@ -387,8 +387,8 @@ function EventCard({ event, onClick, expanded }: EventCardProps) {
       {expanded && event.building && (
         <div className="mt-3 pt-3 border-t border-mq-border">
           <p className="text-xs text-mq-content-tertiary">
-            {t('building') || 'Building'}: {event.building}
-            {event.room && ` - ${t('room') || 'Room'} ${event.room}`}
+            {t('building')}: {event.building}
+            {event.room && ` - ${t('room')} ${event.room}`}
           </p>
         </div>
       )}

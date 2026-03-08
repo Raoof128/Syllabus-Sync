@@ -111,9 +111,7 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
-        <h2 className="text-xl font-bold text-mq-content">
-          {t('featuredEvents') || 'Featured Events'}
-        </h2>
+        <h2 className="text-xl font-bold text-mq-content">{t('featuredEvents')}</h2>
       </div>
 
       {/* Carousel Container */}

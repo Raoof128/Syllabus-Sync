@@ -175,8 +175,7 @@ const FeedClient = memo(() => {
                 <Rss className="h-12 w-12 mx-auto mb-4 text-mq-content-tertiary" />
                 <h3 className="text-lg font-semibold text-mq-content mb-2">{t('noEventsFound')}</h3>
                 <p className="text-sm text-mq-content-secondary max-w-sm mx-auto mb-6">
-                  {t('noEventsFoundDesc') ||
-                    "Try adjusting your filters or search query to find what you're looking for."}
+                  {t('noEventsFoundDesc')}
                 </p>
                 <div className="flex justify-center gap-3">
                   <Button
@@ -187,7 +186,7 @@ const FeedClient = memo(() => {
                       setTimeRange('upcoming');
                     }}
                   >
-                    {t('clearFilters') || 'Clear filters'}
+                    {t('clearFilters')}
                   </Button>
                   <Button
                     onClick={() => {
@@ -195,7 +194,7 @@ const FeedClient = memo(() => {
                       setEventFormOpen(true);
                     }}
                   >
-                    {t('createFirstEvent') || 'Create event'}
+                    {t('createFirstEvent')}
                   </Button>
                 </div>
               </div>

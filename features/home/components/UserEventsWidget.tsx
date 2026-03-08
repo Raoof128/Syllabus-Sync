@@ -12,7 +12,6 @@ import Link from 'next/link';
 import { useHydration } from '@/lib/hooks';
 import { Button } from '@/components/ui/mq/button';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
 import { CardSolid } from '@/features/home/components/HomeCard';
 import { cn } from '@/lib/utils';
 
@@ -21,11 +20,6 @@ const UserEventsWidget = memo(() => {
   const router = useRouter();
   const events = useEventsStore((state) => state.events);
   const { t, language } = useTypedTranslation();
-
-  const tOr = (key: TranslationKey | string, fallback: string) => {
-    const value = t(key as TranslationKey);
-    return value === key ? fallback : value;
-  };
 
   const currentLocale = useMemo(() => {
     switch (language) {
@@ -130,17 +124,17 @@ const UserEventsWidget = memo(() => {
         <div className="flex items-center gap-2">
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            {tOr('myEvents', 'My Events')}
+            {t('myEvents')}
           </CardTitle>
           {isHydrated && monthEndEvents.length > 0 && (
             <Badge
               variant="neutral"
               className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
             >
-              {monthEndEvents.length} {tOr('eventsLabel', 'events')}
+              {monthEndEvents.length} {t('eventsLabel')}
               {overdueCount > 0 && (
                 <span className="text-red-500 ml-1">
-                  ({overdueCount} {tOr('overdue', 'overdue')})
+                  ({overdueCount} {t('overdue')})
                 </span>
               )}
             </Badge>
@@ -159,7 +153,7 @@ const UserEventsWidget = memo(() => {
         <Button size="sm" variant="outline" className="gap-1.5" asChild>
           <Link
             href="/calendar?section=events&highlight=true"
-            aria-label={`${t('viewAll')} ${tOr('myEvents', 'My Events')}`}
+            aria-label={`${t('viewAll')} ${t('myEvents')}`}
           >
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{t('viewAll')}</span>
@@ -177,10 +171,8 @@ const UserEventsWidget = memo(() => {
               className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
               aria-hidden="true"
             />
-            <p className="text-mq-content-tertiary">{tOr('noEventsYet', 'No events yet')}</p>
-            <p className="text-mq-content-tertiary text-sm mt-1">
-              {tOr('addEventsInCalendar', 'Add events in the Calendar tab')}
-            </p>
+            <p className="text-mq-content-tertiary">{t('noEventsYet')}</p>
+            <p className="text-mq-content-tertiary text-sm mt-1">{t('addEventsInCalendar')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -245,7 +237,7 @@ const UserEventsWidget = memo(() => {
                           variant="brand"
                           className="text-[9px] px-1 py-0 h-4 uppercase shrink-0 bg-red-500"
                         >
-                          {tOr('overdue', 'Overdue')}
+                          {t('overdue')}
                         </Badge>
                       )}
                       {!isOverdue && eventIsToday && (
@@ -253,7 +245,7 @@ const UserEventsWidget = memo(() => {
                           variant="neutral"
                           className="text-[10px] px-1.5 py-0.5 font-medium shrink-0 bg-mq-background-secondary text-mq-content-secondary"
                         >
-                          {tOr('today', 'Today')}
+                          {t('today')}
                         </Badge>
                       )}
                     </div>

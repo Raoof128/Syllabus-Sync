@@ -234,7 +234,7 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
                   <ToggleSwitch
                     checked={deadlinesEnabled}
                     onChange={() => setDeadlinesEnabled(!deadlinesEnabled)}
-                    ariaLabel={t('deadlineReminders' as 'title') || 'Deadline Reminders'}
+                    ariaLabel={t('deadlineReminders' as TranslationKey)}
                   />
                 </div>
               </div>
@@ -273,7 +273,7 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
                   <ToggleSwitch
                     checked={classesEnabled}
                     onChange={() => setClassesEnabled(!classesEnabled)}
-                    ariaLabel={t('classReminders' as 'title') || 'Class Reminders'}
+                    ariaLabel={t('classReminders' as TranslationKey)}
                   />
                 </div>
               </div>
@@ -312,7 +312,7 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
                   <ToggleSwitch
                     checked={eventsEnabled}
                     onChange={() => setEventsEnabled(!eventsEnabled)}
-                    ariaLabel={t('eventReminders' as 'title') || 'Event Reminders'}
+                    ariaLabel={t('eventReminders' as TranslationKey)}
                   />
                 </div>
               </div>

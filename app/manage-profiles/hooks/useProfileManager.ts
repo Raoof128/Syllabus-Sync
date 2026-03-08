@@ -116,7 +116,7 @@ export function useProfileManager() {
       result = await updateProfileAction(currentProfile.id, data);
     } catch (error) {
       logger.error('Failed to update profile in server action:', error);
-      toastUtils.error(t('error'), 'Database connection failed');
+      toastUtils.error(t('error'), t('databaseConnectionFailed'));
       form.reset({
         name: currentProfile.name || '',
         studentId: normalizeStudentId(currentProfile.studentId),
@@ -141,19 +141,19 @@ export function useProfileManager() {
         });
         return;
       }
-      toastUtils.success('Saved', t('profileUpdatedMsg') || 'Profile updated successfully');
+      toastUtils.success(t('saved'), t('profileUpdatedMsg'));
       // Reset form to clean "dirty" state
       form.reset(data);
       // Re-fetch from DB so the UI reflects the persisted values
       await fetchProfile();
     } else {
       // Handle server validation failures or messages
-      let errorMessage = 'Validation failed';
+      let errorMessage = t('validationFailed');
 
       if ('error' in result && result.error) {
         errorMessage = 'Please check the form for errors';
       } else if ('message' in result) {
-        errorMessage = result.message || 'Unknown error';
+        errorMessage = result.message || t('unexpectedError');
       }
 
       toastUtils.error(t('error'), errorMessage);
@@ -167,7 +167,7 @@ export function useProfileManager() {
 
   const reloadProfile = async () => {
     await fetchProfile();
-    toastUtils.success('Refreshed', 'Profile reloaded from server');
+    toastUtils.success(t('profileReloaded'), t('profileReloadedMsg'));
   };
 
   return {

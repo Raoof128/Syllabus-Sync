@@ -11,10 +11,7 @@ export function usePasskeyLogin() {
   const loginWithPasskey = useCallback(
     async (email: string, onSuccess: () => void) => {
       if (!email) {
-        toastUtils.error(
-          t('emailRequired'),
-          'Please enter your email to use passkeys.', // Hardcoded fallback for missing key
-        );
+        toastUtils.error(t('emailRequired'), t('emailRequiredPasskey'));
         return;
       }
 
@@ -35,7 +32,7 @@ export function usePasskeyLogin() {
 
         const optionsData = await optionsRes.json();
         if (!optionsRes.ok || !optionsData?.data?.options) {
-          throw new Error(t('loginErrorFailed') || 'Failed to initiate secure login.');
+          throw new Error(t('passkeyLoginInitFailed'));
         }
 
         const options = optionsData.data.options;
@@ -54,7 +51,7 @@ export function usePasskeyLogin() {
           },
         });
 
-        if (!credential) throw new Error('Biometric authentication cancelled.');
+        if (!credential) throw new Error(t('biometricAuthenticationCancelled'));
 
         // 3. Verify Signature
         const assertion = credential as PublicKeyCredential;
@@ -79,7 +76,7 @@ export function usePasskeyLogin() {
           }),
         });
 
-        if (!verifyRes.ok) throw new Error(t('loginErrorFailed') || 'Verification failed.');
+        if (!verifyRes.ok) throw new Error(t('passkeyVerificationFailed'));
 
         // 4. Success
         toastUtils.success(t('welcomeBack'), t('loginSuccess'));

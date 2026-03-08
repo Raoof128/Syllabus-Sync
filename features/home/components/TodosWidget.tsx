@@ -25,11 +25,6 @@ const TodosWidget = memo(() => {
   const toggleComplete = useTodosStore((state) => state.toggleComplete);
   const { t, language } = useTypedTranslation();
 
-  const tOr = (key: TranslationKey | string, fallback: string) => {
-    const value = t(key as TranslationKey);
-    return value === key ? fallback : value;
-  };
-
   const currentLocale = useMemo(() => {
     switch (language) {
       case 'es':
@@ -92,7 +87,7 @@ const TodosWidget = memo(() => {
         <div className="flex items-center gap-2">
           <CardTitle className="flex items-center gap-2">
             <CheckSquare className="h-5 w-5" />
-            {tOr('todos', 'To-Do List')}
+            {t('todos')}
           </CardTitle>
           {isHydrated && totalPending > 0 && (
             <Badge
@@ -116,7 +111,7 @@ const TodosWidget = memo(() => {
         <Button size="sm" variant="outline" className="gap-1.5" asChild>
           <Link
             href="/calendar?section=todos&highlight=true"
-            aria-label={`${t('viewAll')} ${tOr('todos', 'Todos')}`}
+            aria-label={`${t('viewAll')} ${t('todos')}`}
           >
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             <span>{t('viewAll')}</span>
@@ -152,10 +147,8 @@ const TodosWidget = memo(() => {
               className="h-12 w-12 text-mq-content-tertiary mx-auto mb-4"
               aria-hidden="true"
             />
-            <p className="text-mq-content-tertiary">{tOr('noTodos', 'No to-do items')}</p>
-            <p className="text-mq-content-tertiary text-sm mt-1">
-              {tOr('addTodosInCalendar', 'Add to-do items in the Calendar tab')}
-            </p>
+            <p className="text-mq-content-tertiary">{t('noTodos')}</p>
+            <p className="text-mq-content-tertiary text-sm mt-1">{t('addTodosInCalendar')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -213,11 +206,7 @@ const TodosWidget = memo(() => {
                             toggleComplete(todo.id);
                           }}
                           className="shrink-0 p-1.5 -m-1.5 hover:bg-mq-hover-background rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
-                          aria-label={
-                            todo.completed
-                              ? tOr('markIncomplete', 'Mark incomplete')
-                              : tOr('markComplete', 'Mark complete')
-                          }
+                          aria-label={todo.completed ? t('markIncomplete') : t('markComplete')}
                         >
                           {todo.completed ? (
                             <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -239,7 +228,7 @@ const TodosWidget = memo(() => {
                       <div className="flex items-center gap-1.5 shrink-0">
                         {isOverdue && (
                           <span className="text-[10px] font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/40 px-1.5 py-0.5 rounded">
-                            {tOr('overdueLabel', 'Overdue')}
+                            {t('overdueLabel')}
                           </span>
                         )}
                         <Badge
@@ -257,7 +246,7 @@ const TodosWidget = memo(() => {
                       <div className="flex items-center gap-1 text-sm text-mq-content-secondary">
                         <Clock className="h-3.5 w-3.5 shrink-0" />
                         <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
-                          {isOverdue && `${tOr('overdue', 'Overdue')} • `}
+                          {isOverdue && `${t('overdue')} • `}
                           {formatDueDate(dueDate)}
                         </span>
                       </div>

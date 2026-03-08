@@ -83,7 +83,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
     },
     ref,
   ) => {
-    const { safeT } = useSafeTranslation();
+    const { t } = useSafeTranslation();
     const [userLocation, setUserLocation] = useState<MapLatLng | null>(null);
     const [userHeading, setUserHeading] = useState<number | null>(null);
     const [route, setRoute] = useState<GoogleComputedRoute | null>(null);
@@ -127,7 +127,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       }
 
       if (typeof navigator === 'undefined' || !navigator.geolocation) {
-        throw new Error(safeT('locationNotAvailable', 'Location not available.'));
+        throw new Error(t('locationNotAvailable'));
       }
 
       return new Promise<MapLatLng>((resolve, reject) => {
@@ -142,7 +142,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
             resolve(nextLocation);
           },
           () => {
-            reject(new Error(safeT('locationAccessDenied', 'Location access denied.')));
+            reject(new Error(t('locationAccessDenied')));
           },
           {
             enableHighAccuracy: true,
@@ -151,7 +151,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
           },
         );
       });
-    }, [safeT]);
+    }, [t]);
 
     const computeRoute = useEffectEvent(async (forceRecalc = false) => {
       if (!destination) {
@@ -204,7 +204,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
 
         const json = (await response.json()) as RouteApiResponse;
         if (!response.ok || !json.success || !json.data) {
-          const message = json.error?.message || safeT('routeUnavailable', 'Route unavailable.');
+          const message = json.error?.message || t('routeUnavailable');
           if (response.status === 503) {
             routesConfigurationFailedRef.current = true;
           }
@@ -216,9 +216,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
         setHasArrived(false);
       } catch (error) {
         setRoute(null);
-        setRouteError(
-          error instanceof Error ? error.message : safeT('routeUnavailable', 'Route unavailable.'),
-        );
+        setRouteError(error instanceof Error ? error.message : t('routeUnavailable'));
       } finally {
         setIsLoadingRoute(false);
       }
@@ -226,7 +224,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
 
     const startNavigation = useCallback(() => {
       if (!selectedBuilding && !externalDestination) {
-        setRouteError(safeT('selectBuildingToNavigate', 'Select a destination to navigate.'));
+        setRouteError(t('selectBuildingToNavigate'));
         return;
       }
 
@@ -235,7 +233,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
       lastRouteLocationRef.current = null;
       setHasArrived(false);
       setIsNavigating(true);
-    }, [safeT, selectedBuilding, externalDestination]);
+    }, [t, selectedBuilding, externalDestination]);
 
     const stopNavigation = useCallback(() => {
       setIsNavigating(false);
@@ -289,9 +287,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
           }
         },
         () => {
-          setRouteError(
-            (current) => current ?? safeT('locationAccessDenied', 'Location access denied.'),
-          );
+          setRouteError((current) => current ?? t('locationAccessDenied'));
         },
         {
           enableHighAccuracy: true,
@@ -305,7 +301,7 @@ export const GoogleMapController = forwardRef<GoogleMapRef, GoogleMapControllerP
           navigator.geolocation.clearWatch(geolocationWatchRef.current);
         }
       };
-    }, [safeT]);
+    }, [t]);
 
     // Device orientation for compass heading (mobile)
     useEffect(() => {

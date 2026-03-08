@@ -2,22 +2,38 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { APP_CONFIG, UNIVERSITY_CONFIG } from '@/lib/config';
+import { getTranslations, type TranslationKey } from '@/lib/i18n/translations';
 import MapClient from '@/features/map/components/MapClient';
 import { MapPageSkeleton } from '@/features/map/components/MapPageSkeleton';
 
+const translations = getTranslations('en');
+const translate = (key: TranslationKey, vars?: Record<string, string | number>) => {
+  let text =
+    (translations as Record<string, string> | undefined)?.[key] ?? (key as unknown as string);
+
+  if (vars) {
+    Object.entries(vars).forEach(([k, v]) => {
+      text = text.replace(new RegExp(`{{${k}}}`, 'g'), String(v));
+    });
+  }
+
+  return text;
+};
+
+const mapMetaTitle = translate('mapMetaTitle', { appName: APP_CONFIG.name });
+const mapMetaDescription = translate('mapMetaDescription');
+
 export const metadata: Metadata = {
-  title: `${APP_CONFIG.name} - Campus Map`,
-  description:
-    'Navigate the campus with an interactive map featuring building locations and directions.',
+  title: mapMetaTitle,
+  description: mapMetaDescription,
   openGraph: {
-    title: `${APP_CONFIG.name} - Campus Map`,
-    description:
-      'Navigate the campus with an interactive map featuring building locations and directions.',
+    title: mapMetaTitle,
+    description: mapMetaDescription,
     type: 'website',
     images: [
       {
         url: `${UNIVERSITY_CONFIG.website}/MQ_Logo_Final.png`,
-        alt: `${APP_CONFIG.name} logo`,
+        alt: translate('mqLogoAlt'),
       },
     ],
   },

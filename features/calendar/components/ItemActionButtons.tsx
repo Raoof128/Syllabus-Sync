@@ -142,11 +142,8 @@ export default function ItemActionButtons({
             baseButtonClass,
             'hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400',
           )}
-          aria-label={t('navigateToBuildingAria', { building: building || '' }) as string}
-          title={
-            t('navigateTo' as TranslationKey, { location: building || '' }) ||
-            `Navigate to ${building}`
-          }
+          aria-label={t('navigateToBuildingAria', { building }) as string}
+          title={t('navigateTo' as TranslationKey, { location: building })}
         >
           <Navigation className={iconSizeClass} aria-hidden="true" />
         </button>

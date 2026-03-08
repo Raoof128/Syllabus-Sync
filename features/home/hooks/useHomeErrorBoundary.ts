@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 export function useHomeErrorBoundary() {
+  const { t } = useTypedTranslation();
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -15,12 +17,12 @@ export function useHomeErrorBoundary() {
   useEffect(() => {
     const handleUnhandledError = (event: ErrorEvent) => {
       setHasError(true);
-      setErrorMessage(event.error?.message || 'An unexpected error occurred');
+      setErrorMessage(event.error?.message || t('unexpectedError'));
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       setHasError(true);
-      setErrorMessage(event.reason?.message || 'An unexpected error occurred');
+      setErrorMessage(event.reason?.message || t('unexpectedError'));
     };
 
     window.addEventListener('error', handleUnhandledError);
@@ -30,7 +32,7 @@ export function useHomeErrorBoundary() {
       window.removeEventListener('error', handleUnhandledError);
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
-  }, []);
+  }, [t]);
 
   return {
     hasError,

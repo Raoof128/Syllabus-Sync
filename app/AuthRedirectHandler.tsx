@@ -71,7 +71,7 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
         error,
         errorDescription,
       });
-      handleError(errorDescription || error || 'Authentication failed.');
+      handleError(errorDescription || error || t('authenticationFailed'));
       return;
     }
 
@@ -108,7 +108,7 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
 
     // Has auth tokens but not recovery type - let Supabase process
     queueMicrotask(() => setStatus('processing'));
-  }, [router, fallbackRedirect, handleError]);
+  }, [router, fallbackRedirect, handleError, t]);
 
   // Listen for auth state changes from Supabase
   useEffect(() => {

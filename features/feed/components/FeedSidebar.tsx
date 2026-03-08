@@ -116,11 +116,11 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
   const getBadgeLabel = (type: Announcement['type']): string => {
     switch (type) {
       case 'featured':
-        return t('featured') || 'FEATURED';
+        return t('featured');
       case 'new':
-        return t('new') || 'NEW';
+        return t('new');
       case 'info':
-        return t('info') || 'INFO';
+        return t('info');
     }
   };
 

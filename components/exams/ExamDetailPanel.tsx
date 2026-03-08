@@ -258,7 +258,7 @@ export default function ExamDetailPanel({
               <div className="flex items-center gap-3">
                 <div className="w-4 h-4 rounded shrink-0" style={{ backgroundColor: color }} />
                 <div>
-                  <p className="font-semibold text-sm">{exam.building || 'TBA'}</p>
+                  <p className="font-semibold text-sm">{exam.building || t('tba')}</p>
                   {exam.room && (
                     <p className="text-xs text-mq-content-secondary">
                       {t('room')} {exam.room}

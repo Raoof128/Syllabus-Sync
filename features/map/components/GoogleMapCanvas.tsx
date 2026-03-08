@@ -36,7 +36,7 @@ export function GoogleMapCanvas({
   isNavigating,
   onSelectBuilding,
 }: GoogleMapCanvasProps) {
-  const { safeT } = useSafeTranslation();
+  const { t } = useSafeTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const streetViewContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -126,9 +126,7 @@ export function GoogleMapCanvas({
         setError(null);
       } catch (initialiseError) {
         const message =
-          initialiseError instanceof Error
-            ? initialiseError.message
-            : safeT('googleMapUnavailable', 'Google Maps failed to load.');
+          initialiseError instanceof Error ? initialiseError.message : t('googleMapUnavailable');
         setError(message);
       }
     }
@@ -152,7 +150,7 @@ export function GoogleMapCanvas({
       buildingMarkers.clear();
     };
     // Only reinit if mapId changes - NOT on selectedBuilding change
-  }, [googleMapId, safeT, markUserInteraction, initAttempt]);
+  }, [googleMapId, t, markUserInteraction, initAttempt]);
 
   // Sync building markers
   useEffect(() => {
@@ -297,7 +295,7 @@ export function GoogleMapCanvas({
           userMarkerRef.current = new markerLibrary.AdvancedMarkerElement({
             map: mapRef.current,
             position: userLocation,
-            title: safeT('myLocation', 'My Location'),
+            title: t('myLocation'),
             content,
           });
         } else {
@@ -315,7 +313,7 @@ export function GoogleMapCanvas({
           userMarkerRef.current = new google.maps.Marker({
             map: mapRef.current,
             position: userLocation,
-            title: safeT('myLocation', 'My Location'),
+            title: t('myLocation'),
             icon: {
               path: google.maps.SymbolPath.CIRCLE,
               scale: 10,
@@ -336,7 +334,7 @@ export function GoogleMapCanvas({
     return () => {
       cancelled = true;
     };
-  }, [safeT, useAdvancedMarkers, userLocation, userHeading]);
+  }, [t, useAdvancedMarkers, userLocation, userHeading]);
 
   // Sync external destination marker (AdvancedMarkerElement with fallback)
   useEffect(() => {
@@ -500,14 +498,14 @@ export function GoogleMapCanvas({
       <div
         ref={containerRef}
         className={`h-full w-full ${showStreetView ? 'hidden' : ''}`}
-        aria-label={safeT('googleMaps', 'Google Maps')}
+        aria-label={t('googleMaps')}
       />
 
       {/* Street View panorama container */}
       <div
         ref={streetViewContainerRef}
         className={`h-full w-full ${showStreetView ? '' : 'hidden'}`}
-        aria-label={safeT('streetView', 'Street View')}
+        aria-label={t('streetView')}
       />
 
       {/* Street View close button */}
@@ -516,10 +514,10 @@ export function GoogleMapCanvas({
           type="button"
           onClick={handleToggleStreetView}
           className="absolute top-3 left-3 z-[1050] flex items-center gap-2 rounded-full border border-mq-border bg-mq-card-background/95 px-3 py-2 text-sm font-medium text-mq-content shadow-lg backdrop-blur-sm transition-transform hover:scale-105 active:scale-95"
-          aria-label={safeT('closeStreetView', 'Close Street View')}
+          aria-label={t('closeStreetView')}
         >
           <X className="h-4 w-4" />
-          {safeT('closeStreetView', 'Close Street View')}
+          {t('closeStreetView')}
         </button>
       )}
 
@@ -531,8 +529,8 @@ export function GoogleMapCanvas({
             type="button"
             onClick={handleToggleStreetView}
             className="flex h-11 w-11 items-center justify-center rounded-full border border-mq-border bg-mq-card-background/95 shadow-lg backdrop-blur-sm transition-transform hover:scale-105 active:scale-95"
-            aria-label={safeT('streetView', 'Street View')}
-            title={safeT('streetView', 'Street View')}
+            aria-label={t('streetView')}
+            title={t('streetView')}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -555,8 +553,8 @@ export function GoogleMapCanvas({
               type="button"
               onClick={handleRecenter}
               className="flex h-11 w-11 items-center justify-center rounded-full border border-mq-border bg-mq-card-background/95 shadow-lg backdrop-blur-sm transition-transform hover:scale-105 active:scale-95"
-              aria-label={safeT('myLocation', 'My Location')}
-              title={safeT('myLocation', 'My Location')}
+              aria-label={t('myLocation')}
+              title={t('myLocation')}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -581,16 +579,14 @@ export function GoogleMapCanvas({
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-mq-danger" />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-mq-content">
-                {safeT('googleMapUnavailable', 'Google Map unavailable')}
-              </p>
+              <p className="text-sm font-semibold text-mq-content">{t('googleMapUnavailable')}</p>
               <p className="mt-1 text-sm text-mq-content-secondary">{error}</p>
               <button
                 type="button"
                 onClick={handleRetry}
                 className="mt-2 text-sm font-medium text-mq-primary hover:text-mq-primary/80 transition-colors"
               >
-                {safeT('tryAgain', 'Try again')}
+                {t('tryAgain')}
               </button>
             </div>
           </div>

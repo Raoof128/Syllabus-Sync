@@ -249,21 +249,15 @@ export function TranslatedMapErrorBoundary({
   children: ReactNode;
   fallback?: ReactNode;
 }) {
-  const { safeT } = useSafeTranslation();
+  const { t } = useSafeTranslation();
 
   const translations: MapErrorTranslations = {
-    mapFailedToLoad: safeT('mapFailedToLoad', 'Map failed to load'),
-    mapLoadErrorDescription: safeT(
-      'mapLoadErrorDescription',
-      'We encountered an issue loading the campus map. This might be due to a network issue or browser compatibility problem.',
-    ),
-    technicalDetails: safeT('technicalDetails', 'Technical details'),
-    tryAgain: safeT('tryAgain', 'Try again'),
-    reloadPage: safeT('reloadPage', 'Reload page'),
-    mapErrorPersistHelp: safeT(
-      'mapErrorPersistHelp',
-      'If the problem persists, try refreshing the page or clearing your browser cache.',
-    ),
+    mapFailedToLoad: t('mapFailedToLoad'),
+    mapLoadErrorDescription: t('mapLoadErrorDescription'),
+    technicalDetails: t('technicalDetails'),
+    tryAgain: t('tryAgain'),
+    reloadPage: t('reloadPage'),
+    mapErrorPersistHelp: t('mapErrorPersistHelp'),
   };
 
   return (

@@ -60,7 +60,7 @@ const PrivacySettings = memo(({ t, language }: PrivacySettingsProps) => {
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-mq-content flex items-center gap-2">
                 <Shield className="h-4 w-4" aria-hidden="true" />
-                {t('twoFactorAuthentication' as TranslationKey) || 'Two-Factor Authentication'}
+                {t('twoFactorAuthentication' as TranslationKey)}
               </h3>
 
               {isLoadingMFA ? (

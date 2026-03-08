@@ -37,7 +37,7 @@ export function RouteAnnouncer({
   locationStatus,
   selectedBuildingName,
 }: RouteAnnouncerProps) {
-  const { safeT } = useSafeTranslation();
+  const { t } = useSafeTranslation();
   const [announcement, setAnnouncement] = useState('');
   const lastAnnouncementTime = useRef<number>(0);
   const lastDistance = useRef<number | undefined>(undefined);
@@ -59,7 +59,7 @@ export function RouteAnnouncer({
 
     // Priority 1: Arrived at destination
     if (navState?.status === 'arrived') {
-      newAnnouncement = safeT('navigationArrived', 'You have arrived at your destination.');
+      newAnnouncement = t('navigationArrived');
       shouldAnnounce = true;
     }
     // Priority 2: Navigation updates (throttled)
@@ -73,10 +73,10 @@ export function RouteAnnouncer({
       if (distanceChanged || timeSinceLastAnnouncement >= THROTTLE_INTERVAL) {
         const distanceText =
           currentDistance < 1000
-            ? `${currentDistance} ${safeT('meters', 'meters')}`
-            : `${(currentDistance / 1000).toFixed(1)} ${safeT('kilometers', 'kilometers')}`;
+            ? `${currentDistance} ${t('meters')}`
+            : `${(currentDistance / 1000).toFixed(1)} ${t('kilometers')}`;
 
-        newAnnouncement = safeT('navigationUpdate', `Continue for ${distanceText}.`);
+        newAnnouncement = t('navigationUpdate', { distance: distanceText });
 
         lastDistance.current = currentDistance;
         shouldAnnounce = true;
@@ -88,7 +88,7 @@ export function RouteAnnouncer({
       selectedBuildingName &&
       timeSinceLastAnnouncement >= THROTTLE_INTERVAL
     ) {
-      newAnnouncement = safeT('navigatingTo', `Navigating to: ${selectedBuildingName}`);
+      newAnnouncement = `${t('navigatingTo')} ${selectedBuildingName}`;
       shouldAnnounce = true;
     }
 
@@ -96,7 +96,7 @@ export function RouteAnnouncer({
       setAnnouncement(newAnnouncement);
       lastAnnouncementTime.current = now;
     }
-  }, [navState, locationStatus, selectedBuildingName, safeT]);
+  }, [navState, locationStatus, selectedBuildingName, t]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   return (

@@ -99,9 +99,7 @@ export const AnnouncementsSection = memo(
         {/* Header */}
         <div className="flex items-center gap-2 mb-4">
           <Bell className="h-5 w-5 text-mq-primary" />
-          <h2 className="text-xl font-bold text-mq-content">
-            {t('announcements') || 'Announcements'}
-          </h2>
+          <h2 className="text-xl font-bold text-mq-content">{t('announcements')}</h2>
         </div>
 
         {/* Announcements List */}
@@ -126,7 +124,7 @@ export const AnnouncementsSection = memo(
                   }}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Open ${announcement.title}`}
+                  aria-label={t('openAnnouncement', { title: announcement.title })}
                 >
                   <div className="flex items-start gap-3">
                     <div
@@ -140,10 +138,10 @@ export const AnnouncementsSection = memo(
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <Badge className={cn('text-[10px] uppercase tracking-wide', style.badge)}>
-                          {announcement.type === 'new' && (t('new') || 'New')}
-                          {announcement.type === 'info' && (t('info') || 'Info')}
-                          {announcement.type === 'warning' && (t('important') || 'Important')}
-                          {announcement.type === 'highlight' && (t('featured') || 'Featured')}
+                          {announcement.type === 'new' && t('new')}
+                          {announcement.type === 'info' && t('info')}
+                          {announcement.type === 'warning' && t('important')}
+                          {announcement.type === 'highlight' && t('featured')}
                         </Badge>
                         <h4 className="font-semibold text-sm text-mq-content truncate">
                           {announcement.title}
@@ -189,10 +187,10 @@ export const AnnouncementsSection = memo(
                         typeStyles[selectedAnnouncement.type].badge,
                       )}
                     >
-                      {selectedAnnouncement.type === 'new' && (t('new') || 'New')}
-                      {selectedAnnouncement.type === 'info' && (t('info') || 'Info')}
-                      {selectedAnnouncement.type === 'warning' && (t('important') || 'Important')}
-                      {selectedAnnouncement.type === 'highlight' && (t('featured') || 'Featured')}
+                      {selectedAnnouncement.type === 'new' && t('new')}
+                      {selectedAnnouncement.type === 'info' && t('info')}
+                      {selectedAnnouncement.type === 'warning' && t('important')}
+                      {selectedAnnouncement.type === 'highlight' && t('featured')}
                     </Badge>
                   </div>
                   <DialogTitle className="text-2xl">{selectedAnnouncement.title}</DialogTitle>
@@ -204,12 +202,12 @@ export const AnnouncementsSection = memo(
                   {selectedAnnouncement.link && (
                     <Button variant="primary" asChild>
                       <a href={selectedAnnouncement.link} target="_blank" rel="noopener noreferrer">
-                        {t('learnMore') || 'Learn More'}
+                        {t('learnMore')}
                       </a>
                     </Button>
                   )}
                   <Button variant="outline" onClick={closeDialog}>
-                    {t('close') || 'Close'}
+                    {t('close')}
                   </Button>
                 </div>
               </>
