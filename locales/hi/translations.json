@@ -2402,5 +2402,7 @@
   "validationFailed": "Validation failed.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
   "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed."
+  "authenticationFailed": "Authentication failed.",
+  "contact_emailSubject": "{{appName}} Contact & Feedback",
+  "contact_notProvided": "Not provided"
 }

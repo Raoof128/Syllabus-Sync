@@ -23,9 +23,9 @@ export default function ContactPage() {
     }
 
     setError('');
-    const subject = encodeURIComponent(`${APP_CONFIG.name} Contact & Feedback`);
+    const subject = encodeURIComponent(t('contact_emailSubject', { appName: APP_CONFIG.name }));
     const body = encodeURIComponent(
-      `Contact email: ${contactEmail.trim() || 'Not provided'}\n\nFeedback:\n${trimmedFeedback}`,
+      `${t('contact_emailFieldLabel')}: ${contactEmail.trim() || t('contact_notProvided')}\n\n${t('contact_feedbackFieldLabel')}:\n${trimmedFeedback}`,
     );
     window.location.href = `mailto:${UNIVERSITY_CONFIG.supportEmail}?subject=${subject}&body=${body}`;
     setSubmitted(true);

@@ -1,4 +1,11 @@
 Raouf: 2026-03-08 (Australia/Sydney)
+Scope: Info Pages i18n Audit — About, Contact, Terms, and Privacy
+Summary: Audited the static/legal information routes for remaining hardcoded user-facing fallback copy: `app/about/page.tsx`, `app/contact/page.tsx`, `app/terms/page.tsx`, and `app/privacy/page.tsx`. The only remaining code-level issue was in the contact email handoff, where the subject line and email body labels still embedded raw English strings and a `'Not provided'` fallback. Replaced those with translation keys in `app/contact/page.tsx` and added the missing keys `contact_emailSubject` and `contact_notProvided` across all 35 locale files. Final grep over the four audited pages is clean with no remaining active user-facing hardcoded fallback copy.
+Files Changed: `app/contact/page.tsx`, `locales/en/translations.json` + 34 locale `translations.json` files
+Verification: `rg -n "\|\|\s*'[^']+'|\|\|\s*\"[^\"]+\"|safeT\([^\n]+,\s*'[^']+'|safeT\([^\n]+,\s*\"[^\"]+\"|tOr\([^\n]+,\s*'[^']+'|tOr\([^\n]+,\s*\"[^\"]+\""` over `app/about`, `app/contact`, `app/terms`, and `app/privacy` ✅ (no matches after the fix); `npx eslint --config config/eslint/eslint.config.mjs app/about/page.tsx app/contact/page.tsx app/terms/page.tsx app/privacy/page.tsx` ✅; `npm run typecheck` ✅; `npm run check:i18n` ✅ (35 locales validated).
+Follow-ups: None required for the audited info pages; the route-level copy path is now clean.
+
+Raouf: 2026-03-08 (Australia/Sydney)
 Scope: Settings i18n Audit — Final Pass on Settings and Profile Surface
 Summary: Audited the settings route, settings section components, manage-profiles pages/cards, and the header language selector for remaining hardcoded user-facing fallback copy. Removed the last code-level fallback in `AppearanceSettings` so the current-language marker now relies fully on the `currentlySelected` translation key. Final grep confirms the only remaining `||` hits in the audited settings/profile surface are non-user-facing internals: the default section id in `app/settings/layout.tsx` and an internal logger fallback in `SettingsSectionBoundary.tsx`.
 Files Changed: `features/settings/components/AppearanceSettings.tsx`
