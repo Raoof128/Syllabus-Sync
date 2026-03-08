@@ -14,7 +14,8 @@ vi.mock('../../features/feed/hooks/usePublicFeed', () => ({
   usePublicFeed: () => ({
     events: [],
     featuredEvents: [],
-    gridEvents: [],
+    filteredEvents: [],
+    allEvents: [],
     isLoading: false,
     error: null,
     isAddingToCalendar: new Set(),
@@ -82,7 +83,7 @@ describe('PublicFeedClient', () => {
     expect(screen.getByTestId('announcements')).toBeInTheDocument();
   });
 
-  it('renders "no events found" state when gridEvents is empty', () => {
+  it('renders "no events found" state when filteredEvents is empty', () => {
     render(<PublicFeedClient />);
     expect(screen.getByText('noEventsFound')).toBeInTheDocument();
   });

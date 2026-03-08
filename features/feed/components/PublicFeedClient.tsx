@@ -25,10 +25,12 @@ export default function PublicFeedClient() {
   const isHydrated = useHydration();
 
   // Custom hook for feed logic
+  // filteredEvents = single source of truth for the grid (includes featured events)
+  // allEvents = unfiltered events from store (for QuickStats sidebar totals)
   const {
     featuredEvents,
-    gridEvents,
-    nonFeaturedEvents,
+    filteredEvents,
+    allEvents,
     isLoading,
     error,
     isAddingToCalendar,
@@ -111,10 +113,10 @@ export default function PublicFeedClient() {
                   categoryCounts={categoryCounts}
                 />
 
-                {/* Events Grid */}
-                {gridEvents.length > 0 ? (
+                {/* Events Grid — same source of truth as banner (featured events included) */}
+                {filteredEvents.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {gridEvents.map((event) => (
+                    {filteredEvents.map((event) => (
                       <PublicEventCard
                         key={event.id}
                         event={event}
@@ -141,10 +143,10 @@ export default function PublicFeedClient() {
 
           {/* Right Sidebar */}
           <aside className="w-full lg:w-80 shrink-0 space-y-6">
-            {/* Quick Stats */}
+            {/* Quick Stats — counts ALL events (featured + non-featured) */}
             <MagicCard isLiquidEnhanced>
               <div className="p-4">
-                <QuickStats events={nonFeaturedEvents} />
+                <QuickStats events={allEvents} />
               </div>
             </MagicCard>
 

@@ -98,43 +98,30 @@ export function usePublicFeed() {
     return result;
   }, [events, searchQuery, categoryFilter, timeFilter, sortOption]);
 
-  // Non-featured events for the grid
-  const gridEvents = useMemo(() => {
-    const featuredIds = new Set(featuredEvents.map((e) => e.id));
-    return filteredEvents.filter((e) => !featuredIds.has(e.id));
-  }, [filteredEvents, featuredEvents]);
+  // All events from the store (unfiltered) — used for QuickStats sidebar totals
+  const allEvents = useMemo(() => {
+    return Array.isArray(events)
+      ? events.filter((e) => e && typeof e.category === 'string' && e.startAt)
+      : [];
+  }, [events]);
 
-  // All non-featured events (before filtering by category/search/time) for QuickStats
-  const nonFeaturedEvents = useMemo(() => {
-    const featuredIds = new Set(
-      Array.isArray(allFeaturedEvents)
-        ? allFeaturedEvents.filter((e) => e && e.id).map((e) => e.id)
-        : [],
-    );
-    return (
-      Array.isArray(events)
-        ? events.filter((e) => e && typeof e.category === 'string' && e.startAt)
-        : []
-    ).filter((e) => !featuredIds.has(e.id));
-  }, [events, allFeaturedEvents]);
-
-  // Category counts - count only non-featured events to match what's displayed in the grid
-  // Featured events are shown in the carousel, not in the grid
+  // Category counts — count ALL events (featured + non-featured) for consistency
+  // These appear on filter buttons and must match what QuickStats shows
   const categoryCounts = useMemo(() => {
     const counts: Record<CategoryFilter, number> = {
-      All: nonFeaturedEvents.length,
+      All: allEvents.length,
       Career: 0,
       Social: 0,
       Academic: 0,
       'Free Food': 0,
     };
-    nonFeaturedEvents.forEach((e) => {
+    allEvents.forEach((e) => {
       if (e.category in counts) {
         counts[e.category as Exclude<CategoryFilter, 'All'>]++;
       }
     });
     return counts;
-  }, [nonFeaturedEvents]);
+  }, [allEvents]);
 
   // Handle add to calendar
   const handleAddToCalendar = useCallback(
@@ -154,11 +141,27 @@ export function usePublicFeed() {
     [addToCalendar, t],
   );
 
+  // ── DEV sanity check: every featured event ID must exist in the main list ──
+  if (
+    process.env.NODE_ENV === 'development' &&
+    featuredEvents.length > 0 &&
+    filteredEvents.length > 0
+  ) {
+    const listIds = new Set(filteredEvents.map((e) => e.id));
+    const missing = featuredEvents.filter((e) => !listIds.has(e.id));
+    if (missing.length > 0) {
+      console.warn(
+        '[usePublicFeed] Banner/list mismatch! Featured events missing from list:',
+        missing.map((e) => `${e.id} (${e.title})`),
+      );
+    }
+  }
+
   return {
     events,
     featuredEvents,
-    gridEvents,
-    nonFeaturedEvents,
+    filteredEvents,
+    allEvents,
     isLoading,
     error,
     isAddingToCalendar,
