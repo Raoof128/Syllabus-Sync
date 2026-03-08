@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "Disimpan",
+  "profileReloaded": "Profil dimuat semula",
+  "profileReloadedMsg": "Profil dimuat semula daripada pelayan.",
+  "validationFailed": "Pengesahan gagal.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "Kunci laluan",
+  "authenticationFailed": "Pengesahan gagal.",
+  "contact_emailSubject": "{{appName}} hubungan dan maklum balas",
+  "contact_notProvided": "Tidak diberikan"
 }

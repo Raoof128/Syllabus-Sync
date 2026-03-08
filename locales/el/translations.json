@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "Αποθηκεύτηκε",
+  "profileReloaded": "Το προφίλ επαναφορτώθηκε",
+  "profileReloadedMsg": "Το προφίλ επαναφορτώθηκε από τον διακομιστή.",
+  "validationFailed": "Η επικύρωση απέτυχε.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "Κλειδί πρόσβασης",
+  "authenticationFailed": "Η επαλήθευση απέτυχε.",
+  "contact_emailSubject": "{{appName}} επικοινωνία και σχόλια",
+  "contact_notProvided": "Δεν δόθηκε"
 }

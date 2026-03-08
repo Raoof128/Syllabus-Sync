@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "محفوظ ہو گیا",
+  "profileReloaded": "پروفائل دوبارہ لوڈ ہو گئی",
+  "profileReloadedMsg": "پروفائل سرور سے دوبارہ لوڈ کی گئی۔",
+  "validationFailed": "تصدیق ناکام ہوگئی۔",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "پاس کی",
+  "authenticationFailed": "توثیق ناکام ہوگئی۔",
+  "contact_emailSubject": "{{appName}} رابطہ اور رائے",
+  "contact_notProvided": "فراہم نہیں کیا گیا"
 }

@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "Đã lưu",
+  "profileReloaded": "Hồ sơ đã được tải lại",
+  "profileReloadedMsg": "Hồ sơ đã được tải lại từ máy chủ.",
+  "validationFailed": "Xác thực không thành công.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "Khóa truy cập",
+  "authenticationFailed": "Xác thực thất bại.",
+  "contact_emailSubject": "{{appName}} liên hệ và phản hồi",
+  "contact_notProvided": "Không cung cấp"
 }

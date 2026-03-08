@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "تم الحفظ",
+  "profileReloaded": "أُعيد تحميل الملف الشخصي",
+  "profileReloadedMsg": "تمت إعادة تحميل الملف الشخصي من الخادم.",
+  "validationFailed": "فشل التحقق.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "مفتاح مرور",
+  "authenticationFailed": "فشلت المصادقة.",
+  "contact_emailSubject": "{{appName}} التواصل والملاحظات",
+  "contact_notProvided": "غير متوفر"
 }

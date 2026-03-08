@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "บันทึกแล้ว",
+  "profileReloaded": "โหลดโปรไฟล์ใหม่แล้ว",
+  "profileReloadedMsg": "โหลดโปรไฟล์ใหม่จากเซิร์ฟเวอร์แล้ว",
+  "validationFailed": "การตรวจสอบความถูกต้องล้มเหลว",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "พาสคีย์",
+  "authenticationFailed": "การยืนยันตัวตนล้มเหลว",
+  "contact_emailSubject": "{{appName}} ติดต่อและข้อเสนอแนะ",
+  "contact_notProvided": "ไม่ได้ระบุ"
 }

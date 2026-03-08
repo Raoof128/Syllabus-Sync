@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "保存済み",
+  "profileReloaded": "プロフィールを再読み込みしました",
+  "profileReloadedMsg": "プロフィールをサーバーから再読み込みしました。",
+  "validationFailed": "検証に失敗しました。",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "パスキー",
+  "authenticationFailed": "認証に失敗しました。",
+  "contact_emailSubject": "{{appName}} お問い合わせとフィードバック",
+  "contact_notProvided": "未入力"
 }

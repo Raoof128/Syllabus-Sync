@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "Salvat",
+  "profileReloaded": "Profil reîncărcat",
+  "profileReloadedMsg": "Profilul a fost reîncărcat de pe server.",
+  "validationFailed": "Validarea a eșuat.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "Cheie de acces",
+  "authenticationFailed": "Autentificarea a eșuat.",
+  "contact_emailSubject": "{{appName}} contact și feedback",
+  "contact_notProvided": "Neprecizat"
 }

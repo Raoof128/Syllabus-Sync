@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "Kaydedildi",
+  "profileReloaded": "Profil yeniden yüklendi",
+  "profileReloadedMsg": "Profil sunucudan yeniden yüklendi.",
+  "validationFailed": "Doğrulama başarısız oldu.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "Geçiş anahtarı",
+  "authenticationFailed": "Kimlik doğrulama başarısız oldu.",
+  "contact_emailSubject": "{{appName}} iletişim ve geri bildirim",
+  "contact_notProvided": "Belirtilmedi"
 }

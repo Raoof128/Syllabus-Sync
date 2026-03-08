@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "נשמר",
+  "profileReloaded": "הפרופיל נטען מחדש",
+  "profileReloadedMsg": "הפרופיל נטען מחדש מהשרת.",
+  "validationFailed": "האימות נכשל.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "מפתח גישה",
+  "authenticationFailed": "האימות נכשל.",
+  "contact_emailSubject": "{{appName}} יצירת קשר ומשוב",
+  "contact_notProvided": "לא סופק"
 }

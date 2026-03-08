@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "Збережено",
+  "profileReloaded": "Профіль перезавантажено",
+  "profileReloadedMsg": "Профіль було перезавантажено із сервера.",
+  "validationFailed": "Перевірка не пройдена.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "Ключ доступу",
+  "authenticationFailed": "Помилка автентифікації.",
+  "contact_emailSubject": "{{appName}} контакт і відгук",
+  "contact_notProvided": "Не вказано"
 }

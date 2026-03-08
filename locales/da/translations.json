@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "Gemt",
+  "profileReloaded": "Profil genindlæst",
+  "profileReloadedMsg": "Profil blev genindlæst fra serveren.",
+  "validationFailed": "Validering mislykkedes.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "Adgangsnøgle",
+  "authenticationFailed": "Godkendelse mislykkedes.",
+  "contact_emailSubject": "{{appName}} kontakt og feedback",
+  "contact_notProvided": "Ikke angivet"
 }

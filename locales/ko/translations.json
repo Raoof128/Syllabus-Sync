@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "저장됨",
+  "profileReloaded": "프로필을 다시 불러왔습니다",
+  "profileReloadedMsg": "프로필을 서버에서 다시 불러왔습니다.",
+  "validationFailed": "유효성 검사에 실패했습니다.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "패스키",
+  "authenticationFailed": "인증에 실패했습니다.",
+  "contact_emailSubject": "{{appName}} 문의 및 피드백",
+  "contact_notProvided": "제공되지 않음"
 }

@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "සුරකින ලදි",
+  "profileReloaded": "පැතිකඩ නැවත පූරණය කරන ලදි",
+  "profileReloadedMsg": "පැතිකඩ සේවාදායකයෙන් නැවත පූරණය කරන ලදි.",
+  "validationFailed": "වලංගු කිරීම අසාර්ථක විය.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "පාස්කි",
+  "authenticationFailed": "සත්‍යාපනය අසාර්ථක විය.",
+  "contact_emailSubject": "{{appName}} සම්බන්ධ වීම සහ ප්‍රතිචාර",
+  "contact_notProvided": "සපයා නැත"
 }

@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "Guardado",
+  "profileReloaded": "Perfil recarregado",
+  "profileReloadedMsg": "Perfil recarregado do servidor.",
+  "validationFailed": "A validação falhou.",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "Chave de acesso",
+  "authenticationFailed": "A autenticação falhou.",
+  "contact_emailSubject": "{{appName}} contacto e feedback",
+  "contact_notProvided": "Não fornecido"
 }

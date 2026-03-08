@@ -2396,13 +2396,13 @@
   "passkeyLoginInitFailed": "Failed to initiate secure login.",
   "passkeyVerificationFailed": "Verification failed.",
   "databaseConnectionFailed": "Database connection failed.",
-  "saved": "Saved",
-  "profileReloaded": "Profile Reloaded",
-  "profileReloadedMsg": "Profile reloaded from server.",
-  "validationFailed": "Validation failed.",
+  "saved": "已保存",
+  "profileReloaded": "个人资料已重新加载",
+  "profileReloadedMsg": "个人资料已从服务器重新加载。",
+  "validationFailed": "验证失败。",
   "biometricAuthenticationCancelled": "Biometric authentication cancelled.",
-  "passkeyDefaultName": "Passkey",
-  "authenticationFailed": "Authentication failed.",
-  "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "passkeyDefaultName": "通行密钥",
+  "authenticationFailed": "身份验证失败。",
+  "contact_emailSubject": "{{appName}} 联系与反馈",
+  "contact_notProvided": "未提供"
 }
