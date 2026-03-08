@@ -1,85 +1,42 @@
 'use client';
 
-declare global {
-  interface Window {
-    __syllabusSyncGoogleMapsInit?: () => void;
-  }
-}
+let _promise: Promise<void> | null = null;
 
-let googleMapsLoaderPromise: Promise<typeof google.maps> | null = null;
+export function loadGoogleMaps(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (window.google?.maps) return Promise.resolve();
+  if (_promise) return _promise;
 
-function isGoogleMapsReady(): boolean {
-  return (
-    typeof window.google !== 'undefined' &&
-    typeof window.google.maps !== 'undefined' &&
-    typeof window.google.maps.importLibrary === 'function'
-  );
-}
-
-function buildGoogleMapsScriptUrl(apiKey: string): string {
-  const params = new URLSearchParams({
-    key: apiKey,
-    v: 'weekly',
-    loading: 'async',
-    callback: '__syllabusSyncGoogleMapsInit',
-  });
-
-  return `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
-}
-
-export async function loadGoogleMaps(): Promise<typeof google.maps> {
-  if (typeof window === 'undefined') {
-    throw new Error('Google Maps can only be loaded in the browser.');
-  }
-
-  // Already fully loaded — return immediately
-  if (isGoogleMapsReady()) {
-    return window.google.maps;
-  }
-
-  if (!googleMapsLoaderPromise) {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-    if (!apiKey) {
-      throw new Error('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not configured.');
+  _promise = new Promise((resolve, reject) => {
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!key) {
+      _promise = null;
+      return reject(new Error('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not configured'));
     }
 
-    googleMapsLoaderPromise = new Promise<typeof google.maps>((resolve, reject) => {
-      // Remove any stale/failed script element from previous attempts
-      const existingScript = document.getElementById('google-maps-js');
-      if (existingScript) {
-        if (isGoogleMapsReady()) {
-          resolve(window.google.maps);
-          return;
-        }
-        // Previous script failed — remove it so we can retry
-        existingScript.remove();
-      }
+    const cb = '__gmInit__';
+    (window as unknown as Record<string, unknown>)[cb] = () => {
+      delete (window as unknown as Record<string, unknown>)[cb];
+      resolve();
+    };
 
-      window.__syllabusSyncGoogleMapsInit = () => {
-        delete window.__syllabusSyncGoogleMapsInit;
-        if (isGoogleMapsReady()) {
-          resolve(window.google.maps);
-          return;
-        }
-        reject(new Error('Google Maps loaded without importLibrary support.'));
-      };
+    // Remove any stale script from previous failed attempts
+    const existing = document.getElementById('google-maps-js');
+    if (existing) existing.remove();
 
-      const script = document.createElement('script');
-      script.id = 'google-maps-js';
-      script.src = buildGoogleMapsScriptUrl(apiKey);
-      script.async = true;
-      script.defer = true;
-      script.onerror = () => {
-        googleMapsLoaderPromise = null;
-        delete window.__syllabusSyncGoogleMapsInit;
-        // Remove the failed script so future retries can start fresh
-        script.remove();
-        reject(new Error('Failed to load Google Maps JavaScript API.'));
-      };
+    const s = document.createElement('script');
+    s.id = 'google-maps-js';
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=marker,places&callback=${cb}&loading=async`;
+    s.async = true;
+    s.defer = true;
+    s.onerror = () => {
+      _promise = null;
+      delete (window as unknown as Record<string, unknown>)[cb];
+      s.remove();
+      reject(new Error('Google Maps SDK failed to load'));
+    };
+    document.head.appendChild(s);
+  });
 
-      document.head.appendChild(script);
-    });
-  }
-
-  return googleMapsLoaderPromise;
+  return _promise;
 }

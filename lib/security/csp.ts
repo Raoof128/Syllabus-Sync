@@ -59,7 +59,7 @@ export function buildNonceCSP(nonce: string): string {
     "img-src 'self' data: blob: https://*.googleapis.com https://*.gstatic.com https://*.google.com https:",
 
     // Connect: Supabase, Google Maps JS/Routes, weather, Sentry, HMR in dev
-    `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://weather.googleapis.com https://maps.googleapis.com https://routes.googleapis.com https://maps.gstatic.com https://*.sentry.io${isDev ? ' ws://localhost:* ws://127.0.0.1:*' : ''}`,
+    `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://weather.googleapis.com https://maps.googleapis.com https://routes.googleapis.com https://places.googleapis.com https://maps.gstatic.com https://*.sentry.io${isDev ? ' ws://localhost:* ws://127.0.0.1:*' : ''}`,
 
     // Frame sources retained for conservative compatibility with external content.
     "frame-src 'self' https://www.google.com https://maps.google.com",
@@ -179,7 +179,7 @@ export function buildCSP(options: CSPOptions = {}): string {
     "font-src 'self' data: https://r2cdn.perplexity.ai",
 
     // Connect: API endpoints, Supabase, Google Maps JS/Routes, weather
-    `connect-src 'self' https://*.supabase.co https://weather.googleapis.com https://maps.googleapis.com https://routes.googleapis.com https://maps.gstatic.com wss://*.supabase.co ${additionalConnectSrc.join(' ')}`.trim(),
+    `connect-src 'self' https://*.supabase.co https://weather.googleapis.com https://maps.googleapis.com https://routes.googleapis.com https://places.googleapis.com https://maps.gstatic.com wss://*.supabase.co ${additionalConnectSrc.join(' ')}`.trim(),
 
     // Frame ancestors: Prevent clickjacking
     "frame-ancestors 'self'",
@@ -229,7 +229,7 @@ export function buildDevCSP(): string {
     // Fonts
     "font-src 'self' data: https://r2cdn.perplexity.ai",
     // Connect: API endpoints, Supabase, Google Maps JS/Routes, HMR websockets
-    "connect-src 'self' https://*.supabase.co https://weather.googleapis.com https://maps.googleapis.com https://routes.googleapis.com https://maps.gstatic.com wss://*.supabase.co ws://localhost:* ws://127.0.0.1:*",
+    "connect-src 'self' https://*.supabase.co https://weather.googleapis.com https://maps.googleapis.com https://routes.googleapis.com https://places.googleapis.com https://maps.gstatic.com wss://*.supabase.co ws://localhost:* ws://127.0.0.1:*",
     // Frame ancestors
     "frame-ancestors 'self'",
     // Frame sources
@@ -271,7 +271,7 @@ export function buildProdCSP(): string {
     // Fonts: self and known in-app sources
     "font-src 'self' data: https://r2cdn.perplexity.ai",
     // Connect: API endpoints, Supabase, Sentry, routing services
-    "connect-src 'self' https://*.supabase.co https://weather.googleapis.com https://maps.googleapis.com https://routes.googleapis.com https://maps.gstatic.com https://*.sentry.io wss://*.supabase.co",
+    "connect-src 'self' https://*.supabase.co https://weather.googleapis.com https://maps.googleapis.com https://routes.googleapis.com https://places.googleapis.com https://maps.gstatic.com https://*.sentry.io wss://*.supabase.co",
     // Frame ancestors: Prevent clickjacking
     "frame-ancestors 'self'",
     // Frame sources: allow Google Maps embed

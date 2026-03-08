@@ -1,256 +1,140 @@
 'use client';
 
-import {
-  Car,
-  Bike,
-  Bus,
-  Footprints,
-  Loader2,
-  Navigation,
-  RouteIcon,
-  CheckCircle2,
-  ExternalLink,
-} from 'lucide-react';
-import { Badge } from '@/components/ui/mq/badge';
-import { Button } from '@/components/ui/mq/button';
+import { Car, Bike, Bus, Footprints, Navigation, X, ExternalLink } from 'lucide-react';
 import type { GoogleComputedRoute, GoogleTravelMode, MapLatLng } from '@/lib/maps/google/types';
-import { useSafeTranslation } from '@/lib/hooks/useSafeTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
 
-interface GoogleRoutePanelProps {
-  selectedBuildingLabel?: string;
+interface Props {
+  destinationName: string;
   route: GoogleComputedRoute | null;
   travelMode: GoogleTravelMode;
-  isLoading: boolean;
-  error: string | null;
-  hasArrived: boolean;
   isNavigating: boolean;
+  isLoadingRoute: boolean;
+  routeError: string | null;
   userLocation: MapLatLng | null;
-  destinationLocation: { lat: number; lng: number } | null;
+  destination: MapLatLng | null;
+  onTravelModeChange: (m: GoogleTravelMode) => void;
   onStartNavigation: () => void;
-  onTravelModeChange: (mode: GoogleTravelMode) => void;
   onStopNavigation: () => void;
 }
 
-const TRAVEL_MODE_ICONS: Record<GoogleTravelMode, typeof Footprints> = {
-  WALK: Footprints,
-  DRIVE: Car,
-  BICYCLE: Bike,
-  TRANSIT: Bus,
-};
+const MODES: { mode: GoogleTravelMode; label: string; Icon: React.ElementType }[] = [
+  { mode: 'WALK', label: 'Walk', Icon: Footprints },
+  { mode: 'DRIVE', label: 'Drive', Icon: Car },
+  { mode: 'BICYCLE', label: 'Cycle', Icon: Bike },
+  { mode: 'TRANSIT', label: 'Transit', Icon: Bus },
+];
 
-export function GoogleRoutePanel({
-  selectedBuildingLabel,
-  route,
-  travelMode,
-  isLoading,
-  error,
-  hasArrived,
-  isNavigating,
-  userLocation,
-  destinationLocation,
-  onStartNavigation,
-  onTravelModeChange,
-  onStopNavigation,
-}: GoogleRoutePanelProps) {
-  const { t } = useSafeTranslation();
-
-  const travelModes: Array<{ mode: GoogleTravelMode; labelKey: TranslationKey }> = [
-    { mode: 'WALK', labelKey: 'walk' },
-    { mode: 'DRIVE', labelKey: 'drive' },
-    { mode: 'BICYCLE', labelKey: 'bike' },
-    { mode: 'TRANSIT', labelKey: 'transit' },
-  ];
-
-  const formatDistance = (distanceMeters: number): string => {
-    if (distanceMeters >= 1000) {
-      return `${(distanceMeters / 1000).toFixed(1)} ${t('routeKilometersShort')}`;
-    }
-
-    return `${Math.round(distanceMeters)} ${t('routeMetersShort')}`;
-  };
-
-  const formatDuration = (durationSeconds: number): string => {
-    const minutes = Math.max(1, Math.round(durationSeconds / 60));
-    if (minutes >= 60) {
-      const hours = Math.floor(minutes / 60);
-      const remainingMinutes = minutes % 60;
-      return remainingMinutes > 0
-        ? `${hours}${t('routeHoursShort')} ${remainingMinutes}${t('routeMinutesShort')}`
-        : `${hours}${t('routeHoursShort')}`;
-    }
-
-    return `${minutes} ${t('routeMinutesShort')}`;
-  };
-
-  return (
-    <div className="absolute bottom-20 left-3 right-3 z-[1100] pointer-events-none sm:right-auto sm:w-[360px]">
-      <div className="pointer-events-auto rounded-mq-xl border border-mq-border bg-mq-card-background/95 p-4 shadow-xl backdrop-blur-sm">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              {hasArrived ? (
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-              ) : (
-                <RouteIcon className="h-4 w-4 text-mq-primary" />
-              )}
-              <p className="text-sm font-semibold text-mq-content">
-                {hasArrived ? t('navigationArrived') : t('routePlanner')}
-              </p>
-            </div>
-            <p className="mt-1 text-xs text-mq-content-secondary">
-              {hasArrived
-                ? selectedBuildingLabel
-                : selectedBuildingLabel
-                  ? t('navigateTo', { location: selectedBuildingLabel })
-                  : t('selectBuildingToNavigate')}
-            </p>
-          </div>
-          {isNavigating && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2"
-              onClick={onStopNavigation}
-              aria-label={t('stopNavigation')}
-            >
-              <Navigation className="h-4 w-4" />
-              {t('stopNavigation')}
-            </Button>
-          )}
-        </div>
-
-        {/* Travel mode selector */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {travelModes.map(({ mode, labelKey }) => {
-            const active = mode === travelMode;
-            const Icon = TRAVEL_MODE_ICONS[mode];
-            return (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => onTravelModeChange(mode)}
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  active
-                    ? 'border-mq-primary bg-mq-primary text-white'
-                    : 'border-mq-border bg-mq-background-secondary text-mq-content hover:bg-mq-hover-background'
-                }`}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {t(labelKey)}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Start navigation button */}
-        {!isNavigating && !hasArrived && (
-          <Button
-            variant="primary"
-            size="sm"
-            className="mt-4 w-full gap-2"
-            onClick={onStartNavigation}
-          >
-            <Navigation className="h-4 w-4" />
-            {t('startTurnByTurn')}
-          </Button>
-        )}
-
-        {/* Loading state */}
-        {isLoading && (
-          <div className="mt-4 flex items-center gap-2 rounded-mq-lg bg-mq-background-secondary px-3 py-3 text-sm text-mq-content-secondary">
-            <Loader2 className="h-4 w-4 animate-spin text-mq-primary" />
-            {t('loadingRoute')}
-          </div>
-        )}
-
-        {/* Error state */}
-        {error && !isLoading && (
-          <div className="mt-4 rounded-mq-lg border border-mq-danger/20 bg-mq-danger/5 px-3 py-3 text-sm text-mq-content">
-            {error}
-          </div>
-        )}
-
-        {/* Arrived state */}
-        {hasArrived && (
-          <div className="mt-4 rounded-mq-lg border border-green-500/20 bg-green-500/5 px-3 py-3 text-center">
-            <CheckCircle2 className="mx-auto mb-2 h-8 w-8 text-green-500" />
-            <p className="text-sm font-semibold text-mq-content">{t('navigationArrived')}</p>
-            <Button variant="ghost" size="sm" className="mt-2" onClick={onStopNavigation}>
-              {t('close')}
-            </Button>
-          </div>
-        )}
-
-        {/* Route info + steps */}
-        {route && !isLoading && !error && !hasArrived && (
-          <>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Badge variant="neutral">{formatDistance(route.distanceMeters)}</Badge>
-              <Badge variant="neutral">{formatDuration(route.durationSeconds)}</Badge>
-              {isNavigating && (
-                <Badge variant="neutral" className="bg-mq-primary/10 text-mq-primary">
-                  {t('eta')} {formatEta(route.durationSeconds)}
-                </Badge>
-              )}
-            </div>
-
-            <ol className="mt-4 max-h-48 space-y-2 overflow-y-auto pr-1">
-              {route.steps.slice(0, 8).map((step, index) => (
-                <li
-                  key={`${step.instruction}-${index}`}
-                  className="rounded-mq-lg bg-mq-background-secondary px-3 py-2"
-                >
-                  <p className="text-sm font-medium text-mq-content">{step.instruction}</p>
-                  <p className="mt-1 text-xs text-mq-content-secondary">
-                    {formatDistance(step.distanceMeters)} · {formatDuration(step.durationSeconds)}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </>
-        )}
-
-        {/* Open in Google Maps - mobile handoff */}
-        {destinationLocation && (
-          <a
-            href={buildGoogleMapsUrl(userLocation, destinationLocation, travelMode)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-mq-lg border border-mq-border bg-mq-background-secondary px-3 py-2 text-xs font-medium text-mq-content-secondary transition-colors hover:bg-mq-hover-background hover:text-mq-content"
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-            {t('openInGoogleMaps')}
-          </a>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function formatEta(durationSeconds: number): string {
-  const arrival = new Date(Date.now() + durationSeconds * 1000);
-  return arrival.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-const TRAVEL_MODE_URL_MAP: Record<GoogleTravelMode, string> = {
+const GMAPS_MODE: Record<GoogleTravelMode, string> = {
   WALK: 'walking',
   DRIVE: 'driving',
   BICYCLE: 'bicycling',
   TRANSIT: 'transit',
 };
 
-function buildGoogleMapsUrl(
-  origin: MapLatLng | null,
-  destination: { lat: number; lng: number },
-  travelMode: GoogleTravelMode,
-): string {
-  const params = new URLSearchParams({ api: '1' });
-  if (origin) {
-    params.set('origin', `${origin.lat},${origin.lng}`);
-  }
-  params.set('destination', `${destination.lat},${destination.lng}`);
-  params.set('travelmode', TRAVEL_MODE_URL_MAP[travelMode]);
-  return `https://www.google.com/maps/dir/?${params.toString()}`;
+function fmtDuration(totalSeconds: number): string {
+  const m = Math.max(1, Math.round(totalSeconds / 60));
+  return m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${m % 60}m`;
+}
+
+function fmtDistance(meters: number): string {
+  return meters >= 1000 ? `${(meters / 1000).toFixed(1)} km` : `${meters} m`;
+}
+
+export default function GoogleRoutePanel({
+  destinationName,
+  route,
+  travelMode,
+  isNavigating,
+  isLoadingRoute,
+  routeError,
+  userLocation,
+  destination,
+  onTravelModeChange,
+  onStartNavigation,
+  onStopNavigation,
+}: Props) {
+  const handoffUrl =
+    userLocation && destination
+      ? `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${destination.lat},${destination.lng}&travelmode=${GMAPS_MODE[travelMode]}`
+      : null;
+
+  return (
+    <div className="absolute bottom-4 left-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-border bg-background/95 p-4 shadow-xl backdrop-blur">
+      {/* Destination */}
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-xs text-muted-foreground">Destination</p>
+          <p className="truncate text-sm font-semibold">{destinationName}</p>
+        </div>
+        {isNavigating && (
+          <button
+            onClick={onStopNavigation}
+            className="shrink-0 rounded-full p-1 text-muted-foreground hover:text-destructive"
+          >
+            <X size={16} />
+          </button>
+        )}
+      </div>
+
+      {/* Travel mode tabs */}
+      <div className="mb-3 flex gap-1">
+        {MODES.map(({ mode, label, Icon }) => (
+          <button
+            key={mode}
+            onClick={() => onTravelModeChange(mode)}
+            className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-xs transition ${
+              travelMode === mode
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            <Icon size={15} />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Route info */}
+      {isLoadingRoute && (
+        <p className="mb-2 text-center text-xs text-muted-foreground">Calculating route...</p>
+      )}
+      {routeError && <p className="mb-2 text-center text-xs text-destructive">{routeError}</p>}
+      {route && !isLoadingRoute && (
+        <div className="mb-3 flex items-center justify-between rounded-xl bg-muted/50 px-3 py-2">
+          <span className="text-sm font-bold">{fmtDuration(route.durationSeconds)}</span>
+          <span className="text-xs text-muted-foreground">{fmtDistance(route.distanceMeters)}</span>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex gap-2">
+        {!isNavigating ? (
+          <button
+            onClick={onStartNavigation}
+            disabled={!route || isLoadingRoute}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-40"
+          >
+            <Navigation size={15} /> Start
+          </button>
+        ) : (
+          <button
+            onClick={onStopNavigation}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-destructive py-2.5 text-sm font-semibold text-destructive-foreground"
+          >
+            <X size={15} /> Stop
+          </button>
+        )}
+        {handoffUrl && (
+          <a
+            href={handoffUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 rounded-xl border border-border px-3 py-2.5 text-xs text-muted-foreground hover:bg-muted"
+          >
+            <ExternalLink size={14} /> Maps
+          </a>
+        )}
+      </div>
+    </div>
+  );
 }

@@ -33,12 +33,8 @@ import { MagicCard } from '@/components/ui/MagicCard';
 import { toastUtils } from '@/lib/utils/toast';
 import { CAMPUS_IMAGE_URL } from '@/features/map/lib/constants';
 import { MapViewToggle, type MapView } from './MapViewToggle';
-import {
-  GoogleMapController,
-  type GoogleMapRef,
-  type ExternalDestination,
-} from './GoogleMapController';
-import type { GoogleTravelMode } from '@/lib/maps/google/types';
+import GoogleMapController from './GoogleMapController';
+import type { ExternalDestination } from '@/lib/maps/google/types';
 import { useCampusBuildingSearch } from '@/features/map/hooks/useCampusBuildingSearch';
 import {
   useGooglePlacesSearch,
@@ -70,7 +66,6 @@ export default function MapClient() {
   const searchParams = useSearchParams();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const campusMapRef = useRef<CampusMapRef>(null);
-  const googleMapRef = useRef<GoogleMapRef>(null);
   const overlayToggleButtonRef = useRef<HTMLButtonElement | null>(null);
   const wasOverlayOpenRef = useRef(false);
   const mapView: MapView = searchParams.get('view') === 'google' ? 'google' : 'campus';
@@ -106,7 +101,6 @@ export default function MapClient() {
 
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
-  const [googleTravelMode, setGoogleTravelMode] = useState<GoogleTravelMode>('WALK');
   const [externalDestination, setExternalDestination] = useState<ExternalDestination | null>(null);
   const hasAutoNavigatedRef = useRef(false);
 
@@ -364,17 +358,6 @@ export default function MapClient() {
     [searchParams, t],
   );
 
-  // Stable callback for Google Map building marker clicks
-  const handleSelectBuilding = useCallback((building: { id: string }) => {
-    setExternalDestination(null);
-    const params = new URLSearchParams(window.location.search);
-    params.set('building', building.id);
-    params.set('view', 'google');
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState({}, '', newUrl);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  }, []);
-
   // Ensure a non-empty document title for accessibility scanners
   useEffect(() => {
     try {
@@ -422,7 +405,6 @@ export default function MapClient() {
       return;
     }
 
-    googleMapRef.current?.stopNavigation();
     startTransition(() => {
       setIsMapReady(false);
       setMapLoadTimedOut(false);
@@ -672,14 +654,9 @@ export default function MapClient() {
               <div className="absolute inset-0 z-10">
                 <TranslatedMapErrorBoundary>
                   <GoogleMapController
-                    ref={googleMapRef}
                     buildings={buildings}
-                    onNavStateChange={setNavState}
                     selectedBuilding={selectedBuilding}
                     externalDestination={externalDestination}
-                    travelMode={googleTravelMode}
-                    onTravelModeChange={setGoogleTravelMode}
-                    onSelectBuilding={handleSelectBuilding}
                   />
                 </TranslatedMapErrorBoundary>
               </div>
@@ -693,16 +670,8 @@ export default function MapClient() {
                 setBuildingSearch={setBuildingSearch}
                 onCopyShare={copyShareableURL}
                 onExport={handleExport}
-                onStartNavigation={() =>
-                  mapView === 'google'
-                    ? googleMapRef.current?.startNavigation()
-                    : campusMapRef.current?.startNavigation()
-                }
-                onStopNavigation={() =>
-                  mapView === 'google'
-                    ? googleMapRef.current?.stopNavigation()
-                    : campusMapRef.current?.stopNavigation()
-                }
+                onStartNavigation={() => campusMapRef.current?.startNavigation()}
+                onStopNavigation={() => campusMapRef.current?.stopNavigation()}
                 isNavigating={navState?.isNavigating || false}
                 isGoogleMode={mapView === 'google'}
                 placeSuggestions={mapView === 'google' ? placeSuggestions : undefined}
