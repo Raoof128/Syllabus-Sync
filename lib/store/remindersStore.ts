@@ -22,6 +22,7 @@ export interface Reminder {
   itemId: string; // ID of the related item (unit, deadline, event, todo)
   itemType: ReminderItemType;
   itemTitle: string; // Title for display
+  itemDate?: string; // ISO date string of the item being reminded about
   timing: ReminderTiming;
   customDate?: string; // ISO date string for custom timing
   customTime?: string; // HH:mm format for custom timing

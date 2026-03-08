@@ -13,6 +13,7 @@ import { errorHandler } from '@/lib/utils/errorHandling';
 import { registerServiceWorker } from '@/lib/utils/serviceWorker';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationScheduler } from '@/lib/hooks/useNotificationScheduler';
+import { useReminderChecker } from '@/lib/hooks/useReminderChecker';
 import { useInactivityLogout } from '@/lib/hooks/useInactivityLogout';
 import { useInstallPrompt } from '@/lib/hooks/useInstallPrompt';
 import { useSWUpdate } from '@/lib/hooks/useSWUpdate';
@@ -165,6 +166,7 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   }, []);
 
   useNotificationScheduler();
+  useReminderChecker();
   const { canInstall, promptInstall, dismissPrompt } = useInstallPrompt();
   const { updateAvailable, applyUpdate } = useSWUpdate();
 

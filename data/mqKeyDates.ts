@@ -1,14 +1,7 @@
 // data/mqKeyDates.ts
 // Macquarie University Key Academic Dates 2025-2027
 
-export type MQDateCategory =
-  | 'classes'
-  | 'exams'
-  | 'admin'
-  | 'results'
-  | 'payment'
-  | 'enrollment'
-  | 'recess';
+export type MQDateCategory = 'classes' | 'exams' | 'results' | 'payment' | 'enrollment' | 'recess';
 export type MQProgram =
   | 'general'
   | 'business-school'
@@ -79,7 +72,7 @@ const generalDates2025: MQKeyDate[] = [
     date: createDate(2025, 1, 24),
     event: 'Study Period End',
     term: 'Session 3',
-    category: 'admin',
+    category: 'classes',
     program: 'general',
   },
   {
@@ -128,7 +121,7 @@ const generalDates2025: MQKeyDate[] = [
     date: createDate(2025, 2, 24),
     event: 'Study Period Start',
     term: 'Session 1',
-    category: 'admin',
+    category: 'classes',
     program: 'general',
   },
   // March 2025
@@ -147,7 +140,7 @@ const generalDates2025: MQKeyDate[] = [
     description:
       'Last day to withdraw without financial penalty. After this date, fees are locked in and the unit appears on your academic record.',
     term: 'Session 1',
-    category: 'admin',
+    category: 'enrollment',
     program: 'general',
   },
   // April 2025
@@ -222,7 +215,7 @@ const generalDates2025: MQKeyDate[] = [
     date: createDate(2025, 7, 28),
     event: 'Study Period Start',
     term: 'Session 2',
-    category: 'admin',
+    category: 'classes',
     program: 'general',
   },
   // August 2025
@@ -241,7 +234,7 @@ const generalDates2025: MQKeyDate[] = [
     description:
       'Last day to withdraw without financial penalty. After this date, fees are locked in and the unit appears on your academic record.',
     term: 'Session 2',
-    category: 'admin',
+    category: 'enrollment',
     program: 'general',
   },
   // September 2025
@@ -317,7 +310,7 @@ const generalDates2025: MQKeyDate[] = [
     date: createDate(2025, 12, 15),
     event: 'Study Period Start',
     term: 'Session 3',
-    category: 'admin',
+    category: 'classes',
     program: 'general',
   },
 ];
@@ -327,7 +320,7 @@ const generalDates2026: MQKeyDate[] = [
   // Session 3 (2025-2026) - continues from December 2025
   {
     id: 'mq26-1',
-    date: createDate(2026, 1, 1),
+    date: createDate(2026, 1, 4),
     event: 'Recess End',
     term: 'Session 3',
     category: 'recess',
@@ -335,15 +328,23 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-2',
-    date: createDate(2026, 1, 2),
+    date: createDate(2026, 1, 5),
     event: 'Session classes resume',
     term: 'Session 3',
     category: 'classes',
     program: 'general',
   },
   {
+    id: 'mq26-2b',
+    date: createDate(2026, 1, 6),
+    event: 'Last Withdrawal Without Fail',
+    term: 'Session 3',
+    category: 'enrollment',
+    program: 'general',
+  },
+  {
     id: 'mq26-3',
-    date: createDate(2026, 1, 18),
+    date: createDate(2026, 1, 25),
     event: 'Last Day of Classes',
     term: 'Session 3',
     category: 'classes',
@@ -351,7 +352,7 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-4',
-    date: createDate(2026, 1, 19),
+    date: createDate(2026, 1, 27),
     event: 'Exams Start',
     term: 'Session 3',
     category: 'exams',
@@ -359,10 +360,18 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-5',
-    date: createDate(2026, 1, 23),
+    date: createDate(2026, 2, 2),
     event: 'Exams End',
     term: 'Session 3',
     category: 'exams',
+    program: 'general',
+  },
+  {
+    id: 'mq26-5b',
+    date: createDate(2026, 2, 2),
+    event: 'Study Period End',
+    term: 'Session 3',
+    category: 'classes',
     program: 'general',
   },
   {
@@ -376,7 +385,7 @@ const generalDates2026: MQKeyDate[] = [
   // February 2026
   {
     id: 'mq26-7',
-    date: createDate(2026, 2, 5),
+    date: createDate(2026, 2, 12),
     event: 'Result Publication Date',
     term: 'Session 3',
     category: 'results',
@@ -384,7 +393,7 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-8',
-    date: createDate(2026, 2, 9),
+    date: createDate(2026, 2, 16),
     event: 'Supplementary Exams Start',
     term: 'Session 3',
     category: 'exams',
@@ -392,7 +401,7 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-9',
-    date: createDate(2026, 2, 12),
+    date: createDate(2026, 2, 19),
     event: 'Supplementary Exams End',
     term: 'Session 3',
     category: 'exams',
@@ -411,7 +420,7 @@ const generalDates2026: MQKeyDate[] = [
     date: createDate(2026, 2, 23),
     event: 'Study Period Start',
     term: 'Session 1',
-    category: 'admin',
+    category: 'classes',
     program: 'general',
   },
   // March 2026
@@ -429,7 +438,7 @@ const generalDates2026: MQKeyDate[] = [
     event: 'Teaching Census',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'Session 1',
-    category: 'admin',
+    category: 'enrollment',
     program: 'general',
   },
   // April 2026
@@ -451,7 +460,7 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-16',
-    date: createDate(2026, 4, 13),
+    date: createDate(2026, 4, 6),
     event: 'Recess Start',
     term: 'Session 1',
     category: 'recess',
@@ -459,10 +468,18 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-17',
-    date: createDate(2026, 4, 24),
+    date: createDate(2026, 4, 19),
     event: 'Recess End',
     term: 'Session 1',
     category: 'recess',
+    program: 'general',
+  },
+  {
+    id: 'mq26-17b',
+    date: createDate(2026, 4, 20),
+    event: 'Session classes resume',
+    term: 'Session 1',
+    category: 'classes',
     program: 'general',
   },
   {
@@ -475,7 +492,7 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-19',
-    date: createDate(2026, 4, 27),
+    date: createDate(2026, 4, 28),
     event: 'Last Withdrawal Date',
     term: 'Session 1',
     category: 'enrollment',
@@ -514,6 +531,14 @@ const generalDates2026: MQKeyDate[] = [
     category: 'exams',
     program: 'general',
   },
+  {
+    id: 'mq26-23b',
+    date: createDate(2026, 6, 29),
+    event: 'Session break commences',
+    term: 'Session 1',
+    category: 'recess',
+    program: 'general',
+  },
   // July 2026
   {
     id: 'mq26-24',
@@ -525,7 +550,7 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-25',
-    date: createDate(2026, 7, 13),
+    date: createDate(2026, 7, 9),
     event: 'Supplementary Exams Start',
     term: 'Session 1',
     category: 'exams',
@@ -533,10 +558,69 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-26',
-    date: createDate(2026, 7, 16),
+    date: createDate(2026, 7, 21),
     event: 'Supplementary Exams End',
     term: 'Session 1',
     category: 'exams',
+    program: 'general',
+  },
+  // Winter Vacation 2026
+  {
+    id: 'mq26-wv-payment',
+    date: createDate(2026, 6, 19),
+    event: 'Payment Due Date',
+    term: 'Winter Vacation',
+    category: 'payment',
+    program: 'general',
+  },
+  {
+    id: 'mq26-wv-start',
+    date: createDate(2026, 6, 22),
+    event: 'Study Period Start',
+    term: 'Winter Vacation',
+    category: 'classes',
+    program: 'general',
+  },
+  {
+    id: 'mq26-wv-enrol',
+    date: createDate(2026, 6, 29),
+    event: 'Last Enrol Date',
+    term: 'Winter Vacation',
+    category: 'enrollment',
+    program: 'general',
+  },
+  {
+    id: 'mq26-wv-census',
+    date: createDate(2026, 6, 30),
+    event: 'Teaching Census',
+    description:
+      'Last day to withdraw without financial penalty. After this date, fees are locked in and the unit appears on your academic record.',
+    term: 'Winter Vacation',
+    category: 'enrollment',
+    program: 'general',
+  },
+  {
+    id: 'mq26-wv-withdraw',
+    date: createDate(2026, 7, 7),
+    event: 'Last Withdrawal Without Fail',
+    term: 'Winter Vacation',
+    category: 'enrollment',
+    program: 'general',
+  },
+  {
+    id: 'mq26-wv-end',
+    date: createDate(2026, 7, 29),
+    event: 'Study Period End',
+    term: 'Winter Vacation',
+    category: 'classes',
+    program: 'general',
+  },
+  {
+    id: 'mq26-wv-results',
+    date: createDate(2026, 8, 5),
+    event: 'Result Publication Date',
+    term: 'Winter Vacation',
+    category: 'results',
     program: 'general',
   },
   {
@@ -552,7 +636,7 @@ const generalDates2026: MQKeyDate[] = [
     date: createDate(2026, 7, 27),
     event: 'Study Period Start',
     term: 'Session 2',
-    category: 'admin',
+    category: 'classes',
     program: 'general',
   },
   // August 2026
@@ -570,7 +654,7 @@ const generalDates2026: MQKeyDate[] = [
     event: 'Teaching Census',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'Session 2',
-    category: 'admin',
+    category: 'enrollment',
     program: 'general',
   },
   // September 2026
@@ -584,7 +668,7 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-32',
-    date: createDate(2026, 9, 27),
+    date: createDate(2026, 9, 28),
     event: 'Last Withdrawal Date',
     term: 'Session 2',
     category: 'enrollment',
@@ -597,6 +681,14 @@ const generalDates2026: MQKeyDate[] = [
     event: 'Recess End',
     term: 'Session 2',
     category: 'recess',
+    program: 'general',
+  },
+  {
+    id: 'mq26-33b',
+    date: createDate(2026, 10, 6),
+    event: 'Session classes resume',
+    term: 'Session 2',
+    category: 'classes',
     program: 'general',
   },
   // November 2026
@@ -624,6 +716,14 @@ const generalDates2026: MQKeyDate[] = [
     category: 'exams',
     program: 'general',
   },
+  {
+    id: 'mq26-36b',
+    date: createDate(2026, 11, 30),
+    event: 'Session break commences',
+    term: 'Session 2',
+    category: 'recess',
+    program: 'general',
+  },
   // December 2026
   {
     id: 'mq26-37',
@@ -646,12 +746,38 @@ const generalDates2026: MQKeyDate[] = [
     date: createDate(2026, 12, 14),
     event: 'Study Period Start',
     term: 'Session 3',
-    category: 'admin',
+    category: 'classes',
+    program: 'general',
+  },
+  {
+    id: 'mq26-39b',
+    date: createDate(2026, 12, 20),
+    event: 'Last Enrol Date',
+    term: 'Session 3',
+    category: 'enrollment',
+    program: 'general',
+  },
+  {
+    id: 'mq26-39c',
+    date: createDate(2026, 12, 24),
+    event: 'Teaching Census',
+    description:
+      'Last day to withdraw without financial penalty. After this date, fees are locked in and the unit appears on your academic record.',
+    term: 'Session 3',
+    category: 'enrollment',
+    program: 'general',
+  },
+  {
+    id: 'mq26-39d',
+    date: createDate(2026, 12, 28),
+    event: 'Recess Start',
+    term: 'Session 3',
+    category: 'recess',
     program: 'general',
   },
   {
     id: 'mq26-40',
-    date: createDate(2026, 12, 14),
+    date: createDate(2026, 12, 10),
     event: 'Supplementary Exams Start',
     term: 'Session 2',
     category: 'exams',
@@ -659,7 +785,7 @@ const generalDates2026: MQKeyDate[] = [
   },
   {
     id: 'mq26-41',
-    date: createDate(2026, 12, 17),
+    date: createDate(2026, 12, 22),
     event: 'Supplementary Exams End',
     term: 'Session 2',
     category: 'exams',
@@ -690,6 +816,14 @@ const generalDates2026: MQKeyDate[] = [
     category: 'recess',
     program: 'general',
   },
+  {
+    id: 'mq26-44b',
+    date: createDate(2026, 12, 31),
+    event: 'Last Withdrawal Without Fail',
+    term: 'Session 3',
+    category: 'enrollment',
+    program: 'general',
+  },
 ];
 
 // FMHHS (Faculty of Medicine, Health and Human Sciences) dates 2026
@@ -709,7 +843,7 @@ const fmhhsDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'FMHHS Session 1',
-    category: 'admin',
+    category: 'enrollment',
     program: 'fmhhs',
   },
   {
@@ -735,7 +869,7 @@ const fmhhsDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'FMHHS Session 2',
-    category: 'admin',
+    category: 'enrollment',
     program: 'fmhhs',
   },
   {
@@ -765,7 +899,7 @@ const ouaDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'OUA SP1',
-    category: 'admin',
+    category: 'enrollment',
     program: 'oua',
   },
   {
@@ -791,7 +925,7 @@ const ouaDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'OUA SP2',
-    category: 'admin',
+    category: 'enrollment',
     program: 'oua',
   },
   {
@@ -817,7 +951,7 @@ const ouaDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'OUA SP3',
-    category: 'admin',
+    category: 'enrollment',
     program: 'oua',
   },
   {
@@ -843,7 +977,7 @@ const ouaDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'OUA SP4',
-    category: 'admin',
+    category: 'enrollment',
     program: 'oua',
   },
 ];
@@ -921,7 +1055,7 @@ const onlineDegreeDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'Online Session 1',
-    category: 'admin',
+    category: 'enrollment',
     program: 'online-degree',
   },
   {
@@ -947,7 +1081,7 @@ const onlineDegreeDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'Online Session 2',
-    category: 'admin',
+    category: 'enrollment',
     program: 'online-degree',
   },
   {
@@ -973,7 +1107,7 @@ const onlineDegreeDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'Online Session 3',
-    category: 'admin',
+    category: 'enrollment',
     program: 'online-degree',
   },
   {
@@ -1003,7 +1137,7 @@ const muicDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MUIC Term 1',
-    category: 'admin',
+    category: 'enrollment',
     program: 'muic',
   },
   {
@@ -1029,7 +1163,7 @@ const muicDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MUIC Term 2',
-    category: 'admin',
+    category: 'enrollment',
     program: 'muic',
   },
   {
@@ -1055,7 +1189,7 @@ const muicDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MUIC Term 3',
-    category: 'admin',
+    category: 'enrollment',
     program: 'muic',
   },
   {
@@ -1081,7 +1215,7 @@ const muicDates: MQKeyDate[] = [
     event: 'Census Date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MUIC Term 4',
-    category: 'admin',
+    category: 'enrollment',
     program: 'muic',
   },
   {
@@ -1261,7 +1395,7 @@ const businessSchoolDates: MQKeyDate[] = [
     description:
       'Last day to withdraw without financial penalty. After this date, fees are locked in and the unit appears on your academic record.',
     term: 'MBS Term 1',
-    category: 'admin',
+    category: 'enrollment',
     program: 'business-school',
   },
   {
@@ -1313,7 +1447,7 @@ const businessSchoolDates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MBS Term 2',
-    category: 'admin',
+    category: 'enrollment',
     program: 'business-school',
   },
   {
@@ -1365,7 +1499,7 @@ const businessSchoolDates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MBS Term 3',
-    category: 'admin',
+    category: 'enrollment',
     program: 'business-school',
   },
   {
@@ -1417,7 +1551,7 @@ const businessSchoolDates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MBS Term 4',
-    category: 'admin',
+    category: 'enrollment',
     program: 'business-school',
   },
   {
@@ -1473,7 +1607,7 @@ const collegeDates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 1',
-    category: 'admin',
+    category: 'enrollment',
     program: 'college',
   },
   {
@@ -1525,7 +1659,7 @@ const collegeDates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 2',
-    category: 'admin',
+    category: 'enrollment',
     program: 'college',
   },
   {
@@ -1577,7 +1711,7 @@ const collegeDates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 3',
-    category: 'admin',
+    category: 'enrollment',
     program: 'college',
   },
   {
@@ -1629,7 +1763,7 @@ const collegeDates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 4',
-    category: 'admin',
+    category: 'enrollment',
     program: 'college',
   },
   {
@@ -1681,7 +1815,7 @@ const collegeDates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'College Term 5',
-    category: 'admin',
+    category: 'enrollment',
     program: 'college',
   },
   {
@@ -1737,7 +1871,7 @@ const globalMBADates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 1',
-    category: 'admin',
+    category: 'enrollment',
     program: 'global-mba',
   },
   {
@@ -1780,7 +1914,7 @@ const globalMBADates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 2',
-    category: 'admin',
+    category: 'enrollment',
     program: 'global-mba',
   },
   {
@@ -1823,7 +1957,7 @@ const globalMBADates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 3',
-    category: 'admin',
+    category: 'enrollment',
     program: 'global-mba',
   },
   {
@@ -1866,7 +2000,7 @@ const globalMBADates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 4',
-    category: 'admin',
+    category: 'enrollment',
     program: 'global-mba',
   },
   {
@@ -1909,7 +2043,7 @@ const globalMBADates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 5',
-    category: 'admin',
+    category: 'enrollment',
     program: 'global-mba',
   },
   {
@@ -1952,7 +2086,7 @@ const globalMBADates: MQKeyDate[] = [
     event: 'Census date',
     description: CENSUS_DATE_DESCRIPTION,
     term: 'MBA Online 6',
-    category: 'admin',
+    category: 'enrollment',
     program: 'global-mba',
   },
   {
@@ -2004,12 +2138,6 @@ export const MQ_DATE_COLORS: Record<
     border: 'border-rose-600',
     text: 'text-white',
     bgLight: 'bg-rose-200/50',
-  },
-  admin: {
-    bg: 'bg-slate-500',
-    border: 'border-slate-600',
-    text: 'text-white',
-    bgLight: 'bg-slate-200/50',
   },
   results: {
     bg: 'bg-emerald-500',
