@@ -597,7 +597,7 @@ const Header = memo(() => {
                   )}
                 </div>
                 <div
-                  className="text-xs sm:text-sm font-medium text-mq-content-secondary hidden md:inline max-w-[80px] lg:max-w-[120px] truncate"
+                  className="text-xs sm:text-sm font-medium text-mq-content-secondary hidden md:inline max-w-[160px] lg:max-w-[200px] truncate"
                   title={displayName || ''}
                 >
                   {displayName || ''}
@@ -616,19 +616,33 @@ const Header = memo(() => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
-                  // Redirect immediately for snappy UX, then clean up in background
+                onClick={async () => {
+                  // 1. Clear local user state immediately for responsive UI
                   setUser(null);
+
+                  // 2. Sign out the Supabase browser session BEFORE redirect
+                  //    This prevents the auth guard from seeing a stale session
+                  //    and redirecting back to /home.
+                  if (isSupabaseConfigured()) {
+                    try {
+                      const supabase = createBrowserClient();
+                      await supabase.auth.signOut();
+                    } catch {
+                      // Continue with redirect even if sign out fails
+                    }
+                  }
+
+                  // 3. Clear all client stores and storage
+                  await Promise.allSettled([resetAllStores(), clearAllClientStorage()]);
+
+                  // 4. Redirect to login AFTER session is cleared
                   router.replace('/login');
-                  // Fire-and-forget cleanup
-                  Promise.allSettled([
-                    resetAllStores(),
-                    clearAllClientStorage(),
-                    apiRequest('/api/auth/signout', {
-                      method: 'POST',
-                      noRetry: true,
-                    }),
-                  ]).catch(() => {});
+
+                  // 5. Server-side cleanup (fire-and-forget)
+                  apiRequest('/api/auth/signout', {
+                    method: 'POST',
+                    noRetry: true,
+                  }).catch(() => {});
                 }}
                 className="flex items-center gap-2 text-mq-content hover:text-mq-content cursor-pointer"
               >

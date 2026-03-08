@@ -538,7 +538,7 @@ export default function CalendarClient() {
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden md:block sticky top-0 z-30 bg-mq-background px-4 pb-4 pt-4 lg:px-6 lg:pt-6">
+      <div className="hidden md:block shrink-0 bg-mq-background px-4 pb-4 pt-4 lg:px-6 lg:pt-6 border-b border-mq-border">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="min-w-0">
@@ -656,8 +656,8 @@ export default function CalendarClient() {
         </div>
       </div>
 
-      <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
-        <div className="order-1 flex-1 min-w-0 overflow-visible p-4 pb-24 scrollbar-hide md:p-6 md:pb-6 lg:overflow-x-hidden lg:overflow-y-auto">
+      <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row md:overflow-hidden">
+        <div className="order-1 flex-1 min-w-0 overflow-visible p-4 pb-24 scrollbar-hide md:p-6 md:pb-6 md:overflow-x-hidden md:overflow-y-auto">
           {/* Week View */}
           {view === 'week' && (
             <ScrollReveal>

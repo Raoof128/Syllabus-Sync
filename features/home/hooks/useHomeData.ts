@@ -3,6 +3,8 @@ import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useTodosStore } from '@/lib/store/todosStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
+import { useProfilesStore } from '@/lib/store/profilesStore';
+import { useGamificationStore } from '@/lib/store/gamificationStore';
 import { useHydration } from '@/lib/hooks';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
@@ -12,21 +14,27 @@ export function useHomeData() {
   const initialLoadDone = useRef(false);
 
   const units = useUnitsStore((state) => state.units);
+  const isLoadingUnits = useUnitsStore((state) => state.isLoading);
   const forceRefreshUnits = useUnitsStore((state) => state.forceRefresh);
 
+  const isLoadingDeadlines = useDeadlinesStore((state) => state.isLoading);
   const forceRefreshDeadlines = useDeadlinesStore((state) => state.forceRefresh);
   const forceRefreshTodos = useTodosStore((state) => state.forceRefresh);
   const forceRefreshEvents = useEventsStore((state) => state.forceRefresh);
+  const fetchProfile = useProfilesStore((state) => state.fetchProfile);
+  const loadGamification = useGamificationStore((state) => state.loadProfile);
 
-  // Load data from database on mount
+  // Load all data from database on mount — all calls fire in parallel
   useEffect(() => {
     if (hasHydrated && !initialLoadDone.current) {
       initialLoadDone.current = true;
-      // Use forceRefresh on first load to ensure fresh data
+      // Fire all fetches concurrently for fastest possible load
       forceRefreshUnits();
       forceRefreshDeadlines();
       forceRefreshTodos();
       forceRefreshEvents();
+      fetchProfile();
+      loadGamification();
     }
   }, [
     hasHydrated,
@@ -34,6 +42,8 @@ export function useHomeData() {
     forceRefreshDeadlines,
     forceRefreshTodos,
     forceRefreshEvents,
+    fetchProfile,
+    loadGamification,
   ]);
 
   // Listen for auth state changes and refresh data on sign-in
@@ -50,11 +60,20 @@ export function useHomeData() {
         forceRefreshDeadlines();
         forceRefreshTodos();
         forceRefreshEvents();
+        fetchProfile();
+        loadGamification();
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [forceRefreshUnits, forceRefreshDeadlines, forceRefreshTodos, forceRefreshEvents]);
+  }, [
+    forceRefreshUnits,
+    forceRefreshDeadlines,
+    forceRefreshTodos,
+    forceRefreshEvents,
+    fetchProfile,
+    loadGamification,
+  ]);
 
   const hasUnits = units.length > 0;
 
