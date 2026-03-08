@@ -1,5 +1,7 @@
 -- Migration: Seed 16 sample public events for the Events Feed
--- 4 Academic, 4 Free Food, 4 Career, 4 Social — all from March 4 2026 onwards
+-- 4 Academic, 4 Free Food, 4 Career, 4 Social — originally March 4–21 2026
+-- NOTE: Dates below are superseded by 20260308000000_shift_events_to_april.sql
+--       which moves all events to April 10–27 2026 (AEST +10).
 -- These appear in the Events Feed tab; users can add them to their personal calendar.
 
 INSERT INTO public.public_events (

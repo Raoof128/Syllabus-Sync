@@ -18,8 +18,9 @@ import { useEventsStore } from '@/lib/store/eventsStore';
 // ============================================================================
 const createSampleEvents = (): PublicEvent[] => {
   const now = new Date();
-  // Note: Dates shifted +10 days from original database seed to keep them upcoming
-  // Using fixed March/April 2026 dates to ensure exactly 4 events per category
+  // Dates must match the database migration 20260308000000_shift_events_to_april.sql
+  // All April 2026 dates use AEST (UTC+10) — DST ends April 5
+  // Range: April 10–27, one event per day, 16 events total
   return [
     // Academic (4 events)
     {
@@ -27,8 +28,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'Research Skills Workshop',
       description:
         'Learn essential research methodology and academic writing skills. Perfect for thesis students and researchers.',
-      startAt: new Date('2026-03-15T10:00:00+11:00'),
-      endAt: new Date('2026-03-15T12:00:00+11:00'),
+      startAt: new Date('2026-04-17T10:00:00+10:00'),
+      endAt: new Date('2026-04-17T12:00:00+10:00'),
       allDay: false,
       location: 'Library Level 3, Room 301',
       building: 'LIB',
@@ -43,8 +44,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'AI & Ethics Public Lecture',
       description:
         'Guest speaker Prof. Sarah Chen discusses ethical implications of generative AI in education.',
-      startAt: new Date('2026-03-14T14:00:00+11:00'),
-      endAt: new Date('2026-03-14T16:00:00+11:00'),
+      startAt: new Date('2026-04-15T14:00:00+10:00'),
+      endAt: new Date('2026-04-15T16:00:00+10:00'),
       allDay: false,
       location: '4 Eastern Road Auditorium',
       building: '4ER',
@@ -57,8 +58,8 @@ const createSampleEvents = (): PublicEvent[] => {
       id: 'aaaaaaaa-0001-4000-8000-000000000003',
       title: 'Study Jam: Midterm Prep',
       description: 'Collaborative study session with peer tutors. Bring your notes and questions!',
-      startAt: new Date('2026-03-22T10:00:00+11:00'),
-      endAt: new Date('2026-03-22T14:00:00+11:00'),
+      startAt: new Date('2026-04-18T10:00:00+10:00'),
+      endAt: new Date('2026-04-18T14:00:00+10:00'),
       allDay: false,
       location: 'Library Level 2 Study Hub',
       building: 'LIB',
@@ -73,8 +74,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'Data Science Bootcamp',
       description:
         'Hands-on intro to Python data analysis. Laptops provided. No prior experience needed.',
-      startAt: new Date('2026-03-28T09:00:00+11:00'),
-      endAt: new Date('2026-03-28T17:00:00+11:00'),
+      startAt: new Date('2026-04-24T09:00:00+10:00'),
+      endAt: new Date('2026-04-24T17:00:00+10:00'),
       allDay: false,
       location: "9 Wally's Walk Lab",
       building: '9WW',
@@ -90,8 +91,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'Free Pizza Friday',
       description:
         'Join us for free pizza! Hosted by the Student Association. All students welcome.',
-      startAt: new Date('2026-03-16T12:30:00+11:00'),
-      endAt: new Date('2026-03-16T14:00:00+11:00'),
+      startAt: new Date('2026-04-10T12:30:00+10:00'),
+      endAt: new Date('2026-04-10T14:00:00+10:00'),
       allDay: false,
       location: "Wally's Walk Courtyard",
       building: 'WALLYS',
@@ -105,8 +106,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'Pancake Breakfast',
       description:
         'Free pancakes, fruit, and coffee to kickstart your week! Vegan and GF options available.',
-      startAt: new Date('2026-03-19T07:30:00+11:00'),
-      endAt: new Date('2026-03-19T09:30:00+11:00'),
+      startAt: new Date('2026-04-13T07:30:00+10:00'),
+      endAt: new Date('2026-04-13T09:30:00+10:00'),
       allDay: false,
       location: 'Central Courtyard',
       building: 'LIB',
@@ -119,8 +120,8 @@ const createSampleEvents = (): PublicEvent[] => {
       id: 'aaaaaaaa-0002-4000-8000-000000000003',
       title: 'Sushi & Smoothie Giveaway',
       description: 'Free sushi rolls and smoothies while stocks last. Grab lunch on us!',
-      startAt: new Date('2026-03-23T12:00:00+11:00'),
-      endAt: new Date('2026-03-23T13:30:00+11:00'),
+      startAt: new Date('2026-04-23T12:00:00+10:00'),
+      endAt: new Date('2026-04-23T13:30:00+10:00'),
       allDay: false,
       location: 'UniBar Courtyard',
       building: 'UBAR',
@@ -134,8 +135,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'BBQ on the Lawn',
       description:
         'Classic Aussie BBQ with snags, burgers, and veggie options. Sponsored by MQ Sport.',
-      startAt: new Date('2026-03-30T11:30:00+11:00'),
-      endAt: new Date('2026-03-30T14:00:00+11:00'),
+      startAt: new Date('2026-04-26T11:30:00+10:00'),
+      endAt: new Date('2026-04-26T14:00:00+10:00'),
       allDay: false,
       location: 'Sports Fields',
       building: 'FIELDS',
@@ -150,8 +151,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'Tech Industry Career Fair',
       description:
         'Meet recruiters from Google, Microsoft, Atlassian, and more. Bring your resume!',
-      startAt: new Date('2026-03-17T09:00:00+11:00'),
-      endAt: new Date('2026-03-17T16:00:00+11:00'),
+      startAt: new Date('2026-04-14T09:00:00+10:00'),
+      endAt: new Date('2026-04-14T16:00:00+10:00'),
       allDay: false,
       location: 'Macquarie Theatre',
       building: 'MQTH',
@@ -165,8 +166,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'Graduate Employer Mixer',
       description:
         'Casual networking with hiring managers from top graduate programs. Refreshments provided.',
-      startAt: new Date('2026-03-21T17:00:00+11:00'),
-      endAt: new Date('2026-03-21T19:30:00+11:00'),
+      startAt: new Date('2026-04-16T17:00:00+10:00'),
+      endAt: new Date('2026-04-16T19:30:00+10:00'),
       allDay: false,
       location: 'Campus Hub Foyer',
       building: '18WW',
@@ -179,8 +180,8 @@ const createSampleEvents = (): PublicEvent[] => {
       id: 'aaaaaaaa-0003-4000-8000-000000000003',
       title: 'Resume & LinkedIn Workshop',
       description: 'Professional career advisors help you polish your resume and LinkedIn profile.',
-      startAt: new Date('2026-03-24T13:00:00+11:00'),
-      endAt: new Date('2026-03-24T15:00:00+11:00'),
+      startAt: new Date('2026-04-22T13:00:00+10:00'),
+      endAt: new Date('2026-04-22T15:00:00+10:00'),
       allDay: false,
       location: 'Digital Learning Centre',
       building: 'DLC',
@@ -194,8 +195,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'Startup Pitch Night',
       description:
         'Watch student startups pitch to a panel of investors. Networking drinks afterwards.',
-      startAt: new Date('2026-03-29T18:00:00+11:00'),
-      endAt: new Date('2026-03-29T21:00:00+11:00'),
+      startAt: new Date('2026-04-25T18:00:00+10:00'),
+      endAt: new Date('2026-04-25T21:00:00+10:00'),
       allDay: false,
       location: 'Incubator Hub',
       building: 'INCUB',
@@ -209,8 +210,8 @@ const createSampleEvents = (): PublicEvent[] => {
       id: 'aaaaaaaa-0004-4000-8000-000000000001',
       title: 'International Student Mixer',
       description: 'Meet fellow international students! Games, music, and free refreshments.',
-      startAt: new Date('2026-03-18T17:00:00+11:00'),
-      endAt: new Date('2026-03-18T20:00:00+11:00'),
+      startAt: new Date('2026-04-11T17:00:00+10:00'),
+      endAt: new Date('2026-04-11T20:00:00+10:00'),
       allDay: false,
       location: 'UniBar',
       building: 'UBAR',
@@ -223,8 +224,8 @@ const createSampleEvents = (): PublicEvent[] => {
       id: 'aaaaaaaa-0004-4000-8000-000000000002',
       title: 'Trivia Night',
       description: 'Test your knowledge in teams of 4–6. Prizes for top 3! Drinks at bar prices.',
-      startAt: new Date('2026-03-22T18:30:00+11:00'),
-      endAt: new Date('2026-03-22T21:00:00+11:00'),
+      startAt: new Date('2026-04-20T18:30:00+10:00'),
+      endAt: new Date('2026-04-20T21:00:00+10:00'),
       allDay: false,
       location: 'UniBar',
       building: 'UBAR',
@@ -237,8 +238,8 @@ const createSampleEvents = (): PublicEvent[] => {
       id: 'aaaaaaaa-0004-4000-8000-000000000003',
       title: 'Outdoor Movie Night',
       description: 'Screening of Interstellar on the big screen. BYO blankets and snacks!',
-      startAt: new Date('2026-03-25T19:00:00+11:00'),
-      endAt: new Date('2026-03-25T22:00:00+11:00'),
+      startAt: new Date('2026-04-21T19:00:00+10:00'),
+      endAt: new Date('2026-04-21T22:00:00+10:00'),
       allDay: false,
       location: 'Sports Fields',
       building: 'FIELDS',
@@ -252,8 +253,8 @@ const createSampleEvents = (): PublicEvent[] => {
       title: 'Cultural Festival',
       description:
         'Celebrating diversity with food stalls, performances, and art from 30+ cultures.',
-      startAt: new Date('2026-03-31T10:00:00+11:00'),
-      endAt: new Date('2026-03-31T18:00:00+11:00'),
+      startAt: new Date('2026-04-27T10:00:00+10:00'),
+      endAt: new Date('2026-04-27T18:00:00+10:00'),
       allDay: true,
       location: 'Central Courtyard',
       building: 'LIB',
