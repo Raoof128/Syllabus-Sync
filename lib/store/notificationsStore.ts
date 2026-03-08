@@ -7,6 +7,7 @@ import { Notification } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
 import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
+import { toastUtils } from '@/lib/utils/toast';
 
 // Maximum number of notifications to keep in state
 const MAX_NOTIFICATIONS = 100;
@@ -64,13 +65,16 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
       const data = await apiRequest<Notification[]>(API_ROUTES.NOTIFICATIONS.BASE, {
         noRetry: true,
       });
-      const normalized = data
+      const serverNotifications = data
         .map(normalizeNotification)
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, MAX_NOTIFICATIONS);
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+      // Preserve optimistic (temp) notifications not yet confirmed by the server
+      const currentTemp = get().notifications.filter((n) => n.id.startsWith('temp-'));
+      const merged = [...currentTemp, ...serverNotifications].slice(0, MAX_NOTIFICATIONS);
 
       set({
-        notifications: normalized,
+        notifications: merged,
         hasLoaded: true,
         lastLoadedAt: Date.now(),
       });
@@ -82,7 +86,9 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
           error.message.includes('Unauthorized'));
 
       if (isAuthError) {
-        set({ notifications: [], hasLoaded: true, lastLoadedAt: Date.now() });
+        // Preserve optimistic (temp) notifications that haven't been persisted yet
+        const tempNotifications = get().notifications.filter((n) => n.id.startsWith('temp-'));
+        set({ notifications: tempNotifications, hasLoaded: true, lastLoadedAt: Date.now() });
         // Avoid redirect flapping: only redirect if we can confirm there's no session.
         // Middleware/proxy still protects routes on navigation/refresh.
         if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
@@ -103,6 +109,7 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
           hasLoggedNetworkFallback = true;
           console.warn('Notifications API unavailable; using local state fallback.');
         }
+        // Keep existing notifications (including optimistic) as fallback
         set({ hasLoaded: true, lastLoadedAt: Date.now() });
       }
     } finally {
@@ -180,7 +187,14 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         return null;
       }
 
-      // For other errors, log and keep the local notification
+      // For other errors, log and keep the local notification as optimistic fallback
+      const isNetwork = isLikelyNetworkError(error) || isBrowserOffline();
+      if (!isNetwork) {
+        toastUtils.warning(
+          'Notification saved locally',
+          'It will sync when the connection is restored.',
+        );
+      }
       errorHandler.logError(
         error instanceof Error ? error : new Error('Failed to add notification'),
         'NotificationsStore.addNotification',

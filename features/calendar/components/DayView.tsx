@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { TranslationKey } from '@/lib/i18n/translations';
 import { formatLocation, formatScheduleTime } from '@/lib/utils/locale';
-import { getMQKeyDatesForDay, MQ_DATE_COLORS, PROGRAM_STYLES, MQProgram } from '@/data/mqKeyDates';
+import { getMQKeyDatesForDay, PROGRAM_STYLES, MQProgram } from '@/data/mqKeyDates';
 import { CalendarClock } from 'lucide-react';
 
 interface DayViewProps {
@@ -158,10 +158,7 @@ export default function DayView({
           <div className="p-3 border-b border-mq-border bg-mq-background-secondary/30 sticky top-0 z-20 backdrop-blur-sm">
             <div className="flex flex-wrap gap-2">
               {mqKeyDates.map((mqDate) => {
-                const categoryColors = MQ_DATE_COLORS[mqDate.category];
                 const programStyle = PROGRAM_STYLES[mqDate.program];
-                const categoryLabel =
-                  t(`mqCat_${mqDate.category}` as TranslationKey) || mqDate.category;
                 return (
                   <div
                     key={mqDate.id}
@@ -181,15 +178,6 @@ export default function DayView({
                       <span className="text-sm" aria-hidden="true">
                         {programStyle.icon}
                       </span>
-                      <span
-                        className={cn(
-                          'text-[8px] font-bold uppercase px-1 py-0.5 rounded',
-                          categoryColors.bg,
-                          categoryColors.text,
-                        )}
-                      >
-                        {categoryLabel}
-                      </span>
                     </div>
                     <span className={cn('line-clamp-1', programStyle.text)}>{mqDate.event}</span>
                     <span className={cn('text-[9px] opacity-70', programStyle.text)}>
@@ -202,12 +190,12 @@ export default function DayView({
           </div>
         )}
 
-        {/* Date Banner - shows date and Back to Today when viewing a different date */}
-        {!isToday && onGoToToday && (
-          <div className="w-full px-3 py-2 bg-mq-primary/10 border-b border-mq-primary/20 flex items-center justify-between gap-2">
-            <span className="text-sm font-semibold text-mq-content">
-              {dayDate.format('D MMMM YYYY')}
-            </span>
+        {/* Date Banner - always shows current date, with Back to Today when not today */}
+        <div className="w-full px-3 py-2 bg-mq-primary/10 border-b border-mq-primary/20 flex items-center justify-between gap-2">
+          <span className="text-sm font-semibold text-mq-content">
+            {dayDate.format('D MMMM YYYY')}
+          </span>
+          {!isToday && onGoToToday && (
             <button
               onClick={onGoToToday}
               className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-mq-primary/20 hover:bg-mq-primary/30 transition-colors text-sm font-medium text-mq-primary"
@@ -215,8 +203,8 @@ export default function DayView({
               <CalendarClock className="h-4 w-4" />
               <span>{t('backToToday')}</span>
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Time Grid */}
         <div className="relative" style={{ height: HOURS.length * HOUR_HEIGHT + 24 }}>

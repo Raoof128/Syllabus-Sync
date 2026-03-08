@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import type { TranslationKey } from '@/lib/i18n/translations';
 import { Plus, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
@@ -70,8 +69,7 @@ export default function UnitsWidget({
               </span>
               <div className="flex items-center gap-2">
                 <Badge variant="neutral" className="text-[10px] h-5 px-1.5">
-                  {units.length}{' '}
-                  {units.length === 1 ? t('unit') : t('unitsLabel' as TranslationKey)}
+                  {units.length} {units.length === 1 ? t('unit') : t('units')}
                 </Badge>
                 <Button
                   size="icon"

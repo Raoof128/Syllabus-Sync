@@ -1,8 +1,8 @@
-import { createServerClient as createSupabaseServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createServerClient as createSupabaseServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
 // One-time warning flag to prevent console spam
 let serverWarningShown = false;
@@ -12,16 +12,16 @@ function isSupabaseConfigured(): boolean {
   // Check URL is valid
   const hasValidUrl = !!(
     supabaseUrl &&
-    supabaseUrl.includes("supabase.co") &&
-    !supabaseUrl.includes("your-project-id")
+    supabaseUrl.includes('supabase.co') &&
+    !supabaseUrl.includes('your-project-id')
   );
 
   // Check key is valid - Supabase anon keys are JWT tokens starting with "eyJ" or publishable keys starting with "sb_"
   const hasValidKey = !!(
     supabaseAnonKey &&
-    (supabaseAnonKey.startsWith("eyJ") || supabaseAnonKey.startsWith("sb_")) &&
-    supabaseAnonKey !== "your-anon-key-here" &&
-    !supabaseAnonKey.includes("PASTE")
+    (supabaseAnonKey.startsWith('eyJ') || supabaseAnonKey.startsWith('sb_')) &&
+    supabaseAnonKey !== 'your-anon-key-here' &&
+    !supabaseAnonKey.includes('PASTE')
   );
 
   return hasValidUrl && hasValidKey;
@@ -31,8 +31,8 @@ export async function createServerClient() {
   if (!isSupabaseConfigured()) {
     if (!serverWarningShown) {
       console.warn(
-        "⚠️ Supabase not configured for server. Auth features disabled.\n" +
-          "To enable auth, update .env.local with your Supabase credentials.",
+        '⚠️ Supabase not configured for server. Auth features disabled.\n' +
+          'To enable auth, update .env.local with your Supabase credentials.',
       );
       serverWarningShown = true;
     }
@@ -43,22 +43,30 @@ export async function createServerClient() {
         getUser: async () => ({ data: { user: null }, error: null }),
       },
       from: () => {
-        // Create a chainable query builder mock
-        const chainable = {
+        const mockError = { message: 'Supabase not configured.', code: 'MOCK_CLIENT' };
+        // Create a chainable query builder mock that propagates errors through the chain
+        const errorChainable: Record<string, unknown> = {
+          select: () => errorChainable,
+          eq: () => errorChainable,
+          neq: () => errorChainable,
+          is: () => errorChainable,
+          order: () => errorChainable,
+          limit: () => errorChainable,
+          single: () => ({ data: null, error: mockError }),
+          maybeSingle: () => ({ data: null, error: mockError }),
+          then: (resolve: (value: { data: null; error: typeof mockError }) => void) => {
+            resolve({ data: null, error: mockError });
+          },
+          data: null,
+          error: mockError,
+        };
+        // Create a chainable query builder mock for reads (returns empty data, no error)
+        const chainable: Record<string, unknown> = {
           select: () => chainable,
-          insert: () => ({
-            data: null,
-            error: { message: "Supabase not configured." },
-          }),
-          update: () => chainable,
-          delete: () => ({
-            data: null,
-            error: { message: "Supabase not configured." },
-          }),
-          upsert: () => ({
-            data: null,
-            error: { message: "Supabase not configured." },
-          }),
+          insert: () => errorChainable,
+          update: () => errorChainable,
+          delete: () => errorChainable,
+          upsert: () => errorChainable,
           is: () => chainable,
           eq: () => chainable,
           neq: () => chainable,

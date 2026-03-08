@@ -12,13 +12,11 @@ import { Clock, MapPin, AlertCircle, GraduationCap } from 'lucide-react';
 import { parseTimeRange, getEventColors, getDeadlineColor } from '@/lib/calendar-utils';
 import {
   getMQKeyDatesForDay,
-  MQ_DATE_COLORS,
   PROGRAM_STYLES,
   PROGRAM_LABELS,
   MQProgram,
   MQKeyDate,
 } from '@/data/mqKeyDates';
-import type { TranslationKey } from '@/lib/i18n/translations';
 
 interface AgendaViewProps {
   date: Date; // The start date (usually start of week)
@@ -173,10 +171,7 @@ export default function AgendaView({
                   // Render MQ Key Dates
                   if (entry.agendaType === 'mqdate') {
                     const mqDate = entry.item as MQKeyDate;
-                    const categoryColors = MQ_DATE_COLORS[mqDate.category];
                     const programStyle = PROGRAM_STYLES[mqDate.program];
-                    const categoryLabel =
-                      t(`mqCat_${mqDate.category}` as TranslationKey) || mqDate.category;
 
                     return (
                       <Card
@@ -195,15 +190,6 @@ export default function AgendaView({
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <Badge
-                                className={cn(
-                                  'text-[10px] px-1.5 py-0 h-4',
-                                  categoryColors.bg,
-                                  categoryColors.text,
-                                )}
-                              >
-                                {categoryLabel}
-                              </Badge>
                               <h4 className={cn('font-semibold text-sm', programStyle.text)}>
                                 {mqDate.event}
                               </h4>

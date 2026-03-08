@@ -23,7 +23,7 @@ const notificationSchema = z.object({
   read: z.boolean().default(false),
   link: z.string().url().optional(),
   relatedId: z.string().uuid().optional(),
-  createdAt: z.date().optional(),
+  createdAt: z.coerce.date().optional(),
 });
 
 const notificationQuerySchema = z.object({
