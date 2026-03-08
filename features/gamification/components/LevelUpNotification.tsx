@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
 import { toastUtils } from '@/lib/utils/toast';
 import { getLevelTier } from '@/lib/types';
+import { getLevelTitleKey } from '@/lib/utils/gamification';
+import { getTranslations, type Language } from '@/lib/i18n/translations';
 
 // Translations for level-up messages
 const LEVEL_UP_MESSAGES: Record<string, string> = {
@@ -112,7 +114,6 @@ export function LevelUpNotificationProvider({
 }: LevelUpNotificationProviderProps) {
   const profile = useGamificationStore((state) => state.profile);
   const settings = useGamificationStore((state) => state.settings);
-  const getLevelTitle = useGamificationStore((state) => state.getLevelTitle);
 
   // Track previous level to detect changes
   const prevLevelRef = useRef<number | null>(null);
@@ -122,7 +123,9 @@ export function LevelUpNotificationProvider({
     (newLevel: number) => {
       const tier = getLevelTier(newLevel);
       const emoji = TIER_EMOJIS[tier] || '🎉';
-      const title = getLevelTitle();
+      const translations = getTranslations(locale as Language);
+      const titleKey = getLevelTitleKey(newLevel);
+      const title = translations[titleKey] || getTranslations('en')[titleKey] || '';
 
       // Get localized messages
       const congratsMsg = CONGRATULATIONS[locale] || CONGRATULATIONS.en;
@@ -130,7 +133,7 @@ export function LevelUpNotificationProvider({
 
       toastUtils.success(`${emoji} ${congratsMsg}`, `${levelMsg} ${newLevel}! ${title}`);
     },
-    [locale, getLevelTitle],
+    [locale],
   );
 
   useEffect(() => {
@@ -163,7 +166,6 @@ export function LevelUpNotificationProvider({
  * Useful for testing or special scenarios
  */
 export function useLevelUpNotification() {
-  const getLevelTitle = useGamificationStore((state) => state.getLevelTitle);
   const settings = useGamificationStore((state) => state.settings);
 
   const showNotification = useCallback(
@@ -174,14 +176,16 @@ export function useLevelUpNotification() {
 
       const tier = getLevelTier(level);
       const emoji = TIER_EMOJIS[tier] || '🎉';
-      const title = getLevelTitle();
+      const translations = getTranslations(locale as Language);
+      const titleKey = getLevelTitleKey(level);
+      const title = translations[titleKey] || getTranslations('en')[titleKey] || '';
 
       const congratsMsg = CONGRATULATIONS[locale] || CONGRATULATIONS.en;
       const levelMsg = LEVEL_UP_MESSAGES[locale] || LEVEL_UP_MESSAGES.en;
 
       toastUtils.success(`${emoji} ${congratsMsg}`, `${levelMsg} ${level}! ${title}`);
     },
-    [getLevelTitle, settings.showLevelUpNotifications],
+    [settings.showLevelUpNotifications],
   );
 
   return { showNotification };

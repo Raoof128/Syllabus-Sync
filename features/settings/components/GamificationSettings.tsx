@@ -9,6 +9,7 @@ import { MagicCard } from '@/components/ui/MagicCard';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import type { GamificationSettings as GamificationSettingsType } from '@/lib/types';
+import { getLevelTitleKey } from '@/lib/utils/gamification';
 import { GamificationToggleRow } from './GamificationToggleRow';
 import {
   Dialog,
@@ -24,7 +25,7 @@ type GamificationSettingsProps = {
 };
 
 const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
-  const { profile, settings, updateSettings, getLevelTitle, getStreakEmoji, resetProgress } =
+  const { profile, settings, updateSettings, getStreakEmoji, resetProgress } =
     useGamificationStore();
   const [showResetDialog, setShowResetDialog] = useState(false);
 
@@ -67,7 +68,9 @@ const GamificationSettings = memo(({ t }: GamificationSettingsProps) => {
                   <Star className="h-4 w-4" aria-hidden="true" />
                   <div>
                     <p className="text-mq-sm text-mq-content-secondary">{t('commitment')}</p>
-                    <p className="font-semibold text-mq-content">{getLevelTitle()}</p>
+                    <p className="font-semibold text-mq-content">
+                      {t(getLevelTitleKey(profile?.level ?? 1))}
+                    </p>
                     <p className="text-xs text-mq-content-tertiary">
                       {t('level')} {profile?.level ?? 1}
                     </p>

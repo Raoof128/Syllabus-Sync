@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useGamificationStore, useXPProgress, useStreak } from '@/lib/store/gamificationStore';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { getLevelTitleKey } from '@/lib/utils/gamification';
 import { LevelBadge } from './LevelBadge';
 import { XPProgressBar } from './XPProgressBar';
 
@@ -113,10 +114,10 @@ export function GamificationStats({
   className,
 }: GamificationStatsProps) {
   const { t } = useTypedTranslation();
-  const { loadProfile, hasLoaded, isLoading, isDemo, getLevelTitle } = useGamificationStore();
+  const { loadProfile, hasLoaded, isLoading, isDemo } = useGamificationStore();
   const { currentXP, level, xpToNext, progress } = useXPProgress();
   const { days, longest: longestStreak } = useStreak();
-  const levelTitle = getLevelTitle();
+  const levelTitle = t(getLevelTitleKey(level));
 
   // Load profile on mount
   useEffect(() => {

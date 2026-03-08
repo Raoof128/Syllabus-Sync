@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { getLevelTitleKey } from '@/lib/utils/gamification';
 
 interface LevelBadgeProps {
   /** Size variant */
@@ -20,7 +21,7 @@ interface LevelBadgeProps {
  */
 export function LevelBadge({ size = 'md', showTitle = false, className }: LevelBadgeProps) {
   const { t } = useTypedTranslation();
-  const { profile, loadProfile, hasLoaded, isLoading, getLevelTitle } = useGamificationStore();
+  const { profile, loadProfile, hasLoaded, isLoading } = useGamificationStore();
 
   useEffect(() => {
     if (!hasLoaded) {
@@ -29,7 +30,7 @@ export function LevelBadge({ size = 'md', showTitle = false, className }: LevelB
   }, [hasLoaded, loadProfile]);
 
   const level = profile?.level ?? 1;
-  const title = getLevelTitle();
+  const title = t(getLevelTitleKey(level));
 
   const sizeConfig = {
     sm: {
