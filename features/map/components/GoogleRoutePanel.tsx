@@ -144,10 +144,10 @@ export default function GoogleRoutePanel({
                 onClick={() => onTravelModeChange(mode)}
                 aria-label={`Travel mode: ${label}`}
                 aria-pressed={travelMode === mode}
-                className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2 text-xs transition ${
+                className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2 text-xs transition-colors ${
                   travelMode === mode
-                    ? 'bg-foreground text-background'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    ? 'bg-[#d2e3fc] text-[#1a73e8] dark:bg-[#1a3a5c] dark:text-[#8ab4f8] font-semibold'
+                    : 'bg-muted/60 text-muted-foreground hover:bg-muted'
                 }`}
               >
                 <Icon size={16} />

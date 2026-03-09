@@ -681,17 +681,8 @@ export default function MapClient() {
               <div className="absolute inset-0 z-10">
                 <TranslatedMapErrorBoundary>
                   <GoogleMapController
-                    buildings={buildings}
                     selectedBuilding={selectedBuilding}
                     externalDestination={externalDestination}
-                    onSelectBuilding={(id) => {
-                      const params = new URLSearchParams(searchParams.toString());
-                      params.set('building', id);
-                      params.set('view', 'google');
-                      const newUrl = `${window.location.pathname}?${params.toString()}`;
-                      window.history.replaceState({}, '', newUrl);
-                      window.dispatchEvent(new PopStateEvent('popstate'));
-                    }}
                     onDismissRoute={() => {
                       // Clear building selection from URL
                       const params = new URLSearchParams(searchParams.toString());

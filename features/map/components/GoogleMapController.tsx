@@ -46,18 +46,14 @@ const GPS_MIN_DELTA = 0.00005;
 const TRAVEL_MODE_KEY = 'google-map-travel-mode';
 
 interface Props {
-  buildings: Building[];
   selectedBuilding?: Building;
   externalDestination: ExternalDestination | null;
-  onSelectBuilding?: (buildingId: string) => void;
   onDismissRoute?: () => void;
 }
 
 export default function GoogleMapController({
-  buildings,
   selectedBuilding,
   externalDestination,
-  onSelectBuilding,
   onDismissRoute,
 }: Props) {
   const [userLocation, setUserLocation] = useState<MapLatLng | null>(null);
@@ -225,13 +221,11 @@ export default function GoogleMapController({
   return (
     <div className="relative h-full w-full">
       <GoogleMapCanvas
-        buildings={buildings}
         selectedBuilding={selectedBuilding}
         externalDestination={externalDestination}
         userLocation={userLocation}
         route={route}
         isNavigating={isNavigating}
-        onSelectBuilding={onSelectBuilding}
       />
 
       {destination && (

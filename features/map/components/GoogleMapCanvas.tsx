@@ -23,40 +23,6 @@ function clearMarker(m: AnyMarker | null): void {
   }
 }
 
-function createBuildingPin(label: string, selected: boolean, dimmed: boolean): HTMLDivElement {
-  const el = document.createElement('div');
-  Object.assign(el.style, {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: selected ? '54px' : '42px',
-    height: selected ? '40px' : '32px',
-    padding: '0 10px',
-    borderRadius: '999px',
-    border: selected ? '2px solid #b51f2a' : '1px solid rgba(42, 45, 52, 0.16)',
-    background: selected ? '#d24140' : 'rgba(255, 255, 255, 0.94)',
-    color: selected ? '#ffffff' : '#1e293b',
-    fontSize: '12px',
-    fontWeight: '700',
-    boxShadow: '0 12px 28px rgba(15, 23, 42, 0.16)',
-    cursor: dimmed ? 'default' : 'pointer',
-    opacity: dimmed ? '0.3' : '1',
-    pointerEvents: dimmed ? 'none' : 'auto',
-    transition: 'transform 0.15s ease, box-shadow 0.15s ease, opacity 0.3s ease',
-  });
-  el.textContent = label;
-  // Hover effect
-  el.addEventListener('mouseenter', () => {
-    el.style.transform = 'scale(1.12)';
-    el.style.boxShadow = '0 16px 32px rgba(15, 23, 42, 0.24)';
-  });
-  el.addEventListener('mouseleave', () => {
-    el.style.transform = 'scale(1)';
-    el.style.boxShadow = '0 12px 28px rgba(15, 23, 42, 0.16)';
-  });
-  return el;
-}
-
 /** Haversine distance in metres */
 function haversineMetres(a: MapLatLng, b: MapLatLng): number {
   const R = 6_371_000;
@@ -84,27 +50,22 @@ function createRouteDot(color: string): HTMLDivElement {
 }
 
 interface Props {
-  buildings: Building[];
   selectedBuilding?: Building;
   externalDestination: ExternalDestination | null;
   userLocation: MapLatLng | null;
   route: GoogleComputedRoute | null;
   isNavigating: boolean;
-  onSelectBuilding?: (buildingId: string) => void;
 }
 
 export default function GoogleMapCanvas({
-  buildings,
   selectedBuilding,
   externalDestination,
   userLocation,
   route,
   isNavigating,
-  onSelectBuilding,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const buildingMarkersRef = useRef<Map<string, AnyMarker>>(new Map());
   const userMarkerRef = useRef<AnyMarker | null>(null);
   const userAccuracyCircleRef = useRef<google.maps.Circle | null>(null);
   const destMarkerRef = useRef<AnyMarker | null>(null);
@@ -112,7 +73,6 @@ export default function GoogleMapCanvas({
   const outlinePolylineRef = useRef<google.maps.Polyline | null>(null);
   const walkedPolylineRef = useRef<google.maps.Polyline | null>(null);
   const originDotRef = useRef<AnyMarker | null>(null);
-  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const lastAnimatedPosRef = useRef<MapLatLng | null>(null);
@@ -137,7 +97,6 @@ export default function GoogleMapCanvas({
           gestureHandling: 'greedy',
           clickableIcons: true,
         });
-        infoWindowRef.current = new google.maps.InfoWindow();
         setMapReady(true);
       })
       .catch((e: Error) => {
@@ -148,115 +107,46 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
-  // Building markers — with click interaction
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    buildingMarkersRef.current.forEach((m) => clearMarker(m));
-    buildingMarkersRef.current.clear();
-
-    buildings.forEach((b) => {
-      const pos = getBuildingGps(b);
-      const selected = selectedBuilding?.id === b.id;
-      const dimmed = isNavigating && !selected;
-      const title = `${b.id} ${b.name}`.trim();
-
-      let marker: AnyMarker;
-      try {
-        marker = new google.maps.marker.AdvancedMarkerElement({
-          position: pos,
-          title,
-          content: createBuildingPin(b.id, selected, dimmed),
-        });
-      } catch {
-        marker = new google.maps.Marker({
-          position: pos,
-          title,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: selected ? 10 : 7,
-            fillColor: selected ? '#d24140' : '#1d4ed8',
-            fillOpacity: 1,
-            strokeColor: '#fff',
-            strokeWeight: 2,
-          },
-        });
-      }
-
-      // Click handler — select this building
-      if (onSelectBuilding) {
-        if (marker instanceof google.maps.Marker) {
-          marker.addListener('click', () => onSelectBuilding(b.id));
-        } else {
-          marker.addEventListener('gmp-click', () => onSelectBuilding(b.id));
-        }
-      }
-
-      // Show info window on hover / click
-      const showInfo = () => {
-        const iw = infoWindowRef.current;
-        if (!iw || !map) return;
-        const dist = userLocation ? haversineMetres(userLocation, pos) : null;
-        const distStr =
-          dist !== null
-            ? dist >= 1000
-              ? `${(dist / 1000).toFixed(1)} km`
-              : `${Math.round(dist)} m`
-            : '';
-        iw.setContent(
-          `<div style="font-family:system-ui;padding:2px 0"><strong>${b.id}</strong> ${b.name}${distStr ? `<br/><span style="color:#6b7280;font-size:12px">${distStr} away</span>` : ''}</div>`,
-        );
-        if (marker instanceof google.maps.Marker) {
-          iw.open(map, marker);
-        } else {
-          iw.open({ map, anchor: marker });
-        }
-      };
-
-      if (marker instanceof google.maps.Marker) {
-        marker.addListener('click', showInfo);
-        marker.setMap(map);
-      } else {
-        marker.addEventListener('gmp-click', showInfo);
-        marker.map = map;
-      }
-      buildingMarkersRef.current.set(b.id, marker);
-    });
-  }, [buildings, selectedBuilding, mapReady, onSelectBuilding, userLocation, isNavigating]);
-
-  // Pan to selected building
-  useEffect(() => {
-    if (!mapRef.current || !selectedBuilding) return;
-    mapRef.current.panTo(getBuildingGps(selectedBuilding));
-    mapRef.current.setZoom(18);
-  }, [selectedBuilding, mapReady]);
-
-  // External destination marker
+  // Destination marker — single pin for selected building or external destination
+  // (No building markers are rendered; the map stays clean like native Google Maps)
   useEffect(() => {
     if (destMarkerRef.current) {
       clearMarker(destMarkerRef.current);
       destMarkerRef.current = null;
     }
     const map = mapRef.current;
-    if (!map || !externalDestination) return;
+    if (!map) return;
 
-    const pos = { lat: externalDestination.lat, lng: externalDestination.lng };
+    // Determine destination: external place or selected building
+    let pos: { lat: number; lng: number } | null = null;
+    let title = '';
+
+    if (externalDestination) {
+      pos = { lat: externalDestination.lat, lng: externalDestination.lng };
+      title = externalDestination.label;
+    } else if (selectedBuilding) {
+      const gps = getBuildingGps(selectedBuilding);
+      pos = { lat: gps.lat, lng: gps.lng };
+      title = `${selectedBuilding.id} ${selectedBuilding.name}`.trim();
+    }
+
+    if (!pos) return;
+
     let m: AnyMarker;
     try {
       const pin = new google.maps.marker.PinElement({
-        background: '#d24140',
-        borderColor: '#b51f2a',
+        background: '#ea4335',
+        borderColor: '#c5221f',
         glyphColor: '#ffffff',
-        scale: 1.4,
+        scale: 1.3,
       });
       m = new google.maps.marker.AdvancedMarkerElement({
         position: pos,
-        title: externalDestination.label,
+        title,
         content: pin.element,
       });
     } catch {
-      m = new google.maps.Marker({ position: pos, title: externalDestination.label });
+      m = new google.maps.Marker({ position: pos, title });
     }
 
     if (m instanceof google.maps.Marker) {
@@ -267,7 +157,7 @@ export default function GoogleMapCanvas({
     destMarkerRef.current = m;
     map.panTo(pos);
     map.setZoom(17);
-  }, [externalDestination, mapReady]);
+  }, [externalDestination, selectedBuilding, mapReady]);
 
   // Smooth user dot animation helper
   const animateUserDot = useCallback((from: MapLatLng, to: MapLatLng, duration: number) => {
@@ -496,13 +386,11 @@ export default function GoogleMapCanvas({
       const bounds = new google.maps.LatLngBounds();
       path.forEach((p) => bounds.extend(p));
       if (userLocation) bounds.extend(userLocation);
-      // Account for Places panel on desktop (left ~340px)
-      const isDesktop = window.innerWidth >= 640;
       map.fitBounds(bounds, {
-        top: 60,
+        top: 80,
         right: 40,
         bottom: 280,
-        left: isDesktop ? 340 : 20,
+        left: 40,
       });
     }
   }, [route, isNavigating, userLocation, mapReady]);
