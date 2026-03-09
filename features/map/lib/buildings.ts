@@ -84,7 +84,7 @@ export const MAP_CONFIG = {
 // The GCP anchors in geospatialCalibration.ts carry a +110 px X offset that
 // building.position values do not.  Apply this when converting positions to
 // CRS.Simple so markers land on the correct spots on the raster.
-export const BUILDING_PIXEL_OFFSET_X = 110;
+export const BUILDING_PIXEL_OFFSET_X = 80;
 
 // =============================================================================
 // CRS.Simple Coordinate Conversion Functions

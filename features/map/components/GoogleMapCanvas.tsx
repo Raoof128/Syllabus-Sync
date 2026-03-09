@@ -402,6 +402,14 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
+  // Center map on user location
+  const handleMyLocation = useCallback(() => {
+    const map = mapRef.current;
+    if (!map || !userLocation) return;
+    map.panTo({ lat: userLocation.lat, lng: userLocation.lng });
+    map.setZoom(17);
+  }, [userLocation]);
+
   if (error)
     return (
       <div className="flex h-full items-center justify-center bg-muted/50 text-sm text-destructive p-4 text-center">
@@ -412,6 +420,35 @@ export default function GoogleMapCanvas({
   return (
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
+
+      {/* My Location button — matches Google Maps native crosshair */}
+      {userLocation && (
+        <button
+          onClick={handleMyLocation}
+          className="absolute bottom-28 right-2.5 z-[500] flex h-10 w-10 items-center justify-center rounded-md bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-colors hover:bg-gray-100 active:bg-gray-200 dark:bg-[#3c4043] dark:hover:bg-[#4a4e51] dark:active:bg-[#5a5e61]"
+          aria-label="My location"
+          title="My location"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-5 w-5 text-[#666] dark:text-[#e8eaed]"
+          >
+            {/* Crosshair icon matching Google Maps */}
+            <circle cx={12} cy={12} r={4} fill="currentColor" fillOpacity={0.15} />
+            <circle cx={12} cy={12} r={2} fill="#4285F4" stroke="none" />
+            <line x1={12} y1={2} x2={12} y2={6} />
+            <line x1={12} y1={18} x2={12} y2={22} />
+            <line x1={2} y1={12} x2={6} y2={12} />
+            <line x1={18} y1={12} x2={22} y2={12} />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
