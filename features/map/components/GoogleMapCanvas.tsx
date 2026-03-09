@@ -8,7 +8,9 @@ import { loadGoogleMaps } from '@/lib/maps/google/loader';
 import { decodePolyline } from '@/lib/maps/google/decodePolyline';
 import type { GoogleComputedRoute, MapLatLng, ExternalDestination } from '@/lib/maps/google/types';
 
-const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID;
+// DEMO_MAP_ID is Google's built-in demo Map ID that enables Advanced Markers
+// without requiring a custom Map ID from the Cloud Console.
+const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || 'DEMO_MAP_ID';
 
 type AnyMarker = google.maps.marker.AdvancedMarkerElement | google.maps.Marker;
 
@@ -75,7 +77,7 @@ export default function GoogleMapCanvas({
         mapRef.current = new google.maps.Map(containerRef.current, {
           center: CAMPUS_CENTRE_GPS,
           zoom: 16,
-          mapId: MAP_ID || undefined,
+          mapId: MAP_ID,
           mapTypeControl: true,
           mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
           streetViewControl: true,
