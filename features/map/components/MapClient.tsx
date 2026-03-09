@@ -692,6 +692,17 @@ export default function MapClient() {
                       window.history.replaceState({}, '', newUrl);
                       window.dispatchEvent(new PopStateEvent('popstate'));
                     }}
+                    onDismissRoute={() => {
+                      // Clear building selection from URL
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.delete('building');
+                      params.set('view', 'google');
+                      const newUrl = `${window.location.pathname}?${params.toString()}`;
+                      window.history.replaceState({}, '', newUrl);
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                      // Clear external destination
+                      setExternalDestination(null);
+                    }}
                   />
                 </TranslatedMapErrorBoundary>
               </div>

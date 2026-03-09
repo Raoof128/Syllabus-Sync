@@ -50,6 +50,7 @@ interface Props {
   selectedBuilding?: Building;
   externalDestination: ExternalDestination | null;
   onSelectBuilding?: (buildingId: string) => void;
+  onDismissRoute?: () => void;
 }
 
 export default function GoogleMapController({
@@ -57,6 +58,7 @@ export default function GoogleMapController({
   selectedBuilding,
   externalDestination,
   onSelectBuilding,
+  onDismissRoute,
 }: Props) {
   const [userLocation, setUserLocation] = useState<MapLatLng | null>(null);
   const [route, setRoute] = useState<GoogleComputedRoute | null>(null);
@@ -243,6 +245,7 @@ export default function GoogleMapController({
           userLocation={userLocation}
           destination={destination}
           hasArrived={hasArrived}
+          originLabel={userLocation ? 'Your location' : undefined}
           onTravelModeChange={handleTravelModeChange}
           onStartNavigation={() => {
             setHasArrived(false);
@@ -253,6 +256,13 @@ export default function GoogleMapController({
             toastUtils.info('Navigation reset');
           }}
           onDismissArrival={() => setHasArrived(false)}
+          onDismissRoute={() => {
+            setRoute(null);
+            setIsNavigating(false);
+            setHasArrived(false);
+            lastKeyRef.current = '';
+            onDismissRoute?.();
+          }}
         />
       )}
     </div>

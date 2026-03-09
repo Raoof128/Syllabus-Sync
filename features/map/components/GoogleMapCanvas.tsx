@@ -23,7 +23,7 @@ function clearMarker(m: AnyMarker | null): void {
   }
 }
 
-function createBuildingPin(label: string, selected: boolean): HTMLDivElement {
+function createBuildingPin(label: string, selected: boolean, dimmed: boolean): HTMLDivElement {
   const el = document.createElement('div');
   Object.assign(el.style, {
     display: 'flex',
@@ -39,8 +39,10 @@ function createBuildingPin(label: string, selected: boolean): HTMLDivElement {
     fontSize: '12px',
     fontWeight: '700',
     boxShadow: '0 12px 28px rgba(15, 23, 42, 0.16)',
-    cursor: 'pointer',
-    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+    cursor: dimmed ? 'default' : 'pointer',
+    opacity: dimmed ? '0.3' : '1',
+    pointerEvents: dimmed ? 'none' : 'auto',
+    transition: 'transform 0.15s ease, box-shadow 0.15s ease, opacity 0.3s ease',
   });
   el.textContent = label;
   // Hover effect
@@ -66,6 +68,19 @@ function haversineMetres(a: MapLatLng, b: MapLatLng): number {
     sinLat * sinLat +
     Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * sinLng * sinLng;
   return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+}
+
+function createRouteDot(color: string): HTMLDivElement {
+  const el = document.createElement('div');
+  Object.assign(el.style, {
+    width: '14px',
+    height: '14px',
+    borderRadius: '50%',
+    background: color,
+    border: '3px solid #fff',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+  });
+  return el;
 }
 
 interface Props {
@@ -94,7 +109,9 @@ export default function GoogleMapCanvas({
   const userAccuracyCircleRef = useRef<google.maps.Circle | null>(null);
   const destMarkerRef = useRef<AnyMarker | null>(null);
   const polylineRef = useRef<google.maps.Polyline | null>(null);
+  const outlinePolylineRef = useRef<google.maps.Polyline | null>(null);
   const walkedPolylineRef = useRef<google.maps.Polyline | null>(null);
+  const originDotRef = useRef<AnyMarker | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
@@ -114,10 +131,11 @@ export default function GoogleMapCanvas({
           mapTypeControl: true,
           mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
           streetViewControl: true,
-          fullscreenControl: false,
+          fullscreenControl: true,
           zoomControl: true,
+          scaleControl: true,
           gestureHandling: 'greedy',
-          clickableIcons: false,
+          clickableIcons: true,
         });
         infoWindowRef.current = new google.maps.InfoWindow();
         setMapReady(true);
@@ -141,6 +159,7 @@ export default function GoogleMapCanvas({
     buildings.forEach((b) => {
       const pos = getBuildingGps(b);
       const selected = selectedBuilding?.id === b.id;
+      const dimmed = isNavigating && !selected;
       const title = `${b.id} ${b.name}`.trim();
 
       let marker: AnyMarker;
@@ -148,7 +167,7 @@ export default function GoogleMapCanvas({
         marker = new google.maps.marker.AdvancedMarkerElement({
           position: pos,
           title,
-          content: createBuildingPin(b.id, selected),
+          content: createBuildingPin(b.id, selected, dimmed),
         });
       } catch {
         marker = new google.maps.Marker({
@@ -204,7 +223,7 @@ export default function GoogleMapCanvas({
       }
       buildingMarkersRef.current.set(b.id, marker);
     });
-  }, [buildings, selectedBuilding, mapReady, onSelectBuilding, userLocation]);
+  }, [buildings, selectedBuilding, mapReady, onSelectBuilding, userLocation, isNavigating]);
 
   // Pan to selected building
   useEffect(() => {
@@ -383,15 +402,23 @@ export default function GoogleMapCanvas({
     mapRef.current.panTo({ lat: userLocation.lat, lng: userLocation.lng });
   }, [isNavigating, userLocation, mapReady]);
 
-  // Route polyline — shows walked portion in different color
+  // Route polyline — shows walked portion in different color, two-layer outline effect
   useEffect(() => {
     if (polylineRef.current) {
       polylineRef.current.setMap(null);
       polylineRef.current = null;
     }
+    if (outlinePolylineRef.current) {
+      outlinePolylineRef.current.setMap(null);
+      outlinePolylineRef.current = null;
+    }
     if (walkedPolylineRef.current) {
       walkedPolylineRef.current.setMap(null);
       walkedPolylineRef.current = null;
+    }
+    if (originDotRef.current) {
+      clearMarker(originDotRef.current);
+      originDotRef.current = null;
     }
     const map = mapRef.current;
     if (!map || !route) return;
@@ -418,28 +445,65 @@ export default function GoogleMapCanvas({
         map,
         strokeColor: '#94a3b8',
         strokeOpacity: 0.5,
-        strokeWeight: 4,
+        strokeWeight: 5,
         geodesic: true,
+        zIndex: 1,
       });
     }
 
-    // Remaining route
+    // Remaining route — two-layer polyline for Google Maps outline effect
     const remainingPath = isNavigating && splitIdx > 0 ? path.slice(splitIdx) : path;
+
+    // Outer outline layer (darker blue, wider)
+    outlinePolylineRef.current = new google.maps.Polyline({
+      path: remainingPath,
+      map,
+      strokeColor: '#1a56db',
+      strokeOpacity: 1.0,
+      strokeWeight: 8,
+      geodesic: true,
+      zIndex: 2,
+    });
+
+    // Inner core layer (Google Maps blue)
     polylineRef.current = new google.maps.Polyline({
       path: remainingPath,
       map,
-      strokeColor: '#3b82f6',
-      strokeOpacity: 0.9,
-      strokeWeight: 5,
+      strokeColor: '#4285F4',
+      strokeOpacity: 1.0,
+      strokeWeight: 6,
       geodesic: true,
+      zIndex: 3,
     });
+
+    // Origin dot marker (green, like Google Maps)
+    if (path.length > 0 && !isNavigating) {
+      try {
+        originDotRef.current = new google.maps.marker.AdvancedMarkerElement({
+          position: path[0],
+          title: 'Start',
+          content: createRouteDot('#34a853'),
+          zIndex: 100,
+        });
+        (originDotRef.current as google.maps.marker.AdvancedMarkerElement).map = map;
+      } catch {
+        // Fallback — skip origin dot if AdvancedMarkers unavailable
+      }
+    }
 
     // Fit bounds only when route first appears (not during navigation — user is being followed)
     if (!isNavigating && path.length) {
       const bounds = new google.maps.LatLngBounds();
       path.forEach((p) => bounds.extend(p));
       if (userLocation) bounds.extend(userLocation);
-      map.fitBounds(bounds, { top: 60, right: 20, bottom: 220, left: 20 });
+      // Account for Places panel on desktop (left ~340px)
+      const isDesktop = window.innerWidth >= 640;
+      map.fitBounds(bounds, {
+        top: 60,
+        right: 40,
+        bottom: 280,
+        left: isDesktop ? 340 : 20,
+      });
     }
   }, [route, isNavigating, userLocation, mapReady]);
 
