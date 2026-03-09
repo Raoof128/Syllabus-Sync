@@ -64,7 +64,6 @@ export default function GoogleMapCanvas({
   const destMarkerRef = useRef<AnyMarker | null>(null);
   const polylineRef = useRef<google.maps.Polyline | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [limitedMode, setLimitedMode] = useState(false);
   const [mapReady, setMapReady] = useState(false);
 
   // Initialise map once
@@ -85,7 +84,6 @@ export default function GoogleMapCanvas({
           gestureHandling: 'greedy',
           clickableIcons: false,
         });
-        if (!MAP_ID) setLimitedMode(true);
         setMapReady(true);
       })
       .catch((e: Error) => {
@@ -265,11 +263,6 @@ export default function GoogleMapCanvas({
   return (
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
-      {limitedMode && (
-        <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-yellow-300">
-          Limited mode — add NEXT_PUBLIC_GOOGLE_MAP_ID for vector tiles
-        </div>
-      )}
     </div>
   );
 }
