@@ -3,6 +3,8 @@ export type GoogleTravelMode = 'WALK' | 'DRIVE' | 'BICYCLE' | 'TRANSIT';
 export interface MapLatLng {
   lat: number;
   lng: number;
+  /** GPS accuracy in meters (from GeolocationCoordinates.accuracy) */
+  accuracy?: number;
 }
 
 export interface GoogleRouteStep {

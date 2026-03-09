@@ -657,6 +657,14 @@ export default function MapClient() {
                     buildings={buildings}
                     selectedBuilding={selectedBuilding}
                     externalDestination={externalDestination}
+                    onSelectBuilding={(id) => {
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.set('building', id);
+                      params.set('view', 'google');
+                      const newUrl = `${window.location.pathname}?${params.toString()}`;
+                      window.history.replaceState({}, '', newUrl);
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }}
                   />
                 </TranslatedMapErrorBoundary>
               </div>
