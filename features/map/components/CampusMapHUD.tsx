@@ -143,35 +143,35 @@ export default function CampusMapHUD({
         </div>
       )}
 
-      {/* Top-right actions - Floating Toolbar */}
-      <div
-        className={cn('absolute right-3 pointer-events-auto', isGoogleMode ? 'top-20' : 'top-3')}
-      >
-        <LayeredCard interactive={false} className="flex items-center gap-1 p-1.5 rounded-full">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
-            onClick={onCopyShare}
-            aria-label={t('share')}
-          >
-            <Share2 className="h-4 w-4" />
-            <span className="hidden sm:inline font-medium">{t('share')}</span>
-          </Button>
-          <div className="w-px h-4 bg-mq-border/50" />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
-            onClick={onExport}
-            disabled={!onExport}
-            aria-label={t('export')}
-          >
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline font-medium">{t('export')}</span>
-          </Button>
-        </LayeredCard>
-      </div>
+      {/* Top-right actions - Floating Toolbar (campus mode only, Google mode uses header) */}
+      {!isGoogleMode && (
+        <div className="absolute right-3 top-3 pointer-events-auto">
+          <LayeredCard interactive={false} className="flex items-center gap-1 p-1.5 rounded-full">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
+              onClick={onCopyShare}
+              aria-label={t('share')}
+            >
+              <Share2 className="h-4 w-4" />
+              <span className="hidden sm:inline font-medium">{t('share')}</span>
+            </Button>
+            <div className="w-px h-4 bg-mq-border/50" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
+              onClick={onExport}
+              disabled={!onExport}
+              aria-label={t('export')}
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline font-medium">{t('export')}</span>
+            </Button>
+          </LayeredCard>
+        </div>
+      )}
 
       {/* Left sidebar - hidden in focused mode for cleaner view */}
       {!isFocusedMode && (

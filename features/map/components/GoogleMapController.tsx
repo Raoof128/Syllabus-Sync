@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import type { Building } from '@/features/map/lib/buildings';
 import { getBuildingGps } from '@/features/map/lib/buildings';
+import { toastUtils } from '@/lib/utils/toast';
 import type {
   GoogleComputedRoute,
   GoogleTravelMode,
@@ -247,7 +248,10 @@ export default function GoogleMapController({
             setHasArrived(false);
             setIsNavigating(true);
           }}
-          onStopNavigation={() => setIsNavigating(false)}
+          onStopNavigation={() => {
+            setIsNavigating(false);
+            toastUtils.info('Navigation reset');
+          }}
           onDismissArrival={() => setHasArrived(false)}
         />
       )}

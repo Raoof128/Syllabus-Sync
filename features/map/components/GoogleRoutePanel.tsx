@@ -148,6 +148,14 @@ export default function GoogleRoutePanel({
         </div>
       )}
 
+      {/* Waiting for location */}
+      {!userLocation && !route && !isLoadingRoute && !routeError && (
+        <div className="mb-2 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <Loader2 size={14} className="animate-spin" />
+          Waiting for your location...
+        </div>
+      )}
+
       {/* Loading */}
       {isLoadingRoute && (
         <div className="mb-2 flex items-center justify-center gap-2 text-xs text-muted-foreground">

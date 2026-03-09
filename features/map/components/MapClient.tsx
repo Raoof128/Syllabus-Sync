@@ -14,6 +14,7 @@ import {
   Car,
   Droplets,
   BadgeCheck,
+  Download,
   Link as LinkIcon,
 } from 'lucide-react';
 import { TranslatedMapErrorBoundary } from './MapErrorBoundary';
@@ -598,9 +599,35 @@ export default function MapClient() {
             <div className="w-full sm:w-auto">
               <MapViewToggle activeView={mapView} onViewChange={handleMapViewChange} />
             </div>
-            <p className="text-xs text-mq-content-tertiary hidden md:block">
-              {t('mapPanZoomHint')}
-            </p>
+            <div className="flex items-center gap-3">
+              <p className="text-xs text-mq-content-tertiary hidden md:block">
+                {t('mapPanZoomHint')}
+              </p>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 h-8 text-mq-content-secondary hover:text-mq-content"
+                  onClick={copyShareableURL}
+                  aria-label={t('share')}
+                >
+                  <LinkIcon className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline text-xs">{t('share')}</span>
+                </Button>
+                {mapView === 'campus' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 h-8 text-mq-content-secondary hover:text-mq-content"
+                    onClick={handleExport}
+                    aria-label={t('export')}
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline text-xs">{t('export')}</span>
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
 
           <div
