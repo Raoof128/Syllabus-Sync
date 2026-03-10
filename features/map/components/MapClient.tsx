@@ -61,6 +61,8 @@ const CampusMap = dynamic(() => import('./CampusMap'), {
 // Import LocationStatus type
 import type { LocationStatus, CampusMapRef } from './CampusMap';
 
+import DevPinPanel from './DevPinPanel';
+
 export default function MapClient() {
   const { t } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
@@ -103,6 +105,13 @@ export default function MapClient() {
   // Buildings sidebar state
   const [buildingSearch, setBuildingSearch] = useState('');
   const [externalDestination, setExternalDestination] = useState<ExternalDestination | null>(null);
+
+  // Dev Pin Editor state (dev-only — tree-shaken in production)
+  const [devPanelOpen, setDevPanelOpen] = useState(false);
+  const [devBuildingId, setDevBuildingId] = useState<string | null>(null);
+  const [devPendingPos, setDevPendingPos] = useState<[number, number] | null>(null);
+  const [devIsSaving, setDevIsSaving] = useState(false);
+  const [devSaved, setDevSaved] = useState(false);
   const hasAutoNavigatedRef = useRef(false);
 
   const handleCampusMapReady = useCallback(() => {
@@ -294,6 +303,40 @@ export default function MapClient() {
       toastUtils.error(t('error'), t('tryAgain'));
     }
   }, [t]);
+
+  // Dev Pin Editor callbacks (dev-only)
+  const handleDevPinMove = useCallback((buildingId: string, position: [number, number]) => {
+    setDevPendingPos(position);
+    setDevSaved(false);
+    void buildingId; // used via devBuildingId state
+  }, []);
+
+  const handleDevSave = useCallback(async () => {
+    if (!devBuildingId || !devPendingPos) return;
+    setDevIsSaving(true);
+    try {
+      const res = await fetch('/api/maps/dev-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ buildingId: devBuildingId, position: devPendingPos }),
+      });
+      const json = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        toastUtils.error(json.error ?? 'Save failed');
+        return;
+      }
+      setDevSaved(true);
+      toastUtils.success(
+        'buildings.ts updated',
+        `${devBuildingId} → [${devPendingPos.join(', ')}]`,
+      );
+      setTimeout(() => setDevSaved(false), 4000);
+    } catch {
+      toastUtils.error('Save failed', 'Check the dev server console.');
+    } finally {
+      setDevIsSaving(false);
+    }
+  }, [devBuildingId, devPendingPos]);
 
   // Buildings sidebar - filtered and searched with campus-first ranking
   const getTranslatedName = useCallback(
@@ -650,6 +693,8 @@ export default function MapClient() {
                         onLocationStatusChange={setLocationStatus}
                         onNavStateChange={setNavState}
                         onMapReady={handleCampusMapReady}
+                        devBuildingId={devBuildingId ?? undefined}
+                        onDevPinMove={handleDevPinMove}
                       />
                     </Suspense>
                   </TranslatedMapErrorBoundary>
@@ -675,6 +720,41 @@ export default function MapClient() {
                       {t('mapLoadSlow')}
                     </p>
                   </div>
+                )}
+
+                {/* Dev Pin Editor toggle + panel (dev builds only) */}
+                {process.env.NODE_ENV === 'development' && (
+                  <>
+                    {!devPanelOpen && (
+                      <button
+                        onClick={() => setDevPanelOpen(true)}
+                        className="absolute right-3 top-3 z-[2000] flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500 text-white shadow-lg transition-colors hover:bg-orange-600"
+                        title="Open Dev Pin Editor"
+                        aria-label="Open Dev Pin Editor"
+                      >
+                        🔧
+                      </button>
+                    )}
+                    {devPanelOpen && (
+                      <DevPinPanel
+                        devBuildingId={devBuildingId}
+                        devPendingPos={devPendingPos}
+                        isSaving={devIsSaving}
+                        saved={devSaved}
+                        onBuildingSelect={(id) => {
+                          setDevBuildingId(id);
+                          setDevPendingPos(null);
+                          setDevSaved(false);
+                        }}
+                        onSave={() => void handleDevSave()}
+                        onClose={() => {
+                          setDevPanelOpen(false);
+                          setDevBuildingId(null);
+                          setDevPendingPos(null);
+                        }}
+                      />
+                    )}
+                  </>
                 )}
               </>
             ) : (

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import { ChevronUp } from 'lucide-react';
 import type { Building } from '@/features/map/lib/buildings';
 import { getBuildingGps } from '@/features/map/lib/buildings';
 import { toastUtils } from '@/lib/utils/toast';
@@ -65,6 +66,7 @@ export default function GoogleMapController({
     return 'WALK';
   });
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [hasArrived, setHasArrived] = useState(false);
@@ -206,6 +208,7 @@ export default function GoogleMapController({
     if (dist <= ARRIVAL_THRESHOLD) {
       setHasArrived(true);
       setIsNavigating(false);
+      setIsPanelOpen(true);
     }
   }, [isNavigating, userLocation, destination, hasArrived]);
 
@@ -214,6 +217,7 @@ export default function GoogleMapController({
     setRoute(null);
     setIsNavigating(false);
     setHasArrived(false);
+    setIsPanelOpen(true);
     lastKeyRef.current = '';
     lastNavFetchPosRef.current = null;
   }, [selectedBuilding?.id, externalDestination?.placeId]);
@@ -226,9 +230,10 @@ export default function GoogleMapController({
         userLocation={userLocation}
         route={route}
         isNavigating={isNavigating}
+        panelVisible={!!destination && isPanelOpen}
       />
 
-      {destination && (
+      {destination && isPanelOpen && (
         <GoogleRoutePanel
           destinationName={destName}
           route={route}
@@ -244,9 +249,11 @@ export default function GoogleMapController({
           onStartNavigation={() => {
             setHasArrived(false);
             setIsNavigating(true);
+            setIsPanelOpen(false);
           }}
           onStopNavigation={() => {
             setIsNavigating(false);
+            setIsPanelOpen(true);
             toastUtils.info('Navigation reset');
           }}
           onDismissArrival={() => setHasArrived(false)}
@@ -258,6 +265,30 @@ export default function GoogleMapController({
             onDismissRoute?.();
           }}
         />
+      )}
+
+      {/* Compact navigation bar — shown when navigating with panel collapsed */}
+      {isNavigating && !isPanelOpen && (
+        <div className="absolute bottom-4 left-1/2 z-[1000] flex w-auto max-w-[calc(100%-2rem)] -translate-x-1/2 items-center gap-3 rounded-2xl border border-border bg-background/95 px-4 py-3 shadow-xl backdrop-blur">
+          <p className="min-w-0 flex-1 truncate text-sm font-semibold">{destName}</p>
+          <button
+            onClick={() => setIsPanelOpen(true)}
+            className="shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="Expand navigation panel"
+          >
+            <ChevronUp size={16} />
+          </button>
+          <button
+            onClick={() => {
+              setIsNavigating(false);
+              setIsPanelOpen(true);
+              toastUtils.info('Navigation reset');
+            }}
+            className="shrink-0 rounded-xl bg-destructive px-3 py-2 text-xs font-bold text-destructive-foreground"
+          >
+            Stop
+          </button>
+        </div>
       )}
     </div>
   );

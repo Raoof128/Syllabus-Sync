@@ -13,6 +13,9 @@ import {
   Building,
   BUILDING_CATEGORY_LABELS,
   getBuildingCrsCoords,
+  buildings,
+  MAP_CONFIG,
+  BUILDING_PIXEL_OFFSET_X,
 } from '@/features/map/lib/buildings';
 import { createMarkerIcon, createUserLocationIcon } from '@/features/map/lib/mapUtils';
 import { NavigationStateManager } from '@/features/map/lib/realtimeNavigation';
@@ -52,6 +55,11 @@ interface CampusMapProps {
   }) => void;
   /** Callback when map is fully ready (for smooth loading transitions) */
   onMapReady?: () => void;
+  // --- Dev-only props (tree-shaken in production) ---
+  /** Building id whose marker should be draggable (dev mode only) */
+  devBuildingId?: string;
+  /** Fires when the dev marker is dragged; receives new [x, y] pixel coords */
+  onDevPinMove?: (buildingId: string, position: [number, number]) => void;
 }
 
 const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
@@ -62,6 +70,8 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
       onLocationStatusChange,
       onNavStateChange: _onNavStateChange,
       onMapReady,
+      devBuildingId,
+      onDevPinMove,
     },
     ref,
   ) => {
@@ -425,6 +435,41 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                 zIndexOffset={900}
               />
             )}
+
+            {/* DEV: Draggable reposition marker */}
+            {process.env.NODE_ENV === 'development' &&
+              overlaysReady &&
+              devBuildingId &&
+              (() => {
+                const devBuilding = buildings.find((b) => b.id === devBuildingId);
+                if (!devBuilding || !leafletModule) return null;
+                // Orange pin to distinguish from regular markers
+                const devIcon = leafletModule.divIcon({
+                  className: '',
+                  html: '<div style="width:22px;height:22px;border-radius:50%;background:#f97316;border:3px solid #fff;box-shadow:0 0 0 2px #f97316,0 2px 8px rgba(0,0,0,0.4);cursor:grab"></div>',
+                  iconSize: [22, 22],
+                  iconAnchor: [11, 11],
+                });
+                return (
+                  <reactLeafletModule.Marker
+                    key={`dev-drag-${devBuilding.id}`}
+                    position={getBuildingLatLng(devBuilding)}
+                    icon={devIcon}
+                    draggable
+                    zIndexOffset={2000}
+                    eventHandlers={{
+                      dragend: (e) => {
+                        const { lat, lng } = (
+                          e.target as { getLatLng: () => { lat: number; lng: number } }
+                        ).getLatLng();
+                        const px = Math.round(lng - BUILDING_PIXEL_OFFSET_X);
+                        const py = Math.round(MAP_CONFIG.height - lat);
+                        onDevPinMove?.(devBuilding.id, [px, py]);
+                      },
+                    }}
+                  />
+                );
+              })()}
           </reactLeafletModule.MapContainer>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-mq-background-secondary">

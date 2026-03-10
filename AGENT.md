@@ -1,3 +1,17 @@
+Raouf: 2026-03-10 (Australia/Sydney)
+Scope: Dev Pin Editor — Drag-to-Reposition Campus Building Pins
+Summary: Dev-only drag-and-drop building pin editor on campus map. API: `POST /api/maps/dev-pin` (Node.js runtime, NODE_ENV guard, regex-patches buildings.ts on disk). UI: floating DevPinPanel with building dropdown, coord display, Δx/Δy diff, Save button. CampusMap: orange draggable divIcon marker when devBuildingId set; dragend converts CRS.Simple → pixel and fires onDevPinMove. MapClient: wrench toggle (🔧), dev state, save callback, all guarded by NODE_ENV === 'development'. Completely tree-shaken in production.
+Files Changed: `app/api/maps/dev-pin/route.ts` (NEW), `features/map/components/DevPinPanel.tsx` (NEW), `features/map/components/CampusMap.tsx`, `features/map/components/MapClient.tsx`
+Verification: `npx tsc --noEmit` ✅; lint ✅
+Follow-ups: Live preview before save; Reset button; entranceLocation GPS editing.
+
+Raouf: 2026-03-10 (Australia/Sydney)
+Scope: Google Maps UX — Auto-Close Route Panel on Navigate + Location Button Fix
+Summary: Route panel auto-closes on "Start" navigation — compact mini-bar (destination + Stop + expand chevron) shows during active navigation. Location button shifts above the panel (bottom-[28rem]) when panel is open, and z-index raised to z-[1100] to always stay on top. All state transitions (arrive, stop, destination change) correctly reset panel state.
+Files Changed: `features/map/components/GoogleMapController.tsx`, `features/map/components/GoogleMapCanvas.tsx`
+Verification: `npx tsc --noEmit` ✅; lint ✅
+Follow-ups: Mini-bar could show next step instruction. Panel height could be measured dynamically via ref.
+
 Raouf: 2026-03-09 (Australia/Sydney)
 Scope: Google Maps Accuracy & Dynamism Upgrade
 Summary: Enhanced the Google Maps stack across accuracy, interactivity, and real-time navigation. Canvas now renders GPS accuracy circle, animates user dot movement with cubic easing, supports building marker click-to-select with info windows (name + distance), follows user during navigation, and shows walked-portion polyline dimming. Controller now has tighter GPS tracking (5.5m threshold, 1500ms maximumAge), auto route recalculation during navigation (80m movement trigger + off-route heuristic), arrival detection (30m), and persists travel mode to localStorage. Route Panel now shows ETA, turn-by-turn instructions (expandable step list + next-instruction highlight during nav), arrival celebration screen, loading spinner, and accessibility labels on travel mode tabs. MapClient passes `onSelectBuilding` to Controller so building markers can set URL params. Types updated with optional `accuracy` field on `MapLatLng`.
