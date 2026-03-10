@@ -226,7 +226,7 @@ export const buildings: Building[] = [
   {
     id: '18WW',
     name: "18 Wally's Walk (Central Hub)",
-    position: [2282, 1881], // Calibrated near Service Connect / Central Hub footprint
+    position: [2201, 1882], // Calibrated near Service Connect / Central Hub footprint
     description:
       'Main student services building housing Service Connect, IT, HR, Financial Services, and administration offices.',
     tags: ['services', 'administration', 'study'],
@@ -261,7 +261,7 @@ export const buildings: Building[] = [
   {
     id: 'SEC',
     name: 'Security & Emergency',
-    position: [315, 2220], // Calibrated: north end of campus near Link Road
+    position: [232, 2213], // Calibrated: north end of campus near Link Road
     description: 'Campus security headquarters and emergency first aid services. Available 24/7.',
     tags: ['services', 'safety', 'emergency'],
     translationKey: 'building_SEC_name',
@@ -276,7 +276,7 @@ export const buildings: Building[] = [
   {
     id: '25BWW',
     name: "25B Wally's Walk (Arts Faculty)",
-    position: [1762, 2039], // Calibrated: GPS-derived + offset, near 25WW
+    position: [1687, 1913], // Calibrated: GPS-derived + offset, near 25WW
     description:
       'Faculty of Arts administration, Education, Social Sciences, Indigenous Studies, History, and the Gale History Museum.',
     tags: ['academic', 'arts', 'teaching'],
@@ -290,7 +290,7 @@ export const buildings: Building[] = [
   {
     id: '17WW',
     name: "17 Wally's Walk (Law & Media)",
-    position: [2511, 1916], // Calibrated: GPS-derived + offset, near 18WW
+    position: [2436, 1883], // Calibrated: GPS-derived + offset, near 18WW
     description: 'Macquarie Law School, Media & Communication, Michael Kirby Law Building.',
     tags: ['academic', 'law', 'media'],
     translationKey: 'building_17WW_name',
@@ -323,7 +323,7 @@ export const buildings: Building[] = [
   {
     id: '75TAL',
     name: '75 Talavera Road (Health Sciences)',
-    position: [4078, 1604], // Calibrated: GPS-derived + offset, far east
+    position: [4024, 1585], // Calibrated: GPS-derived + offset, far east
     description:
       'Faculty of Medicine, Health Sciences, Medical School, Australian Institute of Health Innovation, Chiropractic.',
     tags: ['academic', 'health', 'research'],
@@ -337,7 +337,7 @@ export const buildings: Building[] = [
   {
     id: '16UA',
     name: '16 University Avenue (Psychology)',
-    position: [1803, 2695], // Calibrated: GPS-derived + offset, south of 21WW
+    position: [1748, 2689], // Calibrated: GPS-derived + offset, south of 21WW
     description:
       'Psychology, Linguistics, Speech & Hearing Clinic, Reading Clinic, Centre for Emotional Health.',
     tags: ['academic', 'psychology', 'health'],
@@ -353,7 +353,7 @@ export const buildings: Building[] = [
   {
     id: '9WW',
     name: "9 Wally's Walk (Engineering)",
-    position: [3162, 1894], // Calibrated: near 12WW
+    position: [3098, 1906], // Calibrated: near 12WW
     description: 'School of Engineering, Australian Astronomical Optics.',
     tags: ['academic', 'engineering', 'labs'],
     translationKey: 'building_9WW_name',
@@ -366,7 +366,7 @@ export const buildings: Building[] = [
   {
     id: '4RPD',
     name: '4 Research Park Drive (Computing)',
-    position: [3685, 1985], // Calibrated: GPS-derived + offset, east of campus
+    position: [3653, 1975], // Calibrated: GPS-derived + offset, east of campus
     description: 'School of Computing, Esc Cafe.',
     tags: ['academic', 'technology', 'labs'],
     translationKey: 'building_4RPD_name',
@@ -379,7 +379,7 @@ export const buildings: Building[] = [
   {
     id: '12WW',
     name: "12 Wally's Walk (Maths & Physics)",
-    position: [2882, 1884], // Calibrated: GPS-derived + offset, near 12MW
+    position: [2790, 1882], // Calibrated: GPS-derived + offset, near 12MW
     description: 'School of Mathematical & Physical Sciences.',
     tags: ['academic', 'science', 'research'],
     translationKey: 'building_12WW_name',
@@ -394,7 +394,7 @@ export const buildings: Building[] = [
   {
     id: '6WW',
     name: "6 Wally's Walk (Natural Sciences)",
-    position: [3158, 1829], // Calibrated: GPS-derived + offset
+    position: [3060, 1830], // Calibrated: GPS-derived + offset
     description: 'School of Natural Sciences, Biological Sciences, Herbarium.',
     tags: ['academic', 'science', 'research'],
     translationKey: 'building_6WW_name',
@@ -408,7 +408,7 @@ export const buildings: Building[] = [
   {
     id: '4WW',
     name: "4 Wally's Walk (Proteome)",
-    position: [3482, 1854], // Calibrated: GPS-derived + offset
+    position: [3407, 1876], // Calibrated: GPS-derived + offset
     description: 'Australian Proteome Analysis Facility.',
     tags: ['academic', 'research', 'labs'],
     translationKey: 'building_4WW_name',
@@ -423,7 +423,7 @@ export const buildings: Building[] = [
   {
     id: 'LOTUS',
     name: 'Lotus Theatre',
-    position: [1677, 1994], // Calculated from GPS using calibrated bounds (2026-01-10)
+    position: [1559, 1961], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Major teaching and entertainment venue.',
     tags: ['venue', 'teaching', 'events'],
     translationKey: 'building_LOTUS_name',
@@ -436,7 +436,7 @@ export const buildings: Building[] = [
   {
     id: 'MQTH',
     name: 'Macquarie Theatre',
-    position: [2124, 1969], // Calibrated: GPS-derived + offset, same row as 21WW
+    position: [2023, 1961], // Calibrated: GPS-derived + offset, same row as 21WW
     description: 'Large lecture theatre and entertainment venue.',
     tags: ['venue', 'teaching', 'events'],
     translationKey: 'building_MQTH_name',
@@ -449,7 +449,7 @@ export const buildings: Building[] = [
   {
     id: 'PRICE',
     name: 'Price Theatre',
-    position: [1964, 2011], // Calibrated: GPS-derived + offset, between LOTUS and MQTH
+    position: [1872, 1956], // Calibrated: GPS-derived + offset, between LOTUS and MQTH
     description: 'Teaching theatre.',
     tags: ['venue', 'teaching'],
     translationKey: 'building_PRICE_name',
@@ -462,7 +462,7 @@ export const buildings: Building[] = [
   {
     id: 'LIGHT',
     name: 'Lighthouse Theatre',
-    position: [2002, 1157], // Calibrated: GPS-derived + offset, north of theatres
+    position: [1928, 1135], // Calibrated: GPS-derived + offset, north of theatres
     description: 'Performance venue.',
     tags: ['venue', 'performance', 'arts'],
     translationKey: 'building_LIGHT_name',
@@ -475,7 +475,7 @@ export const buildings: Building[] = [
   {
     id: 'AINS',
     name: 'Ainsworth Building',
-    position: [3779, 1885], // Calibrated: GPS-derived + offset, near hospital area
+    position: [3722, 1871], // Calibrated: GPS-derived + offset, near hospital area
     description: 'Teaching facility.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_AINS_name',
@@ -490,7 +490,7 @@ export const buildings: Building[] = [
   {
     id: 'HOSP',
     name: 'MQ University Hospital',
-    position: [3799, 1568], // Calculated from GPS using calibrated bounds (2026-01-10)
+    position: [3735, 1622], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Teaching hospital with specialist clinics, medical imaging, and pharmacy.',
     tags: ['health', 'medical', 'services'],
     translationKey: 'building_HOSP_name',
@@ -504,7 +504,7 @@ export const buildings: Building[] = [
   {
     id: 'CLINIC',
     name: 'GP & Physio Clinics',
-    position: [3776, 1471], // Calibrated: GPS-derived + offset, near hospital
+    position: [3646, 1472], // Calibrated: GPS-derived + offset, near hospital
     description: 'General practice and physiotherapy clinics, specialist consultations.',
     tags: ['health', 'medical', 'services'],
     translationKey: 'building_CLINIC_name',
@@ -518,7 +518,7 @@ export const buildings: Building[] = [
   {
     id: 'WOOL',
     name: 'Woolcock Institute',
-    position: [4279, 2129], // Calibrated: far east, south of hospital area
+    position: [4180, 2048], // Calibrated: far east, south of hospital area
     description: 'Woolcock Institute of Medical Research.',
     tags: ['health', 'research'],
     translationKey: 'building_WOOL_name',
@@ -533,7 +533,7 @@ export const buildings: Building[] = [
   {
     id: 'SPORT',
     name: 'Sport & Aquatic Centre',
-    position: [1671, 1162], // Calculated from GPS using calibrated bounds (2026-01-10)
+    position: [1568, 1210], // Calculated from GPS using calibrated bounds (2026-01-10)
     description:
       'Gym, swimming pool, sports facilities, Crunch Cafe, Sporting Hall of Fame Museum.',
     tags: ['sports', 'recreation', 'fitness'],
@@ -548,7 +548,7 @@ export const buildings: Building[] = [
   {
     id: 'FIELDS',
     name: 'Sports Fields & Tennis',
-    position: [2140, 1752], // Calibrated: south of Sport & Aquatic Centre
+    position: [1521, 159], // Calibrated: south of Sport & Aquatic Centre
     description: 'Outdoor sports fields and tennis centre.',
     tags: ['sports', 'recreation', 'outdoor'],
     translationKey: 'building_FIELDS_name',
@@ -563,7 +563,7 @@ export const buildings: Building[] = [
   {
     id: 'UBAR',
     name: 'UBar & Central Courtyard',
-    position: [2551, 1617], // Calculated from GPS -33.774, 151.11365
+    position: [2449, 1542], // Calculated from GPS -33.774, 151.11365
     description: 'Campus bar, social venue, graduation ceremonies area.',
     tags: ['food', 'social', 'events'],
     translationKey: 'building_UBAR_name',
@@ -576,7 +576,7 @@ export const buildings: Building[] = [
   {
     id: 'CULT',
     name: 'Cult Eatery',
-    position: [2462, 1803], // Calibrated: same as 25BWW (in Arts precinct)
+    position: [2424, 1799], // Calibrated: same as 25BWW (in Arts precinct)
     description: 'Campus eatery in Arts precinct.',
     tags: ['food', 'cafe'],
     translationKey: 'building_CULT_name',
@@ -589,7 +589,7 @@ export const buildings: Building[] = [
   {
     id: 'LACH',
     name: "Lachlan's Restaurant",
-    position: [3173, 735], // Calibrated: GPS-derived + offset, north-east area
+    position: [3123, 750], // Calibrated: GPS-derived + offset, north-east area
     description: 'Fine dining restaurant.',
     tags: ['food', 'restaurant'],
     translationKey: 'building_LACH_name',
@@ -604,7 +604,7 @@ export const buildings: Building[] = [
   {
     id: '8SCO',
     name: '8 Sir Christopher Ondaatje Ave',
-    position: [2823, 2260], // Calibrated: GPS-derived + offset, near 12MW
+    position: [2722, 2224], // Calibrated: GPS-derived + offset, near 12MW
     description:
       'Future Students, MQ College, MQ Academy, Prayer Room, IELTS/PTE Test Centre, Access & Widening Participation.',
     tags: ['services', 'student', 'administration'],
@@ -619,7 +619,7 @@ export const buildings: Building[] = [
   {
     id: '16WW',
     name: "16 Wally's Walk (Research)",
-    position: [2465, 1881], // Calibrated: GPS-derived + offset, near 18WW
+    position: [2378, 1884], // Calibrated: GPS-derived + offset, near 18WW
     description: 'Graduate Research Academy, Research Services, Commercialisation & Innovation.',
     tags: ['research', 'services'],
     translationKey: 'building_16WW_name',
@@ -632,7 +632,7 @@ export const buildings: Building[] = [
   {
     id: '12SW',
     name: '12 Second Way (Student Services)',
-    position: [2177, 2120], // Calibrated: GPS-derived + offset, near 14SW
+    position: [2142, 2115], // Calibrated: GPS-derived + offset, near 14SW
     description: 'Student Wellbeing, Student Engagement, Graduation Unit.',
     tags: ['services', 'student', 'wellbeing'],
     translationKey: 'building_12SW_name',
@@ -645,7 +645,7 @@ export const buildings: Building[] = [
   {
     id: '19ER',
     name: '19 Eastern Road (Chancellery)',
-    position: [2942, 1203], // Calibrated: GPS-derived + offset, north of central
+    position: [2969, 1290], // Calibrated: GPS-derived + offset, north of central
     description: 'Chancellery, Archives & Records, Art Gallery.',
     tags: ['administration', 'gallery', 'arts'],
     translationKey: 'building_19ER_name',
@@ -658,7 +658,7 @@ export const buildings: Building[] = [
   {
     id: 'OBS',
     name: 'Observatory',
-    position: [1755, 492], // Calculated from GPS using calibrated bounds (2026-01-10)
+    position: [1665, 480], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Astronomy observatory.',
     tags: ['research', 'science', 'astronomy'],
     translationKey: 'building_OBS_name',
@@ -671,7 +671,7 @@ export const buildings: Building[] = [
   {
     id: 'INCUB',
     name: 'MQ Incubator',
-    position: [1185, 2537], // Calibrated: GPS-derived + offset, south-west
+    position: [1112, 2535], // Calibrated: GPS-derived + offset, south-west
     description: 'Macquarie University Incubator for startups.',
     tags: ['services', 'business', 'innovation'],
     translationKey: 'building_INCUB_name',
@@ -684,7 +684,7 @@ export const buildings: Building[] = [
   {
     id: 'CHAP',
     name: 'Chaplaincy',
-    position: [975, 2580], // Calibrated: GPS-derived + offset, west of campus
+    position: [831, 2555], // Calibrated: GPS-derived + offset, west of campus
     description: 'Multi-faith chaplaincy services.',
     tags: ['services', 'spiritual'],
     translationKey: 'building_CHAP_name',
@@ -698,7 +698,7 @@ export const buildings: Building[] = [
   {
     id: 'WALU',
     name: 'Walanga Muru',
-    position: [1551, 1879], // Calibrated: GPS-derived + offset, near 29WW
+    position: [1474, 1925], // Calibrated: GPS-derived + offset, near 29WW
     description: 'Indigenous student support and cultural services.',
     tags: ['services', 'indigenous', 'culture'],
     translationKey: 'building_WALU_name',
@@ -713,7 +713,7 @@ export const buildings: Building[] = [
   {
     id: 'BANK',
     name: 'Banksia Cottage (Childcare)',
-    position: [1195, 2175], // Calibrated: GPS-derived + offset, west area
+    position: [1129, 2173], // Calibrated: GPS-derived + offset, west area
     description: 'Campus childcare facility.',
     tags: ['services', 'childcare'],
     translationKey: 'building_BANK_name',
@@ -726,7 +726,7 @@ export const buildings: Building[] = [
   {
     id: 'GUMNUT',
     name: 'Gumnut Cottage (Childcare)',
-    position: [2130, 3078], // Calibrated: east, near 16UA
+    position: [2046, 3067], // Calibrated: east, near 16UA
     description: 'Campus childcare facility.',
     tags: ['services', 'childcare'],
     translationKey: 'building_GUMNUT_name',
@@ -739,7 +739,7 @@ export const buildings: Building[] = [
   {
     id: 'MIAMIA',
     name: 'Mia Mia (Childcare)',
-    position: [1553, 1893], // Calibrated: same as WALU (near 29WW)
+    position: [1466, 1852], // Calibrated: same as WALU (near 29WW)
     description: 'Campus childcare facility near Walanga Muru.',
     tags: ['services', 'childcare'],
     translationKey: 'building_MIAMIA_name',
@@ -752,7 +752,7 @@ export const buildings: Building[] = [
   {
     id: 'WARATAH',
     name: 'Waratah (Childcare)',
-    position: [2420, 3144], // Calibrated: far east, near university avenue
+    position: [2362, 3137], // Calibrated: far east, near university avenue
     description: 'Campus childcare facility.',
     tags: ['services', 'childcare'],
     translationKey: 'building_WARATAH_name',
@@ -767,7 +767,7 @@ export const buildings: Building[] = [
   {
     id: 'NEXTSENSE',
     name: 'NextSense Centre of Excellence',
-    position: [1320, 944], // Calibrated: north-west campus
+    position: [1231, 957], // Calibrated: north-west campus
     description: 'NextSense Centre of Excellence for hearing, vision, and sensory research.',
     tags: ['services', 'health', 'research'],
     translationKey: 'building_NEXTSENSE_name',
@@ -780,7 +780,7 @@ export const buildings: Building[] = [
   {
     id: 'NEXTSCHOOL',
     name: 'NextSense School',
-    position: [969, 992], // Calibrated: north-west, near MQ Village
+    position: [942, 1038], // Calibrated: north-west, near MQ Village
     description: 'NextSense School for deaf and vision impaired students.',
     tags: ['services', 'education', 'accessibility'],
     translationKey: 'building_NEXTSCHOOL_name',
@@ -793,7 +793,7 @@ export const buildings: Building[] = [
   {
     id: 'METS',
     name: 'METS (Engineering Services)',
-    position: [3411, 1484], // Calibrated: GPS-derived + offset
+    position: [3334, 1478], // Calibrated: GPS-derived + offset
     description: 'Macquarie Engineering Technical Services - workshop and technical support.',
     tags: ['services', 'engineering', 'workshop'],
     translationKey: 'building_METS_name',
@@ -821,7 +821,7 @@ export const buildings: Building[] = [
   {
     id: 'LIBCAFE',
     name: 'Library Cafe',
-    position: [2450, 2394], // Calculated from GPS -33.77842, 151.11277 (inside Library)
+    position: [2327, 2386], // Calculated from GPS -33.77842, 151.11277 (inside Library)
     description: 'Cafe located in Waranara Library.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_LIBCAFE_name',
@@ -836,7 +836,7 @@ export const buildings: Building[] = [
   {
     id: 'DLC',
     name: 'Dunmore Lang College',
-    position: [3159, 3041], // Calculated from GPS using calibrated bounds (2026-01-10)
+    position: [3035, 3001], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Student residential college.',
     tags: ['residential', 'accommodation'],
     translationKey: 'building_DLC_name',
@@ -862,7 +862,7 @@ export const buildings: Building[] = [
   {
     id: 'MQV',
     name: 'MQ Village',
-    position: [1022, 779], // Calibrated: north-west corner of campus
+    position: [947, 795], // Calibrated: north-west corner of campus
     description: 'Student accommodation village.',
     tags: ['residential', 'accommodation'],
     translationKey: 'building_MQV_name',
@@ -877,7 +877,7 @@ export const buildings: Building[] = [
   {
     id: 'GALLERY',
     name: 'Art Gallery',
-    position: [2981, 2060], // Calibrated: same as 19ER (inside Chancellery)
+    position: [2929, 2062], // Calibrated: same as 19ER (inside Chancellery)
     description: 'University art gallery and exhibitions.',
     tags: ['arts', 'gallery', 'culture'],
     translationKey: 'building_GALLERY_name',
@@ -890,7 +890,7 @@ export const buildings: Building[] = [
   {
     id: 'BIODISC',
     name: 'Biology Discovery Centre',
-    position: [3175, 1597], // Calibrated: near 6WW and METS
+    position: [3085, 1600], // Calibrated: near 6WW and METS
     description: 'Biology museum and discovery centre.',
     tags: ['science', 'museum', 'education'],
     translationKey: 'building_BIODISC_name',
@@ -905,7 +905,7 @@ export const buildings: Building[] = [
   {
     id: '11WW',
     name: "11 Wally's Walk",
-    position: [2938, 1897], // Calibrated: GPS-derived + offset
+    position: [2836, 1927], // Calibrated: GPS-derived + offset
     description: 'Academic building on Wallys Walk.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_11WW_name',
@@ -919,7 +919,7 @@ export const buildings: Building[] = [
   {
     id: '13RPD',
     name: '13 Research Park Drive',
-    position: [3620, 1418], // Calibrated: GPS-derived + offset
+    position: [3529, 1441], // Calibrated: GPS-derived + offset
     description: 'Research facility on Research Park Drive.',
     tags: ['research', 'academic'],
     translationKey: 'building_13RPD_name',
@@ -932,7 +932,7 @@ export const buildings: Building[] = [
   {
     id: '6ER',
     name: '6 Eastern Road',
-    position: [3056, 2281], // Calibrated: GPS-derived + offset
+    position: [2969, 2279], // Calibrated: GPS-derived + offset
     description: 'Academic building on Eastern Road.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_6ER_name',
@@ -946,7 +946,7 @@ export const buildings: Building[] = [
   {
     id: '1CC',
     name: '1 Central Courtyard',
-    position: [2528, 1618], // Calculated from GPS -33.774, 151.11365 (same as UBAR)
+    position: [2467, 1618], // Calculated from GPS -33.774, 151.11365 (same as UBAR)
     description: 'Central Courtyard building and student hub.',
     tags: ['services', 'student'],
     translationKey: 'building_1CC_name',
@@ -962,7 +962,7 @@ export const buildings: Building[] = [
   {
     id: '13ARPD',
     name: '13A Research Park Drive',
-    position: [3456, 1388], // Calibrated: GPS-derived + offset, near 13RPD
+    position: [3369, 1376], // Calibrated: GPS-derived + offset, near 13RPD
     description: 'Research facility on Research Park Drive.',
     tags: ['research', 'academic'],
     translationKey: 'building_13ARPD_name',
@@ -975,7 +975,7 @@ export const buildings: Building[] = [
   {
     id: 'COCHLEAR',
     name: 'Cochlear Limited',
-    position: [2591, 2855], // Calculated from GPS using calibrated bounds (2026-01-10)
+    position: [2473, 2873], // Calculated from GPS using calibrated bounds (2026-01-10)
     description: 'Cochlear headquarters and research facility.',
     tags: ['research', 'commercial', 'health'],
     translationKey: 'building_COCHLEAR_name',
@@ -988,7 +988,7 @@ export const buildings: Building[] = [
   {
     id: '10SCO',
     name: '10 Sir Christopher Ondaatje Ave',
-    position: [2816, 2008], // Calibrated: GPS-derived + offset
+    position: [2688, 2004], // Calibrated: GPS-derived + offset
     description: 'Academic building.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_10SCO_name',
@@ -1001,7 +1001,7 @@ export const buildings: Building[] = [
   {
     id: '14ER',
     name: '14 Eastern Road',
-    position: [3058, 1743], // Calibrated: GPS-derived + offset
+    position: [2966, 1742], // Calibrated: GPS-derived + offset
     description: 'Academic building on Eastern Road. Faculty of Science.',
     tags: ['academic', 'teaching'],
     translationKey: 'building_14ER_name',
@@ -1014,7 +1014,7 @@ export const buildings: Building[] = [
   {
     id: '6SR',
     name: '6 Science Road',
-    position: [3229, 1582], // Calibrated: GPS-derived + offset
+    position: [3108, 1546], // Calibrated: GPS-derived + offset
     description: 'Science building on Science Road.',
     tags: ['academic', 'science', 'labs'],
     translationKey: 'building_6SR_name',
@@ -1028,7 +1028,7 @@ export const buildings: Building[] = [
   {
     id: '14FW',
     name: '14 First Walk (MUSEC)',
-    position: [1423, 2130], // Calibrated: GPS-derived + offset
+    position: [1344, 2130], // Calibrated: GPS-derived + offset
     description: 'Macquarie University Special Education Centre - education programs for children.',
     tags: ['academic', 'education', 'services'],
     translationKey: 'building_14FW_name',
@@ -1041,7 +1041,7 @@ export const buildings: Building[] = [
   {
     id: '14SCO',
     name: '14 Sir Christopher Ondaatje Ave',
-    position: [2767, 1800], // Calibrated: GPS-derived + offset
+    position: [2686, 1761], // Calibrated: GPS-derived + offset
     description: 'Academic building with teaching spaces and exam halls. Faculty of Sciences.',
     tags: ['academic', 'teaching', 'exams'],
     translationKey: 'building_14SCO_name',
@@ -1057,7 +1057,7 @@ export const buildings: Building[] = [
   {
     id: '4WR',
     name: '4 Western Road',
-    position: [1894, 2103], // Calibrated: near theatres area
+    position: [1806, 2086], // Calibrated: near theatres area
     description: 'Academic building with teaching and examination rooms.',
     tags: ['academic', 'teaching', 'exams'],
     translationKey: 'building_4WR_name',
@@ -1071,7 +1071,7 @@ export const buildings: Building[] = [
   {
     id: 'EAST3',
     name: 'East 3 Car Park',
-    position: [3526, 2249],
+    position: [3364, 2227],
     description: 'Multi-storey car park.',
     tags: ['other', 'parking'],
     translationKey: 'building_EAST3_name',
@@ -1083,7 +1083,7 @@ export const buildings: Building[] = [
   {
     id: 'EAST2',
     name: 'East 2 Car Park',
-    position: [3518, 2035],
+    position: [3407, 2045],
     description: 'Multi-storey car park.',
     tags: ['other', 'parking'],
     translationKey: 'building_EAST2_name',
@@ -1095,7 +1095,7 @@ export const buildings: Building[] = [
   {
     id: '75TR',
     name: '75 Talavera Road',
-    position: [4065, 1617],
+    position: [3987, 1590],
     description: 'Commercial building in the Macquarie Park precinct.',
     tags: ['commercial', 'office'],
     translationKey: 'building_75TR_name',
@@ -1107,7 +1107,7 @@ export const buildings: Building[] = [
   {
     id: '3SR',
     name: '3 Science Road',
-    position: [3411, 1538],
+    position: [3312, 1534],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_3SR_name',
@@ -1119,7 +1119,7 @@ export const buildings: Building[] = [
   {
     id: '6FW',
     name: '6 First Walk',
-    position: [2148, 2260],
+    position: [2053, 2256],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_6FW_name',
@@ -1132,7 +1132,7 @@ export const buildings: Building[] = [
   {
     id: '17MW',
     name: '17 Macquarie Walk',
-    position: [2402, 2503],
+    position: [2319, 2431],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_17MW_name',
@@ -1144,7 +1144,7 @@ export const buildings: Building[] = [
   {
     id: '1MD',
     name: '1 Management Drive',
-    position: [3177, 940],
+    position: [3077, 934],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_1MD_name',
@@ -1156,7 +1156,7 @@ export const buildings: Building[] = [
   {
     id: '3MD',
     name: '3 Management Drive',
-    position: [3111, 983],
+    position: [3045, 958],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_3MD_name',
@@ -1168,7 +1168,7 @@ export const buildings: Building[] = [
   {
     id: '5MD',
     name: '5 Management Drive',
-    position: [3349, 1057],
+    position: [3201, 1010],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_5MD_name',
@@ -1180,7 +1180,7 @@ export const buildings: Building[] = [
   {
     id: '1EXR',
     name: '1 Executive Road',
-    position: [3190, 772],
+    position: [3108, 761],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_1EXR_name',
@@ -1192,7 +1192,7 @@ export const buildings: Building[] = [
   {
     id: '2FW',
     name: '2 First Walk',
-    position: [2411, 2222],
+    position: [2309, 2259],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_2FW_name',
@@ -1205,7 +1205,7 @@ export const buildings: Building[] = [
   {
     id: '4FW',
     name: '4 First Walk',
-    position: [2227, 2264],
+    position: [2146, 2258],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_4FW_name',
@@ -1218,7 +1218,7 @@ export const buildings: Building[] = [
   {
     id: '2LR',
     name: '2 Link Road',
-    position: [241, 2064],
+    position: [178, 2057],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_2LR_name',
@@ -1230,7 +1230,7 @@ export const buildings: Building[] = [
   {
     id: '6LR',
     name: '6 Link Road',
-    position: [377, 2131],
+    position: [306, 2123],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_6LR_name',
@@ -1242,7 +1242,7 @@ export const buildings: Building[] = [
   {
     id: '4LR',
     name: '4 Link Road',
-    position: [333, 2201],
+    position: [237, 2208],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_4LR_name',
@@ -1254,7 +1254,7 @@ export const buildings: Building[] = [
   {
     id: 'DESTINATIO',
     name: 'Destination Orana',
-    position: [4406, 1703],
+    position: [4337, 1816],
     description: 'Student accommodation.',
     tags: ['residential'],
     translationKey: 'building_DESTINATIO_name',
@@ -1267,7 +1267,7 @@ export const buildings: Building[] = [
   {
     id: '3IR',
     name: '3 Innovation Road',
-    position: [4137, 2106],
+    position: [4038, 2085],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_3IR_name',
@@ -1279,7 +1279,7 @@ export const buildings: Building[] = [
   {
     id: '1IR',
     name: '1 Innovation Road',
-    position: [4240, 2182],
+    position: [4129, 2160],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_1IR_name',
@@ -1291,7 +1291,7 @@ export const buildings: Building[] = [
   {
     id: '15RPD',
     name: '15 Research Park Drive',
-    position: [3569, 1343],
+    position: [3526, 1318],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_15RPD_name',
@@ -1303,7 +1303,7 @@ export const buildings: Building[] = [
   {
     id: 'RONREILLYP',
     name: 'Ron Reilly Pavilion',
-    position: [1687, 76],
+    position: [1586, 71],
     description: 'Sports pavilion.',
     tags: ['sports'],
     translationKey: 'building_RONREILLYP_name',
@@ -1316,7 +1316,7 @@ export const buildings: Building[] = [
   {
     id: 'VILLAS',
     name: 'The Villas',
-    position: [2358, 3280], // Calibrated: south-east corner (Herring Rd)
+    position: [2137, 3279], // Calibrated: south-east corner (Herring Rd)
     description: 'Residential villas.',
     tags: ['residential'],
     translationKey: 'building_VILLAS_name',
@@ -1329,7 +1329,7 @@ export const buildings: Building[] = [
   {
     id: '6MD',
     name: '6 Management Drive',
-    position: [3238, 1083],
+    position: [3192, 1037],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_6MD_name',
@@ -1341,7 +1341,7 @@ export const buildings: Building[] = [
   {
     id: '7MD',
     name: '7 Management Drive',
-    position: [3128, 1083],
+    position: [3043, 1082],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_7MD_name',
@@ -1353,7 +1353,7 @@ export const buildings: Building[] = [
   {
     id: '12MW',
     name: '12 Macquarie Walk',
-    position: [2681, 2424],
+    position: [2560, 2425],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_12MW_name',
@@ -1365,7 +1365,7 @@ export const buildings: Building[] = [
   {
     id: '18ER',
     name: '18 Eastern Road',
-    position: [3080, 1345],
+    position: [2968, 1321],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_18ER_name',
@@ -1377,7 +1377,7 @@ export const buildings: Building[] = [
   {
     id: '2WW',
     name: "2 Wally's Walk",
-    position: [3582, 1847],
+    position: [3485, 1877],
     description: 'Academic building.',
     tags: ['academic'],
     translationKey: 'building_2WW_name',
@@ -1390,7 +1390,7 @@ export const buildings: Building[] = [
   {
     id: '23WW',
     name: '23WW',
-    position: [1993, 1881],
+    position: [1910, 1880],
     description: '23WW building.',
     tags: ['academic'],
     translationKey: 'building_23WW_name',
@@ -1402,7 +1402,7 @@ export const buildings: Building[] = [
   {
     id: 'SIEMENS',
     name: 'Siemens',
-    position: [4303, 2013],
+    position: [4182, 2015],
     description: 'Siemens building.',
     tags: ['commercial', 'office'],
     translationKey: 'building_SIEMENS_name',
@@ -1415,7 +1415,7 @@ export const buildings: Building[] = [
   {
     id: '10HA',
     name: '10 Hadenfeld Avenue (Chaplaincy)',
-    position: [963, 2565],
+    position: [882, 2522],
     description: 'Multi-faith chaplaincy and spiritual services building.',
     tags: ['services', 'spiritual', 'chaplaincy'],
     translationKey: 'building_10HA_name',
@@ -1427,7 +1427,7 @@ export const buildings: Building[] = [
   {
     id: '16MW',
     name: '16 Macquarie Walk (Waranara Library)',
-    position: [2397, 2389], // Calculated from GPS -33.77842, 151.11277 (same as LIB)
+    position: [2401, 2427], // Calculated from GPS -33.77842, 151.11277 (same as LIB)
     description: 'Main campus library with study spaces, Library Cafe, and extensive collections.',
     tags: ['academic', 'study', 'library', 'resources'],
     translationKey: 'building_16MW_name',
@@ -1439,7 +1439,7 @@ export const buildings: Building[] = [
   {
     id: 'LAKESIDEHO',
     name: 'Lakeside Hotel & Conference Centre',
-    position: [3199, 719],
+    position: [3102, 718],
     description: 'Lakeside Hotel & Conference Centre.',
     tags: ['accommodation', 'hotel', 'venue'],
     translationKey: 'building_LAKESIDEHO_name',
@@ -1451,7 +1451,7 @@ export const buildings: Building[] = [
   {
     id: '8LR',
     name: '8LR (Banksia Cottage)',
-    position: [1261, 2193],
+    position: [1135, 2258],
     description: 'Banksia Cottage campus childcare facility.',
     tags: ['services', 'childcare'],
     translationKey: 'building_8LR_name',
@@ -1463,7 +1463,7 @@ export const buildings: Building[] = [
   {
     id: 'MACQUARIEC',
     name: 'Macquarie Centre',
-    position: [4204, 2607],
+    position: [4112, 2591],
     description: 'Macquarie Centre shopping mall with food court, retail stores, and cinema.',
     tags: ['food', 'retail', 'shopping'],
     translationKey: 'building_MACQUARIEC_name',
@@ -1475,7 +1475,7 @@ export const buildings: Building[] = [
   {
     id: '11GR',
     name: '11GR (Lighthouse Theatre)',
-    position: [2026, 1149],
+    position: [1911, 1136],
     description: 'Performance venue and theatre.',
     tags: ['venue', 'performance', 'arts'],
     translationKey: 'building_11GR_name',
@@ -1487,7 +1487,7 @@ export const buildings: Building[] = [
   {
     id: '10GR',
     name: '10GR (Macquarie University Sport and Aquatic Centre)',
-    position: [1697, 1188],
+    position: [1605, 1126],
     description: '10GR building.',
     tags: ['sports'],
     translationKey: 'building_10GR_name',
@@ -1499,7 +1499,7 @@ export const buildings: Building[] = [
   {
     id: 'DUNMORELAN',
     name: 'Dunmore Lang College - Postgraduate Apartments',
-    position: [3395, 3045],
+    position: [3091, 3052],
     description: 'Dunmore Lang College apartments.',
     tags: ['residential'],
     translationKey: 'building_DUNMORELAN_name',
@@ -1512,7 +1512,7 @@ export const buildings: Building[] = [
   {
     id: '29WW',
     name: '29WW',
-    position: [1576, 1880],
+    position: [1496, 1875],
     description: '29WW building.',
     tags: ['academic'],
     translationKey: 'building_29WW_name',
@@ -1524,7 +1524,7 @@ export const buildings: Building[] = [
   {
     id: '27WW',
     name: '27WW (Lotus Theatre)',
-    position: [1638, 1921],
+    position: [1580, 1880],
     description: 'Major teaching and entertainment venue.',
     tags: ['venue', 'teaching', 'events'],
     translationKey: 'building_27WW_name',
@@ -1536,7 +1536,7 @@ export const buildings: Building[] = [
   {
     id: '25WW',
     name: '25WW',
-    position: [1802, 1881],
+    position: [1685, 1876],
     description: '25WW building.',
     tags: ['academic'],
     translationKey: 'building_25WW_name',
@@ -1548,7 +1548,7 @@ export const buildings: Building[] = [
   {
     id: '21WW',
     name: '21WW (Macquarie Theatre)',
-    position: [2078, 1950],
+    position: [2007, 1932],
     description: 'Large lecture theatre and entertainment venue.',
     tags: ['venue', 'teaching', 'events'],
     translationKey: 'building_21WW_name',
@@ -1560,7 +1560,7 @@ export const buildings: Building[] = [
   {
     id: '14SW',
     name: '14SW',
-    position: [2212, 2069],
+    position: [2096, 2058],
     description: '14SW building.',
     tags: ['academic'],
     translationKey: 'building_14SW_name',
@@ -1573,7 +1573,7 @@ export const buildings: Building[] = [
   {
     id: '2TP',
     name: '2 Technology Place',
-    position: [3776, 1505],
+    position: [3660, 1532],
     description: '2 Technology Place - health and medical facilities.',
     tags: ['health', 'medical'],
     translationKey: 'building_2TP_name',
@@ -1585,7 +1585,7 @@ export const buildings: Building[] = [
   {
     id: 'MACQUARIEU',
     name: 'Macquarie University Hospital',
-    position: [3832, 1669],
+    position: [3707, 1625],
     description: 'Macquarie University Hospital.',
     tags: ['health', 'medical', 'hospital'],
     translationKey: 'building_MACQUARIEU_name',
@@ -1597,7 +1597,7 @@ export const buildings: Building[] = [
   {
     id: 'STUDENTACC',
     name: 'Student Accommodation',
-    position: [2274, 1585],
+    position: [2195, 1586],
     description: 'Student Accommodation.',
     tags: ['residential', 'accommodation'],
     translationKey: 'building_STUDENTACC_name',
@@ -1610,7 +1610,7 @@ export const buildings: Building[] = [
   {
     id: '205A',
     name: '205A Culloden Road',
-    position: [1879, 746], // Calibrated: north-west (Culloden Rd)
+    position: [2100, 663], // Calibrated: north-west (Culloden Rd)
     description: '205A Culloden Road residential building.',
     tags: ['residential'],
     translationKey: 'building_205A_name',
@@ -1622,7 +1622,7 @@ export const buildings: Building[] = [
   {
     id: '205B',
     name: '205B Culloden Road',
-    position: [1821, 836], // Calibrated: north-west (Culloden Rd)
+    position: [2099, 751], // Calibrated: north-west (Culloden Rd)
     description: '205B Culloden Road residential building.',
     tags: ['residential'],
     translationKey: 'building_205B_name',
@@ -1634,7 +1634,7 @@ export const buildings: Building[] = [
   {
     id: '8HA',
     name: '8HA (Incubator)',
-    position: [1169, 2556],
+    position: [1097, 2540],
     description: 'Macquarie University Incubator for startups and innovation.',
     tags: ['services', 'business', 'innovation'],
     translationKey: 'building_8HA_name',
@@ -1646,7 +1646,7 @@ export const buildings: Building[] = [
   {
     id: '5GR',
     name: '5GR (Macquarie Observatory)',
-    position: [1731, 492],
+    position: [1669, 481],
     description: 'Astronomy observatory for research and education.',
     tags: ['research', 'science', 'astronomy'],
     translationKey: 'building_5GR_name',
@@ -1658,7 +1658,7 @@ export const buildings: Building[] = [
   {
     id: '1WW',
     name: '1WW (Ainsworth Building)',
-    position: [3780, 1869],
+    position: [3664, 1882],
     description: '1WW (Ainsworth Building).',
     tags: ['academic'],
     translationKey: 'building_1WW_name',
@@ -1672,7 +1672,7 @@ export const buildings: Building[] = [
   {
     id: '17WWMICHAE',
     name: '17WW (Michael Kirby Building)',
-    position: [2523, 1935],
+    position: [2431, 1881],
     description: '17WW (Michael Kirby Building).',
     tags: ['academic'],
     translationKey: 'building_17WWMICHAE_name',
@@ -1698,7 +1698,7 @@ export const buildings: Building[] = [
   {
     id: '16WWLINCOL',
     name: '16WW (Lincoln Building)',
-    position: [2486, 1880],
+    position: [2403, 1879],
     description: '16WW (Lincoln Building).',
     tags: ['academic'],
     translationKey: 'building_16WWLINCOL_name',
@@ -1711,7 +1711,7 @@ export const buildings: Building[] = [
   {
     id: '19ERTHECHA',
     name: '19ER (The Chancellery)',
-    position: [2914, 1202],
+    position: [2972, 1292],
     description: 'The Chancellery - University administration headquarters.',
     tags: ['services', 'administration'],
     translationKey: 'building_19ERTHECHA_name',
@@ -1724,7 +1724,7 @@ export const buildings: Building[] = [
   {
     id: '16UAAUSTRA',
     name: '16UA (Australian Hearing Hub)',
-    position: [1822, 2706],
+    position: [1706, 2699],
     description: 'Australian Hearing Hub - hearing research and clinical services.',
     tags: ['health', 'research', 'clinic'],
     translationKey: 'building_16UAAUSTRA_name',
@@ -1737,7 +1737,7 @@ export const buildings: Building[] = [
   {
     id: 'DLCNEW',
     name: 'Dunmore Lang College - New Wing',
-    position: [3127, 3003],
+    position: [3067, 3030],
     description: 'Dunmore Lang College New Wing residential building.',
     tags: ['residential'],
     translationKey: 'building_DLCNEW_name',
@@ -1750,7 +1750,7 @@ export const buildings: Building[] = [
   {
     id: 'DLCOFFICE',
     name: 'Dunmore Lang College - Office',
-    position: [3174, 3069],
+    position: [3084, 3048],
     description: 'Dunmore Lang College administration office.',
     tags: ['residential', 'services'],
     translationKey: 'building_DLCOFFICE_name',
@@ -1763,7 +1763,7 @@ export const buildings: Building[] = [
   {
     id: 'VILLAS2',
     name: 'Villas (Building 2)',
-    position: [2363, 3300], // Calibrated: south-east corner (Herring Rd)
+    position: [2146, 3276], // Calibrated: south-east corner (Herring Rd)
     description: 'Residential villas - second building.',
     tags: ['residential'],
     translationKey: 'building_VILLAS2_name',
@@ -1777,7 +1777,7 @@ export const buildings: Building[] = [
   {
     id: '25CWW',
     name: "25C Wally's Walk (Gale History Museum)",
-    position: [1780, 2050], // Near 25B Wally's Walk
+    position: [1686, 1889], // Near 25B Wally's Walk
     description: 'The Gale History Museum - historical exhibits and collections.',
     tags: ['venue', 'museum', 'arts', 'history'],
     translationKey: 'building_25CWW_name',
@@ -1796,7 +1796,7 @@ export const buildings: Building[] = [
   {
     id: 'LBNMQ',
     name: '1919 Lanzhou Beef Noodle',
-    position: [2299, 1795],
+    position: [2440, 1749],
     description: 'Chinese hand-pulled noodle restaurant on campus.',
     tags: ['food', 'restaurant', 'noodles'],
     translationKey: 'building_LBNMQ_name',
@@ -1808,7 +1808,7 @@ export const buildings: Building[] = [
   {
     id: 'BKCMQ',
     name: 'BAP Korean',
-    position: [2415, 1735],
+    position: [2384, 1761],
     description: 'Korean cuisine restaurant on campus.',
     tags: ['food', 'restaurant', 'korean'],
     translationKey: 'building_BKCMQ_name',
@@ -1820,7 +1820,7 @@ export const buildings: Building[] = [
   {
     id: 'BJMQ',
     name: 'Boost Juice',
-    position: [2162, 1550],
+    position: [2426, 1723],
     description: 'Juice and smoothie bar.',
     tags: ['food', 'drinks', 'juice'],
     translationKey: 'building_BJMQ_name',
@@ -1832,7 +1832,7 @@ export const buildings: Building[] = [
   {
     id: 'CTMQ',
     name: 'Chatime',
-    position: [2413, 1833],
+    position: [2429, 1790],
     description: 'Bubble tea and drinks.',
     tags: ['food', 'drinks', 'bubble tea'],
     translationKey: 'building_CTMQ_name',
@@ -1844,7 +1844,7 @@ export const buildings: Building[] = [
   {
     id: 'EIMQ',
     name: 'Eat Istanbul',
-    position: [2426, 1445],
+    position: [2482, 1512],
     description: 'Turkish restaurant on campus.',
     tags: ['food', 'restaurant', 'turkish'],
     translationKey: 'building_EIMQ_name',
@@ -1856,7 +1856,7 @@ export const buildings: Building[] = [
   {
     id: 'IMMQ',
     name: 'Iguanas Mexicana',
-    position: [2167, 1553],
+    position: [2507, 1595],
     description: 'Mexican food on campus.',
     tags: ['food', 'restaurant', 'mexican'],
     translationKey: 'building_IMMQ_name',
@@ -1868,7 +1868,7 @@ export const buildings: Building[] = [
   {
     id: 'IGGMQ',
     name: 'Indi Go-Go',
-    position: [2167, 1553],
+    position: [2390, 1596],
     description: 'Indian food on campus.',
     tags: ['food', 'restaurant', 'indian'],
     translationKey: 'building_IGGMQ_name',
@@ -1880,7 +1880,7 @@ export const buildings: Building[] = [
   {
     id: 'LGBMQ',
     name: 'Lashings Gourmet Burgers',
-    position: [2271, 1543],
+    position: [2403, 1606],
     description: 'Gourmet burger restaurant on campus.',
     tags: ['food', 'restaurant', 'burgers'],
     translationKey: 'building_LGBMQ_name',
@@ -1892,7 +1892,7 @@ export const buildings: Building[] = [
   {
     id: 'LAMQ',
     name: 'Little Asia',
-    position: [2263, 1560],
+    position: [2435, 1611],
     description: 'Asian food court on campus.',
     tags: ['food', 'restaurant', 'asian'],
     translationKey: 'building_LAMQ_name',
@@ -1904,7 +1904,7 @@ export const buildings: Building[] = [
   {
     id: 'MSMQ',
     name: 'Monster Sushi',
-    position: [2327, 1791],
+    position: [2413, 1622],
     description: 'Sushi restaurant on campus.',
     tags: ['food', 'restaurant', 'sushi', 'japanese'],
     translationKey: 'building_MSMQ_name',
@@ -1916,7 +1916,7 @@ export const buildings: Building[] = [
   {
     id: 'PRMQ',
     name: 'PappaRich',
-    position: [2352, 1789],
+    position: [2415, 1712],
     description: 'Malaysian cuisine restaurant on campus.',
     tags: ['food', 'restaurant', 'malaysian'],
     translationKey: 'building_PRMQ_name',
@@ -1928,7 +1928,7 @@ export const buildings: Building[] = [
   {
     id: 'RMQ',
     name: "Roll'd",
-    position: [2128, 1789],
+    position: [2431, 1617],
     description: 'Vietnamese rice paper rolls and pho.',
     tags: ['food', 'restaurant', 'vietnamese'],
     translationKey: 'building_RMQ_name',
@@ -1940,7 +1940,7 @@ export const buildings: Building[] = [
   {
     id: 'SOMQ',
     name: 'Soul Origin',
-    position: [2337, 1549],
+    position: [2386, 1591],
     description: 'Fresh healthy meals, salads, and coffee.',
     tags: ['food', 'cafe', 'healthy'],
     translationKey: 'building_SOMQ_name',
@@ -1952,7 +1952,7 @@ export const buildings: Building[] = [
   {
     id: 'SLCMQ',
     name: 'St Laurent Coffee',
-    position: [2392, 1517],
+    position: [2383, 1593],
     description: 'Specialty coffee shop on campus.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_SLCMQ_name',
@@ -1964,7 +1964,7 @@ export const buildings: Building[] = [
   {
     id: 'SWMQ',
     name: 'Sushi World',
-    position: [2308, 1483],
+    position: [2400, 1627],
     description: 'Sushi and Japanese takeaway on campus.',
     tags: ['food', 'restaurant', 'sushi', 'japanese'],
     translationKey: 'building_SWMQ_name',
@@ -1976,7 +1976,7 @@ export const buildings: Building[] = [
   {
     id: 'TBMQ',
     name: 'Taste Baguette',
-    position: [2431, 1498],
+    position: [2400, 1595],
     description: 'Bakery and cafe serving baguettes and pastries.',
     tags: ['food', 'cafe', 'bakery'],
     translationKey: 'building_TBMQ_name',
@@ -1988,7 +1988,7 @@ export const buildings: Building[] = [
   {
     id: 'BUMQ',
     name: '(BREW)us',
-    position: [2922, 858],
+    position: [2451, 1656],
     description: 'Coffee and brunch spot near Macquarie University Station.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_BUMQ_name',
@@ -2000,7 +2000,7 @@ export const buildings: Building[] = [
   {
     id: 'ECMQ',
     name: 'esc Cafe',
-    position: [3419, 1955],
+    position: [3658, 2001],
     description: 'Cafe near the eastern campus precinct.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_ECMQ_name',
@@ -2012,7 +2012,7 @@ export const buildings: Building[] = [
   {
     id: 'CCMQ',
     name: 'Crunch Cafe',
-    position: [1588, 1022],
+    position: [1527, 1131],
     description: 'Cafe near the Sport & Aquatic Centre.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_CCMQ_name',
@@ -2024,7 +2024,7 @@ export const buildings: Building[] = [
   {
     id: 'WWC',
     name: 'MQH Cafe',
-    position: [3583, 1500],
+    position: [3618, 1419],
     description: 'Cafe at Macquarie University Hospital precinct.',
     tags: ['food', 'cafe', 'hospital'],
     translationKey: 'building_WWC_name',
@@ -2036,7 +2036,7 @@ export const buildings: Building[] = [
   {
     id: 'PICCOLO',
     name: 'Piccolo Me',
-    position: [1963, 2765],
+    position: [1910, 2723],
     description: 'Specialty coffee and food.',
     tags: ['food', 'cafe', 'coffee'],
     translationKey: 'building_PICCOLO_name',
@@ -2050,7 +2050,7 @@ export const buildings: Building[] = [
   {
     id: 'PSOUTH2',
     name: 'Carpark P South 2',
-    position: [2516, 2692],
+    position: [2508, 2603],
     description: 'Car park in the south of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PSOUTH2_name',
@@ -2061,7 +2061,7 @@ export const buildings: Building[] = [
   {
     id: 'PEAST3',
     name: 'Carpark P East 3',
-    position: [3189, 2272],
+    position: [3364, 2243],
     description: 'Car park in the east of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PEAST3_name',
@@ -2072,7 +2072,7 @@ export const buildings: Building[] = [
   {
     id: 'PEAST2',
     name: 'Carpark P East 2',
-    position: [3233, 1932],
+    position: [3386, 1999],
     description: 'Car park in the east of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PEAST2_name',
@@ -2083,7 +2083,7 @@ export const buildings: Building[] = [
   {
     id: 'PWEST5',
     name: 'Carpark P West 5',
-    position: [1249, 1520],
+    position: [1080, 1595],
     description: 'Car park in the west of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PWEST5_name',
@@ -2094,7 +2094,7 @@ export const buildings: Building[] = [
   {
     id: 'PWEST4',
     name: 'Carpark P West 4',
-    position: [1235, 2877],
+    position: [825, 2798],
     description: 'Car park in the west of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PWEST4_name',
@@ -2105,7 +2105,7 @@ export const buildings: Building[] = [
   {
     id: 'PWEST3',
     name: 'Carpark P West 3',
-    position: [1509, 2357],
+    position: [1250, 2351],
     description: 'Car park in the west of campus.',
     tags: ['parking', 'transport'],
     translationKey: 'building_PWEST3_name',
@@ -2118,7 +2118,7 @@ export const buildings: Building[] = [
   {
     id: 'HEALTHP1',
     name: 'MQ Health Disability Parking',
-    position: [3349, 1136],
+    position: [3061, 1340],
     description: 'Disability parking for Macquarie University Clinic.',
     tags: ['parking', 'accessibility', 'hospital'],
     translationKey: 'building_HEALTHP1_name',
@@ -2130,7 +2130,7 @@ export const buildings: Building[] = [
   {
     id: 'HEALTHP2',
     name: 'Macquarie Hospital Parking',
-    position: [3351, 1753],
+    position: [3476, 1758],
     description: 'Parking for Macquarie University Hospital and Clinic.',
     tags: ['parking', 'hospital'],
     translationKey: 'building_HEALTHP2_name',
@@ -2143,7 +2143,7 @@ export const buildings: Building[] = [
   {
     id: '130HR',
     name: 'Central Courtyard Accommodation',
-    position: [2460, 1570],
+    position: [2441, 1803],
     description: 'On-campus student accommodation near Central Courtyard.',
     tags: ['accommodation', 'residential', 'housing'],
     translationKey: 'building_130HR_name',
@@ -2193,7 +2193,7 @@ export const buildings: Building[] = [
   {
     id: 'MUSE',
     name: 'MUSE (MQ University Study Experience)',
-    position: [2123, 1735],
+    position: [2125, 1792],
     description: 'Collaborative study space and student experience hub.',
     tags: ['study', 'academic', 'student'],
     translationKey: 'building_MUSE_name',

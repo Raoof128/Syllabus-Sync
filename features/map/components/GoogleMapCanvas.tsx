@@ -428,7 +428,7 @@ export default function GoogleMapCanvas({
       {userLocation && (
         <button
           onClick={handleMyLocation}
-          className={`absolute ${panelVisible ? 'bottom-[28rem]' : 'bottom-28'} right-2.5 z-[1100] flex h-10 w-10 items-center justify-center rounded-md bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-[#3c4043] dark:hover:bg-[#4a4e51] dark:active:bg-[#5a5e61]`}
+          className={`absolute ${panelVisible ? 'bottom-[28rem]' : 'bottom-24'} left-3 z-[1100] flex h-10 w-10 items-center justify-center rounded-md bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-[#3c4043] dark:hover:bg-[#4a4e51] dark:active:bg-[#5a5e61]`}
           aria-label="My location"
           title="My location"
         >

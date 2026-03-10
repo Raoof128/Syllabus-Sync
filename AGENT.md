@@ -1,4 +1,10 @@
 Raouf: 2026-03-10 (Australia/Sydney)
+Scope: Google Maps — Move My-Location button to left side to avoid control overlap
+Summary: Moved the My-Location crosshair button from `right-2.5` to `left-3` and default `bottom-28` → `bottom-24`. The right side is occupied by Google Maps native controls (mapType + fullscreen at TOP_RIGHT, zoom at right center, streetView pegman at bottom-right). The left side is clear apart from the small scale bar at the very bottom. Panel-open offset (`bottom-[28rem]`) retained.
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`
+Verification: `npx tsc --noEmit` ✅; lint ✅
+
+Raouf: 2026-03-10 (Australia/Sydney)
 Scope: Dev Pin Editor — Drag-to-Reposition Campus Building Pins
 Summary: Dev-only drag-and-drop building pin editor on campus map. API: `POST /api/maps/dev-pin` (Node.js runtime, NODE_ENV guard, regex-patches buildings.ts on disk). UI: floating DevPinPanel with building dropdown, coord display, Δx/Δy diff, Save button. CampusMap: orange draggable divIcon marker when devBuildingId set; dragend converts CRS.Simple → pixel and fires onDevPinMove. MapClient: wrench toggle (🔧), dev state, save callback, all guarded by NODE_ENV === 'development'. Completely tree-shaken in production.
 Files Changed: `app/api/maps/dev-pin/route.ts` (NEW), `features/map/components/DevPinPanel.tsx` (NEW), `features/map/components/CampusMap.tsx`, `features/map/components/MapClient.tsx`
