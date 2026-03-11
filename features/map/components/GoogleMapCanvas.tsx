@@ -434,6 +434,12 @@ export default function GoogleMapCanvas({
       .gm-style .gmnoprint > div > div {
         background-color: #fff !important;
       }
+      /* Ensure Street View Pegman control is always visible */
+      .gm-style .gm-svpc {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
       /* Street View panorama controls */
       .gm-style .gm-iv-container .gm-control-active {
         background-color: #fff !important;
@@ -441,6 +447,14 @@ export default function GoogleMapCanvas({
       }
       .gm-style .gm-compass {
         background-color: #fff !important;
+      }
+      /* Prevent dark/black overlay in Street View panorama */
+      .gm-style .gm-style-pbc {
+        background-color: transparent !important;
+      }
+      .gm-style .gm-iv-address {
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: #333 !important;
       }
     `;
     document.head.appendChild(style);
@@ -509,10 +523,10 @@ export default function GoogleMapCanvas({
       )}
 
       {/* My Location button — always visible, always white (matches Google Maps native controls) */}
-      {/* Sits between Pegman (above zoom +/-) and the zoom buttons on the right side */}
+      {/* Positioned above Google Maps native controls (Pegman + zoom) on the right side */}
       <button
         onClick={handleMyLocation}
-        className={`absolute ${panelVisible ? 'bottom-[28rem]' : 'bottom-[8.5rem]'} right-[10px] z-[1100] flex h-10 w-10 items-center justify-center rounded-sm bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 active:bg-gray-200`}
+        className={`absolute ${panelVisible ? 'bottom-[30rem]' : 'bottom-[10.5rem]'} right-[10px] z-[1100] flex h-10 w-10 items-center justify-center rounded-sm bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 active:bg-gray-200`}
         aria-label="My location"
         title="My location"
       >

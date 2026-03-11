@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Search, Share2, Download, Building2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -61,7 +61,10 @@ export default function CampusMapHUD({
   const searchParams = useSearchParams();
   const layersParam = searchParams.get('layers');
 
-  // No panel state needed — the pill search only shows results while user is typing
+  // Dropdown state — building list opens on focus click and while typing
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const isSearching = buildingSearch.trim().length > 0;
+  const showDropdown = isDropdownOpen || isSearching;
 
   const buildMapHref = (buildingId?: string) => {
     const params = new URLSearchParams();
@@ -73,6 +76,25 @@ export default function CampusMapHUD({
     const qs = params.toString();
     return qs ? `/map?${qs}` : '/map';
   };
+
+  // Override the global red focus-visible ring for the map search input
+  useEffect(() => {
+    const styleId = 'map-search-focus-override';
+    if (document.getElementById(styleId)) return;
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      #map-search-input:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      const el = document.getElementById(styleId);
+      if (el) el.remove();
+    };
+  }, []);
 
   // Cmd/Ctrl+K keyboard shortcut to focus search
   useEffect(() => {
@@ -98,9 +120,8 @@ export default function CampusMapHUD({
   // ─── Google Maps mode: floating search bar ───
   if (isGoogleMode && !isFocusedMode) {
     const hasResults =
-      buildingSearch.trim().length > 0 &&
+      showDropdown &&
       (visibleBuildings.length > 0 || (placeSuggestions && placeSuggestions.length > 0));
-    const isSearching = buildingSearch.trim().length > 0;
 
     return (
       <div className="absolute inset-0 z-[1100] pointer-events-none">
@@ -124,14 +145,19 @@ export default function CampusMapHUD({
                 id="map-search-input"
                 value={buildingSearch}
                 onChange={(e) => setBuildingSearch(e.target.value)}
+                onFocus={() => setIsDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
                 placeholder={t('filterBuildings')}
                 aria-label={t('filterBuildings')}
-                className="w-full bg-transparent pl-11 pr-14 py-3 text-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none"
+                className="w-full bg-transparent pl-11 pr-14 py-3 text-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-0"
               />
               {isSearching ? (
                 <button
                   type="button"
-                  onClick={() => setBuildingSearch('')}
+                  onClick={() => {
+                    setBuildingSearch('');
+                    setIsDropdownOpen(false);
+                  }}
                   className="absolute right-3 p-1.5 rounded-full text-mq-content-secondary hover:text-mq-content hover:bg-mq-hover-background transition-colors"
                   aria-label={t('clearSearch')}
                 >
@@ -145,8 +171,8 @@ export default function CampusMapHUD({
               )}
             </div>
 
-            {/* Search results dropdown */}
-            {isSearching && (
+            {/* Search results dropdown — shows on focus click or when typing */}
+            {showDropdown && (
               <div className="border-t border-mq-border/40 max-h-[280px] overflow-y-auto pb-2 custom-scrollbar">
                 {/* Campus buildings */}
                 {visibleBuildings.length > 0 && (
@@ -160,6 +186,7 @@ export default function CampusMapHUD({
                           onClick={() => {
                             triggerHaptic('tap', 'medium');
                             setBuildingSearch('');
+                            setIsDropdownOpen(false);
                             onClearExternalPlace?.();
                           }}
                           className={cn(
@@ -204,6 +231,7 @@ export default function CampusMapHUD({
                             onSelectPlace?.(place);
                             triggerHaptic('tap', 'medium');
                             setBuildingSearch('');
+                            setIsDropdownOpen(false);
                           }}
                           className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-left hover:bg-mq-hover-background transition-colors"
                         >
@@ -279,8 +307,7 @@ export default function CampusMapHUD({
   }
 
   // ─── Campus mode: pill-style floating search (mirrors Google Maps mode) ───
-  const isSearching = buildingSearch.trim().length > 0;
-  const hasResults = isSearching && visibleBuildings.length > 0;
+  const hasResults = showDropdown && visibleBuildings.length > 0;
 
   return (
     <div className="absolute inset-0 z-[1100] pointer-events-none">
@@ -333,14 +360,19 @@ export default function CampusMapHUD({
                 id="map-search-input"
                 value={buildingSearch}
                 onChange={(e) => setBuildingSearch(e.target.value)}
+                onFocus={() => setIsDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
                 placeholder={t('filterBuildings')}
                 aria-label={t('filterBuildings')}
-                className="w-full bg-transparent pl-11 pr-14 py-3 text-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none"
+                className="w-full bg-transparent pl-11 pr-14 py-3 text-sm text-mq-content placeholder:text-mq-content-tertiary focus:outline-none focus:ring-0"
               />
               {isSearching ? (
                 <button
                   type="button"
-                  onClick={() => setBuildingSearch('')}
+                  onClick={() => {
+                    setBuildingSearch('');
+                    setIsDropdownOpen(false);
+                  }}
                   className="absolute right-3 p-1.5 rounded-full text-mq-content-secondary hover:text-mq-content hover:bg-mq-hover-background transition-colors"
                   aria-label={t('clearSearch')}
                 >
@@ -354,8 +386,8 @@ export default function CampusMapHUD({
               )}
             </div>
 
-            {/* Search results dropdown — only visible when user is typing */}
-            {isSearching && (
+            {/* Search results dropdown — shows on focus click or when typing */}
+            {showDropdown && (
               <div className="border-t border-mq-border/40 max-h-[280px] overflow-y-auto pb-2 custom-scrollbar">
                 {visibleBuildings.length > 0 ? (
                   <div className="px-2 pt-2 space-y-0.5">
@@ -368,6 +400,7 @@ export default function CampusMapHUD({
                           onClick={() => {
                             triggerHaptic('tap', 'medium');
                             setBuildingSearch('');
+                            setIsDropdownOpen(false);
                             onClearExternalPlace?.();
                           }}
                           className={cn(

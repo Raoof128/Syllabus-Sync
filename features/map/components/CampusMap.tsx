@@ -482,10 +482,10 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           onClick={centerOnUser}
           className={cn(
             'absolute z-[1000] flex h-[40px] w-[40px] items-center justify-center rounded-md border-2 border-[rgba(0,0,0,0.2)] bg-white shadow-[0_1px_5px_rgba(0,0,0,0.25)] transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 focus:outline-none',
-            // Positioned above zoom controls at bottom-right
+            // Positioned well above zoom controls at bottom-right (with clear gap)
             selectedBuilding
-              ? 'bottom-[340px] right-[10px] sm:bottom-[86px] sm:right-[10px]'
-              : 'bottom-[86px] right-[10px]',
+              ? 'bottom-[360px] right-[10px] sm:bottom-[106px] sm:right-[10px]'
+              : 'bottom-[106px] right-[10px]',
           )}
           aria-label={t('centerOnLocation')}
           title={t('centerOnLocation')}
