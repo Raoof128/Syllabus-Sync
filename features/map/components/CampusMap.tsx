@@ -477,20 +477,20 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           </div>
         )}
 
-        {/* Locate Me button — compact, positioned left of the Leaflet zoom controls */}
+        {/* Locate Me button — stacked ABOVE the Leaflet zoom +/- controls */}
         <button
           onClick={centerOnUser}
           className={cn(
-            'absolute z-[1000] flex h-[30px] w-[30px] items-center justify-center rounded-sm border-2 border-[rgba(0,0,0,0.2)] bg-white shadow-none transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 focus:outline-none',
-            // Position next to the zoom controls (bottom-right)
+            'absolute z-[1000] flex h-[40px] w-[40px] items-center justify-center rounded-md border-2 border-[rgba(0,0,0,0.2)] bg-white shadow-[0_1px_5px_rgba(0,0,0,0.25)] transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 focus:outline-none',
+            // Positioned above zoom controls at bottom-right
             selectedBuilding
-              ? 'bottom-[280px] right-[46px] sm:bottom-[88px] sm:right-[46px]'
-              : 'bottom-[88px] right-[46px]',
+              ? 'bottom-[340px] right-[10px] sm:bottom-[86px] sm:right-[10px]'
+              : 'bottom-[86px] right-[10px]',
           )}
           aria-label={t('centerOnLocation')}
           title={t('centerOnLocation')}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24">
             {locationStatus === 'searching' ? (
               <circle
                 cx="12"
@@ -504,12 +504,12 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
               />
             ) : (
               <>
-                {/* Simple crosshair icon matching Google Maps style */}
+                {/* Crosshair icon — larger and bolder for visibility */}
                 <circle cx="12" cy="12" r="4" stroke="#666" strokeWidth="2" fill="none" />
                 <circle
                   cx="12"
                   cy="12"
-                  r="1.5"
+                  r="2"
                   fill={locationStatus === 'found' ? '#4285F4' : '#999'}
                   stroke="none"
                 />
