@@ -231,6 +231,7 @@ export default function GoogleMapController({
         route={route}
         isNavigating={isNavigating}
         panelVisible={!!destination && isPanelOpen}
+        travelMode={travelMode}
       />
 
       {destination && isPanelOpen && (

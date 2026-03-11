@@ -6,7 +6,12 @@ import { getBuildingGps } from '@/features/map/lib/buildings';
 import { CAMPUS_CENTRE_GPS } from '@/features/map/lib/constants';
 import { loadGoogleMaps } from '@/lib/maps/google/loader';
 import { decodePolyline } from '@/lib/maps/google/decodePolyline';
-import type { GoogleComputedRoute, MapLatLng, ExternalDestination } from '@/lib/maps/google/types';
+import type {
+  GoogleComputedRoute,
+  GoogleTravelMode,
+  MapLatLng,
+  ExternalDestination,
+} from '@/lib/maps/google/types';
 
 // DEMO_MAP_ID is Google's built-in demo Map ID that enables Advanced Markers
 // without requiring a custom Map ID from the Cloud Console.
@@ -57,6 +62,8 @@ interface Props {
   isNavigating: boolean;
   /** When the route panel is visible, shift the location button above it */
   panelVisible?: boolean;
+  /** Current travel mode — walking uses dashed polyline */
+  travelMode?: GoogleTravelMode;
 }
 
 export default function GoogleMapCanvas({
@@ -66,6 +73,7 @@ export default function GoogleMapCanvas({
   route,
   isNavigating,
   panelVisible,
+  travelMode,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -355,41 +363,64 @@ export default function GoogleMapCanvas({
     // Remaining route — two-layer polyline for Google Maps outline effect
     const remainingPath = isNavigating && splitIdx > 0 ? path.slice(splitIdx) : path;
 
-    // Dashed route styling — repeating symbol icons along the path
-    const outlineDash = {
-      path: 'M 0,-1 0,1',
-      strokeOpacity: 1,
-      strokeColor: '#1a56db',
-      scale: 4,
-    };
-    const coreDash = {
-      path: 'M 0,-1 0,1',
-      strokeOpacity: 1,
-      strokeColor: '#4285F4',
-      scale: 3,
-    };
+    const isWalking = travelMode === 'WALK';
 
-    // Outer outline layer (darker blue, wider, dashed)
-    outlinePolylineRef.current = new google.maps.Polyline({
-      path: remainingPath,
-      map,
-      strokeOpacity: 0,
-      strokeWeight: 8,
-      geodesic: true,
-      zIndex: 2,
-      icons: [{ icon: outlineDash, offset: '0', repeat: '16px' }],
-    });
+    if (isWalking) {
+      // Dashed polyline for walking — repeating symbol icons along the path
+      const outlineDash = {
+        path: 'M 0,-1 0,1',
+        strokeOpacity: 1,
+        strokeColor: '#1a56db',
+        scale: 4,
+      };
+      const coreDash = {
+        path: 'M 0,-1 0,1',
+        strokeOpacity: 1,
+        strokeColor: '#4285F4',
+        scale: 3,
+      };
 
-    // Inner core layer (Google Maps blue, dashed)
-    polylineRef.current = new google.maps.Polyline({
-      path: remainingPath,
-      map,
-      strokeOpacity: 0,
-      strokeWeight: 6,
-      geodesic: true,
-      zIndex: 3,
-      icons: [{ icon: coreDash, offset: '0', repeat: '16px' }],
-    });
+      outlinePolylineRef.current = new google.maps.Polyline({
+        path: remainingPath,
+        map,
+        strokeOpacity: 0,
+        strokeWeight: 8,
+        geodesic: true,
+        zIndex: 2,
+        icons: [{ icon: outlineDash, offset: '0', repeat: '16px' }],
+      });
+
+      polylineRef.current = new google.maps.Polyline({
+        path: remainingPath,
+        map,
+        strokeOpacity: 0,
+        strokeWeight: 6,
+        geodesic: true,
+        zIndex: 3,
+        icons: [{ icon: coreDash, offset: '0', repeat: '16px' }],
+      });
+    } else {
+      // Solid polyline for drive/transit/bicycle
+      outlinePolylineRef.current = new google.maps.Polyline({
+        path: remainingPath,
+        map,
+        strokeColor: '#1a56db',
+        strokeOpacity: 1.0,
+        strokeWeight: 8,
+        geodesic: true,
+        zIndex: 2,
+      });
+
+      polylineRef.current = new google.maps.Polyline({
+        path: remainingPath,
+        map,
+        strokeColor: '#4285F4',
+        strokeOpacity: 1.0,
+        strokeWeight: 6,
+        geodesic: true,
+        zIndex: 3,
+      });
+    }
 
     // Origin dot marker (green, like Google Maps)
     if (path.length > 0 && !isNavigating) {
@@ -418,7 +449,7 @@ export default function GoogleMapCanvas({
         left: 40,
       });
     }
-  }, [route, isNavigating, userLocation, mapReady]);
+  }, [route, isNavigating, userLocation, mapReady, travelMode]);
 
   // Cleanup animation frame on unmount
   useEffect(() => {
