@@ -477,47 +477,46 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           </div>
         )}
 
-        {/* Floating Action Button - Center on User - Positioned above zoom controls */}
+        {/* Locate Me button — compact, positioned left of the Leaflet zoom controls */}
         <button
           onClick={centerOnUser}
           className={cn(
-            'absolute z-[1000] p-3 rounded-full shadow-lg transition-all duration-200 bg-mq-card-background text-mq-primary hover:bg-mq-hover-background focus:outline-none focus:ring-2 focus:ring-mq-primary/50',
-            // Position above zoom controls (which are at bottom-right)
-            // On mobile: above the selected building card if present
-            // On desktop: always in bottom-right corner above zoom
+            'absolute z-[1000] flex h-[30px] w-[30px] items-center justify-center rounded-sm border-2 border-[rgba(0,0,0,0.2)] bg-white shadow-none transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 focus:outline-none',
+            // Position next to the zoom controls (bottom-right)
             selectedBuilding
-              ? 'bottom-[280px] right-4 sm:bottom-[140px] sm:right-4'
-              : 'bottom-[140px] right-4',
+              ? 'bottom-[280px] right-[46px] sm:bottom-[88px] sm:right-[46px]'
+              : 'bottom-[88px] right-[46px]',
           )}
           aria-label={t('centerOnLocation')}
+          title={t('centerOnLocation')}
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24">
             {locationStatus === 'searching' ? (
               <circle
                 cx="12"
                 cy="12"
                 r="10"
+                stroke="currentColor"
+                strokeWidth="2"
                 strokeDasharray="60"
                 strokeDashoffset="20"
-                className="animate-spin origin-center"
+                className="animate-spin origin-center text-gray-500"
               />
             ) : (
               <>
-                <circle cx="12" cy="12" r="3" />
-                <line x1="12" y1="2" x2="12" y2="4" />
-                <line x1="12" y1="20" x2="12" y2="22" />
-                <line x1="4.93" y1="4.93" x2="6.34" y2="6.34" />
-                <line x1="17.66" y1="17.66" x2="19.07" y2="19.07" />
-                <line x1="2" y1="12" x2="4" y2="12" />
-                <line x1="20" y1="12" x2="22" y2="12" />
-                <line x1="4.93" y1="19.07" x2="6.34" y2="17.66" />
-                <line x1="17.66" y1="6.34" x2="19.07" y2="4.93" />
+                {/* Simple crosshair icon matching Google Maps style */}
+                <circle cx="12" cy="12" r="4" stroke="#666" strokeWidth="2" fill="none" />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="1.5"
+                  fill={locationStatus === 'found' ? '#4285F4' : '#999'}
+                  stroke="none"
+                />
+                <line x1="12" y1="2" x2="12" y2="7" stroke="#666" strokeWidth="2" />
+                <line x1="12" y1="17" x2="12" y2="22" stroke="#666" strokeWidth="2" />
+                <line x1="2" y1="12" x2="7" y2="12" stroke="#666" strokeWidth="2" />
+                <line x1="17" y1="12" x2="22" y2="12" stroke="#666" strokeWidth="2" />
               </>
             )}
           </svg>

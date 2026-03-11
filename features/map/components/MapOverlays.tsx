@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { mapOverlayById, type MapOverlayId } from '@/features/map/lib/mapOverlays';
 import type { ReactLeafletModule } from '@/features/map/hooks/useLeafletLoader';
 
@@ -32,6 +32,31 @@ export function MapOverlays({
     [activeOverlays],
   );
 
+  // Inject CSS to improve overlay image rendering quality.
+  // Overlay PNGs are slightly smaller than the base campus map, so Leaflet
+  // upscales them — `image-rendering: high-quality` prevents blurriness.
+  useEffect(() => {
+    const styleId = 'leaflet-overlay-quality';
+    if (document.getElementById(styleId)) return;
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      .leaflet-pane.leaflet-campus-overlays-pane img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: high-quality;
+      }
+      .leaflet-overlay-pane img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: high-quality;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      const el = document.getElementById(styleId);
+      if (el) el.remove();
+    };
+  }, []);
+
   if (!overlaysReady) return null;
 
   return (
@@ -44,6 +69,7 @@ export function MapOverlays({
           opacity={cfg.opacity}
           zIndex={cfg.zIndex}
           interactive={false}
+          className="campus-overlay-image"
         />
       ))}
     </Pane>

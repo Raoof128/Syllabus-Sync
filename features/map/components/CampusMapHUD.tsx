@@ -61,19 +61,8 @@ export default function CampusMapHUD({
   const searchParams = useSearchParams();
   const layersParam = searchParams.get('layers');
 
-  // Mobile: Places panel is collapsed by default, expanded on desktop.
+  // Places panel is collapsed by default — user taps "Places" to expand
   const [isPlacesPanelExpanded, setIsPlacesPanelExpanded] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 640px)');
-    const syncExpandedState = () => {
-      setIsPlacesPanelExpanded(mediaQuery.matches);
-    };
-
-    syncExpandedState();
-    mediaQuery.addEventListener('change', syncExpandedState);
-    return () => mediaQuery.removeEventListener('change', syncExpandedState);
-  }, []);
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {

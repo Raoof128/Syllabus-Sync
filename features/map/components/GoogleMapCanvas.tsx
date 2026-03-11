@@ -92,14 +92,17 @@ export default function GoogleMapCanvas({
           zoom: 16,
           mapId: MAP_ID,
           mapTypeControl: true,
-          mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT },
+          mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_LEFT },
           streetViewControl: true,
-          streetViewControlOptions: { position: google.maps.ControlPosition.LEFT_BOTTOM },
-          fullscreenControl: true,
+          streetViewControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
+          fullscreenControl: false,
           zoomControl: true,
+          zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM },
           scaleControl: true,
           gestureHandling: 'greedy',
           clickableIcons: true,
+          // Disable 3D tilt/rotate camera control on vector maps (not in TS types yet)
+          ...({ tiltControl: false, rotateControl: false } as Partial<google.maps.MapOptions>),
         });
         setMapReady(true);
       })
@@ -406,6 +409,43 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
+  // Inject CSS to keep Google Maps controls readable in Street View and dark mode
+  useEffect(() => {
+    const styleId = 'gmap-control-overrides';
+    if (document.getElementById(styleId)) return;
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      /* Force Google Maps controls to stay white/readable in Street View and dark mode */
+      .gm-style .gm-control-active {
+        background-color: #fff !important;
+        color: #666 !important;
+      }
+      .gm-style .gm-control-active:hover {
+        background-color: #f5f5f5 !important;
+      }
+      .gm-style .gm-control-active > img {
+        filter: none !important;
+      }
+      .gm-style .gmnoprint > div > div {
+        background-color: #fff !important;
+      }
+      /* Street View panorama controls */
+      .gm-style .gm-iv-container .gm-control-active {
+        background-color: #fff !important;
+        color: #666 !important;
+      }
+      .gm-style .gm-compass {
+        background-color: #fff !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      const el = document.getElementById(styleId);
+      if (el) el.remove();
+    };
+  }, []);
+
   // Center map on user location (or request permission if not yet granted)
   const handleMyLocation = useCallback(() => {
     const map = mapRef.current;
@@ -442,10 +482,11 @@ export default function GoogleMapCanvas({
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
 
-      {/* My Location button — always visible, requests permission if needed */}
+      {/* My Location button — always visible, always white (matches Google Maps native controls) */}
+      {/* Sits between Pegman (above zoom +/-) and the zoom buttons on the right side */}
       <button
         onClick={handleMyLocation}
-        className={`absolute ${panelVisible ? 'bottom-[28rem]' : 'bottom-24'} right-3 z-[1100] flex h-10 w-10 items-center justify-center rounded-md bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-[#3c4043] dark:hover:bg-[#4a4e51] dark:active:bg-[#5a5e61]`}
+        className={`absolute ${panelVisible ? 'bottom-[28rem]' : 'bottom-[8.5rem]'} right-[10px] z-[1100] flex h-10 w-10 items-center justify-center rounded-sm bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 active:bg-gray-200`}
         aria-label="My location"
         title="My location"
       >
@@ -457,7 +498,7 @@ export default function GoogleMapCanvas({
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={`h-5 w-5 ${userLocation ? 'text-[#666] dark:text-[#e8eaed]' : 'text-[#999] dark:text-[#888]'}`}
+          className={`h-5 w-5 ${userLocation ? 'text-[#666]' : 'text-[#999]'}`}
         >
           {/* Crosshair icon matching Google Maps */}
           <circle cx={12} cy={12} r={4} fill="currentColor" fillOpacity={0.15} />
