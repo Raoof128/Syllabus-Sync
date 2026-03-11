@@ -221,8 +221,8 @@ const FeedClient = memo(() => {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
-                  <Trash2 className="h-5 w-5 text-red-500 dark:text-red-300" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/25 dark:ring-2 dark:ring-red-400/60">
+                  <Trash2 className="h-6 w-6 text-red-500 dark:text-red-100" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-mq-content">

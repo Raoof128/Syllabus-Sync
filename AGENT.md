@@ -1,4 +1,11 @@
 Raouf: 2026-03-11 (Australia/Sydney)
+Scope: Dark Mode UI — Delete Modal Icon Visibility Boost
+Summary: Increased the destructive icon emphasis well beyond the first contrast fix. Enlarged the delete/warning badge from `h-10 w-10` to `h-12 w-12`, increased icon size from `h-5 w-5` to `h-6 w-6`, switched dark mode to a brighter red surface (`dark:bg-red-500/25`), added a visible ring (`dark:ring-2 dark:ring-red-400/60`), and moved icon foreground to near-white red (`dark:text-red-100`) so the bin symbol reads immediately on dark backgrounds.
+Files Changed: `app/calendar/CalendarClient.tsx`, `app/feed/FeedClient.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs app/calendar/CalendarClient.tsx app/feed/FeedClient.tsx` ✅
+Follow-ups: If you want it even louder, the next step is swapping the icon itself to a filled asset or adding a small destructive label beside it.
+
+Raouf: 2026-03-11 (Australia/Sydney)
 Scope: Dark Mode UI — Delete Modal Bin Icon Contrast Fix
 Summary: Fixed the dark-mode delete confirmation icon treatment so the warning/bin glyph remains visible on dark surfaces. Updated the red circular icon badge in the calendar delete-confirmation modals and the feed delete-confirmation modal from `dark:bg-red-950/30` to the higher-contrast `dark:bg-red-900/40`, and added explicit `dark:text-red-300` icon color overrides for both `Trash2` and `AlertTriangle`.
 Files Changed: `app/calendar/CalendarClient.tsx`, `app/feed/FeedClient.tsx`
