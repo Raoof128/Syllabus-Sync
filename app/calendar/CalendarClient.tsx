@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import {
@@ -1017,245 +1018,263 @@ export default function CalendarClient() {
         }}
       />
 
-      {/* Delete Confirmation Modal for Units */}
-      {deleteConfirmOpen && unitToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
+      {/* Delete Confirmation Modals — portaled to body to escape the overflow-y-auto
+          layout container, preventing iOS Safari scroll-jump on mount */}
+      {deleteConfirmOpen &&
+        unitToDelete &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
+            <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-mq-content">
+                    {t('deleteUnitConfirm')}
+                  </h3>
+                  <p className="text-sm text-mq-content-secondary">
+                    {unitToDelete.code} - {unitToDelete.name}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-mq-content">{t('deleteUnitConfirm')}</h3>
-                <p className="text-sm text-mq-content-secondary">
-                  {unitToDelete.code} - {unitToDelete.name}
-                </p>
+              <p className="text-sm text-mq-content-secondary mb-6">{t('deleteUnitConfirmDesc')}</p>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDeleteConfirmOpen(false);
+                    setUnitToDelete(null);
+                  }}
+                >
+                  {t('cancelAction')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmDeleteUnit}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  {t('confirmDelete')}
+                </Button>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteUnitConfirmDesc')}</p>
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setDeleteConfirmOpen(false);
-                  setUnitToDelete(null);
-                }}
-              >
-                {t('cancelAction')}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDeleteUnit}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                {t('confirmDelete')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
-      {/* Delete Confirmation Modal for Assignments */}
-      {assignmentDeleteConfirmOpen && assignmentToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-600" />
+      {assignmentDeleteConfirmOpen &&
+        assignmentToDelete &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
+            <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-mq-content">
+                    {t('deleteAssignmentConfirm' as TranslationKey)}
+                  </h3>
+                  <p className="text-sm text-mq-content-secondary">{assignmentToDelete.title}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-mq-content">
-                  {t('deleteAssignmentConfirm' as TranslationKey)}
-                </h3>
-                <p className="text-sm text-mq-content-secondary">{assignmentToDelete.title}</p>
+              <p className="text-sm text-mq-content-secondary mb-6">
+                {t('deleteAssignmentConfirmDesc' as TranslationKey)}
+              </p>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setAssignmentDeleteConfirmOpen(false);
+                    setAssignmentToDelete(null);
+                  }}
+                >
+                  {t('cancelAction')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmDeleteAssignment}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  {t('confirmDelete')}
+                </Button>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteAssignmentConfirmDesc' as TranslationKey)}
-            </p>
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setAssignmentDeleteConfirmOpen(false);
-                  setAssignmentToDelete(null);
-                }}
-              >
-                {t('cancelAction')}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDeleteAssignment}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                {t('confirmDelete')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
-      {/* Delete Confirmation Modal for Exams */}
-      {examDeleteConfirmOpen && examToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-600" />
+      {examDeleteConfirmOpen &&
+        examToDelete &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
+            <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-mq-content">
+                    {t('deleteExamConfirm' as TranslationKey)}
+                  </h3>
+                  <p className="text-sm text-mq-content-secondary">{examToDelete.title}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-mq-content">
-                  {t('deleteExamConfirm' as TranslationKey)}
-                </h3>
-                <p className="text-sm text-mq-content-secondary">{examToDelete.title}</p>
+              <p className="text-sm text-mq-content-secondary mb-6">
+                {t('deleteExamConfirmDesc' as TranslationKey)}
+              </p>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setExamDeleteConfirmOpen(false);
+                    setExamToDelete(null);
+                  }}
+                >
+                  {t('cancelAction')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmDeleteExam}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  {t('confirmDelete')}
+                </Button>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteExamConfirmDesc' as TranslationKey)}
-            </p>
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setExamDeleteConfirmOpen(false);
-                  setExamToDelete(null);
-                }}
-              >
-                {t('cancelAction')}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDeleteExam}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                {t('confirmDelete')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
-      {/* Delete Confirmation Modal for Deadlines */}
-      {deadlineDeleteConfirmOpen && deadlineToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-600" />
+      {deadlineDeleteConfirmOpen &&
+        deadlineToDelete &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
+            <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-mq-content">
+                    {t('deleteDeadlineConfirm' as TranslationKey)}
+                  </h3>
+                  <p className="text-sm text-mq-content-secondary">{deadlineToDelete.title}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-mq-content">
-                  {t('deleteDeadlineConfirm' as TranslationKey)}
-                </h3>
-                <p className="text-sm text-mq-content-secondary">{deadlineToDelete.title}</p>
+              <p className="text-sm text-mq-content-secondary mb-6">
+                {t('deleteDeadlineConfirmDesc' as TranslationKey)}
+              </p>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDeadlineDeleteConfirmOpen(false);
+                    setDeadlineToDelete(null);
+                  }}
+                >
+                  {t('cancelAction')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmDeleteDeadline}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  {t('confirmDelete')}
+                </Button>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteDeadlineConfirmDesc' as TranslationKey)}
-            </p>
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setDeadlineDeleteConfirmOpen(false);
-                  setDeadlineToDelete(null);
-                }}
-              >
-                {t('cancelAction')}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDeleteDeadline}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                {t('confirmDelete')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
-      {/* Delete Confirmation Modal for Events */}
-      {eventDeleteConfirmOpen && eventToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-600" />
+      {eventDeleteConfirmOpen &&
+        eventToDelete &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
+            <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-mq-content">
+                    {t('deleteEventConfirm' as TranslationKey)}
+                  </h3>
+                  <p className="text-sm text-mq-content-secondary">{eventToDelete.title}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-mq-content">
-                  {t('deleteEventConfirm' as TranslationKey)}
-                </h3>
-                <p className="text-sm text-mq-content-secondary">{eventToDelete.title}</p>
+              <p className="text-sm text-mq-content-secondary mb-6">
+                {t('deleteEventConfirmDesc' as TranslationKey)}
+              </p>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEventDeleteConfirmOpen(false);
+                    setEventToDelete(null);
+                  }}
+                >
+                  {t('cancelAction')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmDeleteEvent}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  {t('confirmDelete')}
+                </Button>
               </div>
             </div>
-            <p className="text-sm text-mq-content-secondary mb-6">
-              {t('deleteEventConfirmDesc' as TranslationKey)}
-            </p>
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setEventDeleteConfirmOpen(false);
-                  setEventToDelete(null);
-                }}
-              >
-                {t('cancelAction')}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDeleteEvent}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                {t('confirmDelete')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
-      {/* Delete Confirmation Modal for Todos */}
-      {todoDeleteConfirmOpen && todoToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
-          <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-600" />
+      {todoDeleteConfirmOpen &&
+        todoToDelete &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
+            <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-mq-content">
+                    {t('deleteTodoConfirm')}
+                  </h3>
+                  <p className="text-sm text-mq-content-secondary">{todoToDelete.title}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-mq-content">{t('deleteTodoConfirm')}</h3>
-                <p className="text-sm text-mq-content-secondary">{todoToDelete.title}</p>
-              </div>
-            </div>
-            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteTodoConfirmDesc')}</p>
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setTodoDeleteConfirmOpen(false);
-                  setTodoToDelete(null);
-                }}
-              >
-                {t('cancelAction')}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  if (todoToDelete) {
-                    removeTodo(todoToDelete.id);
+              <p className="text-sm text-mq-content-secondary mb-6">{t('deleteTodoConfirmDesc')}</p>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
                     setTodoDeleteConfirmOpen(false);
                     setTodoToDelete(null);
-                  }
-                }}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                {t('confirmDelete')}
-              </Button>
+                  }}
+                >
+                  {t('cancelAction')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    if (todoToDelete) {
+                      removeTodo(todoToDelete.id);
+                      setTodoDeleteConfirmOpen(false);
+                      setTodoToDelete(null);
+                    }
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  {t('confirmDelete')}
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
 
       {/* Todo Modal */}
       <Dialog

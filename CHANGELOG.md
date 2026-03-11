@@ -1,3 +1,10 @@
+Raouf: 2026-03-11 (Australia/Sydney)
+Scope: Mobile UX — FAB Safe Area, Dashed Route Polyline, Delete Modal Scroll-Jump Fix
+Summary: Fixed three mobile bugs. (1) FAB in HomeClient now uses `env(safe-area-inset-bottom)` and `env(safe-area-inset-right)` via inline styles to remain visible above iPhone home indicator. (2) Google Maps route polyline changed from solid two-layer stroke to dashed using repeating `icons` symbols — both outline (#1a56db) and inner core (#4285F4) layers use `strokeOpacity: 0` with `M 0,-1 0,1` dash symbols repeated at 16px. (3) All 7 delete confirmation modals (6 in CalendarClient, 1 in FeedClient) wrapped in `createPortal(…, document.body)` to escape the `overflow-y-auto` layout-main scroll container, preventing iOS Safari scroll-jump on mount.
+Files Changed: `app/home/HomeClient.tsx`, `features/map/components/GoogleMapCanvas.tsx`, `app/calendar/CalendarClient.tsx`, `app/feed/FeedClient.tsx`
+Verification: `npx tsc --noEmit` ✅; `npx eslint` on all changed files ✅
+Follow-ups: Consider `viewport-fit: cover` for full iOS edge-to-edge safe area. Walked-portion polyline kept solid for differentiation.
+
 Raouf: 2026-03-10 (Australia/Sydney)
 Scope: Google Maps — Move My-Location button to left side to avoid control overlap
 Summary: Relocated the My-Location crosshair button from the right side (`right-2.5 bottom-28`) to the left side (`left-3 bottom-24`). The right side is occupied by Google Maps native controls: mapType + fullscreen at TOP_RIGHT, zoom control at right-center, and streetView pegman at bottom-right. The left side is free apart from the tiny scale bar at the very bottom corner. The panel-open upward shift (`bottom-[28rem]`) is retained so the button clears the route panel when visible.

@@ -287,7 +287,13 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         {/* Floating Action Button (FAB) - rendered via portal to escape overflow:auto clipping */}
         {portalTarget &&
           createPortal(
-            <div className="fixed bottom-6 right-6 z-[9999]">
+            <div
+              className="fixed z-[9999]"
+              style={{
+                bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))',
+                right: 'calc(1.5rem + env(safe-area-inset-right, 0px))',
+              }}
+            >
               <LazyMotion features={domAnimation}>
                 <div className="relative">
                   {/* FAB Menu */}

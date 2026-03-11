@@ -355,26 +355,40 @@ export default function GoogleMapCanvas({
     // Remaining route — two-layer polyline for Google Maps outline effect
     const remainingPath = isNavigating && splitIdx > 0 ? path.slice(splitIdx) : path;
 
-    // Outer outline layer (darker blue, wider)
+    // Dashed route styling — repeating symbol icons along the path
+    const outlineDash = {
+      path: 'M 0,-1 0,1',
+      strokeOpacity: 1,
+      strokeColor: '#1a56db',
+      scale: 4,
+    };
+    const coreDash = {
+      path: 'M 0,-1 0,1',
+      strokeOpacity: 1,
+      strokeColor: '#4285F4',
+      scale: 3,
+    };
+
+    // Outer outline layer (darker blue, wider, dashed)
     outlinePolylineRef.current = new google.maps.Polyline({
       path: remainingPath,
       map,
-      strokeColor: '#1a56db',
-      strokeOpacity: 1.0,
+      strokeOpacity: 0,
       strokeWeight: 8,
       geodesic: true,
       zIndex: 2,
+      icons: [{ icon: outlineDash, offset: '0', repeat: '16px' }],
     });
 
-    // Inner core layer (Google Maps blue)
+    // Inner core layer (Google Maps blue, dashed)
     polylineRef.current = new google.maps.Polyline({
       path: remainingPath,
       map,
-      strokeColor: '#4285F4',
-      strokeOpacity: 1.0,
+      strokeOpacity: 0,
       strokeWeight: 6,
       geodesic: true,
       zIndex: 3,
+      icons: [{ icon: coreDash, offset: '0', repeat: '16px' }],
     });
 
     // Origin dot marker (green, like Google Maps)

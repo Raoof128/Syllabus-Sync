@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/mq/button';
 import { Plus, Trash2, Rss, Info } from 'lucide-react';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
@@ -213,48 +214,55 @@ const FeedClient = memo(() => {
       {/* Event Form Dialog */}
       <EventForm open={eventFormOpen} onOpenChange={setEventFormOpen} editEvent={editingEvent} />
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirmOpen && eventToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                <Trash2 className="h-5 w-5 text-red-500" />
+      {/* Delete Confirmation Modal — portaled to body to prevent scroll-jump */}
+      {deleteConfirmOpen &&
+        eventToDelete &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="bg-mq-surface border border-mq-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 text-red-500" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-mq-content">
+                    {t('deleteEventConfirm')}
+                  </h3>
+                  <p className="text-sm text-mq-content-secondary">{eventToDelete.title}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-mq-content">{t('deleteEventConfirm')}</h3>
-                <p className="text-sm text-mq-content-secondary">{eventToDelete.title}</p>
-              </div>
-            </div>
-            <p className="text-sm text-mq-content-secondary mb-6">{t('deleteEventConfirmDesc')}</p>
-            <div className="flex justify-end gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setDeleteConfirmOpen(false);
-                  setEventToDelete(null);
-                }}
-              >
-                {t('cancelAction')}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  if (eventToDelete) {
-                    removeEvent(eventToDelete.id);
+              <p className="text-sm text-mq-content-secondary mb-6">
+                {t('deleteEventConfirmDesc')}
+              </p>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
                     setDeleteConfirmOpen(false);
                     setEventToDelete(null);
-                    toastUtils.success(t('eventDeleted'), t('eventDeletedDesc'));
-                  }
-                }}
-                className="bg-red-500 hover:bg-red-600 text-white"
-              >
-                {t('confirmDelete')}
-              </Button>
+                  }}
+                >
+                  {t('cancelAction')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    if (eventToDelete) {
+                      removeEvent(eventToDelete.id);
+                      setDeleteConfirmOpen(false);
+                      setEventToDelete(null);
+                      toastUtils.success(t('eventDeleted'), t('eventDeletedDesc'));
+                    }
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
+                  {t('confirmDelete')}
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </section>
   );
 });
