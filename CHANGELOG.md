@@ -1,4 +1,11 @@
 Raouf: 2026-03-11 (Australia/Sydney)
+Scope: Dark Mode UI — Delete Modal Bin Icon Contrast Fix
+Summary: Fixed the dark-mode delete confirmation icon treatment so the bin/warning glyph remains visible. The circular destructive icon badge in `CalendarClient` and `FeedClient` now uses a stronger dark red background (`dark:bg-red-900/40`) and explicit icon foreground (`dark:text-red-300`) instead of relying on the lighter-mode red only.
+Files Changed: `app/calendar/CalendarClient.tsx`, `app/feed/FeedClient.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs app/calendar/CalendarClient.tsx app/feed/FeedClient.tsx` ✅
+Follow-ups: Consider standardizing destructive icon badge styles into a shared utility if more modal variants need the same dark-mode treatment.
+
+Raouf: 2026-03-11 (Australia/Sydney)
 Scope: Mobile UX — FAB Safe Area, Dashed Route Polyline, Delete Modal Scroll-Jump Fix
 Summary: Fixed three mobile bugs. (1) FAB in HomeClient now uses `env(safe-area-inset-bottom)` and `env(safe-area-inset-right)` via inline styles to remain visible above iPhone home indicator. (2) Google Maps route polyline changed from solid two-layer stroke to dashed using repeating `icons` symbols — both outline (#1a56db) and inner core (#4285F4) layers use `strokeOpacity: 0` with `M 0,-1 0,1` dash symbols repeated at 16px. (3) All 7 delete confirmation modals (6 in CalendarClient, 1 in FeedClient) wrapped in `createPortal(…, document.body)` to escape the `overflow-y-auto` layout-main scroll container, preventing iOS Safari scroll-jump on mount.
 Files Changed: `app/home/HomeClient.tsx`, `features/map/components/GoogleMapCanvas.tsx`, `app/calendar/CalendarClient.tsx`, `app/feed/FeedClient.tsx`

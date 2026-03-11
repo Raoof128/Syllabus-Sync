@@ -1026,8 +1026,8 @@ export default function CalendarClient() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
             <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
+                  <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-300" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-mq-content">
@@ -1068,8 +1068,8 @@ export default function CalendarClient() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
             <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                  <Trash2 className="h-5 w-5 text-red-600" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
+                  <Trash2 className="h-5 w-5 text-red-600 dark:text-red-300" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-mq-content">
@@ -1110,8 +1110,8 @@ export default function CalendarClient() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
             <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                  <Trash2 className="h-5 w-5 text-red-600" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
+                  <Trash2 className="h-5 w-5 text-red-600 dark:text-red-300" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-mq-content">
@@ -1152,8 +1152,8 @@ export default function CalendarClient() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
             <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                  <Trash2 className="h-5 w-5 text-red-600" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
+                  <Trash2 className="h-5 w-5 text-red-600 dark:text-red-300" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-mq-content">
@@ -1194,8 +1194,8 @@ export default function CalendarClient() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
             <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                  <Trash2 className="h-5 w-5 text-red-600" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
+                  <Trash2 className="h-5 w-5 text-red-600 dark:text-red-300" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-mq-content">
@@ -1236,8 +1236,8 @@ export default function CalendarClient() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/60 backdrop-blur-0 dark:backdrop-blur-sm p-4">
             <div className="bg-mq-background dark:bg-mq-card-background border border-mq-border rounded-lg shadow-xl p-4 sm:p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center">
-                  <Trash2 className="h-5 w-5 text-red-600" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
+                  <Trash2 className="h-5 w-5 text-red-600 dark:text-red-300" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-mq-content">
