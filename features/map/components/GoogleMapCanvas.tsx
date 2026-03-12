@@ -475,8 +475,8 @@ export default function GoogleMapCanvas({
       .gm-style .gm-svpc { display: block !important; visibility: visible !important; opacity: 1 !important; }
       .gm-style .gm-style-pbc { background-color: transparent !important; }
       .gm-style .gm-iv-back-icon, .gm-style .gm-iv-marker { filter: none !important; }
-      .gm-style [role="tooltip"] { display: none !important; }
-      .gm-style .gm-tooltip { display: none !important; }
+      .gm-style [role="tooltip"], .gm-style [role="tooltip"] * { display: none !important; opacity: 0 !important; visibility: hidden !important; }
+      .gm-style .gm-tooltip, .gm-style .gm-tooltip * { display: none !important; opacity: 0 !important; visibility: hidden !important; }
     `;
     document.head.appendChild(style);
     return () => {

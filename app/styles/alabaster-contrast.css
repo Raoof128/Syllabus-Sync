@@ -211,7 +211,8 @@ html:not(.dark) .map-page .gm-style,
 html:not(.dark) .map-page .gm-style * {
   color: revert;
   -webkit-text-fill-color: revert;
-  opacity: revert;
+  /* Do NOT revert opacity — Google Maps uses opacity:0 to hide tooltips.
+     Reverting to UA default (1) would reveal them permanently in light mode. */
   mix-blend-mode: revert;
 }
 
