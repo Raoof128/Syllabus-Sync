@@ -525,11 +525,14 @@ export default function GoogleMapCanvas({
         el.style.setProperty('-webkit-text-fill-color', '#1a73e8', 'important');
       });
 
-      // Short address overlay (e.g. "100 Pennant St") — white on panorama (both modes)
+      // Short address overlay (e.g. "3 Science Rd") — dark text on light pill for readability
       container.querySelectorAll<HTMLElement>('.gm-iv-short-address-description').forEach((el) => {
-        el.style.setProperty('color', '#fff', 'important');
-        el.style.setProperty('-webkit-text-fill-color', '#fff', 'important');
-        el.style.setProperty('text-shadow', '0 1px 3px rgba(0,0,0,0.6)', 'important');
+        el.style.setProperty('color', '#222', 'important');
+        el.style.setProperty('-webkit-text-fill-color', '#222', 'important');
+        el.style.setProperty('background-color', 'rgba(255,255,255,0.85)', 'important');
+        el.style.setProperty('padding', '2px 8px', 'important');
+        el.style.setProperty('border-radius', '4px', 'important');
+        el.style.setProperty('text-shadow', 'none', 'important');
       });
 
       // Footer containers ("Terms", "Keyboard shortcuts", copyright)
