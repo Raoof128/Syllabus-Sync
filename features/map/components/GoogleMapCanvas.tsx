@@ -475,6 +475,8 @@ export default function GoogleMapCanvas({
       .gm-style .gm-svpc { display: block !important; visibility: visible !important; opacity: 1 !important; }
       .gm-style .gm-style-pbc { background-color: transparent !important; }
       .gm-style .gm-iv-back-icon, .gm-style .gm-iv-marker { filter: none !important; }
+      .gm-style [role="tooltip"] { display: none !important; }
+      .gm-style .gm-tooltip { display: none !important; }
     `;
     document.head.appendChild(style);
     return () => {
@@ -483,18 +485,34 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
-  // Strip title attributes from Google Maps controls to remove tooltips
+  // Remove all Google Maps tooltips (native title attrs + custom tooltip divs)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     const strip = () => {
+      // Remove native title tooltips
       container.querySelectorAll<HTMLElement>('.gm-style [title]').forEach((el) => {
         el.removeAttribute('title');
+      });
+      // Hide custom tooltip divs (role="tooltip" or Google's tooltip class)
+      container
+        .querySelectorAll<HTMLElement>('.gm-style [role="tooltip"], .gm-style .gm-tooltip')
+        .forEach((el) => {
+          el.style.setProperty('display', 'none', 'important');
+        });
+      // Hide aria-label-based tooltip popups (black pill with arrow)
+      container.querySelectorAll<HTMLElement>('.gm-style [aria-label]').forEach((el) => {
+        el.removeAttribute('aria-label');
       });
     };
     strip();
     const observer = new MutationObserver(strip);
-    observer.observe(container, { childList: true, subtree: true });
+    observer.observe(container, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['title', 'aria-label'],
+    });
     return () => observer.disconnect();
   }, [mapReady]);
 
