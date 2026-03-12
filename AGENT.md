@@ -1,4 +1,11 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Align Google search bar with campus map position
+Summary: Removed the extra vertical offset on the Google-mode building search bar so the shared `map-search-input` now appears in the same top-left screen position as the campus map search UI. Updated `CampusMapHUD.tsx` from `top-14` to `top-3` and corrected the nearby comment so the two map modes stay visually aligned when switching views.
+Files Changed: `features/map/components/CampusMapHUD.tsx`
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/CampusMapHUD.tsx` ✅
+Follow-ups: Visually confirm on desktop and mobile that the Google search bar clears any native map chrome at the top edge.
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map Tooling — Export calibrated Flutter overlay metadata
 Summary: Extended the Flutter map export bridge so it now ships the same calibrated campus overlay metadata the web map depends on, not just the raster image and building registry. `tools/export_buildings.mjs` now derives pixel bounds, fit-padding / zoom behavior, and affine GPS projection coefficients from the web map calibration source and writes them into Flutter’s `campus_overlay_meta.json`. This keeps Flutter aligned with the web `CRS.Simple` campus map for image bounds, GPS-to-overlay route projection, and marker offset behavior without copying the web component code itself.
 Files Changed: `tools/export_buildings.mjs`

@@ -131,8 +131,8 @@ export default function CampusMapHUD({
           {buildingSearch ? t('buildingsFound', { count: visibleBuildings.length }) : ''}
         </div>
 
-        {/* Google Maps-style floating search bar — offset from top to avoid map controls */}
-        <div className="absolute top-14 left-3 w-[min(400px,calc(100vw-24px))] pointer-events-auto">
+        {/* Google Maps-style floating search bar aligned with campus mode */}
+        <div className="absolute top-3 left-3 w-[min(400px,calc(100vw-24px))] pointer-events-auto">
           <div
             className={cn(
               'bg-mq-card-background shadow-lg',
