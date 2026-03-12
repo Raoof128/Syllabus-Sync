@@ -462,7 +462,7 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
-  // Static CSS overrides for Google Maps controls (baseline)
+  // Static CSS overrides for Google Maps controls (normal map, not Street View)
   useEffect(() => {
     const styleId = 'gmap-control-overrides';
     if (document.getElementById(styleId)) return;
@@ -472,11 +472,8 @@ export default function GoogleMapCanvas({
       .gm-style .gm-control-active { background-color: #fff !important; color: #666 !important; }
       .gm-style .gm-control-active:hover { background-color: #f5f5f5 !important; }
       .gm-style .gm-control-active > img { filter: none !important; }
-      .gm-style .gmnoprint > div > div { background-color: #fff !important; }
       .gm-style .gm-svpc { display: block !important; visibility: visible !important; opacity: 1 !important; }
-      .gm-style .gm-iv-container .gm-control-active { background-color: #fff !important; color: #666 !important; }
       .gm-style .gm-style-pbc { background-color: transparent !important; }
-      .gm-style .gm-compass { background-color: transparent !important; box-shadow: none !important; }
       .gm-style .gm-iv-back-icon, .gm-style .gm-iv-marker { filter: none !important; }
     `;
     document.head.appendChild(style);
@@ -486,15 +483,16 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
-  // MutationObserver to enforce Street View text styles via inline overrides.
+  // MutationObserver: enforce Street View element styles via inline overrides.
   // Only active while Street View is open — avoids perf hit during normal map use.
+  // Inline style.setProperty with 'important' beats all CSS including Google's cloud styles.
   useEffect(() => {
     if (!isStreetViewActive) return;
     const container = containerRef.current;
     if (!container) return;
 
     const enforce = () => {
-      // Address bar — dark text on white bg (unified light/dark)
+      // Address bar (top) — dark text on white bg
       container.querySelectorAll<HTMLElement>('.gm-iv-address').forEach((el) => {
         el.style.setProperty('background-color', 'rgba(255,255,255,0.9)', 'important');
         el.style.setProperty('color', '#333', 'important');
@@ -512,26 +510,57 @@ export default function GoogleMapCanvas({
         el.style.setProperty('text-shadow', '0 1px 3px rgba(0,0,0,0.6)', 'important');
       });
 
-      // Footer ("Terms", "Report a problem") — always white
-      container.querySelectorAll<HTMLElement>('.gm-style-cc, .gm-style-cc *').forEach((el) => {
+      // Footer containers — force transparent bg so our white bg rule doesn't leak
+      container.querySelectorAll<HTMLElement>('.gm-style-cc').forEach((el) => {
+        el.style.setProperty('color', '#fff', 'important');
+        el.style.setProperty('background-color', 'transparent', 'important');
+        // Also fix parent containers that might have white bg
+        let parent = el.parentElement;
+        while (parent && parent !== container) {
+          if (parent.classList.contains('gmnoprint') || parent.style.backgroundColor) {
+            parent.style.setProperty('background-color', 'transparent', 'important');
+          }
+          parent = parent.parentElement;
+        }
+      });
+      // All children inside copyright containers — white text
+      container.querySelectorAll<HTMLElement>('.gm-style-cc *').forEach((el) => {
         el.style.setProperty('color', '#fff', 'important');
       });
+
+      // "Report a problem" text
       container.querySelectorAll<HTMLElement>('.gm-style-pbt').forEach((el) => {
         el.style.setProperty('color', '#fff', 'important');
       });
       container.querySelectorAll<HTMLElement>('a[href*="maps.google.com/maps"]').forEach((el) => {
         el.style.setProperty('color', '#fff', 'important');
       });
+
+      // Compass control — transparent background, no white box
+      container.querySelectorAll<HTMLElement>('.gm-compass').forEach((el) => {
+        el.style.setProperty('background-color', 'transparent', 'important');
+        el.style.setProperty('box-shadow', 'none', 'important');
+      });
+
+      // Zoom/control button containers inside Street View — keep white bg only for buttons
+      container.querySelectorAll<HTMLElement>('.gm-bundled-control').forEach((el) => {
+        el.style.setProperty('background-color', 'transparent', 'important');
+      });
     };
 
-    // Run immediately, then watch for Google Maps DOM re-renders (childList only for perf)
+    // Run immediately, then watch for any DOM change Google Maps makes
     enforce();
     let debounceTimer: ReturnType<typeof setTimeout>;
     const observer = new MutationObserver(() => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(enforce, 50);
     });
-    observer.observe(container, { childList: true, subtree: true });
+    observer.observe(container, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class'],
+    });
 
     return () => {
       clearTimeout(debounceTimer);
