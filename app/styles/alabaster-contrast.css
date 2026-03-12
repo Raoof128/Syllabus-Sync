@@ -200,13 +200,19 @@ html:not(.dark)
   mix-blend-mode: normal;
 }
 
-/* Undo alabaster -webkit-text-fill-color for Google Maps internals.
-   alabaster sets -webkit-text-fill-color:#1a1a1a which overrides color for rendering.
-   currentColor defers to the color property, letting Google Maps' own styles work.
-   Using !important because unset/inherit just re-inherits #1a1a1a from parent chain. */
-.gm-style,
-.gm-style * {
-  -webkit-text-fill-color: currentColor !important;
+/* Undo alabaster for Google Maps internals.
+   Google Maps sets color:transparent + -webkit-text-fill-color for visible text.
+   Blanket overrides (unset/currentColor/inherit + !important) break this technique.
+   This rule has higher specificity than alabaster (0,3,1 > 0,2,1) but NO !important,
+   so Google Maps' own inline styles still win. revert falls through to UA defaults
+   for elements Google doesn't explicitly style. The MutationObserver in
+   GoogleMapCanvas.tsx handles Street View text with explicit inline !important values. */
+html:not(.dark) .map-page .gm-style,
+html:not(.dark) .map-page .gm-style * {
+  color: revert;
+  -webkit-text-fill-color: revert;
+  opacity: revert;
+  mix-blend-mode: revert;
 }
 
 /* ============================================
