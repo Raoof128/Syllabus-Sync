@@ -483,6 +483,21 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
+  // Strip title attributes from Google Maps controls to remove tooltips
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const strip = () => {
+      container.querySelectorAll<HTMLElement>('.gm-style [title]').forEach((el) => {
+        el.removeAttribute('title');
+      });
+    };
+    strip();
+    const observer = new MutationObserver(strip);
+    observer.observe(container, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [mapReady]);
+
   // MutationObserver: enforce Street View element styles via inline overrides.
   // Only active while Street View is open — avoids perf hit during normal map use.
   // Inline style.setProperty with 'important' beats all CSS including Google's cloud styles.
