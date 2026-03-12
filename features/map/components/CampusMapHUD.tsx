@@ -1,12 +1,11 @@
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
-import { Search, Share2, Download, Building2, X } from 'lucide-react';
+import { Search, Building2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Badge } from '@/components/ui/mq/badge';
-import { Button } from '@/components/ui/mq/button';
 import type { Building } from '@/features/map/lib/buildings';
 import type { GooglePlaceSuggestion } from '@/features/map/hooks/useGooglePlacesSearch';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
@@ -18,8 +17,6 @@ type Props = {
   buildings: Building[];
   buildingSearch: string;
   setBuildingSearch: (v: string) => void;
-  onCopyShare: () => void;
-  onExport?: () => void;
   onStartNavigation?: () => void;
   onStopNavigation?: () => void;
   isNavigating?: boolean;
@@ -34,6 +31,8 @@ type Props = {
   selectedPlaceLabel?: string;
   /** Focused mode: hide places panel, show only destination building info */
   isFocusedMode?: boolean;
+  /** Whether Google Maps Street View panorama is currently active */
+  isStreetViewActive?: boolean;
 };
 
 import { LayeredCard } from './LayeredCard';
@@ -43,8 +42,6 @@ export default function CampusMapHUD({
   buildings,
   buildingSearch,
   setBuildingSearch,
-  onCopyShare,
-  onExport,
   onStartNavigation: _onStartNavigation,
   onStopNavigation: _onStopNavigation,
   isNavigating,
@@ -55,6 +52,7 @@ export default function CampusMapHUD({
   onClearExternalPlace,
   selectedPlaceLabel,
   isFocusedMode,
+  isStreetViewActive,
 }: Props) {
   const { t } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
@@ -116,6 +114,9 @@ export default function CampusMapHUD({
   const visibleBuildings = useMemo(() => {
     return buildingSearch.trim() ? buildings : buildings.slice(0, 15);
   }, [buildings, buildingSearch]);
+
+  // ─── Street View active: hide all custom controls ───
+  if (isGoogleMode && isStreetViewActive) return null;
 
   // ─── Google Maps mode: floating search bar ───
   if (isGoogleMode && !isFocusedMode) {
@@ -316,37 +317,9 @@ export default function CampusMapHUD({
         {buildingSearch ? t('buildingsFound', { count: visibleBuildings.length }) : ''}
       </div>
 
-      {/* Top-right actions - Floating Toolbar */}
-      <div className="absolute right-3 top-3 pointer-events-auto">
-        <LayeredCard interactive={false} className="flex items-center gap-1 p-1.5 rounded-full">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
-            onClick={onCopyShare}
-            aria-label={t('share')}
-          >
-            <Share2 className="h-4 w-4" />
-            <span className="hidden sm:inline font-medium">{t('share')}</span>
-          </Button>
-          <div className="w-px h-4 bg-mq-border/50" />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 h-9 rounded-full hover:bg-mq-background-secondary text-mq-content"
-            onClick={onExport}
-            disabled={!onExport}
-            aria-label={t('export')}
-          >
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline font-medium">{t('export')}</span>
-          </Button>
-        </LayeredCard>
-      </div>
-
       {/* Floating pill-style search bar — hidden in focused mode */}
       {!isFocusedMode && (
-        <div className="absolute top-3 left-3 w-[min(360px,calc(100vw-24px))] pointer-events-auto">
+        <div className="absolute top-3 left-3 w-[min(400px,calc(100vw-24px))] pointer-events-auto">
           <div
             className={cn(
               'bg-mq-card-background shadow-lg transition-all',

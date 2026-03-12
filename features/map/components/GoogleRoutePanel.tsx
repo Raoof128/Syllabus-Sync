@@ -108,26 +108,26 @@ export default function GoogleRoutePanel({
   }
 
   return (
-    <div className="absolute bottom-4 left-1/2 z-[1000] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-2xl border border-border bg-background/95 shadow-xl backdrop-blur">
+    <div className="absolute bottom-4 left-1/2 z-[1000] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-2xl border border-mq-border bg-mq-card-background/95 shadow-xl backdrop-blur">
       {/* Header with close button */}
-      <div className="flex items-center justify-between border-b border-border/50 px-4 py-3">
+      <div className="flex items-center justify-between border-b border-mq-border/50 px-4 py-3">
         <div className="flex items-stretch gap-3 min-w-0">
           {/* Origin/destination vertical connector */}
           <div className="flex flex-col items-center py-0.5">
-            <div className="h-2.5 w-2.5 shrink-0 rounded-full border-2 border-white bg-[#4285F4] shadow-sm" />
-            <div className="my-0.5 w-0.5 flex-1 bg-muted-foreground/25" />
-            <div className="h-2.5 w-2.5 shrink-0 rounded-full border-2 border-white bg-[#ea4335] shadow-sm" />
+            <div className="h-2.5 w-2.5 shrink-0 rounded-full border-2 border-white bg-[#4285F4] shadow-sm dark:border-gray-700" />
+            <div className="my-0.5 w-0.5 flex-1 bg-mq-content-tertiary/25" />
+            <div className="h-2.5 w-2.5 shrink-0 rounded-full border-2 border-white bg-[#ea4335] shadow-sm dark:border-gray-700" />
           </div>
           <div className="flex flex-col justify-between min-w-0 py-0.5">
-            <p className="truncate text-xs text-muted-foreground">
+            <p className="truncate text-xs text-mq-content-secondary">
               {originLabel || 'Your location'}
             </p>
-            <p className="truncate text-sm font-semibold">{destinationName}</p>
+            <p className="truncate text-sm font-semibold text-mq-content">{destinationName}</p>
           </div>
         </div>
         <button
           onClick={isNavigating ? onStopNavigation : onDismissRoute}
-          className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="shrink-0 rounded-full p-1.5 text-mq-content-secondary transition-colors hover:bg-mq-hover-background hover:text-mq-content"
           aria-label={isNavigating ? 'Stop navigation' : 'Close directions'}
         >
           <X size={18} />
@@ -147,7 +147,7 @@ export default function GoogleRoutePanel({
                 className={`flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2 text-xs transition-colors ${
                   travelMode === mode
                     ? 'bg-[#d2e3fc] text-[#1a73e8] dark:bg-[#1a3a5c] dark:text-[#8ab4f8] font-semibold'
-                    : 'bg-muted/60 text-muted-foreground hover:bg-muted'
+                    : 'bg-mq-background-secondary text-mq-content-secondary hover:bg-mq-hover-background'
                 }`}
               >
                 <Icon size={16} />
@@ -159,7 +159,7 @@ export default function GoogleRoutePanel({
 
         {/* Waiting for location */}
         {!userLocation && !route && !isLoadingRoute && !routeError && (
-          <div className="mb-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <div className="mb-3 flex items-center justify-center gap-2 text-xs text-mq-content-secondary">
             <Loader2 size={14} className="animate-spin" />
             Waiting for your location...
           </div>
@@ -167,27 +167,31 @@ export default function GoogleRoutePanel({
 
         {/* Loading */}
         {isLoadingRoute && (
-          <div className="mb-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <div className="mb-3 flex items-center justify-center gap-2 text-xs text-mq-content-secondary">
             <Loader2 size={14} className="animate-spin" />
             Calculating route...
           </div>
         )}
 
         {/* Error */}
-        {routeError && <p className="mb-3 text-center text-xs text-destructive">{routeError}</p>}
+        {routeError && (
+          <p className="mb-3 text-center text-xs text-red-600 dark:text-red-400">{routeError}</p>
+        )}
 
         {/* Route info */}
         {route && !isLoadingRoute && (
           <>
             {/* Duration / ETA / distance summary */}
-            <div className="mb-3 flex items-center justify-between rounded-xl bg-muted/50 px-3 py-2.5">
+            <div className="mb-3 flex items-center justify-between rounded-xl bg-mq-background-secondary px-3 py-2.5">
               <div className="flex flex-col">
-                <span className="text-base font-bold">{fmtDuration(route.durationSeconds)}</span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-base font-bold text-mq-content">
+                  {fmtDuration(route.durationSeconds)}
+                </span>
+                <span className="text-[10px] text-mq-content-tertiary">
                   ETA {fmtEta(route.durationSeconds)}
                 </span>
               </div>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-mq-content-secondary">
                 {fmtDistance(route.distanceMeters)}
               </span>
             </div>
@@ -211,7 +215,7 @@ export default function GoogleRoutePanel({
               <div className="mb-3">
                 <button
                   onClick={() => setStepsCollapsed(!stepsCollapsed)}
-                  className="mb-1 flex w-full items-center justify-between px-1 text-xs font-medium text-muted-foreground"
+                  className="mb-1 flex w-full items-center justify-between px-1 text-xs font-medium text-mq-content-secondary"
                 >
                   <span>
                     {route.steps.length} step{route.steps.length !== 1 ? 's' : ''}
@@ -229,13 +233,13 @@ export default function GoogleRoutePanel({
                             : ''
                         }`}
                       >
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-bold">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mq-background-secondary text-[10px] font-bold text-mq-content">
                           {i + 1}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="leading-snug text-foreground/80">{step.instruction}</p>
+                          <p className="leading-snug text-mq-content">{step.instruction}</p>
                           {(step.distanceMeters > 0 || step.transitLineName) && (
-                            <p className="mt-0.5 text-[10px] text-muted-foreground/70">
+                            <p className="mt-0.5 text-[10px] text-mq-content-tertiary">
                               {step.distanceMeters > 0 && fmtDistance(step.distanceMeters)}
                               {step.transitLineName &&
                                 `${step.distanceMeters > 0 ? ' \u00b7 ' : ''}${step.transitLineName}`}
@@ -264,7 +268,7 @@ export default function GoogleRoutePanel({
           ) : (
             <button
               onClick={onStopNavigation}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-destructive py-3 text-sm font-bold text-destructive-foreground"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-bold text-white dark:bg-red-500"
             >
               <X size={16} /> Stop
             </button>
@@ -274,7 +278,7 @@ export default function GoogleRoutePanel({
               href={handoffUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 rounded-xl border-2 border-border px-4 py-3 text-xs font-semibold text-foreground transition-colors hover:bg-muted"
+              className="flex items-center justify-center gap-1.5 rounded-xl border-2 border-mq-border px-4 py-3 text-xs font-semibold text-mq-content transition-colors hover:bg-mq-hover-background"
               aria-label="Open in Google Maps"
             >
               <ExternalLink size={14} /> Maps

@@ -64,6 +64,8 @@ interface Props {
   panelVisible?: boolean;
   /** Current travel mode — walking uses dashed polyline */
   travelMode?: GoogleTravelMode;
+  /** Notifies parent when Street View is entered or exited */
+  onStreetViewChange?: (active: boolean) => void;
 }
 
 export default function GoogleMapCanvas({
@@ -74,6 +76,7 @@ export default function GoogleMapCanvas({
   isNavigating,
   panelVisible,
   travelMode,
+  onStreetViewChange,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -86,6 +89,7 @@ export default function GoogleMapCanvas({
   const originDotRef = useRef<AnyMarker | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [isStreetViewActive, setIsStreetViewActive] = useState(false);
   const lastAnimatedPosRef = useRef<MapLatLng | null>(null);
   const animFrameRef = useRef<number>(0);
 
@@ -509,6 +513,23 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
+  // Detect when Street View panorama is entered or exited
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const sv = map.getStreetView();
+    const listener = sv.addListener('visible_changed', () => {
+      const active = sv.getVisible();
+      setIsStreetViewActive(active);
+    });
+    return () => google.maps.event.removeListener(listener);
+  }, [mapReady]);
+
+  // Notify parent of Street View state changes
+  useEffect(() => {
+    onStreetViewChange?.(isStreetViewActive);
+  }, [isStreetViewActive, onStreetViewChange]);
+
   // Center map on user location (or request permission if not yet granted)
   const handleMyLocation = useCallback(() => {
     const map = mapRef.current;
@@ -536,7 +557,7 @@ export default function GoogleMapCanvas({
 
   if (error)
     return (
-      <div className="flex h-full items-center justify-center bg-muted/50 text-sm text-destructive p-4 text-center">
+      <div className="flex h-full items-center justify-center bg-mq-background-secondary/50 text-sm text-red-600 dark:text-red-400 p-4 text-center">
         Google Maps unavailable: {error}
       </div>
     );
@@ -547,10 +568,10 @@ export default function GoogleMapCanvas({
 
       {/* Loading skeleton — visible until Google Maps initializes */}
       {!mapReady && (
-        <div className="absolute inset-0 z-[900] flex flex-col items-center justify-center bg-[#e8eaed] transition-opacity duration-300">
+        <div className="absolute inset-0 z-[900] flex flex-col items-center justify-center bg-[#e8eaed] dark:bg-mq-background transition-opacity duration-300">
           <div className="relative mb-4">
             <svg
-              className="h-10 w-10 text-gray-400 animate-pulse"
+              className="h-10 w-10 text-mq-content-tertiary animate-pulse"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -563,37 +584,38 @@ export default function GoogleMapCanvas({
               />
             </svg>
           </div>
-          <div className="h-2 w-20 rounded-full bg-gray-300 animate-pulse" />
+          <div className="h-2 w-20 rounded-full bg-gray-300 dark:bg-mq-content-tertiary/30 animate-pulse" />
         </div>
       )}
 
-      {/* My Location button — always visible, always white (matches Google Maps native controls) */}
-      {/* Positioned above Google Maps native controls (Pegman + zoom) on the right side */}
-      <button
-        onClick={handleMyLocation}
-        className={`absolute ${panelVisible ? 'bottom-[30rem]' : 'bottom-[10.5rem]'} right-[10px] z-[1100] flex h-10 w-10 items-center justify-center rounded-sm bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 active:bg-gray-200`}
-        aria-label="My location"
-        title="My location"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={`h-5 w-5 ${userLocation ? 'text-[#666]' : 'text-[#999]'}`}
+      {/* My Location button — left side to avoid Google native controls (zoom/Pegman) on right */}
+      {!isStreetViewActive && (
+        <button
+          onClick={handleMyLocation}
+          className={`absolute ${panelVisible ? 'bottom-[28rem]' : 'bottom-20'} left-3 z-[1100] flex h-10 w-10 items-center justify-center rounded bg-white dark:bg-mq-card-background shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 dark:hover:bg-mq-hover-background active:bg-gray-200 dark:active:bg-mq-background-secondary`}
+          aria-label="My location"
+          title="My location"
         >
-          {/* Crosshair icon matching Google Maps */}
-          <circle cx={12} cy={12} r={4} fill="currentColor" fillOpacity={0.15} />
-          <circle cx={12} cy={12} r={2} fill={userLocation ? '#4285F4' : '#999'} stroke="none" />
-          <line x1={12} y1={2} x2={12} y2={6} />
-          <line x1={12} y1={18} x2={12} y2={22} />
-          <line x1={2} y1={12} x2={6} y2={12} />
-          <line x1={18} y1={12} x2={22} y2={12} />
-        </svg>
-      </button>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            className="h-5 w-5 text-gray-600 dark:text-mq-content-secondary"
+          >
+            <circle cx={12} cy={12} r={4} stroke="currentColor" strokeWidth={2} fill="none" />
+            <circle
+              cx={12}
+              cy={12}
+              r={2}
+              fill={userLocation ? '#4285F4' : 'currentColor'}
+              stroke="none"
+            />
+            <line x1={12} y1={2} x2={12} y2={6} stroke="currentColor" strokeWidth={2} />
+            <line x1={12} y1={18} x2={12} y2={22} stroke="currentColor" strokeWidth={2} />
+            <line x1={2} y1={12} x2={6} y2={12} stroke="currentColor" strokeWidth={2} />
+            <line x1={18} y1={12} x2={22} y2={12} stroke="currentColor" strokeWidth={2} />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }

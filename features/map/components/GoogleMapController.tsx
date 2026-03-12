@@ -50,13 +50,17 @@ interface Props {
   selectedBuilding?: Building;
   externalDestination: ExternalDestination | null;
   onDismissRoute?: () => void;
+  /** Notifies parent when Google Street View is entered or exited */
+  onStreetViewChange?: (active: boolean) => void;
 }
 
 export default function GoogleMapController({
   selectedBuilding,
   externalDestination,
   onDismissRoute,
+  onStreetViewChange,
 }: Props) {
+  const [isStreetViewActive, setIsStreetViewActive] = useState(false);
   const [userLocation, setUserLocation] = useState<MapLatLng | null>(null);
   const [route, setRoute] = useState<GoogleComputedRoute | null>(null);
   const [travelMode, setTravelMode] = useState<GoogleTravelMode>(() => {
@@ -232,9 +236,13 @@ export default function GoogleMapController({
         isNavigating={isNavigating}
         panelVisible={!!destination && isPanelOpen}
         travelMode={travelMode}
+        onStreetViewChange={(active) => {
+          setIsStreetViewActive(active);
+          onStreetViewChange?.(active);
+        }}
       />
 
-      {destination && isPanelOpen && (
+      {destination && isPanelOpen && !isStreetViewActive && (
         <GoogleRoutePanel
           destinationName={destName}
           route={route}
@@ -269,12 +277,14 @@ export default function GoogleMapController({
       )}
 
       {/* Compact navigation bar — shown when navigating with panel collapsed */}
-      {isNavigating && !isPanelOpen && (
-        <div className="absolute bottom-4 left-1/2 z-[1000] flex w-auto max-w-[calc(100%-2rem)] -translate-x-1/2 items-center gap-3 rounded-2xl border border-border bg-background/95 px-4 py-3 shadow-xl backdrop-blur">
-          <p className="min-w-0 flex-1 truncate text-sm font-semibold">{destName}</p>
+      {isNavigating && !isPanelOpen && !isStreetViewActive && (
+        <div className="absolute bottom-4 left-1/2 z-[1000] flex w-auto max-w-[calc(100%-2rem)] -translate-x-1/2 items-center gap-3 rounded-2xl border border-mq-border bg-mq-card-background/95 px-4 py-3 shadow-xl backdrop-blur">
+          <p className="min-w-0 flex-1 truncate text-sm font-semibold text-mq-content">
+            {destName}
+          </p>
           <button
             onClick={() => setIsPanelOpen(true)}
-            className="shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="shrink-0 rounded-full p-1 text-mq-content-secondary transition-colors hover:bg-mq-hover-background hover:text-mq-content"
             aria-label="Expand navigation panel"
           >
             <ChevronUp size={16} />
@@ -285,7 +295,7 @@ export default function GoogleMapController({
               setIsPanelOpen(true);
               toastUtils.info('Navigation reset');
             }}
-            className="shrink-0 rounded-xl bg-destructive px-3 py-2 text-xs font-bold text-destructive-foreground"
+            className="shrink-0 rounded-xl bg-red-600 px-3 py-2 text-xs font-bold text-white dark:bg-red-500"
           >
             Stop
           </button>

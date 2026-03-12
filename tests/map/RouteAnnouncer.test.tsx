@@ -2,15 +2,23 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { RouteAnnouncer } from '@/features/map/components/RouteAnnouncer';
 
-// Mock useSafeTranslation
+// Mock useSafeTranslation — component uses t(), not safeT()
+const translationMap: Record<string, string> = {
+  navigationArrived: 'You have arrived at your destination.',
+  navigatingTo: 'Navigating to:',
+  meters: 'meters',
+  kilometers: 'kilometers',
+};
+
 vi.mock('@/lib/hooks/useSafeTranslation', () => ({
   useSafeTranslation: () => ({
-    safeT: (key: string, fallback: string | undefined) => {
-      // Simple mock implementation
-      if (key === 'navigationUpdate')
-        return fallback?.replace('${distanceText}', '50 meters') || fallback;
-      return fallback || key;
+    t: (key: string, params?: Record<string, string>) => {
+      if (key === 'navigationUpdate' && params?.distance) {
+        return `Continue for ${params.distance}.`;
+      }
+      return translationMap[key] || key;
     },
+    safeT: (key: string, fallback: string) => translationMap[key] || fallback || key,
   }),
 }));
 

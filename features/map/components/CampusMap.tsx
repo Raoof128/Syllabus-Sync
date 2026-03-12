@@ -477,20 +477,21 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
           </div>
         )}
 
-        {/* Locate Me button — stacked ABOVE the Leaflet zoom +/- controls */}
+        {/* Locate Me button — left side to avoid Leaflet zoom controls on right */}
         <button
           onClick={centerOnUser}
           className={cn(
-            'absolute z-[1000] flex h-[40px] w-[40px] items-center justify-center rounded-md border-2 border-[rgba(0,0,0,0.2)] bg-white shadow-[0_1px_5px_rgba(0,0,0,0.25)] transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 focus:outline-none',
-            // Positioned well above zoom controls at bottom-right (with clear gap)
-            selectedBuilding
-              ? 'bottom-[360px] right-[10px] sm:bottom-[106px] sm:right-[10px]'
-              : 'bottom-[106px] right-[10px]',
+            'absolute left-3 z-[1000] flex h-10 w-10 items-center justify-center rounded bg-white dark:bg-mq-card-background shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 dark:hover:bg-mq-hover-background active:bg-gray-200 dark:active:bg-mq-background-secondary focus:outline-none',
+            selectedBuilding ? 'bottom-[220px] sm:bottom-12' : 'bottom-12',
           )}
           aria-label={t('centerOnLocation')}
           title={t('centerOnLocation')}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5 text-gray-600 dark:text-mq-content-secondary"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
             {locationStatus === 'searching' ? (
               <circle
                 cx="12"
@@ -500,23 +501,22 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                 strokeWidth="2"
                 strokeDasharray="60"
                 strokeDashoffset="20"
-                className="animate-spin origin-center text-gray-500"
+                className="animate-spin origin-center"
               />
             ) : (
               <>
-                {/* Crosshair icon — larger and bolder for visibility */}
-                <circle cx="12" cy="12" r="4" stroke="#666" strokeWidth="2" fill="none" />
+                <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none" />
                 <circle
                   cx="12"
                   cy="12"
                   r="2"
-                  fill={locationStatus === 'found' ? '#4285F4' : '#999'}
+                  fill={locationStatus === 'found' ? '#4285F4' : 'currentColor'}
                   stroke="none"
                 />
-                <line x1="12" y1="2" x2="12" y2="7" stroke="#666" strokeWidth="2" />
-                <line x1="12" y1="17" x2="12" y2="22" stroke="#666" strokeWidth="2" />
-                <line x1="2" y1="12" x2="7" y2="12" stroke="#666" strokeWidth="2" />
-                <line x1="17" y1="12" x2="22" y2="12" stroke="#666" strokeWidth="2" />
+                <line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" strokeWidth="2" />
+                <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" strokeWidth="2" />
+                <line x1="2" y1="12" x2="6" y2="12" stroke="currentColor" strokeWidth="2" />
+                <line x1="18" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="2" />
               </>
             )}
           </svg>

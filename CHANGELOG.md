@@ -1,3 +1,21 @@
+Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Dark/Light Mode Text & Button Contrast Fix
+Summary: Fixed dark mode readability issues across both map modes. (1) Locate Me / My Location buttons: added `dark:bg-mq-card-background`, `dark:hover:bg-mq-hover-background`, `dark:active:bg-mq-background-secondary` — previously hardcoded `bg-white` was invisible against dark map tiles. (2) Crosshair SVG icons in both CampusMap and GoogleMapCanvas: migrated from hardcoded `stroke="#666"` / `fill="#999"` to `stroke="currentColor"` / `fill="currentColor"` with parent class `text-gray-600 dark:text-mq-content-secondary` — crosshair was invisible on dark button backgrounds. (3) GoogleMapCanvas loading skeleton: added `dark:bg-mq-background` to prevent bright `#e8eaed` flash in dark mode, and `dark:bg-mq-content-tertiary/30` for the progress bar. Icon uses `text-mq-content-tertiary`. (4) Previous audit: CampusMap button positioning raised to `bottom-[220px]`, error fallback migrated from shadcn to mq-\* tokens.
+Files Changed: `features/map/components/CampusMap.tsx`, `features/map/components/GoogleMapCanvas.tsx`
+Verification: `npx tsc --noEmit` ✅; `npm run lint` ✅; prettier ✅; `npm run build` ✅
+
+Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Full Bug-Fix Audit Follow-Up
+Summary: Post-audit fixes for the 8-issue map bug-fix pass. (1) CampusMap Locate Me button raised from `bottom-[170px] sm:bottom-8` / `bottom-8` to `bottom-[220px] sm:bottom-12` / `bottom-12` — the original values overlapped the full-width building info card on mobile (~200px tall) and sat too close to the off-campus warning banner. (2) GoogleMapCanvas error fallback migrated from shadcn vars (`bg-muted/50 text-destructive`) to `bg-mq-background-secondary/50 text-red-600 dark:text-red-400`. (3) Full shadcn var scan confirmed zero remaining shadcn tokens in all 6 modified files (only DevPinPanel.tsx retains shadcn vars — out of scope, dev-only tool).
+Files Changed: `features/map/components/CampusMap.tsx`, `features/map/components/GoogleMapCanvas.tsx`
+Verification: `npx tsc --noEmit` ✅; `npm run lint` ✅ (0 errors); `npx prettier --check` ✅; `npm run build` ✅
+
+Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Full Bug-Fix Pass (Control Dedup, Positioning, Street View, Dark Mode)
+Summary: Fixed 8 map UX issues. Removed duplicate Share/Export controls (CampusMapHUD floating toolbar was rendering a second set on top of MapClient's toolbar in campus mode). Moved My Location/Locate Me buttons to the left side on both Campus and Google maps to avoid overlapping Google native controls (zoom, Pegman) and Leaflet zoom controls. Added Street View detection via `visible_changed` listener — search bar, My Location, route panel, and compact nav bar all hide when panorama is active. Migrated GoogleRoutePanel and compact nav bar from shadcn vars to `mq-*` design tokens for consistent dark mode contrast. Unified both Locate Me buttons to identical styling (rounded, consistent shadow, matching crosshair SVG). Fixed CampusMap button from `bottom-[360px]` to `bottom-[170px]` on mobile with selected building. Widened campus search bar to 400px (matching Google mode).
+Files Changed: `features/map/components/MapClient.tsx`, `features/map/components/CampusMapHUD.tsx`, `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/GoogleMapController.tsx`, `features/map/components/GoogleRoutePanel.tsx`, `features/map/components/CampusMap.tsx`
+Verification: `npx tsc --noEmit` ✅; lint ✅; prettier ✅; `npm run build` ✅; map tests 9/11 (2 pre-existing i18n failures)
+
 Raouf: 2026-03-11 (Australia/Sydney)
 Scope: Dark Mode UI — Delete Modal Icon Visibility Boost
 Summary: Raised the destructive icon visibility substantially after the first dark-mode pass. The modal icon badge is now larger, the icon itself is larger, dark-mode foreground is nearly white-red, and the badge now uses a brighter red tint plus a visible ring to make the bin/warning symbol stand out immediately.

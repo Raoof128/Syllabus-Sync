@@ -41,7 +41,7 @@ const eslintConfig = [
     },
     plugins: {
       '@next/next': nextPlugin,
-      'react': reactPlugin,
+      react: reactPlugin,
       'react-hooks': reactHooksPlugin,
       'jsx-a11y': jsxA11yPlugin,
       '@typescript-eslint': typescriptPlugin,

@@ -19,7 +19,10 @@ if (!fs.existsSync(PATCHES_DIR)) {
   process.exit(1);
 }
 
-const patchFiles = fs.readdirSync(PATCHES_DIR).filter(f => f.endsWith('.json')).sort();
+const patchFiles = fs
+  .readdirSync(PATCHES_DIR)
+  .filter((f) => f.endsWith('.json'))
+  .sort();
 let totalPatched = 0;
 
 for (const file of patchFiles) {
@@ -53,4 +56,3 @@ for (const file of patchFiles) {
 
 console.log(`\nDone. Patched ${totalPatched} keys total across ${patchFiles.length} locales.`);
 console.log('Run: node tools/validate-legal-translations.cjs');
-

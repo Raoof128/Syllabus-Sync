@@ -3,6 +3,32 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { LevelBadge, LevelBadgeInline } from '@/features/gamification/components/LevelBadge';
 
+// Mock useTypedTranslation so t() returns English level titles
+const levelTitleTranslations: Record<string, string> = {
+  level: 'Level',
+  gamification_level_1: 'Freshman',
+  gamification_level_2: 'Eager Learner',
+  gamification_level_3: 'Rising Star',
+  gamification_level_4: 'Dedicated Scholar',
+  gamification_level_5: 'Academic Achiever',
+  gamification_level_6: 'Knowledge Seeker',
+  gamification_level_7: 'Study Champion',
+  gamification_level_8: "Dean's Lister",
+  gamification_level_9: 'Academic Elite',
+  gamification_level_10: 'Scholarly Master',
+  gamification_level_veteran: 'Academic Veteran',
+  gamification_level_expert: 'Knowledge Expert',
+  gamification_level_legend: 'Scholarly Legend',
+  gamification_level_titan: 'Academic Titan',
+  gamification_level_grand: 'Grand Scholar',
+};
+
+vi.mock('@/lib/hooks/useTypedTranslation', () => ({
+  useTypedTranslation: () => ({
+    t: (key: string) => levelTitleTranslations[key] || key,
+  }),
+}));
+
 // Mock the gamification store
 const mockProfile = {
   xp: 150,
@@ -203,7 +229,7 @@ describe('LevelBadge - Different Level Tiers', () => {
         loadProfile: mockLoadProfile,
         hasLoaded: true,
         isLoading: false,
-        getLevelTitle: vi.fn(() => 'Grand Scholar'),
+        getLevelTitle: vi.fn(() => 'Academic Titan'),
       };
       return typeof selector === 'function'
         ? (selector as (s: typeof state) => unknown)(state)
@@ -212,7 +238,7 @@ describe('LevelBadge - Different Level Tiers', () => {
 
     render(<LevelBadge />);
 
-    const badge = screen.getByTitle('Level 55: Grand Scholar');
+    const badge = screen.getByTitle('Level 55: Academic Titan');
     expect(badge).toHaveClass('from-rose-500', 'to-red-700');
   });
 });

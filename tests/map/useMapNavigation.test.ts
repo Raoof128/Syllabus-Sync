@@ -132,8 +132,8 @@ describe('useMapNavigation', () => {
 
     expect(result.current.isNavigating).toBe(false);
     expect(toastUtils.warning).toHaveBeenCalledWith(
-      'Outside campus boundary',
-      'Navigation is disabled while you are outside campus.',
+      'locationOutsideCampusTitle',
+      'locationOutsideCampusMessage',
     );
   });
 
@@ -233,8 +233,8 @@ describe('useMapNavigation', () => {
     expect(mockNavManager.stopNavigation).toHaveBeenCalled();
     expect(result.current.isNavigating).toBe(false);
     expect(toastUtils.info).toHaveBeenCalledWith(
-      'Destination changed',
-      'Navigation stopped. Tap navigate again for the new destination.',
+      'destinationChanged',
+      'restartNavigationForNewDestination',
     );
   });
 
@@ -314,8 +314,8 @@ describe('useMapNavigation', () => {
     expect(mockNavManager.stopNavigation).toHaveBeenCalled();
     expect(result.current.isNavigating).toBe(false);
     expect(toastUtils.warning).toHaveBeenCalledWith(
-      'Outside campus boundary',
-      'Navigation is disabled while you are outside campus.',
+      'locationOutsideCampusTitle',
+      'locationOutsideCampusMessage',
     );
   });
 });

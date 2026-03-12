@@ -89,6 +89,22 @@ describe('GamificationSettings', () => {
       disabled: 'Disabled',
       cancel: 'Cancel',
       reset: 'Reset',
+      commitment: 'Commitment',
+      gamification_level_1: 'Freshman',
+      gamification_level_2: 'Eager Learner',
+      gamification_level_3: 'Rising Star',
+      gamification_level_4: 'Dedicated Scholar',
+      gamification_level_5: 'Academic Achiever',
+      gamification_level_6: 'Knowledge Seeker',
+      gamification_level_7: 'Study Champion',
+      gamification_level_8: "Dean's Lister",
+      gamification_level_9: 'Academic Elite',
+      gamification_level_10: 'Scholarly Master',
+      gamification_level_veteran: 'Academic Veteran',
+      gamification_level_expert: 'Knowledge Expert',
+      gamification_level_legend: 'Scholarly Legend',
+      gamification_level_titan: 'Academic Titan',
+      gamification_level_grand: 'Grand Scholar',
     };
     return translations[key] || key;
   });

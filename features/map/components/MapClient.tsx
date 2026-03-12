@@ -89,6 +89,9 @@ export default function MapClient() {
   // Location status from CampusMap
   const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle');
 
+  // Street View state (Google Maps mode only)
+  const [isStreetViewActive, setIsStreetViewActive] = useState(false);
+
   // Navigation state for RouteAnnouncer
   const [navState, setNavState] = useState<{
     isNavigating: boolean;
@@ -763,6 +766,7 @@ export default function MapClient() {
                   <GoogleMapController
                     selectedBuilding={selectedBuilding}
                     externalDestination={externalDestination}
+                    onStreetViewChange={setIsStreetViewActive}
                     onDismissRoute={() => {
                       // Clear building selection from URL
                       const params = new URLSearchParams(searchParams.toString());
@@ -785,8 +789,6 @@ export default function MapClient() {
                 buildings={sidebarBuildings}
                 buildingSearch={buildingSearch}
                 setBuildingSearch={setBuildingSearch}
-                onCopyShare={copyShareableURL}
-                onExport={handleExport}
                 onStartNavigation={() => campusMapRef.current?.startNavigation()}
                 onStopNavigation={() => campusMapRef.current?.stopNavigation()}
                 isNavigating={navState?.isNavigating || false}
@@ -797,6 +799,7 @@ export default function MapClient() {
                 onClearExternalPlace={() => setExternalDestination(null)}
                 selectedPlaceLabel={externalDestination?.label}
                 isFocusedMode={isFocusedMode}
+                isStreetViewActive={mapView === 'google' ? isStreetViewActive : false}
               />
             )}
           </div>
