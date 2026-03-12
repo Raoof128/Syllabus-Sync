@@ -492,9 +492,8 @@ export default function GoogleMapCanvas({
     if (!container) return;
 
     const enforce = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      // Footer text: white in dark mode (dark panorama bar), dark in light mode (light bar)
-      const footerColor = isDark ? '#fff' : '#333';
+      // Footer text: always white — readable on Street View panorama in both modes
+      const footerColor = '#fff';
 
       // Address bar (top) — always dark text on white bg
       container.querySelectorAll<HTMLElement>('.gm-iv-address').forEach((el) => {
@@ -517,15 +516,14 @@ export default function GoogleMapCanvas({
       // Footer containers ("Terms", "Keyboard shortcuts", copyright)
       container.querySelectorAll<HTMLElement>('.gm-style-cc').forEach((el) => {
         el.style.setProperty('color', footerColor, 'important');
-        if (isDark) {
-          el.style.setProperty('background-color', 'transparent', 'important');
-          let parent = el.parentElement;
-          while (parent && parent !== container) {
-            if (parent.classList.contains('gmnoprint') || parent.style.backgroundColor) {
-              parent.style.setProperty('background-color', 'transparent', 'important');
-            }
-            parent = parent.parentElement;
+        el.style.setProperty('background-color', 'transparent', 'important');
+        // Clear parent containers so white bar doesn't hide white text
+        let parent = el.parentElement;
+        while (parent && parent !== container) {
+          if (parent.classList.contains('gmnoprint') || parent.style.backgroundColor) {
+            parent.style.setProperty('background-color', 'transparent', 'important');
           }
+          parent = parent.parentElement;
         }
       });
       container.querySelectorAll<HTMLElement>('.gm-style-cc *').forEach((el) => {
@@ -555,29 +553,20 @@ export default function GoogleMapCanvas({
     // Run immediately, then watch for any DOM change Google Maps makes
     enforce();
     let debounceTimer: ReturnType<typeof setTimeout>;
-    const debouncedEnforce = () => {
+    const observer = new MutationObserver(() => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(enforce, 50);
-    };
-    const mapObserver = new MutationObserver(debouncedEnforce);
-    mapObserver.observe(container, {
+    });
+    observer.observe(container, {
       childList: true,
       subtree: true,
       attributes: true,
       attributeFilter: ['style', 'class'],
     });
 
-    // Also watch <html> class changes so we re-enforce when user toggles dark/light mode
-    const themeObserver = new MutationObserver(debouncedEnforce);
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
     return () => {
       clearTimeout(debounceTimer);
-      mapObserver.disconnect();
-      themeObserver.disconnect();
+      observer.disconnect();
     };
   }, [isStreetViewActive]);
 
