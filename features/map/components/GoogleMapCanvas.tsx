@@ -516,6 +516,7 @@ export default function GoogleMapCanvas({
       // Footer containers ("Terms", "Keyboard shortcuts", copyright)
       container.querySelectorAll<HTMLElement>('.gm-style-cc').forEach((el) => {
         el.style.setProperty('color', footerColor, 'important');
+        el.style.setProperty('-webkit-text-fill-color', footerColor, 'important');
         el.style.setProperty('background-color', 'transparent', 'important');
         // Clear parent containers so white bar doesn't hide white text
         let parent = el.parentElement;
@@ -528,14 +529,17 @@ export default function GoogleMapCanvas({
       });
       container.querySelectorAll<HTMLElement>('.gm-style-cc *').forEach((el) => {
         el.style.setProperty('color', footerColor, 'important');
+        el.style.setProperty('-webkit-text-fill-color', footerColor, 'important');
       });
 
       // "Report a problem" text
       container.querySelectorAll<HTMLElement>('.gm-style-pbt').forEach((el) => {
         el.style.setProperty('color', footerColor, 'important');
+        el.style.setProperty('-webkit-text-fill-color', footerColor, 'important');
       });
       container.querySelectorAll<HTMLElement>('a[href*="maps.google.com/maps"]').forEach((el) => {
         el.style.setProperty('color', footerColor, 'important');
+        el.style.setProperty('-webkit-text-fill-color', footerColor, 'important');
       });
 
       // Compass control — transparent background, no white box

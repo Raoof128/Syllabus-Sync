@@ -151,56 +151,49 @@ html:not(.dark) .signup-page {
   color: #1a1a1a;
 }
 
-/* Force text content (excluding SVGs and interactive elements) */
+/* Force text content (excluding SVGs, interactive elements, and Google Maps internals) */
 html:not(.dark)
   .feed-page
   :where(
     *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
         textarea
       ):not(select)
-  ),
+  ):not(.gm-style *),
 html:not(.dark)
   .map-page
   :where(
     *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
         textarea
       ):not(select)
-  ),
-html:not(.dark)
-  .feed-page
-  :where(
-    *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
-        textarea
-      ):not(select)
-  ),
+  ):not(.gm-style *),
 html:not(.dark)
   .calendar-page
   :where(
     *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
         textarea
       ):not(select)
-  ),
+  ):not(.gm-style *),
 html:not(.dark)
   .settings-page
   :where(
     *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
         textarea
       ):not(select)
-  ),
+  ):not(.gm-style *),
 html:not(.dark)
   .login-page
   :where(
     *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
         textarea
       ):not(select)
-  ),
+  ):not(.gm-style *),
 html:not(.dark)
   .signup-page
   :where(
     *:not(svg):not(path):not(circle):not(line):not([role='img']):not(button):not(a):not(input):not(
         textarea
       ):not(select)
-  ) {
+  ):not(.gm-style *) {
   color: #1a1a1a;
   -webkit-text-fill-color: #1a1a1a;
   opacity: 1;
