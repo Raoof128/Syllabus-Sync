@@ -258,7 +258,6 @@ export default function GoogleMapController({
           onStartNavigation={() => {
             setHasArrived(false);
             setIsNavigating(true);
-            setIsPanelOpen(false);
           }}
           onStopNavigation={() => {
             setIsNavigating(false);

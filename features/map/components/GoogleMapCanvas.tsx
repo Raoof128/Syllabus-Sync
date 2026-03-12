@@ -92,6 +92,7 @@ export default function GoogleMapCanvas({
   const [isStreetViewActive, setIsStreetViewActive] = useState(false);
   const lastAnimatedPosRef = useRef<MapLatLng | null>(null);
   const animFrameRef = useRef<number>(0);
+  const hasCenteredOnUserRef = useRef(false);
 
   // Initialise map once
   useEffect(() => {
@@ -311,6 +312,22 @@ export default function GoogleMapCanvas({
     if (userLocation) renderUserMarker(userLocation);
   }, [userLocation, renderUserMarker, mapReady]);
 
+  // Auto-center on user location once (like Google Maps) when no destination is set
+  useEffect(() => {
+    if (
+      !hasCenteredOnUserRef.current &&
+      mapReady &&
+      mapRef.current &&
+      userLocation &&
+      !selectedBuilding &&
+      !externalDestination
+    ) {
+      hasCenteredOnUserRef.current = true;
+      mapRef.current.panTo({ lat: userLocation.lat, lng: userLocation.lng });
+      mapRef.current.setZoom(16);
+    }
+  }, [mapReady, userLocation, selectedBuilding, externalDestination]);
+
   // Follow user during active navigation
   useEffect(() => {
     if (!isNavigating || !userLocation || !mapRef.current) return;
@@ -451,7 +468,7 @@ export default function GoogleMapCanvas({
       map.fitBounds(bounds, {
         top: 80,
         right: 40,
-        bottom: 280,
+        bottom: 160,
         left: 40,
       });
     }
@@ -697,7 +714,7 @@ export default function GoogleMapCanvas({
       {!isStreetViewActive && (
         <button
           onClick={handleMyLocation}
-          className={`absolute ${panelVisible ? 'bottom-[28rem]' : 'bottom-20'} left-3 z-[1100] flex h-10 w-10 items-center justify-center rounded bg-white dark:bg-mq-card-background shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 dark:hover:bg-mq-hover-background active:bg-gray-200 dark:active:bg-mq-background-secondary`}
+          className={`absolute ${panelVisible ? 'bottom-[10rem]' : 'bottom-20'} left-3 z-[1100] flex h-10 w-10 items-center justify-center rounded bg-white dark:bg-mq-card-background shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 dark:hover:bg-mq-hover-background active:bg-gray-200 dark:active:bg-mq-background-secondary`}
           aria-label="My location"
           title="My location"
         >

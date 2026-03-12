@@ -132,7 +132,7 @@ export default function CampusMapHUD({
         </div>
 
         {/* Google Maps-style floating search bar aligned with campus mode */}
-        <div className="absolute top-3 left-3 w-[min(400px,calc(100vw-24px))] pointer-events-auto">
+        <div className="absolute top-3 left-3 w-[min(400px,calc(100vw-100px))] sm:w-[min(400px,calc(100vw-24px))] pointer-events-auto">
           <div
             className={cn(
               'bg-mq-card-background shadow-lg',
