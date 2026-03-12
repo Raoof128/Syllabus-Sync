@@ -1,4 +1,11 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map Tooling — Export calibrated Flutter overlay metadata
+Summary: Extended the Flutter map export bridge so `campus_overlay_meta.json` now carries the same calibrated overlay metadata the web campus map uses, not just the raster path and building offset. The export script now writes pixel bounds, fit-padding / zoom envelope, and affine GPS projection coefficients derived from the web map calibration source, so Flutter can reuse the same campus photo overlay while keeping GPS-derived route and location points aligned with the web `CRS.Simple` map.
+Files Changed: `tools/export_buildings.mjs`
+Verification: `node --experimental-strip-types tools/export_buildings.mjs` ✅
+Follow-ups: Re-run the export bridge whenever the campus overlay asset or GCP calibration data changes.
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map Tooling — Export Flutter Raster/Registry Assets
 Summary: Added `tools/export_buildings.mjs` and `npm run export:flutter-map-assets` so the web app remains the source of truth for Flutter map data. The export script imports `features/map/lib/buildings.ts`, emits normalized Flutter-facing `buildings.json` and `campus_overlay_meta.json`, and copies `public/maps/raster/mq-campus.png` into the sibling Flutter repo. This removes the need to hand-maintain duplicate building registries and campus overlay metadata across web and Flutter.
 Files Changed: `tools/export_buildings.mjs`, `package.json`
