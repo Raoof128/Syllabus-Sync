@@ -501,9 +501,26 @@ export default function GoogleMapCanvas({
       .gm-style .gm-style-pbc {
         background-color: transparent !important;
       }
+      /* Street View address bar — force readable text on all nested elements */
       .gm-style .gm-iv-address {
         background-color: rgba(255, 255, 255, 0.9) !important;
         color: #333 !important;
+      }
+      .gm-style .gm-iv-address * {
+        color: #333 !important;
+      }
+      .gm-style .gm-iv-address a,
+      .gm-style .gm-iv-address a:visited {
+        color: #1a73e8 !important;
+      }
+      /* Street View short address overlay (top-left road name) */
+      .gm-style .gm-iv-short-address-description {
+        color: #333 !important;
+      }
+      /* Street View close/back button label */
+      .gm-style .gm-iv-back-icon,
+      .gm-style .gm-iv-marker {
+        filter: none !important;
       }
     `;
     document.head.appendChild(style);

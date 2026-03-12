@@ -1,4 +1,10 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Street View Address Text + Search Dropdown Animation
+Summary: Fixed Pegman address text (dark mode CSS override for all `.gm-iv-address` children). Replaced janky `transition-all` on search container with `animate-in fade-in slide-in-from-top-2` on dropdown content.
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/CampusMapHUD.tsx`
+Verification: tsc ✅; prettier ✅; build ✅
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map UI — Dark/Light Mode Text & Button Contrast Fix
 Summary: Fixed dark mode for Locate Me buttons (added dark card bg, hover, active states), crosshair SVGs (hardcoded #666 → currentColor with dark:text-mq-content-secondary), and loading skeleton (dark:bg-mq-background). Also includes prior audit fix: button positioning and error fallback token migration.
 Files Changed: `features/map/components/CampusMap.tsx`, `features/map/components/GoogleMapCanvas.tsx`

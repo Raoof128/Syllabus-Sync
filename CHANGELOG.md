@@ -1,4 +1,10 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Street View Address Text Fix + Search Dropdown Animation
+Summary: (1) Fixed Street View (Pegman) address bar text invisible in dark mode — added CSS overrides targeting all nested elements within `.gm-iv-address` (`*`, `a`, `a:visited`, `.gm-iv-short-address-description`) with `!important` color rules. Address text now renders dark on white background in both light and dark mode, matching Google Maps native appearance. (2) Fixed janky campus building search dropdown animation — removed `transition-all` from search container (was causing border-radius to morph weirdly), added `animate-in fade-in slide-in-from-top-2` to dropdown content for smooth fade+slide appearance in both Campus and Google map modes.
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/CampusMapHUD.tsx`
+Verification: `npx tsc --noEmit` ✅; prettier ✅; `npm run build` ✅
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map UI — Dark/Light Mode Text & Button Contrast Fix
 Summary: Fixed dark mode readability issues across both map modes. (1) Locate Me / My Location buttons: added `dark:bg-mq-card-background`, `dark:hover:bg-mq-hover-background`, `dark:active:bg-mq-background-secondary` — previously hardcoded `bg-white` was invisible against dark map tiles. (2) Crosshair SVG icons in both CampusMap and GoogleMapCanvas: migrated from hardcoded `stroke="#666"` / `fill="#999"` to `stroke="currentColor"` / `fill="currentColor"` with parent class `text-gray-600 dark:text-mq-content-secondary` — crosshair was invisible on dark button backgrounds. (3) GoogleMapCanvas loading skeleton: added `dark:bg-mq-background` to prevent bright `#e8eaed` flash in dark mode, and `dark:bg-mq-content-tertiary/30` for the progress bar. Icon uses `text-mq-content-tertiary`. (4) Previous audit: CampusMap button positioning raised to `bottom-[220px]`, error fallback migrated from shadcn to mq-\* tokens.
 Files Changed: `features/map/components/CampusMap.tsx`, `features/map/components/GoogleMapCanvas.tsx`

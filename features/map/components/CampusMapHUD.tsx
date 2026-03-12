@@ -135,7 +135,7 @@ export default function CampusMapHUD({
         <div className="absolute top-14 left-3 w-[min(400px,calc(100vw-24px))] pointer-events-auto">
           <div
             className={cn(
-              'bg-mq-card-background shadow-lg transition-all',
+              'bg-mq-card-background shadow-lg',
               hasResults ? 'rounded-2xl' : 'rounded-full',
             )}
           >
@@ -174,7 +174,7 @@ export default function CampusMapHUD({
 
             {/* Search results dropdown — shows on focus click or when typing */}
             {showDropdown && (
-              <div className="border-t border-mq-border/40 max-h-[280px] overflow-y-auto pb-2 custom-scrollbar">
+              <div className="border-t border-mq-border/40 max-h-[280px] overflow-y-auto pb-2 custom-scrollbar animate-in fade-in slide-in-from-top-2">
                 {/* Campus buildings */}
                 {visibleBuildings.length > 0 && (
                   <div className="px-2 pt-2 space-y-0.5">
@@ -322,7 +322,7 @@ export default function CampusMapHUD({
         <div className="absolute top-3 left-3 w-[min(400px,calc(100vw-24px))] pointer-events-auto">
           <div
             className={cn(
-              'bg-mq-card-background shadow-lg transition-all',
+              'bg-mq-card-background shadow-lg',
               hasResults ? 'rounded-2xl' : 'rounded-full',
             )}
           >
@@ -361,7 +361,7 @@ export default function CampusMapHUD({
 
             {/* Search results dropdown — shows on focus click or when typing */}
             {showDropdown && (
-              <div className="border-t border-mq-border/40 max-h-[280px] overflow-y-auto pb-2 custom-scrollbar">
+              <div className="border-t border-mq-border/40 max-h-[280px] overflow-y-auto pb-2 custom-scrollbar animate-in fade-in slide-in-from-top-2">
                 {visibleBuildings.length > 0 ? (
                   <div className="px-2 pt-2 space-y-0.5">
                     {visibleBuildings.map((b) => {
