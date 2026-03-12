@@ -200,13 +200,13 @@ html:not(.dark)
   mix-blend-mode: normal;
 }
 
-/* Undo alabaster contrast for Google Maps internals — let the map control its own text */
+/* Undo alabaster -webkit-text-fill-color for Google Maps internals.
+   alabaster sets -webkit-text-fill-color:#1a1a1a which overrides color for rendering.
+   currentColor defers to the color property, letting Google Maps' own styles work.
+   Using !important because unset/inherit just re-inherits #1a1a1a from parent chain. */
 .gm-style,
 .gm-style * {
-  color: unset !important;
-  -webkit-text-fill-color: unset !important;
-  opacity: unset !important;
-  mix-blend-mode: unset !important;
+  -webkit-text-fill-color: currentColor !important;
 }
 
 /* ============================================
