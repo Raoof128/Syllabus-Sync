@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import TodaySchedule from '@/features/home/components/TodaySchedule';
@@ -11,7 +11,7 @@ import { WelcomeHeader } from '@/features/home/components/WelcomeHeader';
 import UnitCard from '@/components/units/UnitCard';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { ScrollReveal, revealChildVariants } from '@/components/ui/ScrollReveal';
-import { LazyMotion, m, domAnimation } from 'framer-motion';
+import { LazyMotion, m, domAnimation, AnimatePresence } from 'framer-motion';
 
 import { DEMO_USER } from '@/lib/config';
 import {
@@ -61,6 +61,16 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
 
   const [fabOpen, setFabOpen] = useState(false);
   const portalTarget = typeof document === 'undefined' ? null : document.body;
+
+  // Close FAB menu on Escape key
+  useEffect(() => {
+    if (!fabOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFabOpen(false);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [fabOpen]);
 
   const handleQuickCalendarAction = (target: CalendarIntentTarget) => {
     queueCalendarIntent({
@@ -284,89 +294,116 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
           </ScrollReveal>
         </section>
 
-        {/* Floating Action Button (FAB) - rendered via portal to escape overflow:auto clipping */}
+        {/* Floating Action Button (FAB) - sticky via fixed + portal to escape overflow clipping */}
         {portalTarget &&
           createPortal(
-            <div
-              className="fixed z-[9999]"
-              style={{
-                bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))',
-                right: 'calc(1.5rem + env(safe-area-inset-right, 0px))',
-              }}
-            >
-              <LazyMotion features={domAnimation}>
+            <>
+              {/* Backdrop — click outside to close menu (sibling to FAB for correct z-stacking) */}
+              <AnimatePresence>
+                {fabOpen && (
+                  <m.div
+                    key="fab-backdrop"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[998]"
+                    onClick={() => setFabOpen(false)}
+                    aria-hidden="true"
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* FAB Container */}
+              <div
+                className="fixed z-[999]"
+                style={{
+                  bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))',
+                  right: 'calc(1.5rem + env(safe-area-inset-right, 0px))',
+                }}
+              >
                 <div className="relative">
                   {/* FAB Menu */}
-                  {fabOpen && (
-                    <m.div
-                      initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                      className="absolute bottom-16 right-0 flex flex-col gap-2 items-end"
-                    >
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => handleQuickCalendarAction('unit')}
+                  <AnimatePresence>
+                    {fabOpen && (
+                      <m.div
+                        key="fab-menu"
+                        id="fab-menu"
+                        role="menu"
+                        initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute bottom-14 sm:bottom-16 right-0 flex flex-col gap-2 items-end"
                       >
-                        <BookOpen className="h-4 w-4 text-mq-content" />
-                        {t('addUnitClass')}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => handleQuickCalendarAction('exam')}
-                      >
-                        <GraduationCap className="h-4 w-4 text-mq-content" />
-                        {t('addExam')}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => handleQuickCalendarAction('assignment')}
-                      >
-                        <FileText className="h-4 w-4 text-mq-content" />
-                        {t('addAssignment')}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => handleQuickCalendarAction('event')}
-                      >
-                        <Calendar className="h-4 w-4 text-mq-content" />
-                        {t('addEvent')}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="shadow-lg flex items-center gap-2 whitespace-nowrap"
-                        onClick={() => handleQuickCalendarAction('reminder')}
-                      >
-                        <ListTodo className="h-4 w-4 text-mq-content" />
-                        {t('addTodo')}
-                      </Button>
-                    </m.div>
-                  )}
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          role="menuitem"
+                          className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                          onClick={() => handleQuickCalendarAction('unit')}
+                        >
+                          <BookOpen className="h-4 w-4 text-mq-content" aria-hidden="true" />
+                          {t('addUnitClass')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          role="menuitem"
+                          className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                          onClick={() => handleQuickCalendarAction('exam')}
+                        >
+                          <GraduationCap className="h-4 w-4 text-mq-content" aria-hidden="true" />
+                          {t('addExam')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          role="menuitem"
+                          className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                          onClick={() => handleQuickCalendarAction('assignment')}
+                        >
+                          <FileText className="h-4 w-4 text-mq-content" aria-hidden="true" />
+                          {t('addAssignment')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          role="menuitem"
+                          className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                          onClick={() => handleQuickCalendarAction('event')}
+                        >
+                          <Calendar className="h-4 w-4 text-mq-content" aria-hidden="true" />
+                          {t('addEvent')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          role="menuitem"
+                          className="shadow-lg flex items-center gap-2 whitespace-nowrap"
+                          onClick={() => handleQuickCalendarAction('reminder')}
+                        >
+                          <ListTodo className="h-4 w-4 text-mq-content" aria-hidden="true" />
+                          {t('addTodo')}
+                        </Button>
+                      </m.div>
+                    )}
+                  </AnimatePresence>
 
-                  {/* Main FAB Button */}
+                  {/* Main FAB Button — responsive: 48px mobile, 56px desktop */}
                   <Button
-                    size="lg"
-                    className="h-14 w-14 rounded-full shadow-lg p-0"
+                    className="h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-lg hover:shadow-xl p-0"
                     onClick={() => setFabOpen(!fabOpen)}
                     aria-expanded={fabOpen}
+                    aria-controls="fab-menu"
                     aria-label={t('quickActions')}
                   >
                     <m.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
-                      <Plus className="h-6 w-6" />
+                      <Plus className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
                     </m.div>
                   </Button>
                 </div>
-              </LazyMotion>
-            </div>,
+              </div>
+            </>,
             portalTarget,
           )}
       </section>
