@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { toastUtils } from '@/lib/utils/toast';
-import { profileSchema, ProfileFormValues } from '../schema';
+import { createProfileSchema, ProfileFormValues } from '../schema';
 import { updateProfileAction } from '../actions';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
@@ -34,6 +34,7 @@ function normalizeStudentId(studentId: string | undefined | null): string {
 
 export function useProfileManager() {
   const { t } = useTypedTranslation();
+  const profileSchema = createProfileSchema(t);
 
   // Use selector to get current profile safely
   const currentProfile = useProfilesStore((state) =>
@@ -151,7 +152,7 @@ export function useProfileManager() {
       let errorMessage = t('validationFailed');
 
       if ('error' in result && result.error) {
-        errorMessage = 'Please check the form for errors';
+        errorMessage = t('validationFailed');
       } else if ('message' in result) {
         errorMessage = result.message || t('unexpectedError');
       }

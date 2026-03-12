@@ -32,6 +32,7 @@ interface PlaceSearchApiResponse {
 
 export function useGooglePlacesSearch(
   query: string,
+  languageCode: string,
   options: UseGooglePlacesSearchOptions,
 ): UseGooglePlacesSearchResult {
   const { enabled, minLength = 3, debounceMs = 400 } = options;
@@ -71,6 +72,7 @@ export function useGooglePlacesSearch(
           body: JSON.stringify({
             query: trimmed,
             sessionToken: sessionTokenRef.current,
+            languageCode,
           }),
           signal: controller.signal,
         });
@@ -97,7 +99,7 @@ export function useGooglePlacesSearch(
         }
       }
     },
-    [minLength],
+    [languageCode, minLength],
   );
 
   // Debounced search effect
@@ -139,6 +141,10 @@ export function useGooglePlacesSearch(
       sessionTokenRef.current = generateSessionToken();
     }
   }, [query]);
+
+  useEffect(() => {
+    lastQueryRef.current = '';
+  }, [languageCode]);
 
   return { suggestions, isLoading, error };
 }

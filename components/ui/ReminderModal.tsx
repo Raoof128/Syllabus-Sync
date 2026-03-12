@@ -23,12 +23,8 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/mq/switch';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import {
-  useRemindersStore,
-  ReminderItemType,
-  ReminderTiming,
-  getTimingLabel,
-} from '@/lib/store/remindersStore';
+import type { TranslationKey } from '@/lib/i18n/translations';
+import { useRemindersStore, ReminderItemType, ReminderTiming } from '@/lib/store/remindersStore';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { toastUtils } from '@/lib/utils/toast';
 import { format } from 'date-fns';
@@ -46,7 +42,7 @@ interface ReminderModalProps {
   unitSchedule?: Array<{ day: string; startTime: string; endTime: string }>;
 }
 
-type TimingOption = { value: ReminderTiming; labelKey: string };
+type TimingOption = { value: ReminderTiming; labelKey: TranslationKey };
 
 const TIMING_OPTIONS: TimingOption[] = [
   { value: '15min', labelKey: 'reminder_15minBefore' },
@@ -78,6 +74,14 @@ export default function ReminderModal({
   const [customDate, setCustomDate] = useState('');
   const [customTime, setCustomTime] = useState('09:00');
   const [existingReminderId, setExistingReminderId] = useState<string | null>(null);
+
+  const getTimingLabelText = useCallback(
+    (value: ReminderTiming): string => {
+      const option = TIMING_OPTIONS.find((item) => item.value === value);
+      return option ? t(option.labelKey) : value;
+    },
+    [t],
+  );
 
   // Load existing reminder on open
   useEffect(() => {
@@ -121,7 +125,7 @@ export default function ReminderModal({
     if (enabled) {
       // Validate custom timing
       if (timing === 'custom' && !customDate) {
-        toastUtils.error(t('error'), 'Please select a custom date');
+        toastUtils.error(t('error'), t('reminderCustomDateRequired'));
         return;
       }
 
@@ -146,7 +150,10 @@ export default function ReminderModal({
         // Create a notification to show the reminder was set
         addNotification({
           title: t('reminderSet'),
-          message: `${getTimingLabel(timing)} for "${itemTitle}"`,
+          message: t('reminderNotificationSetMessage', {
+            timing: getTimingLabelText(timing),
+            title: itemTitle,
+          }),
           type: 'system',
           read: false,
           link: undefined,
@@ -163,7 +170,7 @@ export default function ReminderModal({
       // Create a notification to show the reminder was removed
       addNotification({
         title: t('reminderRemoved'),
-        message: `Reminder for "${itemTitle}" has been removed`,
+        message: t('reminderNotificationRemovedMessage', { title: itemTitle }),
         type: 'system',
         read: false,
         link: undefined,
@@ -188,6 +195,7 @@ export default function ReminderModal({
     updateReminder,
     removeReminder,
     addNotification,
+    getTimingLabelText,
     onOpenChange,
     t,
   ]);
@@ -331,7 +339,7 @@ export default function ReminderModal({
                     <Clock className="h-4 w-4 text-mq-primary" />
                     <span className="text-mq-content">
                       {t('youWillBeNotified')}{' '}
-                      <span className="font-medium">{getTimingLabel(timing)}</span>
+                      <span className="font-medium">{getTimingLabelText(timing)}</span>
                     </span>
                   </div>
                 </div>

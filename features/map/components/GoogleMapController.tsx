@@ -5,7 +5,9 @@ import dynamic from 'next/dynamic';
 import { ChevronUp } from 'lucide-react';
 import type { Building } from '@/features/map/lib/buildings';
 import { getBuildingGps } from '@/features/map/lib/buildings';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { toastUtils } from '@/lib/utils/toast';
+import { getLocaleString } from '@/lib/utils/locale';
 import type {
   GoogleComputedRoute,
   GoogleTravelMode,
@@ -19,7 +21,7 @@ const GoogleMapCanvas = dynamic(() => import('./GoogleMapCanvas'), { ssr: false 
 interface RouteApiResponse {
   success: boolean;
   data?: GoogleComputedRoute;
-  error?: { message: string };
+  error?: { code?: string; message: string };
 }
 
 /** Haversine distance in metres */
@@ -60,6 +62,7 @@ export default function GoogleMapController({
   onDismissRoute,
   onStreetViewChange,
 }: Props) {
+  const { t, language } = useTypedTranslation();
   const [isStreetViewActive, setIsStreetViewActive] = useState(false);
   const [userLocation, setUserLocation] = useState<MapLatLng | null>(null);
   const [route, setRoute] = useState<GoogleComputedRoute | null>(null);
@@ -140,10 +143,21 @@ export default function GoogleMapController({
 
   const destName = externalDestination?.label ?? selectedBuilding?.name ?? '';
 
+  const getRouteErrorMessage = useCallback(
+    (code?: string): string => {
+      if (code === 'NOT_FOUND') {
+        return t('noRouteAvailable');
+      }
+
+      return t('routeUnavailable');
+    },
+    [t],
+  );
+
   // Route fetch
   const fetchRoute = useCallback(
     async (origin: MapLatLng, dest: MapLatLng, mode: GoogleTravelMode) => {
-      const key = `${origin.lat.toFixed(5)},${origin.lng.toFixed(5)}>${dest.lat.toFixed(5)},${dest.lng.toFixed(5)}|${mode}`;
+      const key = `${origin.lat.toFixed(5)},${origin.lng.toFixed(5)}>${dest.lat.toFixed(5)},${dest.lng.toFixed(5)}|${mode}|${language}`;
       if (key === lastKeyRef.current) return;
       lastKeyRef.current = key;
 
@@ -153,23 +167,32 @@ export default function GoogleMapController({
         const res = await fetch('/api/maps/routes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ origin, destination: dest, travelMode: mode }),
+          body: JSON.stringify({
+            origin,
+            destination: dest,
+            travelMode: mode,
+            languageCode: getLocaleString(language),
+          }),
         });
         const json = (await res.json()) as RouteApiResponse;
         if (!res.ok || !json.success || !json.data) {
-          throw new Error(json.error?.message ?? 'Route fetch failed');
+          setRouteError(getRouteErrorMessage(json.error?.code));
+          setRoute(null);
+          lastKeyRef.current = '';
+          return;
         }
         setRoute(json.data);
         lastNavFetchPosRef.current = origin;
       } catch (e) {
-        setRouteError(e instanceof Error ? e.message : 'Routing error');
+        void e;
+        setRouteError(t('routeUnavailable'));
         setRoute(null);
         lastKeyRef.current = '';
       } finally {
         setIsLoadingRoute(false);
       }
     },
-    [],
+    [getRouteErrorMessage, language, t],
   );
 
   // Initial route fetch when destination or user location changes
@@ -253,7 +276,7 @@ export default function GoogleMapController({
           userLocation={userLocation}
           destination={destination}
           hasArrived={hasArrived}
-          originLabel={userLocation ? 'Your location' : undefined}
+          originLabel={userLocation ? t('yourLocation') : undefined}
           onTravelModeChange={handleTravelModeChange}
           onStartNavigation={() => {
             setHasArrived(false);
@@ -262,7 +285,7 @@ export default function GoogleMapController({
           onStopNavigation={() => {
             setIsNavigating(false);
             setIsPanelOpen(true);
-            toastUtils.info('Navigation reset');
+            toastUtils.info(t('navigationReset'));
           }}
           onDismissArrival={() => setHasArrived(false)}
           onDismissRoute={() => {
@@ -284,7 +307,7 @@ export default function GoogleMapController({
           <button
             onClick={() => setIsPanelOpen(true)}
             className="shrink-0 rounded-full p-1 text-mq-content-secondary transition-colors hover:bg-mq-hover-background hover:text-mq-content"
-            aria-label="Expand navigation panel"
+            aria-label={t('expandNavigationPanel')}
           >
             <ChevronUp size={16} />
           </button>
@@ -292,11 +315,11 @@ export default function GoogleMapController({
             onClick={() => {
               setIsNavigating(false);
               setIsPanelOpen(true);
-              toastUtils.info('Navigation reset');
+              toastUtils.info(t('navigationReset'));
             }}
             className="shrink-0 rounded-xl bg-red-600 px-3 py-2 text-xs font-bold text-white dark:bg-red-500"
           >
-            Stop
+            {t('stop')}
           </button>
         </div>
       )}

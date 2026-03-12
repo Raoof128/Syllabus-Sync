@@ -601,10 +601,10 @@ export function useMapLocation({
           if (!locationErrorToastShown.current) {
             locationErrorToastShown.current = true;
             toastUtils.info(
-              safeTRef.current('locationTimeoutTitle', 'Location update timed out'),
+              safeTRef.current('locationTimeout', 'Location Timeout'),
               safeTRef.current(
-                'locationTimeoutMessage',
-                'We could not refresh your location. Try moving to an open area and retry.',
+                'locationTimeoutDesc',
+                'Location request timed out. Try moving to a better signal area.',
               ),
             );
           }
@@ -614,7 +614,7 @@ export function useMapLocation({
             locationErrorToastShown.current = true;
             toastUtils.warning(
               safeTRef.current('locationNotAvailable', 'Location Not Available'),
-              safeTRef.current('waitLocation', 'Please wait for your location to be found.'),
+              safeTRef.current('waitingForLocation', 'Waiting for location'),
             );
           }
         }
@@ -648,7 +648,7 @@ export function useMapLocation({
     } else {
       toastUtils.info(
         safeTRef.current('locationNotAvailable', 'Location Not Available'),
-        safeTRef.current('waitLocation', 'Please wait for your location to be found.'),
+        safeTRef.current('waitingForLocation', 'Waiting for location'),
       );
     }
   }, [mapInstance, isMapReady, locationStatus]);

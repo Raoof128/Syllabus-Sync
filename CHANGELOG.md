@@ -4720,3 +4720,9 @@ Scope: Vercel Google Maps Key Sync + Production Redeploy (New User Key)
 Summary: Updated Vercel env `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` with the new provided key across all environments and redeployed production.
 Files: None (infrastructure operation).
 Verification: Deployment `dpl_5p5ExMw98WRw7c2zwwPA3fCs1MYj` status `Ready`; alias `https://syllabus-sync-ashy.vercel.app` active.
+
+Raouf: 2026-03-13 (Australia/Sydney)
+Scope: Repository-Wide i18n Audit + Remediation
+Summary: Audited the full repository i18n architecture, confirmed `locales/en/translations.json` as the canonical English source, and remediated production-facing gaps. Fixed locale propagation through Google Maps routing/place search/place details proxies, localised remaining hardcoded UI copy in map/profile/reminder/auth/contact flows, added the missing English source keys, removed locale drift, repaired placeholder mismatches, and refreshed all supported non-English locale files to full English-equivalent coverage without changing key namespaces or UI behaviour.
+Files: Modified `app/api/maps/routes/route.ts`, `app/api/maps/place-search/route.ts`, `app/api/maps/place-details/route.ts`, `features/map/components/GoogleMapController.tsx`, `features/map/components/GoogleRoutePanel.tsx`, `features/map/components/MapClient.tsx`, `features/map/hooks/useGooglePlacesSearch.ts`, `features/map/hooks/useMapLocation.ts`, `components/ui/ReminderModal.tsx`, `app/manage-profiles/schema.ts`, `app/manage-profiles/hooks/useProfileManager.ts`, `app/login/LoginClient.tsx`, `app/signup/SignupClient.tsx`, `app/contact/page.tsx`, `locales/en/translations.json`, all non-English `locales/*/translations.json`, `AGENT.md`, `CHANGELOG.md`.
+Verification: `node tools/i18n/deep-audit.mjs` ✅ (0 locale coverage defects), `npm run check:i18n` ✅, `npm run typecheck` ✅, `npm run lint` ✅. Residual hardcoded scan findings are intentionally non-user-localised dev/example literals only.

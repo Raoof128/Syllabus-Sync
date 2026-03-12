@@ -25,6 +25,7 @@ const requestSchema = z.object({
   origin: coordinateSchema,
   destination: coordinateSchema,
   travelMode: z.enum(['WALK', 'DRIVE', 'BICYCLE', 'TRANSIT']).default('WALK'),
+  languageCode: z.string().trim().min(2).max(20).default('en-AU'),
 });
 
 interface CachedRoute {
@@ -38,10 +39,11 @@ function buildCacheKey(
   origin: { lat: number; lng: number },
   destination: { lat: number; lng: number },
   travelMode: GoogleTravelMode,
+  languageCode: string,
 ): string {
   return createHash('sha256')
     .update(
-      `${origin.lat.toFixed(5)},${origin.lng.toFixed(5)}:${destination.lat.toFixed(5)},${destination.lng.toFixed(5)}:${travelMode}`,
+      `${origin.lat.toFixed(5)},${origin.lng.toFixed(5)}:${destination.lat.toFixed(5)},${destination.lng.toFixed(5)}:${travelMode}:${languageCode}`,
     )
     .digest('hex')
     .slice(0, 32);
@@ -116,14 +118,14 @@ function formatTransitInstruction(step: {
   const headsign = step.transitDetails?.headsign;
 
   if (lineName && headsign) {
-    return `Take ${lineName} toward ${headsign}`;
+    return `${lineName} → ${headsign}`;
   }
 
   if (lineName) {
-    return `Take ${lineName}`;
+    return lineName;
   }
 
-  return 'Continue to your destination';
+  return '';
 }
 
 function normaliseRouteResponse(
@@ -177,6 +179,7 @@ function buildComputeRoutesBody(
   origin: { lat: number; lng: number },
   destination: { lat: number; lng: number },
   travelMode: GoogleTravelMode,
+  languageCode: string,
 ): Record<string, unknown> {
   const body: Record<string, unknown> = {
     origin: {
@@ -190,7 +193,7 @@ function buildComputeRoutesBody(
       },
     },
     travelMode,
-    languageCode: 'en-AU',
+    languageCode,
     units: 'METRIC',
   };
 
@@ -245,8 +248,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { origin, destination, travelMode } = parsed.data;
-    const cacheKey = buildCacheKey(origin, destination, travelMode);
+    const { origin, destination, travelMode, languageCode } = parsed.data;
+    const cacheKey = buildCacheKey(origin, destination, travelMode, languageCode);
     const cached = getCachedRoute(cacheKey);
 
     if (cached) {
@@ -263,7 +266,7 @@ export async function POST(request: NextRequest) {
         'X-Goog-Api-Key': googleRoutesApiKey,
         'X-Goog-FieldMask': GOOGLE_ROUTES_FIELD_MASK,
       },
-      body: JSON.stringify(buildComputeRoutesBody(origin, destination, travelMode)),
+      body: JSON.stringify(buildComputeRoutesBody(origin, destination, travelMode, languageCode)),
       signal: AbortSignal.timeout(12000),
     });
 

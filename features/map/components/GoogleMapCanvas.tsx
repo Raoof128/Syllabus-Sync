@@ -6,6 +6,7 @@ import { getBuildingGps } from '@/features/map/lib/buildings';
 import { CAMPUS_CENTRE_GPS } from '@/features/map/lib/constants';
 import { loadGoogleMaps } from '@/lib/maps/google/loader';
 import { decodePolyline } from '@/lib/maps/google/decodePolyline';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type {
   GoogleComputedRoute,
   GoogleTravelMode,
@@ -78,6 +79,7 @@ export default function GoogleMapCanvas({
   travelMode,
   onStreetViewChange,
 }: Props) {
+  const { t } = useTypedTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   const userMarkerRef = useRef<AnyMarker | null>(null);
@@ -239,7 +241,7 @@ export default function GoogleMapCanvas({
         try {
           m = new google.maps.marker.AdvancedMarkerElement({
             position: loc,
-            title: 'You',
+            title: t('yourLocation'),
             content: dot,
             zIndex: 999,
           });
@@ -247,7 +249,7 @@ export default function GoogleMapCanvas({
         } catch {
           m = new google.maps.Marker({
             position: loc,
-            title: 'You',
+            title: t('yourLocation'),
             zIndex: 999,
             map,
           });
@@ -305,7 +307,7 @@ export default function GoogleMapCanvas({
         }
       }
     },
-    [animateUserDot],
+    [animateUserDot, t],
   );
 
   useEffect(() => {
@@ -450,7 +452,7 @@ export default function GoogleMapCanvas({
       try {
         originDotRef.current = new google.maps.marker.AdvancedMarkerElement({
           position: path[0],
-          title: 'Start',
+          title: t('start'),
           content: createRouteDot('#34a853'),
           zIndex: 100,
         });
@@ -472,7 +474,7 @@ export default function GoogleMapCanvas({
         left: 40,
       });
     }
-  }, [route, isNavigating, userLocation, mapReady, travelMode]);
+  }, [route, isNavigating, userLocation, mapReady, t, travelMode]);
 
   // Cleanup animation frame on unmount
   useEffect(() => {
@@ -680,7 +682,7 @@ export default function GoogleMapCanvas({
   if (error)
     return (
       <div className="flex h-full items-center justify-center bg-mq-background-secondary/50 text-sm text-red-600 dark:text-red-400 p-4 text-center">
-        Google Maps unavailable: {error}
+        {t('googleMapUnavailable')}: {error}
       </div>
     );
 
@@ -715,8 +717,8 @@ export default function GoogleMapCanvas({
         <button
           onClick={handleMyLocation}
           className={`absolute ${panelVisible ? 'bottom-[10rem]' : 'bottom-20'} left-3 z-[1100] flex h-10 w-10 items-center justify-center rounded bg-white dark:bg-mq-card-background shadow-[0_1px_4px_rgba(0,0,0,0.3)] transition-[bottom] duration-200 hover:bg-gray-100 dark:hover:bg-mq-hover-background active:bg-gray-200 dark:active:bg-mq-background-secondary`}
-          aria-label="My location"
-          title="My location"
+          aria-label={t('myLocation')}
+          title={t('myLocation')}
         >
           <svg
             viewBox="0 0 24 24"

@@ -54,10 +54,7 @@ export default function SignupClient() {
   // OAuth login handler
   const handleGoogleLogin = async () => {
     if (!isSupabaseConfigured()) {
-      toastUtils.error(
-        t('loginErrorFailed'),
-        'Supabase is not configured. OAuth sign-up is disabled.',
-      );
+      toastUtils.error(t('oauthRequired'), t('googleOAuthDesc'));
       return;
     }
 

@@ -16,6 +16,7 @@ const PLACE_DETAILS_FIELD_MASK = [
 const requestSchema = z.object({
   placeId: z.string().min(1).max(300),
   sessionToken: z.string().max(100).optional(),
+  languageCode: z.string().trim().min(2).max(20).default('en-AU'),
 });
 
 export interface PlaceDetails {
@@ -67,12 +68,13 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { placeId, sessionToken } = parsed.data;
+    const { placeId, sessionToken, languageCode } = parsed.data;
 
     const url = new URL(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`);
     if (sessionToken) {
       url.searchParams.set('sessionToken', sessionToken);
     }
+    url.searchParams.set('languageCode', languageCode);
 
     const upstreamResponse = await fetch(url.toString(), {
       method: 'GET',
@@ -115,7 +117,7 @@ export async function POST(request: NextRequest) {
 
     const details: PlaceDetails = {
       placeId: upstreamJson.id ?? placeId,
-      displayName: upstreamJson.displayName?.text ?? 'Unknown place',
+      displayName: upstreamJson.displayName?.text ?? placeId,
       formattedAddress: upstreamJson.formattedAddress ?? '',
       lat: upstreamJson.location.latitude,
       lng: upstreamJson.location.longitude,

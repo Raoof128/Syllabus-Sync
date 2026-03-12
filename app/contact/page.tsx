@@ -202,7 +202,7 @@ export default function ContactPage() {
                 type="email"
                 value={contactEmail}
                 onChange={(event) => setContactEmail(event.target.value)}
-                placeholder="you@mq.edu.au"
+                placeholder={t('emailPlaceholderExample')}
                 className="mt-2.5 w-full rounded-mq-lg border border-mq-border bg-mq-input-background px-4 py-2.5 text-sm text-mq-content shadow-sm outline-none transition-all duration-200 placeholder:text-mq-content-secondary/50 focus:border-mq-primary focus:ring-2 focus:ring-mq-primary/20"
               />
             </div>

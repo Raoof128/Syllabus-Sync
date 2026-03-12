@@ -13,7 +13,9 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { getLocaleString } from '@/lib/utils/locale';
 import type { GoogleComputedRoute, GoogleTravelMode, MapLatLng } from '@/lib/maps/google/types';
 
 interface Props {
@@ -34,11 +36,15 @@ interface Props {
   onDismissRoute: () => void;
 }
 
-const MODES: { mode: GoogleTravelMode; label: string; Icon: React.ElementType }[] = [
-  { mode: 'WALK', label: 'Walk', Icon: Footprints },
-  { mode: 'DRIVE', label: 'Drive', Icon: Car },
-  { mode: 'BICYCLE', label: 'Cycle', Icon: Bike },
-  { mode: 'TRANSIT', label: 'Transit', Icon: Bus },
+const MODES: {
+  mode: GoogleTravelMode;
+  labelKey: 'walk' | 'drive' | 'bike' | 'transit';
+  Icon: React.ElementType;
+}[] = [
+  { mode: 'WALK', labelKey: 'walk', Icon: Footprints },
+  { mode: 'DRIVE', labelKey: 'drive', Icon: Car },
+  { mode: 'BICYCLE', labelKey: 'bike', Icon: Bike },
+  { mode: 'TRANSIT', labelKey: 'transit', Icon: Bus },
 ];
 
 const GMAPS_MODE: Record<GoogleTravelMode, string> = {
@@ -47,20 +53,6 @@ const GMAPS_MODE: Record<GoogleTravelMode, string> = {
   BICYCLE: 'bicycling',
   TRANSIT: 'transit',
 };
-
-function fmtDuration(totalSeconds: number): string {
-  const m = Math.max(1, Math.round(totalSeconds / 60));
-  return m < 60 ? `${m} min` : `${Math.floor(m / 60)}h ${m % 60}m`;
-}
-
-function fmtDistance(meters: number): string {
-  return meters >= 1000 ? `${(meters / 1000).toFixed(1)} km` : `${Math.round(meters)} m`;
-}
-
-function fmtEta(totalSeconds: number): string {
-  const eta = new Date(Date.now() + totalSeconds * 1000);
-  return eta.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
 
 export default function GoogleRoutePanel({
   destinationName,
@@ -79,7 +71,57 @@ export default function GoogleRoutePanel({
   onDismissArrival,
   onDismissRoute,
 }: Props) {
+  const { t, language } = useTypedTranslation();
   const [stepsExpanded, setStepsExpanded] = useState(false);
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  const locale = getLocaleString(language);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setNowMs(Date.now());
+    }, 30_000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  const formatNumber = (value: number, options?: Intl.NumberFormatOptions): string =>
+    new Intl.NumberFormat(locale, options).format(value);
+
+  const fmtDuration = (totalSeconds: number): string => {
+    const totalMinutes = Math.max(1, Math.round(totalSeconds / 60));
+    if (totalMinutes < 60) {
+      return `${formatNumber(totalMinutes)} ${t('routeMinutesShort')}`;
+    }
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const parts = [`${formatNumber(hours)}${t('routeHoursShort')}`];
+
+    if (minutes > 0) {
+      parts.push(`${formatNumber(minutes)} ${t('routeMinutesShort')}`);
+    }
+
+    return parts.join(' ');
+  };
+
+  const fmtDistance = (meters: number): string => {
+    if (meters >= 1000) {
+      return `${formatNumber(meters / 1000, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      })} ${t('routeKilometersShort')}`;
+    }
+
+    return `${formatNumber(Math.round(meters))} ${t('routeMetersShort')}`;
+  };
+
+  const fmtEta = (totalSeconds: number): string =>
+    new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(nowMs + totalSeconds * 1000));
 
   const handoffUrl =
     userLocation && destination
@@ -92,15 +134,13 @@ export default function GoogleRoutePanel({
       <div className="absolute bottom-4 left-1/2 z-[1000] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-green-200 bg-green-50/95 p-4 shadow-xl backdrop-blur dark:border-green-800 dark:bg-green-950/95">
         <div className="flex flex-col items-center gap-2 text-center">
           <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-400" />
-          <p className="text-sm font-semibold text-green-800 dark:text-green-200">
-            You&apos;ve arrived!
-          </p>
+          <p className="text-sm font-semibold text-green-800 dark:text-green-200">{t('arrived')}</p>
           <p className="text-xs text-green-600 dark:text-green-400">{destinationName}</p>
           <button
             onClick={onDismissArrival}
             className="mt-1 rounded-xl bg-green-600 px-4 py-2 text-xs font-semibold text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
           >
-            Done
+            {t('done')}
           </button>
         </div>
       </div>
@@ -118,7 +158,7 @@ export default function GoogleRoutePanel({
         <button
           onClick={isNavigating ? onStopNavigation : onDismissRoute}
           className="shrink-0 rounded-full p-1 text-mq-content-secondary transition-colors hover:bg-mq-hover-background hover:text-mq-content"
-          aria-label={isNavigating ? 'Stop navigation' : 'Close directions'}
+          aria-label={isNavigating ? t('stopNavigation') : t('closeDirections')}
         >
           <X size={16} />
         </button>
@@ -128,22 +168,25 @@ export default function GoogleRoutePanel({
         {/* Travel mode tabs — compact pill style */}
         {!isNavigating && (
           <div className="mb-2 flex gap-1">
-            {MODES.map(({ mode, label, Icon }) => (
-              <button
-                key={mode}
-                onClick={() => onTravelModeChange(mode)}
-                aria-label={`Travel mode: ${label}`}
-                aria-pressed={travelMode === mode}
-                className={`flex flex-1 items-center justify-center gap-1 rounded-full py-1.5 text-[11px] transition-colors ${
-                  travelMode === mode
-                    ? 'bg-[#d2e3fc] text-[#1a73e8] dark:bg-[#1a3a5c] dark:text-[#8ab4f8] font-semibold'
-                    : 'bg-mq-background-secondary text-mq-content-secondary hover:bg-mq-hover-background'
-                }`}
-              >
-                <Icon size={14} />
-                <span className="hidden sm:inline">{label}</span>
-              </button>
-            ))}
+            {MODES.map(({ mode, labelKey, Icon }) => {
+              const label = t(labelKey);
+              return (
+                <button
+                  key={mode}
+                  onClick={() => onTravelModeChange(mode)}
+                  aria-label={t('travelModeLabel', { mode: label })}
+                  aria-pressed={travelMode === mode}
+                  className={`flex flex-1 items-center justify-center gap-1 rounded-full py-1.5 text-[11px] transition-colors ${
+                    travelMode === mode
+                      ? 'bg-[#d2e3fc] text-[#1a73e8] dark:bg-[#1a3a5c] dark:text-[#8ab4f8] font-semibold'
+                      : 'bg-mq-background-secondary text-mq-content-secondary hover:bg-mq-hover-background'
+                  }`}
+                >
+                  <Icon size={14} />
+                  <span className="hidden sm:inline">{label}</span>
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -151,7 +194,7 @@ export default function GoogleRoutePanel({
         {!userLocation && !route && !isLoadingRoute && !routeError && (
           <div className="mb-2 flex items-center justify-center gap-2 text-xs text-mq-content-secondary">
             <Loader2 size={14} className="animate-spin" />
-            Waiting for your location...
+            {t('waitingForLocation')}
           </div>
         )}
 
@@ -159,7 +202,7 @@ export default function GoogleRoutePanel({
         {isLoadingRoute && (
           <div className="mb-2 flex items-center justify-center gap-2 text-xs text-mq-content-secondary">
             <Loader2 size={14} className="animate-spin" />
-            Calculating route...
+            {t('loadingRoute')}
           </div>
         )}
 
@@ -192,7 +235,7 @@ export default function GoogleRoutePanel({
                   {fmtDuration(route.durationSeconds)}
                 </span>
                 <span className="text-[10px] text-mq-content-tertiary">
-                  {fmtDistance(route.distanceMeters)} · ETA {fmtEta(route.durationSeconds)}
+                  {fmtDistance(route.distanceMeters)} · {t('eta')} {fmtEta(route.durationSeconds)}
                 </span>
               </div>
 
@@ -203,14 +246,14 @@ export default function GoogleRoutePanel({
                     disabled={!route || isLoadingRoute}
                     className="flex items-center gap-1.5 rounded-full bg-[#1a73e8] px-4 py-2 text-xs font-bold text-white shadow-md transition-colors hover:bg-[#1557b0] disabled:opacity-40"
                   >
-                    <Navigation size={14} /> Start
+                    <Navigation size={14} /> {t('start')}
                   </button>
                 ) : (
                   <button
                     onClick={onStopNavigation}
                     className="flex items-center gap-1.5 rounded-full bg-red-600 px-4 py-2 text-xs font-bold text-white dark:bg-red-500"
                   >
-                    <X size={14} /> Stop
+                    <X size={14} /> {t('stop')}
                   </button>
                 )}
                 {handoffUrl && (
@@ -219,7 +262,7 @@ export default function GoogleRoutePanel({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center rounded-full border border-mq-border p-2 text-mq-content-secondary transition-colors hover:bg-mq-hover-background"
-                    aria-label="Open in Google Maps"
+                    aria-label={t('openInGoogleMaps')}
                   >
                     <ExternalLink size={14} />
                   </a>
@@ -235,7 +278,9 @@ export default function GoogleRoutePanel({
                   className="flex w-full items-center justify-between px-0.5 py-1 text-[11px] font-medium text-mq-content-secondary"
                 >
                   <span>
-                    {route.steps.length} step{route.steps.length !== 1 ? 's' : ''}
+                    {route.steps.length === 1
+                      ? t('steps_one', { count: formatNumber(route.steps.length) })
+                      : t('steps_other', { count: formatNumber(route.steps.length) })}
                   </span>
                   {stepsExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                 </button>

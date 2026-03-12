@@ -41,6 +41,7 @@ import {
   useGooglePlacesSearch,
   type GooglePlaceSuggestion,
 } from '@/features/map/hooks/useGooglePlacesSearch';
+import { getLocaleString } from '@/lib/utils/locale';
 
 import { triggerHaptic } from '@/lib/utils/haptics';
 
@@ -64,7 +65,7 @@ import type { LocationStatus, CampusMapRef } from './CampusMap';
 import DevPinPanel from './DevPinPanel';
 
 export default function MapClient() {
-  const { t } = useTypedTranslation();
+  const { t, language } = useTypedTranslation();
   const prefersReducedMotion = useReducedMotion();
   const searchParams = useSearchParams();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -355,6 +356,7 @@ export default function MapClient() {
   // Secondary Google Places search (only when Google mode + no strong campus match)
   const { suggestions: placeSuggestions, isLoading: isLoadingPlaces } = useGooglePlacesSearch(
     buildingSearch,
+    getLocaleString(language),
     {
       enabled: mapView === 'google' && !hasStrongMatch && buildingSearch.trim().length >= 3,
     },
@@ -367,7 +369,10 @@ export default function MapClient() {
         const response = await fetch('/api/maps/place-details', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ placeId: place.placeId }),
+          body: JSON.stringify({
+            placeId: place.placeId,
+            languageCode: getLocaleString(language),
+          }),
         });
         const json = (await response.json()) as {
           success: boolean;
@@ -380,7 +385,7 @@ export default function MapClient() {
           error?: { message: string };
         };
         if (!json.success || !json.data) {
-          toastUtils.error(t('error'), json.error?.message ?? t('tryAgain'));
+          toastUtils.error(t('error'), t('tryAgain'));
           return;
         }
 
@@ -402,17 +407,17 @@ export default function MapClient() {
         toastUtils.error(t('error'), t('tryAgain'));
       }
     },
-    [searchParams, t],
+    [language, searchParams, t],
   );
 
   // Ensure a non-empty document title for accessibility scanners
   useEffect(() => {
     try {
-      document.title = `${APP_CONFIG.name} - Map`;
+      document.title = t('mapMetaTitle', { appName: APP_CONFIG.name });
     } catch {
       // ignore
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (mapView !== 'campus') {

@@ -17,6 +17,7 @@ const AUTOCOMPLETE_FIELD_MASK = [
 const requestSchema = z.object({
   query: z.string().min(2).max(200),
   sessionToken: z.string().max(100).optional(),
+  languageCode: z.string().trim().min(2).max(20).default('en-AU'),
 });
 
 export interface PlaceSuggestion {
@@ -82,11 +83,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { query, sessionToken } = parsed.data;
+    const { query, sessionToken, languageCode } = parsed.data;
 
     const autocompleteBody: Record<string, unknown> = {
       input: query,
-      languageCode: 'en-AU',
+      languageCode,
       regionCode: 'AU',
       includedRegionCodes: ['AU'],
       locationBias: {
