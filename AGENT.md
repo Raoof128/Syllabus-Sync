@@ -1,4 +1,10 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Permanent Street View Text Fix (MutationObserver)
+Summary: Replaced CSS-only Street View text overrides with MutationObserver-based inline style enforcement. Observer activates only when Street View is open (tied to `isStreetViewActive` state), debounced at 50ms, watches `childList` only (not attributes) for performance. Directly applies `element.style.setProperty('color', '#fff', 'important')` on `.gm-iv-address`, `.gm-style-cc`, `.gm-style-pbt` elements — inline styles beat Google Maps cloud-based dark styling that was overriding our CSS `!important` rules. Static CSS kept as baseline for non-text controls.
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`
+Verification: tsc ✅; prettier ✅; build ✅
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map UI — Street View Footer Text, Compass, Share Button
 Summary: Street View footer/legal text forced white. Compass bg → transparent. Share/Export buttons given visible border.
 Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/MapClient.tsx`

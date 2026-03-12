@@ -462,88 +462,22 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
-  // Inject CSS to keep Google Maps controls readable in Street View and dark mode
+  // Static CSS overrides for Google Maps controls (baseline)
   useEffect(() => {
     const styleId = 'gmap-control-overrides';
     if (document.getElementById(styleId)) return;
     const style = document.createElement('style');
     style.id = styleId;
     style.textContent = `
-      /* Force Google Maps controls to stay white/readable in Street View and dark mode */
-      .gm-style .gm-control-active {
-        background-color: #fff !important;
-        color: #666 !important;
-      }
-      .gm-style .gm-control-active:hover {
-        background-color: #f5f5f5 !important;
-      }
-      .gm-style .gm-control-active > img {
-        filter: none !important;
-      }
-      .gm-style .gmnoprint > div > div {
-        background-color: #fff !important;
-      }
-      /* Ensure Street View Pegman control is always visible */
-      .gm-style .gm-svpc {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-      }
-      /* Street View panorama controls */
-      .gm-style .gm-iv-container .gm-control-active {
-        background-color: #fff !important;
-        color: #666 !important;
-      }
-      /* Prevent dark/black overlay in Street View panorama */
-      .gm-style .gm-style-pbc {
-        background-color: transparent !important;
-      }
-      /* Street View address bar (top) — readable dark text on white bg */
-      .gm-style .gm-iv-address {
-        background-color: rgba(255, 255, 255, 0.9) !important;
-        color: #333 !important;
-      }
-      .gm-style .gm-iv-address * {
-        color: #333 !important;
-      }
-      .gm-style .gm-iv-address a,
-      .gm-style .gm-iv-address a:visited {
-        color: #1a73e8 !important;
-      }
-      /* Street View short address overlay (top-left road name) — white text on dark panorama */
-      .gm-style .gm-iv-short-address-description {
-        color: #fff !important;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.6) !important;
-      }
-      /* Street View footer links ("Terms", "Report a problem") — white text */
-      .gm-style .gm-style-cc,
-      .gm-style .gm-style-cc * {
-        color: #fff !important;
-      }
-      .gm-style .gm-style-cc a,
-      .gm-style .gm-style-cc a:visited,
-      .gm-style .gm-style-cc button,
-      .gm-style .gm-style-cc span {
-        color: #fff !important;
-      }
-      /* "Report a problem" link at bottom */
-      .gm-style a[href*="maps.google.com/maps"] {
-        color: #fff !important;
-      }
-      /* Street View bottom bar background — semi-transparent dark */
-      .gm-style .gm-style-pbt {
-        color: #fff !important;
-      }
-      /* Compass control — transparent background, not white box */
-      .gm-style .gm-compass {
-        background-color: transparent !important;
-        box-shadow: none !important;
-      }
-      /* Street View close/back button label */
-      .gm-style .gm-iv-back-icon,
-      .gm-style .gm-iv-marker {
-        filter: none !important;
-      }
+      .gm-style .gm-control-active { background-color: #fff !important; color: #666 !important; }
+      .gm-style .gm-control-active:hover { background-color: #f5f5f5 !important; }
+      .gm-style .gm-control-active > img { filter: none !important; }
+      .gm-style .gmnoprint > div > div { background-color: #fff !important; }
+      .gm-style .gm-svpc { display: block !important; visibility: visible !important; opacity: 1 !important; }
+      .gm-style .gm-iv-container .gm-control-active { background-color: #fff !important; color: #666 !important; }
+      .gm-style .gm-style-pbc { background-color: transparent !important; }
+      .gm-style .gm-compass { background-color: transparent !important; box-shadow: none !important; }
+      .gm-style .gm-iv-back-icon, .gm-style .gm-iv-marker { filter: none !important; }
     `;
     document.head.appendChild(style);
     return () => {
@@ -551,6 +485,59 @@ export default function GoogleMapCanvas({
       if (el) el.remove();
     };
   }, []);
+
+  // MutationObserver to enforce Street View text styles via inline overrides.
+  // Only active while Street View is open — avoids perf hit during normal map use.
+  useEffect(() => {
+    if (!isStreetViewActive) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const enforce = () => {
+      // Address bar — dark text on white bg (unified light/dark)
+      container.querySelectorAll<HTMLElement>('.gm-iv-address').forEach((el) => {
+        el.style.setProperty('background-color', 'rgba(255,255,255,0.9)', 'important');
+        el.style.setProperty('color', '#333', 'important');
+      });
+      container.querySelectorAll<HTMLElement>('.gm-iv-address *').forEach((el) => {
+        el.style.setProperty('color', '#333', 'important');
+      });
+      container.querySelectorAll<HTMLElement>('.gm-iv-address a').forEach((el) => {
+        el.style.setProperty('color', '#1a73e8', 'important');
+      });
+
+      // Short address overlay — white on panorama
+      container.querySelectorAll<HTMLElement>('.gm-iv-short-address-description').forEach((el) => {
+        el.style.setProperty('color', '#fff', 'important');
+        el.style.setProperty('text-shadow', '0 1px 3px rgba(0,0,0,0.6)', 'important');
+      });
+
+      // Footer ("Terms", "Report a problem") — always white
+      container.querySelectorAll<HTMLElement>('.gm-style-cc, .gm-style-cc *').forEach((el) => {
+        el.style.setProperty('color', '#fff', 'important');
+      });
+      container.querySelectorAll<HTMLElement>('.gm-style-pbt').forEach((el) => {
+        el.style.setProperty('color', '#fff', 'important');
+      });
+      container.querySelectorAll<HTMLElement>('a[href*="maps.google.com/maps"]').forEach((el) => {
+        el.style.setProperty('color', '#fff', 'important');
+      });
+    };
+
+    // Run immediately, then watch for Google Maps DOM re-renders (childList only for perf)
+    enforce();
+    let debounceTimer: ReturnType<typeof setTimeout>;
+    const observer = new MutationObserver(() => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(enforce, 50);
+    });
+    observer.observe(container, { childList: true, subtree: true });
+
+    return () => {
+      clearTimeout(debounceTimer);
+      observer.disconnect();
+    };
+  }, [isStreetViewActive]);
 
   // Detect when Street View panorama is entered or exited
   useEffect(() => {

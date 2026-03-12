@@ -1,4 +1,10 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Permanent Street View Text Fix (MutationObserver)
+Summary: Replaced CSS-only Street View text overrides with a MutationObserver-based approach that directly applies inline styles to Street View DOM elements. The observer only runs while Street View is active (gated on `isStreetViewActive` state), uses `childList`-only observation (no `attributes` — avoids perf overhead), and debounces enforcement at 50ms. Inline `style.setProperty()` with `'important'` priority beats Google Maps cloud-based dark theme styling that was overriding our CSS `!important` rules in dark mode. Address bar gets white bg + dark text, footer links + "Terms" + "Report a problem" get white text — unified across light and dark mode. Static CSS retained for non-text controls (zoom buttons, Pegman, compass).
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`
+Verification: `npx tsc --noEmit` ✅; prettier ✅; `npm run build` ✅
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map UI — Street View Footer Text, Compass, Share Button
 Summary: (1) Street View footer links ("Terms", "Report a problem") forced to white text — added CSS overrides for `.gm-style-cc`, `.gm-style-cc *`, `.gm-style-pbt`, and Google Maps report link. Short address description also white with text-shadow. (2) Compass control background changed from solid white to transparent — removes the harsh white box in Street View. (3) Share and Export buttons given `border border-mq-border` and `hover:bg-mq-hover-background` so they look like clickable buttons instead of invisible ghost text.
 Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/MapClient.tsx`
