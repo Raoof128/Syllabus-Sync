@@ -653,7 +653,7 @@ export default function MapClient() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="gap-1.5 h-8 text-mq-content-secondary hover:text-mq-content"
+                  className="gap-1.5 h-8 border border-mq-border text-mq-content-secondary hover:text-mq-content hover:bg-mq-hover-background"
                   onClick={copyShareableURL}
                   aria-label={t('share')}
                 >
@@ -664,7 +664,7 @@ export default function MapClient() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-1.5 h-8 text-mq-content-secondary hover:text-mq-content"
+                    className="gap-1.5 h-8 border border-mq-border text-mq-content-secondary hover:text-mq-content hover:bg-mq-hover-background"
                     onClick={handleExport}
                     aria-label={t('export')}
                   >

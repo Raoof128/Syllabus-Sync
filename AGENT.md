@@ -1,4 +1,10 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Street View Footer Text, Compass, Share Button
+Summary: Street View footer/legal text forced white. Compass bg → transparent. Share/Export buttons given visible border.
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/MapClient.tsx`
+Verification: tsc ✅; prettier ✅; build ✅
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map UI — Street View Address Text + Search Dropdown Animation
 Summary: Fixed Pegman address text (dark mode CSS override for all `.gm-iv-address` children). Replaced janky `transition-all` on search container with `animate-in fade-in slide-in-from-top-2` on dropdown content.
 Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/CampusMapHUD.tsx`

@@ -1,4 +1,10 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map UI — Street View Footer Text, Compass, Share Button
+Summary: (1) Street View footer links ("Terms", "Report a problem") forced to white text — added CSS overrides for `.gm-style-cc`, `.gm-style-cc *`, `.gm-style-pbt`, and Google Maps report link. Short address description also white with text-shadow. (2) Compass control background changed from solid white to transparent — removes the harsh white box in Street View. (3) Share and Export buttons given `border border-mq-border` and `hover:bg-mq-hover-background` so they look like clickable buttons instead of invisible ghost text.
+Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/MapClient.tsx`
+Verification: `npx tsc --noEmit` ✅; prettier ✅; `npm run build` ✅
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map UI — Street View Address Text Fix + Search Dropdown Animation
 Summary: (1) Fixed Street View (Pegman) address bar text invisible in dark mode — added CSS overrides targeting all nested elements within `.gm-iv-address` (`*`, `a`, `a:visited`, `.gm-iv-short-address-description`) with `!important` color rules. Address text now renders dark on white background in both light and dark mode, matching Google Maps native appearance. (2) Fixed janky campus building search dropdown animation — removed `transition-all` from search container (was causing border-radius to morph weirdly), added `animate-in fade-in slide-in-from-top-2` to dropdown content for smooth fade+slide appearance in both Campus and Google map modes.
 Files Changed: `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/CampusMapHUD.tsx`

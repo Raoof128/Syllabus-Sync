@@ -494,14 +494,11 @@ export default function GoogleMapCanvas({
         background-color: #fff !important;
         color: #666 !important;
       }
-      .gm-style .gm-compass {
-        background-color: #fff !important;
-      }
       /* Prevent dark/black overlay in Street View panorama */
       .gm-style .gm-style-pbc {
         background-color: transparent !important;
       }
-      /* Street View address bar — force readable text on all nested elements */
+      /* Street View address bar (top) — readable dark text on white bg */
       .gm-style .gm-iv-address {
         background-color: rgba(255, 255, 255, 0.9) !important;
         color: #333 !important;
@@ -513,9 +510,34 @@ export default function GoogleMapCanvas({
       .gm-style .gm-iv-address a:visited {
         color: #1a73e8 !important;
       }
-      /* Street View short address overlay (top-left road name) */
+      /* Street View short address overlay (top-left road name) — white text on dark panorama */
       .gm-style .gm-iv-short-address-description {
-        color: #333 !important;
+        color: #fff !important;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.6) !important;
+      }
+      /* Street View footer links ("Terms", "Report a problem") — white text */
+      .gm-style .gm-style-cc,
+      .gm-style .gm-style-cc * {
+        color: #fff !important;
+      }
+      .gm-style .gm-style-cc a,
+      .gm-style .gm-style-cc a:visited,
+      .gm-style .gm-style-cc button,
+      .gm-style .gm-style-cc span {
+        color: #fff !important;
+      }
+      /* "Report a problem" link at bottom */
+      .gm-style a[href*="maps.google.com/maps"] {
+        color: #fff !important;
+      }
+      /* Street View bottom bar background — semi-transparent dark */
+      .gm-style .gm-style-pbt {
+        color: #fff !important;
+      }
+      /* Compass control — transparent background, not white box */
+      .gm-style .gm-compass {
+        background-color: transparent !important;
+        box-shadow: none !important;
       }
       /* Street View close/back button label */
       .gm-style .gm-iv-back-icon,
