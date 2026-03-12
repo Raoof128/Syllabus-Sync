@@ -2,11 +2,33 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useRemindersStore, calculateReminderDate } from '@/lib/store/remindersStore';
+import {
+  useRemindersStore,
+  calculateReminderDate,
+  type ReminderItemType,
+} from '@/lib/store/remindersStore';
 import { notificationService } from '@/lib/services/notificationService';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import type { Notification } from '@/lib/types';
 
 const CHECK_INTERVAL_MS = 30_000; // Check every 30 seconds
+
+/** Map reminder item type to notification type */
+function mapItemTypeToNotificationType(itemType: ReminderItemType): Notification['type'] {
+  switch (itemType) {
+    case 'unit':
+      return 'class';
+    case 'exam':
+    case 'assignment':
+    case 'todo':
+      return 'deadline';
+    case 'event':
+      return 'event';
+    default:
+      return 'system';
+  }
+}
 
 /**
  * Hook that periodically checks pending reminders and fires browser notifications.
@@ -19,9 +41,6 @@ export function useReminderChecker() {
     const checkReminders = () => {
       const { reminders, markAsNotified } = useRemindersStore.getState();
       const { permissionStatus, pushEnabled } = useNotificationPreferencesStore.getState();
-
-      // Don't check if notifications aren't enabled
-      if (permissionStatus !== 'granted' || !pushEnabled) return;
 
       const now = new Date();
 
@@ -53,15 +72,30 @@ export function useReminderChecker() {
         // Fire if trigger time has passed (within last 5 minutes to avoid missing)
         const timeDiff = now.getTime() - triggerDate.getTime();
         if (timeDiff >= 0 && timeDiff < 5 * 60 * 1000) {
-          // Send browser notification
-          notificationService.sendNotification({
-            title: `Reminder: ${reminder.itemTitle}`,
-            body: `Your reminder for "${reminder.itemTitle}" is now`,
-            tag: `reminder-${reminder.id}`,
-            data: { type: 'reminder', id: reminder.id },
-            onClick: () => {
-              window.location.href = '/calendar';
-            },
+          const title = `Reminder: ${reminder.itemTitle}`;
+          const body = `Your reminder for "${reminder.itemTitle}" is now`;
+
+          // Send browser push notification (only if permission granted)
+          if (permissionStatus === 'granted' && pushEnabled) {
+            notificationService.sendNotification({
+              title,
+              body,
+              tag: `reminder-${reminder.id}`,
+              data: { type: 'reminder', id: reminder.id },
+              onClick: () => {
+                window.location.href = '/calendar';
+              },
+            });
+          }
+
+          // Always add to bell icon notification list (persisted to DB)
+          useNotificationsStore.getState().addNotification({
+            title,
+            message: body,
+            type: mapItemTypeToNotificationType(reminder.itemType),
+            read: false,
+            link: '/calendar',
+            relatedId: undefined,
           });
 
           // Mark as notified so it won't fire again

@@ -7,6 +7,7 @@ import {
   notificationService,
   NotificationPermissionStatus,
 } from '@/lib/services/notificationService';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
 
 export interface NotificationPreferences {
   // Permission status
@@ -186,6 +187,18 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
 
           const timeoutId = window.setTimeout(() => {
             notificationService.sendDeadlineReminder(title, unitCode, dueDate, deadlineId);
+            // Add to bell icon notification list (persisted to DB)
+            try {
+              useNotificationsStore.getState().addNotification({
+                title: `Deadline Reminder: ${title}`,
+                message: `${unitCode} — due ${dueDate.toLocaleDateString()}`,
+                type: 'deadline',
+                read: false,
+                link: '/calendar',
+              });
+            } catch {
+              /* ignore if store unavailable */
+            }
             // Remove from scheduled after sending
             set((s) => {
               const { [deadlineId]: _removed, ...rest } = s.scheduledReminders;
@@ -203,6 +216,18 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         } else if (delay > -state.deadlineReminderTiming * 60 * 1000) {
           // If we're past the reminder time but before the due date, send immediately
           notificationService.sendDeadlineReminder(title, unitCode, dueDate, deadlineId);
+          // Add to bell icon notification list
+          try {
+            useNotificationsStore.getState().addNotification({
+              title: `Deadline Reminder: ${title}`,
+              message: `${unitCode} — due ${dueDate.toLocaleDateString()}`,
+              type: 'deadline',
+              read: false,
+              link: '/calendar',
+            });
+          } catch {
+            /* ignore if store unavailable */
+          }
           set((s) => {
             const { [deadlineId]: _removed, ...rest } = s.pendingReminders;
             void _removed;
@@ -259,6 +284,18 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
               minute: '2-digit',
             });
             notificationService.sendClassReminder(unitCode, unitName, building, room, timeStr);
+            // Add to bell icon notification list (persisted to DB)
+            try {
+              useNotificationsStore.getState().addNotification({
+                title: `Class Reminder: ${unitCode}`,
+                message: `${unitName} at ${timeStr} in ${building} ${room}`,
+                type: 'class',
+                read: false,
+                link: '/calendar',
+              });
+            } catch {
+              /* ignore if store unavailable */
+            }
             set((s) => {
               const { [reminderId]: _removed, ...rest } = s.scheduledReminders;
               void _removed; // Silence unused variable warning
@@ -323,6 +360,18 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
               minute: '2-digit',
             });
             notificationService.sendEventReminder(title, location, timeStr, eventId);
+            // Add to bell icon notification list (persisted to DB)
+            try {
+              useNotificationsStore.getState().addNotification({
+                title: `Event Reminder: ${title}`,
+                message: `${title} at ${timeStr}${location ? ` — ${location}` : ''}`,
+                type: 'event',
+                read: false,
+                link: '/calendar',
+              });
+            } catch {
+              /* ignore if store unavailable */
+            }
             set((s) => {
               const { [eventId]: _removed, ...rest } = s.scheduledReminders;
               void _removed; // Silence unused variable warning
@@ -399,6 +448,17 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
                 new Date(reminder.payload.dueDate as number),
                 id,
               );
+              try {
+                useNotificationsStore.getState().addNotification({
+                  title: `Deadline Reminder: ${reminder.payload.title as string}`,
+                  message: `${reminder.payload.unitCode as string} — due ${new Date(reminder.payload.dueDate as number).toLocaleDateString()}`,
+                  type: 'deadline',
+                  read: false,
+                  link: '/calendar',
+                });
+              } catch {
+                /* ignore */
+              }
             } else if (reminder.type === 'class') {
               const classTime = new Date(reminder.payload.classTime as number);
               const timeStr = classTime.toLocaleTimeString([], {
@@ -412,6 +472,17 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
                 reminder.payload.room as string,
                 timeStr,
               );
+              try {
+                useNotificationsStore.getState().addNotification({
+                  title: `Class Reminder: ${reminder.payload.unitCode as string}`,
+                  message: `${reminder.payload.unitName as string} at ${timeStr} in ${reminder.payload.building as string} ${reminder.payload.room as string}`,
+                  type: 'class',
+                  read: false,
+                  link: '/calendar',
+                });
+              } catch {
+                /* ignore */
+              }
             } else if (reminder.type === 'event') {
               const eventTime = new Date(reminder.payload.eventTime as number);
               const timeStr = eventTime.toLocaleTimeString([], {
@@ -424,6 +495,17 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
                 timeStr,
                 id,
               );
+              try {
+                useNotificationsStore.getState().addNotification({
+                  title: `Event Reminder: ${reminder.payload.title as string}`,
+                  message: `${reminder.payload.title as string} at ${timeStr}${reminder.payload.location ? ` — ${reminder.payload.location as string}` : ''}`,
+                  type: 'event',
+                  read: false,
+                  link: '/calendar',
+                });
+              } catch {
+                /* ignore */
+              }
             }
 
             set((s) => {
