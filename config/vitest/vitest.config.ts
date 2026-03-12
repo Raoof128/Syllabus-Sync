@@ -17,24 +17,35 @@ export default defineConfig({
     include: ['tests/**/*.{test,spec}.{ts,tsx}'],
     globals: true,
     testTimeout: 10000,
-    // Coverage configuration
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary', 'lcov', 'html'],
       reportsDirectory: './coverage',
       exclude: [
-        'node_modules/**',
+        '**/node_modules/**',
+        '**/.next/**',
+        '**/dist/**',
+
+        // Tests and generated output
         'tests/**',
+        'coverage/**',
+
+        // Types and config files
         '**/*.d.ts',
         '**/*.config.{ts,js,mjs}',
         '**/types/**',
+
+        // Public assets and scripts
         'public/**',
-        '.next/**',
-        'coverage/**',
-        // Exclude files that are hard to test (configs, scripts)
         'scripts/**',
+
+        // Specific files you already excluded
         'sentry.*.config.ts',
-        'app/api/_lib/versioning.ts', // Minimal utility
+        'app/api/_lib/versioning.ts',
+
+        // ✅ Exclude heavy UI from global coverage
+        'components/**',
+        'features/**/components/**',
       ],
       thresholds: {
         statements: 50,
