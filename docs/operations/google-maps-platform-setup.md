@@ -36,7 +36,11 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-browser-key
 
 ## 4) Create the server key
 
-This key is used only by `/api/maps/routes`.
+This key is used by the server-side Google map proxies:
+
+- `/api/maps/routes`
+- `/api/maps/place-search`
+- `/api/maps/place-details`
 
 1. Create a second API key.
 2. Restrict it by API to **Routes API**.
@@ -96,7 +100,7 @@ Add all three variables to `development`, `preview`, and `production`.
 
 - `NEXT_PUBLIC_GOOGLE_MAP_ID` missing:
   - The map cannot initialize Advanced Markers correctly. Create a JavaScript Map ID.
-- Map loads but routes fail:
+- Map loads but routes or place lookup fail:
   - Confirm `GOOGLE_ROUTES_API_KEY` is present server-side and the Routes API is enabled.
 - `RefererNotAllowedMapError`:
   - Your browser key referrer allowlist does not match the current domain.

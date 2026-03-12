@@ -1,412 +1,197 @@
-# 🎓 The Syllabus Sync
+# Syllabus Sync
 
-**Enterprise-Grade Campus Management & Academic Productivity Platform**
-<br/>
-_Next-Generation Student Experience Platform for Macquarie University_
+Production-grade Next.js 16 application for Macquarie University student planning, campus navigation, notifications, and profile management.
 
-[![Next.js 16](https://img.shields.io/badge/Next.js-16.1-black?logo=next.js)](https://nextjs.org/)
-[![React 19](https://img.shields.io/badge/React-19.2-blue?logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-Database-green?logo=supabase)](https://supabase.com/)
-[![Vitest](https://img.shields.io/badge/Tests-498_Passed-brightgreen?logo=vitest)](https://vitest.dev/)
+## What This Repository Actually Contains
 
----
+- Next.js 16 App Router application with 23 user-facing routes under `app/`
+- 63 API route handlers under `app/api/`
+- Supabase-backed auth, profile, academic, notification, audit, and security flows
+- Dual map stack:
+  - Campus raster mode via Leaflet + ORS-backed `/api/navigate`
+  - Google mode via Maps JavaScript API + `/api/maps/routes`
+- Feature-first frontend modules in `features/`
+- Shared UI/layout primitives in `components/`
+- Zustand stores in `lib/store/`
+- 35 locale directories in `locales/`
+- 92 test files across app, API, security, map, settings, stores, and utilities
 
-## 🌟 Executive Summary
+## Current Runtime Stack
 
-**The Syllabus Sync** is a comprehensive, enterprise-grade campus management ecosystem engineered specifically for Macquarie University students. Built on **Next.js 16 (App Router)** and **React 19**, the platform combines cutting-edge web technologies with thoughtful user experience design to deliver a high-performance, accessible, and visually stunning productivity suite.
+| Layer             | Implementation in this repo                                      |
+| ----------------- | ---------------------------------------------------------------- |
+| App framework     | Next.js 16 App Router                                            |
+| UI runtime        | React 19                                                         |
+| Language          | TypeScript 5                                                     |
+| Styling           | Tailwind CSS 4, Radix UI primitives, custom `mq-*` design tokens |
+| State             | Zustand                                                          |
+| Data/auth         | Supabase SSR + Supabase Postgres                                 |
+| Email             | Resend                                                           |
+| Error tracking    | Sentry config for client, server, and edge                       |
+| Tests             | Vitest + Testing Library                                         |
+| CI/CD             | GitHub Actions (`ci-cd.yml`, `production-deploy.yml`)            |
+| Deployment target | Vercel                                                           |
 
-From precision campus navigation with real-time wayfinding to intelligent deadline tracking with automated workload analysis, Syllabus Sync represents the pinnacle of modern student experience design—transforming how students interact with their academic environment.
+## App Bootstrap And Entry Points
 
-### 🗺️ System Architecture
+- `app/layout.tsx`: root metadata, nonce-aware inline theme/RTL scripts, JSON-LD, `QueryProvider`
+- `app/client-layout.tsx`: auth gate, sidebar/header shell, service worker registration, install prompt, offline/update UI
+- `app/page.tsx`: root redirect surface via `AuthRedirectHandler`
+- `components/layout/Sidebar.tsx`: primary authenticated navigation for `/home`, `/calendar`, `/map`, `/feed`, `/settings`
+- `app/settings/layout.tsx`: secondary settings navigation for `/settings/general`, `/appearance`, `/security`, `/experience`, `/about`
 
-```mermaid
-flowchart TD
-    classDef frontend fill:#0f172a,stroke:#3b82f6,stroke-width:2px,color:#fff
-    classDef backend fill:#1e1b4b,stroke:#8b5cf6,stroke-width:2px,color:#fff
-    classDef external fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#fff
-    classDef db fill:#3f6212,stroke:#84cc16,stroke-width:2px,color:#fff
-    classDef security fill:#7f1d1d,stroke:#ef4444,stroke-width:2px,color:#fff
+## User-Facing Routes
 
-    User([👤 User / Browser])
+Primary pages present in code:
 
-    subgraph FE ["🎨 Frontend Layer (Next.js 16 + React 19)"]
-        UI[MQ Design System UI]:::frontend
-        State[Zustand Stores]:::frontend
-        Auth[Supabase Auth Client]:::frontend
-        Navigation[Campus Map + Google Maps JS]:::frontend
-        SW[Service Workers / PWA]:::frontend
-    end
+- `/`
+- `/about`
+- `/calendar`
+- `/contact`
+- `/feed`
+- `/home`
+- `/login`
+- `/manage-profiles`
+- `/map`
+- `/map/position-editor`
+- `/offline`
+- `/onboarding`
+- `/privacy`
+- `/reset-password`
+- `/settings`
+- `/settings/about`
+- `/settings/appearance`
+- `/settings/experience`
+- `/settings/general`
+- `/settings/security`
+- `/signup`
+- `/terms`
+- `/verify`
 
-    subgraph Gateway ["🛡️ Security & API Gateway (Edge)"]
-        Middleware{Next.js Middleware}:::security
-        RL[Upstash Redis Rate Limit]:::security
-        CSRF[Double-Submit CSRF]:::security
-    end
+Route behavior details live in [docs/reference/ROUTES_AND_NAVIGATION.md](./docs/reference/ROUTES_AND_NAVIGATION.md).
 
-    subgraph BE ["⚙️ Backend Services (Server Components & Routes)"]
-        API_Routes[REST API Endpoints]:::backend
-        Auth_Handler[WebAuthn / Passkeys]:::backend
-        Map_Proxy[Routing Providers]:::backend
-        Sync_Engine[Academic Sync Engine]:::backend
-    end
+## API Surface
 
-    subgraph Services ["☁️ External Providers"]
-        Supabase[(PostgreSQL + RLS)]:::db
-        GoogleMaps[Google Maps Platform\nMaps JS + Routes API]:::external
-        ORS[OpenRouteService Core\nCampus mode only]:::external
-        Resend[Resend Email Delivery]:::external
-        Vercel[Vercel Edge & Cron]:::external
-    end
+This repository currently exposes 63 route handlers under `app/api/`, including:
 
-    %% Connections
-    User ==== UI
-    UI <--> State
-    UI <--> Navigation
-    State <--> Auth
-    UI <--> SW
+- Auth and account lifecycle
+- MFA and passkeys
+- Units, deadlines, events, todos, notifications
+- Profiles and user preferences
+- Weather, audit, sync, health
+- Campus and Google map routing
+- Security utilities and admin-only map tools
 
-    UI --->|Encrypted API Requests| Middleware
-    Middleware --> RL
-    Middleware --> CSRF
-    CSRF --> API_Routes
+Canonical API documentation: [docs/api/API_REFERENCE.md](./docs/api/API_REFERENCE.md)
 
-    API_Routes <--> Auth_Handler
-    API_Routes <--> Map_Proxy
-    API_Routes <--> Sync_Engine
+## Repository Layout
 
-    Auth_Handler ===>|JWT Verification| Supabase
-    Sync_Engine ===>|Strict RLS Queries| Supabase
-    Map_Proxy ===>|Google mode routing| GoogleMaps
-    Map_Proxy ===>|Campus mode routing| ORS
-    API_Routes ===>|Transactional Auth| Resend
-    Vercel -.->|Automated Sync Triggers| Sync_Engine
+```text
+app/                Next.js routes, layouts, route handlers
+components/         Shared UI and layout components
+config/             ESLint, Next, Prettier, Sentry, Tailwind, TS, Vitest, Lighthouse
+data/               Static academic data
+docs/               Architecture, operations, API, policy, security, reference docs
+features/           Feature-first client modules (home, calendar, map, settings, feed, auth)
+infra/              Docker assets
+lib/                Stores, hooks, services, security, utilities, Supabase clients
+locales/            35 locale dictionaries
+public/             Static assets, icons, map tiles, overlays, service worker
+supabase/           Canonical migration history and Supabase notes
+tests/              Vitest suites
+tools/              Repo utilities for i18n, security, exports, Vercel, load testing
 ```
 
-### 💎 Technical Excellence
+Detailed inventory: [docs/reference/REPOSITORY_INVENTORY.md](./docs/reference/REPOSITORY_INVENTORY.md)
 
-#### **🎨 Premium User Experience**
+## Environment And Setup
 
-- **MQ Design System:** Custom design system built on Macquarie University brand tokens with glassmorphism accents, fluid animations, and haptic-responsive interactions
-- **Micro-animations & Transitions:** Sophisticated motion design with respect for user accessibility preferences
-- **Responsive Design:** Mobile-first approach with full breakpoint passes (360px-2560px) across all pages — login, calendar, map, settings, manage-profiles — with optimized touch targets and progressive enhancement
-
-#### **🛡️ Enterprise Security**
-
-- **Multi-Layer Defense:** Distributed rate limiting (Vercel KV / Upstash Redis in production, Supabase Postgres fallback), CSRF protection with double-submit cookies, and Content Security Policy (CSP) with SHA-256 hashes
-- **Zero-Trust Architecture:** Strict Row Level Security (RLS) policies and comprehensive input sanitization
-- **Privacy-First Design:** GDPR-compliant data handling with user-controlled export/deletion capabilities
-
-#### **🌍 Global Inclusivity**
-
-- **Internationalization:** Complete localization infrastructure supporting **19 languages** with full RTL (right-to-left) support for Arabic, Persian, Urdu, and Hebrew
-- **Cultural Adaptation:** Localized date formats, academic terminology, and cultural context awareness
-- **Accessibility Excellence:** WCAG 2.1 AA certified with comprehensive ARIA semantics, 44px minimum tap targets, and keyboard-first navigation patterns
-
----
-
-## 🚀 Core Platform Features
-
-### 📅 **Academic Management System**
-
-- **Intelligent Calendar Engine:** Interactive weekly/daily views with real-time academic workload analysis
-- **Automated Stress Monitoring:** Dynamic stress indicator based on assignment density, deadline proximity, and study patterns
-- **Deadline Intelligence:** Smart prioritization with automated reminders and dependency tracking
-- **Structured Data Integration:** JSON-LD schema markup for enhanced SEO and academic calendar integration
-
-### 🗺️ **Campus Navigation Platform**
-
-- **Precision Wayfinding System:** Dual-mode architecture featuring an in-house Leaflet campus renderer alongside a full Google Maps JavaScript canvas for Google mode, both driven by the same campus building registry and HUD flow.
-- **Real-Time GPS Engine:** High-frequency tracker utilizing `navigator.geolocation.watchPosition` enriched by sensor-fusion, Kalman filtering, and spatial threshold debouncing (~20m bounds) to completely eliminate map-flashing and UI jitter during active roaming.
-- **Turn-by-Turn Telemetry:** Google mode uses the Google Routes API for route computation and in-app polyline rendering, while the campus raster mode retains ORS-backed campus routing with off-route recalibration.
-- **Comprehensive Building Directory:** Highly curated geospatial layer containing 100+ campus structures, dynamic visual overlays (parking, events), and accessibility status vectors.
-
-### 🎮 **Academic Gamification Framework**
-
-- **Experience & Progression System:** XP earning through academic achievement, campus engagement, and peer collaboration
-- **Advanced Analytics:** Performance tracking with predictive insights and improvement recommendations
-- **Social Features:** Leaderboards, achievement sharing, and collaborative study group formation
-- **Motivation Engine:** Streak tracking, milestone rewards, and personalized challenge system
-
-### 🔐 **Security & Authentication**
-
-- **Custom Email Verification:** Production-ready email verification via Resend with SHA-256 token hashing, 20-minute expiry, and rate limiting (3 sends/hour)
-- **Multi-Factor Authentication:** TOTP authenticator app support (Google Authenticator, Authy) with fail-closed login enforcement
-- **WebAuthn/Passkey Support:** FIDO2 passkey registration and login with biometric indicators on the login page
-- **Gamification Security Hardening:** Cross-user mutation guards, SECURITY DEFINER lockdown, and search_path hardening on database RPCs
-- **Database Alignment:** Full code-to-migration audit ensuring all referenced tables and RPCs exist in canonical Supabase migrations
-
-### 🔔 **Intelligent Notification Hub**
-
-- **Context-Aware Scheduling:** AI-powered notification timing based on user behavior, importance, and location
-- **Multi-Channel Delivery:** Browser push, email, and in-app notifications with cross-device synchronization
-- **Preference Granularity:** Fine-grained control over notification types, frequency, and delivery methods
-- **Do Not Disturb Integration:** Academic focus modes with emergency override capabilities
-
----
-
-## 🛠️ Technology Architecture
-
-| **Layer**                | **Technologies**                                                                       | **Purpose**                                  |
-| :----------------------- | :------------------------------------------------------------------------------------- | :------------------------------------------- |
-| **Frontend**             | React 19, Next.js 16 (Turbopack), Zustand, Framer Motion                               | Modern UI/UX with optimal performance        |
-| **Backend**              | Supabase (PostgreSQL + RLS), Node.js API Routes, Server Components                     | Secure data management & business logic      |
-| **Design System**        | Tailwind CSS, Radix UI Primitives, Lucide Icons, Custom MQ Design Tokens               | Consistent, accessible component library     |
-| **Security**             | Upstash Redis (Rate Limiting), CSRF Protection, CSP with SHA-256 Hashes, Zod Schemas   | Defense-in-depth security architecture       |
-| **Testing & QA**         | Vitest (Unit/Integration), Playwright (E2E/Accessibility), GitHub Actions CI/CD        | Comprehensive quality assurance              |
-| **Internationalization** | Custom JSON-based Engine, ICU MessageFormat, RTL Support, Date/Time Localization       | Global accessibility and cultural adaptation |
-| **Performance**          | Vercel Edge Functions, Image Optimization, Bundle Analysis, Core Web Vitals Monitoring | Production-grade optimization                |
-
----
-
-## 📥 Development Setup
-
-### **System Requirements**
-
-- **Node.js 22+** (LTS version recommended)
-- **npm 10+** or **yarn 1.22+**
-- **Supabase Account** (for database, auth, and storage)
-- **Upstash Redis** (recommended for high-traffic production rate limiting; optional)
-
-### **Installation Process**
-
-#### 1. Repository Setup
+1. Install Node.js 22.x and npm.
+2. Copy `.env.example` to `.env.local`.
+3. Configure the variables required for your intended feature set.
+4. Install dependencies and start the app.
 
 ```bash
-# Clone the repository
-git clone https://github.com/mrpouyaalavi/syllabus-sync.git
-cd syllabus-sync
-
-# Install dependencies with recommended package manager
-npm install
-# OR: yarn install
-```
-
-#### 2. Environment Configuration
-
-```bash
-# Copy environment template
 cp .env.example .env.local
-
-# Configure your environment variables
-# Required: Supabase URL, Anon Key, Service Role Key, Google Maps JS API key, Google Map ID, Google Routes API key
-# Optional: Redis URL, ORS API Key (campus raster mode)
-# Required for weather: GOOGLE_WEATHER_API_KEY (server-side only)
-```
-
-Email (Resend) + Vercel notes:
-
-- Transactional email (verification) is sent via **Resend** using `RESEND_API_KEY` and `VERIFICATION_EMAIL_FROM`.
-- Vercel Cron endpoints are protected by `CRON_SECRET`.
-- Google JS map mode requires `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_GOOGLE_MAP_ID`,
-  and server-side `GOOGLE_ROUTES_API_KEY`.
-- Setup guide: `docs/operations/resend-vercel-setup.md`
-- Google Maps Platform setup guide: `docs/operations/google-maps-platform-setup.md`
-- OAuth setup: `docs/operations/supabase-oauth-setup.md`
-
-Google Maps Platform quick setup:
-
-1. In Google Cloud, enable **Maps JavaScript API** and **Routes API**.
-2. Create a browser key for `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` and restrict it to your app domains.
-3. Create a server key for `GOOGLE_ROUTES_API_KEY` and restrict it to the Routes API.
-4. Create a vector **Map ID** and set `NEXT_PUBLIC_GOOGLE_MAP_ID`.
-5. Restart the app and open `/map?view=google` to verify the JavaScript map, campus markers, and routed polyline rendering.
-
-If you deploy to Vercel using the CLI, the repo includes pinned scripts:
-
-```bash
-npm run vercel:link
-VERCEL_ENVIRONMENT=production npm run vercel:env:check
-npm run vercel:deploy:prod
-```
-
-#### 3. Database Initialization
-
-Execute `docs/database/database-schema.sql` in your Supabase SQL Editor to:
-
-- Create all required tables with proper constraints
-- Implement Row Level Security (RLS) policies
-- Set up database triggers and functions
-- Initialize default data and indexes
-
-#### 4. Development Server
-
-```bash
-# Start development server with Turbopack
+npm install
 npm run dev
-
-# Alternative: Build and start production server locally
-npm run build
-npm start
 ```
 
-#### 5. Quality Assurance
+Important environment groups reflected in code:
+
+- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- Google Maps: `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_GOOGLE_MAP_ID`, `GOOGLE_ROUTES_API_KEY`
+- Campus routing: `ORS_API_KEY`
+- Weather: `GOOGLE_WEATHER_API_KEY`
+- Email: `RESEND_API_KEY`, `VERIFICATION_EMAIL_FROM`, `VERIFICATION_EMAIL_NAME`
+- Security/runtime: `CRON_SECRET`, `WEBAUTHN_RP_ID`, `WEBAUTHN_ORIGIN`, optional Upstash Redis vars
+- Observability: Sentry DSN/auth variables
+
+Canonical setup docs:
+
+- [docs/operations/ENVIRONMENT_SETUP.md](./docs/operations/ENVIRONMENT_SETUP.md)
+- [docs/operations/google-maps-platform-setup.md](./docs/operations/google-maps-platform-setup.md)
+- [docs/operations/resend-vercel-setup.md](./docs/operations/resend-vercel-setup.md)
+- [docs/operations/supabase-oauth-setup.md](./docs/operations/supabase-oauth-setup.md)
+
+## Database Source Of Truth
+
+The source of truth is `supabase/migrations/`, not the legacy schema snapshot alone.
+
+- Use `supabase/migrations/` for real schema history.
+- `docs/database/database-schema.sql` is a reference snapshot, useful for review but not the authoritative migration chain.
+- Repo-level Supabase notes: [supabase/README.md](./supabase/README.md)
+
+## Development Commands
 
 ```bash
-# Run comprehensive checks before committing
-npm run check  # Runs: secrets → format → typecheck → lint → tests → build
-
-# Run lint only (fast local feedback during development)
+npm run dev
+npm run dev:turbo
 npm run lint
+npm run typecheck
+npm run test
+npm run test:coverage
+npm run format:check
+npm run check
+npm run export:flutter-map-assets
 ```
 
-### **Common Development Commands**
+## Quality Gates
 
-```bash
-npm run dev           # Start local development server
-npm run lint          # ESLint checks
-npm run typecheck     # TypeScript type checks (no emit)
-npm run test          # Run test suite
-npm run build         # Production build validation
-```
+Implemented checks in this repository:
 
----
+- `npm run lint`
+- `npm run typecheck`
+- `npm run test`
+- `npm run test:coverage`
+- `npm run check:secrets`
+- `npm run check:i18n`
+- `npm run build`
 
-## 🏗️ System Architecture
+CI workflows:
 
-### **Directory Structure**
+- `.github/workflows/ci-cd.yml`: typecheck, lint, coverage, npm audit, secrets scan, i18n check, build, Lighthouse
+- `.github/workflows/production-deploy.yml`: build validation, tests, secrets validation, Vercel deploy, post-deploy verification
 
-```
-syllabus-sync/
-├── app/                          # Next.js 16 App Router (Server/Client Components)
-│   ├── api/                       # Standardized REST API with Security Middleware
-│   │   ├── auth/                  # Authentication & authorization endpoints
-│   │   ├── units/                 # Academic unit management
-│   │   ├── deadlines/              # Assignment & exam tracking
-│   │   └── ...                    # Feature-specific API routes
-│   ├── home/                      # Main dashboard & analytics engine
-│   ├── calendar/                   # Academic calendar & scheduling
-│   ├── map/                       # Campus navigation system
-│   ├── feed/                      # Public event feed
-│   ├── login/                     # Authentication login page
-│   ├── signup/                    # User registration flow
-│   ├── verify/                    # Email verification landing page
-│   ├── manage-profiles/           # Multi-profile management
-│   └── settings/                  # User preferences & configuration
-├── features/                       # Feature-first modules
-│   ├── map/                       # Campus map feature module
-│   ├── calendar/                  # Calendar feature module
-│   ├── settings/                  # Settings feature module
-│   ├── feed/                      # Feed feature module
-│   ├── home/                      # Home dashboard feature module
-│   ├── auth/                      # Auth feature module
-│   └── gamification/              # XP and progression feature module
-├── components/                     # Shared component layers
-│   ├── ui/                        # Shared UI primitives
-│   └── layout/                    # Shared layout components
-├── lib/                           # Core business logic & utilities
-│   ├── store/                      # Zustand state management architecture
-│   │   ├── unitsStore.ts           # Academic unit state
-│   │   ├── deadlinesStore.ts       # Deadline management
-│   │   └── ...                    # Feature-specific stores
-│   ├── security/                   # CSRF, CSP, and auth utilities
-│   ├── services/                   # External API integrations
-│   ├── hooks/                      # Custom React hooks
-│   └── utils/                      # Shared utility functions
-├── tests/                          # Comprehensive test suite (482+ tests)
-│   ├── settings/                   # Settings feature tests
-│   ├── map/                        # Real-time navigation tests (68 tests)
-│   ├── gamification/               # Gamification logic tests
-│   ├── api/                        # API route and authentication tests
-│   ├── security/                   # Security boundary tests
-│   └── unit/                       # Unit tests for core primitives
-├── docs/                           # Documentation and project artifacts
-│   ├── README.md                  # Docs index
-│   └── project/                   # Team plans, sketches, restructure notes
-├── config/                         # Tooling configuration (next/ts/eslint/vitest/etc.)
-├── infra/                          # Infrastructure assets (Docker, deployment helpers)
-├── tools/                          # Operational tooling (proxy/loadtest utilities)
-├── supabase/                       # Database migrations & configuration
-│   └── migrations/                # Ordered SQL migration files
-├── public/                         # Static assets & media (includes sw.js)
-└── assets/                         # Non-public source assets
-```
+## Documentation Map
 
-### **Key Architectural Patterns**
+- Architecture: [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md)
+- Technical explanation: [TECHNICAL_EXPLANATION.md](./TECHNICAL_EXPLANATION.md)
+- API reference: [docs/api/API_REFERENCE.md](./docs/api/API_REFERENCE.md)
+- Environment setup: [docs/operations/ENVIRONMENT_SETUP.md](./docs/operations/ENVIRONMENT_SETUP.md)
+- Routes and navigation: [docs/reference/ROUTES_AND_NAVIGATION.md](./docs/reference/ROUTES_AND_NAVIGATION.md)
+- Repository inventory: [docs/reference/REPOSITORY_INVENTORY.md](./docs/reference/REPOSITORY_INVENTORY.md)
+- Docs index: [docs/README.md](./docs/README.md)
+- Security policy: [SECURITY.md](./SECURITY.md)
+- Contributing: [CONTRIBUTING.md](./CONTRIBUTING.md)
+- Code of conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+- License: [LICENSE](./LICENSE)
 
-- **Feature-First Organization:** Co-located components, pages, and logic
-- **Atomic Design System:** Reusable component hierarchy with consistent theming
-- **Server-Client Boundary:** Strategic use of Server Components for data fetching
-- **Security by Design:** Middleware-level protection and input validation
-- **Performance Optimization:** Lazy loading, code splitting, and edge caching
+## Known Documentation Corrections Made In This Pass
 
----
+This README intentionally avoids earlier stale claims that were not backed by the current repo, including:
 
-## 🔒 Security & Quality Assurance
-
-### **Enterprise Security Posture**
-
-Our platform maintains a defense-in-depth security architecture:
-
-- **Advanced CSRF Protection:** Double-submit cookie pattern with strict origin validation across all mutation endpoints
-- **Intelligent Rate Limiting:** IP-based distributed throttling via Upstash Redis with adaptive limits based on user behavior
-- **Zero-Trust Data Validation:** Comprehensive Zod schema validation, PostgreSQL foreign key constraints, and SQL injection prevention
-- **Content Security Policy:** SHA-256 hashed CSP with granular directives for XSS prevention
-- **Authentication Security:** Secure session management, passkey/WebAuthn support, TOTP authenticator app 2FA, and custom email verification via Resend (SHA-256 hashed tokens, 20-min expiry, rate-limited)
-
-### **Quality Assurance Framework**
-
-- **Automated CI/CD Pipeline:** GitHub Actions workflows with secrets detection, code formatting, linting, Vercel deployments, and mandatory test coverage requirements.
-- **Comprehensive Testing:** Over 480 verified tests across unit, integration, and security layers. Fully mocked map components test GPS drift without real-world latency.
-- **Performance Monitoring:** Core Web Vitals tracking, bundle analysis, and 60fps framerate locking on critical UI animations.
-- **Code Quality Gates:** Edge-native TypeScript strictness, automated ESLint formatting, and Prettier CI checks.
-
-### **Compliance & Privacy**
-
-- **GDPR Compliant:** User data portability, right to deletion, and transparent data handling
-- **WCAG 2.1 AA Certified:** Full accessibility compliance with regular automated audits
-- **Educational Data Protection:** FERPA-aligned handling of academic information
-
----
-
-## 📚 Documentation & Resources
-
-### **Technical Documentation**
-
-- **[📋 Development Guide](AGENT.md)** - Project architecture, tech stack, and development commands
-- **[📅 Changelog](CHANGELOG.md)** - Version history and feature rollouts
-- **[🗂️ Restructure Notes](docs/project/restructure-notes.md)** - Before/after tree and migration decisions
-- **[📁 Docs Index](docs/README.md)** - Documentation structure and usage
-- **[🔒 Security Guide](SECURITY.md)** - Security policies, vulnerability reporting, and best practices
-- **[🛡️ Privacy Policy](docs/policies/privacy-policy.md)** - What data this app collects, uses, and shares
-- **[🛡️ Security Posture Report](docs/security/SECURITY_POSTURE.md)** - Evidence-backed hardening controls and threat snapshot
-- **[🧾 Security Evidence Index](docs/security/SECURITY_EVIDENCE_INDEX.md)** - Reviewer index of security controls by file path
-
-### **Development Resources**
-
-- **[🚀 Deployment Checklist](docs/operations/deployment-checklist.md)** - Production deployment guidelines and validation steps
-- **[🔐 Supabase OAuth Setup](docs/operations/supabase-oauth-setup.md)** - Google/Facebook OAuth configuration and redirect URLs
-- **[🎨 Design Sketches](docs/project/sketch/)** - Project concept and UI sketches
-
-## 👥 Core Development Team
-
-### **Leadership**
-
-- **Pouya Alavi** - _Frontend Architect_ (UI/UX Design, Component Architecture, State Management)
-- **Raouf Abedini** - _Backend Engineer_ (API Development, Database Design, Security & Infrastructure)
-
-### **Contributors**
-
-Built with modern engineering practices by the Macquarie University community development team.
-
----
-
-## 📞 Support & Community
-
-### **Getting Help**
-
-- **📖 Documentation:** Start with our comprehensive guides and API reference
-- **🐛 Bug Reports:** Open an issue on [GitHub Issues](https://github.com/mrpouyaalavi/syllabus-sync/issues)
-- **💬 Feature Requests:** Share ideas and vote on community proposals
-- **🔒 Security:** Report vulnerabilities privately to maintain security disclosure best practices
-
-### **Community**
-
-- **🌟 Stars & Forks:** Show your support and contribute improvements
-- **📝 Contributions:** Review our contribution guidelines and submit pull requests
-- **📢 Feedback:** Help us improve by sharing your experience and suggestions
-
----
-
-_© 2026 Syllabus Sync - Engineered with ❤️ for the Macquarie University community_
+- Tailwind 3 wording while `package.json` uses Tailwind 4
+- Turbopack as the default runtime while default scripts use webpack-based `next dev --webpack` and `next build --webpack`
+- Playwright as an active repo test layer even though the current checked-in test/config surface is Vitest-focused
+- Manual schema initialization as the primary path instead of the canonical `supabase/migrations/` history

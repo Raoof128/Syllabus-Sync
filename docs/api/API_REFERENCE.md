@@ -1,230 +1,144 @@
 # API Reference
 
-> Syllabus Sync REST API — All routes are under `/api/`.
+This document reflects the current `app/api/**/route.ts` surface in the repository.
 
 ## Conventions
 
-- **Authentication**: Most endpoints require a valid Supabase session cookie. Unauthenticated requests return `401`.
-- **Rate Limiting**: All endpoints are rate-limited per IP. Auth-sensitive routes have stricter limits.
-- **Validation**: Request bodies are validated with Zod. Invalid input returns `400` with field-level errors.
-- **CSRF**: Mutation methods (`POST`, `PUT`, `PATCH`, `DELETE`) require a valid CSRF token header.
-- **Responses**: All responses follow `{ success, data?, error?, code? }` shape.
+- Most authenticated routes depend on Supabase session state.
+- Mutation routes commonly validate payloads with Zod and apply rate limiting.
+- Shared response helpers live under `app/api/_lib/`.
+- Some routes are internal/operational and not intended for public client use.
 
----
+## Auth And Account
 
-## Authentication
-
-| Method | Path                               | Auth | Description                   |
-| ------ | ---------------------------------- | ---- | ----------------------------- |
-| POST   | `/api/auth/signup`                 | No   | Register a new account        |
-| POST   | `/api/auth/signin`                 | No   | Sign in with email + password |
-| POST   | `/api/auth/signout`                | Yes  | Sign out (invalidate session) |
-| GET    | `/api/auth/user`                   | Yes  | Get current user profile      |
-| POST   | `/api/auth/password`               | Yes  | Change password               |
-| POST   | `/api/auth/password/request-reset` | No   | Request password reset email  |
-| POST   | `/api/auth/password/reset`         | No   | Reset password with token     |
-| GET    | `/api/auth/sessions`               | Yes  | List active sessions          |
-| POST   | `/api/auth/sessions`               | Yes  | Terminate sessions by scope   |
-| GET    | `/api/auth/onboarding`             | Yes  | Get/set onboarding status     |
+| Method        | Path                               | Notes                         |
+| ------------- | ---------------------------------- | ----------------------------- |
+| `POST`        | `/api/auth/signup`                 | Sign-up flow                  |
+| `POST`        | `/api/auth/signin`                 | Sign-in flow                  |
+| `POST`        | `/api/auth/signout`                | Server-side sign-out cleanup  |
+| `GET`         | `/api/auth/user`                   | Current user snapshot         |
+| `POST`        | `/api/auth/password`               | Authenticated password change |
+| `POST`        | `/api/auth/password/request-reset` | Request password reset        |
+| `POST`        | `/api/auth/password/reset`         | Complete password reset       |
+| `GET`, `POST` | `/api/auth/sessions`               | List/terminate sessions       |
+| `POST`        | `/api/auth/onboarding`             | Save onboarding profile data  |
 
 ### Email Verification
 
-| Method | Path                                  | Auth | Description               |
-| ------ | ------------------------------------- | ---- | ------------------------- |
-| POST   | `/api/auth/email/send-verification`   | Yes  | Send verification email   |
-| POST   | `/api/auth/email/resend-verification` | Yes  | Resend verification email |
-| POST   | `/api/auth/email/verify`              | No   | Verify email with token   |
+| Method | Path                                  |
+| ------ | ------------------------------------- |
+| `POST` | `/api/auth/email/send-verification`   |
+| `POST` | `/api/auth/email/resend-verification` |
+| `POST` | `/api/auth/email/verify`              |
 
-### MFA (TOTP / SMS)
+Internal cleanup route files also exist for email/password/rate-limit cleanup and are intended for operational use.
 
-| Method | Path                             | Auth | Description               |
-| ------ | -------------------------------- | ---- | ------------------------- |
-| POST   | `/api/auth/mfa/enroll`           | Yes  | Start TOTP enrollment     |
-| POST   | `/api/auth/mfa/verify`           | Yes  | Verify TOTP code          |
-| POST   | `/api/auth/mfa/challenge`        | Yes  | Request MFA challenge     |
-| POST   | `/api/auth/mfa/challenge-verify` | Yes  | Verify challenge response |
-| GET    | `/api/auth/mfa/status`           | Yes  | Get MFA enrollment status |
-| DELETE | `/api/auth/mfa/unenroll`         | Yes  | Remove MFA factor         |
-| POST   | `/api/auth/mfa/sms/enroll`       | Yes  | Enroll SMS factor         |
-| POST   | `/api/auth/mfa/sms/verify`       | Yes  | Verify SMS code           |
+## MFA And Passkeys
 
-### WebAuthn / Passkeys
+### MFA
 
-| Method | Path                                 | Auth | Description                 |
-| ------ | ------------------------------------ | ---- | --------------------------- |
-| GET    | `/api/webauthn/register/options`     | Yes  | Get registration options    |
-| POST   | `/api/webauthn/register/verify`      | Yes  | Verify registration         |
-| GET    | `/api/webauthn/authenticate/options` | No   | Get authentication options  |
-| POST   | `/api/webauthn/authenticate/verify`  | No   | Verify authentication       |
-| GET    | `/api/webauthn/credentials`          | Yes  | List registered credentials |
-| DELETE | `/api/webauthn/credentials`          | Yes  | Remove a credential         |
+| Method | Path                             |
+| ------ | -------------------------------- |
+| `POST` | `/api/auth/mfa/enroll`           |
+| `POST` | `/api/auth/mfa/verify`           |
+| `POST` | `/api/auth/mfa/challenge`        |
+| `POST` | `/api/auth/mfa/challenge-verify` |
+| `GET`  | `/api/auth/mfa/status`           |
+| `POST` | `/api/auth/mfa/unenroll`         |
+| `POST` | `/api/auth/mfa/sms/enroll`       |
+| `POST` | `/api/auth/mfa/sms/verify`       |
 
----
+### Passkey / WebAuthn
+
+| Method          | Path                                 |
+| --------------- | ------------------------------------ |
+| `POST`          | `/api/auth/passkey/options`          |
+| `POST`          | `/api/auth/passkey/register-options` |
+| `POST`          | `/api/auth/passkey/register`         |
+| `POST`          | `/api/auth/passkey/verify`           |
+| `POST`          | `/api/auth/passkey/status`           |
+| `POST`          | `/api/webauthn/register/options`     |
+| `POST`          | `/api/webauthn/register/verify`      |
+| `POST`          | `/api/webauthn/authenticate/options` |
+| `POST`          | `/api/webauthn/authenticate/verify`  |
+| `GET`, `DELETE` | `/api/webauthn/credentials`          |
+
+## Core User Data
+
+| Method                          | Path                               | Notes                              |
+| ------------------------------- | ---------------------------------- | ---------------------------------- |
+| `GET`, `PUT`, `DELETE`          | `/api/profiles`                    | Current user profile               |
+| `GET`, `PUT`                    | `/api/user-preferences`            | Preference record                  |
+| `GET`, `POST`, `DELETE`         | `/api/notifications`               | List/create/clear notification set |
+| `GET`, `PUT`, `PATCH`, `DELETE` | `/api/notifications/[id]`          | Single notification                |
+| `PUT`                           | `/api/notifications/mark-all-read` | Bulk mark read                     |
 
 ## Academic Data
 
 ### Units
 
-| Method | Path              | Auth | Description                     |
-| ------ | ----------------- | ---- | ------------------------------- |
-| GET    | `/api/units`      | Yes  | List user's enrolled units      |
-| POST   | `/api/units`      | Yes  | Create a unit with class times  |
-| GET    | `/api/units/[id]` | Yes  | Get unit by ID                  |
-| PUT    | `/api/units/[id]` | Yes  | Update a unit                   |
-| DELETE | `/api/units/[id]` | Yes  | Delete a unit                   |
-| POST   | `/api/units/sync` | Yes  | Sync units from external source |
+| Method          | Path              | Notes                                   |
+| --------------- | ----------------- | --------------------------------------- |
+| `GET`, `POST`   | `/api/units`      | Units plus schedule/class-time handling |
+| `PUT`, `DELETE` | `/api/units/[id]` | Single unit                             |
+| `POST`          | `/api/units/sync` | Sync/import path                        |
 
 ### Deadlines
 
-| Method | Path                  | Auth | Description        |
-| ------ | --------------------- | ---- | ------------------ |
-| GET    | `/api/deadlines`      | Yes  | List all deadlines |
-| POST   | `/api/deadlines`      | Yes  | Create a deadline  |
-| GET    | `/api/deadlines/[id]` | Yes  | Get deadline by ID |
-| PUT    | `/api/deadlines/[id]` | Yes  | Update a deadline  |
-| DELETE | `/api/deadlines/[id]` | Yes  | Delete a deadline  |
+| Method          | Path                  |
+| --------------- | --------------------- |
+| `GET`, `POST`   | `/api/deadlines`      |
+| `PUT`, `DELETE` | `/api/deadlines/[id]` |
 
 ### Events
 
-| Method | Path               | Auth | Description        |
-| ------ | ------------------ | ---- | ------------------ |
-| GET    | `/api/events`      | No   | List public events |
-| POST   | `/api/events`      | Yes  | Create an event    |
-| GET    | `/api/events/[id]` | No   | Get event by ID    |
-| PUT    | `/api/events/[id]` | Yes  | Update an event    |
-| DELETE | `/api/events/[id]` | Yes  | Delete an event    |
+| Method          | Path               |
+| --------------- | ------------------ |
+| `GET`, `POST`   | `/api/events`      |
+| `PUT`, `DELETE` | `/api/events/[id]` |
 
 ### Todos
 
-| Method | Path              | Auth | Description   |
-| ------ | ----------------- | ---- | ------------- |
-| GET    | `/api/todos`      | Yes  | List todos    |
-| POST   | `/api/todos`      | Yes  | Create a todo |
-| PUT    | `/api/todos/[id]` | Yes  | Update a todo |
-| DELETE | `/api/todos/[id]` | Yes  | Delete a todo |
+| Method          | Path              |
+| --------------- | ----------------- |
+| `GET`, `POST`   | `/api/todos`      |
+| `PUT`, `DELETE` | `/api/todos/[id]` |
 
----
+## Product Features
 
-## User Data
+| Method        | Path                         | Notes                              |
+| ------------- | ---------------------------- | ---------------------------------- |
+| `GET`, `POST` | `/api/gamification`          | Read and mutate gamification state |
+| `POST`        | `/api/gamification/award-xp` | Award XP                           |
+| `POST`        | `/api/sync`                  | Sync surface                       |
+| `GET`         | `/api/weather`               | Server-side weather proxy          |
+| `GET`, `POST` | `/api/audit`                 | Audit access and writes            |
 
-### Profiles
+## Navigation And Maps
 
-| Method | Path            | Auth | Description           |
-| ------ | --------------- | ---- | --------------------- |
-| GET    | `/api/profiles` | Yes  | Get user profile      |
-| PUT    | `/api/profiles` | Yes  | Update profile fields |
-| DELETE | `/api/profiles` | Yes  | Delete profile        |
+| Method        | Path                                   | Notes                                             |
+| ------------- | -------------------------------------- | ------------------------------------------------- |
+| `POST`        | `/api/navigate`                        | Campus raster navigation via ORS or demo fallback |
+| `POST`        | `/api/maps/routes`                     | Google Routes proxy                               |
+| `POST`        | `/api/maps/place-search`               | Google place search proxy                         |
+| `POST`        | `/api/maps/place-details`              | Google place details proxy                        |
+| `POST`        | `/api/maps/dev-pin`                    | Dev-only building pin save path                   |
+| `GET`, `POST` | `/api/admin/update-building-positions` | Admin building-position utility                   |
 
-### User Preferences
+## Security And Operations
 
-| Method | Path                    | Auth | Description          |
-| ------ | ----------------------- | ---- | -------------------- |
-| GET    | `/api/user-preferences` | Yes  | Get user preferences |
-| PUT    | `/api/user-preferences` | Yes  | Update preferences   |
+| Method | Path                                  | Notes                                     |
+| ------ | ------------------------------------- | ----------------------------------------- |
+| `GET`  | `/api/health`                         | Health/degraded status endpoint           |
+| `POST` | `/api/security/check-password-breach` | Password breach check                     |
+| `POST` | `/api/security/scan-headers`          | Header scan utility                       |
+| `POST` | `/api/csp-report`                     | CSP report intake                         |
+| `GET`  | `/api/auth/biometric`                 | Biometric/passkey-related capability path |
+| `POST` | `/api/auth/biometric`                 | Biometric/passkey action path             |
 
-### Notifications
+## Notes From Reconciliation
 
-| Method | Path                               | Auth | Description            |
-| ------ | ---------------------------------- | ---- | ---------------------- |
-| GET    | `/api/notifications`               | Yes  | List notifications     |
-| POST   | `/api/notifications`               | Yes  | Create a notification  |
-| PUT    | `/api/notifications/[id]`          | Yes  | Mark notification read |
-| DELETE | `/api/notifications/[id]`          | Yes  | Delete notification    |
-| PUT    | `/api/notifications/mark-all-read` | Yes  | Mark all read          |
-
----
-
-## Features
-
-### Gamification
-
-| Method | Path                         | Auth | Description            |
-| ------ | ---------------------------- | ---- | ---------------------- |
-| GET    | `/api/gamification`          | Yes  | Get XP, level, streaks |
-| POST   | `/api/gamification/award-xp` | Yes  | Award XP for an action |
-
-### Weather
-
-| Method | Path                       | Auth | Description                 |
-| ------ | -------------------------- | ---- | --------------------------- |
-| GET    | `/api/weather?lat=X&lon=Y` | No   | Get weather for coordinates |
-
-**Query Parameters:**
-
-- `lat` (required): Latitude (-90 to 90)
-- `lon` (required): Longitude (-180 to 180)
-
-**Response:** Current conditions + 12-hour forecast with WMO-compatible weather codes.
-Cached for 5 minutes. Powered by Google Weather API (server-side proxy).
-
-### Navigation
-
-| Method | Path               | Auth | Description                                          |
-| ------ | ------------------ | ---- | ---------------------------------------------------- |
-| POST   | `/api/navigate`    | No   | Get campus-raster walking route between points       |
-| POST   | `/api/maps/routes` | No   | Get Google-mode route between origin and destination |
-
-**`/api/navigate` Body:** `{ start: { lat, lng }, end: { lat, lng } }`
-Campus mode only. Proxied through OpenRouteService with server-side key handling.
-
-**`/api/maps/routes` Body:** `{ origin: { lat, lng }, destination: { lat, lng }, travelMode?: 'WALK' | 'DRIVE' | 'BICYCLE' | 'TRANSIT' }`
-Google-mode routing endpoint. Proxied through the Google Routes API with field-masked responses and server-side key handling.
-
----
-
-## Operations
-
-### Sync
-
-| Method | Path        | Auth | Description    |
-| ------ | ----------- | ---- | -------------- |
-| POST   | `/api/sync` | Yes  | Full data sync |
-
-### Health
-
-| Method | Path          | Auth | Description                |
-| ------ | ------------- | ---- | -------------------------- |
-| GET    | `/api/health` | No   | Health check (returns 200) |
-
-### Security Utilities
-
-| Method | Path                                  | Auth | Description                 |
-| ------ | ------------------------------------- | ---- | --------------------------- |
-| POST   | `/api/security/check-password-breach` | Yes  | Check password against HIBP |
-| POST   | `/api/security/scan-headers`          | Yes  | Scan URL security headers   |
-
-### Audit
-
-| Method | Path         | Auth | Description            |
-| ------ | ------------ | ---- | ---------------------- |
-| GET    | `/api/audit` | Yes  | Read audit log entries |
-| POST   | `/api/audit` | Yes  | Write audit log entry  |
-
-### Admin
-
-| Method | Path                                   | Auth | Description                   |
-| ------ | -------------------------------------- | ---- | ----------------------------- |
-| POST   | `/api/admin/update-building-positions` | Yes  | Update campus building coords |
-
----
-
-## Error Codes
-
-| Code                     | HTTP Status | Meaning                                         |
-| ------------------------ | ----------- | ----------------------------------------------- |
-| `VALIDATION_ERROR`       | 400         | Request body/params failed Zod validation       |
-| `UNAUTHORIZED`           | 401         | Missing or invalid session                      |
-| `FORBIDDEN`              | 403         | CSRF failure or insufficient permissions        |
-| `NOT_FOUND`              | 404         | Resource does not exist or not owned by user    |
-| `RATE_LIMITED`           | 429         | Too many requests — check `Retry-After` header  |
-| `EXTERNAL_SERVICE_ERROR` | 503         | Upstream service (weather, routing) unavailable |
-
-## Rate Limits
-
-| Endpoint Group        | Limit       | Window     |
-| --------------------- | ----------- | ---------- |
-| Auth (login, signup)  | 5 requests  | 15 minutes |
-| MFA verification      | 5 attempts  | 15 minutes |
-| General API           | 60 requests | 1 minute   |
-| Weather               | 30 requests | 1 minute   |
-| Password breach check | 10 requests | 1 minute   |
+- `/api/auth/onboarding` is `POST` only in code. It is not a `GET` endpoint.
+- `/api/auth/mfa/unenroll` is `POST` in code, not `DELETE`.
+- Units still use the `class_times` table alongside unit records; documentation should not collapse this away.
+- Some cleanup route files exist for operational use without a standard exported REST method list in the same style as the public routes.

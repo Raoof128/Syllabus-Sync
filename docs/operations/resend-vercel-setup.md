@@ -16,6 +16,8 @@ Set these in Vercel: Project -> Settings -> Environment Variables.
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` (required for Google mode map loading)
 - `NEXT_PUBLIC_GOOGLE_MAP_ID` (required for Advanced Markers/vector map styling)
 - `GOOGLE_ROUTES_API_KEY` (required for Google mode route computation)
+- `KV_REST_API_URL` (required by the committed production env check)
+- `KV_REST_API_TOKEN` (required by the committed production env check)
 - `CRON_SECRET` (secret, used to protect cron endpoints)
 
 ## Vercel CLI (Recommended)
@@ -57,7 +59,11 @@ VERCEL_ENVIRONMENT=production npm run vercel:env:check
 
 ## Cron Security
 
-`vercel.json` configures scheduled calls to internal routes (e.g., verification/password-reset token cleanup).
+`vercel.json` configures scheduled calls to:
+
+- `/api/auth/email/cleanup`
+- `/api/auth/password/cleanup`
+- `/api/security/rate-limit/cleanup`
 
 The cleanup route requires:
 
@@ -76,5 +82,10 @@ This repo includes a distributed rate limiter that prefers (in order):
 
 Avoid setting `ALLOW_MEMORY_RATE_LIMIT` in production.
 
-For this Vercel deployment, we recommend provisioning Upstash for Redis via the Vercel Marketplace.
-It automatically injects the required `KV_*` and `REDIS_URL` environment variables into the project.
+Important: the committed `tools/vercel/check-required-env.mjs` currently requires
+`KV_REST_API_URL` and `KV_REST_API_TOKEN` for production validation, so deploy docs
+must treat them as required for the checked-in production workflow even though the
+runtime code has fallback behavior in some scenarios.
+
+For this Vercel deployment, provision a compatible KV/Redis resource that supplies
+the `KV_*` variables. `REDIS_URL` alone is not sufficient for the current app code.
