@@ -120,6 +120,8 @@ export default function GoogleMapCanvas({
             rotateControl: false,
           } as Partial<google.maps.MapOptions>),
         });
+        // Disable Street View pan/compass control — removes the "Rotate the view" tooltip
+        mapRef.current.getStreetView().setOptions({ panControl: false });
         setMapReady(true);
       })
       .catch((e: Error) => {
