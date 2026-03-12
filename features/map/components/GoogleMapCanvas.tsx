@@ -485,34 +485,36 @@ export default function GoogleMapCanvas({
     };
   }, []);
 
-  // Remove all Google Maps tooltips (native title attrs + custom tooltip divs)
+  // Remove all Google Maps tooltips — strip title attrs and pierce shadow roots
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    const tooltipCSS = `[role="tooltip"] { display: none !important; } .gm-tooltip { display: none !important; }`;
+
     const strip = () => {
-      // Remove native title tooltips
-      container.querySelectorAll<HTMLElement>('.gm-style [title]').forEach((el) => {
+      // Strip title attributes (native browser tooltips)
+      container.querySelectorAll<HTMLElement>('[title]').forEach((el) => {
         el.removeAttribute('title');
       });
-      // Hide custom tooltip divs (role="tooltip" or Google's tooltip class)
-      container
-        .querySelectorAll<HTMLElement>('.gm-style [role="tooltip"], .gm-style .gm-tooltip')
-        .forEach((el) => {
-          el.style.setProperty('display', 'none', 'important');
-        });
-      // Hide aria-label-based tooltip popups (black pill with arrow)
-      container.querySelectorAll<HTMLElement>('.gm-style [aria-label]').forEach((el) => {
-        el.removeAttribute('aria-label');
+      // Hide regular DOM tooltip elements
+      container.querySelectorAll<HTMLElement>('[role="tooltip"], .gm-tooltip').forEach((el) => {
+        el.style.setProperty('display', 'none', 'important');
+      });
+      // Pierce ALL shadow roots in the map container and inject hide rule
+      container.querySelectorAll<HTMLElement>('*').forEach((el) => {
+        if (el.shadowRoot && !el.shadowRoot.querySelector('#gm-no-tooltip')) {
+          const s = document.createElement('style');
+          s.id = 'gm-no-tooltip';
+          s.textContent = tooltipCSS;
+          el.shadowRoot.appendChild(s);
+        }
       });
     };
+
     strip();
     const observer = new MutationObserver(strip);
-    observer.observe(container, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['title', 'aria-label'],
-    });
+    observer.observe(container, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, [mapReady]);
 
