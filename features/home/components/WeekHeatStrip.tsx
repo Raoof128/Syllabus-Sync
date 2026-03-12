@@ -209,12 +209,12 @@ export default function WeekHeatStrip() {
         </div>
       </div>
 
-      <div className="flex justify-between items-end h-28 gap-3 sm:gap-5 relative px-2 sm:px-3">
+      <div className="flex justify-between items-end h-28 gap-2 sm:gap-3 md:gap-5 relative px-2 sm:px-3">
         {weekData.map((day, i) => (
           <Link
             key={i}
             href={`/calendar?date=${format(day.date, 'yyyy-MM-dd')}`}
-            className="flex-1 flex flex-col justify-end items-center h-full group relative rounded-md hover:bg-mq-background-secondary/50 transition-colors focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background focus-visible:outline-none min-w-[40px]"
+            className="flex-1 flex flex-col justify-end items-center h-full group relative rounded-md hover:bg-mq-background-secondary/50 transition-colors focus-visible:ring-2 focus-visible:ring-mq-primary focus-visible:ring-offset-2 focus-visible:ring-offset-mq-card-background focus-visible:outline-none min-w-0"
             aria-label={t('weekDayAriaLabel' as TranslationKey, {
               date: day.fullDate,
               classCount: day.classCount,
@@ -230,7 +230,7 @@ export default function WeekHeatStrip() {
                 transform: 'translateX(-50%)',
               }}
             >
-              <p className="font-bold whitespace-nowrap">{day.fullDate}</p>
+              <p className="font-bold">{day.fullDate}</p>
               <p>
                 {day.classCount}{' '}
                 {day.classCount === 1

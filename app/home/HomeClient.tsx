@@ -164,28 +164,28 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         <ScrollReveal delay={0.25} staggerChildren={0.1}>
           <section aria-labelledby="units-section-heading" className="mb-6">
             <CardSolid>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle id="units-section-heading" className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5" aria-hidden="true" />
-                  {t('myUnits')}
+              <CardHeader className="flex flex-row items-center justify-between gap-2">
+                <CardTitle id="units-section-heading" className="flex items-center gap-2 min-w-0">
+                  <BookOpen className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  <span className="truncate">{t('myUnits')}</span>
                   {/* View Only Badge - makes read-only state obvious */}
                   {hasHydrated && units.length > 0 && (
                     <Badge
                       variant="neutral"
-                      className="ml-2 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 flex items-center gap-1"
+                      className="ml-2 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 hidden sm:flex items-center gap-1"
                     >
                       <Eye className="h-3 w-3" aria-hidden="true" />
                       {t('viewOnly')}
                     </Badge>
                   )}
                 </CardTitle>
-                <Button size="sm" variant="outline" className="gap-1.5" asChild>
+                <Button size="sm" variant="outline" className="gap-1.5 shrink-0" asChild>
                   <Link
                     href="/calendar?highlightWidget=units"
                     aria-label={`${t('manageInCalendar')} ${t('myUnits')}`}
                   >
                     <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>{t('manageInCalendar')}</span>
+                    <span className="hidden sm:inline">{t('manageInCalendar')}</span>
                   </Link>
                 </Button>
               </CardHeader>

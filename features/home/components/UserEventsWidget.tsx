@@ -115,21 +115,21 @@ const UserEventsWidget = memo(() => {
   return (
     <CardSolid className="h-full flex flex-col">
       <CardHeader
-        className="flex flex-row items-center justify-between"
+        className="flex flex-row items-center justify-between gap-2"
         style={{
           color: 'var(--mq-content)',
           WebkitTextFillColor: 'var(--mq-content)',
         }}
       >
-        <div className="flex items-center gap-2">
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+        <div className="flex items-center gap-2 min-w-0">
+          <CardTitle className="flex items-center gap-2 truncate">
+            <Calendar className="h-5 w-5 shrink-0" />
             {t('myEvents')}
           </CardTitle>
           {isHydrated && monthEndEvents.length > 0 && (
             <Badge
               variant="neutral"
-              className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
+              className="bg-mq-background-secondary text-mq-content-secondary text-[10px] shrink-0 hidden sm:inline-flex"
             >
               {monthEndEvents.length} {t('eventsLabel')}
               {overdueCount > 0 && (
@@ -143,20 +143,20 @@ const UserEventsWidget = memo(() => {
           {isHydrated && events.length > 0 && (
             <Badge
               variant="neutral"
-              className="ml-1 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 flex items-center gap-1"
+              className="ml-1 bg-mq-background-secondary text-mq-content-tertiary text-[10px] px-2 py-0.5 hidden sm:flex items-center gap-1"
             >
               <Eye className="h-3 w-3" aria-hidden="true" />
               {t('viewOnly')}
             </Badge>
           )}
         </div>
-        <Button size="sm" variant="outline" className="gap-1.5" asChild>
+        <Button size="sm" variant="outline" className="gap-1.5 shrink-0" asChild>
           <Link
             href="/calendar?section=events&highlight=true"
             aria-label={`${t('viewAll')} ${t('myEvents')}`}
           >
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{t('viewAll')}</span>
+            <span className="hidden sm:inline">{t('viewAll')}</span>
           </Link>
         </Button>
       </CardHeader>

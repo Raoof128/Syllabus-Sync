@@ -174,14 +174,14 @@ const TodaySchedule = memo(() => {
 
   return (
     <CardSolid className="h-full flex flex-col">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div className="flex items-center gap-2">
-          <CardTitle className="flex items-center gap-2">{t('todaysClasses')}</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <CardTitle className="flex items-center gap-2 truncate">{t('todaysClasses')}</CardTitle>
           {/* Smart indicator - remaining classes */}
           {isHydrated && classesWithStatus.length > 0 && (
             <Badge
               variant="neutral"
-              className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
+              className="bg-mq-background-secondary text-mq-content-secondary text-[10px] shrink-0"
             >
               {remainingClasses > 0
                 ? t('classesRemaining', { count: remainingClasses })
@@ -189,10 +189,10 @@ const TodaySchedule = memo(() => {
             </Badge>
           )}
         </div>
-        <Button size="sm" variant="outline" className="gap-1.5" asChild>
+        <Button size="sm" variant="outline" className="gap-1.5 shrink-0" asChild>
           <Link href="/calendar" aria-label={`${t('viewInCalendar')} ${t('todaysClasses')}`}>
             <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{t('viewInCalendar')}</span>
+            <span className="hidden sm:inline">{t('viewInCalendar')}</span>
           </Link>
         </Button>
       </CardHeader>

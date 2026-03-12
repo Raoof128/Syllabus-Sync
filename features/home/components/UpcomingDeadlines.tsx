@@ -70,30 +70,30 @@ const UpcomingDeadlines = memo(() => {
   return (
     <CardSolid className="h-full flex flex-col">
       <CardHeader
-        className="flex flex-row items-center justify-between"
+        className="flex flex-row items-center justify-between gap-2"
         style={{
           color: 'var(--mq-content)',
           WebkitTextFillColor: 'var(--mq-content)',
         }}
       >
-        <div className="flex items-center gap-2">
-          <CardTitle className="flex items-center gap-2">
-            <CalendarDays className="h-5 w-5" />
+        <div className="flex items-center gap-2 min-w-0">
+          <CardTitle className="flex items-center gap-2 truncate">
+            <CalendarDays className="h-5 w-5 shrink-0" />
             {t('upcomingDeadlines')}
           </CardTitle>
           {isHydrated && pendingCount > 0 && (
             <Badge
               variant="neutral"
-              className="bg-mq-background-secondary text-mq-content-secondary text-[10px]"
+              className="bg-mq-background-secondary text-mq-content-secondary text-[10px] shrink-0 hidden sm:inline-flex"
             >
               {pendingCount} {t('pending')}
             </Badge>
           )}
         </div>
-        <Button size="sm" variant="outline" className="gap-1.5" asChild>
+        <Button size="sm" variant="outline" className="gap-1.5 shrink-0" asChild>
           <Link href="/calendar" aria-label={`${t('viewAll')} ${t('upcomingDeadlines')}`}>
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>{t('viewAll')}</span>
+            <span className="hidden sm:inline">{t('viewAll')}</span>
           </Link>
         </Button>
       </CardHeader>
