@@ -492,7 +492,11 @@ export default function GoogleMapCanvas({
     if (!container) return;
 
     const enforce = () => {
-      // Address bar (top) — dark text on white bg
+      const isDark = document.documentElement.classList.contains('dark');
+      // Footer text: white in dark mode (dark panorama bar), dark in light mode (light bar)
+      const footerColor = isDark ? '#fff' : '#333';
+
+      // Address bar (top) — always dark text on white bg
       container.querySelectorAll<HTMLElement>('.gm-iv-address').forEach((el) => {
         el.style.setProperty('background-color', 'rgba(255,255,255,0.9)', 'important');
         el.style.setProperty('color', '#333', 'important');
@@ -504,36 +508,36 @@ export default function GoogleMapCanvas({
         el.style.setProperty('color', '#1a73e8', 'important');
       });
 
-      // Short address overlay — white on panorama
+      // Short address overlay — white on panorama (both modes)
       container.querySelectorAll<HTMLElement>('.gm-iv-short-address-description').forEach((el) => {
         el.style.setProperty('color', '#fff', 'important');
         el.style.setProperty('text-shadow', '0 1px 3px rgba(0,0,0,0.6)', 'important');
       });
 
-      // Footer containers — force transparent bg so our white bg rule doesn't leak
+      // Footer containers ("Terms", "Keyboard shortcuts", copyright)
       container.querySelectorAll<HTMLElement>('.gm-style-cc').forEach((el) => {
-        el.style.setProperty('color', '#fff', 'important');
-        el.style.setProperty('background-color', 'transparent', 'important');
-        // Also fix parent containers that might have white bg
-        let parent = el.parentElement;
-        while (parent && parent !== container) {
-          if (parent.classList.contains('gmnoprint') || parent.style.backgroundColor) {
-            parent.style.setProperty('background-color', 'transparent', 'important');
+        el.style.setProperty('color', footerColor, 'important');
+        if (isDark) {
+          el.style.setProperty('background-color', 'transparent', 'important');
+          let parent = el.parentElement;
+          while (parent && parent !== container) {
+            if (parent.classList.contains('gmnoprint') || parent.style.backgroundColor) {
+              parent.style.setProperty('background-color', 'transparent', 'important');
+            }
+            parent = parent.parentElement;
           }
-          parent = parent.parentElement;
         }
       });
-      // All children inside copyright containers — white text
       container.querySelectorAll<HTMLElement>('.gm-style-cc *').forEach((el) => {
-        el.style.setProperty('color', '#fff', 'important');
+        el.style.setProperty('color', footerColor, 'important');
       });
 
       // "Report a problem" text
       container.querySelectorAll<HTMLElement>('.gm-style-pbt').forEach((el) => {
-        el.style.setProperty('color', '#fff', 'important');
+        el.style.setProperty('color', footerColor, 'important');
       });
       container.querySelectorAll<HTMLElement>('a[href*="maps.google.com/maps"]').forEach((el) => {
-        el.style.setProperty('color', '#fff', 'important');
+        el.style.setProperty('color', footerColor, 'important');
       });
 
       // Compass control — transparent background, no white box
@@ -542,7 +546,7 @@ export default function GoogleMapCanvas({
         el.style.setProperty('box-shadow', 'none', 'important');
       });
 
-      // Zoom/control button containers inside Street View — keep white bg only for buttons
+      // Zoom/control button containers — keep transparent wrapper
       container.querySelectorAll<HTMLElement>('.gm-bundled-control').forEach((el) => {
         el.style.setProperty('background-color', 'transparent', 'important');
       });
@@ -551,20 +555,29 @@ export default function GoogleMapCanvas({
     // Run immediately, then watch for any DOM change Google Maps makes
     enforce();
     let debounceTimer: ReturnType<typeof setTimeout>;
-    const observer = new MutationObserver(() => {
+    const debouncedEnforce = () => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(enforce, 50);
-    });
-    observer.observe(container, {
+    };
+    const mapObserver = new MutationObserver(debouncedEnforce);
+    mapObserver.observe(container, {
       childList: true,
       subtree: true,
       attributes: true,
       attributeFilter: ['style', 'class'],
     });
 
+    // Also watch <html> class changes so we re-enforce when user toggles dark/light mode
+    const themeObserver = new MutationObserver(debouncedEnforce);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
     return () => {
       clearTimeout(debounceTimer);
-      observer.disconnect();
+      mapObserver.disconnect();
+      themeObserver.disconnect();
     };
   }, [isStreetViewActive]);
 
