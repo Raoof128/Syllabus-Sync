@@ -1,4 +1,10 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map Tooling — Export Flutter Raster/Registry Assets
+Summary: Added a first-class export bridge from the web map source of truth into the Flutter app. New `tools/export_buildings.mjs` imports the authored campus registry from `features/map/lib/buildings.ts`, preserves the shared pixel coordinate system (`campusX/campusY` + `BUILDING_PIXEL_OFFSET_X`), writes normalized Flutter-facing JSON (`assets/data/buildings.json` and `assets/data/campus_overlay_meta.json`) into the sibling `mq_navigation` repo, and copies the audited raster image (`public/maps/raster/mq-campus.png`) into Flutter assets. Added `npm run export:flutter-map-assets` so Flutter can be resynced from the web authoring source without hand-editing duplicate registries.
+Files Changed: `tools/export_buildings.mjs`, `package.json`
+Verification: `node --experimental-strip-types tools/export_buildings.mjs` ✅ (153 buildings exported; overlay metadata + raster copied to Flutter repo)
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map UI — Permanent Street View Text Fix (MutationObserver)
 Summary: Replaced CSS-only Street View text overrides with MutationObserver-based inline style enforcement. Observer activates only when Street View is open (tied to `isStreetViewActive` state), debounced at 50ms, watches `childList` only (not attributes) for performance. Directly applies `element.style.setProperty('color', '#fff', 'important')` on `.gm-iv-address`, `.gm-style-cc`, `.gm-style-pbt` elements — inline styles beat Google Maps cloud-based dark styling that was overriding our CSS `!important` rules. Static CSS kept as baseline for non-text controls.
 Files Changed: `features/map/components/GoogleMapCanvas.tsx`

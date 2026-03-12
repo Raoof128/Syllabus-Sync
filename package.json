@@ -25,6 +25,7 @@
     "check:secrets": "node tools/security/check-secrets.mjs",
     "check": "npm run check:secrets && npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build",
     "check:i18n": "node tools/i18n/check-translations.mjs",
+    "export:flutter-map-assets": "node --experimental-strip-types tools/export_buildings.mjs",
     "lighthouse": "lhci autorun --config=config/lighthouse/.lighthouserc.json",
     "lighthouse:local": "pkill -f 'next start' || true; npx kill-port 3000 || true; lhci collect --config-path=config/lighthouse/.lighthouserc.json",
     "docker:build": "docker build -f infra/docker/Dockerfile -t syllabus-sync .",

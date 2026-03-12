@@ -1,4 +1,10 @@
 Raouf: 2026-03-12 (Australia/Sydney)
+Scope: Map Tooling — Export Flutter Raster/Registry Assets
+Summary: Added `tools/export_buildings.mjs` and `npm run export:flutter-map-assets` so the web app remains the source of truth for Flutter map data. The export script imports `features/map/lib/buildings.ts`, emits normalized Flutter-facing `buildings.json` and `campus_overlay_meta.json`, and copies `public/maps/raster/mq-campus.png` into the sibling Flutter repo. This removes the need to hand-maintain duplicate building registries and campus overlay metadata across web and Flutter.
+Files Changed: `tools/export_buildings.mjs`, `package.json`
+Verification: `node --experimental-strip-types tools/export_buildings.mjs` ✅
+
+Raouf: 2026-03-12 (Australia/Sydney)
 Scope: Map UI — Permanent Street View Text Fix (MutationObserver)
 Summary: Replaced CSS-only Street View text overrides with a MutationObserver-based approach that directly applies inline styles to Street View DOM elements. The observer only runs while Street View is active (gated on `isStreetViewActive` state), uses `childList`-only observation (no `attributes` — avoids perf overhead), and debounces enforcement at 50ms. Inline `style.setProperty()` with `'important'` priority beats Google Maps cloud-based dark theme styling that was overriding our CSS `!important` rules in dark mode. Address bar gets white bg + dark text, footer links + "Terms" + "Report a problem" get white text — unified across light and dark mode. Static CSS retained for non-text controls (zoom buttons, Pegman, compass).
 Files Changed: `features/map/components/GoogleMapCanvas.tsx`
