@@ -514,17 +514,21 @@ export default function GoogleMapCanvas({
       container.querySelectorAll<HTMLElement>('.gm-iv-address').forEach((el) => {
         el.style.setProperty('background-color', 'rgba(255,255,255,0.9)', 'important');
         el.style.setProperty('color', '#333', 'important');
+        el.style.setProperty('-webkit-text-fill-color', '#333', 'important');
       });
       container.querySelectorAll<HTMLElement>('.gm-iv-address *').forEach((el) => {
         el.style.setProperty('color', '#333', 'important');
+        el.style.setProperty('-webkit-text-fill-color', '#333', 'important');
       });
       container.querySelectorAll<HTMLElement>('.gm-iv-address a').forEach((el) => {
         el.style.setProperty('color', '#1a73e8', 'important');
+        el.style.setProperty('-webkit-text-fill-color', '#1a73e8', 'important');
       });
 
-      // Short address overlay — white on panorama (both modes)
+      // Short address overlay (e.g. "100 Pennant St") — white on panorama (both modes)
       container.querySelectorAll<HTMLElement>('.gm-iv-short-address-description').forEach((el) => {
         el.style.setProperty('color', '#fff', 'important');
+        el.style.setProperty('-webkit-text-fill-color', '#fff', 'important');
         el.style.setProperty('text-shadow', '0 1px 3px rgba(0,0,0,0.6)', 'important');
       });
 
