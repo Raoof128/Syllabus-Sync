@@ -41,16 +41,8 @@ npm run check
 Verify the deployment target matches the committed workflows:
 
 - `.github/workflows/ci-cd.yml`
-- `.github/workflows/production-deploy.yml`
 
-The production workflow expects Vercel and validates these secrets before deployment:
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `VERCEL_TOKEN`
-- `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
+GitHub Actions now validates application quality only. Vercel deployment, if enabled for the linked project, is managed outside this repository's CI workflow.
 
 ## 5. Runtime Verification
 

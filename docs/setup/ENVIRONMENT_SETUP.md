@@ -115,5 +115,4 @@ After setup, validate:
 
 - `vercel.json` defines cron schedules and static header rules.
 - `.github/workflows/ci-cd.yml` defines CI validation on `main` and `develop`.
-- `.github/workflows/production-deploy.yml` defines the production deployment workflow.
 - `infra/docker/README.md` documents the Docker-based runtime path.

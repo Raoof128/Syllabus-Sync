@@ -126,12 +126,10 @@ This index groups security-relevant files for fast reviewer navigation.
 - `package-lock.json`
 - `tools/security/check-secrets.mjs`
 - `.github/workflows/ci-cd.yml`
-- `.github/workflows/production-deploy.yml`
 
 ## Deployment / Operations Hardening
 
 - `.github/workflows/ci-cd.yml`
-- `.github/workflows/production-deploy.yml`
 - `config/next/next.config.ts`
 - `vercel.json`
 - `infra/docker/Dockerfile`

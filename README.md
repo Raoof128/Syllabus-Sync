@@ -29,7 +29,7 @@ Production-grade Next.js 16 application for Macquarie University student plannin
 | Email             | Resend                                                           |
 | Error tracking    | Sentry config for client, server, and edge                       |
 | Tests             | Vitest + Testing Library                                         |
-| CI/CD             | GitHub Actions (`ci-cd.yml`, `production-deploy.yml`)            |
+| CI/CD             | GitHub Actions (`ci-cd.yml`)                                     |
 | Deployment target | Vercel                                                           |
 
 ## App Bootstrap And Entry Points
@@ -171,7 +171,7 @@ Implemented checks in this repository:
 CI workflows:
 
 - `.github/workflows/ci-cd.yml`: typecheck, lint, coverage, npm audit, secrets scan, i18n check, build, Lighthouse
-- `.github/workflows/production-deploy.yml`: build validation, tests, secrets validation, Vercel deploy, post-deploy verification
+- Vercel deployment remains available as the hosting target, but it is no longer driven by a dedicated GitHub Actions deployment workflow in this repo
 
 ## Documentation Map
 

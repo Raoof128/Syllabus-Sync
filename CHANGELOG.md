@@ -1,3 +1,20 @@
+### Raouf: Remove GitHub Vercel Deployment Workflow — 2026-03-13
+
+**Scope:** Remove Vercel deployment from repository CI/CD while keeping Vercel as the deployment target.
+
+1. **Deleted GitHub-side deployment workflow** (`.github/workflows/production-deploy.yml`):
+   - Removed the dedicated GitHub Actions production deployment pipeline, including the Vercel deploy, post-deploy verification, and deployment notification jobs.
+   - Kept `.github/workflows/ci-cd.yml` as the single repository-managed quality workflow for tests, security checks, and production build validation.
+
+2. **Aligned repository documentation** (`README.md`, `docs/setup/ENVIRONMENT_SETUP.md`, `docs/security/SECURITY_POSTURE.md`, `docs/security/SECURITY_EVIDENCE_INDEX.md`, `docs/operations/deployment-checklist.md`, `docs/architecture/ARCHITECTURE.md`):
+   - Removed stale references to `.github/workflows/production-deploy.yml`.
+   - Documented that Vercel deployment is now handled outside GitHub Actions for this repo.
+
+**Verification:**
+
+- `rg -n "production-deploy\\.yml" README.md docs .github -g '!AGENT.md' -g '!CHANGELOG.md'` ✅
+- `git diff -- .github/workflows README.md docs/setup/ENVIRONMENT_SETUP.md docs/security/SECURITY_POSTURE.md docs/security/SECURITY_EVIDENCE_INDEX.md docs/operations/deployment-checklist.md docs/architecture/ARCHITECTURE.md` ✅
+
 Raouf: 2026-03-13 (Australia/Sydney)
 Scope: CI/CD Repair — Test, Audit, and Deploy Workflow Stabilization
 Summary: Investigated the failing GitHub checks and reproduced the breakpoints locally. The production build itself succeeded, but the CI test suite was failing on a stale assertion in `tests/map/useMapLocation.test.ts` after the hook copy changed from “Please wait for your location to be found.” to the current fallback “Waiting for location”. Updated that expectation to match the shipped behavior. The security job was failing because `npm audit --audit-level high` scanned dev dependencies and flagged the Vercel CLI dependency tree; production/runtime dependencies were not the issue. Narrowed the CI audit command to `npm audit --omit=dev --audit-level high`, which aligns the security gate with deployable application risk rather than local/dev tooling. The production workflow’s `Validate and Build` job was also configured to fail early when deployment secrets were absent, which makes the build-validation check red even when code health is fine. Split that concern into a dedicated `deployment-prerequisites` job so the build/test job can pass independently, while Vercel deployment now runs only when the required secrets are actually present.

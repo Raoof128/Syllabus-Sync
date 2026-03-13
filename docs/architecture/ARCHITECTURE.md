@@ -128,7 +128,7 @@ Implemented security layers visible in code:
 | Concern           | Current implementation                               |
 | ----------------- | ---------------------------------------------------- |
 | CI                | `.github/workflows/ci-cd.yml`                        |
-| Production deploy | `.github/workflows/production-deploy.yml`            |
+| Production deploy | Vercel project integration outside GitHub Actions    |
 | Error tracking    | Sentry config in `config/sentry/` plus root wrappers |
 | Health endpoint   | `GET /api/health`                                    |
 | Docker            | `infra/docker/`                                      |
