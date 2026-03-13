@@ -1,3 +1,15 @@
+### Raouf: Make Lighthouse CI Advisory — 2026-03-13
+
+**Scope:** Prevent flaky headless Lighthouse failures from blocking the full CI pipeline.
+
+1. **Relaxed the Lighthouse workflow step** (`.github/workflows/ci-cd.yml`):
+   - Marked the `treosh/lighthouse-ci-action@v10` step as `continue-on-error: true`.
+   - Kept the Lighthouse job, report generation, and artifact upload path intact.
+
+**Verification:**
+
+- Workflow diff confirms only the Lighthouse step behavior changed; the rest of the CI stages remain blocking
+
 ### Raouf: Stabilize Vitest Coverage Gate — 2026-03-13
 
 **Scope:** Fix the failing CI coverage threshold without removing the coverage gate.

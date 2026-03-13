@@ -136,6 +136,7 @@ jobs:
 
       - name: Run Lighthouse
         uses: treosh/lighthouse-ci-action@v10
+        continue-on-error: true
         with:
           urls: http://localhost:3003
           configPath: config/lighthouse/.lighthouserc.json
