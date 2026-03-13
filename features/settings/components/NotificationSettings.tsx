@@ -53,17 +53,24 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
   }, [initialize]);
 
   const handleRequestPermission = useCallback(async () => {
-    const status = await requestPermission();
-    if (status === 'granted') {
+    const enabled = await setPushEnabled(true);
+    const status = enabled ? 'granted' : await requestPermission();
+    if (status === 'granted' || enabled) {
       toastUtils.success(t('notificationsEnabled'), t('notificationsEnabledMsg'));
     } else if (status === 'denied') {
       toastUtils.error(t('permissionDenied'), t('permissionDeniedMsg'));
     }
-  }, [requestPermission, t]);
+  }, [requestPermission, setPushEnabled, t]);
 
-  const handleTogglePush = useCallback(() => {
+  const handleTogglePush = useCallback(async () => {
     const newValue = !pushEnabled;
-    setPushEnabled(newValue);
+    const applied = await setPushEnabled(newValue);
+
+    if (newValue && !applied) {
+      toastUtils.error(t('permissionDenied'), t('permissionDeniedMsg'));
+      return;
+    }
+
     toastUtils.success(
       t('preferenceUpdated'),
       t('pushNotificationsToggle', {
@@ -197,7 +204,7 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
                   <Button
                     size="sm"
                     className="w-full sm:w-auto sm:flex-shrink-0"
-                    onClick={handleRequestPermission}
+                    onClick={() => void handleRequestPermission()}
                     data-testid="enable-notifications-button"
                   >
                     {t('enable')}
@@ -218,7 +225,7 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
               </div>
               <ToggleControl
                 checked={pushEnabled}
-                onToggle={handleTogglePush}
+                onToggle={() => void handleTogglePush()}
                 label={t('pushNotifications')}
                 testId="toggle-push-notifications"
               />

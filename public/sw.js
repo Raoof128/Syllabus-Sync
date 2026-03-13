@@ -121,6 +121,89 @@ self.addEventListener("message", (event) => {
   }
 });
 
+self.addEventListener("push", (event) => {
+  const fallbackPayload = {
+    title: "Syllabus Sync",
+    body: "You have a new reminder.",
+    icon: "/MQ_Logo_Final.png",
+    badge: "/icons/icon-192.png",
+    data: {
+      url: "/",
+    },
+  };
+
+  let payload = fallbackPayload;
+
+  if (event.data) {
+    try {
+      payload = { ...fallbackPayload, ...event.data.json() };
+    } catch (_error) {
+      payload = {
+        ...fallbackPayload,
+        body: event.data.text(),
+      };
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(payload.title, {
+      body: payload.body,
+      icon: payload.icon || "/MQ_Logo_Final.png",
+      badge: payload.badge || "/icons/icon-192.png",
+      tag: payload.tag,
+      data: payload.data || { url: "/" },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  const urlPath = event.notification.data?.url || "/";
+  const absoluteUrl = new URL(urlPath, self.location.origin).href;
+
+  event.waitUntil(
+    (async () => {
+      const windowClients = await self.clients.matchAll({
+        type: "window",
+        includeUncontrolled: true,
+      });
+
+      let focusedClient = null;
+
+      for (const client of windowClients) {
+        if ("focus" in client) {
+          if (client.url === absoluteUrl || client.url.startsWith(absoluteUrl)) {
+            focusedClient = client;
+            break;
+          }
+
+          if (!focusedClient) {
+            focusedClient = client;
+          }
+        }
+      }
+
+      if (focusedClient) {
+        if ("navigate" in focusedClient) {
+          await focusedClient.navigate(absoluteUrl);
+        }
+        await focusedClient.focus();
+      } else if (self.clients.openWindow) {
+        await self.clients.openWindow(absoluteUrl);
+      }
+
+      windowClients.forEach((client) => {
+        client.postMessage({
+          type: "NOTIFICATION_CLICK",
+          tag: event.notification.tag,
+          data: event.notification.data || {},
+        });
+      });
+    })(),
+  );
+});
+
 /**
  * SECURITY: Check if a URL should be cached
  * Only static assets with safe extensions are cacheable

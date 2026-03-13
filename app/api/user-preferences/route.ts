@@ -19,6 +19,13 @@ import { logger } from '@/lib/logger';
 const UpdatePreferencesSchema = z.object({
   notifications_enabled: z.boolean().optional(),
   email_notifications: z.boolean().optional(),
+  push_notifications: z.boolean().optional(),
+  deadline_notifications_enabled: z.boolean().optional(),
+  class_notifications_enabled: z.boolean().optional(),
+  event_notifications_enabled: z.boolean().optional(),
+  deadline_reminder_timing_minutes: z.number().int().min(0).optional(),
+  class_reminder_timing_minutes: z.number().int().min(0).optional(),
+  event_reminder_timing_minutes: z.number().int().min(0).optional(),
 });
 
 export async function GET() {

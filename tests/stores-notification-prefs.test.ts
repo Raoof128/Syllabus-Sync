@@ -5,11 +5,20 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 
+const apiRequestMock = vi.fn();
+
+vi.mock('@/lib/utils/api', () => ({
+  apiRequest: (...args: unknown[]) => apiRequestMock(...args),
+}));
+
 // Mock the notificationService to avoid real browser APIs
 vi.mock('@/lib/services/notificationService', () => ({
   notificationService: {
     getPermissionStatus: vi.fn().mockReturnValue('default'),
     requestPermission: vi.fn().mockResolvedValue('granted'),
+    subscribeToPush: vi.fn().mockResolvedValue(true),
+    unsubscribeFromPush: vi.fn().mockResolvedValue(true),
+    isPushSupported: vi.fn().mockReturnValue(true),
     isNotificationTypeEnabled: vi.fn().mockReturnValue(true),
     setNotificationTypeEnabled: vi.fn(),
     sendDeadlineReminder: vi.fn().mockResolvedValue(true),
@@ -27,6 +36,8 @@ vi.mock('@/lib/store/notificationsStore', () => ({
 
 describe('notificationPreferencesStore', () => {
   beforeEach(() => {
+    apiRequestMock.mockReset();
+    apiRequestMock.mockResolvedValue({});
     useNotificationPreferencesStore.getState().reset();
   });
 
@@ -61,23 +72,24 @@ describe('notificationPreferencesStore', () => {
     expect(useNotificationPreferencesStore.getState().eventsEnabled).toBe(false);
   });
 
-  it('setPushEnabled disables push and clears all reminders', () => {
+  it('setPushEnabled disables push and clears all reminders', async () => {
     useNotificationPreferencesStore.setState({
       scheduledReminders: { a: 1 },
       pendingReminders: { a: { type: 'deadline', payload: {}, triggerAt: 0 } },
     });
-    useNotificationPreferencesStore.getState().setPushEnabled(false);
+    await useNotificationPreferencesStore.getState().setPushEnabled(false);
     expect(useNotificationPreferencesStore.getState().pushEnabled).toBe(false);
     expect(useNotificationPreferencesStore.getState().scheduledReminders).toEqual({});
     expect(useNotificationPreferencesStore.getState().pendingReminders).toEqual({});
   });
 
-  it('setPushEnabled(true) does not clear reminders', () => {
+  it('setPushEnabled(true) does not clear reminders', async () => {
     useNotificationPreferencesStore.setState({
       scheduledReminders: { a: 1 },
       pushEnabled: false,
+      permissionStatus: 'granted',
     });
-    useNotificationPreferencesStore.getState().setPushEnabled(true);
+    await useNotificationPreferencesStore.getState().setPushEnabled(true);
     expect(useNotificationPreferencesStore.getState().pushEnabled).toBe(true);
     expect(useNotificationPreferencesStore.getState().scheduledReminders).toEqual({ a: 1 });
   });
@@ -104,12 +116,21 @@ describe('notificationPreferencesStore', () => {
   });
 
   it('initialize sets permission and syncs type toggles', async () => {
+    apiRequestMock.mockResolvedValueOnce({
+      push_notifications: false,
+      deadline_notifications_enabled: true,
+      class_notifications_enabled: true,
+      event_notifications_enabled: true,
+      deadline_reminder_timing_minutes: 30,
+    });
     await useNotificationPreferencesStore.getState().initialize();
     const s = useNotificationPreferencesStore.getState();
     expect(s.permissionStatus).toBe('default');
     expect(s.deadlinesEnabled).toBe(true);
     expect(s.classesEnabled).toBe(true);
     expect(s.eventsEnabled).toBe(true);
+    expect(s.pushEnabled).toBe(false);
+    expect(s.deadlineReminderTiming).toBe(30);
   });
 
   // scheduleDeadlineReminder guards

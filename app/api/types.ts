@@ -44,6 +44,12 @@ export interface UserPreferences {
   notifications_enabled: boolean;
   email_notifications: boolean;
   push_notifications: boolean;
+  deadline_notifications_enabled: boolean;
+  class_notifications_enabled: boolean;
+  event_notifications_enabled: boolean;
+  deadline_reminder_timing_minutes: number;
+  class_reminder_timing_minutes: number;
+  event_reminder_timing_minutes: number;
 }
 
 // Academic types

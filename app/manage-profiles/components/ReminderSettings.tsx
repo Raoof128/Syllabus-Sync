@@ -181,7 +181,9 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
               label={t('pushNotifications')}
               description={t('pushNotificationsDesc')}
               checked={pushEnabled}
-              onToggle={() => setPushEnabled(!pushEnabled)}
+              onToggle={() => {
+                void setPushEnabled(!pushEnabled);
+              }}
               ariaLabel={t('pushNotifications')}
             />
             <ToggleRow

@@ -77,6 +77,7 @@
     "resend": "^6.9.2",
     "tailwind-merge": "^3.4.0",
     "uuid": "^13.0.0",
+    "web-push": "^3.6.7",
     "zod": "^4.3.6",
     "zustand": "^5.0.9",
     "zxcvbn": "^4.4.2"
@@ -95,6 +96,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
+    "@types/web-push": "^3.6.4",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react": "^5.1.2",

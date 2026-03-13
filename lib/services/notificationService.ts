@@ -3,6 +3,7 @@
 
 import { STORAGE_KEYS } from '@/lib/constants';
 import { logger } from '@/lib/logger';
+import { apiRequest } from '@/lib/utils/api';
 
 export type NotificationPermissionStatus = 'granted' | 'denied' | 'default' | 'unsupported';
 
@@ -12,6 +13,7 @@ export interface NotificationOptions {
   icon?: string;
   tag?: string;
   data?: Record<string, unknown>;
+  url?: string;
   onClick?: () => void;
 }
 
@@ -127,6 +129,15 @@ class NotificationService {
     return typeof window !== 'undefined' && 'Notification' in window;
   }
 
+  isPushSupported(): boolean {
+    return (
+      typeof window !== 'undefined' &&
+      'Notification' in window &&
+      'serviceWorker' in navigator &&
+      'PushManager' in window
+    );
+  }
+
   /**
    * Get current notification permission status
    */
@@ -147,6 +158,113 @@ class NotificationService {
     } catch (error) {
       logger.error('Failed to request notification permission:', error);
       return 'denied';
+    }
+  }
+
+  private async ensureServiceWorkerRegistration(): Promise<ServiceWorkerRegistration | null> {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      return null;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js', {
+        scope: '/',
+      });
+
+      return registration.active ? registration : navigator.serviceWorker.ready;
+    } catch (error) {
+      logger.error('Failed to register notification service worker:', error);
+      return null;
+    }
+  }
+
+  private urlBase64ToUint8Array(base64String: string): Uint8Array {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const normalized = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(normalized);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; i += 1) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+
+    return outputArray;
+  }
+
+  async subscribeToPush(): Promise<boolean> {
+    if (!this.isPushSupported()) {
+      return false;
+    }
+
+    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim();
+    if (!publicKey) {
+      logger.warn('Cannot subscribe to push without NEXT_PUBLIC_VAPID_PUBLIC_KEY');
+      return false;
+    }
+
+    const registration = await this.ensureServiceWorkerRegistration();
+    if (!registration) {
+      return false;
+    }
+
+    try {
+      let subscription = await registration.pushManager.getSubscription();
+
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: this.urlBase64ToUint8Array(publicKey) as BufferSource,
+        });
+      }
+
+      await apiRequest('/api/push/subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...subscription.toJSON(),
+          userAgent: navigator.userAgent,
+        }),
+        noRetry: true,
+      });
+
+      return true;
+    } catch (error) {
+      logger.error('Failed to subscribe browser to push notifications:', error);
+      return false;
+    }
+  }
+
+  async unsubscribeFromPush(): Promise<boolean> {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      return true;
+    }
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+
+      if (!subscription) {
+        return true;
+      }
+
+      const endpoint = subscription.endpoint;
+      await subscription.unsubscribe();
+
+      await apiRequest('/api/push/subscription', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ endpoint }),
+        noRetry: true,
+      });
+
+      return true;
+    } catch (error) {
+      logger.error('Failed to unsubscribe browser from push notifications:', error);
+      return false;
     }
   }
 
@@ -173,16 +291,22 @@ class NotificationService {
     }
 
     try {
+      const notificationData = {
+        ...(options.data ?? {}),
+        url: options.url ?? (options.data?.url as string | undefined) ?? '/',
+      };
+
       // Prefer service worker notifications if available (more resilient when tab is hidden)
       if ('serviceWorker' in navigator) {
         try {
-          const registration = await navigator.serviceWorker.ready;
+          const registration = await this.ensureServiceWorkerRegistration();
           if (registration?.showNotification) {
             await registration.showNotification(options.title, {
               body: options.body,
               icon: options.icon || '/MQ_Logo_Final.png',
+              badge: '/icons/icon-192.png',
               tag: options.tag,
-              data: options.data,
+              data: notificationData,
             });
             // Register click handler for service worker notifications
             if (options.tag && options.onClick) {
@@ -206,7 +330,7 @@ class NotificationService {
         body: options.body,
         icon: options.icon || '/MQ_Logo_Final.png',
         tag: options.tag,
-        data: options.data,
+        data: notificationData,
       });
 
       // Mark as sent to prevent duplicates
@@ -300,6 +424,7 @@ class NotificationService {
       body: `"${deadlineTitle}" is due ${timeText}`,
       tag: `deadline-${deadlineId}`,
       data: { type: 'deadline', id: deadlineId },
+      url: '/calendar',
       onClick: () => {
         window.location.href = '/calendar';
       },
@@ -323,6 +448,7 @@ class NotificationService {
       body: `${unitName} at ${building} ${room} - ${startTime}`,
       tag: `class-${unitCode}-${Date.now()}`,
       data: { type: 'class', unitCode },
+      url: '/home',
       onClick: () => {
         window.location.href = '/home';
       },
@@ -345,6 +471,7 @@ class NotificationService {
       body: `${eventTitle} at ${eventLocation} - ${eventTime}`,
       tag: `event-${eventId}`,
       data: { type: 'event', id: eventId },
+      url: '/feed',
       onClick: () => {
         window.location.href = '/feed';
       },

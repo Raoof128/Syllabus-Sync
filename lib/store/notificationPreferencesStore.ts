@@ -8,6 +8,8 @@ import {
   NotificationPermissionStatus,
 } from '@/lib/services/notificationService';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { apiRequest } from '@/lib/utils/api';
+import { logger } from '@/lib/logger';
 
 export interface NotificationPreferences {
   // Permission status
@@ -47,7 +49,7 @@ interface NotificationPreferencesState extends NotificationPreferences {
   setDeadlinesEnabled: (enabled: boolean) => void;
   setClassesEnabled: (enabled: boolean) => void;
   setEventsEnabled: (enabled: boolean) => void;
-  setPushEnabled: (enabled: boolean) => void;
+  setPushEnabled: (enabled: boolean) => Promise<boolean>;
   setDeadlineReminderTiming: (minutes: number) => void;
   setClassReminderTiming: (minutes: number) => void;
   setEventReminderTiming: (minutes: number) => void;
@@ -76,6 +78,55 @@ interface NotificationPreferencesState extends NotificationPreferences {
   reset: () => void;
 }
 
+type ServerNotificationPreferences = {
+  push_notifications?: boolean | null;
+  deadline_notifications_enabled?: boolean | null;
+  class_notifications_enabled?: boolean | null;
+  event_notifications_enabled?: boolean | null;
+  deadline_reminder_timing_minutes?: number | null;
+  class_reminder_timing_minutes?: number | null;
+  event_reminder_timing_minutes?: number | null;
+};
+
+function isAuthPreferenceError(error: unknown): boolean {
+  return (
+    error instanceof Error && (error.message.startsWith('401:') || error.message.startsWith('403:'))
+  );
+}
+
+async function loadServerNotificationPreferences(): Promise<ServerNotificationPreferences | null> {
+  try {
+    return await apiRequest<ServerNotificationPreferences>('/api/user-preferences', {
+      method: 'GET',
+      noRetry: true,
+    });
+  } catch (error) {
+    if (!isAuthPreferenceError(error)) {
+      logger.warn('Failed to load notification preferences from server', error);
+    }
+    return null;
+  }
+}
+
+async function persistServerNotificationPreferences(
+  updates: ServerNotificationPreferences,
+): Promise<void> {
+  try {
+    await apiRequest('/api/user-preferences', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+      noRetry: true,
+    });
+  } catch (error) {
+    if (!isAuthPreferenceError(error)) {
+      logger.warn('Failed to persist notification preferences to server', error);
+    }
+  }
+}
+
 export const useNotificationPreferencesStore = create<NotificationPreferencesState>()(
   persist(
     (set, get) => ({
@@ -93,14 +144,32 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
 
       initialize: async () => {
         const status = notificationService.getPermissionStatus();
-        set({ permissionStatus: status });
-
-        // Sync with localStorage legacy values
         const deadlinesEnabled = notificationService.isNotificationTypeEnabled('deadlines');
         const classesEnabled = notificationService.isNotificationTypeEnabled('classes');
         const eventsEnabled = notificationService.isNotificationTypeEnabled('events');
 
-        set({ deadlinesEnabled, classesEnabled, eventsEnabled });
+        set({ permissionStatus: status, deadlinesEnabled, classesEnabled, eventsEnabled });
+
+        const serverPreferences = await loadServerNotificationPreferences();
+        if (serverPreferences) {
+          set((state) => ({
+            pushEnabled: serverPreferences.push_notifications ?? state.pushEnabled,
+            deadlinesEnabled:
+              serverPreferences.deadline_notifications_enabled ?? state.deadlinesEnabled,
+            classesEnabled: serverPreferences.class_notifications_enabled ?? state.classesEnabled,
+            eventsEnabled: serverPreferences.event_notifications_enabled ?? state.eventsEnabled,
+            deadlineReminderTiming:
+              serverPreferences.deadline_reminder_timing_minutes ?? state.deadlineReminderTiming,
+            classReminderTiming:
+              serverPreferences.class_reminder_timing_minutes ?? state.classReminderTiming,
+            eventReminderTiming:
+              serverPreferences.event_reminder_timing_minutes ?? state.eventReminderTiming,
+          }));
+        }
+
+        if (status === 'granted' && get().pushEnabled) {
+          void notificationService.subscribeToPush();
+        }
 
         // Reschedule any pending reminders that survived persistence
         get().reschedulePending();
@@ -109,42 +178,93 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
       requestPermission: async () => {
         const status = await notificationService.requestPermission();
         set({ permissionStatus: status });
+        if (status === 'granted' && get().pushEnabled) {
+          void notificationService.subscribeToPush();
+        }
         return status;
       },
 
       setDeadlinesEnabled: (enabled: boolean) => {
         notificationService.setNotificationTypeEnabled('deadlines', enabled);
         set({ deadlinesEnabled: enabled });
+        void persistServerNotificationPreferences({
+          deadline_notifications_enabled: enabled,
+        });
       },
 
       setClassesEnabled: (enabled: boolean) => {
         notificationService.setNotificationTypeEnabled('classes', enabled);
         set({ classesEnabled: enabled });
+        void persistServerNotificationPreferences({
+          class_notifications_enabled: enabled,
+        });
       },
 
       setEventsEnabled: (enabled: boolean) => {
         notificationService.setNotificationTypeEnabled('events', enabled);
         set({ eventsEnabled: enabled });
+        void persistServerNotificationPreferences({
+          event_notifications_enabled: enabled,
+        });
       },
 
-      setPushEnabled: (enabled: boolean) => {
-        set({ pushEnabled: enabled });
+      setPushEnabled: async (enabled: boolean) => {
         if (!enabled) {
-          // Clear all scheduled reminders when push is disabled
+          await notificationService.unsubscribeFromPush();
+          set({ pushEnabled: false });
           get().clearAllReminders();
+          void persistServerNotificationPreferences({
+            push_notifications: false,
+          });
+          return true;
         }
+
+        let status = get().permissionStatus;
+        if (status !== 'granted') {
+          status = await notificationService.requestPermission();
+          set({ permissionStatus: status });
+        }
+
+        if (status !== 'granted') {
+          set({ pushEnabled: false });
+          void persistServerNotificationPreferences({
+            push_notifications: false,
+          });
+          return false;
+        }
+
+        const subscribed = await notificationService.subscribeToPush();
+        if (!subscribed && notificationService.isPushSupported()) {
+          logger.warn('Browser granted notifications but push subscription could not be created');
+        }
+
+        set({ pushEnabled: true });
+        void persistServerNotificationPreferences({
+          push_notifications: true,
+        });
+        get().reschedulePending();
+        return subscribed || !notificationService.isPushSupported();
       },
 
       setDeadlineReminderTiming: (minutes: number) => {
         set({ deadlineReminderTiming: minutes });
+        void persistServerNotificationPreferences({
+          deadline_reminder_timing_minutes: minutes,
+        });
       },
 
       setClassReminderTiming: (minutes: number) => {
         set({ classReminderTiming: minutes });
+        void persistServerNotificationPreferences({
+          class_reminder_timing_minutes: minutes,
+        });
       },
 
       setEventReminderTiming: (minutes: number) => {
         set({ eventReminderTiming: minutes });
+        void persistServerNotificationPreferences({
+          event_reminder_timing_minutes: minutes,
+        });
       },
 
       scheduleDeadlineReminder: (

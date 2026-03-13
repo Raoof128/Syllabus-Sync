@@ -25,10 +25,10 @@ const mockStore = {
   eventReminderTiming: 60,
   initialize: vi.fn(),
   requestPermission: vi.fn().mockResolvedValue('granted'),
+  setPushEnabled: vi.fn().mockResolvedValue(true),
   setDeadlinesEnabled: vi.fn(),
   setClassesEnabled: vi.fn(),
   setEventsEnabled: vi.fn(),
-  setPushEnabled: vi.fn(),
   setDeadlineReminderTiming: vi.fn(),
   setClassReminderTiming: vi.fn(),
   setEventReminderTiming: vi.fn(),
@@ -176,12 +176,12 @@ describe('NotificationSettings', () => {
     expect(screen.getByTestId('enable-notifications-button')).toBeInTheDocument();
   });
 
-  it('calls requestPermission when enable button is clicked', async () => {
+  it('calls setPushEnabled when enable button is clicked', async () => {
     render(<NotificationSettings {...defaultProps} />);
 
     fireEvent.click(screen.getByTestId('enable-notifications-button'));
     await waitFor(() => {
-      expect(mockStore.requestPermission).toHaveBeenCalled();
+      expect(mockStore.setPushEnabled).toHaveBeenCalledWith(true);
     });
   });
 
