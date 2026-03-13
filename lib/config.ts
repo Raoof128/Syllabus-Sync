@@ -80,7 +80,7 @@ export const SOCIAL_LINKS = {
  * External Links
  */
 export const EXTERNAL_LINKS = {
-  documentation: 'https://github.com/mrpouyaalavi',
+  documentation: UNIVERSITY_CONFIG.website,
   feedback: 'mailto:support@mq.edu.au?subject=Syllabus Sync Feedback',
   privacy: '/privacy',
   terms: '/terms',
