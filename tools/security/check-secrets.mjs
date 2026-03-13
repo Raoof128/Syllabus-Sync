@@ -46,6 +46,18 @@ const SECRET_PATTERNS = [
     name: "private_key_block",
     regex: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/g,
   },
+  {
+    name: "google_api_key",
+    regex: /\bAIza[0-9A-Za-z\-_]{35}\b/g,
+  },
+  {
+    name: "vapid_private_key",
+    regex: /VAPID_PRIVATE_KEY\s*[:=]\s*['"][^'"\n]{20,}['"]/g,
+  },
+  {
+    name: "ors_api_key",
+    regex: /ORS_API_KEY\s*[:=]\s*['"][^'"\n]{16,}['"]/g,
+  },
 ];
 
 const ALLOWLIST_MARKERS = [

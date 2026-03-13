@@ -119,6 +119,9 @@ export async function POST(request: Request) {
 
     const { type, table, recordId, data, clientVersion } = validation.data;
     const forceVersion = data?._forceVersion === true;
+    if (forceVersion) {
+      logger.warn(`Sync forceVersion used by user ${user.id} on ${table}:${recordId}`);
+    }
 
     // ========================================================================
     // CHECK PERMISSIONS (for shared schedules)
@@ -193,11 +196,12 @@ export async function POST(request: Request) {
         return jsonError('Data required for UPDATE', 400);
       }
 
-      // Fetch current server version
+      // Fetch current server version — SECURITY: scope by user_id to prevent IDOR
       const { data: current, error: fetchError } = await supabase
         .from(table)
         .select('*')
         .eq('id', recordId)
+        .eq('user_id', user.id)
         .maybeSingle();
 
       if (fetchError || !current) {
@@ -236,6 +240,7 @@ export async function POST(request: Request) {
         .from(table)
         .update(updatePayload)
         .eq('id', recordId)
+        .eq('user_id', user.id)
         .select()
         .single();
 
@@ -249,6 +254,7 @@ export async function POST(request: Request) {
 
     if (type === 'DELETE') {
       // Soft-delete: set is_deleted = true (preserve for sync)
+      // SECURITY: scope by user_id to prevent IDOR
       const { error: deleteError } = await supabase
         .from(table)
         .update({
@@ -256,7 +262,8 @@ export async function POST(request: Request) {
           deleted_at: new Date().toISOString(),
           last_modified_by: user.id,
         })
-        .eq('id', recordId);
+        .eq('id', recordId)
+        .eq('user_id', user.id);
 
       if (deleteError) {
         logger.error(`Sync DELETE error on ${table}:`, deleteError);

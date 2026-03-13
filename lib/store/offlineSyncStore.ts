@@ -198,9 +198,21 @@ export const useSyncStore = create<SyncState>()(
           }
 
           try {
+            // SECURITY: Include credentials for auth cookies and CSRF token header
+            const csrfToken =
+              typeof document !== 'undefined'
+                ? document.cookie
+                    .split('; ')
+                    .find((c) => c.startsWith('__Host-csrf='))
+                    ?.split('=')[1] || ''
+                : '';
             const response = await fetch(SYNC_API_URL, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
+              },
               body: JSON.stringify({
                 type: action.type,
                 table: action.table,

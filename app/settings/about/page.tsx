@@ -1,18 +1,11 @@
-'use client';
+import type { Metadata } from 'next';
+import { AboutSettingsContent } from './AboutSettingsContent';
 
-import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
-import { AboutSettings } from '@/features/settings/components';
+export const metadata: Metadata = {
+  title: 'About | Syllabus Sync',
+  description: 'About Syllabus Sync application',
+};
 
 export default function AboutSettingsPage() {
-  const { t } = useTypedTranslation();
-
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="grid grid-cols-1 gap-4 sm:gap-6">
-        <div className="transform transition-all duration-300 hover:-translate-y-1 hover:shadow-mq-lg rounded-xl">
-          <AboutSettings t={t} />
-        </div>
-      </div>
-    </div>
-  );
+  return <AboutSettingsContent />;
 }

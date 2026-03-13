@@ -43,7 +43,10 @@ function isPublicApiPath(path: string): boolean {
     path.startsWith('/api/auth/') ||
     path.startsWith('/api/health') ||
     path.startsWith('/api/maps/') ||
-    path.startsWith('/api/weather')
+    path.startsWith('/api/weather') ||
+    path.startsWith('/api/cron/') ||
+    path.startsWith('/api/security/rate-limit/cleanup') ||
+    path.startsWith('/api/csp-report')
   );
 }
 

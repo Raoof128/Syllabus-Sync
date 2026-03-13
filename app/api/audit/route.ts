@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
-import { jsonError, ERROR_CODES } from '@/app/api/_lib/response';
+import { jsonError, parseJsonBody, BODY_SIZE_LIMITS, ERROR_CODES } from '@/app/api/_lib/response';
 import { requireAuth } from '@/app/api/_lib/middleware';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
@@ -147,8 +147,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   return requireAuth(request, async (userId: string) => {
     try {
-      const body = await request.json();
-      const { action, tableName, recordId, oldData, newData, severity, metadata } = body;
+      // SECURITY: Use parseJsonBody with size limit instead of raw request.json()
+      const { data: body, error: bodyError } = await parseJsonBody(
+        request,
+        BODY_SIZE_LIMITS.DEFAULT,
+      );
+      if (bodyError) return bodyError;
+      const { action, tableName, recordId, oldData, newData, severity, metadata } = body as Record<
+        string,
+        unknown
+      >;
 
       // Validate required fields
       if (!action) {
@@ -182,13 +190,13 @@ export async function POST(request: NextRequest) {
         'SUSPICIOUS_ACTIVITY',
       ];
 
-      if (!validActions.includes(action)) {
+      if (!validActions.includes(action as string)) {
         return jsonError('Invalid action', 400, ERROR_CODES.BAD_REQUEST);
       }
 
       // Validate severity
       const validSeverities = ['info', 'warning', 'critical'];
-      const finalSeverity = severity || 'info';
+      const finalSeverity = (severity as string) || 'info';
       if (!validSeverities.includes(finalSeverity)) {
         return jsonError('Invalid severity', 400, ERROR_CODES.BAD_REQUEST);
       }

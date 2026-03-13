@@ -1,3 +1,36 @@
+### Raouf: Full Production Readiness Audit — 2026-03-14
+
+**Scope:** Fix all critical and warning findings from a 7-domain production readiness audit.
+
+1. **IDOR fix in `/api/sync`** — added `.eq('user_id', user.id)` to UPDATE and DELETE queries to prevent cross-user record modification
+2. **Cron job fix** — added `/api/cron/`, `/api/security/rate-limit/cleanup`, and `/api/csp-report` to `isPublicApiPath()` in `lib/proxy.ts` so unauthenticated cron/reporting requests reach their handlers
+3. **Auth validation fix** — replaced `getSession()` with `getUser()` in `lib/supabase/middleware.ts` for server-side JWT validation (prevents tampered cookie bypass)
+4. **Offline sync fix** — added `credentials: 'include'` and CSRF token header to `offlineSyncStore.ts` fetch calls
+5. **Audit POST body limit** — replaced raw `request.json()` with `parseJsonBody()` + size limit
+6. **Navigate CSRF** — added `validateOrigin()` check to `/api/navigate` POST handler
+7. **Profiles/Preferences CSRF** — refactored both routes to use `requireAuth`/`requireAuthWithRateLimit` for consistent CSRF origin validation
+8. **Error message leak** — profiles PUT no longer exposes internal Supabase error messages to client
+9. **Sentry condition** — changed enablement from `SENTRY_AUTH_TOKEN` to `NEXT_PUBLIC_SENTRY_DSN` (error capture vs source map upload)
+10. **Sentry environment** — all 3 configs now use `VERCEL_ENV ?? NODE_ENV` to correctly tag preview vs production
+11. **CORP header** — changed from `same-site` to `cross-origin` to avoid breaking third-party integrations
+12. **IP anomaly detection** — added production guard against plaintext HTTP calls and explicit stub warnings
+13. **Settings metadata** — converted 5 settings pages from `'use client'` to server components with metadata export
+14. **Error boundaries** — added `error.tsx` for `/calendar`, `/map`, `/feed` routes
+15. **Loading state** — added `loading.tsx` for `/settings` sub-routes
+16. **SSR guard** — fixed `FeedClient.tsx` portal to check `typeof document`
+17. **Profile delete rollback** — `deleteProfile` now restores local state on API failure
+18. **CI build env** — added placeholder `NEXT_PUBLIC_*` vars to CI build step
+19. **Branch protection** — populated `contexts` array with CI job names
+20. **Secrets scanner** — added patterns for Google API keys (`AIza*`), VAPID private keys, ORS keys
+21. **Dependencies** — moved `@types/react-window` and `@types/zxcvbn` to devDependencies
+22. **forceVersion audit** — added warning log when `_forceVersion` is used in sync
+
+**Verification:**
+
+- `npx tsc --noEmit` ✅
+- `npm run test` ✅ (91 files, 848/848 tests)
+- `npm run build` ✅
+
 ### Raouf: Make Lighthouse CI Advisory — 2026-03-13
 
 **Scope:** Prevent flaky headless Lighthouse failures from blocking the full CI pipeline.

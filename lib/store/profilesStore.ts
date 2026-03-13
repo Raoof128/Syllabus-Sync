@@ -276,6 +276,10 @@ export const useProfilesStore = create<ProfilesState>()(
         // Check if this is the current (authenticated) profile BEFORE updating state
         const isCurrentProfile = get().currentProfileId === id;
 
+        // Save state for rollback on API failure
+        const previousProfiles = get().profiles;
+        const previousCurrentProfileId = get().currentProfileId;
+
         set((state) => {
           const newProfiles = state.profiles.filter((p) => p.id !== id);
           const newCurrentProfileId = state.currentProfileId === id ? null : state.currentProfileId;
@@ -293,6 +297,11 @@ export const useProfilesStore = create<ProfilesState>()(
             method: 'DELETE',
           });
         } catch (error) {
+          // Rollback local state on API failure
+          set({
+            profiles: previousProfiles,
+            currentProfileId: previousCurrentProfileId,
+          });
           errorHandler.logError(
             error instanceof Error ? error : new Error('Failed to delete profile'),
             'ProfilesStore.deleteProfile',

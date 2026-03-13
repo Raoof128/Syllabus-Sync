@@ -7,6 +7,14 @@ vi.mock('@/lib/supabase/server', () => ({
   createServerClient: () => createServerClientMock(),
 }));
 
+// Mock requireAuthWithRateLimit to pass through to handler with userId
+vi.mock('@/app/api/_lib/middleware', () => ({
+  requireAuth: (_request: Request, handler: (userId: string) => Promise<Response>) =>
+    handler('user-1'),
+  requireAuthWithRateLimit: (_request: Request, handler: (userId: string) => Promise<Response>) =>
+    handler('user-1'),
+}));
+
 type UpdateResult = {
   data: Record<string, unknown> | null;
   error: { message?: string } | null;
@@ -48,12 +56,6 @@ describe('profiles API route', () => {
     });
 
     createServerClientMock.mockResolvedValue({
-      auth: {
-        getUser: vi.fn().mockResolvedValue({
-          data: { user: { id: 'user-1' } },
-          error: null,
-        }),
-      },
       from: vi.fn(() => profilesTable),
     });
 
@@ -87,12 +89,6 @@ describe('profiles API route', () => {
     });
 
     createServerClientMock.mockResolvedValue({
-      auth: {
-        getUser: vi.fn().mockResolvedValue({
-          data: { user: { id: 'user-1' } },
-          error: null,
-        }),
-      },
       from: vi.fn(() => profilesTable),
     });
 

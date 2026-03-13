@@ -8,7 +8,8 @@ const bundleAnalyzer = withBundleAnalyzer({
 });
 
 const isProduction = process.env.NODE_ENV === 'production';
-const sentryEnabled = isProduction && Boolean(process.env.SENTRY_AUTH_TOKEN);
+// SECURITY: Gate Sentry on DSN (runtime error capture), not AUTH_TOKEN (source map upload only)
+const sentryEnabled = isProduction && Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN);
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -120,8 +121,8 @@ const nextConfig: NextConfig = {
           { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
           // Indicate this is not an Electron/webview app
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-          // Allow same-site cross-origin resources (Supabase, CDNs)
-          { key: 'Cross-Origin-Resource-Policy', value: 'same-site' },
+          // Allow cross-origin resources for APIs (Supabase, Google Maps, CDNs)
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
         ],
       },
     ];
@@ -145,8 +146,8 @@ const sentryOptions = {
   automaticVercelMonitors: true,
   // Source map configuration
   sourcemaps: {
-    // Disable source map upload if no auth token is configured
-    disable: !sentryEnabled,
+    // Disable source map upload if no auth token — separate from error capture
+    disable: !Boolean(process.env.SENTRY_AUTH_TOKEN),
   },
 };
 

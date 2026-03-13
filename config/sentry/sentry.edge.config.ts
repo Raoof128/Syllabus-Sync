@@ -22,7 +22,7 @@ if (sentryEnabled) {
         debug: false,
 
         // Environment tagging
-        environment: process.env.NODE_ENV || 'development',
+        environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'development',
 
         // Only send errors in production (unless explicitly enabled)
         enabled: process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true',

@@ -6,7 +6,13 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 
 vi.mock('@/lib/utils/api', () => ({
-  apiRequest: vi.fn().mockRejectedValue(new Error('401: authentication required')),
+  apiRequest: vi.fn().mockImplementation((_url: string, options?: { method?: string }) => {
+    // DELETE succeeds (for deleteProfile tests), other calls fail as before
+    if (options?.method === 'DELETE') {
+      return Promise.resolve({ id: 'test' });
+    }
+    return Promise.reject(new Error('401: authentication required'));
+  }),
 }));
 
 vi.mock('@/lib/utils/errorHandling', () => ({

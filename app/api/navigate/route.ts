@@ -3,6 +3,7 @@ import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { parseJsonBody } from '@/app/api/_lib/middleware';
+import { validateOrigin } from '@/lib/security/csrf';
 import { createHash } from 'crypto';
 import { logger } from '@/lib/logger';
 import { GPS_CAMPUS_BOUNDS } from '@/features/map/lib/constants';
@@ -233,6 +234,12 @@ function generateDemoRoute(start: { lat: number; lng: number }, end: { lat: numb
 }
 
 export async function POST(request: NextRequest) {
+  // SECURITY: Validate origin for CSRF protection on mutation requests
+  const originResult = validateOrigin(request);
+  if (!originResult.valid) {
+    return jsonError('Invalid request origin', 403, ERROR_CODES.FORBIDDEN);
+  }
+
   // SECURITY: Use shared IP extraction utility for consistent, secure IP handling
   const clientIP = getClientIP(request);
   const clientId = `ip:${clientIP}`;

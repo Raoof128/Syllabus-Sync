@@ -1,16 +1,11 @@
-"use client";
+import type { Metadata } from 'next';
+import { PrivacySettingsPage } from './PrivacySettingsPage';
 
-import { useTypedTranslation } from "@/lib/hooks/useTypedTranslation";
-import { PrivacySettings } from "@/features/settings/components";
+export const metadata: Metadata = {
+  title: 'Privacy & Security Settings | Syllabus Sync',
+  description: 'Manage your privacy and security preferences',
+};
 
-export default function SecuritySettingsPage() {
-  const { t, language } = useTypedTranslation();
-
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="transform transition-all duration-300 hover:-translate-y-1 hover:shadow-mq-lg rounded-xl">
-        <PrivacySettings t={t} language={language} />
-      </div>
-    </div>
-  );
+export default function SecuritySettingsPageWrapper() {
+  return <PrivacySettingsPage />;
 }

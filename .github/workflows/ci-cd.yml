@@ -103,6 +103,11 @@ jobs:
         run: npm ci
 
       - name: Build for production
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder
+          NEXT_PUBLIC_APP_URL: https://ci-build.example.com
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: BPlaceholder
         run: npm run build
 
       - name: Upload build artifacts

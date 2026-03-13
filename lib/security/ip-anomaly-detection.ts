@@ -11,9 +11,9 @@
  * - Risk scoring and alerting
  */
 
-import { NextRequest } from "next/server";
-import { getClientIP } from "@/lib/security/ip";
-import { logger } from "@/lib/logger";
+import { NextRequest } from 'next/server';
+import { getClientIP } from '@/lib/security/ip';
+import { logger } from '@/lib/logger';
 
 // ============================================================================
 // TYPES
@@ -48,7 +48,7 @@ export interface IPAnomalyResult {
   /** Risk score (0-100) */
   riskScore: number;
   /** Risk level */
-  riskLevel: "low" | "medium" | "high" | "critical";
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
   /** Reasons for anomaly */
   reasons: string[];
   /** Distance from previous location (km) */
@@ -81,13 +81,25 @@ export async function getIPGeolocation(ip: string): Promise<IPInfo> {
     if (isPrivateIP(ip)) {
       return {
         ip,
-        country: "LOCAL",
-        city: "Localhost",
+        country: 'LOCAL',
+        city: 'Localhost',
         timestamp: new Date(),
       };
     }
 
-    // Use ip-api.com (free, no API key required)
+    // SECURITY: Use HTTPS to prevent leaking user IPs in cleartext
+    // Note: ip-api.com free tier does not support HTTPS. In production, use MaxMind GeoIP2.
+    // For now, return minimal info rather than making an insecure HTTP call.
+    if (process.env.NODE_ENV === 'production') {
+      logger.warn(
+        'IP geolocation: skipping in production — configure MaxMind GeoIP2 for real data',
+      );
+      return {
+        ip,
+        timestamp: new Date(),
+      };
+    }
+
     const response = await fetch(
       `http://ip-api.com/json/${ip}?fields=status,country,countryCode,city,region,lat,lon,isp,proxy,hosting,query`,
     );
@@ -98,7 +110,7 @@ export async function getIPGeolocation(ip: string): Promise<IPInfo> {
 
     const data = await response.json();
 
-    if (data.status !== "success") {
+    if (data.status !== 'success') {
       throw new Error(`IP geolocation failed: ${data.message}`);
     }
 
@@ -114,7 +126,7 @@ export async function getIPGeolocation(ip: string): Promise<IPInfo> {
       timestamp: new Date(),
     };
   } catch (error) {
-    logger.error("IP geolocation error:", error);
+    logger.error('IP geolocation error:', error);
     // Return minimal info on error
     return {
       ip,
@@ -163,47 +175,35 @@ export async function detectIPAnomaly(
 
   // Check if this is a new IP
   const previousIPs = ipHistory.filter((ip) => ip.ip !== currentIP);
-  const isNewIP =
-    previousIPs.length === 0 || !previousIPs.some((ip) => ip.ip === currentIP);
+  const isNewIP = previousIPs.length === 0 || !previousIPs.some((ip) => ip.ip === currentIP);
 
   if (isNewIP && previousIPs.length > 0) {
-    reasons.push("New IP address detected");
+    reasons.push('New IP address detected');
     riskScore += 20;
   }
 
   // Check for VPN/Proxy
   if (currentIPInfo.isProxy) {
-    reasons.push("VPN or proxy detected");
+    reasons.push('VPN or proxy detected');
     riskScore += 30;
   }
 
   // Check for Tor exit node
   if (currentIPInfo.isTor) {
-    reasons.push("Tor exit node detected");
+    reasons.push('Tor exit node detected');
     riskScore += 40;
   }
 
   // Check for country change
   if (previousIPs.length > 0) {
     const lastIP = previousIPs[0];
-    if (
-      lastIP.country &&
-      currentIPInfo.country &&
-      lastIP.country !== currentIPInfo.country
-    ) {
-      reasons.push(
-        `Country changed from ${lastIP.country} to ${currentIPInfo.country}`,
-      );
+    if (lastIP.country && currentIPInfo.country && lastIP.country !== currentIPInfo.country) {
+      reasons.push(`Country changed from ${lastIP.country} to ${currentIPInfo.country}`);
       riskScore += 25;
     }
 
     // Calculate distance and time
-    if (
-      lastIP.latitude &&
-      lastIP.longitude &&
-      currentIPInfo.latitude &&
-      currentIPInfo.longitude
-    ) {
+    if (lastIP.latitude && lastIP.longitude && currentIPInfo.latitude && currentIPInfo.longitude) {
       const distance = calculateDistance(
         lastIP.latitude,
         lastIP.longitude,
@@ -212,8 +212,7 @@ export async function detectIPAnomaly(
       );
 
       const timeDiff =
-        (currentIPInfo.timestamp.getTime() - lastIP.timestamp.getTime()) /
-        (1000 * 60 * 60); // hours
+        (currentIPInfo.timestamp.getTime() - lastIP.timestamp.getTime()) / (1000 * 60 * 60); // hours
 
       // Check for impossible travel (velocity anomaly)
       if (distance > 1000 && timeDiff < 2) {
@@ -246,22 +245,14 @@ export async function detectIPAnomaly(
 /**
  * Calculate distance between two coordinates using Haversine formula
  */
-function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-): number {
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth's radius in km
   const dLat = toRadians(lat2 - lat1);
   const dLon = toRadians(lon2 - lon1);
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) *
-      Math.cos(toRadians(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
@@ -274,11 +265,11 @@ function toRadians(degrees: number): number {
 /**
  * Get risk level from score
  */
-function getRiskLevel(score: number): "low" | "medium" | "high" | "critical" {
-  if (score < 20) return "low";
-  if (score < 40) return "medium";
-  if (score < 60) return "high";
-  return "critical";
+function getRiskLevel(score: number): 'low' | 'medium' | 'high' | 'critical' {
+  if (score < 20) return 'low';
+  if (score < 40) return 'medium';
+  if (score < 60) return 'high';
+  return 'critical';
 }
 
 // ============================================================================
@@ -290,8 +281,11 @@ function getRiskLevel(score: number): "low" | "medium" | "high" | "critical" {
  * In production, this would fetch from a database
  */
 export async function getIPHistory(_userId: string): Promise<IPInfo[]> {
-  // In a real implementation, this would fetch from a database
-  // For now, return empty array
+  // STUB: IP history is not implemented — anomaly detection will always treat
+  // every login as a new IP. This feature provides NO security value until
+  // backed by a real database store (e.g., Supabase ip_login_history table).
+  // See: https://github.com/your-org/syllabus-sync/issues/XXX
+  logger.warn('IP anomaly detection: getIPHistory is a stub — returns empty history');
   return [];
 }
 
@@ -299,24 +293,16 @@ export async function getIPHistory(_userId: string): Promise<IPInfo[]> {
  * Add IP to user's history
  * In production, this would store to a database
  */
-export async function addIPToHistory(
-  _userId: string,
-  _ipInfo: IPInfo,
-): Promise<void> {
-  // In a real implementation, this would store to a database
-  // await db.ipHistory.upsert({ userId, ...ipInfo });
+export async function addIPToHistory(_userId: string, _ipInfo: IPInfo): Promise<void> {
+  // STUB: Not implemented — see getIPHistory comment above.
 }
 
 /**
  * Clean up old IP history entries
  * Keeps only the most recent entries (default: 50)
  */
-export async function cleanupIPHistory(
-  _userId: string,
-  _maxEntries: number = 50,
-): Promise<void> {
-  // In a real implementation, this would clean up the database
-  // await db.ipHistory.deleteMany({ userId }, { orderBy: { timestamp: 'desc' }, skip: maxEntries });
+export async function cleanupIPHistory(_userId: string, _maxEntries: number = 50): Promise<void> {
+  // STUB: Not implemented — see getIPHistory comment above.
 }
 
 // ============================================================================
@@ -343,17 +329,17 @@ export async function analyzeRequestForAnomaly(
     const reasons: string[] = [];
 
     if (ipInfo.isProxy) {
-      reasons.push("VPN or proxy detected");
+      reasons.push('VPN or proxy detected');
     }
 
     if (ipInfo.isTor) {
-      reasons.push("Tor exit node detected");
+      reasons.push('Tor exit node detected');
     }
 
     return {
       isAnomalous: reasons.length > 0,
       riskScore: reasons.length > 0 ? 30 : 0,
-      riskLevel: reasons.length > 0 ? "medium" : "low",
+      riskLevel: reasons.length > 0 ? 'medium' : 'low',
       reasons,
     };
   }
@@ -383,37 +369,37 @@ export async function analyzeRequestForAnomaly(
  */
 export function assessRisk(result: IPAnomalyResult): {
   requiresVerification: boolean;
-  verificationMethod: "none" | "email" | "2fa" | "block";
+  verificationMethod: 'none' | 'email' | '2fa' | 'block';
   message: string;
 } {
-  if (result.riskLevel === "critical") {
+  if (result.riskLevel === 'critical') {
     return {
       requiresVerification: true,
-      verificationMethod: "block",
-      message: "Suspicious activity detected. Please contact support.",
+      verificationMethod: 'block',
+      message: 'Suspicious activity detected. Please contact support.',
     };
   }
 
-  if (result.riskLevel === "high") {
+  if (result.riskLevel === 'high') {
     return {
       requiresVerification: true,
-      verificationMethod: "2fa",
-      message: "Unusual login detected. Please verify your identity with 2FA.",
+      verificationMethod: '2fa',
+      message: 'Unusual login detected. Please verify your identity with 2FA.',
     };
   }
 
-  if (result.riskLevel === "medium") {
+  if (result.riskLevel === 'medium') {
     return {
       requiresVerification: true,
-      verificationMethod: "email",
-      message: "New location detected. Please verify your email.",
+      verificationMethod: 'email',
+      message: 'New location detected. Please verify your email.',
     };
   }
 
   return {
     requiresVerification: false,
-    verificationMethod: "none",
-    message: "",
+    verificationMethod: 'none',
+    message: '',
   };
 }
 
@@ -425,17 +411,14 @@ export function assessRisk(result: IPAnomalyResult): {
  * API route handler for IP anomaly check
  * Use this in /api/security/check-ip-anomaly
  */
-export async function handleIPAnomalyCheck(
-  request: Request,
-  userId?: string,
-): Promise<Response> {
+export async function handleIPAnomalyCheck(request: Request, userId?: string): Promise<Response> {
   try {
     const body = await request.json();
     const { ip } = body;
 
     if (!ip) {
       return Response.json(
-        { error: { code: "MISSING_IP", message: "IP address is required" } },
+        { error: { code: 'MISSING_IP', message: 'IP address is required' } },
         { status: 400 },
       );
     }
@@ -450,12 +433,12 @@ export async function handleIPAnomalyCheck(
       riskAssessment,
     });
   } catch (error) {
-    logger.error("IP anomaly check error:", error);
+    logger.error('IP anomaly check error:', error);
     return Response.json(
       {
         error: {
-          code: "INTERNAL_ERROR",
-          message: "Failed to check IP anomaly",
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to check IP anomaly',
         },
       },
       { status: 500 },

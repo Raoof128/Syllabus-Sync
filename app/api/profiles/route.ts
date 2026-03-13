@@ -7,12 +7,11 @@ import { createServerClient } from '@/lib/supabase/server';
 import {
   jsonSuccess,
   jsonError,
-  jsonUnauthorized,
   parseJsonBody,
   BODY_SIZE_LIMITS,
   ERROR_CODES,
 } from '@/app/api/_lib/response';
-import { mutationLimiter } from '@/lib/services/rateLimitService';
+import { requireAuth, requireAuthWithRateLimit } from '@/app/api/_lib/middleware';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -33,60 +32,57 @@ const UpdateProfileSchema = z.object({
 // GET /api/profiles - Get current user's profile
 // ============================================================================
 
-export async function GET() {
-  try {
-    const supabase = await createServerClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+export async function GET(request: Request) {
+  return requireAuth(request, async (userId: string) => {
+    try {
+      const supabase = await createServerClient();
 
-    if (authError || !user) {
-      return jsonUnauthorized('Not authenticated');
-    }
+      // Get profile data
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    // Get profile data
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+      if (profileError) {
+        // PGRST116 is "not found" - profile may not exist yet
+        // Auto-create profile for authenticated users who don't have one
+        if (profileError.code === 'PGRST116') {
+          logger.warn('Profile not found, auto-creating for user:', userId);
 
-    if (profileError) {
-      // PGRST116 is "not found" - profile may not exist yet
-      // Auto-create profile for authenticated users who don't have one
-      if (profileError.code === 'PGRST116') {
-        console.warn('Profile not found, auto-creating for user:', user.id);
+          const { data: userData } = await supabase.auth.getUser();
+          const user = userData?.user;
 
-        // Create profile from user metadata
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-            student_id: user.user_metadata?.student_id || null,
-          })
-          .select()
-          .single();
+          // Create profile from user metadata
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              id: userId,
+              email: user?.email,
+              full_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User',
+              student_id: user?.user_metadata?.student_id || null,
+            })
+            .select()
+            .single();
 
-        if (createError) {
-          logger.error('Auto-create profile failed:', createError);
-          // Return null instead of erroring - let client handle it
-          return jsonSuccess(null);
+          if (createError) {
+            logger.error('Auto-create profile failed:', createError);
+            // Return null instead of erroring - let client handle it
+            return jsonSuccess(null);
+          }
+
+          return jsonSuccess(newProfile);
         }
-
-        return jsonSuccess(newProfile);
+        logger.error('Profile fetch error:', profileError);
+        return jsonError('Failed to fetch profile', 500);
       }
-      logger.error('Profile fetch error:', profileError);
-      return jsonError('Failed to fetch profile', 500);
-    }
 
-    return jsonSuccess(profile);
-  } catch (error) {
-    logger.error('Profile GET error:', error);
-    return jsonError('Internal server error', 500);
-  }
+      return jsonSuccess(profile);
+    } catch (error) {
+      logger.error('Profile GET error:', error);
+      return jsonError('Internal server error', 500);
+    }
+  });
 }
 
 // ============================================================================
@@ -94,123 +90,92 @@ export async function GET() {
 // ============================================================================
 
 export async function PUT(request: Request) {
-  try {
-    const supabase = await createServerClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+  return requireAuthWithRateLimit(
+    request,
+    async (userId: string) => {
+      try {
+        const supabase = await createServerClient();
 
-    if (authError || !user) {
-      return jsonUnauthorized('Not authenticated');
-    }
+        // Parse and validate request body
+        const { data: body, error: parseError } = await parseJsonBody(
+          request,
+          BODY_SIZE_LIMITS.DEFAULT,
+        );
+        if (parseError) return parseError;
 
-    // SECURITY: Rate limit profile mutations
-    const rateLimitResult = await mutationLimiter(`user:${user.id}:profiles`);
-    if (!rateLimitResult.allowed) {
-      return jsonError(
-        `Rate limit exceeded. Try again in ${rateLimitResult.resetIn} seconds.`,
-        429,
-        ERROR_CODES.RATE_LIMITED,
-      );
-    }
+        const validation = UpdateProfileSchema.safeParse(body);
+        if (!validation.success) {
+          logger.error(
+            'Profile validation failed:',
+            JSON.stringify(validation.error.flatten().fieldErrors),
+          );
+          return jsonError('Invalid profile data', 400, 'VALIDATION_ERROR', {
+            errors: validation.error.flatten().fieldErrors,
+          });
+        }
 
-    // Parse and validate request body
-    const { data: body, error: parseError } = await parseJsonBody(
-      request,
-      BODY_SIZE_LIMITS.DEFAULT,
-    );
-    if (parseError) return parseError;
+        const updates = validation.data;
+        const updatePayload: Record<string, string | null> = {
+          updated_at: new Date().toISOString(),
+        };
+        if ('full_name' in updates) updatePayload.full_name = updates.full_name ?? null;
+        if ('student_id' in updates) updatePayload.student_id = updates.student_id ?? null;
+        if ('faculty' in updates) updatePayload.faculty = updates.faculty ?? null;
+        if ('course' in updates) updatePayload.course = updates.course ?? null;
+        if ('year' in updates) updatePayload.year = updates.year ?? null;
+        if ('avatar_url' in updates) updatePayload.avatar_url = updates.avatar_url ?? null;
 
-    const validation = UpdateProfileSchema.safeParse(body);
-    if (!validation.success) {
-      logger.error(
-        'Profile validation failed:',
-        JSON.stringify(validation.error.flatten().fieldErrors),
-      );
-      logger.error('Profile body was:', JSON.stringify(body));
-      return jsonError('Invalid profile data', 400, 'VALIDATION_ERROR', {
-        errors: validation.error.flatten().fieldErrors,
-      });
-    }
+        // SECURITY: Only allow updating safe fields
+        const { data: profile, error: updateError } = await supabase
+          .from('profiles')
+          .update(updatePayload)
+          .eq('id', userId)
+          .select()
+          .single();
 
-    const updates = validation.data;
-    const updatePayload: Record<string, string | null> = {
-      updated_at: new Date().toISOString(),
-    };
-    if ('full_name' in updates) updatePayload.full_name = updates.full_name ?? null;
-    if ('student_id' in updates) updatePayload.student_id = updates.student_id ?? null;
-    if ('faculty' in updates) updatePayload.faculty = updates.faculty ?? null;
-    if ('course' in updates) updatePayload.course = updates.course ?? null;
-    if ('year' in updates) updatePayload.year = updates.year ?? null;
-    if ('avatar_url' in updates) updatePayload.avatar_url = updates.avatar_url ?? null;
+        if (updateError) {
+          logger.error('Profile update error:', updateError.code, updateError.details);
+          if (updateError.message?.includes('Cannot modify')) {
+            return jsonError('Cannot modify protected fields', 403);
+          }
+          // SECURITY: Don't leak internal error messages to client
+          return jsonError('Failed to update profile', 500, ERROR_CODES.DATABASE_ERROR);
+        }
 
-    // SECURITY: Only allow updating safe fields (full_name, student_id, faculty, course, year, avatar_url)
-    // email is protected by DB trigger (cannot be changed)
-    const { data: profile, error: updateError } = await supabase
-      .from('profiles')
-      .update(updatePayload)
-      .eq('id', user.id)
-      .select()
-      .single();
-
-    if (updateError) {
-      logger.error(
-        'Profile update error:',
-        updateError.message,
-        updateError.code,
-        updateError.details,
-      );
-      // Check for protected field modification
-      if (updateError.message?.includes('Cannot modify')) {
-        return jsonError('Cannot modify protected fields', 403);
+        return jsonSuccess(profile);
+      } catch (error) {
+        logger.error('Profile PUT error:', error);
+        return jsonError('Internal server error', 500);
       }
-      return jsonError(`Failed to update profile: ${updateError.message}`, 500);
-    }
-
-    return jsonSuccess(profile);
-  } catch (error) {
-    logger.error('Profile PUT error:', error);
-    return jsonError('Internal server error', 500);
-  }
+    },
+    'profiles',
+  );
 }
 
 // ============================================================================
 // DELETE /api/profiles - Delete current user's profile
 // ============================================================================
 
-export async function DELETE() {
-  try {
-    const supabase = await createServerClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+export async function DELETE(request: Request) {
+  return requireAuthWithRateLimit(
+    request,
+    async (userId: string) => {
+      try {
+        const supabase = await createServerClient();
 
-    if (authError || !user) {
-      return jsonUnauthorized('Not authenticated');
-    }
+        const { error } = await supabase.from('profiles').delete().eq('id', userId);
+        if (error) {
+          return jsonError('Failed to delete profile', 500);
+        }
 
-    // SECURITY: Rate limit profile mutations
-    const rateLimitResult = await mutationLimiter(`user:${user.id}:profiles`);
-    if (!rateLimitResult.allowed) {
-      return jsonError(
-        `Rate limit exceeded. Try again in ${rateLimitResult.resetIn} seconds.`,
-        429,
-        ERROR_CODES.RATE_LIMITED,
-      );
-    }
+        await supabase.from('user_preferences').delete().eq('user_id', userId);
 
-    const { error } = await supabase.from('profiles').delete().eq('id', user.id);
-    if (error) {
-      return jsonError('Failed to delete profile', 500);
-    }
-
-    await supabase.from('user_preferences').delete().eq('user_id', user.id);
-
-    return jsonSuccess({ id: user.id });
-  } catch (error) {
-    logger.error('Profile DELETE error:', error);
-    return jsonError('Internal server error', 500);
-  }
+        return jsonSuccess({ id: userId });
+      } catch (error) {
+        logger.error('Profile DELETE error:', error);
+        return jsonError('Internal server error', 500);
+      }
+    },
+    'profiles',
+  );
 }

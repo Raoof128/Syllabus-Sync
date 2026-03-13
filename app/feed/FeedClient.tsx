@@ -261,7 +261,7 @@ const FeedClient = memo(() => {
               </div>
             </div>
           </div>,
-          document.body,
+          typeof document === 'undefined' ? null! : document.body,
         )}
     </section>
   );
