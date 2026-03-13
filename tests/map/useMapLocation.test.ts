@@ -290,7 +290,7 @@ describe('useMapLocation', () => {
     expect(errorHandler.logError).toHaveBeenCalled();
     expect(toastUtils.warning).toHaveBeenCalledWith(
       'Location Not Available',
-      'Please wait for your location to be found.',
+      'Waiting for location',
     );
 
     unmount();
