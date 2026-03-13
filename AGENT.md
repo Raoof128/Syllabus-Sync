@@ -1,4 +1,11 @@
 Raouf: 2026-03-13 (Australia/Sydney)
+Scope: Push Notifications Test Audit — Missing DB Column Recovery
+Summary: While running a live end-to-end push-notification smoke test against the repaired Supabase environment, the test failed before delivery because `user_preferences.push_notifications` was still missing from the remote schema. Verification via the service-role client showed the newer reminder-timing columns existed but `push_notifications` did not, which means the earlier `20260119000000_add_push_notifications_to_user_preferences.sql` migration had been marked as applied during migration-history repair without the underlying column actually existing. Added a corrective migration that backfills `push_notifications` with `ADD COLUMN IF NOT EXISTS ... NOT NULL DEFAULT true` plus a null-to-true data update so server-side preference writes and cron reminder selection can function again on drifted environments.
+Files Changed: `supabase/migrations/20260313120000_backfill_push_notifications_column.sql`
+Verification: service-role probe of `user_preferences` sample keys showed `deadline_notifications_enabled`/timing fields present but no `push_notifications`; original legacy migration inspected to confirm the missing DDL
+Follow-ups: Push this corrective migration remotely, then rerun the browser-based push smoke test to confirm subscription storage and cron delivery.
+
+Raouf: 2026-03-13 (Australia/Sydney)
 Scope: Supabase Shared-Event Seed Compatibility
 Summary: The next `supabase db push --yes` replay advanced into `20260108140000_add_event_date_columns.sql` and failed because that legacy migration seeds shared events with `user_id = NULL`, while the current remote schema enforces `public.events.user_id NOT NULL`. Hardened the migration by wrapping the shared-event seed in a `DO $$` guard that only runs when `public.events.user_id` is nullable. This preserves the original bootstrap behavior for early schemas while safely skipping obsolete public-event seed logic on later schemas that no longer permit null-owned events.
 Files Changed: `supabase/migrations/20260108140000_add_event_date_columns.sql`
