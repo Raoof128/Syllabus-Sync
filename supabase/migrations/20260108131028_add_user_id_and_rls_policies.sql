@@ -38,9 +38,26 @@ ALTER TABLE public.units DROP CONSTRAINT IF EXISTS units_code_key;
 DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint WHERE conname = 'units_user_code_unique'
+    SELECT 1
+    FROM pg_constraint c
+    JOIN pg_class t ON t.oid = c.conrelid
+    JOIN pg_namespace n ON n.oid = t.relnamespace
+    WHERE c.contype = 'u'
+      AND n.nspname = 'public'
+      AND t.relname = 'units'
+      AND (
+        c.conname = 'units_user_code_unique'
+        OR pg_get_constraintdef(c.oid) = 'UNIQUE (user_id, code)'
+      )
   ) THEN
-    ALTER TABLE public.units ADD CONSTRAINT units_user_code_unique UNIQUE (user_id, code);
+    BEGIN
+      ALTER TABLE public.units ADD CONSTRAINT units_user_code_unique UNIQUE (user_id, code);
+    EXCEPTION
+      WHEN duplicate_object THEN
+        NULL;
+      WHEN SQLSTATE '42P07' THEN
+        NULL;
+    END;
   END IF;
 END $$;
 
