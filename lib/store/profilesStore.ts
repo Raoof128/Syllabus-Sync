@@ -66,10 +66,11 @@ export interface ProfilesState {
   currentProfileId: string | null;
   isLoading: boolean;
   hasLoaded: boolean;
+  lastFetched: number | null;
   // Actions
   addProfile: (profile: Omit<UserProfile, 'id' | 'createdAt'>) => void;
   deleteProfile: (id: string) => Promise<void>;
-  fetchProfile: () => Promise<void>;
+  fetchProfile: (options?: { force?: boolean }) => Promise<void>;
   updateProfile: (id: string, updates: Partial<UserProfile>) => Promise<UserProfile | null>;
   setCurrentProfile: (id: string | null) => void;
   getCurrentProfile: () => UserProfile | null;
@@ -250,6 +251,7 @@ export const useProfilesStore = create<ProfilesState>()(
       currentProfileId: null,
       isLoading: false,
       hasLoaded: false,
+      lastFetched: null,
 
       /**
        * Add a local profile (used for local profile management)
@@ -310,8 +312,14 @@ export const useProfilesStore = create<ProfilesState>()(
         }
       },
 
-      fetchProfile: async () => {
+      fetchProfile: async (options) => {
         if (get().isLoading) return;
+
+        // SWR: skip fetch if data is fresh (< 60s) unless forced
+        const { lastFetched } = get();
+        if (!options?.force && lastFetched && Date.now() - lastFetched < 60_000) {
+          return;
+        }
 
         set({ isLoading: true });
         try {
@@ -354,10 +362,11 @@ export const useProfilesStore = create<ProfilesState>()(
                 profiles: newProfiles,
                 currentProfileId: dbProfile.id,
                 hasLoaded: true,
+                lastFetched: Date.now(),
               };
             });
           } else {
-            set({ hasLoaded: true });
+            set({ hasLoaded: true, lastFetched: Date.now() });
           }
         } catch (error) {
           // Silently handle API errors - keep persisted data
@@ -529,6 +538,7 @@ export const useProfilesStore = create<ProfilesState>()(
           profiles: [],
           currentProfileId: null,
           hasLoaded: false,
+          lastFetched: null,
         });
       },
 
@@ -538,6 +548,7 @@ export const useProfilesStore = create<ProfilesState>()(
           currentProfileId: null,
           hasLoaded: false,
           isLoading: false,
+          lastFetched: null,
         });
       },
     }),
