@@ -68,16 +68,22 @@ export async function GET(request: Request) {
           if (createError) {
             logger.error('Auto-create profile failed:', createError);
             // Return null instead of erroring - let client handle it
-            return jsonSuccess(null);
+            const nullResponse = jsonSuccess(null);
+            nullResponse.headers.set('Cache-Control', 'private, max-age=0, must-revalidate');
+            return nullResponse;
           }
 
-          return jsonSuccess(newProfile);
+          const newProfileResponse = jsonSuccess(newProfile);
+          newProfileResponse.headers.set('Cache-Control', 'private, max-age=0, must-revalidate');
+          return newProfileResponse;
         }
         logger.error('Profile fetch error:', profileError);
         return jsonError('Failed to fetch profile', 500);
       }
 
-      return jsonSuccess(profile);
+      const response = jsonSuccess(profile);
+      response.headers.set('Cache-Control', 'private, max-age=0, must-revalidate');
+      return response;
     } catch (error) {
       logger.error('Profile GET error:', error);
       return jsonError('Internal server error', 500);

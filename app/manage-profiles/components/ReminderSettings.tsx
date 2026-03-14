@@ -41,6 +41,7 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
       : null,
   );
   const updateProfile = useProfilesStore((state) => state.updateProfile);
+  const fetchProfile = useProfilesStore((state) => state.fetchProfile);
   const [isTogglingPreference, setIsTogglingPreference] = useState(false);
 
   // Notification Store for push/reminders
@@ -74,6 +75,9 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
       const result = await updateProfile(currentProfile.id, {
         preferences: newPreferences,
       });
+      if (result) {
+        await fetchProfile({ force: true });
+      }
       if (!result) {
         toastUtils.error(t('error'), t('failedToUpdateProfile'), {
           id: 'preference-toggle-error-toast',
