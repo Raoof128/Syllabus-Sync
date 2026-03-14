@@ -132,13 +132,23 @@ export default function LoginClient() {
       setIsSuccess(true);
       toastUtils.success(t('welcomeBack'), t('loginSuccess'));
 
-      // Full page navigation to ensure auth cookies are fully propagated
-      // and all Zustand stores reload fresh data from the API.
-      // Using window.location instead of router.push avoids race conditions
-      // where client-side navigation fires before cookies are committed.
+      // Listen for auth state change to redirect when session is fully mounted
+      const { createBrowserClient } = await import('@/lib/supabase/client');
+      const supabase = createBrowserClient();
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((event: string) => {
+        if (event === 'SIGNED_IN') {
+          subscription.unsubscribe();
+          window.location.href = redirectTo;
+        }
+      });
+
+      // Fallback: if event doesn't fire within 2s, redirect anyway
       setTimeout(() => {
+        subscription.unsubscribe();
         window.location.href = redirectTo;
-      }, 800);
+      }, 2000);
     } catch {
       setGeneralError(t('unexpectedError'));
     }
