@@ -8,6 +8,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { Event } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { v4 as uuidv4 } from 'uuid';
 let hasLoggedNetworkFallback = false;
 
@@ -257,17 +258,23 @@ export const useEventsStore = create<EventsState>()(
           events: state.events.filter((e) => e.id !== id),
         }));
 
+        // Clean up notifications referencing the deleted event (local operation)
+        const notifStore = useNotificationsStore.getState();
+        const staleNotifs = notifStore.notifications.filter((n) => n.relatedId === id);
+        for (const n of staleNotifs) {
+          notifStore.removeNotification(n.id);
+        }
+
         try {
           await apiRequest<{ id: string }>(`/api/events/${id}`, {
             method: 'DELETE',
           });
-          // SUCCESS: Delete persisted to DB
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
 
           // 404 means event doesn't exist on server - that's fine, local delete succeeded
           if (errorMessage.includes('404') || errorMessage.includes('not found')) {
-            return; // Delete successful (event was local-only or already deleted)
+            return;
           }
 
           // FAILURE: Restore the event to local state for real errors

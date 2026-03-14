@@ -3,7 +3,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
-import { Unit, Deadline, Notification } from '@/lib/types';
+import { useEventsStore } from '@/lib/store/eventsStore';
+import { Unit, Deadline, Notification, Event } from '@/lib/types';
 import { apiRequest } from '@/lib/utils/api';
 
 vi.mock('@/lib/utils/api', () => ({
@@ -211,6 +212,10 @@ describe('deadlinesStore', () => {
         const id = url.split('/').pop() as string;
         return { id };
       }
+      if (url.includes('/api/notifications/') && method === 'DELETE') {
+        const id = url.split('/').pop() as string;
+        return { id };
+      }
       throw new Error('Unhandled apiRequest call');
     });
   });
@@ -322,6 +327,39 @@ describe('deadlinesStore', () => {
     useDeadlinesStore.setState({ deadlines: urgentDeadlines });
     ({ getStressLevel } = useDeadlinesStore.getState());
     expect(getStressLevel()).toBe('High');
+  });
+
+  it('should clean up notifications when deleting a deadline', async () => {
+    const deadlineId = '11111111-1111-1111-1111-111111111111';
+    useDeadlinesStore.setState({ deadlines: [mockDeadline] });
+    useNotificationsStore.setState({
+      notifications: [
+        {
+          id: 'aaaa1111-1111-1111-1111-111111111111',
+          title: 'Deadline Reminder',
+          message: 'Due soon',
+          type: 'deadline',
+          read: false,
+          createdAt: new Date(),
+          relatedId: deadlineId,
+        },
+        {
+          id: 'bbbb2222-2222-2222-2222-222222222222',
+          title: 'Other',
+          message: 'Unrelated',
+          type: 'system',
+          read: false,
+          createdAt: new Date(),
+        },
+      ],
+    });
+
+    await useDeadlinesStore.getState().removeDeadline(deadlineId);
+
+    expect(useDeadlinesStore.getState().deadlines).toHaveLength(0);
+    const notifs = useNotificationsStore.getState().notifications;
+    expect(notifs).toHaveLength(1);
+    expect(notifs[0].id).toBe('bbbb2222-2222-2222-2222-222222222222');
   });
 });
 
@@ -452,5 +490,72 @@ describe('notificationsStore', () => {
 
     const { getUnreadCount } = useNotificationsStore.getState();
     expect(getUnreadCount()).toBe(1);
+  });
+});
+
+describe('eventsStore — notification cleanup on delete', () => {
+  const mockEvent: Event = {
+    id: 'eeee1111-1111-1111-1111-111111111111',
+    title: 'Campus Tour',
+    description: 'A campus tour',
+    category: 'Academic',
+    allDay: false,
+    startAt: new Date('2026-03-20T10:00:00'),
+    date: new Date('2026-03-20T10:00:00'),
+    time: '10:00 AM',
+  };
+
+  beforeEach(() => {
+    useEventsStore.setState({ events: [], isLoading: false, hasLoaded: false });
+    useNotificationsStore.setState({
+      notifications: [],
+      isLoading: false,
+      hasLoaded: false,
+      lastLoadedAt: null,
+    });
+    apiRequestMock.mockReset();
+    apiRequestMock.mockImplementation(async (input: RequestInfo, init?: RequestInit) => {
+      const url = input.toString();
+      const method = init?.method ?? 'GET';
+      if (url.includes('/api/events/') && method === 'DELETE') {
+        return { id: url.split('/').pop() };
+      }
+      if (url.includes('/api/notifications/') && method === 'DELETE') {
+        return { id: url.split('/').pop() };
+      }
+      throw new Error('Unhandled apiRequest call');
+    });
+  });
+
+  it('should clean up notifications when deleting an event', async () => {
+    useEventsStore.setState({ events: [mockEvent] });
+    useNotificationsStore.setState({
+      notifications: [
+        {
+          id: 'cccc1111-1111-1111-1111-111111111111',
+          title: 'Event Reminder',
+          message: 'Campus Tour soon',
+          type: 'event',
+          read: false,
+          createdAt: new Date(),
+          relatedId: mockEvent.id,
+        },
+        {
+          id: 'dddd2222-2222-2222-2222-222222222222',
+          title: 'Other',
+          message: 'Unrelated',
+          type: 'system',
+          read: false,
+          createdAt: new Date(),
+        },
+      ],
+    });
+
+    await useEventsStore.getState().removeEvent(mockEvent.id);
+
+    expect(useEventsStore.getState().events).toHaveLength(0);
+    const notifs = useNotificationsStore.getState().notifications;
+    expect(notifs).toHaveLength(1);
+    expect(notifs[0].id).toBe('dddd2222-2222-2222-2222-222222222222');
   });
 });

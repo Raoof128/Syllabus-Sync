@@ -1,3 +1,25 @@
+### Raouf: End-to-End Notification & Delete Audit — 2026-03-15
+
+**Scope:** Full trace of notification + delete surfaces; fix cascade notification cleanup for deadline and event deletion.
+
+1. **Deadline notification cleanup** — `removeDeadline` now cleans up notifications where `relatedId` matches the deleted deadline ID, preventing stale "Deadline Reminder" entries from persisting in the bell dropdown
+2. **Event notification cleanup** — `removeEvent` now cleans up notifications where `relatedId` matches the deleted event ID
+3. **Cleanup runs before sync check** — notification cleanup is a local operation and now executes immediately after the optimistic delete, so it works regardless of Supabase auth/sync state
+4. **Regression tests** — added tests confirming deadline and event deletion removes related notifications while preserving unrelated ones
+
+**Verified intact (no changes needed):**
+
+- Soft-delete consistency: all notification API routes use `deleted_at` timestamp, all queries filter `deleted_at IS NULL`
+- `clearAll()` DELETE handler: present on `/api/notifications` route
+- Dark-mode destructive icons: `action-buttons-auto` CSS forces `opacity: 1 !important` in dark mode
+- Portal scroll-jump fix: all delete modals in CalendarClient/FeedClient are portalled to `document.body`
+- ReminderModal propagation: `stopPropagation` on wrapper div + all button handlers
+- Temp-ID delete guard: `removeNotification` skips API for non-UUID/temp IDs
+
+**Verification:**
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 91 files / 857 tests, build)
+
 ### Raouf: Fix Notification Store Optimistic UI — 2026-03-15
 
 **Scope:** Fix `removeNotification` sending invalid temp IDs to the API and breaking rollback order.

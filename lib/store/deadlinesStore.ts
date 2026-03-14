@@ -8,6 +8,7 @@ import { errorHandler } from '@/lib/utils/errorHandling';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { isValidUUID } from '@/lib/utils/uuid';
 // NOTE: Sample data fallback removed - authenticated users load from database only
 // This ensures proper user isolation and data ownership
@@ -187,6 +188,13 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           deadlines: state.deadlines.filter((d) => d.id !== id),
         }));
 
+        // Clean up notifications referencing the deleted deadline (local operation)
+        const notifStore = useNotificationsStore.getState();
+        const staleNotifs = notifStore.notifications.filter((n) => n.relatedId === id);
+        for (const n of staleNotifs) {
+          notifStore.removeNotification(n.id);
+        }
+
         try {
           const canSync = await shouldSyncDeadlines();
           if (!canSync) {
@@ -197,7 +205,6 @@ export const useDeadlinesStore = create<DeadlinesState>()(
           await apiRequest<{ id: string }>(`/api/deadlines/${id}`, {
             method: 'DELETE',
           });
-          // SUCCESS: Delete persisted to DB
         } catch (error) {
           // FAILURE: Restore the deadline to local state
           if (deadlineToRemove) {
