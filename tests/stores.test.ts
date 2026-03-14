@@ -394,6 +394,56 @@ describe('notificationsStore', () => {
     expect(notifications).toHaveLength(0);
   });
 
+  it('should remove temp-ID notification locally without API call', async () => {
+    const tempNotification: Notification = {
+      id: 'temp-1234567890-abcdef',
+      title: 'Temp',
+      message: 'Optimistic notification',
+      type: 'system',
+      read: false,
+      createdAt: new Date(),
+    };
+    useNotificationsStore.setState({ notifications: [tempNotification] });
+
+    apiRequestMock.mockReset();
+
+    await useNotificationsStore.getState().removeNotification('temp-1234567890-abcdef');
+
+    expect(useNotificationsStore.getState().notifications).toHaveLength(0);
+    // No API call should have been made for a temp ID
+    expect(apiRequestMock).not.toHaveBeenCalled();
+  });
+
+  it('should restore original order on delete API failure', async () => {
+    const n1: Notification = {
+      id: '11111111-1111-1111-1111-111111111111',
+      title: 'First',
+      message: 'First',
+      type: 'system',
+      read: false,
+      createdAt: new Date(),
+    };
+    const n2: Notification = {
+      id: '22222222-2222-2222-2222-222222222222',
+      title: 'Second',
+      message: 'Second',
+      type: 'system',
+      read: false,
+      createdAt: new Date(),
+    };
+    useNotificationsStore.setState({ notifications: [n1, n2] });
+
+    apiRequestMock.mockRejectedValueOnce(new Error('500 Internal Server Error'));
+
+    await useNotificationsStore.getState().removeNotification(n1.id);
+
+    // Should be restored to original order, not appended
+    const { notifications } = useNotificationsStore.getState();
+    expect(notifications).toHaveLength(2);
+    expect(notifications[0].id).toBe(n1.id);
+    expect(notifications[1].id).toBe(n2.id);
+  });
+
   it('should get unread count', () => {
     const notification2 = { ...mockNotification, id: 'notif-2', read: true };
     useNotificationsStore.setState({

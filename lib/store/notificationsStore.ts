@@ -309,10 +309,18 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
   },
 
   removeNotification: async (id) => {
-    const notificationToRemove = get().notifications.find((n) => n.id === id);
+    // Snapshot the full list so we can restore exact order on rollback
+    const previousNotifications = get().notifications;
     set((state) => ({
       notifications: state.notifications.filter((n) => n.id !== id),
     }));
+
+    // Temp or non-UUID IDs only exist locally — skip the API call entirely.
+    // Without this guard the DELETE would always 404 and the server-side
+    // notification would silently survive, reappearing on next load.
+    if (!isValidUUID(id) || id.startsWith('temp-')) {
+      return;
+    }
 
     try {
       await apiRequest<{ id: string }>(`/api/notifications/${id}`, {
@@ -324,11 +332,8 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         return;
       }
 
-      if (notificationToRemove) {
-        set((state) => ({
-          notifications: [...state.notifications, notificationToRemove],
-        }));
-      }
+      // Restore the full previous list to preserve original order
+      set({ notifications: previousNotifications });
       errorHandler.logError(
         error instanceof Error ? error : new Error(`Failed to remove notification ${id}`),
         'NotificationsStore.removeNotification',

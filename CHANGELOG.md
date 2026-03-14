@@ -1,3 +1,15 @@
+### Raouf: Fix Notification Store Optimistic UI — 2026-03-15
+
+**Scope:** Fix `removeNotification` sending invalid temp IDs to the API and breaking rollback order.
+
+1. **Delete guard for temp/non-UUID IDs** — `removeNotification` now skips the API call entirely for `temp-` prefixed or non-UUID IDs (local-only delete), matching the existing guard in `markAsRead`. Previously, deleting a temp-ID notification sent `DELETE /api/notifications/temp-...` which always 404'd silently, leaving the server-side notification to reappear on next load.
+2. **Rollback preserves original order** — on non-404 API failure, the full pre-delete notification array is restored instead of appending the removed item at the end (which caused a visual position jump).
+3. **Regression tests** — added test confirming temp-ID delete makes no API call; added test confirming failed delete restores exact original order.
+
+**Verification:**
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 91 files / 855 tests, build)
+
 ### Raouf: Notification & Delete Systems Audit — 2026-03-15
 
 **Scope:** Fix remaining bugs from notification/delete audit — UUID deduplication, API test gaps, cascade notification cleanup.
