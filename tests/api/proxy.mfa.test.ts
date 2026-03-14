@@ -27,7 +27,7 @@ describe('proxy mfa enforcement', () => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'eyJ.test';
 
     supabaseMocks.getUserMock.mockResolvedValue({
-      data: { user: { id: 'user-1' } },
+      data: { user: { id: 'user-1', email_confirmed_at: '2026-01-01T00:00:00Z' } },
       error: null,
     });
 
