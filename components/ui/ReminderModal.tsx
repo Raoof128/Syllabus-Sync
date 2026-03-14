@@ -24,7 +24,12 @@ import {
 import { Switch } from '@/components/ui/mq/switch';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
-import { useRemindersStore, ReminderItemType, ReminderTiming } from '@/lib/store/remindersStore';
+import {
+  useRemindersStore,
+  ReminderItemType,
+  ReminderTiming,
+  calculateReminderDate,
+} from '@/lib/store/remindersStore';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { toastUtils } from '@/lib/utils/toast';
 import { format } from 'date-fns';
@@ -38,6 +43,8 @@ interface ReminderModalProps {
   itemTitle: string;
   itemDate?: Date; // The date/time of the item (for reference)
   itemColor?: string; // Optional color for visual indication
+  /** Unit code for contextual notification messages (e.g., COMP2120) */
+  unitCode?: string;
   /** Class schedule for units - array of day/time strings */
   unitSchedule?: Array<{ day: string; startTime: string; endTime: string }>;
 }
@@ -63,6 +70,7 @@ export default function ReminderModal({
   itemTitle,
   itemDate,
   itemColor,
+  unitCode,
   unitSchedule,
 }: ReminderModalProps) {
   const { t } = useTypedTranslation();
@@ -140,6 +148,21 @@ export default function ReminderModal({
         enabled: true,
       };
 
+      // Build a descriptive label: "Assignment 1 of COMP2120" or just "Assignment 1"
+      const itemLabel = unitCode ? `${itemTitle} of ${unitCode}` : itemTitle;
+
+      // Build the reminder date string for the notification
+      let reminderDateStr = '';
+      if (timing === 'custom' && customDate) {
+        const d = customTime
+          ? new Date(`${customDate}T${customTime}`)
+          : new Date(`${customDate}T09:00`);
+        reminderDateStr = format(d, 'PPP p');
+      } else if (itemDate) {
+        const triggerDate = calculateReminderDate(itemDate, timing);
+        reminderDateStr = format(triggerDate, 'PPP p');
+      }
+
       if (existingReminderId) {
         updateReminder(existingReminderId, reminderData);
         toastUtils.success(t('success'), t('reminderUpdated'));
@@ -147,16 +170,16 @@ export default function ReminderModal({
         const newReminder = addReminder(reminderData);
         setExistingReminderId(newReminder.id);
 
-        // Create a notification to show the reminder was set
+        // Create a detailed notification showing the reminder was set
+        const message = reminderDateStr
+          ? `The reminder for ${itemLabel} is set for ${reminderDateStr}`
+          : `${getTimingLabelText(timing)} for "${itemTitle}"`;
         addNotification({
           title: t('reminderSet'),
-          message: t('reminderNotificationSetMessage', {
-            timing: getTimingLabelText(timing),
-            title: itemTitle,
-          }),
+          message,
           type: 'system',
           read: false,
-          link: undefined,
+          link: '/calendar',
           relatedId: itemId,
         });
 
@@ -167,13 +190,15 @@ export default function ReminderModal({
       removeReminder(existingReminderId);
       setExistingReminderId(null);
 
-      // Create a notification to show the reminder was removed
+      const itemLabel = unitCode ? `${itemTitle} of ${unitCode}` : itemTitle;
+
+      // Create a notification showing the reminder was removed
       addNotification({
         title: t('reminderRemoved'),
-        message: t('reminderNotificationRemovedMessage', { title: itemTitle }),
+        message: `The reminder for ${itemLabel} has been removed`,
         type: 'system',
         read: false,
-        link: undefined,
+        link: '/calendar',
         relatedId: itemId,
       });
 
@@ -195,6 +220,7 @@ export default function ReminderModal({
     updateReminder,
     removeReminder,
     addNotification,
+    unitCode,
     getTimingLabelText,
     onOpenChange,
     t,

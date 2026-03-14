@@ -40,6 +40,10 @@ export interface NotificationPreferences {
       triggerAt: number;
     }
   >;
+
+  // IDs of default reminders the user has dismissed (read/deleted).
+  // Prevents them from being re-created on subsequent logins.
+  dismissedDefaultReminders: string[];
 }
 
 interface NotificationPreferencesState extends NotificationPreferences {
@@ -53,6 +57,7 @@ interface NotificationPreferencesState extends NotificationPreferences {
   setDeadlineReminderTiming: (minutes: number) => void;
   setClassReminderTiming: (minutes: number) => void;
   setEventReminderTiming: (minutes: number) => void;
+  dismissDefaultReminder: (key: string) => void;
   reschedulePending: () => void;
   scheduleDeadlineReminder: (
     deadlineId: string,
@@ -141,6 +146,7 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
       pushEnabled: true,
       scheduledReminders: {},
       pendingReminders: {},
+      dismissedDefaultReminders: [],
 
       initialize: async () => {
         const status = notificationService.getPermissionStatus();
@@ -267,6 +273,14 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         });
       },
 
+      dismissDefaultReminder: (key: string) => {
+        set((s) => ({
+          dismissedDefaultReminders: s.dismissedDefaultReminders.includes(key)
+            ? s.dismissedDefaultReminders
+            : [...s.dismissedDefaultReminders, key],
+        }));
+      },
+
       scheduleDeadlineReminder: (
         deadlineId: string,
         title: string,
@@ -288,8 +302,13 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         const reminderTime = new Date(dueDate.getTime() - state.deadlineReminderTiming * 60 * 1000);
         const delay = reminderTime.getTime() - now.getTime();
 
+        // setTimeout max safe delay is 2^31 - 1 ms (~24.85 days).
+        // Delays exceeding this overflow to 0, firing the callback immediately.
+        const MAX_SAFE_TIMEOUT = 2_147_483_647;
+
         // Only schedule if reminder time is in the future
         if (delay > 0) {
+          // Save to pendingReminders so it can be rescheduled on next page load
           set((s) => ({
             pendingReminders: {
               ...s.pendingReminders,
@@ -304,6 +323,13 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
               },
             },
           }));
+
+          // If the delay exceeds the safe setTimeout limit, skip the timer.
+          // The pending reminder will be rescheduled on the next page load
+          // when it's closer to the trigger time.
+          if (delay > MAX_SAFE_TIMEOUT) {
+            return;
+          }
 
           const timeoutId = window.setTimeout(() => {
             notificationService.sendDeadlineReminder(title, unitCode, dueDate, deadlineId);
@@ -334,7 +360,33 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
             },
           }));
         } else if (delay > -state.deadlineReminderTiming * 60 * 1000) {
-          // If we're past the reminder time but before the due date, send immediately
+          // If we're past the reminder time but before the due date,
+          // only send if not previously dismissed and no matching notification exists
+          const defaultKey = `default-deadline-${deadlineId}`;
+          if (state.dismissedDefaultReminders.includes(defaultKey)) {
+            set((s) => {
+              const { [deadlineId]: _removed, ...rest } = s.pendingReminders;
+              void _removed;
+              return { pendingReminders: rest };
+            });
+            return;
+          }
+
+          const existing = useNotificationsStore
+            .getState()
+            .notifications.find(
+              (n) => n.type === 'deadline' && n.title === `Deadline Reminder: ${title}`,
+            );
+          if (existing) {
+            // Already notified for this deadline — skip
+            set((s) => {
+              const { [deadlineId]: _removed, ...rest } = s.pendingReminders;
+              void _removed;
+              return { pendingReminders: rest };
+            });
+            return;
+          }
+
           notificationService.sendDeadlineReminder(title, unitCode, dueDate, deadlineId);
           // Add to bell icon notification list
           try {
@@ -380,6 +432,9 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         const reminderTime = new Date(classTime.getTime() - state.classReminderTiming * 60 * 1000);
         const delay = reminderTime.getTime() - now.getTime();
 
+        // setTimeout max safe delay is 2^31 - 1 ms (~24.85 days)
+        const MAX_SAFE_TIMEOUT = 2_147_483_647;
+
         if (delay > 0) {
           set((s) => ({
             pendingReminders: {
@@ -397,6 +452,10 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
               },
             },
           }));
+
+          if (delay > MAX_SAFE_TIMEOUT) {
+            return;
+          }
 
           const timeoutId = window.setTimeout(() => {
             const timeStr = classTime.toLocaleTimeString([], {
@@ -465,6 +524,9 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         const reminderTime = new Date(eventTime.getTime() - state.eventReminderTiming * 60 * 1000);
         const delay = reminderTime.getTime() - now.getTime();
 
+        // setTimeout max safe delay is 2^31 - 1 ms (~24.85 days)
+        const MAX_SAFE_TIMEOUT = 2_147_483_647;
+
         if (delay > 0) {
           set((s) => ({
             pendingReminders: {
@@ -480,6 +542,10 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
               },
             },
           }));
+
+          if (delay > MAX_SAFE_TIMEOUT) {
+            return;
+          }
 
           const timeoutId = window.setTimeout(() => {
             const timeStr = eventTime.toLocaleTimeString([], {
@@ -551,6 +617,9 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         if (!state.pushEnabled || state.permissionStatus !== 'granted') return;
 
         const now = Date.now();
+        // setTimeout max safe delay is 2^31 - 1 ms (~24.85 days)
+        const MAX_SAFE_TIMEOUT = 2_147_483_647;
+
         Object.entries(state.pendingReminders).forEach(([id, reminder]) => {
           const delay = reminder.triggerAt - now;
           if (delay <= 0) {
@@ -560,6 +629,11 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
               void _removed;
               return { pendingReminders: rest };
             });
+            return;
+          }
+
+          // Skip if delay exceeds safe setTimeout limit — will be rescheduled next load
+          if (delay > MAX_SAFE_TIMEOUT) {
             return;
           }
 
@@ -671,6 +745,7 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
           pushEnabled: true,
           scheduledReminders: {},
           pendingReminders: {},
+          dismissedDefaultReminders: [],
         });
       },
     }),
@@ -686,6 +761,7 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         eventReminderTiming: state.eventReminderTiming,
         pushEnabled: state.pushEnabled,
         pendingReminders: state.pendingReminders,
+        dismissedDefaultReminders: state.dismissedDefaultReminders,
       }),
     },
   ),

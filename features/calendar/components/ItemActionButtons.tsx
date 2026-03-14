@@ -52,6 +52,7 @@ export default function ItemActionButtons({
   itemTitle,
   building,
   room,
+  unitCode,
   dateTime,
   itemColor,
   unitSchedule,
@@ -229,6 +230,7 @@ export default function ItemActionButtons({
           itemTitle={itemTitle}
           itemDate={itemDate}
           itemColor={itemColor}
+          unitCode={unitCode}
           unitSchedule={unitSchedule}
         />
       </div>

@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { APP_CONFIG, BRAND_COLORS, UNIVERSITY_CONFIG } from '@/lib/config';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { useThemeStore } from '@/lib/store/themeStore';
@@ -84,8 +85,25 @@ const Header = memo(() => {
   const markAllAsRead = useNotificationsStore((state) => state.markAllAsRead);
   const removeNotification = useNotificationsStore((state) => state.removeNotification);
 
+  const dismissDefaultReminder = useNotificationPreferencesStore(
+    (state) => state.dismissDefaultReminder,
+  );
+
   const deadlines = useDeadlinesStore((state) => state.deadlines);
   const events = useEventsStore((state) => state.events);
+
+  // When a user marks-as-read or deletes a default reminder notification,
+  // record its dismissal so it won't be re-created on the next login.
+  const handleDismissDefault = (notification: (typeof notifications)[0]) => {
+    if (notification.type === 'deadline' && notification.title.startsWith('Deadline Reminder:')) {
+      // Find the matching deadline by title suffix
+      const titleSuffix = notification.title.replace('Deadline Reminder: ', '');
+      const matchingDeadline = deadlines.find((d) => d.title === titleSuffix);
+      if (matchingDeadline) {
+        dismissDefaultReminder(`default-deadline-${matchingDeadline.id}`);
+      }
+    }
+  };
 
   // Check if a notification's related deadline/event is overdue
   const isNotificationOverdue = (notification: (typeof notifications)[0]): boolean => {
@@ -479,16 +497,17 @@ const Header = memo(() => {
                               )}
                             </div>
                           </Link>
-                          {/* Action buttons */}
+                          {/* Action buttons — tick (mark read) + X (delete) */}
                           <div className="flex flex-col gap-1 mr-2 mt-2">
-                            {/* Mark as read button - only for unread notifications */}
-                            {!notification.read ? (
+                            {/* Mark as read button — only shown for unread notifications */}
+                            {!notification.read && (
                               <button
                                 type="button"
                                 onClick={(event) => {
                                   event.preventDefault();
                                   event.stopPropagation();
                                   markAsRead(notification.id);
+                                  handleDismissDefault(notification);
                                 }}
                                 className="flex h-7 w-7 items-center justify-center rounded-full text-mq-info transition-colors hover:bg-mq-info/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
                                 aria-label={t('markAsRead')}
@@ -496,22 +515,22 @@ const Header = memo(() => {
                               >
                                 <Check className="h-4 w-4" aria-hidden="true" />
                               </button>
-                            ) : (
-                              /* Delete button - only for read notifications */
-                              <button
-                                type="button"
-                                onClick={(event) => {
-                                  event.preventDefault();
-                                  event.stopPropagation();
-                                  removeNotification(notification.id);
-                                }}
-                                className="flex h-7 w-7 items-center justify-center rounded-full text-mq-content-tertiary dark:text-white/60 transition-colors hover:bg-mq-error/10 hover:text-mq-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
-                                aria-label={t('deleteNotification')}
-                                title={t('deleteNotification')}
-                              >
-                                <X className="h-4 w-4" aria-hidden="true" />
-                              </button>
                             )}
+                            {/* Delete button — always shown */}
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                handleDismissDefault(notification);
+                                removeNotification(notification.id);
+                              }}
+                              className="flex h-7 w-7 items-center justify-center rounded-full text-mq-content-tertiary dark:text-white/60 transition-colors hover:bg-mq-error/10 hover:text-mq-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-focus"
+                              aria-label={t('deleteNotification')}
+                              title={t('deleteNotification')}
+                            >
+                              <X className="h-4 w-4" aria-hidden="true" />
+                            </button>
                           </div>
                         </div>
                       </DropdownMenuItem>
