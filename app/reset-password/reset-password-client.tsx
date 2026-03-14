@@ -218,7 +218,7 @@ export default function ResetPasswordClient() {
       });
 
       if (error) {
-        setGeneralError(error.message || tStr('failedToUpdatePassword'));
+        setGeneralError(tStr('failedToUpdatePassword'));
         return;
       }
 
