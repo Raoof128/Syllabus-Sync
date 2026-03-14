@@ -260,6 +260,18 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // Email verification gate — redirect unverified users to /verify
+  if (user && isProtectedRoute && authResolution === 'resolved') {
+    const emailConfirmed = user.email_confirmed_at;
+    if (!emailConfirmed) {
+      const redirectUrl = new URL('/verify', request.url);
+      redirectUrl.searchParams.set('reason', 'unverified');
+      const verifyResponse = NextResponse.redirect(redirectUrl);
+      setSecurityHeaders(verifyResponse.headers);
+      return verifyResponse;
+    }
+  }
+
   let requiresMfaUpgrade = false;
   let mfaResolution: 'resolved' | 'unknown' = 'unknown';
   if (user && (isProtectedRoute || isAuthRoute || (isApiRoute && !isPublicApi))) {
