@@ -6,6 +6,7 @@ import { apiRequest } from '@/lib/utils/api';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
+import { isValidUUID } from '@/lib/utils/uuid';
 
 interface TodosState {
   todos: Todo[];
@@ -39,12 +40,6 @@ const normalizeTodo = (todo: Todo): Todo => ({
       : new Date(todo.completedAt)
     : undefined,
 });
-
-// Helper to validate UUIDs
-const isValidUUID = (id: string) => {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
-};
 
 const shouldSyncTodos = async (): Promise<boolean> => {
   if (!isSupabaseConfigured()) return false;

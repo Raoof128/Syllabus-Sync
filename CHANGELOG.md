@@ -1,3 +1,24 @@
+### Raouf: Notification & Delete Systems Audit — 2026-03-15
+
+**Scope:** Fix remaining bugs from notification/delete audit — UUID deduplication, API test gaps, cascade notification cleanup.
+
+1. **Shared UUID utility** — extracted `isValidUUID` from 4 files (`notificationsStore` ×2, `deadlinesStore`, `todosStore`, `useFeedLogic`) into `lib/utils/uuid.ts`
+2. **Notification API test coverage** — added 4 tests: POST with invalid body (400), POST with valid body (201), GET pagination metadata, GET page-2 offset verification
+3. **Cascade notification cleanup** — `removeUnit` now captures affected deadline IDs before calling `removeDeadlinesByUnit`, then removes related notifications from `notificationsStore`
+4. **Cascade delete integration test** — added store test verifying unit deletion cascades to deadline removal
+
+**Already fixed (verified, no changes needed):**
+
+- Event reminder tag uses `event-${eventId}` (not `Date.now()`)
+- `package.json` test script already passes `--config`
+- Dark mode action buttons use `action-buttons-auto` with `opacity: 1 !important`
+- `ReminderModal` wrapper has `stopPropagation` on all handlers
+- `deleteProfile` reads `currentProfileId` before state update
+
+**Verification:**
+
+- `npm run check` ✅ (secrets, format, typecheck, lint, 91 files / 853 tests, build)
+
 ### Raouf: Full Production Readiness Audit — 2026-03-14
 
 **Scope:** Fix all critical and warning findings from a 7-domain production readiness audit.

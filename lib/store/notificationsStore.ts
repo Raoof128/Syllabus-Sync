@@ -8,6 +8,7 @@ import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
 import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 import { toastUtils } from '@/lib/utils/toast';
+import { isValidUUID } from '@/lib/utils/uuid';
 
 // Maximum number of notifications to keep in state
 const MAX_NOTIFICATIONS = 100;
@@ -147,10 +148,6 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
   },
 
   addNotification: async (notificationData) => {
-    const isValidUUID = (value?: string) =>
-      typeof value === 'string' &&
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
-
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     const notification: Notification = {
@@ -250,9 +247,6 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
   },
 
   markAsRead: async (id) => {
-    const isValidUUID = (value: string) =>
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
-
     set((state) => ({
       notifications: state.notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
     }));

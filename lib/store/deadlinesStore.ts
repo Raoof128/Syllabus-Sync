@@ -8,6 +8,7 @@ import { errorHandler } from '@/lib/utils/errorHandling';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 import { useGamificationStore } from '@/lib/store/gamificationStore';
+import { isValidUUID } from '@/lib/utils/uuid';
 // NOTE: Sample data fallback removed - authenticated users load from database only
 // This ensures proper user isolation and data ownership
 let hasLoggedNetworkFallback = false;
@@ -35,12 +36,6 @@ const normalizeDeadline = (deadline: Deadline): Deadline => ({
   dueDate: deadline.dueDate instanceof Date ? deadline.dueDate : new Date(deadline.dueDate),
   createdAt: deadline.createdAt instanceof Date ? deadline.createdAt : new Date(deadline.createdAt),
 });
-
-// Helper to validate UUIDs
-const isValidUUID = (id: string) => {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(id);
-};
 
 const shouldSyncDeadlines = async (): Promise<boolean> => {
   if (!isSupabaseConfigured()) return false;

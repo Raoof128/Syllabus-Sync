@@ -9,6 +9,7 @@ import { apiRequest } from '@/lib/utils/api';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import { useDeadlinesStore } from '@/lib/store/deadlinesStore';
+import { useNotificationsStore } from '@/lib/store/notificationsStore';
 
 interface UnitsState {
   units: Unit[];
@@ -177,8 +178,25 @@ export const useUnitsStore = create<UnitsState>()(
 
           // If cascade delete was successful, also remove related deadlines from local state
           if (response.cascadeDeleted && unitCode) {
+            // Capture deadline IDs before removal for notification cleanup
+            const affectedDeadlineIds = useDeadlinesStore
+              .getState()
+              .deadlines.filter((d) => d.unitId === id || d.unitCode === unitCode)
+              .map((d) => d.id);
+
             // Explicitly sync globally first, so any component reading deadlines is updated
             useDeadlinesStore.getState().removeDeadlinesByUnit(id, unitCode);
+
+            // Clean up notifications referencing deleted deadlines
+            if (affectedDeadlineIds.length > 0) {
+              const notifStore = useNotificationsStore.getState();
+              const toRemove = notifStore.notifications.filter(
+                (n) => n.relatedId && affectedDeadlineIds.includes(n.relatedId),
+              );
+              for (const n of toRemove) {
+                notifStore.removeNotification(n.id);
+              }
+            }
 
             // Dispatch a custom event that components can listen to
             if (typeof window !== 'undefined') {
@@ -198,7 +216,24 @@ export const useUnitsStore = create<UnitsState>()(
           if (errorMessage.includes('404') || errorMessage.includes('not found')) {
             // Dispatch event to clean up related deadlines locally
             if (unitCode) {
+              // Capture deadline IDs before removal for notification cleanup
+              const affectedDeadlineIds = useDeadlinesStore
+                .getState()
+                .deadlines.filter((d) => d.unitId === id || d.unitCode === unitCode)
+                .map((d) => d.id);
+
               useDeadlinesStore.getState().removeDeadlinesByUnit(id, unitCode);
+
+              // Clean up notifications referencing deleted deadlines
+              if (affectedDeadlineIds.length > 0) {
+                const notifStore = useNotificationsStore.getState();
+                const toRemove = notifStore.notifications.filter(
+                  (n) => n.relatedId && affectedDeadlineIds.includes(n.relatedId),
+                );
+                for (const n of toRemove) {
+                  notifStore.removeNotification(n.id);
+                }
+              }
 
               if (typeof window !== 'undefined') {
                 window.dispatchEvent(

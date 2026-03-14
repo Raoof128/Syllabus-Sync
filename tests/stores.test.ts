@@ -115,6 +115,54 @@ describe('unitsStore', () => {
 
     expect(unit).toBeUndefined();
   });
+
+  it('should cascade-delete deadlines when removing a unit', async () => {
+    // Set up unit with two related deadlines
+    useUnitsStore.setState({ units: [mockUnit] });
+    useDeadlinesStore.setState({
+      deadlines: [
+        {
+          id: 'deadline-1',
+          title: 'Assignment 1',
+          unitId: 'test-unit-1',
+          unitCode: 'COMP2310',
+          dueDate: new Date(),
+          priority: 'High' as const,
+          type: 'Assignment' as const,
+          completed: false,
+          createdAt: new Date(),
+        },
+        {
+          id: 'deadline-2',
+          title: 'Exam 1',
+          unitId: 'test-unit-1',
+          unitCode: 'COMP2310',
+          dueDate: new Date(),
+          priority: 'Medium' as const,
+          type: 'Exam' as const,
+          completed: false,
+          createdAt: new Date(),
+        },
+      ],
+      isLoading: false,
+      hasLoaded: true,
+    });
+
+    // Mock DELETE to return cascadeDeleted: true
+    apiRequestMock.mockImplementation(async (input: RequestInfo, init?: RequestInit) => {
+      const url = input.toString();
+      const method = init?.method ?? 'GET';
+      if (url.includes('/api/units/') && method === 'DELETE') {
+        return { id: 'test-unit-1', code: 'COMP2310', cascadeDeleted: true };
+      }
+      throw new Error('Unhandled apiRequest call');
+    });
+
+    await useUnitsStore.getState().removeUnit('test-unit-1');
+
+    expect(useUnitsStore.getState().units).toHaveLength(0);
+    expect(useDeadlinesStore.getState().deadlines).toHaveLength(0);
+  });
 });
 
 describe('deadlinesStore', () => {

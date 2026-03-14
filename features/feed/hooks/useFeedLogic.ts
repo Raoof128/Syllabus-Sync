@@ -8,6 +8,7 @@ import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { useEventsStore } from '@/lib/store/eventsStore';
 import { apiRequest } from '@/lib/utils/api';
+import { isValidUUID } from '@/lib/utils/uuid';
 import { Event } from '@/lib/types';
 import { TimeRange, SortMode, CategoryFilter } from '@/features/feed/components/FeedFilters';
 
@@ -172,9 +173,7 @@ export function useFeedLogic() {
             : undefined;
 
         // Only include relatedId if eventId is a valid UUID format (sample events use 'event-1' format)
-        const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-          eventId,
-        );
+        const hasValidUUID = isValidUUID(eventId);
 
         await addNotification({
           title: t('reminderTimingUpdated'),
@@ -182,12 +181,12 @@ export function useFeedLogic() {
           type: 'event',
           read: false,
           ...(notificationLink && { link: notificationLink }),
-          ...(isValidUUID && { relatedId: eventId }),
+          ...(hasValidUUID && { relatedId: eventId }),
         });
 
         // If user is authenticated and the event has a verifiable UUID, award XP
         // (event_attended now requires a concrete event reference for anti-abuse checks)
-        if (!isDemo && isValidUUID) {
+        if (!isDemo && hasValidUUID) {
           try {
             const response = await apiRequest<{
               message: string;
