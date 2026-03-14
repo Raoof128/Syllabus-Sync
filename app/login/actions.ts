@@ -57,7 +57,7 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
 
   // 3. Auth: Supabase Login
   const supabase = await createServerClient();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data: signInData, error } = await supabase.auth.signInWithPassword({
     email: result.data.email,
     password: result.data.password,
   });
@@ -73,6 +73,12 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
     }
 
     return { error: 'invalid_credentials' };
+  }
+
+  // Explicit email verification check — don't rely solely on Supabase error string parsing
+  if (signInData?.user && !signInData.user.email_confirmed_at) {
+    logger.warn('Login blocked: email not verified', { email_hint: emailHint });
+    return { error: 'email_not_confirmed' };
   }
 
   // 4. Check MFA status — if user has enrolled MFA factors, require aal2
