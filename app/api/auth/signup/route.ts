@@ -269,7 +269,8 @@ export async function POST(request: NextRequest) {
     const userId = createdUser.id;
     let profileCreated = false;
 
-    // Create profile atomically using admin client
+    // Profile is auto-created by Postgres trigger on auth.users insert.
+    // Upsert here to set additional fields from the signup form.
     if (adminClient) {
       const { error: profileError } = await adminClient.from('profiles').upsert(
         {
@@ -285,38 +286,12 @@ export async function POST(request: NextRequest) {
       );
 
       if (profileError) {
-        logger.error('Profile creation failed - initiating rollback:', {
+        // Non-critical: trigger already created base profile.
+        // Log but don't rollback — user can update profile later.
+        logger.warn('Profile enrichment failed (trigger created base profile):', {
           userId,
           error: profileError.message,
         });
-
-        // CRITICAL: Rollback auth user to prevent orphaned accounts
-        const { error: deleteError } = await adminClient.auth.admin.deleteUser(userId);
-        if (deleteError) {
-          logger.error('CRITICAL: Rollback failed - orphaned auth user:', {
-            userId,
-            error: deleteError.message,
-          });
-        } else {
-          logger.info('Rollback successful - deleted orphaned auth user:', {
-            userId,
-          });
-
-          // AUDIT: Log rollback execution
-          logAuthEvent(
-            adminClient,
-            'rollback_executed',
-            { user_id: userId, reason: 'profile_creation_failed' },
-            request,
-          );
-        }
-
-        return jsonError(
-          'Failed to create student profile. Please try again.',
-          500,
-          ERROR_CODES.INTERNAL_ERROR,
-          { target: 'root' },
-        );
       }
 
       profileCreated = true;
