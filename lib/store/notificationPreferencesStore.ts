@@ -403,7 +403,14 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
               hour: '2-digit',
               minute: '2-digit',
             });
-            notificationService.sendClassReminder(unitCode, unitName, building, room, timeStr);
+            notificationService.sendClassReminder(
+              unitCode,
+              unitName,
+              building,
+              room,
+              timeStr,
+              classTime.getTime(),
+            );
             // Add to bell icon notification list (persisted to DB)
             try {
               useNotificationsStore.getState().addNotification({
@@ -591,6 +598,7 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
                 reminder.payload.building as string,
                 reminder.payload.room as string,
                 timeStr,
+                reminder.payload.classTime as number,
               );
               try {
                 useNotificationsStore.getState().addNotification({

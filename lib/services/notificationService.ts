@@ -440,13 +440,14 @@ class NotificationService {
     building: string,
     room: string,
     startTime: string,
+    classTimestamp: number,
   ): Promise<boolean> {
     if (!this.isNotificationTypeEnabled('classes')) return false;
 
     return this.sendNotification({
       title: `📚 Class Starting Soon: ${unitCode}`,
       body: `${unitName} at ${building} ${room} - ${startTime}`,
-      tag: `class-${unitCode}-${Date.now()}`,
+      tag: `class-${unitCode}-${classTimestamp}`,
       data: { type: 'class', unitCode },
       url: '/home',
       onClick: () => {
