@@ -14,6 +14,12 @@ const MAX_NOTIFICATIONS = 100;
 const STALE_MS = 3 * 60 * 1000; // 3 minutes revalidation window (reduces invocations)
 let hasLoggedNetworkFallback = false;
 
+// Concurrency guard: prevents overlapping loadNotifications calls from
+// overwriting each other's results (the root cause of the disappearing badge).
+let _loadInFlight = false;
+let _loadStartedAt = 0;
+const LOAD_TIMEOUT_MS = 30_000; // safety valve if a fetch hangs
+
 type LoadOptions = { force?: boolean };
 
 interface NotificationsState {
@@ -59,6 +65,14 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
     if (!force && lastLoadedAt !== null && now - lastLoadedAt < STALE_MS) {
       return;
     }
+
+    // Concurrency guard: skip if another load is already in-flight
+    // (prevents a concurrent GET from overwriting just-added notifications)
+    if (_loadInFlight && now - _loadStartedAt < LOAD_TIMEOUT_MS) {
+      return;
+    }
+    _loadInFlight = true;
+    _loadStartedAt = now;
 
     set({ isLoading: true });
     try {
@@ -127,6 +141,7 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         set({ hasLoaded: true, lastLoadedAt: Date.now() });
       }
     } finally {
+      _loadInFlight = false;
       set({ isLoading: false });
     }
   },
@@ -184,9 +199,25 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         body: JSON.stringify(apiPayload),
       });
       const serverNormalized = normalizeNotification(created);
-      set((state) => ({
-        notifications: state.notifications.map((n) => (n.id === tempId ? serverNormalized : n)),
-      }));
+      // Atomic replace-or-prepend: if a concurrent loadNotifications removed the
+      // temp notification before this POST completed, re-add the server version
+      // instead of silently losing it.
+      set((state) => {
+        const tempExists = state.notifications.some((n) => n.id === tempId);
+        if (tempExists) {
+          return {
+            notifications: state.notifications.map((n) => (n.id === tempId ? serverNormalized : n)),
+          };
+        }
+        // Temp was removed — check if server ID already exists (dedup)
+        if (state.notifications.some((n) => n.id === serverNormalized.id)) {
+          return {};
+        }
+        // Re-add the confirmed notification
+        return {
+          notifications: [serverNormalized, ...state.notifications].slice(0, MAX_NOTIFICATIONS),
+        };
+      });
       return serverNormalized;
     } catch (error) {
       // Handle 409 Conflict (notification already exists) gracefully
