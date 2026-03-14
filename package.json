@@ -81,7 +81,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/eslintrc": "3.2.0",
     "@next/bundle-analyzer": "^16.1.6",
     "@next/eslint-plugin-next": "^16.1.6",
     "@tailwindcss/postcss": "^4.1.18",
@@ -93,8 +93,10 @@
     "@types/node": "^22.19.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-window": "^1.8.8",
     "@types/uuid": "^10.0.0",
     "@types/web-push": "^3.6.4",
+    "@types/zxcvbn": "^4.4.5",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-react": "^5.1.2",
@@ -103,7 +105,7 @@
     "browserslist": "^4.28.1",
     "caniuse-lite": "^1.0.30001767",
     "dotenv": "^17.2.3",
-    "eslint": "^9.18.0",
+    "eslint": "^9.39.4",
     "eslint-config-next": "^16.1.6",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
@@ -116,11 +118,8 @@
     "prettier": "^3.3.3",
     "tailwindcss": "^4.1.18",
     "typescript": "^5",
-    "vercel": "^50.28.0",
     "vite-tsconfig-paths": "^6.0.5",
-    "vitest": "^4.0.16",
-    "@types/react-window": "^1.8.8",
-    "@types/zxcvbn": "^4.4.5"
+    "vitest": "^4.0.16"
   },
   "keywords": [
     "react",
@@ -149,10 +148,13 @@
   "author": "Pouya Alavi <pouya@syllabus-sync.dev>",
   "license": "MIT",
   "overrides": {
-    "undici": "^7.21.0",
+    "minimatch": "^10.2.3",
+    "flatted": "^3.4.0",
+    "yauzl": "^3.2.1",
+    "undici": "^7.23.1",
     "serialize-javascript": "^7.0.3",
     "path-to-regexp": "^8.3.0",
-    "tar": "^7.5.9",
+    "tar": "^7.5.11",
     "@tootallnate/once": "^3.0.1"
   },
   "lint-staged": {
