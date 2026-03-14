@@ -93,6 +93,15 @@ type ServerNotificationPreferences = {
   event_reminder_timing_minutes?: number | null;
 };
 
+/** Convert a timing in minutes to a human-readable label */
+function formatTimingLabel(minutes: number): string {
+  if (minutes < 60) return `${minutes} minutes`;
+  if (minutes === 60) return '1 hour';
+  if (minutes < 1440) return `${Math.round(minutes / 60)} hours`;
+  if (minutes === 1440) return '24 hours';
+  return `${Math.round(minutes / 1440)} days`;
+}
+
 function isAuthPreferenceError(error: unknown): boolean {
   return (
     error instanceof Error && (error.message.startsWith('401:') || error.message.startsWith('403:'))
@@ -334,13 +343,16 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
           const timeoutId = window.setTimeout(() => {
             notificationService.sendDeadlineReminder(title, unitCode, dueDate, deadlineId);
             // Add to bell icon notification list (persisted to DB)
+            const timingMinutes = get().deadlineReminderTiming;
+            const timeLabel = formatTimingLabel(timingMinutes);
             try {
               useNotificationsStore.getState().addNotification({
-                title: `Deadline Reminder: ${title}`,
-                message: `${unitCode} — due ${dueDate.toLocaleDateString()}`,
+                title: `Deadline Reminder: ${unitCode}`,
+                message: `"${title}" of ${unitCode} is due in ${timeLabel}, hurry up!`,
                 type: 'deadline',
                 read: false,
                 link: '/calendar',
+                relatedId: deadlineId,
               });
             } catch {
               /* ignore if store unavailable */
@@ -375,7 +387,7 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
           const existing = useNotificationsStore
             .getState()
             .notifications.find(
-              (n) => n.type === 'deadline' && n.title === `Deadline Reminder: ${title}`,
+              (n) => n.type === 'deadline' && n.title === `Deadline Reminder: ${unitCode}`,
             );
           if (existing) {
             // Already notified for this deadline — skip
@@ -389,13 +401,16 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
 
           notificationService.sendDeadlineReminder(title, unitCode, dueDate, deadlineId);
           // Add to bell icon notification list
+          const timingMinutes = state.deadlineReminderTiming;
+          const timeLabel = formatTimingLabel(timingMinutes);
           try {
             useNotificationsStore.getState().addNotification({
-              title: `Deadline Reminder: ${title}`,
-              message: `${unitCode} — due ${dueDate.toLocaleDateString()}`,
+              title: `Deadline Reminder: ${unitCode}`,
+              message: `"${title}" of ${unitCode} is due in ${timeLabel}, hurry up!`,
               type: 'deadline',
               read: false,
               link: '/calendar',
+              relatedId: deadlineId,
             });
           } catch {
             /* ignore if store unavailable */
@@ -643,19 +658,24 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
 
           const timeoutId = window.setTimeout(() => {
             if (reminder.type === 'deadline') {
+              const deadlineTitle = reminder.payload.title as string;
+              const deadlineUnitCode = reminder.payload.unitCode as string;
               notificationService.sendDeadlineReminder(
-                reminder.payload.title as string,
-                reminder.payload.unitCode as string,
+                deadlineTitle,
+                deadlineUnitCode,
                 new Date(reminder.payload.dueDate as number),
                 id,
               );
+              const timingMinutes = get().deadlineReminderTiming;
+              const timeLabel = formatTimingLabel(timingMinutes);
               try {
                 useNotificationsStore.getState().addNotification({
-                  title: `Deadline Reminder: ${reminder.payload.title as string}`,
-                  message: `${reminder.payload.unitCode as string} — due ${new Date(reminder.payload.dueDate as number).toLocaleDateString()}`,
+                  title: `Deadline Reminder: ${deadlineUnitCode}`,
+                  message: `"${deadlineTitle}" of ${deadlineUnitCode} is due in ${timeLabel}, hurry up!`,
                   type: 'deadline',
                   read: false,
                   link: '/calendar',
+                  relatedId: id,
                 });
               } catch {
                 /* ignore */

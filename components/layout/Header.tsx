@@ -96,11 +96,16 @@ const Header = memo(() => {
   // record its dismissal so it won't be re-created on the next login.
   const handleDismissDefault = (notification: (typeof notifications)[0]) => {
     if (notification.type === 'deadline' && notification.title.startsWith('Deadline Reminder:')) {
-      // Find the matching deadline by title suffix
-      const titleSuffix = notification.title.replace('Deadline Reminder: ', '');
-      const matchingDeadline = deadlines.find((d) => d.title === titleSuffix);
-      if (matchingDeadline) {
-        dismissDefaultReminder(`default-deadline-${matchingDeadline.id}`);
+      // Use relatedId (deadline ID) directly if available
+      if (notification.relatedId) {
+        dismissDefaultReminder(`default-deadline-${notification.relatedId}`);
+      } else {
+        // Fallback: match by unitCode in title against deadlines
+        const unitCode = notification.title.replace('Deadline Reminder: ', '');
+        const matchingDeadlines = deadlines.filter((d) => d.unitCode === unitCode);
+        matchingDeadlines.forEach((d) => {
+          dismissDefaultReminder(`default-deadline-${d.id}`);
+        });
       }
     }
   };

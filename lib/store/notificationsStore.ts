@@ -69,9 +69,20 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         .map(normalizeNotification)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-      // Preserve optimistic (temp) notifications not yet confirmed by the server
-      const currentTemp = get().notifications.filter((n) => n.id.startsWith('temp-'));
-      const merged = [...currentTemp, ...serverNotifications].slice(0, MAX_NOTIFICATIONS);
+      // Build a set of server-side IDs for fast lookup
+      const serverIds = new Set(serverNotifications.map((n) => n.id));
+
+      // Preserve notifications not yet visible to the server:
+      // 1. Temp (optimistic) notifications whose POST hasn't completed
+      // 2. Recently-confirmed notifications (POST completed, but this GET
+      //    started before the POST finished — classic race condition)
+      const recentThreshold = Date.now() - 10_000; // 10-second grace window
+      const currentPreserved = get().notifications.filter(
+        (n) =>
+          n.id.startsWith('temp-') ||
+          (!serverIds.has(n.id) && new Date(n.createdAt).getTime() > recentThreshold),
+      );
+      const merged = [...currentPreserved, ...serverNotifications].slice(0, MAX_NOTIFICATIONS);
 
       set({
         notifications: merged,
@@ -86,9 +97,12 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
           error.message.includes('Unauthorized'));
 
       if (isAuthError) {
-        // Preserve optimistic (temp) notifications that haven't been persisted yet
-        const tempNotifications = get().notifications.filter((n) => n.id.startsWith('temp-'));
-        set({ notifications: tempNotifications, hasLoaded: true, lastLoadedAt: Date.now() });
+        // Preserve optimistic (temp) and recently-confirmed notifications
+        const recentThreshold = Date.now() - 10_000;
+        const preservedNotifications = get().notifications.filter(
+          (n) => n.id.startsWith('temp-') || new Date(n.createdAt).getTime() > recentThreshold,
+        );
+        set({ notifications: preservedNotifications, hasLoaded: true, lastLoadedAt: Date.now() });
         // Avoid redirect flapping: only redirect if we can confirm there's no session.
         // Middleware/proxy still protects routes on navigation/refresh.
         if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {

@@ -151,16 +151,16 @@ export default function ReminderModal({
       // Build a descriptive label: "Assignment 1 of COMP2120" or just "Assignment 1"
       const itemLabel = unitCode ? `${itemTitle} of ${unitCode}` : itemTitle;
 
-      // Build the reminder date string for the notification
+      // Build the reminder date string (dd/MM/yyyy format)
       let reminderDateStr = '';
       if (timing === 'custom' && customDate) {
         const d = customTime
           ? new Date(`${customDate}T${customTime}`)
           : new Date(`${customDate}T09:00`);
-        reminderDateStr = format(d, 'PPP p');
+        reminderDateStr = format(d, 'dd/MM/yyyy');
       } else if (itemDate) {
         const triggerDate = calculateReminderDate(itemDate, timing);
-        reminderDateStr = format(triggerDate, 'PPP p');
+        reminderDateStr = format(triggerDate, 'dd/MM/yyyy');
       }
 
       if (existingReminderId) {
@@ -170,9 +170,9 @@ export default function ReminderModal({
         const newReminder = addReminder(reminderData);
         setExistingReminderId(newReminder.id);
 
-        // Create a detailed notification showing the reminder was set
+        // Create a detailed notification showing the reminder was added
         const message = reminderDateStr
-          ? `The reminder for ${itemLabel} is set for ${reminderDateStr}`
+          ? `The reminder for ${itemLabel} is added on ${reminderDateStr}`
           : `${getTimingLabelText(timing)} for "${itemTitle}"`;
         addNotification({
           title: t('reminderSet'),
@@ -192,10 +192,19 @@ export default function ReminderModal({
 
       const itemLabel = unitCode ? `${itemTitle} of ${unitCode}` : itemTitle;
 
+      // Build the date string for the removed notification
+      let removeDateStr = '';
+      if (itemDate) {
+        removeDateStr = format(itemDate, 'dd/MM/yyyy');
+      }
+
       // Create a notification showing the reminder was removed
+      const removeMessage = removeDateStr
+        ? `The reminder for ${itemLabel} on ${removeDateStr} is removed`
+        : `The reminder for ${itemLabel} is removed`;
       addNotification({
         title: t('reminderRemoved'),
-        message: `The reminder for ${itemLabel} has been removed`,
+        message: removeMessage,
         type: 'system',
         read: false,
         link: '/calendar',
