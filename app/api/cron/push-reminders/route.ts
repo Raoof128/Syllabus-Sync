@@ -62,13 +62,14 @@ async function collectDeadlineReminders(
     relatedId: deadline.id,
     scheduledFor: deadline.due_date,
     payload: {
-      title: `Deadline Reminder: ${deadline.unit_code}`,
-      body: `"${deadline.title}" is due soon`,
+      title: `Deadline: ${deadline.title}`,
+      body: `${deadline.unit_code} — due ${new Date(deadline.due_date).toLocaleDateString('en-AU', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
       url: '/calendar',
       tag: `deadline-${deadline.id}`,
       data: {
         type: 'deadline',
         id: deadline.id,
+        relatedId: deadline.id,
       },
     },
   }));
@@ -106,15 +107,16 @@ async function collectEventReminders(
     relatedId: event.id,
     scheduledFor: event.start_at,
     payload: {
-      title: 'Event Reminder',
+      title: event.title,
       body: event.location
-        ? `${event.title} is starting soon at ${event.location}`
-        : `${event.title} is starting soon`,
+        ? `Starting soon at ${event.location} — ${new Date(event.start_at).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}`
+        : `Starting soon — ${new Date(event.start_at).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}`,
       url: '/feed',
       tag: `event-${event.id}`,
       data: {
         type: 'event',
         id: event.id,
+        relatedId: event.id,
       },
     },
   }));
