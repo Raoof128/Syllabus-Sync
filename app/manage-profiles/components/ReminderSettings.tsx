@@ -43,6 +43,7 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
   const updateProfile = useProfilesStore((state) => state.updateProfile);
   const fetchProfile = useProfilesStore((state) => state.fetchProfile);
   const [isTogglingPreference, setIsTogglingPreference] = useState(false);
+  const [isSavingReminderSettings, setIsSavingReminderSettings] = useState(false);
 
   // Notification Store for push/reminders
   const {
@@ -89,6 +90,26 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
       });
     } finally {
       setIsTogglingPreference(false);
+    }
+  };
+
+  const saveReminderSetting = async (update: () => Promise<boolean>) => {
+    if (disabled || isSavingReminderSettings) return;
+
+    setIsSavingReminderSettings(true);
+    try {
+      const saved = await update();
+      if (!saved) {
+        toastUtils.error(t('error'), t('databaseConnectionFailed'), {
+          id: 'reminder-settings-save-error-toast',
+        });
+      }
+    } catch {
+      toastUtils.error(t('error'), t('databaseConnectionFailed'), {
+        id: 'reminder-settings-save-error-toast',
+      });
+    } finally {
+      setIsSavingReminderSettings(false);
     }
   };
 
@@ -239,15 +260,21 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
                 <div className="sm:flex-shrink-0">
                   <ToggleSwitch
                     checked={deadlinesEnabled}
-                    onChange={() => setDeadlinesEnabled(!deadlinesEnabled)}
+                    onChange={() => {
+                      void saveReminderSetting(() => setDeadlinesEnabled(!deadlinesEnabled));
+                    }}
                     ariaLabel={t('deadlineReminders' as TranslationKey)}
+                    disabled={isSavingReminderSettings}
                   />
                 </div>
               </div>
               {deadlinesEnabled && (
                 <Select
                   value={deadlineReminderTiming.toString()}
-                  onValueChange={(value) => setDeadlineReminderTiming(parseInt(value))}
+                  onValueChange={(value) => {
+                    void saveReminderSetting(() => setDeadlineReminderTiming(parseInt(value, 10)));
+                  }}
+                  disabled={isSavingReminderSettings || disabled}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
@@ -278,15 +305,21 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
                 <div className="sm:flex-shrink-0">
                   <ToggleSwitch
                     checked={classesEnabled}
-                    onChange={() => setClassesEnabled(!classesEnabled)}
+                    onChange={() => {
+                      void saveReminderSetting(() => setClassesEnabled(!classesEnabled));
+                    }}
                     ariaLabel={t('classReminders' as TranslationKey)}
+                    disabled={isSavingReminderSettings}
                   />
                 </div>
               </div>
               {classesEnabled && (
                 <Select
                   value={classReminderTiming.toString()}
-                  onValueChange={(value) => setClassReminderTiming(parseInt(value))}
+                  onValueChange={(value) => {
+                    void saveReminderSetting(() => setClassReminderTiming(parseInt(value, 10)));
+                  }}
+                  disabled={isSavingReminderSettings || disabled}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
@@ -317,15 +350,21 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
                 <div className="sm:flex-shrink-0">
                   <ToggleSwitch
                     checked={eventsEnabled}
-                    onChange={() => setEventsEnabled(!eventsEnabled)}
+                    onChange={() => {
+                      void saveReminderSetting(() => setEventsEnabled(!eventsEnabled));
+                    }}
                     ariaLabel={t('eventReminders' as TranslationKey)}
+                    disabled={isSavingReminderSettings}
                   />
                 </div>
               </div>
               {eventsEnabled && (
                 <Select
                   value={eventReminderTiming.toString()}
-                  onValueChange={(value) => setEventReminderTiming(parseInt(value))}
+                  onValueChange={(value) => {
+                    void saveReminderSetting(() => setEventReminderTiming(parseInt(value, 10)));
+                  }}
+                  disabled={isSavingReminderSettings || disabled}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />

@@ -451,7 +451,7 @@
   "classNow": "NOW",
   "classNext": "NEXT",
   "classUpcoming": "UPCOMING",
-  "classDone": "DONE",
+  "classDone": "PASSED",
   "classStartsIn": "Starts in {{time}}",
   "classEndsIn": "Ends in {{time}}",
   "classesRemaining": "{{count}} classes remaining today",

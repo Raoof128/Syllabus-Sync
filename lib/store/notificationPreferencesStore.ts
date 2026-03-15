@@ -50,13 +50,13 @@ interface NotificationPreferencesState extends NotificationPreferences {
   // Actions
   initialize: () => Promise<void>;
   requestPermission: () => Promise<NotificationPermissionStatus>;
-  setDeadlinesEnabled: (enabled: boolean) => void;
-  setClassesEnabled: (enabled: boolean) => void;
-  setEventsEnabled: (enabled: boolean) => void;
+  setDeadlinesEnabled: (enabled: boolean) => Promise<boolean>;
+  setClassesEnabled: (enabled: boolean) => Promise<boolean>;
+  setEventsEnabled: (enabled: boolean) => Promise<boolean>;
   setPushEnabled: (enabled: boolean) => Promise<boolean>;
-  setDeadlineReminderTiming: (minutes: number) => void;
-  setClassReminderTiming: (minutes: number) => void;
-  setEventReminderTiming: (minutes: number) => void;
+  setDeadlineReminderTiming: (minutes: number) => Promise<boolean>;
+  setClassReminderTiming: (minutes: number) => Promise<boolean>;
+  setEventReminderTiming: (minutes: number) => Promise<boolean>;
   dismissDefaultReminder: (key: string) => void;
   reschedulePending: () => void;
   scheduleDeadlineReminder: (
@@ -124,7 +124,7 @@ async function loadServerNotificationPreferences(): Promise<ServerNotificationPr
 
 async function persistServerNotificationPreferences(
   updates: ServerNotificationPreferences,
-): Promise<void> {
+): Promise<boolean> {
   try {
     await apiRequest('/api/user-preferences', {
       method: 'PUT',
@@ -134,10 +134,12 @@ async function persistServerNotificationPreferences(
       body: JSON.stringify(updates),
       noRetry: true,
     });
+    return true;
   } catch (error) {
     if (!isAuthPreferenceError(error)) {
       logger.warn('Failed to persist notification preferences to server', error);
     }
+    return false;
   }
 }
 
@@ -199,28 +201,46 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         return status;
       },
 
-      setDeadlinesEnabled: (enabled: boolean) => {
+      setDeadlinesEnabled: async (enabled: boolean) => {
+        const previousEnabled = get().deadlinesEnabled;
         notificationService.setNotificationTypeEnabled('deadlines', enabled);
         set({ deadlinesEnabled: enabled });
-        void persistServerNotificationPreferences({
+        const persisted = await persistServerNotificationPreferences({
           deadline_notifications_enabled: enabled,
         });
+        if (!persisted) {
+          notificationService.setNotificationTypeEnabled('deadlines', previousEnabled);
+          set({ deadlinesEnabled: previousEnabled });
+        }
+        return persisted;
       },
 
-      setClassesEnabled: (enabled: boolean) => {
+      setClassesEnabled: async (enabled: boolean) => {
+        const previousEnabled = get().classesEnabled;
         notificationService.setNotificationTypeEnabled('classes', enabled);
         set({ classesEnabled: enabled });
-        void persistServerNotificationPreferences({
+        const persisted = await persistServerNotificationPreferences({
           class_notifications_enabled: enabled,
         });
+        if (!persisted) {
+          notificationService.setNotificationTypeEnabled('classes', previousEnabled);
+          set({ classesEnabled: previousEnabled });
+        }
+        return persisted;
       },
 
-      setEventsEnabled: (enabled: boolean) => {
+      setEventsEnabled: async (enabled: boolean) => {
+        const previousEnabled = get().eventsEnabled;
         notificationService.setNotificationTypeEnabled('events', enabled);
         set({ eventsEnabled: enabled });
-        void persistServerNotificationPreferences({
+        const persisted = await persistServerNotificationPreferences({
           event_notifications_enabled: enabled,
         });
+        if (!persisted) {
+          notificationService.setNotificationTypeEnabled('events', previousEnabled);
+          set({ eventsEnabled: previousEnabled });
+        }
+        return persisted;
       },
 
       setPushEnabled: async (enabled: boolean) => {
@@ -261,25 +281,40 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         return subscribed || !notificationService.isPushSupported();
       },
 
-      setDeadlineReminderTiming: (minutes: number) => {
+      setDeadlineReminderTiming: async (minutes: number) => {
+        const previousTiming = get().deadlineReminderTiming;
         set({ deadlineReminderTiming: minutes });
-        void persistServerNotificationPreferences({
+        const persisted = await persistServerNotificationPreferences({
           deadline_reminder_timing_minutes: minutes,
         });
+        if (!persisted) {
+          set({ deadlineReminderTiming: previousTiming });
+        }
+        return persisted;
       },
 
-      setClassReminderTiming: (minutes: number) => {
+      setClassReminderTiming: async (minutes: number) => {
+        const previousTiming = get().classReminderTiming;
         set({ classReminderTiming: minutes });
-        void persistServerNotificationPreferences({
+        const persisted = await persistServerNotificationPreferences({
           class_reminder_timing_minutes: minutes,
         });
+        if (!persisted) {
+          set({ classReminderTiming: previousTiming });
+        }
+        return persisted;
       },
 
-      setEventReminderTiming: (minutes: number) => {
+      setEventReminderTiming: async (minutes: number) => {
+        const previousTiming = get().eventReminderTiming;
         set({ eventReminderTiming: minutes });
-        void persistServerNotificationPreferences({
+        const persisted = await persistServerNotificationPreferences({
           event_reminder_timing_minutes: minutes,
         });
+        if (!persisted) {
+          set({ eventReminderTiming: previousTiming });
+        }
+        return persisted;
       },
 
       dismissDefaultReminder: (key: string) => {

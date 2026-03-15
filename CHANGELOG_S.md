@@ -1,3 +1,18 @@
+### Raouf: Manage Profile Reminder Settings Persistence + Today Classes Passed State — 2026-03-16
+
+**Scope:** Make Manage Profile reminder settings reflect real database persistence and mark past classes as passed in Today’s Classes.
+
+1. **Reminder settings now rollback on DB failure** — `lib/store/notificationPreferencesStore.ts` reminder toggle/timing setters now await `/api/user-preferences` and revert local state if the database write fails.
+2. **Manage Profile UI now surfaces save failures** — `app/manage-profiles/components/ReminderSettings.tsx` disables reminder controls while saving and shows a database error toast if persistence fails.
+3. **Passed classes are visually obvious** — `features/home/components/TodaySchedule.tsx` now strikes through past class code, title, time, and location, and the English `classDone` label now reads `PASSED`.
+4. **Regression coverage added** — store, route, and TodaySchedule tests now cover reminder-setting persistence plus passed-class rendering.
+
+**Verification:**
+
+- `npx vitest run --config config/vitest/vitest.config.ts tests/stores-notification-prefs.test.ts tests/TodaySchedule.test.tsx tests/api/user-preferences.route.test.ts` ✅
+- `npx tsc -p config/ts/tsconfig.json --noEmit` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs lib/store/notificationPreferencesStore.ts app/manage-profiles/components/ReminderSettings.tsx features/home/components/TodaySchedule.tsx tests/stores-notification-prefs.test.ts tests/TodaySchedule.test.tsx tests/api/user-preferences.route.test.ts` ✅
+
 ### Raouf: Custom Reminder Re-Arm Fix — 2026-03-16
 
 **Scope:** Restore alarms/toasts/bell notifications for edited custom-time reminders.

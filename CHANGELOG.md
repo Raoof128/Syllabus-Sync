@@ -1,3 +1,18 @@
+### Raouf: Manage Profile Reminder Settings Persistence + Today Classes Passed State — 2026-03-16
+
+**Scope:** Make Manage Profile reminder settings reflect real database persistence and mark past classes as passed in Today’s Classes.
+
+1. **Reminder settings now rollback on DB failure** — `lib/store/notificationPreferencesStore.ts` reminder toggle/timing setters now await `/api/user-preferences`, return success/failure, and revert local Zustand state if the database write fails instead of leaving the UI in a false-saved state.
+2. **Manage Profile UI now surfaces save failures** — `app/manage-profiles/components/ReminderSettings.tsx` now serializes reminder-setting saves, disables the reminder controls during persistence, and shows a database error toast when a deadline/class/event reminder preference fails to save.
+3. **Passed classes are visually obvious** — `features/home/components/TodaySchedule.tsx` now crosses out past class code, title, time, and location, while the English `classDone` label is updated to `PASSED` for a clearer status cue in the dashboard card.
+4. **Regression coverage added** — `tests/stores-notification-prefs.test.ts` now verifies each reminder setting writes the correct `/api/user-preferences` payload and rolls back on failure; `tests/api/user-preferences.route.test.ts` covers create/update validation on the API route; `tests/TodaySchedule.test.tsx` proves a finished class renders struck through with the passed badge.
+
+**Verification:**
+
+- `npx vitest run --config config/vitest/vitest.config.ts tests/stores-notification-prefs.test.ts tests/TodaySchedule.test.tsx tests/api/user-preferences.route.test.ts` ✅
+- `npx tsc -p config/ts/tsconfig.json --noEmit` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs lib/store/notificationPreferencesStore.ts app/manage-profiles/components/ReminderSettings.tsx features/home/components/TodaySchedule.tsx tests/stores-notification-prefs.test.ts tests/TodaySchedule.test.tsx tests/api/user-preferences.route.test.ts` ✅
+
 ### Raouf: Custom Reminder Re-Arm Fix — 2026-03-16
 
 **Scope:** Restore alarms/toasts/bell notifications for edited custom-time reminders.

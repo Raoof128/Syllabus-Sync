@@ -55,21 +55,42 @@ describe('notificationPreferencesStore', () => {
     expect(s.pendingReminders).toEqual({});
   });
 
-  it('setDeadlinesEnabled toggles deadlines', () => {
-    useNotificationPreferencesStore.getState().setDeadlinesEnabled(false);
+  it('setDeadlinesEnabled toggles deadlines and persists to the API', async () => {
+    await useNotificationPreferencesStore.getState().setDeadlinesEnabled(false);
     expect(useNotificationPreferencesStore.getState().deadlinesEnabled).toBe(false);
-    useNotificationPreferencesStore.getState().setDeadlinesEnabled(true);
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/api/user-preferences',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ deadline_notifications_enabled: false }),
+      }),
+    );
+    await useNotificationPreferencesStore.getState().setDeadlinesEnabled(true);
     expect(useNotificationPreferencesStore.getState().deadlinesEnabled).toBe(true);
   });
 
-  it('setClassesEnabled toggles classes', () => {
-    useNotificationPreferencesStore.getState().setClassesEnabled(false);
+  it('setClassesEnabled toggles classes and persists to the API', async () => {
+    await useNotificationPreferencesStore.getState().setClassesEnabled(false);
     expect(useNotificationPreferencesStore.getState().classesEnabled).toBe(false);
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/api/user-preferences',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ class_notifications_enabled: false }),
+      }),
+    );
   });
 
-  it('setEventsEnabled toggles events', () => {
-    useNotificationPreferencesStore.getState().setEventsEnabled(false);
+  it('setEventsEnabled toggles events and persists to the API', async () => {
+    await useNotificationPreferencesStore.getState().setEventsEnabled(false);
     expect(useNotificationPreferencesStore.getState().eventsEnabled).toBe(false);
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/api/user-preferences',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ event_notifications_enabled: false }),
+      }),
+    );
   });
 
   it('setPushEnabled disables push and clears all reminders', async () => {
@@ -94,19 +115,58 @@ describe('notificationPreferencesStore', () => {
     expect(useNotificationPreferencesStore.getState().scheduledReminders).toEqual({ a: 1 });
   });
 
-  it('setDeadlineReminderTiming changes timing', () => {
-    useNotificationPreferencesStore.getState().setDeadlineReminderTiming(60);
+  it('setDeadlineReminderTiming changes timing and persists to the API', async () => {
+    await useNotificationPreferencesStore.getState().setDeadlineReminderTiming(60);
     expect(useNotificationPreferencesStore.getState().deadlineReminderTiming).toBe(60);
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/api/user-preferences',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ deadline_reminder_timing_minutes: 60 }),
+      }),
+    );
   });
 
-  it('setClassReminderTiming changes timing', () => {
-    useNotificationPreferencesStore.getState().setClassReminderTiming(30);
+  it('setClassReminderTiming changes timing and persists to the API', async () => {
+    await useNotificationPreferencesStore.getState().setClassReminderTiming(30);
     expect(useNotificationPreferencesStore.getState().classReminderTiming).toBe(30);
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/api/user-preferences',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ class_reminder_timing_minutes: 30 }),
+      }),
+    );
   });
 
-  it('setEventReminderTiming changes timing', () => {
-    useNotificationPreferencesStore.getState().setEventReminderTiming(120);
+  it('setEventReminderTiming changes timing and persists to the API', async () => {
+    await useNotificationPreferencesStore.getState().setEventReminderTiming(120);
     expect(useNotificationPreferencesStore.getState().eventReminderTiming).toBe(120);
+    expect(apiRequestMock).toHaveBeenCalledWith(
+      '/api/user-preferences',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ event_reminder_timing_minutes: 120 }),
+      }),
+    );
+  });
+
+  it('rolls back reminder toggles when the database update fails', async () => {
+    apiRequestMock.mockRejectedValueOnce(new Error('500: failed to save'));
+
+    const saved = await useNotificationPreferencesStore.getState().setClassesEnabled(false);
+
+    expect(saved).toBe(false);
+    expect(useNotificationPreferencesStore.getState().classesEnabled).toBe(true);
+  });
+
+  it('rolls back reminder timing when the database update fails', async () => {
+    apiRequestMock.mockRejectedValueOnce(new Error('500: failed to save'));
+
+    const saved = await useNotificationPreferencesStore.getState().setEventReminderTiming(120);
+
+    expect(saved).toBe(false);
+    expect(useNotificationPreferencesStore.getState().eventReminderTiming).toBe(60);
   });
 
   it('requestPermission updates permissionStatus', async () => {

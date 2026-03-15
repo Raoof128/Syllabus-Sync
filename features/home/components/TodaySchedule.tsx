@@ -257,7 +257,7 @@ const TodaySchedule = memo(() => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <h3
-                      className={`font-semibold text-mq-content ${cls.status === 'done' ? 'line-through' : ''}`}
+                      className={`font-semibold ${cls.status === 'done' ? 'text-mq-content-tertiary line-through' : 'text-mq-content'}`}
                     >
                       {cls.code}
                     </h3>
@@ -265,23 +265,33 @@ const TodaySchedule = memo(() => {
                   </div>
 
                   <p
-                    className="text-sm text-mq-content-secondary mb-1.5 line-clamp-1"
+                    className={`text-sm mb-1.5 line-clamp-1 ${
+                      cls.status === 'done'
+                        ? 'text-mq-content-tertiary line-through'
+                        : 'text-mq-content-secondary'
+                    }`}
                     title={cls.name}
                   >
                     {cls.name}
                   </p>
 
-                  <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-mq-content-secondary">
+                  <div
+                    className={`flex items-center flex-wrap gap-x-4 gap-y-1 text-sm ${
+                      cls.status === 'done'
+                        ? 'text-mq-content-tertiary'
+                        : 'text-mq-content-secondary'
+                    }`}
+                  >
                     <div className="flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>
+                      <span className={cls.status === 'done' ? 'line-through' : undefined}>
                         {formatScheduleTime(cls.startTime, language)} -{' '}
                         {formatScheduleTime(cls.endTime, language)}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>
+                      <span className={cls.status === 'done' ? 'line-through' : undefined}>
                         {formatLocation(cls.location.building, cls.location.room, t('room'))}
                       </span>
                     </div>

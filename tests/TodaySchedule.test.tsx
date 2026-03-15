@@ -8,7 +8,7 @@ const { mockState } = vi.hoisted(() => {
   const mockGetTodayClasses = () => [];
   return {
     mockState: {
-      units: [],
+      units: [] as Array<Record<string, unknown>>,
       getTodayClasses: mockGetTodayClasses,
     },
   };
@@ -19,6 +19,10 @@ vi.mock('@/lib/store/unitsStore', () => ({
   useUnitsStore: (selector: (state: typeof mockState) => unknown) => {
     return selector(mockState);
   },
+}));
+
+vi.mock('@/lib/hooks', () => ({
+  useHydration: () => true,
 }));
 
 // Mock next/navigation
@@ -37,6 +41,8 @@ import TodaySchedule from '@/features/home/components/TodaySchedule';
 
 describe('TodaySchedule', () => {
   afterEach(() => {
+    vi.useRealTimers();
+    mockState.units = [];
     cleanup();
   });
 
@@ -59,5 +65,33 @@ describe('TodaySchedule', () => {
     await waitFor(() => {
       expect(screen.getByText('No classes today')).toBeInTheDocument();
     });
+  });
+
+  it('crosses out past classes and shows them as passed', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-16T14:30:00'));
+
+    mockState.units = [
+      {
+        id: 'unit-1',
+        code: 'COMP1010',
+        name: 'Intro to Computing',
+        color: '#2563eb',
+        location: { building: '4ER', room: '120' },
+        schedule: [
+          {
+            day: 'Monday',
+            startTime: '09:00',
+            endTime: '10:00',
+          },
+        ],
+      },
+    ];
+
+    render(<TodaySchedule />);
+
+    expect(screen.getByText('COMP1010')).toHaveClass('line-through');
+    expect(screen.getByText('Intro to Computing')).toHaveClass('line-through');
+    expect(screen.getByText('PASSED')).toBeInTheDocument();
   });
 });
