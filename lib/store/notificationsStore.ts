@@ -112,12 +112,11 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
           error.message.includes('Unauthorized'));
 
       if (isAuthError) {
-        // Preserve optimistic (temp) and recently-confirmed notifications
-        const recentThreshold = Date.now() - 10_000;
-        const preservedNotifications = get().notifications.filter(
-          (n) => n.id.startsWith('temp-') || new Date(n.createdAt).getTime() > recentThreshold,
-        );
-        set({ notifications: preservedNotifications, hasLoaded: true, lastLoadedAt: Date.now() });
+        // Keep ALL existing notifications intact — don't clear the bell on
+        // transient auth errors (e.g., token refresh, cold start race).
+        // Previously this aggressively wiped non-temp/non-recent notifications,
+        // causing the bell to appear empty after any brief auth hiccup.
+        set({ hasLoaded: true, lastLoadedAt: Date.now() });
         // Avoid redirect flapping: only redirect if we can confirm there's no session.
         // Middleware/proxy still protects routes on navigation/refresh.
         if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {

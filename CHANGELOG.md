@@ -1,3 +1,18 @@
+### Raouf: Fix Bell Notification Visibility — 2026-03-16
+
+**Scope:** Fix notifications and reminders not appearing in the bell notification section.
+
+1. **Preserve notifications on auth errors** — `loadNotifications` previously cleared all non-temp, non-recent notifications on 401 auth errors. Any transient auth hiccup (token refresh, cold start) wiped the bell clean. Now keeps all existing notifications intact on auth errors.
+2. **Bell-first firing order** — `fireReminder` previously called `sendNotification` (browser push) before `addNotification` (bell). If browser notification threw, the bell update could be skipped. Now fires in priority order: bell → toast → browser notification, each in independent try-catch.
+3. **Toast fallback on reminder fire** — added `toastUtils.info()` toast so the user sees a visible popup when a reminder fires, not just a subtle bell badge change.
+4. **Header visibility reload** — added `visibilitychange` listener to the Header to reload notifications when the tab becomes visible (handles device sleep, background suspension).
+
+**Verification:**
+
+- `npm test` ✅ (91 files / 857 tests)
+- `npx tsc --noEmit` ✅
+- `npx vercel --prod` ✅ (deployed to production)
+
 ### Raouf: Fix Reminder Alarm Firing — 2026-03-16
 
 **Scope:** Fix user-set reminders (via ReminderModal) failing to fire their alarm when the trigger time arrives.

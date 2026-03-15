@@ -10,6 +10,7 @@ import {
 import { notificationService } from '@/lib/services/notificationService';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
+import { toastUtils } from '@/lib/utils/toast';
 import type { Notification } from '@/lib/types';
 
 const CHECK_INTERVAL_MS = 15_000; // Check every 15 seconds for faster detection
@@ -34,39 +35,57 @@ function mapItemTypeToNotificationType(itemType: ReminderItemType): Notification
 }
 
 /**
- * Fire a reminder: send browser notification + add to bell icon list.
- * Browser notification is attempted regardless of push preference —
- * push controls server-sent notifications, not local alerts the user explicitly set.
+ * Fire a reminder: add to bell icon list FIRST, then send browser notification.
+ * Bell notification is prioritised because it's the most reliable channel.
+ * A toast is also shown as a visible fallback in case the bell badge isn't noticed.
  */
 function fireReminder(reminder: { id: string; itemTitle: string; itemType: ReminderItemType }) {
   const title = `Reminder: ${reminder.itemTitle}`;
   const body = `Your reminder for "${reminder.itemTitle}" is now`;
 
-  // Always attempt browser notification if permission is granted.
-  // The user explicitly set this reminder, so honour it even when the
-  // global "push" toggle is off (push controls server-sent pushes).
-  const { permissionStatus } = useNotificationPreferencesStore.getState();
-  if (permissionStatus === 'granted') {
-    notificationService.sendNotification({
+  // 1. BELL — always add to bell icon notification list (persisted to DB).
+  //    This runs first so the bell badge updates even if the browser
+  //    notification throws or is blocked.
+  try {
+    useNotificationsStore.getState().addNotification({
       title,
-      body,
-      tag: `reminder-${reminder.id}`,
-      data: { type: 'reminder', id: reminder.id },
-      onClick: () => {
-        window.location.href = '/calendar';
-      },
+      message: body,
+      type: mapItemTypeToNotificationType(reminder.itemType),
+      read: false,
+      link: '/calendar',
+      relatedId: undefined,
     });
+  } catch {
+    /* store unavailable — continue to toast fallback */
   }
 
-  // Always add to bell icon notification list (persisted to DB)
-  useNotificationsStore.getState().addNotification({
-    title,
-    message: body,
-    type: mapItemTypeToNotificationType(reminder.itemType),
-    read: false,
-    link: '/calendar',
-    relatedId: undefined,
-  });
+  // 2. TOAST — always show an in-app toast so the user sees the reminder
+  //    even if they don't notice the bell badge change.
+  try {
+    toastUtils.info(title, body);
+  } catch {
+    /* toast unavailable */
+  }
+
+  // 3. BROWSER NOTIFICATION — attempt if permission is granted.
+  //    The user explicitly set this reminder, so honour it even when the
+  //    global "push" toggle is off (push controls server-sent pushes).
+  try {
+    const { permissionStatus } = useNotificationPreferencesStore.getState();
+    if (permissionStatus === 'granted') {
+      notificationService.sendNotification({
+        title,
+        body,
+        tag: `reminder-${reminder.id}`,
+        data: { type: 'reminder', id: reminder.id },
+        onClick: () => {
+          window.location.href = '/calendar';
+        },
+      });
+    }
+  } catch {
+    /* browser notification failed — bell + toast already handled */
+  }
 }
 
 /**
