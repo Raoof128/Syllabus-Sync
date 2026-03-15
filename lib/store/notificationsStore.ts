@@ -21,6 +21,11 @@ let _loadInFlight = false;
 let _loadStartedAt = 0;
 const LOAD_TIMEOUT_MS = 30_000; // safety valve if a fetch hangs
 
+// Recently-added notifications are protected from being removed by loadNotifications.
+// Maps notification ID (temp or server) → timestamp when added.
+const _protectedIds = new Map<string, number>();
+const PROTECTION_WINDOW_MS = 120_000; // 2 minutes
+
 type LoadOptions = { force?: boolean };
 
 interface NotificationsState {
@@ -87,17 +92,28 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
       // Build a set of server-side IDs for fast lookup
       const serverIds = new Set(serverNotifications.map((n) => n.id));
 
+      // Purge expired entries from the protection map
+      const now = Date.now();
+      for (const [id, ts] of _protectedIds) {
+        if (now - ts > PROTECTION_WINDOW_MS) _protectedIds.delete(id);
+      }
+
       // Preserve notifications not yet visible to the server:
       // 1. Temp (optimistic) notifications whose POST hasn't completed
       // 2. Recently-confirmed notifications (POST completed, but this GET
       //    started before the POST finished — classic race condition)
-      const recentThreshold = Date.now() - 60_000; // 60-second grace window
+      // 3. Protected notifications (recently added via addNotification)
+      const recentThreshold = now - 60_000; // 60-second grace window
       const currentPreserved = get().notifications.filter(
         (n) =>
           n.id.startsWith('temp-') ||
+          _protectedIds.has(n.id) ||
           (!serverIds.has(n.id) && new Date(n.createdAt).getTime() > recentThreshold),
       );
-      const merged = [...currentPreserved, ...serverNotifications].slice(0, MAX_NOTIFICATIONS);
+      // Deduplicate: if a protected notification also exists in server results, keep the server version
+      const preservedIds = new Set(currentPreserved.map((n) => n.id));
+      const deduplicatedServer = serverNotifications.filter((n) => !preservedIds.has(n.id));
+      const merged = [...currentPreserved, ...deduplicatedServer].slice(0, MAX_NOTIFICATIONS);
 
       set({
         notifications: merged,
@@ -158,6 +174,9 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
     const normalized = normalizeNotification(notification);
     const localNotification = { ...normalized, id: tempId };
 
+    // Protect this notification from being removed by loadNotifications
+    _protectedIds.set(tempId, Date.now());
+
     set((state) => ({
       notifications: [localNotification, ...state.notifications].slice(0, MAX_NOTIFICATIONS),
     }));
@@ -201,6 +220,9 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         body: JSON.stringify(apiPayload),
       });
       const serverNormalized = normalizeNotification(created);
+      // Transfer protection from temp ID to server ID
+      _protectedIds.delete(tempId);
+      _protectedIds.set(serverNormalized.id, Date.now());
       // Atomic replace-or-prepend: if a concurrent loadNotifications removed the
       // temp notification before this POST completed, re-add the server version
       // instead of silently losing it.
