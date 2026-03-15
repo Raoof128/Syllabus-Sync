@@ -52,6 +52,16 @@ interface RemindersState {
   reset: () => void;
 }
 
+function shouldRearmReminder(updates: Partial<Omit<Reminder, 'id' | 'createdAt'>>): boolean {
+  return (
+    updates.enabled === true ||
+    updates.timing !== undefined ||
+    updates.customDate !== undefined ||
+    updates.customTime !== undefined ||
+    updates.itemDate !== undefined
+  );
+}
+
 // Calculate reminder date based on timing and target date
 export function calculateReminderDate(
   targetDate: Date,
@@ -143,7 +153,18 @@ export const useRemindersStore = create<RemindersState>()(
 
       updateReminder: (id, updates) => {
         set((state) => ({
-          reminders: state.reminders.map((r) => (r.id === id ? { ...r, ...updates } : r)),
+          reminders: state.reminders.map((r) =>
+            r.id === id
+              ? {
+                  ...r,
+                  ...updates,
+                  // Editing or re-enabling a reminder should arm it again.
+                  // Without this, a previously-fired reminder keeps its old
+                  // notifiedAt timestamp and the checker will skip it forever.
+                  ...(shouldRearmReminder(updates) ? { notifiedAt: undefined } : {}),
+                }
+              : r,
+          ),
         }));
       },
 

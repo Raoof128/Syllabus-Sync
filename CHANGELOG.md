@@ -1,3 +1,17 @@
+### Raouf: Custom Reminder Re-Arm Fix — 2026-03-16
+
+**Scope:** Restore alarms/toasts/bell notifications for edited custom-time reminders.
+
+1. **Root cause identified** — `updateReminder()` preserved `notifiedAt` when an existing reminder was edited. `useReminderChecker` skips any reminder with `notifiedAt`, so changing a previously-fired reminder to a new custom time silently left it permanently disarmed.
+2. **Central store fix** — `lib/store/remindersStore.ts` now re-arms reminders on schedule edits or re-enable actions by clearing `notifiedAt` whenever timing/custom date/custom time/item date/enabled state changes.
+3. **Regression test** — `tests/stores-misc.test.ts` now verifies that a notified reminder becomes pending again after being edited to a new custom time.
+
+**Verification:**
+
+- `npx vitest run --config config/vitest/vitest.config.ts tests/stores-misc.test.ts` ✅
+- `npx tsc -p config/ts/tsconfig.json --noEmit` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs lib/store/remindersStore.ts tests/stores-misc.test.ts` ✅
+
 ### Raouf: Notification 409 Conflict Fix — 2026-03-16
 
 **Scope:** Stop reminder bell notifications from colliding with the notifications uniqueness index and disappearing after optimistic render.

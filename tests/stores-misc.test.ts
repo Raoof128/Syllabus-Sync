@@ -291,6 +291,33 @@ describe('remindersStore', () => {
     expect(useRemindersStore.getState().reminders[0].timing).toBe('2days');
   });
 
+  it('should re-arm a notified reminder when timing is updated', () => {
+    const reminder = useRemindersStore.getState().addReminder({
+      itemId: 'deadline-1',
+      itemType: 'assignment',
+      itemTitle: 'Assignment 1',
+      timing: '1day',
+      enabled: true,
+      customDate: '2026-03-16',
+      customTime: '09:00',
+    });
+
+    useRemindersStore.getState().markAsNotified(reminder.id);
+    expect(useRemindersStore.getState().reminders[0].notifiedAt).toBeDefined();
+
+    useRemindersStore.getState().updateReminder(reminder.id, {
+      timing: 'custom',
+      customDate: '2026-03-17',
+      customTime: '10:15',
+      enabled: true,
+    });
+
+    const updated = useRemindersStore.getState().reminders[0];
+    expect(updated.notifiedAt).toBeUndefined();
+    expect(updated.customDate).toBe('2026-03-17');
+    expect(updated.customTime).toBe('10:15');
+  });
+
   it('should remove a reminder', () => {
     const reminder = useRemindersStore.getState().addReminder({
       itemId: 'deadline-1',
