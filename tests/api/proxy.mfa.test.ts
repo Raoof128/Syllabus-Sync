@@ -101,6 +101,46 @@ describe('proxy mfa enforcement', () => {
     vi.useRealTimers();
   });
 
+  it('allows /api/webauthn/authenticate/* through without auth (pre-login passkey flow)', async () => {
+    // Simulate unauthenticated user (no session)
+    supabaseMocks.getUserMock.mockResolvedValueOnce({
+      data: { user: null },
+      error: null,
+    });
+
+    const { proxy } = await import('@/lib/proxy');
+
+    const optionsReq = new NextRequest('http://localhost/api/webauthn/authenticate/options', {
+      method: 'POST',
+    });
+    const optionsRes = await proxy(optionsReq);
+    // Should NOT be 401/403 — the route is public
+    expect(optionsRes.status).not.toBe(401);
+    expect(optionsRes.status).not.toBe(403);
+
+    const verifyReq = new NextRequest('http://localhost/api/webauthn/authenticate/verify', {
+      method: 'POST',
+    });
+    const verifyRes = await proxy(verifyReq);
+    expect(verifyRes.status).not.toBe(401);
+    expect(verifyRes.status).not.toBe(403);
+  });
+
+  it('blocks /api/webauthn/register/* without auth (requires session)', async () => {
+    supabaseMocks.getUserMock.mockResolvedValueOnce({
+      data: { user: null },
+      error: null,
+    });
+
+    const { proxy } = await import('@/lib/proxy');
+
+    const req = new NextRequest('http://localhost/api/webauthn/register/options', {
+      method: 'POST',
+    });
+    const res = await proxy(req);
+    expect(res.status).toBe(401);
+  });
+
   it('does not force local signout for non-refresh 400 auth errors', async () => {
     supabaseMocks.getUserMock.mockResolvedValueOnce({
       data: { user: null },

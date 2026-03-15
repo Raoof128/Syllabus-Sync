@@ -1,3 +1,17 @@
+### Raouf: Fix Biometric Login 401 — Add WebAuthn Authenticate Routes to Proxy Public Path Allowlist — 2026-03-16
+
+**Scope:** Unblock biometric login by adding the WebAuthn authenticate endpoints to the proxy's public API path allowlist.
+
+1. **Root cause** — The previous commit switched login from `/api/auth/passkey/*` to `/api/webauthn/authenticate/*`, but the proxy's `isPublicApiPath()` only allows `/api/auth/` as a public prefix. The new WebAuthn authenticate routes were blocked with 401 for unauthenticated users (i.e. anyone trying to log in).
+2. **Proxy fix** — Added `path.startsWith('/api/webauthn/authenticate/')` to `isPublicApiPath()` in `lib/proxy.ts`. Only the authenticate sub-path is public; register and credentials routes remain auth-gated.
+3. **Regression tests** — Added two tests in `tests/api/proxy.mfa.test.ts`: one proving `/api/webauthn/authenticate/*` passes through without auth, another confirming `/api/webauthn/register/*` is still blocked for unauthenticated users.
+
+**Verification:**
+
+- `npx vitest run --config config/vitest/vitest.config.ts tests/api/proxy.mfa.test.ts` ✅ (8 tests)
+- `npx tsc -p config/ts/tsconfig.json --noEmit` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs lib/proxy.ts tests/api/proxy.mfa.test.ts` ✅
+
 ### Raouf: Biometric Login Full Audit — Align Settings Toggle, Login Status, and WebAuthn Credentials — 2026-03-16
 
 **Scope:** Finish the biometric/passkey audit by making the settings toggle reflect real DB-backed passkey state and disable biometric login completely.
