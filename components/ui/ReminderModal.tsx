@@ -32,6 +32,7 @@ import {
 } from '@/lib/store/remindersStore';
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import { toastUtils } from '@/lib/utils/toast';
+import { logger } from '@/lib/logger';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -75,7 +76,6 @@ export default function ReminderModal({
 }: ReminderModalProps) {
   const { t } = useTypedTranslation();
   const { addReminder, updateReminder, removeReminder, getReminderForItem } = useRemindersStore();
-  const { addNotification } = useNotificationsStore();
 
   const [enabled, setEnabled] = useState(false);
   const [timing, setTiming] = useState<ReminderTiming>('1day');
@@ -163,28 +163,34 @@ export default function ReminderModal({
         reminderDateStr = format(triggerDate, 'dd/MM/yyyy');
       }
 
-      if (existingReminderId) {
+      const isUpdate = !!existingReminderId;
+
+      if (isUpdate) {
         updateReminder(existingReminderId, reminderData);
-        toastUtils.success(t('success'), t('reminderUpdated'));
       } else {
         const newReminder = addReminder(reminderData);
         setExistingReminderId(newReminder.id);
+      }
 
-        // Create a detailed notification showing the reminder was added
-        const message = reminderDateStr
-          ? `The reminder for ${itemLabel} is added on ${reminderDateStr}`
-          : `${getTimingLabelText(timing)} for "${itemTitle}"`;
-        addNotification({
-          title: t('reminderSet'),
+      // ALWAYS create a bell notification for both new and updated reminders.
+      // Uses direct store access to avoid stale closure references.
+      const message = reminderDateStr
+        ? `The reminder for ${itemLabel} is ${isUpdate ? 'updated to' : 'added on'} ${reminderDateStr}`
+        : `${getTimingLabelText(timing)} for "${itemTitle}"`;
+      try {
+        useNotificationsStore.getState().addNotification({
+          title: t(isUpdate ? 'reminderUpdated' : 'reminderSet'),
           message,
           type: 'system',
           read: false,
           link: '/calendar',
           relatedId: itemId,
         });
-
-        toastUtils.success(t('success'), t('reminderSet'));
+      } catch (error) {
+        logger.warn('Failed to add reminder notification to bell', error);
       }
+
+      toastUtils.success(t('success'), t(isUpdate ? 'reminderUpdated' : 'reminderSet'));
     } else if (existingReminderId) {
       // Disable/remove reminder
       removeReminder(existingReminderId);
@@ -202,14 +208,18 @@ export default function ReminderModal({
       const removeMessage = removeDateStr
         ? `The reminder for ${itemLabel} on ${removeDateStr} is removed`
         : `The reminder for ${itemLabel} is removed`;
-      addNotification({
-        title: t('reminderRemoved'),
-        message: removeMessage,
-        type: 'system',
-        read: false,
-        link: '/calendar',
-        relatedId: itemId,
-      });
+      try {
+        useNotificationsStore.getState().addNotification({
+          title: t('reminderRemoved'),
+          message: removeMessage,
+          type: 'system',
+          read: false,
+          link: '/calendar',
+          relatedId: itemId,
+        });
+      } catch (error) {
+        logger.warn('Failed to add reminder-removed notification to bell', error);
+      }
 
       toastUtils.success(t('success'), t('reminderRemoved'));
     }
@@ -228,7 +238,6 @@ export default function ReminderModal({
     addReminder,
     updateReminder,
     removeReminder,
-    addNotification,
     unitCode,
     getTimingLabelText,
     onOpenChange,
