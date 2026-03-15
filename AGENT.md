@@ -1,4 +1,11 @@
 Raouf: 2026-03-16 (Australia/Sydney)
+Scope: Fix Reminder Bell Notification — Always Create Bell Entry on Set/Update/Remove
+Summary: Fixed bell notifications not appearing when user sets a reminder via ReminderModal. Two root causes: (1) When updating an existing reminder (`existingReminderId` truthy), `handleSave` only called `updateReminder` + toast but SKIPPED `addNotification` — no bell entry was created. Only first-time reminder creation called `addNotification`. Fix: always create a bell notification for set, update, AND remove flows. (2) `addNotification` was destructured from `useNotificationsStore()` (no selector, subscribes to ALL state) and used in a `useCallback` — potential stale closure. Fix: switched to `useNotificationsStore.getState().addNotification()` for direct store access, bypassing React hook lifecycle. Each `addNotification` call is wrapped in try-catch with logger fallback.
+Files Changed: `components/ui/ReminderModal.tsx`
+Verification: `npm test` ✅ (91 files / 857 tests), `npx tsc --noEmit` ✅, `npx vercel --prod` ✅ (deployed)
+Follow-ups: None.
+
+Raouf: 2026-03-16 (Australia/Sydney)
 Scope: Fix Bell Notification Visibility — Preserve Notifications on Auth Errors, Toast Fallback, Robust Firing
 Summary: Fixed notifications and reminders not appearing in the bell notification section. Three root causes: (1) `loadNotifications` on auth error (401) aggressively cleared ALL non-temp, non-recent (>10s) notifications from the store. Any transient auth hiccup (token refresh, cold start race) wiped the bell clean. Fix: on auth error, keep ALL existing notifications intact instead of clearing. (2) `fireReminder` in `useReminderChecker` called `sendNotification` (browser push, async) before `addNotification` (bell). If the browser notification threw, the bell notification could be skipped. Fix: reversed order — bell first, then toast, then browser notification — each wrapped in independent try-catch. (3) No visible in-app feedback when a reminder fires — user had to notice the bell badge change. Fix: added `toastUtils.info()` toast as a visual fallback. Also added `visibilitychange` listener on the Header to reload notifications when tab becomes visible (handles device sleep).
 Files Changed: `lib/store/notificationsStore.ts`, `lib/hooks/useReminderChecker.ts`, `components/layout/Header.tsx`

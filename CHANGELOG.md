@@ -1,3 +1,17 @@
+### Raouf: Fix Reminder Bell Notification — 2026-03-16
+
+**Scope:** Fix bell notifications not appearing when user sets/updates a reminder via ReminderModal.
+
+1. **Always create bell notification** — updating an existing reminder previously only called `updateReminder` + toast, skipping `addNotification` entirely. Now creates a bell notification for all three flows: set, update, and remove.
+2. **Direct store access** — switched from hook-destructured `addNotification` (potential stale closure in `useCallback`) to `useNotificationsStore.getState().addNotification()` for reliable direct store access.
+3. **Error handling** — each `addNotification` call wrapped in try-catch with `logger.warn` fallback.
+
+**Verification:**
+
+- `npm test` ✅ (91 files / 857 tests)
+- `npx tsc --noEmit` ✅
+- `npx vercel --prod` ✅ (deployed to production)
+
 ### Raouf: Fix Bell Notification Visibility — 2026-03-16
 
 **Scope:** Fix notifications and reminders not appearing in the bell notification section.
