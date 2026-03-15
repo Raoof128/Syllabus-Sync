@@ -482,6 +482,24 @@ describe('notificationsStore', () => {
     expect(notifications[1].id).toBe(n2.id);
   });
 
+  it('should preserve existing notifications when loadNotifications hits auth errors', async () => {
+    useNotificationsStore.setState({
+      notifications: [mockNotification],
+      isLoading: false,
+      hasLoaded: false,
+      lastLoadedAt: null,
+    });
+
+    apiRequestMock.mockRejectedValueOnce(new Error('401: Valid authentication token required'));
+
+    await useNotificationsStore.getState().loadNotifications({ force: true });
+
+    const { notifications, hasLoaded } = useNotificationsStore.getState();
+    expect(hasLoaded).toBe(true);
+    expect(notifications).toHaveLength(1);
+    expect(notifications[0].id).toBe(mockNotification.id);
+  });
+
   it('should get unread count', () => {
     const notification2 = { ...mockNotification, id: 'notif-2', read: true };
     useNotificationsStore.setState({

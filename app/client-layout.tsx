@@ -19,8 +19,11 @@ import { useInstallPrompt } from '@/lib/hooks/useInstallPrompt';
 import { useSWUpdate } from '@/lib/hooks/useSWUpdate';
 import { useLanguageStore } from '@/lib/store/languageStore';
 import { LevelUpNotificationProvider } from '@/features/gamification/components/LevelUpNotification';
-import { isSupabaseConfigured } from '@/lib/supabase/client';
-import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
+import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import {
+  getBrowserAuthSnapshot,
+  getConfirmedBrowserAuthSnapshot,
+} from '@/lib/supabase/browserSession';
 import { clearAllClientStorage, resetAllStores } from '@/lib/utils/clientStorage';
 import { apiRequest } from '@/lib/utils/api';
 import { API_ROUTES } from '@/lib/constants/config';
@@ -94,6 +97,11 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     () => !isAuthRoute && !isPublicRoute && !isPostAuthRoute,
   );
+  const isAuthenticatedRef = useRef(isAuthenticated);
+
+  useEffect(() => {
+    isAuthenticatedRef.current = isAuthenticated;
+  }, [isAuthenticated]);
 
   const checkAuth = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
@@ -101,11 +109,21 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     if (pathname.startsWith('/reset-password')) return;
 
     try {
-      const { user, resolution } = await getBrowserAuthSnapshot();
+      const authSnapshot = isAuthenticatedRef.current
+        ? await getConfirmedBrowserAuthSnapshot()
+        : await getBrowserAuthSnapshot();
+      const { user, resolution } = authSnapshot;
       if (resolution === 'unknown') {
         return;
       }
       const authenticated = Boolean(user?.id);
+
+      // Keep the authenticated shell mounted while a focus-time auth recheck is
+      // ambiguous. Real sign-outs are handled by Supabase auth events below.
+      if (!authenticated && isAuthenticatedRef.current) {
+        return;
+      }
+
       setIsAuthenticated(authenticated);
 
       const searchParams =
@@ -138,6 +156,39 @@ function ClientLayoutComponent({ children }: { children: React.ReactNode }) {
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    if (isPublicRoute || isPostAuthRoute) return;
+    if (pathname.startsWith('/reset-password')) return;
+
+    const supabase = createBrowserClient();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event: string, session: unknown) => {
+      const maybeSession =
+        session && typeof session === 'object'
+          ? (session as { user?: { id?: string } | null })
+          : null;
+      const hasUser = Boolean(maybeSession?.user?.id);
+
+      if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+        if (!isAuthRoute) {
+          router.replace('/login');
+        }
+        return;
+      }
+
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (hasUser) {
+          setIsAuthenticated(true);
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router, isAuthRoute, isPublicRoute, isPostAuthRoute, pathname]);
 
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {

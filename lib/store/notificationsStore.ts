@@ -6,7 +6,6 @@ import { API_ROUTES } from '@/lib/constants/config';
 import { Notification } from '@/lib/types';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import { apiRequest, isLikelyNetworkError, isBrowserOffline } from '@/lib/utils/api';
-import { getBrowserAuthSnapshot } from '@/lib/supabase/browserSession';
 import { toastUtils } from '@/lib/utils/toast';
 import { isValidUUID } from '@/lib/utils/uuid';
 
@@ -139,18 +138,6 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         // Previously this aggressively wiped non-temp/non-recent notifications,
         // causing the bell to appear empty after any brief auth hiccup.
         set({ hasLoaded: true, lastLoadedAt: Date.now() });
-        // Avoid redirect flapping: only redirect if we can confirm there's no session.
-        // Middleware/proxy still protects routes on navigation/refresh.
-        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-          try {
-            const { user, resolution } = await getBrowserAuthSnapshot();
-            if (resolution === 'resolved' && !user) {
-              window.location.href = '/login';
-            }
-          } catch {
-            // If we can't determine session client-side, do not redirect aggressively.
-          }
-        }
       } else {
         const isNetworkError = isLikelyNetworkError(error) || isBrowserOffline();
         if (!isNetworkError) {

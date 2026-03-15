@@ -1,3 +1,33 @@
+### Raouf: Notification Disappears Follow-Up — 2026-03-16
+
+**Scope:** Stop focus-time auth revalidation from tearing down the authenticated shell and making bell notifications appear to vanish.
+
+1. **Optimistic auth retention in client layout** — `app/client-layout.tsx` now keeps the authenticated shell mounted when a focus-triggered auth recheck returns `null` after a previously authenticated state. This avoids treating a transient Supabase refresh gap as a real logout.
+2. **Explicit auth-event ownership** — `app/client-layout.tsx` now listens to `onAuthStateChange` and only drives teardown/redirect from explicit `SIGNED_OUT`, while `SIGNED_IN` and `TOKEN_REFRESHED` restore authenticated state.
+3. **Notification store no longer redirects** — `lib/store/notificationsStore.ts` still preserves notifications on auth errors, but it no longer owns `/login` redirects. Navigation stays with the auth layer instead of a data store.
+4. **Regression test** — `tests/stores.test.ts` now proves that a 401 during `loadNotifications()` preserves existing bell notifications.
+
+**Verification:**
+
+- `npx vitest run --config config/vitest/vitest.config.ts tests/stores.test.ts tests/unit/utils/browserSession.test.ts` ✅
+- `npx tsc -p config/ts/tsconfig.json --noEmit` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs app/client-layout.tsx lib/store/notificationsStore.ts lib/supabase/browserSession.ts tests/unit/utils/browserSession.test.ts tests/stores.test.ts` ✅
+
+### Raouf: Auth Focus Recovery Hardening — 2026-03-16
+
+**Scope:** Prevent transient focus-time auth reads from remounting the authenticated header and re-triggering notification reloads.
+
+1. **Confirmed browser auth snapshot** — added `getConfirmedBrowserAuthSnapshot()` in `lib/supabase/browserSession.ts` to retry once before treating the browser as signed out.
+2. **Client layout hardening** — `app/client-layout.tsx` now uses the confirmed snapshot while the user is already authenticated, preventing a one-off `null` user read from flipping `isAuthenticated` and remounting `Header`.
+3. **Notification auth fallback hardening** — `lib/store/notificationsStore.ts` now confirms the signed-out state before redirecting to `/login` after notification-auth errors.
+4. **Regression tests** — added `tests/unit/utils/browserSession.test.ts` covering resolved user, unknown resolution, transient null recovery, and confirmed signed-out cases.
+
+**Verification:**
+
+- `npx vitest run --config config/vitest/vitest.config.ts tests/unit/utils/browserSession.test.ts` ✅
+- `npx tsc -p config/ts/tsconfig.json --noEmit` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs app/client-layout.tsx lib/store/notificationsStore.ts lib/supabase/browserSession.ts tests/unit/utils/browserSession.test.ts` ✅
+
 ### Raouf: Fix Reminder Bell Notification — 2026-03-16
 
 **Scope:** Fix bell notifications not appearing when user sets/updates a reminder via ReminderModal.
