@@ -209,9 +209,9 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         if (tempExists) {
           return {
             notifications: state.notifications.map((n) => (n.id === tempId ? serverNormalized : n)),
-            // Invalidate stale cache so the next loadNotifications refetches
-            // fresh data that includes this notification.
-            lastLoadedAt: null,
+            // Mark as freshly loaded so focus/visibility handlers don't
+            // immediately trigger a loadNotifications that could race us.
+            lastLoadedAt: Date.now(),
           };
         }
         // Temp was removed — check if server ID already exists (dedup)
@@ -221,7 +221,7 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         // Re-add the confirmed notification
         return {
           notifications: [serverNormalized, ...state.notifications].slice(0, MAX_NOTIFICATIONS),
-          lastLoadedAt: null,
+          lastLoadedAt: Date.now(),
         };
       });
       _loadInFlight = false;
