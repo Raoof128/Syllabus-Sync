@@ -638,7 +638,86 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         Object.entries(state.pendingReminders).forEach(([id, reminder]) => {
           const delay = reminder.triggerAt - now;
           if (delay <= 0) {
-            // Skip expired reminders
+            // Reminder was due while the page was closed — fire it now
+            // (up to 24 hours late; beyond that silently discard).
+            const lateMs = -delay;
+            const MAX_LATE_MS = 24 * 60 * 60 * 1000;
+            if (lateMs < MAX_LATE_MS) {
+              // Fire the missed reminder immediately
+              if (reminder.type === 'deadline') {
+                const deadlineTitle = reminder.payload.title as string;
+                const deadlineUnitCode = reminder.payload.unitCode as string;
+                notificationService.sendDeadlineReminder(
+                  deadlineTitle,
+                  deadlineUnitCode,
+                  new Date(reminder.payload.dueDate as number),
+                  id,
+                );
+                const timingMinutes = get().deadlineReminderTiming;
+                const timeLabel = formatTimingLabel(timingMinutes);
+                try {
+                  useNotificationsStore.getState().addNotification({
+                    title: `Deadline Reminder: ${deadlineUnitCode}`,
+                    message: `"${deadlineTitle}" of ${deadlineUnitCode} is due in ${timeLabel}, hurry up!`,
+                    type: 'deadline',
+                    read: false,
+                    link: '/calendar',
+                    relatedId: id,
+                  });
+                } catch {
+                  /* ignore */
+                }
+              } else if (reminder.type === 'class') {
+                const classTime = new Date(reminder.payload.classTime as number);
+                const timeStr = classTime.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
+                notificationService.sendClassReminder(
+                  reminder.payload.unitCode as string,
+                  reminder.payload.unitName as string,
+                  reminder.payload.building as string,
+                  reminder.payload.room as string,
+                  timeStr,
+                  reminder.payload.classTime as number,
+                );
+                try {
+                  useNotificationsStore.getState().addNotification({
+                    title: `Class Reminder: ${reminder.payload.unitCode as string}`,
+                    message: `${reminder.payload.unitName as string} at ${timeStr} in ${reminder.payload.building as string} ${reminder.payload.room as string}`,
+                    type: 'class',
+                    read: false,
+                    link: '/calendar',
+                  });
+                } catch {
+                  /* ignore */
+                }
+              } else if (reminder.type === 'event') {
+                const eventTime = new Date(reminder.payload.eventTime as number);
+                const timeStr = eventTime.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
+                notificationService.sendEventReminder(
+                  reminder.payload.title as string,
+                  reminder.payload.location as string,
+                  timeStr,
+                  id,
+                );
+                try {
+                  useNotificationsStore.getState().addNotification({
+                    title: `Event Reminder: ${reminder.payload.title as string}`,
+                    message: `${reminder.payload.title as string} at ${timeStr}${reminder.payload.location ? ` — ${reminder.payload.location as string}` : ''}`,
+                    type: 'event',
+                    read: false,
+                    link: '/calendar',
+                  });
+                } catch {
+                  /* ignore */
+                }
+              }
+            }
+            // Remove from pending regardless (fired or too old)
             set((s) => {
               const { [id]: _removed, ...rest } = s.pendingReminders;
               void _removed;

@@ -12,7 +12,10 @@ import { useNotificationPreferencesStore } from '@/lib/store/notificationPrefere
 import { useNotificationsStore } from '@/lib/store/notificationsStore';
 import type { Notification } from '@/lib/types';
 
-const CHECK_INTERVAL_MS = 30_000; // Check every 30 seconds
+const CHECK_INTERVAL_MS = 15_000; // Check every 15 seconds for faster detection
+
+// Accept reminders that are up to 24 hours late (handles background tabs, sleep, etc.)
+const MAX_LATE_MS = 24 * 60 * 60 * 1000;
 
 /** Map reminder item type to notification type */
 function mapItemTypeToNotificationType(itemType: ReminderItemType): Notification['type'] {
@@ -31,6 +34,42 @@ function mapItemTypeToNotificationType(itemType: ReminderItemType): Notification
 }
 
 /**
+ * Fire a reminder: send browser notification + add to bell icon list.
+ * Browser notification is attempted regardless of push preference —
+ * push controls server-sent notifications, not local alerts the user explicitly set.
+ */
+function fireReminder(reminder: { id: string; itemTitle: string; itemType: ReminderItemType }) {
+  const title = `Reminder: ${reminder.itemTitle}`;
+  const body = `Your reminder for "${reminder.itemTitle}" is now`;
+
+  // Always attempt browser notification if permission is granted.
+  // The user explicitly set this reminder, so honour it even when the
+  // global "push" toggle is off (push controls server-sent pushes).
+  const { permissionStatus } = useNotificationPreferencesStore.getState();
+  if (permissionStatus === 'granted') {
+    notificationService.sendNotification({
+      title,
+      body,
+      tag: `reminder-${reminder.id}`,
+      data: { type: 'reminder', id: reminder.id },
+      onClick: () => {
+        window.location.href = '/calendar';
+      },
+    });
+  }
+
+  // Always add to bell icon notification list (persisted to DB)
+  useNotificationsStore.getState().addNotification({
+    title,
+    message: body,
+    type: mapItemTypeToNotificationType(reminder.itemType),
+    read: false,
+    link: '/calendar',
+    relatedId: undefined,
+  });
+}
+
+/**
  * Hook that periodically checks pending reminders and fires browser notifications.
  * Should be mounted once at the app level (e.g., in ClientLayout).
  */
@@ -40,7 +79,6 @@ export function useReminderChecker() {
   useEffect(() => {
     const checkReminders = () => {
       const { reminders, markAsNotified } = useRemindersStore.getState();
-      const { permissionStatus, pushEnabled } = useNotificationPreferencesStore.getState();
 
       const now = new Date();
 
@@ -69,41 +107,18 @@ export function useReminderChecker() {
 
         if (!triggerDate) return;
 
-        // Fire if trigger time has passed (within last 5 minutes to avoid missing)
         const timeDiff = now.getTime() - triggerDate.getTime();
-        if (timeDiff >= 0 && timeDiff < 5 * 60 * 1000) {
-          const title = `Reminder: ${reminder.itemTitle}`;
-          const body = `Your reminder for "${reminder.itemTitle}" is now`;
 
-          // Send browser push notification (only if permission granted)
-          if (permissionStatus === 'granted' && pushEnabled) {
-            notificationService.sendNotification({
-              title,
-              body,
-              tag: `reminder-${reminder.id}`,
-              data: { type: 'reminder', id: reminder.id },
-              onClick: () => {
-                window.location.href = '/calendar';
-              },
-            });
-          }
-
-          // Always add to bell icon notification list (persisted to DB)
-          useNotificationsStore.getState().addNotification({
-            title,
-            message: body,
-            type: mapItemTypeToNotificationType(reminder.itemType),
-            read: false,
-            link: '/calendar',
-            relatedId: undefined,
-          });
-
-          // Mark as notified so it won't fire again
+        if (timeDiff >= 0 && timeDiff < MAX_LATE_MS) {
+          // Trigger time has passed but within the grace window — fire now.
+          // This covers background-tab throttling, device sleep, page reloads.
+          fireReminder(reminder);
           markAsNotified(reminder.id);
-        } else if (timeDiff >= 5 * 60 * 1000) {
-          // Trigger time was more than 5 minutes ago - mark as notified to clean up
+        } else if (timeDiff >= MAX_LATE_MS) {
+          // Trigger time was more than 24 hours ago — silently expire
           markAsNotified(reminder.id);
         }
+        // timeDiff < 0 means trigger is still in the future — do nothing yet
       });
     };
 
@@ -113,10 +128,19 @@ export function useReminderChecker() {
     // Set up interval
     intervalRef.current = setInterval(checkReminders, CHECK_INTERVAL_MS);
 
+    // Also check when the tab regains focus (handles sleep / background suspension)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkReminders();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 }

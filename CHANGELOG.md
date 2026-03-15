@@ -1,3 +1,19 @@
+### Raouf: Fix Reminder Alarm Firing — 2026-03-16
+
+**Scope:** Fix user-set reminders (via ReminderModal) failing to fire their alarm when the trigger time arrives.
+
+1. **Widened fire window from 5min to 24h** — `useReminderChecker` previously only fired reminders within a 5-minute window of their trigger time. Browsers throttle `setInterval` in background tabs (once/min or fully suspended), causing the checker to miss the window. Reminders were silently marked as notified without ever firing. Now accepts reminders up to 24 hours late, so missed reminders fire when the user returns.
+2. **Browser notification no longer gated on pushEnabled** — the checker required both `permissionStatus === 'granted'` AND `pushEnabled` to fire browser notifications. But `pushEnabled` controls server-sent push, not local alarms the user explicitly set. Now fires whenever browser permission is granted.
+3. **Fire missed pending reminders on page reload** — `reschedulePending()` silently discarded expired pending reminders. Now fires them (up to 24h late) before removing them from the pending queue.
+4. **Faster check interval** — reduced from 30s to 15s for quicker detection.
+5. **Tab focus recovery** — added `visibilitychange` listener so reminders are checked immediately when the tab regains focus (handles device sleep and extended background).
+
+**Verification:**
+
+- `npm test` ✅ (91 files / 857 tests)
+- `npx tsc --noEmit` ✅
+- `npx vercel --prod` ✅ (deployed to production)
+
 ### Raouf: End-to-End Notification & Delete Audit — 2026-03-15
 
 **Scope:** Full trace of notification + delete surfaces; fix cascade notification cleanup for deadline and event deletion.
