@@ -91,7 +91,7 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
       // 1. Temp (optimistic) notifications whose POST hasn't completed
       // 2. Recently-confirmed notifications (POST completed, but this GET
       //    started before the POST finished — classic race condition)
-      const recentThreshold = Date.now() - 10_000; // 10-second grace window
+      const recentThreshold = Date.now() - 60_000; // 60-second grace window
       const currentPreserved = get().notifications.filter(
         (n) =>
           n.id.startsWith('temp-') ||
@@ -162,6 +162,12 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
       notifications: [localNotification, ...state.notifications].slice(0, MAX_NOTIFICATIONS),
     }));
 
+    // Block concurrent loadNotifications while the POST is in-flight.
+    // Without this, a focus-triggered load can race the POST and overwrite
+    // the just-added notification (the "appears then disappears" bug).
+    _loadInFlight = true;
+    _loadStartedAt = Date.now();
+
     try {
       const apiPayload: Partial<Notification> = { ...normalized };
 
@@ -203,6 +209,9 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         if (tempExists) {
           return {
             notifications: state.notifications.map((n) => (n.id === tempId ? serverNormalized : n)),
+            // Invalidate stale cache so the next loadNotifications refetches
+            // fresh data that includes this notification.
+            lastLoadedAt: null,
           };
         }
         // Temp was removed — check if server ID already exists (dedup)
@@ -212,10 +221,13 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         // Re-add the confirmed notification
         return {
           notifications: [serverNormalized, ...state.notifications].slice(0, MAX_NOTIFICATIONS),
+          lastLoadedAt: null,
         };
       });
+      _loadInFlight = false;
       return serverNormalized;
     } catch (error) {
+      _loadInFlight = false;
       // Handle 409 Conflict (notification already exists) gracefully
       const is409 = error instanceof Error && error.message.includes('409');
       if (is409) {
