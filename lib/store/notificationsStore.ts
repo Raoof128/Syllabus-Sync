@@ -89,8 +89,27 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         .map(normalizeNotification)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-      // Build a set of server-side IDs for fast lookup
-      const serverIds = new Set(serverNotifications.map((n) => n.id));
+      // MERGE STRATEGY: never remove existing notifications, only add/update.
+      // This prevents the "appears then disappears" bug regardless of what
+      // triggers loadNotifications (focus, visibility, Header remount, etc.).
+      const currentNotifications = get().notifications;
+      const currentById = new Map(currentNotifications.map((n) => [n.id, n]));
+
+      // Update existing notifications with server data (e.g., read status)
+      // and add new server notifications we don't have locally
+      for (const serverNotif of serverNotifications) {
+        const existing = currentById.get(serverNotif.id);
+        if (existing) {
+          // Update with server version (picks up read status, etc.)
+          // BUT if it's a temp or protected notification, keep the local version
+          if (!existing.id.startsWith('temp-') && !_protectedIds.has(existing.id)) {
+            currentById.set(serverNotif.id, serverNotif);
+          }
+        } else {
+          // New from server — add it
+          currentById.set(serverNotif.id, serverNotif);
+        }
+      }
 
       // Purge expired entries from the protection map
       const now = Date.now();
@@ -98,22 +117,9 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         if (now - ts > PROTECTION_WINDOW_MS) _protectedIds.delete(id);
       }
 
-      // Preserve notifications not yet visible to the server:
-      // 1. Temp (optimistic) notifications whose POST hasn't completed
-      // 2. Recently-confirmed notifications (POST completed, but this GET
-      //    started before the POST finished — classic race condition)
-      // 3. Protected notifications (recently added via addNotification)
-      const recentThreshold = now - 60_000; // 60-second grace window
-      const currentPreserved = get().notifications.filter(
-        (n) =>
-          n.id.startsWith('temp-') ||
-          _protectedIds.has(n.id) ||
-          (!serverIds.has(n.id) && new Date(n.createdAt).getTime() > recentThreshold),
-      );
-      // Deduplicate: if a protected notification also exists in server results, keep the server version
-      const preservedIds = new Set(currentPreserved.map((n) => n.id));
-      const deduplicatedServer = serverNotifications.filter((n) => !preservedIds.has(n.id));
-      const merged = [...currentPreserved, ...deduplicatedServer].slice(0, MAX_NOTIFICATIONS);
+      const merged = Array.from(currentById.values())
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, MAX_NOTIFICATIONS);
 
       set({
         notifications: merged,

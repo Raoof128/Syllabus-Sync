@@ -197,11 +197,18 @@ const Header = memo(() => {
         }).data.subscription
       : null;
 
+    const handleFocus = () => {
+      loadNotifications();
+    };
+
+    window.addEventListener('focus', handleFocus);
+
     return () => {
       isActive = false;
+      window.removeEventListener('focus', handleFocus);
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [loadNotifications]);
 
   // Handle notifications seeding (only if authenticated)
   useEffect(() => {
