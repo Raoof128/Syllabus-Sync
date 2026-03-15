@@ -1,4 +1,11 @@
 Raouf: 2026-03-16 (Australia/Sydney)
+Scope: Fix WebAuthn RP ID Mismatch — Trim Env Vars and Remove Stale Vercel Overrides
+Summary: Biometric login failed in production with "The relying party ID is not a registrable domain suffix of, nor equal to the current domain." The `WEBAUTHN_RP_ID` and `WEBAUTHN_ORIGIN` env vars in Vercel were set to stale/incorrect values (likely `localhost` or contained trailing newlines). Fix: (1) Added `.trim()` to env var reads in both `lib/security/webauthn.ts` and `app/api/auth/passkey/_lib.ts` to prevent trailing whitespace/newline issues. (2) Removed both `WEBAUTHN_RP_ID` and `WEBAUTHN_ORIGIN` from Vercel production env so the code auto-detects from request headers, which always matches the actual domain.
+Files Changed: `lib/security/webauthn.ts`, `app/api/auth/passkey/_lib.ts`
+Verification: `npm run check` ✅
+Follow-ups: If a custom domain is added later, re-add `WEBAUTHN_RP_ID` and `WEBAUTHN_ORIGIN` with correct values.
+
+Raouf: 2026-03-16 (Australia/Sydney)
 Scope: Fix Biometric Login 401 — Add WebAuthn Authenticate Routes to Proxy Public Path Allowlist
 Summary: Biometric login was broken because the previous fix switched `usePasskeyLogin` from `/api/auth/passkey/*` (covered by the `/api/auth/` prefix in `isPublicApiPath`) to `/api/webauthn/authenticate/*`, but forgot to add the new path prefix to the proxy allowlist. Since these are pre-login routes (no session exists), the proxy returned 401 before the request ever reached the route handler. Fix: added `/api/webauthn/authenticate/` to `isPublicApiPath()` in `lib/proxy.ts`. Only the authenticate sub-path is public — register and credentials routes remain auth-protected. Added two regression tests: one proving authenticate routes pass through without auth, another proving register routes are still blocked.
 Files Changed: `lib/proxy.ts`, `tests/api/proxy.mfa.test.ts`

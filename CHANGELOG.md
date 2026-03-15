@@ -1,3 +1,15 @@
+### Raouf: Fix WebAuthn RP ID Mismatch — Trim Env Vars and Remove Stale Vercel Overrides — 2026-03-16
+
+**Scope:** Fix "relying party ID is not a registrable domain suffix" error in production biometric login.
+
+1. **Root cause** — `WEBAUTHN_RP_ID` and `WEBAUTHN_ORIGIN` in Vercel production were set to stale/incorrect values, causing the browser to reject the WebAuthn ceremony because the RP ID didn't match the actual domain.
+2. **Code hardening** — Added `.trim()` to env var reads in `lib/security/webauthn.ts` and `app/api/auth/passkey/_lib.ts` to prevent trailing whitespace/newline from corrupting the RP ID or origin.
+3. **Env cleanup** — Removed both env vars from Vercel production so the code auto-detects from request headers, which always matches the actual domain.
+
+**Verification:**
+
+- `npm run check` ✅
+
 ### Raouf: Fix Biometric Login 401 — Add WebAuthn Authenticate Routes to Proxy Public Path Allowlist — 2026-03-16
 
 **Scope:** Unblock biometric login by adding the WebAuthn authenticate endpoints to the proxy's public API path allowlist.

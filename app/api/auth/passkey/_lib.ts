@@ -6,13 +6,15 @@ export const PASSKEY_USER_COOKIE = 'passkey_user';
 const cookieMaxAgeSeconds = 5 * 60;
 
 export const getRpId = (request: NextRequest) => {
-  if (process.env.WEBAUTHN_RP_ID) return process.env.WEBAUTHN_RP_ID;
+  const envRpId = process.env.WEBAUTHN_RP_ID?.trim();
+  if (envRpId) return envRpId;
   const host = request.headers.get('host') ?? new URL(request.url).hostname;
   return host.split(':')[0];
 };
 
 export const getOrigin = (request: NextRequest) => {
-  if (process.env.WEBAUTHN_ORIGIN) return process.env.WEBAUTHN_ORIGIN;
+  const envOrigin = process.env.WEBAUTHN_ORIGIN?.trim();
+  if (envOrigin) return envOrigin;
   return request.headers.get('origin') ?? new URL(request.url).origin;
 };
 
