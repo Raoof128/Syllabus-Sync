@@ -15,6 +15,10 @@ describe('auth biometric API', () => {
 
   it('returns 401 when unauthenticated', async () => {
     createServerClientMock.mockResolvedValue({
+      from: vi.fn(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValue({ count: 0, error: null }),
+      })),
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
       },
@@ -26,7 +30,13 @@ describe('auth biometric API', () => {
 
   it('clears biometric metadata when disabling', async () => {
     const updateUser = vi.fn().mockResolvedValue({ error: null });
+    const deleteChain = {
+      delete: vi.fn(),
+      eq: vi.fn().mockResolvedValue({ error: null }),
+    };
+    deleteChain.delete.mockReturnValue(deleteChain);
     createServerClientMock.mockResolvedValue({
+      from: vi.fn(() => deleteChain),
       auth: {
         getUser: vi.fn().mockResolvedValue({
           data: { user: { id: 'user-1', user_metadata: {} } },
@@ -48,5 +58,31 @@ describe('auth biometric API', () => {
     expect(response.status).toBe(200);
     expect(json.data.enabled).toBe(false);
     expect(updateUser).toHaveBeenCalled();
+    expect(deleteChain.delete).toHaveBeenCalled();
+  });
+
+  it('treats DB-backed credentials as biometric enabled on GET', async () => {
+    const selectChain = {
+      select: vi.fn(),
+      eq: vi.fn().mockResolvedValue({ count: 2, error: null }),
+    };
+    selectChain.select.mockReturnValue(selectChain);
+
+    createServerClientMock.mockResolvedValue({
+      from: vi.fn(() => selectChain),
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: 'user-1', user_metadata: {} } },
+          error: null,
+        }),
+      },
+    });
+
+    const response = await GET();
+    const json = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(json.data.enabled).toBe(true);
+    expect(json.data.credentialCount).toBe(2);
   });
 });

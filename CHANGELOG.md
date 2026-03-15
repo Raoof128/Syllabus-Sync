@@ -1,3 +1,33 @@
+### Raouf: Biometric Login Full Audit — Align Settings Toggle, Login Status, and WebAuthn Credentials — 2026-03-16
+
+**Scope:** Finish the biometric/passkey audit by making the settings toggle reflect real DB-backed passkey state and disable biometric login completely.
+
+1. **Found a second mismatch in settings** — `app/api/auth/biometric/route.ts` still treated biometric status as legacy metadata-only, so settings could report disabled even when `public.webauthn_credentials` contained valid passkeys, and disabling biometric only cleared metadata without removing DB-backed credentials.
+2. **Biometric status now includes DB-backed credentials** — `GET /api/auth/biometric` now checks `webauthn_credentials` for the authenticated user and reports biometric enabled when either legacy metadata or DB-backed passkeys exist.
+3. **Disabling biometric now removes DB-backed passkeys** — `POST /api/auth/biometric` now deletes all user-owned `webauthn_credentials` before clearing legacy biometric metadata, so the settings toggle aligns with actual login capability.
+4. **Audit regression coverage expanded** — `tests/api/auth/biometric.test.ts` now verifies DB-backed credentials surface as enabled and that disabling biometric triggers credential cleanup. The wider biometric suite also passed against status, auth-options, credentials, and settings component tests.
+
+**Verification:**
+
+- `npx vitest run --config config/vitest/vitest.config.ts tests/api/auth/passkey.status.test.ts tests/api/auth/biometric.test.ts tests/security/webauthn-auth-options.test.ts tests/security/webauthn-credentials.test.ts tests/unit/components/PasskeySecuritySection.test.tsx` ✅
+- `npx tsc -p config/ts/tsconfig.json --noEmit` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs app/login/hooks/usePasskeyLogin.ts app/api/auth/passkey/status/route.ts app/api/auth/biometric/route.ts tests/api/auth/passkey.status.test.ts tests/api/auth/biometric.test.ts` ✅
+
+### Raouf: Biometric Login Audit — Unify Login Availability with DB-Backed WebAuthn — 2026-03-16
+
+**Scope:** Fix biometric/passkey login so credentials added through settings are recognized by the login screen.
+
+1. **Root cause identified** — the repository was running two overlapping passkey systems: settings/security registration used the newer DB-backed `/api/webauthn/*` flow and stored credentials in `public.webauthn_credentials`, while the login screen still checked `/api/auth/passkey/status` and authenticated through legacy `/api/auth/passkey/*` endpoints tied mainly to `auth.users.user_metadata.biometric_*`.
+2. **Login path switched to WebAuthn auth endpoints** — `app/login/hooks/usePasskeyLogin.ts` now uses `/api/webauthn/authenticate/options` and `/api/webauthn/authenticate/verify`, which already support both DB-backed credentials and legacy metadata fallback.
+3. **Status route now sees DB-backed credentials** — `app/api/auth/passkey/status/route.ts` now reports passkey availability when either a legacy metadata credential exists or the user has at least one `webauthn_credentials` row, so the biometric button on the login page no longer stays hidden after a settings-side passkey registration.
+4. **Regression test added** — `tests/api/auth/passkey.status.test.ts` now covers legacy-only, DB-backed-only, and no-passkey cases for the login availability route.
+
+**Verification:**
+
+- `npx vitest run --config config/vitest/vitest.config.ts tests/api/auth/passkey.status.test.ts tests/security/webauthn-auth-options.test.ts tests/api/auth/biometric.test.ts` ✅
+- `npx tsc -p config/ts/tsconfig.json --noEmit` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs app/login/hooks/usePasskeyLogin.ts app/api/auth/passkey/status/route.ts tests/api/auth/passkey.status.test.ts` ✅
+
 ### Raouf: Manage Profile Reminder Settings Persistence + Today Classes Passed State — 2026-03-16
 
 **Scope:** Make Manage Profile reminder settings reflect real database persistence and mark past classes as passed in Today’s Classes.

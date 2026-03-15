@@ -65,7 +65,18 @@ export async function POST(request: NextRequest) {
     }
 
     const metadata = (userRow.user_meta ?? {}) as Record<string, unknown>;
-    const biometricAvailable = Boolean(metadata.biometric_credential_id);
+    const hasLegacyCredential = Boolean(metadata.biometric_credential_id);
+
+    const { count: dbCredentialCount, error: credentialsError } = await adminClient
+      .from('webauthn_credentials')
+      .select('credential_id', { head: true, count: 'exact' })
+      .eq('user_id', userRow.user_id);
+
+    if (credentialsError) {
+      logger.warn('Passkey status credential lookup failed:', credentialsError);
+    }
+
+    const biometricAvailable = hasLegacyCredential || (dbCredentialCount ?? 0) > 0;
 
     // Check MFA factors via admin API
     let mfaEnabled = false;

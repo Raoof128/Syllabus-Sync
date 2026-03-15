@@ -24,7 +24,7 @@ export function usePasskeyLogin() {
 
       try {
         // 1. Get Challenge
-        const optionsRes = await fetch(API_ROUTES.AUTH.PASSKEY_OPTIONS, {
+        const optionsRes = await fetch(API_ROUTES.AUTH.WEBAUTHN_AUTH_OPTIONS, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: email.trim() }),
@@ -57,7 +57,7 @@ export function usePasskeyLogin() {
         const assertion = credential as PublicKeyCredential;
         const response = assertion.response as AuthenticatorAssertionResponse;
 
-        const verifyRes = await fetch(API_ROUTES.AUTH.PASSKEY_VERIFY, {
+        const verifyRes = await fetch(API_ROUTES.AUTH.WEBAUTHN_AUTH_VERIFY, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -41,14 +41,25 @@ export async function GET() {
     }
 
     const metadata = (user.user_metadata || {}) as BiometricMetadata;
+    const { count: dbCredentialCount, error: credentialsError } = await supabase
+      .from('webauthn_credentials')
+      .select('id', { head: true, count: 'exact' })
+      .eq('user_id', user.id);
+
+    if (credentialsError) {
+      logger.warn('Biometric GET credential lookup failed:', credentialsError);
+    }
+
+    const hasDbCredentials = (dbCredentialCount ?? 0) > 0;
 
     return jsonSuccess({
-      enabled: Boolean(metadata.biometric_enabled),
+      enabled: Boolean(metadata.biometric_enabled) || hasDbCredentials,
       credentialId: metadata.biometric_credential_id ?? null,
       publicKey: metadata.biometric_public_key ?? null,
       counter: metadata.biometric_counter ?? null,
       transports: metadata.biometric_transports ?? null,
       updatedAt: metadata.biometric_updated_at ?? null,
+      credentialCount: dbCredentialCount ?? 0,
     });
   } catch (error) {
     logger.error('Biometric GET error:', error);
@@ -86,6 +97,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!enabled) {
+      const { error: deleteCredentialsError } = await supabase
+        .from('webauthn_credentials')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (deleteCredentialsError) {
+        logger.error('Biometric disable credential cleanup failed:', deleteCredentialsError);
+        return jsonError('Failed to update biometric settings', 400, ERROR_CODES.BAD_REQUEST);
+      }
+    }
+
     const { error: updateError } = await supabase.auth.updateUser({
       data: {
         biometric_enabled: enabled,
@@ -108,6 +131,7 @@ export async function POST(request: NextRequest) {
       publicKey: enabled ? (publicKey ?? null) : null,
       counter: enabled ? (counter ?? 0) : null,
       transports: enabled ? (transports ?? null) : null,
+      credentialCount: enabled ? undefined : 0,
     });
   } catch (error) {
     logger.error('Biometric POST error:', error);
