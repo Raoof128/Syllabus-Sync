@@ -399,6 +399,35 @@ describe('notificationsStore', () => {
     expect(notifications[0].title).toBe('Welcome');
   });
 
+  it('should strip relatedId from system notifications before POST to avoid 409 conflicts', async () => {
+    const relatedId = '11111111-1111-1111-1111-111111111111';
+    apiRequestMock.mockImplementationOnce(async (_input: RequestInfo, _init?: RequestInit) => {
+      return {
+        id: '22222222-2222-2222-2222-222222222222',
+        title: 'Reminder set',
+        message: 'Body',
+        type: 'system',
+        read: false,
+        createdAt: new Date().toISOString(),
+        link: 'http://localhost/calendar',
+        relatedId: undefined,
+      };
+    });
+
+    await useNotificationsStore.getState().addNotification({
+      title: 'Reminder set',
+      message: 'Body',
+      type: 'system',
+      read: false,
+      link: '/calendar',
+      relatedId,
+    });
+
+    const [, requestInit] = apiRequestMock.mock.calls[0];
+    const body = JSON.parse(String((requestInit as RequestInit).body));
+    expect(body.relatedId).toBeUndefined();
+  });
+
   it('should mark a notification as read', () => {
     useNotificationsStore.setState({ notifications: [mockNotification] });
 

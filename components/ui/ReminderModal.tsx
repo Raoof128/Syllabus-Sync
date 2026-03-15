@@ -184,7 +184,6 @@ export default function ReminderModal({
           type: 'system',
           read: false,
           link: '/calendar',
-          relatedId: itemId,
         });
       } catch (error) {
         logger.warn('Failed to add reminder notification to bell', error);
@@ -215,7 +214,6 @@ export default function ReminderModal({
           type: 'system',
           read: false,
           link: '/calendar',
-          relatedId: itemId,
         });
       } catch (error) {
         logger.warn('Failed to add reminder-removed notification to bell', error);

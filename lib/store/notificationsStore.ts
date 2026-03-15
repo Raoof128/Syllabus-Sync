@@ -165,7 +165,12 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
     };
 
     const normalized = normalizeNotification(notification);
-    const localNotification = { ...normalized, id: tempId };
+    // `system` notifications are informational bell entries, not entity-bound reminders.
+    // The database has a unique index on (user_id, related_id, type) when related_id exists,
+    // so persisting a system notification with relatedId causes false 409 conflicts on repeat actions.
+    const sanitizedNotification =
+      normalized.type === 'system' ? { ...normalized, relatedId: undefined } : normalized;
+    const localNotification = { ...sanitizedNotification, id: tempId };
 
     // Protect this notification from being removed by loadNotifications
     _protectedIds.set(tempId, Date.now());
@@ -181,7 +186,7 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
     _loadStartedAt = Date.now();
 
     try {
-      const apiPayload: Partial<Notification> = { ...normalized };
+      const apiPayload: Partial<Notification> = { ...sanitizedNotification };
 
       if (apiPayload.id && !isValidUUID(apiPayload.id)) {
         delete apiPayload.id;
@@ -268,7 +273,7 @@ export const useNotificationsStore = create<NotificationsState>()((set, get) => 
         'NotificationsStore.addNotification',
         'medium',
       );
-      return normalized;
+      return sanitizedNotification;
     }
   },
 

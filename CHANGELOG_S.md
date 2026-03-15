@@ -1,3 +1,18 @@
+### Raouf: Notification 409 Conflict Fix — 2026-03-16
+
+**Scope:** Stop reminder bell notifications from colliding with the notifications uniqueness index and disappearing after optimistic render.
+
+1. **Root cause identified** — the database has a unique index on `(user_id, related_id, type)` for notifications with `related_id`, and `ReminderModal` was posting repeated `system` notifications with the same `relatedId`.
+2. **Centralized store fix** — `lib/store/notificationsStore.ts` now strips `relatedId` from all `system` notifications before POST.
+3. **Caller cleanup** — `components/ui/ReminderModal.tsx` no longer passes `relatedId` for reminder set/update/remove bell entries.
+4. **Regression test** — `tests/stores.test.ts` now verifies that `system` notification POST bodies omit `relatedId`.
+
+**Verification:**
+
+- `npx vitest run --config config/vitest/vitest.config.ts tests/stores.test.ts` ✅
+- `npx tsc -p config/ts/tsconfig.json --noEmit` ✅
+- `npx eslint --config config/eslint/eslint.config.mjs lib/store/notificationsStore.ts components/ui/ReminderModal.tsx tests/stores.test.ts` ✅
+
 ### Raouf: Notification Disappears Follow-Up — 2026-03-16
 
 **Scope:** Stop focus-time auth revalidation from tearing down the authenticated shell and making bell notifications appear to vanish.
