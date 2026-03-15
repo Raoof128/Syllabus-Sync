@@ -197,28 +197,11 @@ const Header = memo(() => {
         }).data.subscription
       : null;
 
-    const handleFocus = () => {
-      // Don't force-refresh on every focus; store has its own staleness window.
-      loadNotifications();
-    };
-
-    // Also reload when tab becomes visible (covers device sleep / background)
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        loadNotifications();
-      }
-    };
-
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
     return () => {
       isActive = false;
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
       subscription?.unsubscribe();
     };
-  }, [loadNotifications]);
+  }, []);
 
   // Handle notifications seeding (only if authenticated)
   useEffect(() => {
