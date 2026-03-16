@@ -640,7 +640,7 @@ export function useMapLocation({
       locationStatus === 'found'
     ) {
       const latLng = userMarkerRef.current.getLatLng();
-      mapInstance.flyTo(latLng, 2, {
+      mapInstance.flyTo(latLng, 1, {
         animate: true,
         duration: 1.5,
       });
