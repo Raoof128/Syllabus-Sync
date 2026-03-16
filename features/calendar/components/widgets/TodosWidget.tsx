@@ -56,32 +56,10 @@ export default function TodosWidget({
     }
   };
 
-  // Sort pending todos: Overdue first, then High priority, then by due date
+  // Sort pending todos by date ascending, then by time
   const pendingTodos = todos
     .filter((t) => !t.completed)
-    .sort((a, b) => {
-      // 1. Overdue first
-      const now = dayjs();
-      const aDue = dayjs(a.dueDate);
-      const bDue = dayjs(b.dueDate);
-      const aOverdue = aDue.isBefore(now);
-      const bOverdue = bDue.isBefore(now);
-
-      if (aOverdue && !bOverdue) return -1;
-      if (!aOverdue && bOverdue) return 1;
-
-      // 2. Priority
-      const priorityOrder: Record<string, number> = {
-        High: 0,
-        Medium: 1,
-        Low: 2,
-      };
-      const pDiff = (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
-      if (pDiff !== 0) return pDiff;
-
-      // 3. Due Date (soonest first)
-      return aDue.valueOf() - bDue.valueOf();
-    });
+    .sort((a, b) => dayjs(a.dueDate).valueOf() - dayjs(b.dueDate).valueOf());
 
   return (
     <MagicCard

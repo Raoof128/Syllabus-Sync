@@ -13,7 +13,7 @@ import { useEventsStore } from '@/lib/store/eventsStore';
 import { Event } from '@/lib/types';
 import ItemActionButtons from '@/features/calendar/components/ItemActionButtons';
 import { formatLocalizedDate } from '@/lib/utils/locale';
-import { isPast, startOfDay } from 'date-fns';
+import { isPast } from 'date-fns';
 import { CALENDAR_WIDGET_IDS } from '@/features/calendar/lib/calendarIntent';
 
 interface EventsWidgetProps {
@@ -39,12 +39,8 @@ export default function EventsWidget({
   const events = useEventsStore((state) => state.events);
   const toggleEventNotification = useEventsStore((state) => state.toggleNotification);
 
-  // Sort events: upcoming events first (by date ascending), then overdue events (by date descending)
-  // This ensures upcoming events are shown prominently, matching the Home page widget behavior
+  // Sort events by date ascending, then by time
   const sortedEvents = useMemo(() => {
-    const now = new Date();
-    const today = startOfDay(now);
-
     const getEventDate = (event: Event): Date => {
       if (event.startAt) {
         return event.startAt instanceof Date ? event.startAt : new Date(event.startAt);
@@ -56,22 +52,7 @@ export default function EventsWidget({
     };
 
     return [...events].sort((a, b) => {
-      const dateA = getEventDate(a);
-      const dateB = getEventDate(b);
-      const aIsOverdue = startOfDay(dateA) < today;
-      const bIsOverdue = startOfDay(dateB) < today;
-
-      // Upcoming events come first
-      if (!aIsOverdue && bIsOverdue) return -1;
-      if (aIsOverdue && !bIsOverdue) return 1;
-
-      // Within same group, sort by date
-      // Upcoming: ascending (nearest first)
-      // Overdue: descending (most recent first)
-      if (!aIsOverdue && !bIsOverdue) {
-        return dateA.getTime() - dateB.getTime();
-      }
-      return dateB.getTime() - dateA.getTime();
+      return getEventDate(a).getTime() - getEventDate(b).getTime();
     });
   }, [events]);
 
