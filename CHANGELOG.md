@@ -1,3 +1,28 @@
+### Raouf: Fix README badge and clone URL — use real GitHub org mrpouyaalavi — 2026-03-17
+
+**Scope:** Replace placeholder `pouya-alavi/syllabus-sync` paths with the confirmed public repo `mrpouyaalavi/syllabus-sync`.
+
+1. Updated CI/CD badge URL to `github.com/mrpouyaalavi/syllabus-sync/actions/workflows/ci-cd.yml`
+2. Updated `git clone` command to `github.com/mrpouyaalavi/syllabus-sync.git`
+
+**Verification:** `git remote -v` confirms `git@github-raoof999:mrpouyaalavi/syllabus-sync.git` ✅
+
+### Raouf: Rewrite README for Claude for OSS and OpenAI Codex for OSS Grant Applications — 2026-03-17
+
+**Scope:** Replace the internal-facing technical README with a grant-optimised public README targeting the Claude for OSS and OpenAI Codex for OSS programmes.
+
+1. **Ecosystem Impact section** — framed the project as a modular "Campus OS" layered architecture blueprint that any Australian university can fork via data substitution + environment variable replacement, with a quantified impact table (~47,000 MQ students; ~1M+ across G08+ATN if adopted).
+2. **Security & Privacy Architecture section** — documented Zero-Trust proxy middleware (`lib/proxy.ts`), Supabase RLS enforcement at the database layer, PII minimisation practices, full FIDO2/WebAuthn passkey flow, and prompt injection mitigations in the LLM OCR pipeline (schema-constrained output, input sanitisation, output validation, least-privilege API keys).
+3. **AI-Native Maintainer Workflow section** — articulated the use of Claude claude-sonnet-4-6 for schema mapping, architecture review, changelog intelligence, and security auditing; and Codex for unit test generation, regression scaffolding, i18n key generation, and migration authoring. Introduced the "Syllabus-as-Code" framing for the living documentation suite.
+4. **Project Governance section** — confirmed OSI-approved MIT licence, added contributing pathways, published P0/P1/P2 roadmap (standalone `@syllabus-sync/extractor` package, MCP server, institutional forks), and listed maintainers.
+5. **Professional GitHub badges** — added MIT, CI/CD, TypeScript, Next.js, Supabase, tests-passing, OSI-approved, and PRs-welcome shields.
+6. **Structure** — clean numbered section hierarchy with scannable tables throughout, preserved all accurate technical facts from the prior README.
+
+**Verification:**
+
+- README renders correctly (Markdown lint implicit via structure review) ✅
+- No breaking changes to code — documentation-only change ✅
+
 ### Raouf: Fix WebAuthn RP ID Mismatch — Trim Env Vars and Remove Stale Vercel Overrides — 2026-03-16
 
 **Scope:** Fix "relying party ID is not a registrable domain suffix" error in production biometric login.

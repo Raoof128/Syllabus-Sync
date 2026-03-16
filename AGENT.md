@@ -1,3 +1,10 @@
+Raouf: 2026-03-17 (Australia/Sydney)
+Scope: Rewrite README for Claude for OSS and OpenAI Codex for OSS Grant Applications
+Summary: Replaced the internal-facing technical README with a grant-optimised public README. Added professional GitHub badges (MIT, CI/CD, TypeScript, Next.js, Supabase, tests, OSI, PRs). Structured four grant-targeted sections: (1) Ecosystem Impact framing the project as a modular "Campus OS" blueprint for Australian universities with layered architecture diagram and quantified impact table; (2) Security & Privacy Architecture covering Zero-Trust proxy middleware, Supabase RLS, PII minimisation, FIDO2/WebAuthn passkeys, and LLM OCR prompt injection mitigations; (3) AI-Native Maintainer Workflow documenting Claude 4.6 for schema mapping/architecture/security auditing and Codex for test generation/migrations/i18n, plus the Syllabus-as-Code documentation suite framing; (4) Project Governance with OSI-approved MIT licence confirmation, contributing pathways, P0–P2 roadmap (standalone extractor package, MCP server, institutional forks), and maintainer listing. Preserved all accurate technical facts from the prior README.
+Files Changed: `README.md`, `CHANGELOG.md`, `AGENT.md`
+Verification: Documentation-only change; no code modified ✅
+Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and clone command from placeholder to real org/repo path.
+
 Raouf: 2026-03-16 (Australia/Sydney)
 Scope: Fix WebAuthn RP ID Mismatch — Trim Env Vars and Remove Stale Vercel Overrides
 Summary: Biometric login failed in production with "The relying party ID is not a registrable domain suffix of, nor equal to the current domain." The `WEBAUTHN_RP_ID` and `WEBAUTHN_ORIGIN` env vars in Vercel were set to stale/incorrect values (likely `localhost` or contained trailing newlines). Fix: (1) Added `.trim()` to env var reads in both `lib/security/webauthn.ts` and `app/api/auth/passkey/_lib.ts` to prevent trailing whitespace/newline issues. (2) Removed both `WEBAUTHN_RP_ID` and `WEBAUTHN_ORIGIN` from Vercel production env so the code auto-detects from request headers, which always matches the actual domain.
