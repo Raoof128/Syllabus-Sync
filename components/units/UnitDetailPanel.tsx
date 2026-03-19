@@ -247,7 +247,7 @@ export default function UnitDetailPanel({
         {/* Unit Info Summary */}
         <div className="flex flex-wrap gap-4 py-3 border-b border-mq-border">
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
-            e <MapPin className="h-4 w-4 text-mq-content-secondary" />
+            <MapPin className="h-4 w-4 text-mq-content-secondary" />
             <span>{formatLocation(unit.location.building, unit.location.room, t('room'))}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-mq-content-secondary">
