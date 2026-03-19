@@ -1,0 +1,12 @@
+.git
+.next
+.vercel
+node_modules
+test-results
+.ruff_cache
+output
+coverage
+.DS_Store
+.env.local
+.env
+

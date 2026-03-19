@@ -39,7 +39,7 @@
     "vercel:env:check": "node tools/vercel/check-required-env.mjs",
     "vercel:deploy:preview": "node tools/vercel/deploy.mjs",
     "vercel:deploy:prod": "node tools/vercel/deploy.mjs --prod",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
