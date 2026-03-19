@@ -3,7 +3,18 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { sendPushNotificationToUser, isWebPushConfigured } from '@/lib/server/push';
 
-const LOOKAHEAD_MINUTES = 10;
+const DEFAULT_LOOKAHEAD_MINUTES = 10;
+
+function getLookaheadMinutes(): number {
+  const rawValue = process.env.PUSH_REMINDER_LOOKAHEAD_MINUTES;
+  const parsed = rawValue ? Number.parseInt(rawValue, 10) : Number.NaN;
+
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+
+  return DEFAULT_LOOKAHEAD_MINUTES;
+}
 
 type ReminderCandidate = {
   reminderKey: string;
@@ -124,6 +135,7 @@ async function collectEventReminders(
 
 async function handlePushReminderCron() {
   const admin = createAdminClient();
+  const lookaheadMinutes = getLookaheadMinutes();
 
   if (!admin) {
     return jsonError(
@@ -138,7 +150,7 @@ async function handlePushReminderCron() {
   }
 
   const now = new Date();
-  const windowEnd = new Date(now.getTime() + LOOKAHEAD_MINUTES * 60 * 1000);
+  const windowEnd = new Date(now.getTime() + lookaheadMinutes * 60 * 1000);
 
   const { data: preferences, error } = await admin
     .from('user_preferences')
@@ -204,7 +216,7 @@ async function handlePushReminderCron() {
   }
 
   return jsonSuccess({
-    lookaheadMinutes: LOOKAHEAD_MINUTES,
+    lookaheadMinutes,
     scannedUsers: preferences?.length ?? 0,
     matchedReminders: reminderCount,
     deliveredReminders: deliveredReminderCount,
