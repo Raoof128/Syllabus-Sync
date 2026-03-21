@@ -1,44 +1,128 @@
 # Supabase OAuth Setup (Google)
 
-This project uses **Supabase Auth OAuth** (PKCE flow) and completes the auth code exchange in:
+> **Audience:** Engineers configuring Google OAuth authentication via Supabase Auth.
+> **Last verified:** 2026-03-21
 
-- `GET /auth/callback` (`app/auth/callback/route.ts`)
+Syllabus Sync uses the Supabase Auth PKCE flow for OAuth. The auth code exchange happens in the server-side route handler at `app/auth/callback/route.ts`.
 
-## 1. Set Supabase Auth Site URL and Redirect URLs
+---
 
-In Supabase Dashboard:
+## Prerequisites
 
-1. Go to **Authentication -> URL Configuration**
-2. Set **Site URL** to your primary production domain:
-   - `https://syllabus-sync-ashy.vercel.app`
-3. Add **Additional Redirect URLs** for every domain users may access:
-   - `https://syllabus-sync-ashy.vercel.app/auth/callback`
-   - `https://syllabus-sync-ashy.vercel.app/auth/callback/**`
-   - `https://syllabus-sync-ashy.vercel.app/auth/confirm`
-   - `https://syllabus-sync-ashy.vercel.app/reset-password`
-   - `http://localhost:3000/auth/callback`
-   - `http://localhost:3000/auth/callback/**`
-   - `http://localhost:3000/auth/confirm`
-   - `http://localhost:3000/reset-password`
+- A Supabase project with Authentication enabled.
+- A Google Cloud project with OAuth 2.0 credentials configured.
+- Access to both the [Supabase Dashboard](https://supabase.com/dashboard) and the [Google Cloud Console](https://console.cloud.google.com/).
 
-Notes:
+---
 
-- The login UI sends users to Supabase OAuth with `redirectTo=<your-origin>/auth/callback?redirectTo=<safe-path>`.
-- `/auth/callback` validates `redirectTo` to prevent open redirects.
-- The callback URL origin is determined by `window.location.origin` in the browser, so **every domain that serves the app must be listed**.
+## 1. Configure Supabase Auth URLs
 
-## 2. Configure Google Provider
+In the Supabase Dashboard, navigate to **Authentication > URL Configuration**.
 
-1. In Supabase Dashboard: **Authentication -> Providers -> Google** (enable it)
-2. In Google Cloud Console OAuth settings:
-   - Add the Supabase callback URL as an authorized redirect URI:
-     - `https://<your-project-ref>.supabase.co/auth/v1/callback`
+### Site URL
 
-## 3. Local Verification
+Set the **Site URL** to your primary production domain:
 
-1. Ensure `.env.local` has:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_APP_URL=http://localhost:3000` (recommended)
-2. Start dev server and click:
-   - Login -> Continue with Google
+```
+https://your-production-domain.vercel.app
+```
+
+### Redirect URLs
+
+Add the following redirect URLs. Every domain that serves the application must be listed, because the browser's `window.location.origin` determines which callback URL is used.
+
+**Production:**
+
+```
+https://your-production-domain.vercel.app/auth/callback
+https://your-production-domain.vercel.app/auth/callback/**
+https://your-production-domain.vercel.app/auth/confirm
+https://your-production-domain.vercel.app/reset-password
+```
+
+**Local development:**
+
+```
+http://localhost:3000/auth/callback
+http://localhost:3000/auth/callback/**
+http://localhost:3000/auth/confirm
+http://localhost:3000/reset-password
+```
+
+**Preview deployments (if applicable):**
+
+If you use Vercel preview URLs, add wildcard patterns or add each preview domain as needed.
+
+---
+
+## 2. Configure the Google OAuth Provider
+
+### In the Supabase Dashboard
+
+1. Navigate to **Authentication > Providers > Google**.
+2. Enable the Google provider.
+3. Enter the **Client ID** and **Client Secret** from your Google Cloud OAuth credentials.
+
+### In the Google Cloud Console
+
+1. Navigate to **APIs & Services > Credentials**.
+2. Open your OAuth 2.0 Client ID (or create one if it does not exist).
+3. Under **Authorized redirect URIs**, add the Supabase callback URL:
+
+```
+https://<your-supabase-project-ref>.supabase.co/auth/v1/callback
+```
+
+4. Save the changes.
+
+---
+
+## 3. Application Configuration
+
+### Environment variables
+
+Ensure the following are set in `.env.local` (local development) or in Vercel (production):
+
+| Variable                        | Example                    | Notes                                                                    |
+| :------------------------------ | :------------------------- | :----------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | `https://xxxx.supabase.co` | Your Supabase project URL.                                               |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJ...` or `sb_...`       | Supabase anonymous/public key.                                           |
+| `NEXT_PUBLIC_APP_URL`           | `http://localhost:3000`    | Used to construct redirect URLs. Set to production domain in production. |
+
+### Auth flow details
+
+- The login UI redirects users to Supabase OAuth with `redirectTo=<origin>/auth/callback?redirectTo=<safe-path>`.
+- The `/auth/callback` route handler validates the `redirectTo` parameter against an allowlist to prevent open redirect attacks.
+- After successful authentication, users are redirected to the originally requested page.
+
+---
+
+## 4. Verification
+
+### Local development
+
+1. Confirm `.env.local` contains `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_APP_URL=http://localhost:3000`.
+2. Start the development server: `npm run dev`.
+3. Navigate to the login page.
+4. Click **Continue with Google**.
+5. Complete the Google sign-in flow.
+6. Confirm that you are redirected back to the application and your session is established.
+
+### Production
+
+1. Open the production URL in an incognito browser window.
+2. Click **Continue with Google**.
+3. Confirm the OAuth flow completes and the session is active.
+4. Log out and log back in to verify session persistence.
+
+---
+
+## Troubleshooting
+
+| Symptom                                        | Likely Cause                                                                           | Resolution                                                                                                                          |
+| :--------------------------------------------- | :------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| "Redirect URI mismatch" error from Google      | The Supabase callback URL is not listed in Google Cloud OAuth authorized redirect URIs | Add `https://<project-ref>.supabase.co/auth/v1/callback` to the Google OAuth client.                                                |
+| OAuth flow completes but user is not logged in | The redirect URL is not listed in Supabase's allowed redirect URLs                     | Add the domain's `/auth/callback` URL to Supabase Auth URL Configuration.                                                           |
+| Open redirect warning in security audit        | `redirectTo` parameter not validated                                                   | The `/auth/callback` handler validates against a safe-path allowlist. Confirm the validation logic in `app/auth/callback/route.ts`. |
+| "Invalid origin" error                         | `NEXT_PUBLIC_APP_URL` does not match the domain serving the app                        | Update the variable to match the actual serving domain.                                                                             |
+| OAuth works locally but not in production      | Site URL or redirect URLs in Supabase are still set to `localhost`                     | Update the Supabase Auth URL Configuration with production URLs.                                                                    |

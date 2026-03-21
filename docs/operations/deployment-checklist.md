@@ -1,86 +1,211 @@
-# Production Deployment & Release Runbook
+# Production Deployment Runbook
 
-This document outlines the mandatory procedures and quality gates for deploying Syllabus Sync to production. We follow a **Stable-by-Default** release strategy, ensuring that every deployment is verifiable and reversible.
+> **Audience:** Engineers performing production releases of Syllabus Sync.
+> **Last verified:** 2026-03-21
 
----
-
-## 1. Pre-Flight Environment Validation
-
-Before initiating a release, ensure the following environment variables are correctly configured in your production provider (e.g., Vercel):
-
-- [ ] **Database:** `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] **Infrastructure:** `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
-- [ ] **Email:** `RESEND_API_KEY`, `RESEND_SENDER_EMAIL`
-- [ ] **Security:** `CRON_SECRET` (Minimum 32 chars), `NEXT_PUBLIC_APP_URL`
-- [ ] **Observability:** `SENTRY_DSN` (Must be active and configured for the `production` environment)
-
-_Refer to the [Environment Setup Guide](../setup/ENVIRONMENT_SETUP.md) for variable specifications._
+This runbook covers every step required to ship a release safely, verify it in production, and roll back if something goes wrong. Follow each section in order.
 
 ---
 
-## 2. Database Migration Sequence
+## Prerequisites
 
-We treat database schema changes as immutable, versioned migrations.
+Before starting a release, confirm the following:
 
-1. **Review Schema:** Audit `supabase/migrations/` for any pending SQL scripts.
-2. **Execution:** Apply migrations using the Supabase CLI:
-   ```bash
-   npx supabase db push
-   ```
-3. **Verification:** Confirm migration success via the Supabase Dashboard.
-   _Warning: Never use `database-schema.sql` for deployment; it is a reference snapshot only._
+- You have write access to the `main` branch and the Vercel project.
+- The Supabase CLI is installed and linked to the production project (`npx supabase link`).
+- You have access to the Vercel Dashboard, Sentry Dashboard, and Supabase Dashboard.
+- You are working from a clean `main` branch with all changes merged.
 
 ---
 
-## 3. The Quality Gate (`npm run check`)
+## 1. Environment Variable Audit
 
-Every production release must pass the local system integrity check. This ensures zero regressions in type safety, linting, and behavioral tests.
+Open the Vercel project settings and confirm that every required variable is present for the **production** environment. Missing or stale values are the most common cause of post-deploy incidents.
+
+| Category      | Variables                                                                                    | Notes                                                                  |
+| :------------ | :------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------- |
+| Database      | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`     | Service role key is server-side only.                                  |
+| Rate Limiting | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `KV_REST_API_URL`, `KV_REST_API_TOKEN` | KV variables required by the production env check script.              |
+| Email         | `RESEND_API_KEY`, `VERIFICATION_EMAIL_FROM`, `VERIFICATION_EMAIL_NAME`                       | Sender must be a verified domain in production.                        |
+| Maps          | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`, `NEXT_PUBLIC_GOOGLE_MAP_ID`, `GOOGLE_ROUTES_API_KEY`      | See the [Google Maps Platform Setup](./google-maps-platform-setup.md). |
+| Security      | `CRON_SECRET` (min 32 chars), `NEXT_PUBLIC_APP_URL`, `CSRF_VALIDATION_ENABLED`               | Generate CRON_SECRET with `openssl rand -hex 32`.                      |
+| WebAuthn      | `WEBAUTHN_RP_ID`, `WEBAUTHN_ORIGIN`                                                          | Must match your production domain.                                     |
+| Push          | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`                         | Generate once with `npx web-push generate-vapid-keys`.                 |
+| Observability | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`                | DSN must be active for the production environment.                     |
+
+You can also validate variable names programmatically:
+
+```bash
+VERCEL_ENVIRONMENT=production npm run vercel:env:check
+```
+
+Refer to the [Environment Setup Guide](../setup/ENVIRONMENT_SETUP.md) for full variable specifications.
+
+---
+
+## 2. Database Migrations
+
+Database schema changes are managed as timestamped, immutable SQL migration files in `supabase/migrations/`.
+
+**Step 1 -- Review pending migrations:**
+
+```bash
+ls -lt supabase/migrations/ | head -20
+```
+
+Read through any migration files that have not yet been applied to production. Confirm that they are safe, idempotent, and do not drop data without a backup plan.
+
+**Step 2 -- Apply migrations:**
+
+```bash
+npx supabase db push
+```
+
+**Step 3 -- Verify in the Supabase Dashboard:**
+
+Open the SQL Editor or Table Editor and confirm that the expected tables, columns, RLS policies, and functions are present.
+
+> **Warning:** The file `docs/database/database-schema.sql` is a reference snapshot only. Never use it to apply schema changes in production. The migration chain in `supabase/migrations/` is the single source of truth.
+
+---
+
+## 3. Quality Gate
+
+Every production release must pass the full local integrity check before deployment. This runs secrets scanning, formatting checks, TypeScript compilation, ESLint, the Vitest test suite, and a production build.
 
 ```bash
 npm run check
 ```
 
-**Success Criteria:**
+**All of the following must be true before proceeding:**
 
-- 0 ESLint errors or warnings.
-- 0 TypeScript compilation errors.
-- 100% passing Vitest unit and integration tests.
-- Successful Next.js production build.
+- [ ] Zero ESLint errors or warnings
+- [ ] Zero TypeScript compilation errors
+- [ ] All Vitest unit and integration tests pass (500+ tests)
+- [ ] Next.js production build completes without errors
+- [ ] No secrets detected in source files
 
----
-
-## 4. Deployment Execution (Vercel)
-
-We utilize Vercel's immutable deployment model.
-
-1. **Trigger Build:** Push to the `main` branch or use the Vercel CLI:
-   ```bash
-   vercel --prod
-   ```
-2. **Build Monitoring:** Observe the Sentry dashboard for any "Build Error" or "Source Map" alerts.
-3. **Atomic Cutover:** Vercel automatically handles the traffic shift once health checks pass.
+If any check fails, fix the issue and re-run `npm run check` before continuing.
 
 ---
 
-## 5. Post-Deployment Verification (Smoke Tests)
+## 4. Deploy to Production
 
-Execute the following checks against the live production URL:
+Syllabus Sync uses Vercel's immutable deployment model. Each deployment is an atomic snapshot that can be rolled back to instantly.
 
-- **Health Check:** `GET /api/health` should return `200 OK`.
-- **Auth Cycle:** Perform a full Signup -> MFA Enroll -> Logout -> Login cycle.
-- **Route Integrity:** Verify `/home`, `/calendar`, `/map`, and `/feed` render without client-side exceptions.
-- **Security Headers:** Run a `curl -I` and verify `Content-Security-Policy` and `Strict-Transport-Security` are present.
+**Option A -- Git-triggered deploy (recommended):**
+
+Push to the `main` branch. Vercel will build and deploy automatically.
+
+```bash
+git push origin main
+```
+
+**Option B -- CLI deploy:**
+
+```bash
+npx vercel --prod
+```
+
+Monitor the build in the Vercel Dashboard. Watch for:
+
+- Build errors in the Vercel build log
+- Source map upload failures in the Sentry release
+- Function size warnings
 
 ---
 
-## 6. Incident Response & Rollback
+## 5. Post-Deployment Smoke Tests
 
-If critical regressions are detected post-deploy:
+Run these checks against the live production URL immediately after the deployment completes.
 
-1. **Immediate Rollback:** Use the Vercel Dashboard to redeploy the previous known-stable build. This shift is instantaneous and does not require a new build.
-2. **Audit Logs:** Review the `audit_logs` table and Sentry issues to identify the root cause.
-3. **Post-Mortem:** Document the failure in a new report under `docs/reports/`.
+### 5.1 Health Check
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" https://your-production-domain.vercel.app/api/health
+# Expected: 200
+```
+
+### 5.2 Security Headers
+
+```bash
+curl -sI https://your-production-domain.vercel.app | grep -iE "content-security-policy|strict-transport-security|x-frame-options|x-content-type-options"
+```
+
+Confirm that `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options`, and `X-Content-Type-Options` headers are all present.
+
+### 5.3 Authentication Cycle
+
+1. Open the production URL in an incognito browser window.
+2. Sign up with a new test account (or use an existing test account).
+3. Complete MFA enrollment if enabled.
+4. Log out.
+5. Log back in and confirm session is established.
+
+### 5.4 Core Route Verification
+
+Navigate to each of the following routes and confirm they render without client-side errors (check the browser console):
+
+- `/home`
+- `/calendar`
+- `/map` (both raster and Google modes)
+- `/feed`
+
+### 5.5 Cron Endpoint Validation
+
+Confirm that cron-protected endpoints reject unauthenticated requests:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" https://your-production-domain.vercel.app/api/auth/email/cleanup
+# Expected: 401 (no Bearer token provided)
+```
 
 ---
 
-_For a detailed mapping of routes, refer to the [Route Inventory](../inventory/ROUTE_INVENTORY.md)._
+## 6. Monitoring Verification
+
+After deployment, confirm that observability systems are receiving data:
+
+- [ ] **Sentry:** New release appears in the Sentry Releases page. No new unhandled exceptions in the first 15 minutes.
+- [ ] **Vercel Analytics:** Function invocations and Web Vitals data are flowing.
+- [ ] **Supabase Dashboard:** Database connections are healthy. No unexpected spikes in query latency.
+
+---
+
+## 7. Rollback Procedure
+
+If a critical regression is detected after deployment:
+
+### Immediate Rollback (< 2 minutes)
+
+1. Open the Vercel Dashboard and navigate to the **Deployments** tab.
+2. Find the previous known-stable deployment (the one immediately before the current release).
+3. Click the three-dot menu and select **Promote to Production**.
+4. Vercel shifts traffic instantly -- no rebuild required.
+
+### Database Rollback
+
+If the regression was caused by a database migration:
+
+1. Write and test a compensating migration that reverses the problematic changes.
+2. Apply it with `npx supabase db push`.
+3. Never manually edit production tables through the Supabase Dashboard without a documented reason.
+
+### Post-Incident
+
+1. Review the `audit_logs` table and Sentry error stream to identify the root cause.
+2. Document the incident, root cause, and remediation steps.
+3. If the fix is ready, go back to Step 3 (Quality Gate) and re-deploy.
+
+---
+
+## Quick Reference
+
+```text
+Pre-deploy:   npm run check              # Must pass cleanly
+Deploy:       npx vercel --prod           # Or push to main
+Smoke test:   curl /api/health            # Must return 200
+Rollback:     Vercel Dashboard > Promote previous deployment
+Migrations:   npx supabase db push        # Apply pending SQL
+Env check:    VERCEL_ENVIRONMENT=production npm run vercel:env:check
+```

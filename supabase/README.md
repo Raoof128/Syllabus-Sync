@@ -1,38 +1,71 @@
-# Supabase Notes
+# Supabase Database
 
-## Source Of Truth
+> **Last verified:** 2026-03-21
 
-The authoritative database history for this repository is the ordered SQL files in `supabase/migrations/`.
+This directory contains the database migration history, development seed data, and archived SQL artifacts for Syllabus Sync.
 
-Do not treat a single schema snapshot as the canonical deployment source when the migration chain is available.
+---
 
-## Contents
+## Source of Truth
 
-```text
+The **ordered SQL files in `supabase/migrations/`** are the authoritative database history. Every schema change is recorded as a timestamped, immutable migration file. Do not treat standalone schema snapshots (such as `docs/database/database-schema.sql`) as deployment sources -- they exist for reference only.
+
+---
+
+## Directory Structure
+
+```
 supabase/
-├── migrations/   timestamped migration history
-├── archive/      older helper/archive SQL artifacts
-└── seed_dev.sql  development seed helper
+  migrations/    Timestamped SQL migration files (source of truth)
+  archive/       Older helper and archive SQL artifacts
+  seed_dev.sql   Development seed data
 ```
 
-## How To Work With It
+---
 
-Typical workflow:
+## Common Workflows
+
+### Link to a Supabase project
 
 ```bash
-supabase link --project-ref <project-ref>
-supabase db push
-supabase migration new <name>
+npx supabase link --project-ref <your-project-ref>
 ```
 
-## Current Documentation Contract
+### Apply all pending migrations
 
-- Canonical schema history: `supabase/migrations/`
-- Reference snapshot: `docs/database/database-schema.sql`
-- Deployment checklist: `docs/operations/deployment-checklist.md`
-- Environment setup: `docs/operations/ENVIRONMENT_SETUP.md`
+```bash
+npx supabase db push
+```
 
-## Reconciliation Notes
+### Create a new migration
 
-This repository still contains `docs/database/database-schema.sql` and some archived SQL material, but the current app/API surface should be reconciled against `supabase/migrations/` first.
+```bash
+npx supabase migration new <descriptive-name>
+```
 
+This creates a new timestamped file in `supabase/migrations/`. Write your SQL in the generated file, then apply it with `npx supabase db push`.
+
+### View migration status
+
+```bash
+npx supabase migration list
+```
+
+---
+
+## Guidelines
+
+- **Never modify an existing migration file** after it has been applied to any environment. Create a new migration to alter or undo changes.
+- **Always test migrations locally** before applying to production. Use `npx supabase db reset` against a local or staging database to verify the full migration chain.
+- **Include both up and down logic** when practical, or document how to reverse a migration manually.
+- **Use `SECURITY DEFINER` functions carefully** and ensure RLS policies are tested. The migration chain includes several security-hardening migrations.
+
+---
+
+## Related Documentation
+
+| Document | Location |
+| :--- | :--- |
+| Environment Setup | [`docs/setup/ENVIRONMENT_SETUP.md`](../docs/setup/ENVIRONMENT_SETUP.md) |
+| Deployment Checklist | [`docs/operations/deployment-checklist.md`](../docs/operations/deployment-checklist.md) |
+| Database Schema Reference | [`docs/database/database-schema.sql`](../docs/database/database-schema.sql) |

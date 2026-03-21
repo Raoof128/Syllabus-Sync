@@ -1,108 +1,150 @@
 # Google Maps Platform Setup
 
-This runbook configures the production Google map mode for `/map?view=google`.
+> **Audience:** Engineers configuring Google Maps for the `/map?view=google` mode.
+> **Last verified:** 2026-03-21
 
-## 1) Create or select a Google Cloud project
+This runbook walks through provisioning Google Cloud APIs, creating API keys, and configuring the application for both local development and Vercel production.
 
-1. Open https://console.cloud.google.com/.
-2. Create a project or select the one used by this app.
-3. Ensure billing is enabled.
+---
 
-## 2) Enable the required Google APIs
+## Prerequisites
 
-Enable:
+- A Google Cloud account with billing enabled.
+- Access to the [Google Cloud Console](https://console.cloud.google.com/).
+- The Syllabus Sync repository cloned locally.
 
-1. **Maps JavaScript API**
-2. **Routes API**
+---
 
-## 3) Create the browser key
+## 1. Create or Select a Google Cloud Project
 
-This key is used by the Google Maps JavaScript loader.
+1. Open the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project or select the existing project used by Syllabus Sync.
+3. Confirm that billing is enabled on the project. Google Maps Platform APIs require an active billing account.
 
-1. Open **APIs & Services -> Credentials**.
-2. Create an API key.
-3. Restrict it to **HTTP referrers**.
-4. Add allowed origins such as:
-   - `http://localhost:3000/*`
-   - `https://your-preview-domain/*`
-   - `https://your-production-domain/*`
-5. Restrict the key to **Maps JavaScript API**.
+---
 
-Set it as:
+## 2. Enable Required APIs
 
-```bash
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-browser-key
+Navigate to **APIs & Services > Library** and enable the following APIs:
+
+| API                     | Purpose                                                   |
+| :---------------------- | :-------------------------------------------------------- |
+| **Maps JavaScript API** | Renders the interactive map in the browser.               |
+| **Routes API**          | Computes walking/driving/transit directions server-side.  |
+| **Places API (New)**    | Powers place search and place detail lookups server-side. |
+
+---
+
+## 3. Create the Browser API Key
+
+This key is loaded by the Google Maps JavaScript API in the client browser.
+
+1. Navigate to **APIs & Services > Credentials**.
+2. Click **Create Credentials > API Key**.
+3. Click **Edit API Key** and configure restrictions:
+   - **Application restriction:** HTTP referrers (websites).
+   - **Website restrictions:** Add each domain that serves the application:
+     - `http://localhost:3000/*`
+     - `https://your-preview-domain.vercel.app/*`
+     - `https://your-production-domain.vercel.app/*`
+   - **API restriction:** Restrict to **Maps JavaScript API** only.
+4. Save the key.
+
+Set in your environment:
+
+```
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<your-browser-key>
 ```
 
-## 4) Create the server key
+---
 
-This key is used by the server-side Google map proxies:
+## 4. Create the Server API Key
 
-- `/api/maps/routes`
-- `/api/maps/place-search`
-- `/api/maps/place-details`
+This key is used by the server-side API proxy routes:
 
-1. Create a second API key.
-2. Restrict it by API to **Routes API**.
-3. Apply server/network restrictions that fit your deployment platform.
+- `/api/maps/routes` -- route computation
+- `/api/maps/place-search` -- place autocomplete and search
+- `/api/maps/place-details` -- place detail lookups
 
-Set it as:
+These proxies keep the server key off the client. They include rate limiting (`apiLimiter`) and origin validation (`isTrustedOrigin`).
 
-```bash
-GOOGLE_ROUTES_API_KEY=your-server-key
+1. Create a second API key in **APIs & Services > Credentials**.
+2. Configure restrictions:
+   - **Application restriction:** Choose IP addresses or "None" depending on your deployment platform. Vercel serverless functions do not have stable IPs, so IP restriction may not be practical.
+   - **API restriction:** Restrict to **Routes API** and **Places API (New)**.
+3. Save the key.
+
+Set in your environment:
+
+```
+GOOGLE_ROUTES_API_KEY=<your-server-key>
 ```
 
-## 5) Create a Google Map ID
+---
 
-Advanced markers and vector styling require a Map ID.
+## 5. Create a Map ID
 
-1. Open **Google Maps Platform -> Map Management**.
-2. Create a new **JavaScript** map ID.
-3. Apply cloud styling if desired.
+Advanced Markers and vector map styling require a Map ID.
 
-Set it as:
+1. Navigate to **Google Maps Platform > Map Management**.
+2. Click **Create Map ID**.
+3. Select **JavaScript** as the map type.
+4. Optionally apply a cloud-based map style for custom appearance.
+5. Copy the generated Map ID.
 
-```bash
-NEXT_PUBLIC_GOOGLE_MAP_ID=your-map-id
+Set in your environment:
+
+```
+NEXT_PUBLIC_GOOGLE_MAP_ID=<your-map-id>
 ```
 
-## 6) Configure the app
+---
 
-### Local development
+## 6. Configure the Application
 
-Add to `.env.local`:
+### Local Development
+
+Add all three variables to `.env.local`:
 
 ```bash
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-browser-key
-NEXT_PUBLIC_GOOGLE_MAP_ID=your-map-id
-GOOGLE_ROUTES_API_KEY=your-server-key
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<your-browser-key>
+NEXT_PUBLIC_GOOGLE_MAP_ID=<your-map-id>
+GOOGLE_ROUTES_API_KEY=<your-server-key>
 ```
 
-Restart the app:
+Restart the development server:
 
 ```bash
 npm run dev
 ```
 
-### Vercel deployment
+### Vercel Deployment
 
-Add all three variables to `development`, `preview`, and `production`.
+Add all three variables in the Vercel Dashboard under **Settings > Environment Variables**. Apply them to `development`, `preview`, and `production` environments as appropriate.
 
-## 7) Verify
+---
 
-1. Open `/map?view=google`.
-2. Confirm the JavaScript map loads instead of an iframe.
-3. Search/select a campus building through the shared HUD.
-4. Switch travel modes and start navigation.
-5. Confirm the route polyline and route panel update in-app.
+## 7. Verification
 
-## 8) Troubleshooting
+After configuration, verify the full map pipeline:
 
-- `NEXT_PUBLIC_GOOGLE_MAP_ID` missing:
-  - The map cannot initialize Advanced Markers correctly. Create a JavaScript Map ID.
-- Map loads but routes or place lookup fail:
-  - Confirm `GOOGLE_ROUTES_API_KEY` is present server-side and the Routes API is enabled.
-- `RefererNotAllowedMapError`:
-  - Your browser key referrer allowlist does not match the current domain.
-- Map script blocked by CSP:
-  - Confirm `lib/security/csp.ts` is deployed with the Google Maps script/connect allowlist.
+1. Open `/map?view=google` in your browser.
+2. Confirm the interactive JavaScript map renders (not an iframe fallback).
+3. Use the search HUD to find a campus building.
+4. Select a destination and confirm that route computation succeeds.
+5. Switch between travel modes (walking, driving, transit) and verify the route polyline and route panel update.
+6. Click **Start Navigation** and confirm live tracking activates (location follow, route recalculation).
+
+---
+
+## Troubleshooting
+
+| Symptom                                | Likely Cause                                                          | Resolution                                                                                                             |
+| :------------------------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
+| Map does not render                    | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` missing or invalid                  | Verify the key exists in `.env.local` and the Maps JavaScript API is enabled.                                          |
+| `RefererNotAllowedMapError` in console | Browser key referrer restriction does not match the current domain    | Add the current domain to the key's HTTP referrer allowlist in the Cloud Console.                                      |
+| Map renders but routes fail            | `GOOGLE_ROUTES_API_KEY` missing server-side or Routes API not enabled | Confirm the server key is set and the Routes API is enabled on the project.                                            |
+| Place search returns no results        | Places API (New) not enabled or server key not authorized             | Enable the Places API and add it to the server key's API restrictions.                                                 |
+| Advanced Markers not appearing         | `NEXT_PUBLIC_GOOGLE_MAP_ID` missing or not a JavaScript-type Map ID   | Create a JavaScript Map ID in Map Management.                                                                          |
+| Map script blocked by CSP              | Content Security Policy does not allow Google Maps domains            | Confirm that `lib/security/csp.ts` includes the Google Maps script and connect-src allowlists. Redeploy after changes. |
+| 401 errors on `/api/maps/*` routes     | API routes not listed in `isPublicApiPath()`                          | Verify that `lib/proxy.ts` includes `/api/maps/` in its public path list.                                              |

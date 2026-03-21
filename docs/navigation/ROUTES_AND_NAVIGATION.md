@@ -1,145 +1,179 @@
-# Routes And Navigation
+# Routes and Navigation
 
-This document reconciles the user-visible navigation model with the current App Router implementation.
+Technical reference for the Syllabus Sync navigation model, shell architecture, and URL-state conventions.
 
-## Bootstrap And Shells
+---
 
-### Root Layout
+## Root Layout
 
-`app/layout.tsx` is the global bootstrap boundary. It sets metadata, viewport, manifest links, theme/RTL bootstrap scripts, JSON-LD organization metadata, and wraps the tree with `QueryProvider` and `ClientLayout`.
+`app/layout.tsx` is the global bootstrap boundary. It provides:
 
-### Redirect Entry Route
+- HTML metadata, viewport, and manifest links
+- Theme and RTL bootstrap scripts (runs before paint to prevent FOUC)
+- JSON-LD organization metadata for SEO
+- `QueryProvider` (React Query) and `ClientLayout` wrappers
 
-`app/page.tsx` mounts `AuthRedirectHandler`. `/` should be documented as:
+---
 
-- the Supabase redirect landing route
-- a recovery/PKCE/auth forwarding surface
-- not a brochure page or neutral dashboard index
+## Shell Selection
 
-### Shell Selection
+`app/client-layout.tsx` inspects the current pathname and selects a shell variant:
 
-`app/client-layout.tsx` chooses between shells based on pathname:
+| Route Class | Matched Routes                                        | Shell                                                                   |
+| :---------- | :---------------------------------------------------- | :---------------------------------------------------------------------- |
+| Auth        | `/login`, `/signup`, `/reset-password`                | Bare (no chrome)                                                        |
+| Public      | `/terms`, `/privacy`, `/verify`, `/about`, `/contact` | Bare (no chrome)                                                        |
+| Post-auth   | `/onboarding`                                         | Bare (no chrome)                                                        |
+| Protected   | All other app routes                                  | Full (sidebar, header, footer, offline indicator, toaster, sync dialog) |
 
-| Route class | Routes                                                | Shell behavior                                                   |
-| ----------- | ----------------------------------------------------- | ---------------------------------------------------------------- |
-| Auth        | `/login`, `/signup`, `/reset-password`                | no sidebar/header/footer                                         |
-| Public      | `/terms`, `/privacy`, `/verify`, `/about`, `/contact` | no sidebar/header/footer                                         |
-| Post-auth   | `/onboarding`                                         | no sidebar/header/footer                                         |
-| Protected   | all other app routes                                  | sidebar, header, footer, offline indicator, toaster, sync dialog |
+---
 
-## Top-Level Navigation
+## Entry Route
 
-The canonical top-level navigation lives in `components/layout/Sidebar.tsx`.
+`app/page.tsx` mounts `AuthRedirectHandler`. The root path `/` is:
 
-| Label source | Route       |
-| ------------ | ----------- |
-| `home`       | `/home`     |
-| `calendar`   | `/calendar` |
-| `navigation` | `/map`      |
-| `feed`       | `/feed`     |
-| `settings`   | `/settings` |
+- The Supabase redirect landing route for OAuth, PKCE, and email confirmation callbacks
+- A recovery and auth-forwarding surface
+- Not a brochure page or dashboard index
 
-The sidebar also exposes a gamification deep link:
+Authenticated users hitting `/` are redirected to `/home`. Unauthenticated users are redirected to `/login`.
 
-- `GAMIFICATION_SETTINGS_ROUTE = /settings/experience`
+---
 
-Desktop and mobile sidebar variants share the same route targets.
+## Primary Navigation
 
-## Header And Secondary Navigation
+### Sidebar
+
+Source of truth: `components/layout/Sidebar.tsx`
+
+| i18n Key     | Route       | Purpose                |
+| :----------- | :---------- | :--------------------- |
+| `home`       | `/home`     | Dashboard and widgets  |
+| `calendar`   | `/calendar` | Schedule and deadlines |
+| `navigation` | `/map`      | Campus map and routing |
+| `feed`       | `/feed`     | Events and social feed |
+| `settings`   | `/settings` | Preferences hub        |
+
+The sidebar also exposes a gamification deep link to `/settings/experience`.
+
+Desktop and mobile sidebar variants share identical route targets.
+
+### Header
 
 `components/layout/Header.tsx` provides access to:
 
-- the root redirect route via logo/home link
-- notifications
-- theme toggle
-- manage profile route
-- account actions
+- Root redirect via logo / home link
+- Notification bell
+- Theme toggle
+- Profile management (`/manage-profiles`)
+- Account actions (sign out)
 
-Settings quick actions are defined separately in `features/settings/constants.ts` and point to:
+### Settings Quick Actions
 
-- `/home`
-- `/calendar`
-- `/feed`
-- `/map`
-- `/manage-profiles`
+Defined in `features/settings/constants.ts`:
 
-## Nested Settings Navigation
+| Target             | Description         |
+| :----------------- | :------------------ |
+| `/home`            | Return to dashboard |
+| `/calendar`        | Open calendar       |
+| `/feed`            | Open feed           |
+| `/map`             | Open map            |
+| `/manage-profiles` | Profile management  |
+
+---
+
+## Settings Navigation
 
 `app/settings/page.tsx` redirects to `/settings/general`.
 
-`app/settings/layout.tsx` owns nested section navigation for:
+`app/settings/layout.tsx` renders nested section navigation:
 
-- `/settings/general`
-- `/settings/appearance`
-- `/settings/security`
-- `/settings/experience`
-- `/settings/about`
+| Section Route          | Label      | Content                                       |
+| :--------------------- | :--------- | :-------------------------------------------- |
+| `/settings/general`    | General    | Language, reminders, notification preferences |
+| `/settings/appearance` | Appearance | Theme, color scheme, display density          |
+| `/settings/security`   | Security   | MFA, passkeys, sessions, security audit log   |
+| `/settings/experience` | Experience | XP profile, streak, level progress, badges    |
+| `/settings/about`      | About      | Version, licenses, credits                    |
 
-This is the current settings router contract and is covered by `tests/settings/SettingsRoutesIntegrity.test.ts`.
+This is the settings router contract. It is enforced by `tests/settings/SettingsRoutesIntegrity.test.ts`.
+
+---
 
 ## Feature Route Behavior
 
 ### `/home`
 
-- server entry: `app/home/page.tsx`
-- client runtime: `app/home/HomeClient.tsx`
-- quick-add orchestration now uses state, then routes to `/calendar`
-- some widget links still rely on query params for focused highlighting
+- **Server entry:** `app/home/page.tsx`
+- **Client runtime:** `app/home/HomeClient.tsx`
+- Quick-add orchestration uses state, then routes to `/calendar`
+- Widget links may use query parameters for focused highlighting
 
 ### `/calendar`
 
-- server entry: `app/calendar/page.tsx`
-- client runtime: `app/calendar/CalendarClient.tsx`
-- receives legacy query params from widgets and cards
-- also consumes the pending calendar intent store for state-driven quick-add
+- **Server entry:** `app/calendar/page.tsx`
+- **Client runtime:** `app/calendar/CalendarClient.tsx`
+- Receives legacy query parameters from widgets and cards
+- Consumes the pending calendar intent store for state-driven quick-add
 
 ### `/map`
 
-- server entry: `app/map/page.tsx`
-- client runtime: `features/map/components/MapClient.tsx`
-- default campus map mode
-- Google map mode via `?view=google`
-- additional URL state:
-  - `building`
-  - `autonav`
-  - `focused`
-  - `layers`
+- **Server entry:** `app/map/page.tsx`
+- **Client runtime:** `features/map/components/MapClient.tsx`
+- Default mode: campus SVG map
+- Google Maps mode: `?view=google`
+- URL state parameters:
+
+| Parameter  | Type    | Description                                |
+| :--------- | :------ | :----------------------------------------- |
+| `view`     | string  | `google` to switch to Google Maps renderer |
+| `building` | string  | Pre-select a building by identifier        |
+| `autonav`  | boolean | Auto-start navigation on load              |
+| `focused`  | boolean | Highlight the selected building            |
+| `layers`   | string  | Toggle map layer visibility                |
 
 ### `/feed`
 
-- server entry: `app/feed/page.tsx`
-- client runtime: `features/feed/components/PublicFeedClient.tsx`
-- feed cards can deep-link into `/map` and `/calendar`
+- **Server entry:** `app/feed/page.tsx`
+- **Client runtime:** `features/feed/components/PublicFeedClient.tsx`
+- Feed cards can deep-link into `/map` (building navigation) and `/calendar` (event scheduling)
 
 ### `/manage-profiles`
 
-- dedicated profile management route
-- reachable from settings quick actions and header profile surfaces
+- Dedicated profile management route
+- Reachable from settings quick actions and header profile menu
 
 ### `/map/position-editor`
 
-- standalone specialized route under the map namespace
-- should be treated as a niche tool route, not core primary navigation
+- Standalone admin tool under the map namespace
+- Used for adjusting building GPS coordinates
+- Not part of primary navigation
+
+---
+
+## Route Protection
+
+### Page Routes
+
+The proxy middleware (`lib/proxy.ts`) enforces access control:
+
+1. **Protected routes** (`/home`, `/calendar`, `/feed`, `/map`, `/settings`, `/manage-profiles`) require an authenticated Supabase session. Unauthenticated users are redirected to `/login?redirectTo={path}`.
+2. **Auth routes** (`/login`, `/signup`, `/reset-password`) redirect authenticated users to `/home` (unless MFA step-up is pending).
+3. **Email verification gate** -- authenticated users without a confirmed email are redirected to `/verify?reason=unverified`.
+4. **MFA gate** -- users with enrolled MFA factors at AAL1 are redirected to `/login?mfa=1` to complete the step-up challenge.
+
+### API Routes
+
+See the [API Reference](../api/API_REFERENCE.md) for the complete public vs. authenticated endpoint classification.
+
+---
 
 ## Navigation-Related Test Coverage
 
-Current route integrity coverage exists in:
+| Test File                                        | Coverage                                                         |
+| :----------------------------------------------- | :--------------------------------------------------------------- |
+| `tests/settings/SettingsRoutesIntegrity.test.ts` | Verifies every settings section target has an `app/.../page.tsx` |
+| `tests/settings/QuickActions.test.tsx`           | Verifies every quick-action target resolves to a page            |
+| `tests/api/proxy.mfa.test.ts`                    | Verifies proxy auth, MFA, and email verification gates           |
 
-- `tests/settings/SettingsRoutesIntegrity.test.ts`
-- `tests/settings/QuickActions.test.tsx`
-
-These tests currently prove:
-
-- each settings section target has an `app/.../page.tsx`
-- each settings quick action target resolves to a page
-- the gamification badge target remains `/settings/experience`
-
-## Documentation Rules Going Forward
-
-Route docs in this repository should state:
-
-- `/` is an auth redirect processor
-- `/settings` is a route family with a redirecting index
-- top-level nav sources of truth are `Sidebar.tsx` and `features/settings/constants.ts`
-- `/map` is partially URL-state driven
-- route integrity tests exist and should be updated with any navigation changes
+These tests are part of the `npm run check` quality gate. Any navigation change must be reflected in them.

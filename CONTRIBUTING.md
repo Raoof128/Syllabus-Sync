@@ -1,69 +1,322 @@
 # Contributing to Syllabus Sync
 
-**Enterprise-Grade Development Guidelines for Industry Professionals**
-
-Syllabus Sync operates under strict engineering standards. We treat this repository as a production-grade enterprise application, prioritizing security, type safety, and architectural consistency.
-
-This document outlines the required workflows and quality gates for all contributions.
+Thank you for your interest in contributing to Syllabus Sync. This document describes our development standards, contribution workflow, and quality expectations. We hold contributions to the same bar as production software at companies like Vercel and Supabase -- if a change ships, it must be correct, secure, and maintainable.
 
 ---
 
-## 1. The AI-Native Workflow (Raouf Change Protocol)
+## Table of Contents
 
-We employ an AI-native development methodology. Whether you are a human developer or an AI agent, you must adhere to the **Raouf Change Protocol** before submitting code.
+- [Getting Started](#getting-started)
+- [Development Environment](#development-environment)
+- [Contribution Workflow](#contribution-workflow)
+- [Code Standards](#code-standards)
+- [Quality Gate](#quality-gate)
+- [Testing Requirements](#testing-requirements)
+- [Pull Request Process](#pull-request-process)
+- [Commit Conventions](#commit-conventions)
+- [Architecture Constraints](#architecture-constraints)
+- [Security Requirements](#security-requirements)
+- [Issue and Discussion Guidelines](#issue-and-discussion-guidelines)
+- [AI-Assisted Contributions](#ai-assisted-contributions)
 
-1. **Preflight Reading:** You must read `AGENT.md` (for architectural constraints) and the `CHANGELOG.md` (to understand recent context) before writing a line of code.
-2. **Explain Before Touching:** Formulate a minimal, surgical plan. Do not perform sweeping refactors outside the scope of your specific feature or bug fix.
-3. **Atomic Commits:** Keep changes small and reviewable.
-4. **Postflight Logging:** Every significant PR must be accompanied by an update to the `CHANGELOG.md` detailing the scope, files changed, and verification steps.
+---
 
-## 2. Quality Gates & The `check` Pipeline
+## Getting Started
 
-No code is merged unless it passes our comprehensive, zero-tolerance quality gate. Before opening a PR, you **must** run:
+1. **Read first.** Before writing any code, review:
+   - [`AGENT.md`](./AGENT.md) -- architectural constraints and conventions.
+   - [`CHANGELOG.md`](./CHANGELOG.md) -- recent changes and context.
+   - [`docs/architecture/ARCHITECTURE.md`](./docs/architecture/ARCHITECTURE.md) -- system design.
+
+2. **Check existing work.** Search open issues and pull requests to avoid duplicate effort.
+
+3. **Discuss before building.** For non-trivial changes (new features, architectural modifications, database schema changes), open a GitHub Discussion or Issue first. We will help you scope the work and avoid wasted effort.
+
+---
+
+## Development Environment
+
+### Prerequisites
+
+| Requirement  | Version    |
+| ------------ | ---------- |
+| Node.js      | `>=22 <23` |
+| npm          | `>=10`     |
+| Supabase CLI | Latest     |
+| Git          | `>=2.40`   |
+
+### Setup
+
+```bash
+git clone https://github.com/mrpouyaalavi/syllabus-sync.git
+cd syllabus-sync
+npm install
+cp .env.example .env.local
+# Populate .env.local with your Supabase, Redis, and API credentials
+npm run dev
+```
+
+Full environment configuration guide: [`docs/operations/ENVIRONMENT_SETUP.md`](./docs/operations/ENVIRONMENT_SETUP.md).
+
+---
+
+## Contribution Workflow
+
+We follow a fork-and-branch model.
+
+```
+1. Fork the repository
+2. Create a feature branch from `main`
+3. Make your changes (small, focused commits)
+4. Run `npm run check` -- all gates must pass
+5. Push your branch and open a Pull Request
+6. Address review feedback
+7. Maintainer merges after approval
+```
+
+### Branch Naming
+
+Use descriptive, prefixed branch names:
+
+| Prefix      | Purpose                               | Example                         |
+| ----------- | ------------------------------------- | ------------------------------- |
+| `feat/`     | New functionality                     | `feat/offline-calendar-sync`    |
+| `fix/`      | Bug fix                               | `fix/auth-race-condition`       |
+| `refactor/` | Code improvement (no behavior change) | `refactor/extract-map-hooks`    |
+| `docs/`     | Documentation only                    | `docs/api-reference-update`     |
+| `test/`     | Test additions or fixes               | `test/notification-integration` |
+| `chore/`    | Tooling, dependencies, CI             | `chore/upgrade-vitest`          |
+
+---
+
+## Code Standards
+
+### TypeScript
+
+- **Strict mode is mandatory.** The project enforces `strict: true` in `tsconfig.json`.
+- **Zero `any` policy.** Never use `any`. Use `unknown` and narrow with type guards, or define proper interfaces.
+- **Explicit return types** on exported functions and API route handlers.
+
+### React and Next.js
+
+- **App Router only.** We use the Next.js App Router exclusively. Do not create `pages/` routes.
+- **Server Components by default.** Only add `"use client"` at the leaf node where interactivity is required. Data fetching and layout belong in Server Components.
+- **Tailwind CSS only.** Use the project's semantic design tokens (e.g., `bg-mq-card-background`, `text-mq-primary`) defined in `tailwind.config.ts`. Do not use hardcoded hex values or inline `style` attributes.
+- **Zustand for global state.** Complex state mutations must use optimistic UI patterns with additive server merging.
+
+### File Organization
+
+- Feature code lives in `features/` (e.g., `features/calendar/`, `features/map/`).
+- Shared utilities live in `lib/`.
+- Reusable UI components live in `components/`.
+- API route handlers live in `app/api/`.
+
+### Code Style
+
+- Prettier handles all formatting. Do not override or disable rules.
+- ESLint must return zero errors and zero warnings.
+- Maximum component size: aim for under 300 lines. Extract sub-components and custom hooks when files grow beyond this.
+
+---
+
+## Quality Gate
+
+Before opening a PR, you **must** run the full quality pipeline:
 
 ```bash
 npm run check
 ```
 
-This command acts as your primary reviewer, executing:
+This executes the following stages in order:
 
-- **Secrets Scan:** `tools/security/check-secrets.mjs` ensures no API keys or credentials are leaked.
-- **Formatter:** Prettier ensures exact stylistic consistency.
-- **Typecheck:** `tsc --noEmit` verifies strict TypeScript compliance. We enforce a **Zero `any`** policy.
-- **Linter:** ESLint must return 0 errors and 0 warnings.
-- **Test Suite:** Vitest executes all unit and integration tests.
-- **Build:** Next.js production build verifies route integrity and Server Component constraints.
+| Stage        | Tool                               | What It Checks                                      |
+| ------------ | ---------------------------------- | --------------------------------------------------- |
+| Secrets scan | `tools/security/check-secrets.mjs` | No API keys, tokens, or credentials in source       |
+| Format       | Prettier                           | Consistent code style across the entire codebase    |
+| Type check   | `tsc --noEmit`                     | Strict TypeScript compliance, zero errors           |
+| Lint         | ESLint                             | Code quality rules, zero errors, zero warnings      |
+| Test         | Vitest                             | All unit and integration tests pass                 |
+| Build        | `next build`                       | Production build succeeds, route integrity verified |
 
-_If `npm run check` fails, your PR will not be reviewed._
+**If any stage fails, your PR will not be reviewed.** Fix all issues locally before pushing.
 
-## 3. Architectural & Style Constraints
+---
 
-### Frontend (Next.js & React)
+## Testing Requirements
 
-- **App Router:** We strictly use the Next.js 16 App Router. Prefer React Server Components (RSC) for data fetching and layout. Use `"use client"` only at the leaf nodes where interactivity is required.
-- **Styling:** Tailwind CSS is mandatory. Do not use hardcoded hex values; you must use the semantic MQ tokens (e.g., `bg-mq-card-background`) defined in `tailwind.config.ts`.
-- **State Management:** Use Zustand for global state. Complex state mutations should employ optimistic UI patterns with additive server merging to prevent race conditions.
+Every contribution that changes behavior must include tests.
 
-### Backend (Supabase & API)
+### What to Test
 
-- **Zero-Trust Middleware:** All new API routes must be wrapped in `requireAuth` or `requireAuthWithRateLimit` to inherit CSRF protection and session validation.
-- **Database Migrations:** Never modify the Supabase schema via the UI. All database changes must be scripted as idempotent, reversible SQL migrations in `supabase/migrations/`.
-- **Row-Level Security (RLS):** Every new table must have RLS enabled, with policies restricting access to `auth.uid()`.
-- **RPCs over APIs:** For complex, multi-table transactions (like gamification XP awards), prefer PostgreSQL Stored Procedures (RPCs) with `SECURITY DEFINER` over thick Next.js API logic.
+| Change Type         | Required Testing                                                                  |
+| ------------------- | --------------------------------------------------------------------------------- |
+| New utility or hook | Unit test covering primary paths and edge cases                                   |
+| New API route       | Integration test for success, auth failure, validation failure, and rate limiting |
+| Bug fix             | Regression test proving the fix and preventing recurrence                         |
+| UI component        | Render test verifying key states (loading, error, empty, populated)               |
 
-## 4. Testing Mandate
+### Test Conventions
 
-A feature is incomplete without automated verification.
+- Test files live in `tests/` mirroring the source directory structure.
+- Use Vitest and Testing Library.
+- Mock external dependencies (Supabase, browser APIs) using the patterns established in `tests/setup.ts`.
+- Prefer testing behavior over implementation details.
+- Name test files `<ModuleName>.test.ts` or `<ComponentName>.test.tsx`.
 
-- **Unit Tests:** All utilities, hooks, and complex components must be tested via Vitest. Mock external dependencies (like Supabase or standard browser APIs) robustly in `tests/setup.ts`.
-- **Integration Tests:** API routes must have integration coverage proving both the success path and the failure paths (e.g., unauthenticated, invalid payload, rate-limited).
-- **Test Coverage:** We aim for high branch coverage on critical paths (Auth, Notifications, Mapping).
+### Running Tests
 
-## 5. Submitting Your Pull Request
+```bash
+# Run the full suite
+npm test
 
-1. Branch from `develop` (or `main` if instructed).
-2. Use conventional commit messages (e.g., `feat(map): add fused heading`, `fix(auth): resolve race condition in signup`).
-3. Fill out the Pull Request template entirely, providing links to the relevant issue, before/after screenshots (for UI changes), and the output of your `npm run check`.
-4. Request review from the core maintainers.
+# Run a specific test file
+npx vitest run tests/path/to/file.test.ts
 
-Thank you for helping us build a robust, secure Campus OS!
+# Run tests in watch mode during development
+npx vitest tests/path/to/file.test.ts
+```
+
+---
+
+## Pull Request Process
+
+### PR Requirements
+
+1. **Title:** Use a conventional commit prefix (e.g., `feat(calendar): add recurring event support`).
+2. **Description:** Clearly explain:
+   - **What** changed and **why**.
+   - How to test or verify the change.
+   - Screenshots or recordings for UI changes.
+3. **Scope:** Keep PRs focused. One logical change per PR. If you find an unrelated issue while working, file a separate issue.
+4. **Quality gate output:** Confirm `npm run check` passes. The CI pipeline will verify this independently.
+5. **Changelog:** For significant changes, add an entry to `CHANGELOG.md` describing the scope, files changed, and verification approach.
+
+### Review Process
+
+- At least one maintainer must approve before merge.
+- Reviewers will evaluate correctness, security implications, test coverage, and adherence to architectural conventions.
+- Address all review comments. If you disagree with feedback, explain your reasoning -- we value constructive technical discussion.
+- PRs that go stale for more than 14 days without response may be closed.
+
+### After Merge
+
+- The maintainer team handles deployment.
+- If your change requires environment variable additions or database migrations, document them clearly in the PR description.
+
+---
+
+## Commit Conventions
+
+We use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Types
+
+| Type       | When to Use                                |
+| ---------- | ------------------------------------------ |
+| `feat`     | New feature or capability                  |
+| `fix`      | Bug fix                                    |
+| `refactor` | Code restructuring without behavior change |
+| `test`     | Adding or updating tests                   |
+| `docs`     | Documentation changes                      |
+| `chore`    | Build, CI, dependency updates              |
+| `perf`     | Performance improvement                    |
+| `security` | Security hardening                         |
+
+### Scope
+
+Use the feature area: `auth`, `calendar`, `map`, `feed`, `notifications`, `settings`, `api`, `db`, `ci`, `docs`.
+
+### Examples
+
+```
+feat(map): add fused heading for pedestrian navigation
+fix(auth): resolve race condition in concurrent signup flow
+refactor(calendar): extract deadline computation into custom hook
+test(api): add integration coverage for notification preferences endpoint
+security(middleware): add CSRF origin validation to mutation routes
+```
+
+---
+
+## Architecture Constraints
+
+These constraints are non-negotiable. PRs that violate them will be rejected.
+
+### Proxy Middleware Auth Gate
+
+All API routes require Supabase authentication **unless** explicitly listed in `isPublicApiPath()` in `lib/proxy.ts`. If you add a new public API route, you must register it there. Forgetting this step will cause your route to return `401 Unauthorized` in production.
+
+### Database Discipline
+
+- **Never modify the database through the Supabase Dashboard UI.** All schema changes must be scripted as idempotent, reversible SQL migrations in `supabase/migrations/`.
+- **Row-Level Security (RLS) is mandatory.** Every new table must have RLS enabled with policies scoped to `auth.uid()`.
+- **Prefer PostgreSQL RPCs** for multi-table transactions. Use `SECURITY DEFINER` stored procedures over thick API route logic.
+
+### API Security
+
+- All new API routes must use `requireAuth` or `requireAuthWithRateLimit` middleware.
+- Input validation via Zod schemas is mandatory for all request bodies.
+- Error responses must use sanitized messages -- never expose stack traces, internal paths, or database details.
+
+---
+
+## Security Requirements
+
+Security is a first-class concern, not a post-launch consideration.
+
+- **Never commit secrets.** The secrets scanner will block your PR, but verify manually as well. Use `.env.local` for local development.
+- **Never disable security controls** (CSP, rate limiting, RLS policies) to make development easier. If a control blocks your workflow, ask for help.
+- **Report vulnerabilities privately.** If you discover a security issue, do not open a public issue. Follow the process in [`SECURITY.md`](./SECURITY.md).
+
+---
+
+## Issue and Discussion Guidelines
+
+### Bug Reports
+
+Open a GitHub Issue with:
+
+- Steps to reproduce.
+- Expected vs. actual behavior.
+- Browser/OS/Node version.
+- Console errors or network traces, if applicable.
+
+### Feature Requests
+
+Open a GitHub Discussion with:
+
+- The problem you are trying to solve (not just the solution you want).
+- How it fits within the existing architecture.
+- Whether you are willing to implement it.
+
+### Questions
+
+Use GitHub Discussions for general questions about the codebase, architecture, or setup.
+
+---
+
+## AI-Assisted Contributions
+
+We welcome contributions developed with AI assistance (Claude, Copilot, Codex, etc.). AI-assisted contributions are held to the same quality bar as any other contribution. You are responsible for:
+
+- Understanding every line of code you submit.
+- Verifying that AI-generated code passes all quality gates.
+- Ensuring AI-generated tests actually test meaningful behavior (not just achieving coverage numbers).
+
+When using AI agents in this repository, they must follow the **Raouf Change Protocol** defined in `AGENT.md`: preflight reading, minimal/surgical changes, atomic commits, and postflight changelog updates.
+
+---
+
+## Recognition
+
+All contributors are recognized in the project. Significant contributions are acknowledged in release notes and the changelog.
+
+Thank you for helping build Syllabus Sync into a robust, secure campus platform.

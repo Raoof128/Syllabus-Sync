@@ -23,9 +23,9 @@
 
 > **A production-ready, AI-native platform that transforms static university infrastructure into a secure, high-performance, and cohesive student experience.**
 
-Syllabus Sync is an open-source student operations platform that transforms university syllabus PDFs into structured, machine-readable data — wrapping them in a modern, security-focused productivity application built for university students.
+Syllabus Sync is a production-grade, security-hardened web platform that unifies academic scheduling, deadline intelligence, campus navigation, and student engagement into a single, cohesive experience. Built on Next.js 16, React 19, and Supabase with strict TypeScript throughout, it delivers the kind of integrated campus infrastructure that universities promise but rarely ship.
 
-Built initially for **Macquarie University**, it unifies scheduling, deadline tracking, campus navigation, and student engagement into a single, highly secure, edge-delivered web application. This project serves as a comprehensive portfolio piece demonstrating advanced full-stack engineering, rigorous cybersecurity implementations, and AI-native development workflows.
+Built initially for **Macquarie University**, it is designed to be adaptable to other institutions by swapping academic datasets and configuring environment variables. This project serves as a comprehensive portfolio piece demonstrating advanced full-stack engineering, rigorous cybersecurity implementations, and AI-native development workflows.
 
 **[🔗 Live Demo](https://syllabus-sync-ashy.vercel.app)** &nbsp;·&nbsp; **[📖 Docs](./docs/README.md)** &nbsp;·&nbsp; **[🔐 Security](./SECURITY.md)** &nbsp;·&nbsp; **[🤝 Contributing](./CONTRIBUTING.md)**
 
@@ -43,6 +43,20 @@ Traditional university systems are fragmented, leading to missed deadlines, poor
 - **Advanced Campus Navigation:** Real-time, fused-heading campus navigation combining OpenStreetMap (Leaflet) and Google Maps Embed APIs, tailored for high-accuracy pedestrian routing.
 - **Enterprise-Grade Security:** A defense-in-depth architecture featuring WebAuthn (Passkeys), hardware-backed MFA, Zero-Trust middleware, and strict Row-Level Security (RLS).
 - **Gamified Engagement:** Secure, anti-abuse XP and streak mechanics to incentivize academic consistency.
+
+<br/>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
+
+<br/>
+
+## Why This Project Matters
+
+University platforms are often decades-old monoliths with bolted-on features and poor mobile experiences. Students deserve better. Syllabus Sync was built to prove three things:
+
+1. **A unified campus experience is technically achievable.** Timetables, assessment deadlines, campus wayfinding, weather-aware planning, and gamified engagement belong in one application -- not scattered across five different portals.
+2. **Security and usability are not trade-offs.** This platform implements WebAuthn passkeys, hardware-backed MFA, and Zero-Trust middleware while maintaining sub-second page loads and a frictionless UX.
+3. **AI-augmented engineering produces auditable, production-quality software.** Every architectural decision and security hardening is traced through an immutable changelog, following the **Raouf Change Protocol**.
 
 <br/>
 
@@ -93,39 +107,29 @@ Traditional university systems are fragmented, leading to missed deadlines, poor
 
 ## 🏗️ Technical Architecture Overview
 
-Syllabus Sync is built on a modern, edge-ready tech stack designed for scalability, type safety, and rapid iteration.
+Syllabus Sync is built on a modern, edge-ready tech stack designed for scalability, type safety, and zero-trust security.
 
-### The Stack
+### Runtime Stack
 
-<div align="center">
-
-**[ FRONTEND ]**
-[![Next.js](https://img.shields.io/badge/Next.js_16-000?style=for-the-badge&logo=nextdotjs)](https://nextjs.org)
-[![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
-[![TypeScript](https://skillicons.dev/icons?i=ts&theme=dark)](https://www.typescriptlang.org)
-[![Tailwind CSS](https://skillicons.dev/icons?i=tailwind&theme=dark)](https://tailwindcss.com)
-
-**[ BACKEND & DATABASE ]**
-[![Supabase](https://skillicons.dev/icons?i=supabase&theme=dark)](https://supabase.com)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
-
-**[ DEVOPS & TOOLING ]**
-[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
-[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
-[![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com)
-
-**[ TESTING ]**
-[![Vitest](https://img.shields.io/badge/Vitest-6366f1?style=for-the-badge&logo=vitest&logoColor=ffffff)](https://vitest.dev)
-[![Playwright](https://img.shields.io/badge/Playwright-22c55e?style=for-the-badge&logo=playwright&logoColor=ffffff)](https://playwright.dev)
-
-</div>
+| Layer | Technology |
+| --- | --- |
+| **Framework** | Next.js 16 (App Router) |
+| **UI** | React 19, Tailwind CSS 4, Radix UI, Framer Motion |
+| **State** | Zustand (persistent storage, SWR-like caching) |
+| **Database & Auth** | Supabase PostgreSQL with enforced Row-Level Security (RLS) |
+| **Infrastructure** | Vercel (Edge Middleware, Serverless Functions) |
+| **Rate Limiting** | Upstash Redis (distributed) |
+| **Error Tracking** | Sentry (client, server, edge) |
 
 ### Key Architectural Decisions
 
-1. **Edge-First Security Middleware:** All routing passes through Vercel Edge Middleware, enforcing authentication state, email verification gates, CSRF protection, and rate-limiting before requests hit serverless compute.
-2. **Distributed Rate Limiting:** The platform uses Upstash Redis for distributed rate limiting, ensuring consistency across serverless instances.
-3. **Database-Level Atomicity:** Critical operations are handled via PostgreSQL triggers to guarantee data integrity and prevent orphaned records.
-4. **Optimistic UI with Additive Server Sync:** Complex state uses an optimistic update pattern backed by an additive merge strategy to eliminate race conditions.
+- **Edge-First Security Middleware:** All routing passes through Vercel Edge Middleware. Auth state, email verification gates, CSRF protection, and rate limiting are enforced at the edge.
+- **Distributed Rate Limiting:** Uses Upstash Redis and explicitly fails closed in production if Redis is unconfigured, preventing bypass attacks during autoscaling events.
+- **Database-Level Atomicity:** Critical operations (e.g., profile creation) are handled via PostgreSQL triggers to guarantee integrity.
+- **Optimistic UI with Additive Server Sync:** Complex state uses optimistic updates backed by an additive merge strategy to eliminate race conditions.
+- **Proxy Middleware Auth Gate:** All `/api/*` routes require authentication by default, ensuring security-by-default for new endpoints.
+
+> **Deep Dive:** [Technical Explanation](./TECHNICAL_EXPLANATION.md) | [Architecture Reference](./docs/architecture/ARCHITECTURE.md)
 
 <br/>
 
@@ -135,15 +139,14 @@ Syllabus Sync is built on a modern, edge-ready tech stack designed for scalabili
 
 ## 🔒 Security Posture & Hardening
 
-Security is a **core design constraint**, featuring a defense-in-depth architecture aligned with industry best practices.
+Security is a structural constraint, with defense-in-depth across every layer.
 
-- **Authentication:** FIDO2 WebAuthn (Passkeys), hardware-backed MFA (TOTP), and strict session termination.
+- **Authentication:** FIDO2 WebAuthn (Passkeys restricted to platform authenticators), hardware-backed MFA (TOTP), and audited session termination.
 - **Authorization:** Absolute tenant isolation via PostgreSQL Row-Level Security (RLS) at the query execution layer.
-- **Defense-in-Depth:** Content Security Policy (CSP), Subresource Integrity (SRI), and API request signing.
-- **Data Protection:** Encryption at rest (AES-256) and in transit (TLS 1.3).
-- **Auditability:** Tamper-evident audit logging for all sensitive system and user operations.
+- **Data Protection:** Encryption at rest (AES-256), in transit (TLS 1.3), and strict Content Security Policy (CSP).
+- **Compliance:** Tamper-evident audit logging for all sensitive system and user operations.
 
-Full details: [SECURITY.md](./SECURITY.md)
+> **For Security Reviewers:** [Security Posture Report](./docs/security/SECURITY_POSTURE.md) | [Security Evidence Index](./docs/security/SECURITY_EVIDENCE_INDEX.md)
 
 <br/>
 
@@ -153,28 +156,17 @@ Full details: [SECURITY.md](./SECURITY.md)
 
 ## 🤖 AI-Native Engineering Workflow
 
-Developed using the **Raouf Change Protocol**, a rigorous, AI-native development methodology orchestrating agents for production-grade software engineering.
+Developed using the **Raouf Change Protocol**, orchestrating agents for production-grade software engineering.
 
 ### OpenAI Codex — Implementation & Test Generation
-
-Codex is used for:
-
-| Task                            | Description                                                                                                                    |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Unit test generation**        | Given a new route handler or store action, Codex generates Vitest test cases covering happy path, auth failure, and edge cases |
-| **Regression test scaffolding** | After each bug fix, Codex generates regression tests that prove the specific failure mode cannot recur                         |
-| **i18n key scaffolding**        | Codex generates translation key entries across all 35 locale files when new UI strings are added                               |
-| **Migration authoring**         | Codex drafts Supabase migration SQL from schema descriptions, which is then reviewed and applied via `supabase/migrations/`    |
+- **Unit test generation** covering happy paths, auth failures, and edge cases.
+- **Regression test scaffolding** following every bug fix.
+- **Migration authoring** drafting Supabase migration SQL from schema descriptions.
 
 ### Syllabus-as-Code Documentation Suite
-
-The project maintains a living documentation suite that is **generated and validated by AI**:
-
-- `docs/api/API_REFERENCE.md` — every route handler is documented with request/responses; Claude validates these against TypeScript types.
-- `docs/architecture/ARCHITECTURE.md` — the architecture document is used as a constraint document by Claude during code review.
-- `CHANGELOG.md` — structured `Raouf:` protocol entries capture scope, root cause, and verification for every change.
-
-This workflow means the project's AI assistants have **persistent, structured memory of every decision** — not just the current state of the code.
+- `docs/api/API_REFERENCE.md` — Auto-validated request/response schemas.
+- `docs/architecture/ARCHITECTURE.md` — Constraint document used during code reviews.
+- `CHANGELOG.md` — Immutable ledger of every architectural decision and fix.
 
 <br/>
 
@@ -185,24 +177,15 @@ This workflow means the project's AI assistants have **persistent, structured me
 ## 🎯 Project Governance
 
 ### License
-
-Syllabus Sync is released under the **MIT License** — an OSI-approved, permissive open-source license.
-
-### Contributing
-
-We welcome contributions from students, developers, and university IT staff. See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+Released under the **MIT License** — an OSI-approved, permissive open-source license.
 
 ### Roadmap & Priorities
-
-| Priority | Item |
-| -------- | ---- |
-| P0 | Generalise the LLM OCR extraction pipeline as a standalone package (`@syllabus-sync/extractor`) |
-| P0 | Publish the Zod schema contracts as a versioned npm package |
-| P1 | Add University of Sydney and UNSW as reference dataset forks |
-| P1 | MCP (Model Context Protocol) server exposing the syllabus data API |
+- **P0:** Standalone `@syllabus-sync/extractor` package for LLM OCR pipelines.
+- **P1:** Reference dataset forks for USYD and UNSW.
+- **P1:** MCP (Model Context Protocol) server for direct agent integration.
+- **P2:** Federated identity via institution SSO (SAML/OIDC).
 
 ### Maintainers
-
 | Name | Role |
 | --- | --- |
 | Mohammad Raouf Abedini | Lead maintainer — security, AI workflows, backend |
@@ -214,29 +197,10 @@ We welcome contributions from students, developers, and university IT staff. See
 
 <br/>
 
-## ⚡ Current Runtime Stack
-
-| Layer | Implementation |
-| --- | --- |
-| App framework | Next.js 16 App Router |
-| UI runtime | React 19 |
-| Styling | Tailwind CSS 4, Radix UI primitives |
-| State | Zustand |
-| Data/auth | Supabase SSR + Supabase Postgres (RLS enforced) |
-| Tests | Vitest + Testing Library (503 tests, 92 files) |
-| CI/CD | GitHub Actions (`ci-cd.yml`) |
-| Deployment | Vercel |
-
-<br/>
-
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
-
-<br/>
-
 ## Repository Layout
 
 ```text
-app/                Next.js routes, layouts, 63 API route handlers
+app/                Next.js routes, layouts, 65 API route handlers
 components/         Shared UI and layout components
 config/             ESLint, Next, Prettier, Sentry, Tailwind, TS, Vitest, Lighthouse
 data/               Static academic data (unit catalogue, building maps)
@@ -246,10 +210,12 @@ infra/              Docker assets
 lib/                Stores, hooks, services, security, utilities, Supabase clients
 locales/            35 locale dictionaries
 public/             Static assets, icons, map tiles, overlays, service worker
-supabase/           Canonical migration history
-tests/              Vitest suites (92 files, 503 tests)
+supabase/           Canonical migration history and configuration
+tests/              Vitest suites (93 files, 503 tests)
 tools/              Repo utilities (i18n, security, exports, load testing)
 ```
+
+> **Full Inventory:** [Repository Inventory](./docs/reference/REPOSITORY_INVENTORY.md)
 
 <br/>
 
@@ -259,22 +225,30 @@ tools/              Repo utilities (i18n, security, exports, load testing)
 
 ## Quick Start
 
+### Prerequisites
+- Node.js `>=22 <23`
+- npm `>=10`
+- Supabase project and Upstash Redis instance
+
+### Setup
 ```bash
-# 1. Clone and install
+# Clone and install
 git clone https://github.com/mrpouyaalavi/syllabus-sync.git
 cd syllabus-sync
 npm install
 
-# 2. Configure environment
+# Configure environment
 cp .env.example .env.local
-# Fill in Supabase, Google Maps, and Resend credentials
 
-# 3. Start development server
+# Initialize database
+npx supabase link --project-ref <your-project-ref>
+npx supabase db push
+
+# Start development
 npm run dev
 ```
 
 ### Quality Assurance
-
 ```bash
 npm run check
 # Runs: secrets scan → format → typecheck → lint → 503 tests → build
@@ -289,13 +263,14 @@ npm run check
 ## Documentation Map
 
 | Document | Path |
-|---|---|
+| --- | --- |
 | Architecture | [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md) |
-| Technical explanation | [TECHNICAL_EXPLANATION.md](./TECHNICAL_EXPLANATION.md) |
-| API reference | [docs/api/API_REFERENCE.md](./docs/api/API_REFERENCE.md) |
-| Security policy | [SECURITY.md](./SECURITY.md) |
-| Contributing | [CONTRIBUTING.md](./CONTRIBUTING.md) |
-| Docs index | [docs/README.md](./docs/README.md) |
+| Technical Explanation | [TECHNICAL_EXPLANATION.md](./TECHNICAL_EXPLANATION.md) |
+| API Reference | [docs/api/API_REFERENCE.md](./docs/api/API_REFERENCE.md) |
+| Environment Setup | [docs/operations/ENVIRONMENT_SETUP.md](./docs/operations/ENVIRONMENT_SETUP.md) |
+| Deployment Checklist | [docs/operations/deployment-checklist.md](./docs/operations/deployment-checklist.md) |
+| Docs Index | [docs/README.md](./docs/README.md) |
+| Security Policy | [SECURITY.md](./SECURITY.md) |
 
 <br/>
 
@@ -307,10 +282,10 @@ npm run check
 
 Built with the support of the open-source community. This project benefits from:
 
-- [Supabase](https://supabase.com/) for the open-source backend and RLS infrastructure
-- [Vercel](https://vercel.com/) for deployment infrastructure
-- [Anthropic Claude](https://www.anthropic.com/claude) for AI-assisted architecture and security auditing
-- [OpenAI Codex](https://openai.com/codex) for automated test generation
+- [Anthropic Claude](https://www.anthropic.com/claude) — AI-assisted architecture and security auditing.
+- [OpenAI Codex](https://openai.com/codex) — Automated test generation and migration authoring.
+- [Supabase](https://supabase.com/) — Open-source backend with RLS.
+- [Vercel](https://vercel.com/) — Edge deployment infrastructure.
 
 <br/>
 

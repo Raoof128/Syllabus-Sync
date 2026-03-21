@@ -1,40 +1,107 @@
-# Security Policy & Vulnerability Disclosure
+# Security Policy
 
-Security is a foundational pillar of Syllabus Sync. This document outlines our vulnerability disclosure policy and provides a high-level overview of our secure-by-design architecture.
+**Syllabus Sync -- Coordinated Vulnerability Disclosure**
+
+---
+
+## Scope
+
+This policy covers the Syllabus Sync web application, its API surface (`/api/*`), database layer (Supabase PostgreSQL), edge middleware, and all first-party client code deployed to production.
 
 ## Supported Versions
 
-We actively maintain and provide security patches for the following versions:
-
-| Version | Supported | Notes                    |
-| ------- | --------- | ------------------------ |
-| 1.0.x   | ✅ Yes    | Active production branch |
-| < 1.0   | ❌ No     | Deprecated prototypes    |
+| Version | Status | Security Support     |
+| ------- | ------ | -------------------- |
+| 1.0.x   | Active | Patch and advisory   |
+| < 1.0   | EOL    | No longer maintained |
 
 ## Reporting a Vulnerability
 
-We deeply appreciate the efforts of security researchers and our community in keeping Syllabus Sync secure.
+**Do not open a public GitHub issue for security vulnerabilities.** Public disclosure of an unpatched vulnerability puts users at risk.
 
-**If you discover a security vulnerability, please DO NOT report it via public GitHub issues.**
+### Preferred Channel
 
-Instead, please adhere to the following process:
+Email **security@syllabus-sync.dev** with:
 
-1. **Email:** Report the vulnerability directly to `security@syllabus-sync.dev`.
-2. **Details:** Include a clear description of the vulnerability, steps to reproduce it, and the potential impact.
-3. **Response:** Our security team will acknowledge receipt of your email within 48 hours and provide an estimated timeline for resolution.
-4. **Resolution:** We ask that you maintain confidentiality until we have patched the vulnerability and deployed the fix to our production environments.
+1. **Description** -- What the vulnerability is and which component it affects.
+2. **Reproduction steps** -- A minimal, reliable proof-of-concept. Include HTTP requests, screenshots, or code as appropriate.
+3. **Impact assessment** -- Your best estimate of severity (consider confidentiality, integrity, availability). A CVSS 3.1 vector is helpful but not required.
+4. **Suggested remediation** -- If you have one.
 
-We review all reports and will attempt to coordinate public disclosure with you once the issue is resolved.
+### Alternative Channel
 
-## Our Secure-By-Design Philosophy
+Use GitHub's **Private Security Advisory** feature on this repository to submit findings directly through the GitHub interface.
 
-Syllabus Sync implements a defense-in-depth strategy, operating under a Zero-Trust model where every request is treated as potentially hostile until proven otherwise.
+### What to Expect
 
-### Core Security Tenets
+| Stage          | Timeline                       | What Happens                                                                              |
+| -------------- | ------------------------------ | ----------------------------------------------------------------------------------------- |
+| Acknowledgment | Within 48 hours                | We confirm receipt and assign a tracking identifier.                                      |
+| Triage         | Within 7 days                  | We validate the finding, assign a severity, and share our assessment with you.            |
+| Remediation    | Severity-dependent (see below) | We develop and test a fix.                                                                |
+| Disclosure     | 14 days after patch deployment | We coordinate public disclosure with you. You receive credit unless you prefer anonymity. |
 
-1. **Zero-Trust Edge:** All incoming traffic passes through Vercel Edge Middleware. This layer validates authentication JWTs, enforces IP-based rate limiting, and injects strict Content Security Policies (CSP) before any application logic is executed.
-2. **Database-Level Isolation:** We do not rely solely on application-layer checks. Supabase PostgreSQL Row-Level Security (RLS) policies act as the ultimate gatekeeper, ensuring tenant isolation at the query execution level.
-3. **Hardware-Backed Auth:** We prioritize strong authentication, offering FIDO2 WebAuthn (Passkeys) and hardware-backed MFA over legacy SMS or purely password-based flows.
-4. **Resilient Data Protection:** All user data is encrypted at rest (AES-256) and in transit (TLS 1.3). We employ cryptographic hashing for all sensitive identifiers and strict parameter validation (Zod) on all API boundaries.
+**Target remediation windows:**
 
-> 📚 **Auditors & Reviewers:** For a detailed breakdown of our implemented controls, threat models, and evidence matrices, please consult the [Security Posture Report](./docs/security/SECURITY_POSTURE.md) and the [Security Evidence Index](./docs/security/SECURITY_EVIDENCE_INDEX.md).
+- Critical / High: 7-14 days
+- Medium: 30 days
+- Low / Informational: Next scheduled release
+
+### Safe Harbor
+
+We will not pursue legal action against researchers who:
+
+- Act in good faith and comply with this policy.
+- Avoid privacy violations, data destruction, and service disruption.
+- Report findings exclusively through the channels above.
+- Allow reasonable time for remediation before any disclosure.
+
+This commitment aligns with the [disclose.io](https://disclose.io) Safe Harbor framework.
+
+## Security Architecture Overview
+
+Syllabus Sync implements a **defense-in-depth** strategy grounded in **Zero Trust** principles. No single control is treated as sufficient; security is enforced at every layer of the stack.
+
+### Layer Model
+
+```
+                     Internet
+                        |
+            +-----------+-----------+
+            |   Vercel Edge Network  |
+            |   (TLS 1.3 termination)|
+            +-----------+-----------+
+                        |
+            +-----------+-----------+
+            | Edge Middleware (proxy) |  <-- JWT validation, CSP injection,
+            | lib/proxy.ts           |      CSRF enforcement, rate limiting
+            +-----------+-----------+
+                        |
+            +-----------+-----------+
+            |  Next.js API Routes    |  <-- Zod schema validation, HMAC
+            |  app/api/*             |      request signing, audit logging
+            +-----------+-----------+
+                        |
+            +-----------+-----------+
+            |  Supabase PostgreSQL   |  <-- Row-Level Security (RLS),
+            |  + Auth (GoTrue)       |      SECURITY DEFINER RPCs,
+            |                        |      encrypted storage (AES-256)
+            +------------------------+
+```
+
+### Key Controls
+
+| Domain               | Control                                                                                                   | Why It Matters                                                                                                                                        |
+| -------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Identity**         | FIDO2 WebAuthn (Passkeys), TOTP MFA, email verification gates                                             | Phishing-resistant authentication eliminates the largest class of account takeover attacks (OWASP A07:2021).                                          |
+| **Tenant Isolation** | PostgreSQL Row-Level Security on every user-data table                                                    | Authorization is enforced by the database engine, not application code. A bug in a route handler cannot leak another tenant's data (NIST AC-3, AC-4). |
+| **Transport**        | TLS 1.3, nonce-based CSP, SRI on CDN assets, `__Host-` CSRF cookies                                       | Defense against XSS, supply-chain tampering, and request forgery (OWASP A03:2021).                                                                    |
+| **Abuse Prevention** | Distributed sliding-window rate limiting (Upstash Redis), IP anomaly detection, HIBP credential screening | Mitigates credential stuffing, brute-force, and denial-of-service vectors. Security-critical limiters fail closed.                                    |
+| **Observability**    | Centralized `audit_logs` table with IP, user-agent, action type, and severity                             | Tamper-evident audit trail for incident response and forensic analysis (NIST AU-2, AU-3).                                                             |
+
+### Further Reading
+
+- [Security Posture Report](./docs/security/SECURITY_POSTURE.md) -- Threat model (STRIDE), full control catalogue, and compliance mapping.
+- [Security Evidence Index](./docs/security/SECURITY_EVIDENCE_INDEX.md) -- File-level evidence matrix for auditors.
+- [Privacy Policy](./docs/policies/privacy-policy.md) -- Data inventory, retention, and third-party processors.
+- [Security Disclosure Policy](./docs/policies/security-policy.md) -- Extended responsible-disclosure program details.

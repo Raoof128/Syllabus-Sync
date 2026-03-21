@@ -1,274 +1,215 @@
 # Security Vulnerability Disclosure Policy
 
-**Responsible Disclosure Program for Security Researchers**
+**Syllabus Sync -- Coordinated Disclosure Program**
 
-## 🎯 Our Commitment
+---
 
-At The Syllabus Sync, we take security seriously and value the work of security researchers in helping us maintain a secure platform for our users. We commit to:
+## 1. Our Commitment
 
-- **Prompt Response:** Acknowledge receipt of reports within 48 hours
-- **Transparent Communication:** Keep you informed throughout the resolution process
-- **Fair Recognition:** Appropriate credit and bounties for valid findings
-- **Safe Harbor:** Legal protection for good-faith security research
+We believe that security research conducted in good faith makes the internet safer. This policy describes how to report security vulnerabilities to us, what to expect from our response, and the protections we extend to researchers.
 
-## 📋 What to Report
+We commit to:
 
-### **In-Scope Vulnerabilities**
+- **Acknowledgment within 48 hours** of receiving a report.
+- **Transparent communication** throughout triage, validation, and remediation.
+- **Credit and recognition** for valid findings, unless the researcher prefers anonymity.
+- **Safe harbor** for good-faith research conducted within this policy's guidelines.
 
-- **Web Application:** All features and APIs at `*.syllabus-sync.dev` and `*.mq.edu.au` domains
-- **Mobile Applications:** iOS and Android applications
-- **Infrastructure:** Core services, databases, and APIs
-- **Third-Party Services:** Dependencies and integrations we maintain
-- **Authentication Systems:** Login, passkey, and session management
-- **Data Protection:** Encryption, storage, and transmission
+---
 
-### **Vulnerability Types**
+## 2. Scope
 
-- **Authentication Bypass:** Methods to impersonate other users
-- **Data Exposure:** Unauthorized access to sensitive information
-- **Injection:** SQL, XSS, command injection, template injection
-- **Privilege Escalation:** Gaining elevated access rights
-- **Denial of Service:** Disrupting service availability
-- **Cryptographic Issues:** Weak encryption or insecure implementations
-- **Configuration Errors:** Exposed credentials or misconfigurations
-- **Session Management:** Session fixation, hijacking, or prediction
-- **Cross-Site Scripting (XSS):** Reflected, stored, or DOM-based
-- **Cross-Site Request Forgery (CSRF):** Forced actions on behalf of users
+### In-Scope
 
-### **Out-of-Scope Items**
+- **Web application:** All routes and features at `*.syllabus-sync.dev`
+- **API surface:** All endpoints under `/api/*`
+- **Authentication systems:** Password, passkey (WebAuthn), MFA (TOTP/SMS), session management
+- **Authorization:** Row-Level Security policies, SECURITY DEFINER RPCs, tenant isolation
+- **Client-side security:** CSP, CSRF, SRI, client storage handling
+- **Infrastructure:** Deployment configuration, CI/CD pipeline, secrets management
+- **Dependencies:** First-party code and directly integrated third-party libraries
 
-- **Third-Party Services:** Vulnerabilities in services we don't control
-- **Social Engineering:** Physical security, phishing, or user education
-- **Denial of Service:** Network-level attacks against our infrastructure
-- **Spam/Abuse:** Content policy violations without security implications
-- **Theoretical Issues:** Vulnerabilities without demonstrated exploit
+### Out of Scope
 
-## 📧 How to Report
+- **Third-party services we do not control** (e.g., vulnerabilities in Supabase's platform, Vercel's infrastructure, or upstream library bugs not caused by our integration)
+- **Social engineering** (phishing, pretexting) targeting users or team members
+- **Volumetric denial-of-service** attacks against production infrastructure
+- **Spam or content policy violations** without a security impact
+- **Findings that require physical access** to a user's device
+- **Theoretical vulnerabilities** without a demonstrable proof of concept
 
-### **Primary Method (Encrypted)**
+---
 
-1. **Generate PGP Key:** Use our public key below
-2. **Encrypt Report:** Include vulnerability details and proof of concept
-3. **Send Email:** `security@syllabus-sync.dev`
+## 3. How to Report
 
-### **Alternative Methods**
+### Primary Channel
 
-- **GitHub Security Advisory:** Create a private security advisory
-- **Bug Bounty Platform:** Report through our HackerOne program
-- **Direct Contact:** For urgent security issues only
+**Email:** security@syllabus-sync.dev
 
-### **Report Format**
+If you have a PGP key and would like to encrypt your report, contact us at the address above to exchange keys.
 
-```markdown
+### Alternative Channel
+
+**GitHub Private Security Advisory:** Use the "Report a vulnerability" button on the repository's Security tab. This creates a private advisory visible only to maintainers.
+
+### What to Include
+
+A good report enables fast triage. Please include:
+
+1. **Vulnerability summary** -- A concise description of the issue and the affected component.
+2. **Reproduction steps** -- Detailed, step-by-step instructions to reproduce the vulnerability. Include HTTP requests, curl commands, screenshots, or video as appropriate.
+3. **Affected systems** -- Component name, version, environment (production, staging, local).
+4. **Impact assessment** -- What can an attacker achieve? Consider confidentiality, integrity, and availability.
+5. **CVSS score** (optional) -- A CVSS 3.1 vector string if you have assessed severity.
+6. **Suggested remediation** (optional) -- Recommendations for fixing the issue.
+
+### Report Template
+
+```
 ## Vulnerability Summary
+[Brief description]
 
-Brief description of the security issue
+## Affected Component
+[File path, API route, or feature area]
 
-## CVSS Score
+## Reproduction Steps
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
 
-[Optional] CVSS v3.1 score and vector
+## Impact
+[What data is exposed, what actions can be performed, what is the blast radius]
 
-## Affected Systems
+## CVSS Vector (optional)
+[CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N]
 
-List of affected components, versions, and environments
-
-## Proof of Concept
-
-Detailed steps to reproduce the vulnerability
-Include screenshots, videos, or code examples
-
-## Impact Assessment
-
-Business and technical impact of the vulnerability
-Potential data exposure or system compromise
-
-## Suggested Fix
-
-Recommendations for remediation (if known)
-
-## Timeline
-
-Discovery date, report date, and any disclosure plans
+## Suggested Fix (optional)
+[Your recommendation]
 ```
-
-## 🔐 PGP Public Key
-
-```
------BEGIN PGP PUBLIC KEY-----
-
-[Insert your actual PGP public key here]
-
------END PGP PUBLIC KEY-----
-```
-
-Fingerprint: `ABCD 1234 EFGH 5678 IJKL 9012 MNOP 3456`
-Key ID: `0xABCD1234EFGH5678`
-
-## 🏆 Bounty Program
-
-### **Reward Tiers**
-
-| Severity      | Bounty Range     | Examples                                         |
-| ------------- | ---------------- | ------------------------------------------------ |
-| Critical      | $3,000 - $10,000 | Remote code execution, full data compromise      |
-| High          | $1,000 - $3,000  | Significant data exposure, authentication bypass |
-| Medium        | $300 - $1,000    | Limited data exposure, privilege escalation      |
-| Low           | $100 - $300      | Information disclosure, minor security issues    |
-| Informational | $50 - $100       | Best practice violations, minor issues           |
-
-### **Severity Definitions**
-
-- **Critical:** Can compromise application security or data integrity
-- **High:** Significant impact on confidentiality, integrity, or availability
-- **Medium:** Limited impact, requires specific conditions or user interaction
-- **Low:** Minimal security impact, minor exploitability
-- **Informational:** Security best practice violations or informational findings
-
-### **Bonus Awards**
-
-- **Quality Reports:** Detailed, well-documented findings (+20%)
-- **Chain Vulnerabilities:** Multiple related vulnerabilities (+30%)
-- **Zero-Day Exploits:** Previously unknown vulnerabilities (+50%)
-- **Automation:** Tools or scripts for detection (+25%)
-
-## ⏱️ Response Timeline
-
-### **Initial Response (Within 48 Hours)**
-
-- Acknowledge receipt of report
-- Assign tracking number and priority
-- Begin initial triage and analysis
-- Request additional information if needed
-
-### **Detailed Assessment (Within 7 Days)**
-
-- Complete vulnerability validation
-- Severity classification and bounty determination
-- Impact assessment and risk analysis
-- Begin remediation planning
-
-### **Resolution Timeline**
-
-- **Critical:** 7-14 days for fix and deployment
-- **High:** 14-30 days for fix and deployment
-- **Medium:** 30-60 days for next release cycle
-- **Low:** 60-90 days or next major version
-
-## 🎁 Recognition Program
-
-### **Hall of Fame**
-
-- Public recognition on our security page
-- LinkedIn recommendation (with permission)
-- Conference invitations and speaking opportunities
-- Priority consideration for future opportunities
-
-### **Swag**
-
-- Syllabus Sync security team t-shirt
-- Branded security researcher hoodie
-- Custom security challenge coin
-- Certificate of recognition
-
-### **Career Support**
-
-- Referrals to security teams
-- Resume review and interview preparation
-- Technical skill development resources
-
-## 📊 Disclosure Policy
-
-### **Coordination Process**
-
-1. **Report Receipt:** Immediate confirmation and tracking number
-2. **Triage Period:** Initial validation within 48 hours
-3. **Validation Phase:** Detailed analysis within 7 days
-4. **Remediation:** Development and testing of fixes
-5. **Disclosure:** Public disclosure after fix deployment
-
-### **Public Disclosure**
-
-- **Fixed Vulnerabilities:** Published within 14 days of patch deployment
-- **Coordinated Disclosure:** Work with researchers on timing
-- **Credit Recognition:** Public acknowledgment of researcher contribution
-- **Detailed Advisories:** Technical blog posts with CVE details
-
-### **Exception Handling**
-
-- **Active Exploitation:** Immediate disclosure and user notification
-- **Widespread Attacks:** Early public warning and mitigation guidance
-- **Third-Party Issues:** Coordination with affected vendors
-
-## 🔍 Safe Harbor
-
-### **Legal Protection**
-
-We commit to legal protection for security researchers who:
-
-- Report vulnerabilities in good faith
-- Don't violate applicable laws
-- Don't damage systems or data
-- Provide reasonable time for remediation
-- Keep vulnerability details confidential
-
-### **Research Guidelines**
-
-- **Authorized Testing:** Only on systems you own or have explicit permission
-- **Non-Destructive:** Avoid actions that could damage systems or data
-- **Limited Scope:** Focus on reported vulnerability, avoid lateral movement
-- **Data Privacy:** Only access data necessary for vulnerability demonstration
-- **Responsible Disclosure:** Maintain confidentiality until coordinated disclosure
-
-## 📞 Contact Information
-
-### **Security Team**
-
-- **Email:** `security@syllabus-sync.dev` (PGP encrypted preferred)
-- **PGP Key:** Available at bottom of this policy
-- **Response Time:** Within 48 hours for initial acknowledgment
-
-### **General Inquiries**
-
-- **Security Questions:** `security@syllabus-sync.dev`
-- **Business Issues:** `contact@syllabus-sync.dev`
-- **Press Inquiries:** `press@syllabus-sync.dev`
-
-### **Emergency Contacts**
-
-For active exploitation or critical security incidents:
-
-- **24/7 Hotline:** `+61-2-XXXX-XXXX` (if applicable)
-- **Emergency Email:** `emergency@syllabus-sync.dev`
-- **Post-Mortem:** Public disclosure within 72 hours of resolution
-
-## 📚 Resources
-
-### **Security Tools**
-
-- **OWASP Testing Guide:** Comprehensive web application testing methodology
-- **Burp Suite:** Professional web application security testing platform
-- **OWASP ZAP:** Free, open-source web application security scanner
-- **Nmap:** Network discovery and security auditing tool
-
-### **Educational Resources**
-
-- **OWASP Top 10:** Most critical web application security risks
-- **SANS Security Training:** Professional security education and certification
-- **Bug Bounty Field Manual:** Guide to successful security research
 
 ---
 
-## 🔐 Trusted Security Research Partners
+## 4. Response Process
 
-We work with the following security platforms and researchers:
+### Timeline
 
-- **HackerOne:** Enterprise bug bounty program management
-- **Bugcrowd:** Private vulnerability disclosure coordination
-- **Intigriti:** Independent security research community
-- **Synack:** Premium private bug bounty platform
+| Phase              | Duration            | Actions                                                |
+| ------------------ | ------------------- | ------------------------------------------------------ |
+| **Acknowledgment** | Within 48 hours     | Confirm receipt, assign tracking ID, begin triage      |
+| **Triage**         | Within 7 days       | Validate the finding, classify severity, assess impact |
+| **Remediation**    | Severity-dependent  | Develop, test, and deploy fix                          |
+| **Disclosure**     | 14 days after patch | Coordinate public disclosure with the researcher       |
+
+### Severity-Based Remediation Targets
+
+| Severity     | Target Resolution | Examples                                                                                       |
+| ------------ | ----------------- | ---------------------------------------------------------------------------------------------- |
+| **Critical** | 7 days            | Authentication bypass, RLS policy circumvention, remote code execution, full data exfiltration |
+| **High**     | 14 days           | Significant data exposure, privilege escalation, session hijacking                             |
+| **Medium**   | 30 days           | Limited data exposure requiring specific preconditions, stored XSS with limited scope          |
+| **Low**      | 60 days           | Information disclosure with minimal impact, minor configuration issues                         |
+
+### Severity Classification
+
+We use CVSS 3.1 as a starting point and adjust based on the specific context of our application:
+
+- **Critical (CVSS 9.0-10.0):** Can compromise application security, tenant isolation, or data integrity for multiple users.
+- **High (CVSS 7.0-8.9):** Significant impact on confidentiality, integrity, or availability for individual users or limited scope.
+- **Medium (CVSS 4.0-6.9):** Limited impact, requires specific conditions, user interaction, or authenticated access.
+- **Low (CVSS 0.1-3.9):** Minimal security impact, defense-in-depth improvement, or informational finding.
 
 ---
 
-**Thank you for helping keep The Syllabus Sync secure! 🛡️**
+## 5. Safe Harbor
 
-_Your responsible security research helps protect thousands of Macquarie University students._
+### Legal Protection
+
+We will not initiate legal action against researchers who:
+
+- Discover and report vulnerabilities in accordance with this policy.
+- Avoid actions that could harm users, disrupt services, or destroy data.
+- Do not access data beyond what is necessary to demonstrate the vulnerability.
+- Provide reasonable time for remediation before any public disclosure.
+- Keep vulnerability details confidential until coordinated disclosure.
+
+This commitment is consistent with the [disclose.io](https://disclose.io) Safe Harbor framework.
+
+### Research Guidelines
+
+To stay within the scope of this policy:
+
+- **Test only against accounts you own.** Do not access, modify, or delete data belonging to other users.
+- **Avoid destructive actions.** Do not degrade service availability or corrupt data.
+- **Minimize data access.** If you discover a data exposure vulnerability, access only the minimum data needed to prove the issue exists. Do not exfiltrate, copy, or store exposed data.
+- **Do not pivot.** If you discover access to one system, do not use it to probe other systems.
+- **Stop and report.** If you accidentally access sensitive data, stop immediately and report the finding.
+
+---
+
+## 6. Disclosure Coordination
+
+### Our Process
+
+1. **Researcher reports vulnerability** through a channel defined in Section 3.
+2. **We acknowledge receipt** within 48 hours and assign a tracking ID.
+3. **We validate and classify** the finding within 7 days. We share our assessment with the researcher.
+4. **We develop and test a fix.** The researcher may be consulted for validation.
+5. **We deploy the fix** to production.
+6. **We coordinate public disclosure** with the researcher within 14 days of patch deployment.
+
+### Public Disclosure
+
+- We publish a security advisory describing the vulnerability, its impact, and the fix.
+- The researcher receives credit by name (or pseudonym) unless they request anonymity.
+- We assign a CVE identifier when appropriate.
+
+### Exceptions
+
+- **Active exploitation:** If we detect that a vulnerability is being actively exploited, we may deploy an emergency fix and issue a public advisory before the standard coordination timeline.
+- **Third-party involvement:** If the vulnerability affects a third-party dependency, we coordinate with the upstream maintainer and may adjust the disclosure timeline accordingly.
+
+---
+
+## 7. Recognition
+
+We recognize researchers who report valid vulnerabilities:
+
+- **Public acknowledgment** in our security advisories and documentation.
+- **LinkedIn recommendation** for significant findings (with the researcher's permission).
+- **Certificate of recognition** for validated reports.
+
+We do not currently operate a paid bug bounty program. If this changes, the details will be published in this policy.
+
+---
+
+## 8. What We Ask of You
+
+- **Report promptly.** The sooner we know about a vulnerability, the sooner we can protect users.
+- **Provide detail.** Clear reproduction steps dramatically reduce triage time.
+- **Be patient.** Some fixes require careful testing to avoid regressions. We will keep you informed.
+- **Coordinate disclosure.** Please do not publish vulnerability details until we have confirmed that the fix is deployed.
+
+---
+
+## 9. Contact
+
+| Channel                  | Address                    | Use Case                                     |
+| ------------------------ | -------------------------- | -------------------------------------------- |
+| Security reports         | security@syllabus-sync.dev | Vulnerability reports and security questions |
+| GitHub Security Advisory | Repository Security tab    | Alternative reporting channel                |
+| General inquiries        | contact@syllabus-sync.dev  | Non-security questions                       |
+
+---
+
+## 10. References
+
+- [OWASP Testing Guide](https://owasp.org/www-project-web-security-testing-guide/) -- Methodology for web application security testing
+- [OWASP Top 10 (2021)](https://owasp.org/www-project-top-ten/) -- Most critical web application security risks
+- [NIST 800-53 Rev. 5](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final) -- Security and privacy controls catalog
+- [disclose.io](https://disclose.io) -- Safe Harbor framework for vulnerability disclosure
+- [RFC 9116](https://www.rfc-editor.org/rfc/rfc9116) -- security.txt specification
+- [CVSS 3.1 Calculator](https://www.first.org/cvss/calculator/3.1) -- Severity scoring
+
+---
+
+_This policy is effective as of 2026-03-21 and will be reviewed quarterly._

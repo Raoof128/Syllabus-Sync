@@ -1,91 +1,144 @@
-# Resend + Vercel Setup (Email)
+# Resend and Vercel Setup
 
-This project sends transactional email (email verification and password reset) via **Resend** and is deployed on **Vercel**.
+> **Audience:** Engineers configuring email delivery and the Vercel deployment environment.
+> **Last verified:** 2026-03-21
 
-## Required Environment Variables
+This runbook covers Resend (transactional email), Vercel environment variable management, cron job security, and production rate limiting configuration.
 
-Set these in Vercel: Project -> Settings -> Environment Variables.
+---
 
-- `RESEND_API_KEY` (secret)
-- `VERIFICATION_EMAIL_FROM` (e.g., `onboarding@resend.dev` in development; a verified sender in production)
-- `VERIFICATION_EMAIL_NAME` (e.g., `Syllabus Sync`)
-- `NEXT_PUBLIC_APP_URL` (recommended; fallback uses `VERCEL_URL`)
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` (secret, required for admin auth operations and distributed rate limiting)
-- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` (required for Google mode map loading)
-- `NEXT_PUBLIC_GOOGLE_MAP_ID` (required for Advanced Markers/vector map styling)
-- `GOOGLE_ROUTES_API_KEY` (required for Google mode route computation)
-- `KV_REST_API_URL` (required by the committed production env check)
-- `KV_REST_API_TOKEN` (required by the committed production env check)
-- `CRON_SECRET` (secret, used to protect cron endpoints)
+## Prerequisites
 
-## Vercel CLI (Recommended)
+- A [Resend](https://resend.com/) account with a verified sending domain (or use `onboarding@resend.dev` for development).
+- Access to the Vercel project dashboard.
+- The Vercel CLI installed (`npm i -g vercel` or use the project's pinned version).
 
-The repo includes pinned Vercel CLI tooling:
+---
+
+## 1. Required Environment Variables
+
+Configure the following variables in the Vercel Dashboard under **Settings > Environment Variables**. Apply them to the appropriate environments (development, preview, production).
+
+### Core Application
+
+| Variable                        | Visibility | Description                                                                                                  |
+| :------------------------------ | :--------- | :----------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Public     | Supabase project URL.                                                                                        |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public     | Supabase anonymous/public key.                                                                               |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Secret     | Supabase service role key. Server-side only.                                                                 |
+| `NEXT_PUBLIC_APP_URL`           | Public     | Primary production domain (e.g., `https://syllabus-sync.vercel.app`). Falls back to `VERCEL_URL` if not set. |
+
+### Email (Resend)
+
+| Variable                  | Visibility | Description                                                                                          |
+| :------------------------ | :--------- | :--------------------------------------------------------------------------------------------------- |
+| `RESEND_API_KEY`          | Secret     | Resend API key for sending transactional email.                                                      |
+| `VERIFICATION_EMAIL_FROM` | Plain      | Sender address. Use `onboarding@resend.dev` in development; a verified domain address in production. |
+| `VERIFICATION_EMAIL_NAME` | Plain      | Display name for outbound emails (e.g., `Syllabus Sync`).                                            |
+
+### Google Maps
+
+| Variable                          | Visibility | Description                                     |
+| :-------------------------------- | :--------- | :---------------------------------------------- |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Public     | Browser key for the Maps JavaScript API.        |
+| `NEXT_PUBLIC_GOOGLE_MAP_ID`       | Public     | Map ID for Advanced Markers and vector styling. |
+| `GOOGLE_ROUTES_API_KEY`           | Secret     | Server key for Routes and Places API proxies.   |
+
+### Rate Limiting
+
+| Variable                   | Visibility | Description                                                           |
+| :------------------------- | :--------- | :-------------------------------------------------------------------- |
+| `KV_REST_API_URL`          | Secret     | Vercel KV REST endpoint. Required by the production env check script. |
+| `KV_REST_API_TOKEN`        | Secret     | Vercel KV REST token. Required by the production env check script.    |
+| `UPSTASH_REDIS_REST_URL`   | Secret     | Upstash Redis REST endpoint (preferred over KV at higher traffic).    |
+| `UPSTASH_REDIS_REST_TOKEN` | Secret     | Upstash Redis REST token.                                             |
+
+### Security
+
+| Variable      | Visibility | Description                                                                           |
+| :------------ | :--------- | :------------------------------------------------------------------------------------ |
+| `CRON_SECRET` | Secret     | Protects cron endpoints. Minimum 32 characters. Generate with `openssl rand -hex 32`. |
+
+---
+
+## 2. Managing Variables with the Vercel CLI
+
+The repository includes helper scripts for common Vercel operations.
+
+### Link the project
 
 ```bash
 npm run vercel:link
+```
+
+### Pull remote variables to local `.env.local`
+
+```bash
 npm run vercel:env:pull
 ```
 
-### Add/Update Env Vars With Vercel CLI
-
-Example (production):
+### Add or update a variable
 
 ```bash
 vercel env add RESEND_API_KEY production
-vercel env add VERIFICATION_EMAIL_FROM production
-vercel env add VERIFICATION_EMAIL_NAME production
-vercel env add NEXT_PUBLIC_APP_URL production
-vercel env add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY production
-vercel env add NEXT_PUBLIC_GOOGLE_MAP_ID production
-vercel env add GOOGLE_ROUTES_API_KEY production
-vercel env add CRON_SECRET production
+# The CLI prompts for the value interactively; it is never printed back.
 ```
 
-Notes:
+### Validate that all required variable names exist
 
-- `vercel env add` will prompt for the value and does not print it back.
-- Prefer setting `NEXT_PUBLIC_APP_URL` to your primary domain (e.g., `https://syllabus-sync.dev`).
-
-### Validate Required Keys Exist On Vercel
-
-This checks **names only** (no secret values):
+This checks names only and does not reveal secret values:
 
 ```bash
 VERCEL_ENVIRONMENT=production npm run vercel:env:check
 ```
 
-## Cron Security
+---
 
-`vercel.json` configures scheduled calls to:
+## 3. Cron Job Security
 
-- `/api/auth/email/cleanup`
-- `/api/auth/password/cleanup`
-- `/api/security/rate-limit/cleanup`
+The `vercel.json` configuration schedules periodic cleanup jobs:
 
-The cleanup route requires:
+| Endpoint                           | Purpose                                    |
+| :--------------------------------- | :----------------------------------------- |
+| `/api/auth/email/cleanup`          | Removes expired email verification tokens. |
+| `/api/auth/password/cleanup`       | Removes expired password reset tokens.     |
+| `/api/security/rate-limit/cleanup` | Purges stale rate-limit entries.           |
 
-- `CRON_SECRET` to be set on Vercel
-- Requests to include `Authorization: Bearer <CRON_SECRET>`
+These endpoints require the `Authorization: Bearer <CRON_SECRET>` header. Vercel Cron Jobs sends this header automatically when `CRON_SECRET` is configured in the project's environment variables.
 
-Vercel Cron Jobs support this header when `CRON_SECRET` is configured.
+**Verification:** After setting `CRON_SECRET`, confirm that an unauthenticated request returns 401:
 
-## Rate Limiting (Production)
+```bash
+curl -s -o /dev/null -w "%{http_code}" https://your-domain.vercel.app/api/auth/email/cleanup
+# Expected: 401
+```
 
-This repo includes a distributed rate limiter that prefers (in order):
+---
 
-1. Upstash Redis (recommended at higher traffic): `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
-2. Vercel KV (compatible REST env vars): `KV_REST_API_URL`, `KV_REST_API_TOKEN`
-3. Supabase Postgres (default fallback if `SUPABASE_SERVICE_ROLE_KEY` is configured)
+## 4. Rate Limiting in Production
 
-Avoid setting `ALLOW_MEMORY_RATE_LIMIT` in production.
+The application includes a distributed rate limiter that selects a backend in the following priority order:
 
-Important: the committed `tools/vercel/check-required-env.mjs` currently requires
-`KV_REST_API_URL` and `KV_REST_API_TOKEN` for production validation, so deploy docs
-must treat them as required for the checked-in production workflow even though the
-runtime code has fallback behavior in some scenarios.
+| Priority | Backend                      | Required Variables                                   |
+| :------- | :--------------------------- | :--------------------------------------------------- |
+| 1        | Upstash Redis                | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+| 2        | Vercel KV                    | `KV_REST_API_URL`, `KV_REST_API_TOKEN`               |
+| 3        | Supabase Postgres (fallback) | `SUPABASE_SERVICE_ROLE_KEY`                          |
 
-For this Vercel deployment, provision a compatible KV/Redis resource that supplies
-the `KV_*` variables. `REDIS_URL` alone is not sufficient for the current app code.
+**Important considerations:**
+
+- The production env check script (`tools/vercel/check-required-env.mjs`) requires `KV_REST_API_URL` and `KV_REST_API_TOKEN` to be set, even if the runtime would fall back to another backend. Provision a compatible KV or Redis resource that supplies these variables.
+- Do not set `ALLOW_MEMORY_RATE_LIMIT=true` in production. In-memory rate limiting is per-instance only and does not work correctly across Vercel's serverless function invocations.
+- `REDIS_URL` alone is not sufficient; the application expects the REST-based `KV_*` or `UPSTASH_*` variables.
+
+---
+
+## Troubleshooting
+
+| Symptom                                                  | Likely Cause                                                           | Resolution                                                                     |
+| :------------------------------------------------------- | :--------------------------------------------------------------------- | :----------------------------------------------------------------------------- |
+| Verification emails not sending                          | `RESEND_API_KEY` missing or invalid                                    | Verify the key in the Resend dashboard and confirm it is set in Vercel.        |
+| Emails arrive from `onboarding@resend.dev` in production | `VERIFICATION_EMAIL_FROM` still set to the development sender          | Update to a verified production domain address.                                |
+| `vercel:env:check` fails                                 | One or more required variables are missing from the target environment | Run `vercel env ls` to see what is configured, then add the missing variables. |
+| Cron jobs returning 401                                  | `CRON_SECRET` not set or mismatched                                    | Regenerate with `openssl rand -hex 32` and set in Vercel.                      |
+| Rate limiting not working                                | No distributed store configured                                        | Provision Upstash Redis or Vercel KV and set the corresponding variables.      |

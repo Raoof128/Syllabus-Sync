@@ -1,45 +1,117 @@
-# Syllabus Sync — Documentation Directory
+# Syllabus Sync -- Documentation Index
 
-Welcome to the central documentation hub for **Syllabus Sync**. This directory contains all technical, operational, and policy documentation required to understand, deploy, and maintain the platform as an enterprise-grade Campus OS.
+This directory is the central navigation hub for all project documentation. Documents are organized by domain so that engineers, security reviewers, and stakeholders can find what they need without scanning the full repository.
 
-## 🏛️ Architecture & System Design
+---
 
-Documents detailing the structural decisions and component interactions that power the platform.
+## Architecture and System Design
 
-- **[Architecture Overview](./architecture/ARCHITECTURE.md)**: High-level system architecture, Next.js App Router utilization, and the Supabase integration strategy.
-- **[Technical Explanation](../TECHNICAL_EXPLANATION.md)**: Deep-dive into edge middleware, Zero-Trust pipelines, state management, and the fused-heading map algorithm.
-- **[Route & File Inventory](./inventory/ROUTE_INVENTORY.md)**: A comprehensive map of the Next.js routes, API handlers, and core directory structures.
-- **[Navigation Model](./navigation/ROUTES_AND_NAVIGATION.md)**: Reconciles the user-visible navigation (Sidebar, Shells) with the underlying Next.js routing implementation.
+Structural decisions, component interactions, and the technical patterns that power the platform.
 
-## 🔒 Security & Compliance
+| Document                                                    | Description                                                                                                            |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| [Architecture Overview](./architecture/ARCHITECTURE.md)     | High-level system architecture, Next.js App Router patterns, and Supabase integration strategy                         |
+| [Technical Explanation](../TECHNICAL_EXPLANATION.md)        | Deep-dive into edge middleware, Zero-Trust pipelines, optimistic state management, and the fused-heading map algorithm |
+| [Route and File Inventory](./inventory/ROUTE_INVENTORY.md)  | Comprehensive map of Next.js routes, API handlers, and directory structure                                             |
+| [Navigation Model](./navigation/ROUTES_AND_NAVIGATION.md)   | How user-visible navigation (sidebar, shells) maps to underlying Next.js routing                                       |
+| [Repository Inventory](./reference/REPOSITORY_INVENTORY.md) | Full directory-level inventory of the codebase                                                                         |
 
-Documentation proving our secure-by-default posture and adherence to industry best practices.
+## Security and Compliance
 
-- **[Security Posture & Hardening Report](./security/SECURITY_POSTURE.md)**: Executive summary, threat models, and our implemented control catalogue.
-- **[Security Evidence Index](./security/SECURITY_EVIDENCE_INDEX.md)**: A fast-navigation guide linking specific security controls (WebAuthn, MFA, CSP) directly to their implementation in code.
-- **[Privacy Policy](./policies/privacy-policy.md)**: An implementation-aware policy detailing data collection, processing, and user deletion rights.
-- **[Security Policy](../SECURITY.md)**: Vulnerability disclosure guidelines and high-level security tenets.
+Evidence-backed documentation of the project's security posture, suitable for institutional review and audit.
 
-## ⚙️ Operations & Deployment
+| Document                                                         | Description                                                                                            |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [Security Posture Report](./security/SECURITY_POSTURE.md)        | Executive summary, threat models, and implemented control catalogue                                    |
+| [Security Evidence Index](./security/SECURITY_EVIDENCE_INDEX.md) | Direct links from specific security controls (WebAuthn, MFA, CSP, RLS) to their implementation in code |
+| [Security Policy](../SECURITY.md)                                | Vulnerability disclosure process and high-level security tenets                                        |
+| [Privacy Policy](./policies/privacy-policy.md)                   | Data collection, processing, retention, and user deletion rights                                       |
 
-Runbooks and checklists for managing the application lifecycle across environments.
+## API Reference
 
-- **[Environment Setup](./setup/ENVIRONMENT_SETUP.md)**: Prerequisites, local environment configuration, and required third-party services.
-- **[Deployment Checklist](./operations/deployment-checklist.md)**: Mandatory quality gates and pre-flight checks required before a production release.
-- **[Google Maps Platform Setup](./operations/google-maps-platform-setup.md)**: Runbook for configuring the authenticated Google Maps Embed API and restricting referrer keys.
-- **[Email & Cron (Resend + Vercel)](./operations/resend-vercel-setup.md)**: Operational setup for transactional email and scheduled push notification jobs.
+Documentation for developers interacting with or extending the backend.
 
-## 🔌 API & Integration
+| Document                                                                        | Description                                                                                               |
+| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| [API Reference](./api/API_REFERENCE.md)                                         | REST API surface (`app/api/**`), authentication requirements, rate limiting, and request/response schemas |
+| [University Integration Requirements](./university-integration-requirements.md) | Technical proposal for integration with institutional systems (SSO, timetables, Canvas/iLearn)            |
 
-Resources for developers interacting with or extending the Syllabus Sync backend.
+## Operations and Deployment
 
-- **[API Reference](./api/API_REFERENCE.md)**: Documentation of the REST API surface (`app/api/**`), including authentication requirements, rate limiting constraints, and expected payloads.
-- **[University Integration Requirements](./university-integration-requirements.md)**: Our technical proposal for integrating Syllabus Sync with official university systems (SSO, Timetables, Canvas/iLearn).
+Runbooks and checklists for managing the application lifecycle.
 
-## 🚀 Project Planning & Roadmap
+| Document                                                                 | Description                                                           |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| [Environment Setup](./operations/ENVIRONMENT_SETUP.md)                   | Prerequisites, local configuration, and required third-party services |
+| [Deployment Checklist](./operations/deployment-checklist.md)             | Pre-production quality gates and release verification steps           |
+| [Google Maps Platform Setup](./operations/google-maps-platform-setup.md) | Configuration for Google Maps Embed API, Routes API, and Places API   |
+| [Resend and Vercel Setup](./operations/resend-vercel-setup.md)           | Transactional email and scheduled cron job configuration              |
+| [Supabase OAuth Setup](./operations/supabase-oauth-setup.md)             | OAuth provider configuration for Supabase Auth                        |
 
-Historical context and future direction for the engineering team.
+## Project Planning
 
-- **[Improvements Roadmap](../IMPROVEMENTS-ROADMAP.md)**: A categorized, prioritized matrix of planned security, performance, and feature enhancements.
-- **[Team Roadmap](./project/team_plan/TEAM_ROADMAP.md)**: Historical tracking of project phases and milestones.
-- **[Bug Reports & Post-Mortems](./reports/)**: Detailed analyses of complex system issues (e.g., race conditions in optimistic UI) and their architectural resolutions.
+Roadmap, team structure, and historical context for engineering decisions.
+
+| Document                                                              | Description                                                                                          |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [Product Roadmap](../IMPROVEMENTS-ROADMAP.md)                         | Strategic roadmap organized by theme: delivered milestones, current priorities, and future direction |
+| [Team Roadmap](./project/team_plan/TEAM_ROADMAP.md)                   | Phase-by-phase tracking of project milestones                                                        |
+| [Team Roles](./project/team_plan/TEAM_ROLES.md)                       | Maintainer responsibilities and ownership areas                                                      |
+| [Calendar Upgrade Plan](./project/team_plan/Calendar_Upgrade_Plan.md) | Feature plan for calendar system enhancements                                                        |
+
+## Design and Planning Documents
+
+Technical design documents and feature planning artifacts.
+
+| Document                                                                                             | Description                                                              |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [Notifications, Profiles, and Auth Design](./plans/2026-03-14-notifications-profiles-auth-design.md) | System design for the notification, profile, and auth subsystem overhaul |
+| [Notifications, Profiles, and Auth Plan](./plans/2026-03-14-notifications-profiles-auth-plan.md)     | Implementation plan and task breakdown                                   |
+| [Restructure Notes](./project/restructure-notes.md)                                                  | Notes from the codebase restructuring effort                             |
+
+## Reports and Post-Mortems
+
+Detailed analyses of system issues and their architectural resolutions.
+
+| Document                                                                          | Description                                                                     |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [Notification Reminder Bug Report](./reports/notification-reminder-bug-report.md) | Root-cause analysis of race conditions in the optimistic UI notification system |
+
+## Presentations
+
+Stakeholder-facing materials.
+
+| Document                                                        | Description                                                                                                   |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| [Industry Deck](./presentations/syllabus-sync-industry-deck.md) | Marp-compatible presentation for industry stakeholders, covering architecture, security, and product strategy |
+
+## Governance
+
+Project-level policies and contributor guidelines (located in the repository root).
+
+| Document                                      | Description                                                                         |
+| --------------------------------------------- | ----------------------------------------------------------------------------------- |
+| [Contributing Guidelines](../CONTRIBUTING.md) | Development standards, PR process, code conventions, and quality gate requirements  |
+| [Code of Conduct](../CODE_OF_CONDUCT.md)      | Contributor Covenant v2.1 -- community standards and enforcement process            |
+| [License](../LICENSE)                         | MIT License                                                                         |
+| [Changelog](../CHANGELOG.md)                  | Chronological record of all significant changes with scope, files, and verification |
+
+---
+
+## Database
+
+| File                                              | Description                                               |
+| ------------------------------------------------- | --------------------------------------------------------- |
+| [Database Schema](./database/database-schema.sql) | Canonical SQL schema for the Supabase PostgreSQL database |
+
+---
+
+## Quick Reference
+
+**For contributors:** Start with [Contributing Guidelines](../CONTRIBUTING.md), then [Environment Setup](./operations/ENVIRONMENT_SETUP.md).
+
+**For security reviewers:** Start with [Security Posture Report](./security/SECURITY_POSTURE.md), then [Security Evidence Index](./security/SECURITY_EVIDENCE_INDEX.md).
+
+**For stakeholders:** Start with [Industry Deck](./presentations/syllabus-sync-industry-deck.md), then [Product Roadmap](../IMPROVEMENTS-ROADMAP.md).
+
+**For API consumers:** Start with [API Reference](./api/API_REFERENCE.md), then [University Integration Requirements](./university-integration-requirements.md).

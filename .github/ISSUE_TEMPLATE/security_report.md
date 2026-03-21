@@ -1,70 +1,46 @@
+---
 name: Security Vulnerability
-description: Report a security vulnerability privately to our security team
-title: "[Security]: "
-labels: ["security", "urgent", "private"]
-body:
+about: Report a security vulnerability (visible to maintainers only)
+title: '[Security] '
+labels: security, urgent
+---
 
-- type: markdown
-  attributes:
-  value: | ## 🔐 Security Vulnerability Report
-  **IMPORTANT**: This report is only visible to project maintainers and security team.
+> **Important:** If this is a critical or actively exploited vulnerability, contact the maintainers directly rather than filing a public issue. See the repository's SECURITY.md for private disclosure instructions.
 
-      ## 📋 Vulnerability Summary
-      Brief description of the security issue.
+## Vulnerability Summary
 
-      ## 🎯 CVSS Score
-      [Optional] CVSS v3.1 score and vector if calculated.
+A brief, one-paragraph description of the security issue.
 
-      ## 🔍 Affected Systems
-      - **Application**: [web/mobile/api/database]
-      - **Component**: [specific module or feature]
-      - **Version**: [affected version(s)]
-      - **Environment**: [development/staging/production]
+## Affected Component
 
-      ## 📝 Detailed Description
-      Comprehensive description including:
-      - Vulnerability type and classification
-      - Technical implementation details
-      - Attack vectors and prerequisites
-      - Impact on confidentiality, integrity, availability
+- **Area:** (e.g., authentication, API, database, client-side)
+- **File or route:** (e.g., `app/auth/callback/route.ts`, `/api/maps/routes`)
+- **Affected versions:** (e.g., all versions, or specific commits/releases)
 
-      ## 🔧 Proof of Concept
-      Steps to reproduce the vulnerability:
-      1.
-      2.
-      3.
+## Severity Assessment
 
-      Include screenshots, code examples, or videos as appropriate.
+- **Attack complexity:** Low / Medium / High
+- **Privileges required:** None / Low / High
+- **User interaction required:** None / Required
+- **Impact:** Confidentiality / Integrity / Availability (select all that apply)
 
-      ## 🎭 Impact Assessment
-      - **Data at Risk**: [user data/system data/financial data]
-      - **Attack Complexity**: [low/medium/high]
-      - **Privileges Required**: [none/low/high/admin]
-      - **User Interaction**: [none/required/single]
-      - **Scope**: [single user/multiple users/system-wide]
+## Steps to Reproduce
 
-      ## 🛠️ Suggested Remediation
-      Recommendations for fixing the vulnerability:
-      - Immediate mitigation steps
-      - Long-term solution approach
-      - Code changes needed
-      - Configuration updates required
+1. ...
+2. ...
+3. ...
 
-      ## 🔒 Disclosure Policy
-      - **Public Disclosure**: [Yes/No - after fix deployment]
-      - **Timeline Request**: [Immediate/30 days/90 days]
-      - **Coordinate with**: [Project maintainers only/Public disclosure]
+Include code snippets, curl commands, or screenshots as appropriate.
 
-      ## 🏆 Recognition Request
-      - **Bounty Program**: [Yes/No - HackerOne program]
-      - **Hall of Fame**: [Yes/No - Public acknowledgment]
-      - **Anonymous**: [Yes/No - Name/handle preferred]
+## Impact
 
-      ## 📞 Contact Information
-      - **PGP Public Key**: [For encrypted communication]
-      - **Preferred Contact**: [Email/Discord/Signal/Keybase]
-      - **Time Zone**: [For coordination]
+Describe the potential impact if this vulnerability were exploited. What data or functionality is at risk?
 
-      ---
-      ## 🔐 Security Team Acknowledgment
-      This report will be reviewed within 48 hours. Thank you for responsible disclosure.
+## Suggested Remediation
+
+If you have recommendations for fixing the issue, describe them here. Include code changes, configuration updates, or architectural suggestions.
+
+## Disclosure Timeline
+
+- **Preferred disclosure model:** Coordinated (fix first, then disclose) / Immediate
+- **Requested timeline:** 30 days / 60 days / 90 days
