@@ -107,12 +107,12 @@ Syllabus Sync is built on a modern, edge-ready tech stack designed for scalabili
 
 **[ BACKEND & DATABASE ]**
 [![Supabase](https://skillicons.dev/icons?i=supabase&theme=dark)](https://supabase.com)
-[![PostgreSQL](https://skillicons.dev/icons?i=postgres&theme=dark)](https://www.postgresql.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
 
 **[ DEVOPS & TOOLING ]**
-[![GitHub Actions](https://skillicons.dev/icons?i=githubactions&theme=dark)](https://github.com/features/actions)
-[![Vercel](https://skillicons.dev/icons?i=vercel&theme=dark)](https://vercel.com)
-[![Git](https://skillicons.dev/icons?i=git&theme=dark)](https://git-scm.com)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
+[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
+[![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com)
 
 **[ TESTING ]**
 [![Vitest](https://img.shields.io/badge/Vitest-6366f1?style=for-the-badge&logo=vitest&logoColor=ffffff)](https://vitest.dev)
@@ -155,9 +155,77 @@ Full details: [SECURITY.md](./SECURITY.md)
 
 Developed using the **Raouf Change Protocol**, a rigorous, AI-native development methodology orchestrating agents for production-grade software engineering.
 
-- **Mandatory Preflight:** Agents must read architecture, agent constraints (`AGENT.md`), and historical changelogs before proposing modifications.
-- **Atomic, Verifiable Changes:** Every modification is accompanied by a documented test/verification strategy.
-- **Traceability:** A continuous, immutable ledger (`CHANGELOG.md`) tracks all architectural decisions, bug fixes, and security hardenings.
+### OpenAI Codex — Implementation & Test Generation
+
+Codex is used for:
+
+| Task                            | Description                                                                                                                    |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Unit test generation**        | Given a new route handler or store action, Codex generates Vitest test cases covering happy path, auth failure, and edge cases |
+| **Regression test scaffolding** | After each bug fix, Codex generates regression tests that prove the specific failure mode cannot recur                         |
+| **i18n key scaffolding**        | Codex generates translation key entries across all 35 locale files when new UI strings are added                               |
+| **Migration authoring**         | Codex drafts Supabase migration SQL from schema descriptions, which is then reviewed and applied via `supabase/migrations/`    |
+
+### Syllabus-as-Code Documentation Suite
+
+The project maintains a living documentation suite that is **generated and validated by AI**:
+
+- `docs/api/API_REFERENCE.md` — every route handler is documented with request/responses; Claude validates these against TypeScript types.
+- `docs/architecture/ARCHITECTURE.md` — the architecture document is used as a constraint document by Claude during code review.
+- `CHANGELOG.md` — structured `Raouf:` protocol entries capture scope, root cause, and verification for every change.
+
+This workflow means the project's AI assistants have **persistent, structured memory of every decision** — not just the current state of the code.
+
+<br/>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
+
+<br/>
+
+## 🎯 Project Governance
+
+### License
+
+Syllabus Sync is released under the **MIT License** — an OSI-approved, permissive open-source license.
+
+### Contributing
+
+We welcome contributions from students, developers, and university IT staff. See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+
+### Roadmap & Priorities
+
+| Priority | Item |
+| -------- | ---- |
+| P0 | Generalise the LLM OCR extraction pipeline as a standalone package (`@syllabus-sync/extractor`) |
+| P0 | Publish the Zod schema contracts as a versioned npm package |
+| P1 | Add University of Sydney and UNSW as reference dataset forks |
+| P1 | MCP (Model Context Protocol) server exposing the syllabus data API |
+
+### Maintainers
+
+| Name | Role |
+| --- | --- |
+| Mohammad Raouf Abedini | Lead maintainer — security, AI workflows, backend |
+| Mohammad Pouya Alavi Naeini | Co-maintainer — architecture, infrastructure |
+
+<br/>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
+
+<br/>
+
+## ⚡ Current Runtime Stack
+
+| Layer | Implementation |
+| --- | --- |
+| App framework | Next.js 16 App Router |
+| UI runtime | React 19 |
+| Styling | Tailwind CSS 4, Radix UI primitives |
+| State | Zustand |
+| Data/auth | Supabase SSR + Supabase Postgres (RLS enforced) |
+| Tests | Vitest + Testing Library (503 tests, 92 files) |
+| CI/CD | GitHub Actions (`ci-cd.yml`) |
+| Deployment | Vercel |
 
 <br/>
 
@@ -209,7 +277,7 @@ npm run dev
 
 ```bash
 npm run check
-# Runs: secrets scan, prettier format, tsc typecheck, eslint, vitest, and next build
+# Runs: secrets scan → format → typecheck → lint → 503 tests → build
 ```
 
 <br/>
