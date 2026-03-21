@@ -1,78 +1,40 @@
-# Security Policy
+# Security Policy & Vulnerability Disclosure
+
+Security is a foundational pillar of Syllabus Sync. This document outlines our vulnerability disclosure policy and provides a high-level overview of our secure-by-design architecture.
 
 ## Supported Versions
 
-| Version | Supported |
-| ------- | --------- |
-| 1.0.x   | ✅ Yes    |
-| < 1.0   | ❌ No     |
+We actively maintain and provide security patches for the following versions:
+
+| Version | Supported | Notes                    |
+| ------- | --------- | ------------------------ |
+| 1.0.x   | ✅ Yes    | Active production branch |
+| < 1.0   | ❌ No     | Deprecated prototypes    |
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability, please report it privately via GitHub Security Advisories or by contacting the maintainers directly. **Do not create public issues for security vulnerabilities.**
+We deeply appreciate the efforts of security researchers and our community in keeping Syllabus Sync secure.
 
-## Security Architecture
+**If you discover a security vulnerability, please DO NOT report it via public GitHub issues.**
 
-Syllabus Sync implements a multi-layered security model:
+Instead, please adhere to the following process:
 
-### 1. Request Validation
+1. **Email:** Report the vulnerability directly to `security@syllabus-sync.dev`.
+2. **Details:** Include a clear description of the vulnerability, steps to reproduce it, and the potential impact.
+3. **Response:** Our security team will acknowledge receipt of your email within 48 hours and provide an estimated timeline for resolution.
+4. **Resolution:** We ask that you maintain confidentiality until we have patched the vulnerability and deployed the fix to our production environments.
 
-- **Global Security Middleware**: A root-level `middleware.ts` enforces security headers across the entire application, including HSTS, X-Frame-Options, and CSP.
-- **CSRF/Origin Validation**: Origin validation is enabled on mutation routes that use shared API middleware. Some authentication and integration flows rely on explicit route-level controls to preserve Supabase compatibility.
-- **Schema Validation & XSS Prevention**: All API inputs are strictly validated using `zod`. Text fields are refined to reject common XSS vectors (e.g., `<script>`, `<html>`) at the schema level.
-- **Body Size Limits**: JSON payloads are restricted to 100KB (and 10KB for auth) to prevent DoS attacks.
-- **Open Redirect Prevention**: Login redirect URLs are validated against a whitelist of allowed paths and dangerous schemes are blocked.
+We review all reports and will attempt to coordinate public disclosure with you once the issue is resolved.
 
-### 2. Infrastructure Security
+## Our Secure-By-Design Philosophy
 
-- **Rate Limiting**: Distributed rate limiting using Upstash Redis (production) or in-memory (development). Limits are applied per IP and per user. Rate limiting uses `VERCEL_ENV` for reliable production detection.
-- **HSTS**: Strict Transport Security enforced via global middleware with a 1-year max-age.
-- **CSP (Content Security Policy)**: Strict policy enforced globally. Inline scripts for theme and RTL are validated using pre-computed SHA-256 hashes, eliminating the need for `'unsafe-inline'`.
-- **Enumeration Prevention**: Authentication endpoints (Signup/Signin) return generic success/error messages to prevent user account enumeration.
-- **X-Powered-By Disabled**: Server technology identification is disabled to reduce attack surface.
-- **API Key Proxying**: Third-party API keys (e.g., Google Weather) are proxied through server-side endpoints, never exposed to clients.
+Syllabus Sync implements a defense-in-depth strategy, operating under a Zero-Trust model where every request is treated as potentially hostile until proven otherwise.
 
-### 3. Database Security
+### Core Security Tenets
 
-- **RLS (Row Level Security)**: PostgreSQL policies ensure users can only `SELECT`, `INSERT`, `UPDATE`, or `DELETE` their own data.
-- **Service Role Isolation**: High-privilege operations are restricted to server-side routes using the Supabase Service Role Key.
-- **Error Message Sanitization**: Database error details are only exposed in development, never in production.
+1. **Zero-Trust Edge:** All incoming traffic passes through Vercel Edge Middleware. This layer validates authentication JWTs, enforces IP-based rate limiting, and injects strict Content Security Policies (CSP) before any application logic is executed.
+2. **Database-Level Isolation:** We do not rely solely on application-layer checks. Supabase PostgreSQL Row-Level Security (RLS) policies act as the ultimate gatekeeper, ensuring tenant isolation at the query execution level.
+3. **Hardware-Backed Auth:** We prioritize strong authentication, offering FIDO2 WebAuthn (Passkeys) and hardware-backed MFA over legacy SMS or purely password-based flows.
+4. **Resilient Data Protection:** All user data is encrypted at rest (AES-256) and in transit (TLS 1.3). We employ cryptographic hashing for all sensitive identifiers and strict parameter validation (Zod) on all API boundaries.
 
-### 4. Code Quality
-
-- **Secrets Scanning**: CI runs repository secret-pattern scanning before build/deploy stages.
-- **Dependency Audits**: Regular `npm audit` and version pinning.
-- **CI Security Checks**: Production security validation runs in CI/CD pipeline before deployment.
-
-### 5. Production Detection
-
-The application uses `VERCEL_ENV` for reliable production environment detection:
-
-```typescript
-const isRealProduction =
-  process.env.VERCEL_ENV === 'production' ||
-  (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
-```
-
-This ensures security features (CSRF, rate limiting, dev bypasses) cannot be circumvented by manipulating `NODE_ENV` locally.
-
-## Required Environment Variables for Production
-
-| Variable                        | Required | Purpose                      |
-| ------------------------------- | -------- | ---------------------------- |
-| `UPSTASH_REDIS_REST_URL`        | Yes      | Distributed rate limiting    |
-| `UPSTASH_REDIS_REST_TOKEN`      | Yes      | Distributed rate limiting    |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Yes      | Database connection          |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes      | Client-side database access  |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Yes      | Server-side admin operations |
-| `GOOGLE_WEATHER_API_KEY`        | Yes      | Google Weather API access    |
-
-## Development vs Production
-
-| Feature                    | Development                      | Production                  |
-| -------------------------- | -------------------------------- | --------------------------- |
-| Dev email bypass           | Enabled (with DEV_BYPASS_EMAILS) | **Always disabled**         |
-| Origin/CSRF route controls | Applied by middleware/route      | Applied by middleware/route |
-| Rate limiting              | In-memory (fallback)             | **Requires Redis**          |
-| Error details              | Exposed                          | **Hidden**                  |
-| Database errors            | Detailed                         | **Generic message only**    |
+> 📚 **Auditors & Reviewers:** For a detailed breakdown of our implemented controls, threat models, and evidence matrices, please consult the [Security Posture Report](./docs/security/SECURITY_POSTURE.md) and the [Security Evidence Index](./docs/security/SECURITY_EVIDENCE_INDEX.md).

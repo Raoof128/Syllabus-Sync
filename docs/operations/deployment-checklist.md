@@ -1,70 +1,86 @@
-# Deployment Checklist
+# Production Deployment & Release Runbook
 
-This checklist reflects the current repository structure and deployment workflows.
+This document outlines the mandatory procedures and quality gates for deploying Syllabus Sync to production. We follow a **Stable-by-Default** release strategy, ensuring that every deployment is verifiable and reversible.
 
-## 1. Environment
+---
 
-- [ ] Copy `.env.example` to `.env.local` for local verification
-- [ ] Populate required Supabase variables
-- [ ] Populate required Google Maps/Routes variables if Google map mode is needed
-- [ ] Populate `RESEND_API_KEY` and verification email sender if email flows are needed
-- [ ] Populate `CRON_SECRET` for protected cron/cleanup routes
-- [ ] Populate Sentry variables if release monitoring is required
+## 1. Pre-Flight Environment Validation
 
-See also: [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)
+Before initiating a release, ensure the following environment variables are correctly configured in your production provider (e.g., Vercel):
 
-## 2. Database
+- [ ] **Database:** `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+- [ ] **Infrastructure:** `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+- [ ] **Email:** `RESEND_API_KEY`, `RESEND_SENDER_EMAIL`
+- [ ] **Security:** `CRON_SECRET` (Minimum 32 chars), `NEXT_PUBLIC_APP_URL`
+- [ ] **Observability:** `SENTRY_DSN` (Must be active and configured for the `production` environment)
 
-- [ ] Treat `supabase/migrations/` as the authoritative schema history
-- [ ] Review pending migrations before deployment
-- [ ] Apply migrations through Supabase CLI or your controlled database rollout path
-- [ ] Use `docs/database/database-schema.sql` only as a schema snapshot/reference, not as the canonical deployment sequence
+_Refer to the [Environment Setup Guide](../setup/ENVIRONMENT_SETUP.md) for variable specifications._
 
-## 3. Static Validation
+---
 
-- [ ] `npm install`
-- [ ] `npm run typecheck`
-- [ ] `npm run lint`
-- [ ] `npm run test`
-- [ ] `npm run check:secrets`
-- [ ] `npm run check:i18n`
-- [ ] `npm run build`
+## 2. Database Migration Sequence
 
-If you want the full local gate:
+We treat database schema changes as immutable, versioned migrations.
+
+1. **Review Schema:** Audit `supabase/migrations/` for any pending SQL scripts.
+2. **Execution:** Apply migrations using the Supabase CLI:
+   ```bash
+   npx supabase db push
+   ```
+3. **Verification:** Confirm migration success via the Supabase Dashboard.
+   _Warning: Never use `database-schema.sql` for deployment; it is a reference snapshot only._
+
+---
+
+## 3. The Quality Gate (`npm run check`)
+
+Every production release must pass the local system integrity check. This ensures zero regressions in type safety, linting, and behavioral tests.
 
 ```bash
 npm run check
 ```
 
-## 4. CI/CD Alignment
+**Success Criteria:**
 
-Verify the deployment target matches the committed workflows:
+- 0 ESLint errors or warnings.
+- 0 TypeScript compilation errors.
+- 100% passing Vitest unit and integration tests.
+- Successful Next.js production build.
 
-- `.github/workflows/ci-cd.yml`
+---
 
-GitHub Actions now validates application quality only. Vercel deployment, if enabled for the linked project, is managed outside this repository's CI workflow.
+## 4. Deployment Execution (Vercel)
 
-## 5. Runtime Verification
+We utilize Vercel's immutable deployment model.
 
-- [ ] `GET /api/health` returns `healthy` or an intentional `degraded` state
-- [ ] Auth flows work: signup/login/logout/password reset
-- [ ] Primary authenticated routes render: `/home`, `/calendar`, `/map`, `/feed`, `/settings/general`
-- [ ] Notifications, profiles, and user preferences load for an authenticated user
-- [ ] Map routing works for the configured mode:
-  - campus mode: `/api/navigate`
-  - Google mode: `/api/maps/routes`
+1. **Trigger Build:** Push to the `main` branch or use the Vercel CLI:
+   ```bash
+   vercel --prod
+   ```
+2. **Build Monitoring:** Observe the Sentry dashboard for any "Build Error" or "Source Map" alerts.
+3. **Atomic Cutover:** Vercel automatically handles the traffic shift once health checks pass.
 
-## 6. Post-Deploy Checks
+---
 
-- [ ] Confirm the Vercel deployment is serving the expected environment
-- [ ] Confirm Sentry DSN and source-map flow if Sentry is enabled
-- [ ] Confirm service worker behavior does not serve stale app chunks after deploy
-- [ ] Confirm protected cron/cleanup endpoints are using the expected secret header flow
+## 5. Post-Deployment Verification (Smoke Tests)
 
-## 7. Things This Checklist Explicitly Avoids
+Execute the following checks against the live production URL:
 
-This document intentionally does not repeat older, stale deployment assumptions that no longer match the repository, such as:
+- **Health Check:** `GET /api/health` should return `200 OK`.
+- **Auth Cycle:** Perform a full Signup -> MFA Enroll -> Logout -> Login cycle.
+- **Route Integrity:** Verify `/home`, `/calendar`, `/map`, and `/feed` render without client-side exceptions.
+- **Security Headers:** Run a `curl -I` and verify `Content-Security-Policy` and `Strict-Transport-Security` are present.
 
-- treating `docs/database/database-schema.sql` as the only deployment path
-- describing Netlify as an equivalent committed deployment target
-- assuming outdated unit/location field mappings without checking the current route handlers
+---
+
+## 6. Incident Response & Rollback
+
+If critical regressions are detected post-deploy:
+
+1. **Immediate Rollback:** Use the Vercel Dashboard to redeploy the previous known-stable build. This shift is instantaneous and does not require a new build.
+2. **Audit Logs:** Review the `audit_logs` table and Sentry issues to identify the root cause.
+3. **Post-Mortem:** Document the failure in a new report under `docs/reports/`.
+
+---
+
+_For a detailed mapping of routes, refer to the [Route Inventory](../inventory/ROUTE_INVENTORY.md)._

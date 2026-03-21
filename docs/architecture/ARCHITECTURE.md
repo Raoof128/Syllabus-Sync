@@ -2,141 +2,73 @@
 
 ## System Summary
 
-Syllabus Sync is a Next.js App Router application that combines:
+Syllabus Sync is engineered as a secure, high-performance "Campus OS" using the Next.js 16 App Router paradigm. It merges an authenticated student productivity suite (scheduling, deadlines) with advanced location-aware services (fused-heading campus navigation), all backed by a Zero-Trust, edge-protected Supabase infrastructure.
 
-- authenticated student productivity flows
-- campus and Google-backed map navigation
-- Supabase-backed data and auth
-- security-focused API route handlers
-- a feature-first client architecture
+### The Stack
 
-## Runtime Layers
+- **Frontend:** Next.js 16 (App Router), React 19, Tailwind CSS, Shadcn UI
+- **State Management:** Zustand (persistent, optimistic UI patterns)
+- **Backend & Database:** Supabase (PostgreSQL, GoTrue Auth, Storage)
+- **Infrastructure:** Vercel (Edge Middleware, Serverless API)
+- **Mapping:** Leaflet (OpenStreetMap) combined with Google Maps Embed API
 
-```text
-Browser / PWA
-  -> app/layout.tsx + app/client-layout.tsx
-  -> feature modules, shared components, Zustand stores
-  -> Next.js route handlers under app/api
-  -> Supabase / Google Maps / Google Routes / Google Weather / Resend / ORS
-```
+---
 
-## Bootstrap Path
+## 1. Application Flow & The Request Lifecycle
 
-1. `app/layout.tsx`
-   - metadata
-   - nonce-aware theme and RTL bootstrap scripts
-   - JSON-LD organization schema
-   - `QueryProvider`
-2. `app/client-layout.tsx`
-   - auth gating
-   - top-level app shell
-   - service worker registration
-   - offline/update/install UX
-   - inactivity logout
-3. `app/page.tsx`
-   - redirect decision surface via `AuthRedirectHandler`
+### 1.1 The Edge Gateway (`lib/proxy.ts` / `middleware.ts`)
 
-## Frontend Structure
+Before any request hits the application logic, it must pass through the Vercel Edge Middleware. This is our Zero-Trust boundary.
 
-| Area          | Current responsibility                                     |
-| ------------- | ---------------------------------------------------------- |
-| `app/`        | Pages, layouts, route handlers                             |
-| `features/`   | Feature-specific UI logic and orchestration                |
-| `components/` | Shared UI and layout primitives                            |
-| `lib/`        | Stores, hooks, security, services, utils, Supabase clients |
-| `locales/`    | Translation dictionaries                                   |
-| `tests/`      | Vitest suites                                              |
+- **Classification:** Requests are categorized (Auth, Public, Protected, API, Static).
+- **Session Resolution:** The Supabase session is verified at the edge. We use a fail-fast fetch wrapper (`lib/supabase/fetch.ts`) to prevent upstream network latency from blocking the edge function.
+- **Email Gate:** Unverified users attempting to access protected routes are intercepted and redirected to `/verify`.
+- **Security Headers:** Strict CSP, HSTS, and cross-origin headers are injected.
 
-## Route And Navigation Architecture
+### 1.2 Route Handling & The App Router
 
-Primary authenticated navigation is controlled by `components/layout/Sidebar.tsx`:
+The application strictly separates Server Components from Client Components to optimize payload size.
 
-- `/home`
-- `/calendar`
-- `/map`
-- `/feed`
-- `/settings`
+- **Server Components:** Used for data fetching, layout generation, and rendering static shells (e.g., `app/home/page.tsx`).
+- **Client Components:** Used only at the leaf nodes where interactivity is required (e.g., `features/home/components/EventsFeed.tsx`).
 
-Route-local settings navigation is controlled by `app/settings/layout.tsx`:
+### 1.3 The API Layer (`app/api/**`)
 
-- `/settings/general`
-- `/settings/appearance`
-- `/settings/security`
-- `/settings/experience`
-- `/settings/about`
+Our Next.js API routes act as a secure proxy to the database.
 
-Public/auth-adjacent routes are handled separately in `app/client-layout.tsx`, which treats these as non-shell flows:
+- **Protection:** All non-public routes are wrapped in `requireAuth` or `requireAuthWithRateLimit`, enforcing CSRF checks and session validation.
+- **Validation:** Every request payload is strictly parsed using Zod schemas.
+- **Atomicity:** Complex mutations (like XP awards) are delegated to PostgreSQL Stored Procedures (RPCs) to ensure atomicity and prevent race conditions.
 
-- auth routes: `/login`, `/signup`, `/reset-password`
-- public routes: `/terms`, `/privacy`, `/verify`, `/about`, `/contact`
-- post-auth route: `/onboarding`
+---
 
-## Map Architecture
+## 2. Core Architectural Pillars
 
-### Shared Coordinator
+### 2.1 Defense-in-Depth Security
 
-- `features/map/components/MapClient.tsx`
+We do not rely solely on the API layer for authorization.
 
-Owns shared map shell state, query-parameter flow, mode switching, HUD coordination, and building selection.
+- **Row-Level Security (RLS):** Every table in the PostgreSQL database has RLS enabled. The database engine itself verifies that `auth.uid()` matches the required policy before executing any query, eliminating IDOR vulnerabilities.
+- **Modern Auth:** We support FIDO2 WebAuthn (Passkeys) for hardware-backed security, alongside traditional MFA (TOTP/SMS).
 
-### Campus Raster Mode
+### 2.2 Optimistic UI & Additive Merging
 
-- Leaflet-based rendering
-- ORS-backed `POST /api/navigate`
-- fallback demo route generation if `ORS_API_KEY` is missing
+To ensure a snappy, app-like feel on slow campus networks, we employ optimistic UI updates via Zustand.
 
-### Google Mode
+- **The Challenge:** Optimistic updates can be overwritten if a background data fetch completes before the server acknowledges the mutation.
+- **The Solution:** We implemented an **Additive Merge Strategy**. When syncing with the server, we preserve locally created items (protected by temporary IDs and an `_loadInFlight` guard) and merge them with confirmed server data, preventing UI flickering and data loss.
 
-- Google Maps JavaScript API rendering
-- Google Routes API proxy via `POST /api/maps/routes`
-- supporting proxies:
-  - `POST /api/maps/place-search`
-  - `POST /api/maps/place-details`
+### 2.3 Highly Accurate Campus Navigation
 
-## Data And Persistence
+Standard HTML5 Geolocation is insufficient for precise pedestrian routing on campus.
 
-Primary persistence is Supabase/Postgres. Canonical schema evolution lives in `supabase/migrations/`.
+- **Heading Fusion Algorithm:** Our custom `useMapLocation` hook fuses GPS heading data (when moving quickly), movement-derived vector smoothing, and DeviceOrientation compass data (when stationary) to provide a stable, highly accurate directional cone.
+- **Outlier Rejection:** We dynamically discard GPS samples with severe coordinate jumps or low accuracy scores to prevent the map marker from erratically bouncing across buildings.
 
-Main data domains backed by code:
+---
 
-- profiles
-- user preferences
-- units
-- class times
-- deadlines
-- events
-- todos
-- notifications
-- gamification
-- audit/security support tables
-- passkeys and password reset records
+## Further Reading
 
-## Security Architecture
-
-Implemented security layers visible in code:
-
-- CSP and security header utilities
-- CSRF helpers
-- rate limiting
-- password reset and email verification flows
-- MFA and WebAuthn/passkeys
-- audit and health-check endpoints
-- route-level auth middleware and validation helpers
-
-## Delivery And Observability
-
-| Concern           | Current implementation                               |
-| ----------------- | ---------------------------------------------------- |
-| CI                | `.github/workflows/ci-cd.yml`                        |
-| Production deploy | Vercel project integration outside GitHub Actions    |
-| Error tracking    | Sentry config in `config/sentry/` plus root wrappers |
-| Health endpoint   | `GET /api/health`                                    |
-| Docker            | `infra/docker/`                                      |
-| Vercel scripts    | `tools/vercel/` and `package.json`                   |
-
-## Related Documents
-
-- [/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/TECHNICAL_EXPLANATION.md](/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/TECHNICAL_EXPLANATION.md)
-- [/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/docs/reference/ROUTES_AND_NAVIGATION.md](/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/docs/reference/ROUTES_AND_NAVIGATION.md)
-- [/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/docs/reference/REPOSITORY_INVENTORY.md](/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/docs/reference/REPOSITORY_INVENTORY.md)
-- [/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/docs/api/API_REFERENCE.md](/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/docs/api/API_REFERENCE.md)
+- [Technical Explanation](../../TECHNICAL_EXPLANATION.md): Deep-dive into specific implementations and bug resolutions.
+- [Security Posture](../security/SECURITY_POSTURE.md): Complete catalogue of implemented security controls.
+- [Route Inventory](../inventory/ROUTE_INVENTORY.md): Mapping of the Next.js App Router structure.

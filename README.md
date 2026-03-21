@@ -13,23 +13,39 @@
 ![Tests](https://img.shields.io/badge/503_Tests-Vitest-6E9F18?style=for-the-badge)
 ![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 
-**[🔗 Live Demo](https://syllabus-sync-ashy.vercel.app)** &nbsp;·&nbsp; **[📖 Docs](./docs/README.md)** &nbsp;·&nbsp; **[🔐 Security](./SECURITY.md)** &nbsp;·&nbsp; **[🤝 Contributing](./CONTRIBUTING.md)**
-
 </div>
 
 <img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
 
 <br/>
 
-## What is Syllabus Sync?
+# Syllabus Sync — Enterprise-Grade Campus OS Blueprint
 
-Syllabus Sync is an **open-source student operations platform** that transforms university syllabus PDFs into structured, machine-readable data — wrapping them in a modern, security-focused productivity application built for university students.
+> **A production-ready, AI-native platform that transforms static university infrastructure into a secure, high-performance, and cohesive student experience.**
 
-Built initially for **Macquarie University**, it is designed to be adaptable to other Australian institutions by swapping academic datasets and configuring environment variables.
+Syllabus Sync is an open-source student operations platform that transforms university syllabus PDFs into structured, machine-readable data — wrapping them in a modern, security-focused productivity application built for university students.
 
-> **The core problem it solves:** Academic information — deadlines, assessments, timetables — is often locked inside static PDFs. Students manually copy data, miss deadlines, and navigate fragmented tools. Syllabus Sync reduces that friction.
+Built initially for **Macquarie University**, it unifies scheduling, deadline tracking, campus navigation, and student engagement into a single, highly secure, edge-delivered web application. This project serves as a comprehensive portfolio piece demonstrating advanced full-stack engineering, rigorous cybersecurity implementations, and AI-native development workflows.
+
+**[🔗 Live Demo](https://syllabus-sync-ashy.vercel.app)** &nbsp;·&nbsp; **[📖 Docs](./docs/README.md)** &nbsp;·&nbsp; **[🔐 Security](./SECURITY.md)** &nbsp;·&nbsp; **[🤝 Contributing](./CONTRIBUTING.md)**
 
 <br/>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
+
+<br/>
+
+## 🎯 High-Level Impact & Value Proposition
+
+Traditional university systems are fragmented, leading to missed deadlines, poor campus discoverability, and sub-optimal student experiences. Syllabus Sync solves this by providing:
+
+- **Unified Academic Management:** Seamless integration of enrolled units, class times, and assessment deadlines with stress-aware predictive tracking.
+- **Advanced Campus Navigation:** Real-time, fused-heading campus navigation combining OpenStreetMap (Leaflet) and Google Maps Embed APIs, tailored for high-accuracy pedestrian routing.
+- **Enterprise-Grade Security:** A defense-in-depth architecture featuring WebAuthn (Passkeys), hardware-backed MFA, Zero-Trust middleware, and strict Row-Level Security (RLS).
+- **Gamified Engagement:** Secure, anti-abuse XP and streak mechanics to incentivize academic consistency.
+
+<br/>
+
 <img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
 
 <br/>
@@ -75,35 +91,41 @@ Built initially for **Macquarie University**, it is designed to be adaptable to 
 
 <br/>
 
-## Tech Stack
+## 🏗️ Technical Architecture Overview
+
+Syllabus Sync is built on a modern, edge-ready tech stack designed for scalability, type safety, and rapid iteration.
+
+### The Stack
 
 <div align="center">
 
 **[ FRONTEND ]**
-
 [![Next.js](https://img.shields.io/badge/Next.js_16-000?style=for-the-badge&logo=nextdotjs)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://skillicons.dev/icons?i=ts&theme=dark)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://skillicons.dev/icons?i=tailwind&theme=dark)](https://tailwindcss.com)
 
 **[ BACKEND & DATABASE ]**
-
 [![Supabase](https://skillicons.dev/icons?i=supabase&theme=dark)](https://supabase.com)
 [![PostgreSQL](https://skillicons.dev/icons?i=postgres&theme=dark)](https://www.postgresql.org)
 
 **[ DEVOPS & TOOLING ]**
-
 [![GitHub Actions](https://skillicons.dev/icons?i=githubactions&theme=dark)](https://github.com/features/actions)
 [![Vercel](https://skillicons.dev/icons?i=vercel&theme=dark)](https://vercel.com)
 [![Git](https://skillicons.dev/icons?i=git&theme=dark)](https://git-scm.com)
 
 **[ TESTING ]**
-
 [![Vitest](https://img.shields.io/badge/Vitest-6366f1?style=for-the-badge&logo=vitest&logoColor=ffffff)](https://vitest.dev)
 [![Playwright](https://img.shields.io/badge/Playwright-22c55e?style=for-the-badge&logo=playwright&logoColor=ffffff)](https://playwright.dev)
-[![Testing Library](https://img.shields.io/badge/Testing_Library-E33332?style=for-the-badge&logo=testinglibrary&logoColor=white)](https://testing-library.com)
 
 </div>
+
+### Key Architectural Decisions
+
+1. **Edge-First Security Middleware:** All routing passes through Vercel Edge Middleware, enforcing authentication state, email verification gates, CSRF protection, and rate-limiting before requests hit serverless compute.
+2. **Distributed Rate Limiting:** The platform uses Upstash Redis for distributed rate limiting, ensuring consistency across serverless instances.
+3. **Database-Level Atomicity:** Critical operations are handled via PostgreSQL triggers to guarantee data integrity and prevent orphaned records.
+4. **Optimistic UI with Additive Server Sync:** Complex state uses an optimistic update pattern backed by an additive merge strategy to eliminate race conditions.
 
 <br/>
 
@@ -111,18 +133,39 @@ Built initially for **Macquarie University**, it is designed to be adaptable to 
 
 <br/>
 
-## Architecture
+## 🔒 Security Posture & Hardening
 
-Syllabus Sync is structured as four layered platform concerns:
+Security is a **core design constraint**, featuring a defense-in-depth architecture aligned with industry best practices.
 
-| Layer | Responsibility |
-|---|---|
-| **Layer 1 — Identity & Data** | Supabase Auth · PostgreSQL · Row-Level Security · migration-based schema |
-| **Layer 2 — Syllabus Intelligence** | OCR/LLM extraction pipeline · schema validation · structured output |
-| **Layer 3 — Academic Data API** | 63 route handlers: units, deadlines, events, todos, notifications, profiles |
-| **Layer 4 — Student UX Shell** | Next.js app · calendar · maps · reminders · preferences · account flows |
+- **Authentication:** FIDO2 WebAuthn (Passkeys), hardware-backed MFA (TOTP), and strict session termination.
+- **Authorization:** Absolute tenant isolation via PostgreSQL Row-Level Security (RLS) at the query execution layer.
+- **Defense-in-Depth:** Content Security Policy (CSP), Subresource Integrity (SRI), and API request signing.
+- **Data Protection:** Encryption at rest (AES-256) and in transit (TLS 1.3).
+- **Auditability:** Tamper-evident audit logging for all sensitive system and user operations.
 
-### Repository Layout
+Full details: [SECURITY.md](./SECURITY.md)
+
+<br/>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
+
+<br/>
+
+## 🤖 AI-Native Engineering Workflow
+
+Developed using the **Raouf Change Protocol**, a rigorous, AI-native development methodology orchestrating agents for production-grade software engineering.
+
+- **Mandatory Preflight:** Agents must read architecture, agent constraints (`AGENT.md`), and historical changelogs before proposing modifications.
+- **Atomic, Verifiable Changes:** Every modification is accompanied by a documented test/verification strategy.
+- **Traceability:** A continuous, immutable ledger (`CHANGELOG.md`) tracks all architectural decisions, bug fixes, and security hardenings.
+
+<br/>
+
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
+
+<br/>
+
+## Repository Layout
 
 ```text
 app/                Next.js routes, layouts, 63 API route handlers
@@ -146,28 +189,6 @@ tools/              Repo utilities (i18n, security, exports, load testing)
 
 <br/>
 
-## Security Highlights
-
-Security is a **core design constraint**, not an afterthought.
-
-| Measure | Implementation |
-|---|---|
-| Authentication | MFA (TOTP) + WebAuthn/Passkey support |
-| API Protection | Auth-by-default route guards + trusted origin validation |
-| Rate Limiting | Upstash Redis distributed rate limiting on sensitive endpoints |
-| Data Isolation | Supabase Row-Level Security for per-user data enforcement |
-| Transport | HTTPS-only · CSRF protection |
-| CI Scanning | Secrets scanning on every push · `npm audit` in pipeline |
-| Compliance | GDPR-compliant data handling · `.env.example` separation |
-
-Full details: [SECURITY.md](./SECURITY.md)
-
-<br/>
-
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
-
-<br/>
-
 ## Quick Start
 
 ```bash
@@ -184,46 +205,12 @@ cp .env.example .env.local
 npm run dev
 ```
 
-### Required Environment Variables
-
-| Group | Variables |
-|---|---|
-| Supabase | `NEXT_PUBLIC_SUPABASE_URL` · `NEXT_PUBLIC_SUPABASE_ANON_KEY` · `SUPABASE_SERVICE_ROLE_KEY` |
-| Google Maps | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` · `NEXT_PUBLIC_GOOGLE_MAP_ID` · `GOOGLE_ROUTES_API_KEY` |
-| Campus Routing | `ORS_API_KEY` |
-| Email | `RESEND_API_KEY` · `VERIFICATION_EMAIL_FROM` · `VERIFICATION_EMAIL_NAME` |
-| Security | `CRON_SECRET` · `WEBAUTHN_RP_ID` · `WEBAUTHN_ORIGIN` |
-| Observability | Sentry DSN and auth variables |
-
-Full setup guide: [docs/setup/ENVIRONMENT_SETUP.md](./docs/setup/ENVIRONMENT_SETUP.md)
-
-<br/>
-
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f172a,30:6366f1,60:22c55e,100:0f172a&height=2" width="100%"/>
-
-<br/>
-
-## Quality Gates & CI/CD
-
-### Local Check
+### Quality Assurance
 
 ```bash
 npm run check
-# secrets scan → prettier → tsc → eslint → vitest (503 tests) → next build
+# Runs: secrets scan, prettier format, tsc typecheck, eslint, vitest, and next build
 ```
-
-### CI Pipeline
-
-| Step | Tool |
-|---|---|
-| Type check | `tsc --noEmit` |
-| Lint | ESLint with strict config |
-| Test coverage | Vitest with coverage report |
-| Dependency audit | `npm audit` |
-| Secrets scan | Custom pattern scanner |
-| i18n validation | Key completeness check across 35 locales |
-| Build | `next build` |
-| Lighthouse | Performance/accessibility score gate |
 
 <br/>
 
@@ -238,8 +225,6 @@ npm run check
 | Architecture | [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md) |
 | Technical explanation | [TECHNICAL_EXPLANATION.md](./TECHNICAL_EXPLANATION.md) |
 | API reference | [docs/api/API_REFERENCE.md](./docs/api/API_REFERENCE.md) |
-| Environment setup | [docs/setup/ENVIRONMENT_SETUP.md](./docs/operations/ENVIRONMENT_SETUP.md) |
-| Google Maps setup | [docs/operations/google-maps-platform-setup.md](./docs/operations/google-maps-platform-setup.md) |
 | Security policy | [SECURITY.md](./SECURITY.md) |
 | Contributing | [CONTRIBUTING.md](./CONTRIBUTING.md) |
 | Docs index | [docs/README.md](./docs/README.md) |

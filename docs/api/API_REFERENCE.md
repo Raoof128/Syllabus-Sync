@@ -1,144 +1,132 @@
 # API Reference
 
-This document reflects the current `app/api/**/route.ts` surface in the repository.
+This document provides a comprehensive technical reference for the Syllabus Sync REST API surface. All routes are implemented using Next.js App Router Handlers and are located under `app/api/**/route.ts`.
 
-## Conventions
+---
 
-- Most authenticated routes depend on Supabase session state.
-- Mutation routes commonly validate payloads with Zod and apply rate limiting.
-- Shared response helpers live under `app/api/_lib/`.
-- Some routes are internal/operational and not intended for public client use.
+## 🔒 Security & Request Standards
 
-## Auth And Account
+### Authentication
 
-| Method        | Path                               | Notes                         |
-| ------------- | ---------------------------------- | ----------------------------- |
-| `POST`        | `/api/auth/signup`                 | Sign-up flow                  |
-| `POST`        | `/api/auth/signin`                 | Sign-in flow                  |
-| `POST`        | `/api/auth/signout`                | Server-side sign-out cleanup  |
-| `GET`         | `/api/auth/user`                   | Current user snapshot         |
-| `POST`        | `/api/auth/password`               | Authenticated password change |
-| `POST`        | `/api/auth/password/request-reset` | Request password reset        |
-| `POST`        | `/api/auth/password/reset`         | Complete password reset       |
-| `GET`, `POST` | `/api/auth/sessions`               | List/terminate sessions       |
-| `POST`        | `/api/auth/onboarding`             | Save onboarding profile data  |
+Most authenticated routes depend on a valid Supabase session. Authentication is typically enforced via the `requireAuth` or `requireAuthWithRateLimit` middleware wrappers.
 
-### Email Verification
+### Headers
 
-| Method | Path                                  |
-| ------ | ------------------------------------- |
-| `POST` | `/api/auth/email/send-verification`   |
-| `POST` | `/api/auth/email/resend-verification` |
-| `POST` | `/api/auth/email/verify`              |
+- **Content-Type:** `application/json`
+- **X-CSRF-Token:** Required for all mutation requests (POST, PUT, PATCH, DELETE). This is automatically handled by the `lib/utils/api.ts` utility.
 
-Internal cleanup route files also exist for email/password/rate-limit cleanup and are intended for operational use.
+### Rate Limiting
 
-## MFA And Passkeys
+Security-critical endpoints (Auth, Security) implement strict, Redis-backed sliding-window rate limiting. Non-critical endpoints use a more relaxed threshold. Exceeding these limits returns a `429 Too Many Requests` response.
 
-### MFA
+---
 
-| Method | Path                             |
-| ------ | -------------------------------- |
-| `POST` | `/api/auth/mfa/enroll`           |
-| `POST` | `/api/auth/mfa/verify`           |
-| `POST` | `/api/auth/mfa/challenge`        |
-| `POST` | `/api/auth/mfa/challenge-verify` |
-| `GET`  | `/api/auth/mfa/status`           |
-| `POST` | `/api/auth/mfa/unenroll`         |
-| `POST` | `/api/auth/mfa/sms/enroll`       |
-| `POST` | `/api/auth/mfa/sms/verify`       |
+## 🔑 Authentication Endpoints
 
-### Passkey / WebAuthn
+### `POST /api/auth/signup`
 
-| Method          | Path                                 |
-| --------------- | ------------------------------------ |
-| `POST`          | `/api/auth/passkey/options`          |
-| `POST`          | `/api/auth/passkey/register-options` |
-| `POST`          | `/api/auth/passkey/register`         |
-| `POST`          | `/api/auth/passkey/verify`           |
-| `POST`          | `/api/auth/passkey/status`           |
-| `POST`          | `/api/webauthn/register/options`     |
-| `POST`          | `/api/webauthn/register/verify`      |
-| `POST`          | `/api/webauthn/authenticate/options` |
-| `POST`          | `/api/webauthn/authenticate/verify`  |
-| `GET`, `DELETE` | `/api/webauthn/credentials`          |
+Creates a new student account.
 
-## Core User Data
+- **Payload:** `{ email, password, fullName, studentId, course, year }`
+- **Security:** Checks `HaveIBeenPwned` for breached passwords; triggers database-level profile creation.
 
-| Method                          | Path                               | Notes                              |
-| ------------------------------- | ---------------------------------- | ---------------------------------- |
-| `GET`, `PUT`, `DELETE`          | `/api/profiles`                    | Current user profile               |
-| `GET`, `PUT`                    | `/api/user-preferences`            | Preference record                  |
-| `GET`, `POST`, `DELETE`         | `/api/notifications`               | List/create/clear notification set |
-| `GET`, `PUT`, `PATCH`, `DELETE` | `/api/notifications/[id]`          | Single notification                |
-| `PUT`                           | `/api/notifications/mark-all-read` | Bulk mark read                     |
+### `POST /api/auth/signin`
 
-## Academic Data
+Authenticates a user and establishes a session.
 
-### Units
+- **Payload:** `{ email, password }`
+- **Security:** Enforces email verification gate and MFA/Passkey status checks.
 
-| Method          | Path              | Notes                                   |
-| --------------- | ----------------- | --------------------------------------- |
-| `GET`, `POST`   | `/api/units`      | Units plus schedule/class-time handling |
-| `PUT`, `DELETE` | `/api/units/[id]` | Single unit                             |
-| `POST`          | `/api/units/sync` | Sync/import path                        |
+### `POST /api/auth/mfa/enroll`
 
-### Deadlines
+Initiates the enrollment process for a new MFA factor (TOTP).
 
-| Method          | Path                  |
-| --------------- | --------------------- |
-| `GET`, `POST`   | `/api/deadlines`      |
-| `PUT`, `DELETE` | `/api/deadlines/[id]` |
+- **Security:** Requires active AAL1 session.
 
-### Events
+---
 
-| Method          | Path               |
-| --------------- | ------------------ |
-| `GET`, `POST`   | `/api/events`      |
-| `PUT`, `DELETE` | `/api/events/[id]` |
+## 👤 Profile & Preferences
 
-### Todos
+### `GET /api/profiles`
 
-| Method          | Path              |
-| --------------- | ----------------- |
-| `GET`, `POST`   | `/api/todos`      |
-| `PUT`, `DELETE` | `/api/todos/[id]` |
+Fetches the profile for the authenticated user.
 
-## Product Features
+- **Caching:** Returns `Cache-Control: private, max-age=0, must-revalidate` to ensure fresh data in Zustand while allowing browser-level revalidation.
 
-| Method        | Path                         | Notes                              |
-| ------------- | ---------------------------- | ---------------------------------- |
-| `GET`, `POST` | `/api/gamification`          | Read and mutate gamification state |
-| `POST`        | `/api/gamification/award-xp` | Award XP                           |
-| `POST`        | `/api/sync`                  | Sync surface                       |
-| `GET`         | `/api/weather`               | Server-side weather proxy          |
-| `GET`, `POST` | `/api/audit`                 | Audit access and writes            |
+### `PATCH /api/user-preferences`
 
-## Navigation And Maps
+Updates user-specific application preferences (Language, Reminders, Theme).
 
-| Method        | Path                                   | Notes                                             |
-| ------------- | -------------------------------------- | ------------------------------------------------- |
-| `POST`        | `/api/navigate`                        | Campus raster navigation via ORS or demo fallback |
-| `POST`        | `/api/maps/routes`                     | Google Routes proxy                               |
-| `POST`        | `/api/maps/place-search`               | Google place search proxy                         |
-| `POST`        | `/api/maps/place-details`              | Google place details proxy                        |
-| `POST`        | `/api/maps/dev-pin`                    | Dev-only building pin save path                   |
-| `GET`, `POST` | `/api/admin/update-building-positions` | Admin building-position utility                   |
+- **Payload:** Partial `UserPreferences` object.
 
-## Security And Operations
+---
 
-| Method | Path                                  | Notes                                     |
-| ------ | ------------------------------------- | ----------------------------------------- |
-| `GET`  | `/api/health`                         | Health/degraded status endpoint           |
-| `POST` | `/api/security/check-password-breach` | Password breach check                     |
-| `POST` | `/api/security/scan-headers`          | Header scan utility                       |
-| `POST` | `/api/csp-report`                     | CSP report intake                         |
-| `GET`  | `/api/auth/biometric`                 | Biometric/passkey-related capability path |
-| `POST` | `/api/auth/biometric`                 | Biometric/passkey action path             |
+## 📅 Academic Data
 
-## Notes From Reconciliation
+### `GET /api/units`
 
-- `/api/auth/onboarding` is `POST` only in code. It is not a `GET` endpoint.
-- `/api/auth/mfa/unenroll` is `POST` in code, not `DELETE`.
-- Units still use the `class_times` table alongside unit records; documentation should not collapse this away.
-- Some cleanup route files exist for operational use without a standard exported REST method list in the same style as the public routes.
+Returns a list of academic units for the authenticated user.
+
+### `POST /api/units`
+
+Creates a new academic unit and associated class times.
+
+- **Payload:** `{ code, name, color, building, room, schedule }`
+
+### `GET /api/deadlines`
+
+Fetches all upcoming academic deadlines, calculated with stress-level indicators.
+
+---
+
+## 🗺️ Navigation & Location
+
+### `GET /api/navigate`
+
+Proxies requests to external routing engines (e.g., OpenRouteService) to provide high-accuracy campus pedestrian paths.
+
+- **Security:** Validates origin and enforces geofencing boundaries.
+
+### `GET /api/weather`
+
+Fetches real-time campus weather data.
+
+- **Security:** Rate-limited to prevent API key exhaustion.
+
+---
+
+## 🛡️ Security & Auditing
+
+### `GET /api/audit`
+
+Retrieves the audit log history for the authenticated user.
+
+- **Query Params:** `limit`, `offset`, `action`, `severity`.
+
+### `POST /api/security/scan-headers`
+
+Analyzes the security headers of a given URL and returns a graded posture report.
+
+- **Internal Use:** Powers the Security Center's external link validation.
+
+---
+
+## 🛠️ Error Handling
+
+The API uses standardized JSON error responses:
+
+```json
+{
+  "error": "error_code_identifier",
+  "message": "Human-readable explanation of the error.",
+  "status": 400
+}
+```
+
+**Common Error Codes:**
+
+- `unauthorized`: Session missing or expired.
+- `forbidden`: Insufficient permissions (RLS violation).
+- `bad_request`: Invalid payload (Zod validation failure).
+- `rate_limit_exceeded`: Too many requests from this IP.
+- `internal_error`: Unhandled server-side exception.

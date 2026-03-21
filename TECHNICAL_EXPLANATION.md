@@ -1,139 +1,126 @@
-# Technical Explanation
+# Technical Explanation & Architecture Deep-Dive
 
 ## Purpose
 
-Syllabus Sync is a Next.js App Router application that combines student productivity workflows with campus-aware navigation and account/security features. The repository is organized around a feature-first frontend, a route-handler API layer, and Supabase-backed persistence.
+Syllabus Sync is engineered as a blueprint for a modern, secure "Campus OS." This document provides a deep dive into the system's internal mechanics, architectural decisions, and the technical hurdles overcome during its development. It is intended for senior engineers, security architects, and technical reviewers evaluating the platform's production readiness.
 
-## How The App Boots
+## 1. System Architecture & The Edge-First Paradigm
 
-1. `app/layout.tsx` defines global metadata, security nonce usage, JSON-LD, and wraps the app in `QueryProvider`.
-2. `app/client-layout.tsx` applies the authenticated application shell:
-   - checks auth state
-   - renders `Sidebar`, `Header`, `AppFooter`
-   - registers the service worker
-   - wires install/update/offline UX
-   - applies inactivity logout for browser mode
-3. `app/page.tsx` delegates the landing decision to `AuthRedirectHandler`.
-4. Authenticated users are navigated into the main application routes such as `/home`, `/calendar`, `/map`, `/feed`, and `/settings/*`.
+### 1.1 Next.js App Router & Server Components
 
-## Route Architecture
+The application leverages the Next.js 16 App Router, heavily utilizing React Server Components (RSC) to minimize the client-side JavaScript payload.
 
-The route tree has two major layers:
+**Why RSC?** By rendering data-heavy components (like the initial user profile, daily schedule, and complex settings layouts) on the server, we significantly reduce Time to Interactive (TTI) on mobile devices—crucial for students navigating campus on cellular networks.
 
-- User-facing pages in `app/**/page.tsx`
-- Server-side route handlers in `app/api/**/route.ts`
+### 1.2 The Supabase Ecosystem & RLS
 
-The primary authenticated navigation comes from `components/layout/Sidebar.tsx` and points to:
+We chose Supabase (PostgreSQL) as the backend, specifically for its tight integration with GoTrue auth and PostgREST.
 
-- `/home`
-- `/calendar`
-- `/map`
-- `/feed`
-- `/settings`
+**The Security Hurdle:** Traditional API-layer authorization is prone to human error (e.g., forgetting a `WHERE user_id = ?` clause, leading to IDOR vulnerabilities).
+**The Solution:** We implement strict Row-Level Security (RLS) directly within PostgreSQL. Even if an API route is compromised or poorly written, the database engine enforces tenant isolation at the query execution level. No query can read or mutate data unless the `auth.uid()` matches the required policy.
 
-The settings area has its own route-local navigation in `app/settings/layout.tsx`:
+## 2. Zero-Trust Security & Middleware Pipeline
 
-- `/settings/general`
-- `/settings/appearance`
-- `/settings/security`
-- `/settings/experience`
-- `/settings/about`
+Security in Syllabus Sync is not an afterthought; it is enforced at the edge before requests reach the application logic.
 
-## Frontend Module Structure
+### 2.1 Edge Middleware (`lib/proxy.ts` / `middleware.ts`)
 
-- `features/home`: dashboard widgets, quick actions, hydration/auth helpers
-- `features/calendar`: calendar UI, widgets, add/edit flows, pending intent flow
-- `features/map`: campus raster map, Google map mode, location/navigation helpers
-- `features/settings`: settings sections, privacy/security controls, quick actions
-- `features/feed`: public event feed logic and presentation
-- `features/gamification`: XP, levels, streaks, notifications
+Every incoming request passes through the Vercel Edge Middleware. This layer acts as our Zero-Trust gateway:
 
-Cross-cutting shared layers:
+1. **Route Classification:** Determines if a route is public, protected, or an API endpoint.
+2. **Session Validation:** Extracts the Supabase JWT and validates the session.
+3. **Email Verification Gate:** Unverified users attempting to access protected routes are intercepted at the edge and redirected to `/verify`.
+4. **Security Headers:** Injects dynamic Content Security Policy (CSP), Strict-Transport-Security (HSTS), and Cross-Origin policies.
 
-- `components/`: reusable UI/layout building blocks
-- `lib/store/`: Zustand persistence and domain state
-- `lib/security/`: CSP, CSRF, WebAuthn, MFA, audit, password and session utilities
-- `lib/supabase/`: browser/server/admin clients and types
+#### Infrastructure Scaling & Edge Limits
 
-## Navigation And Map Model
+Vercel Edge functions have strict execution time limits. To prevent upstream Supabase latency (e.g., `ECONNRESET`) from hanging the edge function and causing 504 Gateway Timeouts:
 
-The repository contains two distinct navigation modes:
+- We engineered a **Fail-Fast Fetch Wrapper** (`lib/supabase/fetch.ts`) with a hard `15,000ms` limit.
+- The proxy auth resolution implements an aggressive **`6,000ms` deadline** in production (`PROXY_AUTH_DEADLINE_MS`). If Supabase fails to validate the session within 6 seconds, the proxy fails closed or falls back to an unauthenticated state, preserving edge stability during traffic spikes.
 
-### Campus Raster Mode
+### 2.2 API Hardening & CSRF Protection
 
-- UI surface: `features/map/components/CampusMap.tsx`
-- Client orchestration: `features/map/components/MapClient.tsx`
-- Routing API: `POST /api/navigate`
-- Upstream provider: OpenRouteService
-- Notes:
-  - geofence enforcement is applied when ORS is configured
-  - demo routing is generated when `ORS_API_KEY` is absent
+API routes (`app/api/**`) employ a shared `requireAuth` wrapper. This wrapper enforces:
 
-### Google Mode
+- **Session state:** Validating the user JWT.
+- **CSRF Origin Checks:** Ensuring `Origin` or `Referer` headers match the allowed application domain.
+- **Distributed Rate Limiting:** IP-based anomaly detection and rate limiting (`lib/services/rateLimitService.ts`).
+  - _Architectural Note:_ In serverless environments, in-memory rate limiting fails because state isn't shared across instances. Our architecture **mandates Upstash Redis** for production rate limiting, explicitly failing-closed if Redis is unconfigured, preventing bypass attacks during scaling events.
 
-- UI surfaces: `GoogleMapCanvas`, `GoogleMapController`, `GoogleRoutePanel`
-- Routing API: `POST /api/maps/routes`
-- Search/detail proxies:
-  - `POST /api/maps/place-search`
-  - `POST /api/maps/place-details`
-- Upstream providers: Google Maps JavaScript API and Google Routes API
+## 3. State Management & Optimistic UI Concurrency
 
-Both modes share building metadata and route-selection state through `MapClient`.
+A core UX requirement is that the app feels instantaneous, even on poor campus Wi-Fi. We use Zustand for global state management with aggressive optimistic updates.
 
-## Backend And Data Model
+### 3.1 The Race Condition Hurdle
 
-The backend is implemented with Next.js route handlers plus Supabase:
+Optimistic UI introduces a classic race condition:
 
-- Supabase auth sessions for user identity
-- Postgres with RLS for application data
-- route-level validation with Zod in many handlers
-- shared response helpers under `app/api/_lib`
+1. User creates a reminder → Client instantly updates UI (`temp-id`).
+2. Client sends POST request to server.
+3. Concurrently, a background focus event triggers a full GET `/api/notifications` refresh.
+4. The GET request completes _before_ the POST is processed, overwriting the local state and causing the optimistic notification to vanish.
 
-Major data areas reflected in code:
+### 3.2 The Additive Merge Solution
 
-- profiles
-- user preferences
-- units and `class_times`
-- deadlines
-- events
-- todos
-- notifications
-- gamification
-- audit/security tables
-- WebAuthn and password reset flows
+To solve this, we implemented an **Additive Merge Strategy** in `notificationsStore.ts`.
+Instead of the standard "replace local state with server state" pattern, our store:
 
-Canonical schema history lives in `supabase/migrations/`.
+- Keeps all current notifications.
+- Updates existing ones with server data.
+- Adds new ones from the server.
+- Employs a `_protectedIds` map and an `_loadInFlight` concurrency guard to ensure optimistic items survive background polling until the server confirms their creation.
 
-## Security Model
+## 4. Identity, Gamification & Database Atomicity
 
-Security controls implemented in code include:
+### 4.1 FIDO2 WebAuthn (Passkeys)
 
-- security headers and nonce flow
-- CSRF utilities
-- rate limiting service
-- passkey and MFA flows
-- password reset and email verification flows
-- audit utilities and supporting endpoints
-- Sentry and health-check surfaces for runtime visibility
+We implemented hardware-backed authentication to reduce password fatigue and enhance security.
 
-## Testing And Delivery
+- **Authenticator Scope:** The WebAuthn configuration explicitly restricts `authenticatorAttachment` to `'platform'`. This limits passkeys to the user's built-in device authenticators (FaceID, TouchID, Windows Hello), prioritizing a frictionless, biometric UX over cross-platform roaming authenticators (like physical YubiKeys).
 
-The checked-in QA stack in this repository is currently:
+### 4.2 Securing the RPC Layer (Gamification)
 
-- Vitest + Testing Library for unit/integration coverage
-- workflow validation in GitHub Actions
-- Lighthouse job in CI
+The app includes XP and streak mechanics. Client-controlled XP awards are inherently vulnerable to tampering.
 
-The main workflows are:
+- **Function:** `award_xp(user_id, amount, source)`
+- **Security:** Functions are defined as `SECURITY DEFINER SET search_path = public`. Public execution is revoked; only `authenticated` users can call it.
+- **Validation:** The RPC validates that the caller `auth.uid()` matches the target `user_id`, preventing cross-user mutation (IDOR).
 
-- `.github/workflows/ci-cd.yml`
-- `.github/workflows/production-deploy.yml`
+### 4.3 Signup Atomicity via Postgres Triggers
 
-## Recommended Companion Docs
+Initially, creating a user profile alongside the Auth record was done via sequential API calls in the signup route. This risked creating orphaned Auth users if the profile insertion failed.
+**The Fix:** We implemented a PostgreSQL trigger (`on_auth_user_created`) that automatically inserts a blank `public.profiles` row whenever a row is inserted into `auth.users`. This guarantees database-level atomicity.
 
-- [README.md](./README.md)
-- [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md)
-- [docs/api/API_REFERENCE.md](./docs/api/API_REFERENCE.md)
-- [docs/reference/ROUTES_AND_NAVIGATION.md](./docs/reference/ROUTES_AND_NAVIGATION.md)
-- [docs/reference/REPOSITORY_INVENTORY.md](./docs/reference/REPOSITORY_INVENTORY.md)
-- [docs/operations/ENVIRONMENT_SETUP.md](./docs/operations/ENVIRONMENT_SETUP.md)
+### 4.4 Centralized Audit Logging
+
+All sensitive mutations are recorded via the `log_audit` RPC into the `audit_logs` table.
+
+- **PII Handling Note:** While highly sensitive data (like passwords or API keys) within the `old_data`/`new_data` JSON payloads is redacted via `sanitizeForAudit` in the client utilities, **IP addresses and User Agents are currently logged and stored in plaintext** (cast to `inet` and `text` respectively) to facilitate IP anomaly detection and security incident response.
+
+## 5. Fused-Heading Campus Navigation
+
+The Campus Map (`features/map/`) is a critical feature, replacing standard Google Maps with a custom Leaflet implementation optimized for campus boundaries.
+
+### 5.1 The Navigation Accuracy Hurdle
+
+Standard HTML5 Geolocation provides inaccurate headings when a user is walking slowly or stopped.
+
+### 5.2 The Heading Fusion Algorithm
+
+We implemented a sophisticated `useMapLocation` hook that fuses multiple data sources to provide a highly accurate "Blue Dot" directional cone:
+
+1. **GPS Heading:** Used only when velocity is high.
+2. **Movement-Derived Heading:** Calculated by smoothing the vector between the last N coordinates.
+3. **Compass Fallback (DeviceOrientation):** Used when the user is stationary.
+4. **Outlier Rejection:** Discards GPS samples with massive coordinate jumps and low accuracy scores, preventing the map from wildly jumping across campus.
+
+## 6. Development Operations & Observability
+
+- **Strict Quality Gates:** CI/CD enforces 0 ESLint warnings, strict TypeScript compilation, and 100% passing tests (Vitest + Playwright) before deployment.
+- **Sentry Integration:** Comprehensive error tracking across Edge, Server, and Client environments.
+- **Secret Scanning:** Automated pre-commit hooks (`tools/security/check-secrets.mjs`) prevent accidental credential leakage.
+
+---
+
+_For a complete map of the codebase, refer to the [Repository Inventory](./docs/inventory/ROUTE_INVENTORY.md)._

@@ -1,118 +1,91 @@
-# Environment And Setup
+# Environment & Setup Guide
 
-This guide reflects the current repository structure, scripts, workflows, and route dependencies.
+This document provides technical instructions for configuring a local development environment for Syllabus Sync. The platform is built on a modern, serverless-first stack requiring several cloud service configurations.
 
-## Runtime Requirements
+---
 
-- Node.js `>=22 <23`
-- npm `>=10`
-- Supabase project for auth, database, storage, and RPC-backed operations
-- Google Cloud project for Google map mode and weather
-- Optional Upstash Redis for production-grade distributed rate limiting
+## 🛠️ Runtime Requirements
 
-## Local Setup
+Ensure the following are installed on your workstation:
+
+- **Node.js:** `>=22.0.0` (Active LTS)
+- **npm:** `>=10.0.0`
+- **Docker:** Required only for local Supabase emulation (Optional).
+
+---
+
+## 🚀 Step-by-Step Onboarding
+
+### 1. Repository Initialization
 
 ```bash
 git clone https://github.com/mrpouyaalavi/syllabus-sync.git
 cd syllabus-sync
 npm install
+```
+
+### 2. Infrastructure Configuration
+
+Syllabus Sync requires active projects on the following platforms:
+
+#### **Supabase (Auth & Database)**
+
+1. Create a new Supabase project.
+2. Link your local environment: `npx supabase link --project-ref <your-ref>`.
+3. Apply migrations: `npx supabase db push`.
+4. Obtain your `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+
+#### **Upstash (Rate Limiting)**
+
+1. Create a Redis database on Upstash.
+2. Obtain your `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+
+#### **Resend (Email)**
+
+1. Create a Resend account and verify a domain.
+2. Obtain your `RESEND_API_KEY`.
+
+### 3. Environment Variable Injection
+
+Copy `.env.example` to `.env.local` and populate the keys retrieved in Step 2.
+
+```bash
 cp .env.example .env.local
 ```
 
-## Environment Variables By Capability
-
-### Core application
+**Key Variables Required:**
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `NEXT_PUBLIC_APP_URL`
-
-### Google map mode
-
-- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
-- `NEXT_PUBLIC_GOOGLE_MAP_ID`
-- `GOOGLE_ROUTES_API_KEY`
-
-These power `/map?view=google`, `/api/maps/routes`, `/api/maps/place-search`, and `/api/maps/place-details`.
-
-### Campus routing
-
-- `ORS_API_KEY`
-
-Used only by `/api/navigate` for campus raster mode.
-
-### Weather
-
-- `GOOGLE_WEATHER_API_KEY`
-
-Used by `/api/weather`.
-
-### Email and cron cleanup
-
-- `RESEND_API_KEY`
-- `VERIFICATION_EMAIL_FROM`
-- `VERIFICATION_EMAIL_NAME`
-- `CRON_SECRET`
-
-`CRON_SECRET` protects:
-
-- `/api/auth/email/cleanup`
-- `/api/auth/password/cleanup`
-- `/api/security/rate-limit/cleanup`
-
-### WebAuthn and security
-
-- `WEBAUTHN_RP_ID`
-- `WEBAUTHN_ORIGIN`
-- `CSRF_VALIDATION_ENABLED`
-
-### Production rate limiting
-
 - `UPSTASH_REDIS_REST_URL`
-- `UPSTASH_REDIS_REST_TOKEN`
+- `RESEND_API_KEY`
 
-## Database Initialization
+---
 
-Use `supabase/migrations/` as the canonical source of truth.
+## 💻 Development Workflow
 
-Recommended workflow:
+### Execution Commands
 
-```bash
-supabase link --project-ref <your-project-ref>
-supabase db push
-```
+| Command         | Purpose                                                                   |
+| :-------------- | :------------------------------------------------------------------------ |
+| `npm run dev`   | Starts the Next.js development server with HMR.                           |
+| `npm run check` | **Mandatory.** Runs the full quality gate (lint, typecheck, test, build). |
+| `npm run lint`  | Executes ESLint rules (configured for 0 tolerance).                       |
+| `npm run test`  | Runs the Vitest unit and integration suite.                               |
 
-Legacy schema snapshots under `docs/database/` are reference artifacts, not the primary migration workflow.
+### Quality Gates
 
-## Verification Workflow
+We maintain a zero-tolerance policy for linting errors and type-safety violations. Ensure your IDE is configured to respect the project's `.editorconfig` and Prettier rules.
 
-```bash
-npm run typecheck
-npm run lint
-npm run test
-npm run build
-```
+---
 
-Full local gate:
+## 🏗️ Deployment Strategy
 
-```bash
-npm run check
-```
+The application is optimized for **Vercel**.
 
-## Route-Specific Smoke Checks
+1. Connect your GitHub repository to Vercel.
+2. Configure the production environment variables in the Vercel Dashboard.
+3. Ensure the `Node.js Version` is set to `22.x`.
 
-After setup, validate:
-
-1. `/login` loads the public/auth shell.
-2. `/home` loads the protected shell.
-3. `/settings` redirects to `/settings/general`.
-4. `/map` loads campus mode.
-5. `/map?view=google` loads Google mode if Google env vars are present.
-6. `/api/health` returns success.
-
-## Deployment References
-
-- `vercel.json` defines cron schedules and static header rules.
-- `.github/workflows/ci-cd.yml` defines CI validation on `main` and `develop`.
-- `infra/docker/README.md` documents the Docker-based runtime path.
+For Docker-based deployments, refer to the [Docker README](../../infra/docker/README.md).
