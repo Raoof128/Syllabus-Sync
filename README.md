@@ -192,7 +192,7 @@ tests/              Vitest suites (92 files)
 tools/              Repo utilities (i18n, security, exports, Vercel, load testing)
 ```
 
-Full inventory: [docs/reference/REPOSITORY_INVENTORY.md](./docs/reference/REPOSITORY_INVENTORY.md)
+Full inventory: [docs/inventory/ROUTE_INVENTORY.md](./docs/inventory/ROUTE_INVENTORY.md)
 
 ---
 
@@ -224,7 +224,7 @@ npm run dev
 | Security       | `CRON_SECRET`, `WEBAUTHN_RP_ID`, `WEBAUTHN_ORIGIN`                                       |
 | Observability  | Sentry DSN and auth variables                                                            |
 
-Full setup guide: [docs/operations/ENVIRONMENT_SETUP.md](./docs/operations/ENVIRONMENT_SETUP.md)
+Full setup guide: [docs/setup/ENVIRONMENT_SETUP.md](./docs/setup/ENVIRONMENT_SETUP.md)
 
 ---
 
@@ -278,8 +278,8 @@ npm run check
 | Google Maps setup     | [docs/operations/google-maps-platform-setup.md](./docs/operations/google-maps-platform-setup.md) |
 | Resend / Vercel setup | [docs/operations/resend-vercel-setup.md](./docs/operations/resend-vercel-setup.md)               |
 | Supabase OAuth setup  | [docs/operations/supabase-oauth-setup.md](./docs/operations/supabase-oauth-setup.md)             |
-| Routes & navigation   | [docs/reference/ROUTES_AND_NAVIGATION.md](./docs/reference/ROUTES_AND_NAVIGATION.md)             |
-| Repository inventory  | [docs/reference/REPOSITORY_INVENTORY.md](./docs/reference/REPOSITORY_INVENTORY.md)               |
+| Routes & navigation   | [docs/navigation/ROUTES_AND_NAVIGATION.md](./docs/navigation/ROUTES_AND_NAVIGATION.md)             |
+| Repository inventory  | [docs/inventory/REPOSITORY_INVENTORY.md](./docs/inventory/REPOSITORY_INVENTORY.md)               |
 | Docs index            | [docs/README.md](./docs/README.md)                                                               |
 | Security policy       | [SECURITY.md](./SECURITY.md)                                                                     |
 | Contributing          | [CONTRIBUTING.md](./CONTRIBUTING.md)                                                             |
