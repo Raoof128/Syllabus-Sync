@@ -159,23 +159,20 @@ For full details, see [SECURITY.md](./SECURITY.md).
 
 ## Screenshots
 
-Add screenshots here.
+### Home / Dashboard
+<img width="654" height="667" alt="Dashboard" src="https://github.com/user-attachments/assets/837072a4-ee98-4d6f-9157-1fdf8ed56a6c" />
 
-Suggested screenshots:
+### Calendar
+<img width="715" height="673" alt="Calendar" src="https://github.com/user-attachments/assets/77548321-6501-4569-9ddf-b9b2bdfce841" />
 
-- Home/dashboard
-- Calendar or deadline view
-- Campus map/navigation page
-- Mobile responsive layout
+### Campus Map
+<img width="715" height="689" alt="Campus map" src="https://github.com/user-attachments/assets/fde5eae3-c08a-4d07-a4b1-f9fae80383d2" />
 
-Example:
+### Google Maps 
+<img width="715" height="625" alt="Google map" src="https://github.com/user-attachments/assets/ecf4f6e9-a341-4467-b54e-1c476bff5c49" />
 
-```md
-![Dashboard](./docs/images/dashboard.png)
-![Calendar](./docs/images/calendar.png)
-![Map](./docs/images/map.png)
-```
-
+### Events
+<img width="715" height="685" alt="Event" src="https://github.com/user-attachments/assets/a6c496a0-84cc-4a29-9cb5-74c0ced23950" />
 
 ## 6. Repository Layout
 
