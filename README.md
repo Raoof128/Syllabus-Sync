@@ -1,249 +1,181 @@
 # Syllabus Sync — Campus OS for Australian Universities
 
-> **A production-grade, AI-native platform that transforms static university syllabi and timetable PDFs into structured, agent-readable data — and wraps them in a full student operations suite built on modern open-source infrastructure.**
+An open-source student operations platform that transforms university syllabus PDFs into structured, machine-readable data and wraps them in a modern student productivity app.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![CI/CD](https://github.com/mrpouyaalavi/syllabus-sync/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/mrpouyaalavi/syllabus-sync/actions/workflows/ci-cd.yml)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-RLS%20enforced-3ECF8E?logo=supabase)](https://supabase.com/)
-[![Tests](https://img.shields.io/badge/tests-503%20passing-brightgreen)](./tests/)
-[![OSI Approved](https://img.shields.io/badge/license-OSI%20Approved-blue)](https://opensource.org/license/mit)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Next.js](https://img.shields.io/badge/Next.js-000?logo=nextdotjs)
+![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-06B6D4?logo=tailwindcss&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-Vitest-6E9F18)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF)
 
----
+## Live Demo
+
+[Open the app](https://syllabus-sync-ashy.vercel.app)
 
 ## Overview
 
-**Syllabus Sync** is an open-source student operations platform built for Macquarie University (MQ) and designed to be **forked by any Australian university** within a single afternoon. At its core it solves a universal problem: university syllabi, unit guides, and timetable exports are locked in PDF formats that neither students nor AI agents can meaningfully act on.
+Syllabus Sync is an open-source platform designed to help students and universities turn static syllabus and timetable PDFs into structured, machine-readable data.
 
-This project provides:
+Built initially for Macquarie University, the platform combines academic planning, reminders, campus navigation, secure authentication, and multilingual support in a modern full-stack application. The project is designed to be adaptable for other institutions by replacing academic datasets and configuring environment variables.
 
-- **LLM OCR pipeline** — extracts structured syllabus data from MQ unit-guide PDFs into validated JSON/Markdown schemas that any agent or downstream service can consume
-- **Syllabus-as-Code** — every unit's assessments, deadlines, and learning outcomes are version-controlled, diff-able, and CI-tested artefacts
-- **Full student OS** — calendar, reminders, campus navigation (Leaflet + Google Maps), notifications, and multi-profile management built on top of the extracted data
-- **Security-first architecture** — Zero-Trust proxy middleware, Supabase Row-Level Security, WebAuthn passkeys, and active prompt injection mitigations
+At its core, Syllabus Sync aims to solve a common problem across universities: important academic information is often locked inside PDFs that are difficult for students, systems, and AI tools to use effectively.
 
----
+## Why Syllabus Sync?
 
-## Table of Contents
+University unit guides and timetables often contain valuable information such as:
 
-1. [Ecosystem Impact — Campus OS Blueprint](#1-ecosystem-impact--campus-os-blueprint)
-2. [Security & Privacy Architecture](#2-security--privacy-architecture)
-3. [AI-Native Maintainer Workflow](#3-ai-native-maintainer-workflow)
-4. [Project Governance](#4-project-governance)
-5. [Current Runtime Stack](#5-current-runtime-stack)
-6. [Repository Layout](#6-repository-layout)
-7. [Quick Start](#7-quick-start)
-8. [API Surface](#8-api-surface)
-9. [Quality Gates & CI/CD](#9-quality-gates--cicd)
-10. [Documentation Map](#10-documentation-map)
+- assessment deadlines
+- learning outcomes
+- unit requirements
+- lecture and tutorial timing
+- campus and location details
 
----
+However, this information is usually published in static PDF format. Students often need to manually copy deadlines into calendars, track assessments by hand, or repeatedly check multiple systems.
 
-## 1. Ecosystem Impact — Campus OS Blueprint
+Syllabus Sync addresses this by converting academic information into structured, usable data and building student-facing features on top of it.
 
-### The Problem
+## Key Features
 
-Every Australian university publishes syllabi as unstructured PDFs. Students manually copy assessment dates into calendars, advisors manually re-key prerequisite chains, and AI assistants hallucinate deadlines because no machine-readable source of truth exists. The administrative cost is real; the student frustration is measurable.
+- Extracts syllabus data from PDF unit guides into structured JSON and Markdown
+- Academic planning and deadline tracking
+- Calendar, reminders, and notifications
+- Campus navigation and map support
+- Secure authentication with MFA and WebAuthn
+- Multilingual and student-focused user experience
+- Multi-profile support
+- Version-controlled academic data workflows
+- CI-tested full-stack application architecture
 
-### The Solution: A Modular Campus OS
+## Core Capabilities
 
-Syllabus Sync is architected as a **layered Campus OS** — each layer is independently deployable and fork-friendly:
+### 1. Syllabus Data Extraction
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Layer 4 — Student UX Shell                                 │
-│  Next.js 16 App Router · Calendar · Map · Notifications     │
-├─────────────────────────────────────────────────────────────┤
-│  Layer 3 — Academic Data API                                │
-│  63 route handlers · Units · Deadlines · Events · Todos     │
-├─────────────────────────────────────────────────────────────┤
-│  Layer 2 — Syllabus Intelligence Engine                     │
-│  LLM OCR pipeline → Validated JSON/Markdown schemas         │
-├─────────────────────────────────────────────────────────────┤
-│  Layer 1 — Identity & Data Platform                         │
-│  Supabase Auth · RLS Policies · Postgres migrations         │
-└─────────────────────────────────────────────────────────────┘
-```
+Syllabus Sync includes an OCR- and LLM-assisted pipeline that converts university syllabus content into structured formats for downstream systems, applications, or AI workflows.
 
-**Any university can adopt this stack by:**
+### 2. Student Productivity Tools
 
-1. Forking the repository and updating the `data/` static academic datasets
-2. Replacing MQ-specific unit codes with their own catalogue
-3. Running the LLM extraction pipeline against their own PDF syllabi
-4. Deploying to Vercel with their Supabase project — zero infrastructure to manage
+The application provides a student-focused interface for managing:
 
-Universities currently served by the reference implementation: **Macquarie University (MQ)**. The schema contracts, API surface, and authentication flows are designed to be institution-agnostic. Western Sydney University, UTS, and UNSW use structurally identical PDF formats — a fork requires data substitution, not architectural change.
+- academic deadlines
+- calendar events
+- reminders
+- notifications
+- unit-related information
 
-### Broader Impact
+### 3. Campus Navigation
 
-| Metric          | Detail                                                                                   |
-| --------------- | ---------------------------------------------------------------------------------------- |
-| Target users    | ~47,000 MQ students; ~1M+ students across the G08 + ATN groups if forked                 |
-| Saved effort    | Eliminates ~3–4 hours/semester per student of manual calendar entry                      |
-| Agent-readiness | JSON schemas expose unit metadata to AI assistants, tutoring agents, and scheduling bots |
-| Forkability     | Parameterised by institution via environment variables and `data/` substitution          |
+Students can access campus-related support features such as maps and routing tools to improve navigation and day-to-day planning.
 
----
+### 4. Secure User Management
 
-## 2. Security & Privacy Architecture
+The platform includes modern authentication and security measures, including:
 
-Security is not bolted on — it is the **first constraint** at every layer of this system.
+- Supabase authentication
+- Row-Level Security (RLS)
+- MFA support
+- WebAuthn / passkey flows
+- protected API routing
+- rate limiting and request validation
 
-### Zero-Trust Proxy Middleware
+## Tech Stack
 
-All `/api/*` routes pass through a custom proxy middleware (`lib/proxy.ts`) that enforces:
+### Frontend
 
-- **Authentication-by-default** — every route requires a valid Supabase session unless explicitly listed in `isPublicApiPath()`
-- **Origin validation** — all map and data API calls validate the request origin via `isTrustedOrigin()` before proxying to upstream services
-- **Rate limiting** — sensitive endpoints are wrapped with `apiLimiter` to prevent brute-force and enumeration attacks
-- **Public path allowlist** — only `/api/auth/`, `/api/health`, `/api/maps/`, `/api/weather`, and `/api/webauthn/authenticate/` are reachable without a session
+- Next.js 16
+- React 19
+- TypeScript 5
+- Tailwind CSS 4
+- Radix UI
+- Zustand
 
-A missing allowlist entry was the root cause of a recent biometric login regression — demonstrating that the Zero-Trust default actively catches misconfiguration in production.
+### Backend / Data
 
-### Supabase Row-Level Security (RLS)
+- Supabase
+- PostgreSQL
+- Supabase Auth
+- Row-Level Security (RLS)
 
-All user data (units, deadlines, events, todos, notifications, audit logs, WebAuthn credentials) is stored in Postgres with **RLS policies enforced at the database layer**. No application-level query can accidentally leak cross-user data — the database rejects it. Migration files in `supabase/migrations/` are the canonical, version-controlled source of truth for all policy definitions.
+### Tooling / Quality
 
-### PII Protection & Data Minimisation
+- Vitest
+- Testing Library
+- ESLint
+- Prettier
+- GitHub Actions
+- Vercel
+- Sentry
 
-- User profile data is scoped to authenticated sessions and never logged to Sentry or stdout
-- The secrets scanner (`npm run check:secrets`) runs in CI and blocks commits containing credential patterns
-- `.env.local` is never committed; `.env.example` ships only placeholder values
-- WebAuthn credentials are stored as opaque public-key descriptors — no passwords are ever held by the application
+### Integrations
 
-### WebAuthn / Passkey Authentication
+- Google Maps
+- OpenRouteService
+- Resend
 
-The application implements a full FIDO2/WebAuthn passkey flow:
+## Architecture Summary
 
-- Registration through `app/api/webauthn/register/*` stores credentials in `public.webauthn_credentials` with Postgres-level uniqueness constraints
-- Authentication through `app/api/webauthn/authenticate/*` validates assertions against stored public keys — no shared secret ever leaves the device
-- RP ID is auto-detected from request headers to prevent domain-mismatch failures and is sanitised with `.trim()` to guard against trailing-whitespace injection from CI/CD environment variable propagation
+Syllabus Sync is structured as a layered full-stack platform:
 
-### Prompt Injection Mitigation in OCR Pipelines
+### Layer 1 — Identity & Data Platform
 
-When LLM OCR processes raw PDF text, adversarial content in syllabus PDFs (e.g., injected instructions in assessment rubrics) is a realistic attack vector. The extraction pipeline addresses this through:
+- Supabase Auth
+- PostgreSQL
+- Row-Level Security policies
+- migration-based schema management
 
-- **Schema-constrained output** — the LLM is constrained to emit only valid JSON matching a strict Zod schema; free-form instruction execution is structurally impossible
-- **Input sanitisation** — raw PDF text is stripped of known injection patterns before passing to the model context
-- **Output validation** — all LLM responses are validated against the schema before being written to the database; schema violations are rejected, not silently accepted
-- **Least-privilege API keys** — the LLM service key has no write access to the database; schema writes are performed by a separate, authenticated service layer
+### Layer 2 — Syllabus Intelligence Layer
 
-### Security Policy
+- OCR / LLM-assisted extraction pipeline
+- schema validation
+- structured syllabus output
 
-Full responsible disclosure policy: [SECURITY.md](./SECURITY.md)
+### Layer 3 — Academic Data API
 
----
+- route handlers for units, deadlines, todos, events, notifications, profiles, and related services
 
-## 3. AI-Native Maintainer Workflow
+### Layer 4 — Student UX Shell
 
-Syllabus Sync is not just built with AI assistance — it is **maintained through an AI-native workflow** that treats the codebase as a living, continuously-verified artefact.
+- responsive Next.js application
+- calendar, reminders, map tools, preferences, and account flows
 
-### Claude 4.6 — Reasoning & Architecture
+## Security Highlights
 
-[Claude claude-sonnet-4-6](https://www.anthropic.com/claude) (Anthropic's most capable coding model) is used for:
+Security is treated as a core design constraint across the system.
 
-| Task                          | Description                                                                                                                                                     |
-| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Autonomous schema mapping** | Given a new university's PDF structure, Claude reasons about field alignment and generates the Zod schema for the extraction pipeline                           |
-| **Architecture review**       | Before any feature branch is merged, Claude performs a structured architectural review against the documented invariants in `docs/architecture/ARCHITECTURE.md` |
-| **Changelog intelligence**    | Every change is logged via the `Raouf:` protocol — a structured entry format that Claude reads to understand prior decisions and avoid regressing resolved bugs |
-| **Security audit**            | Claude performs end-to-end security traces of auth flows (e.g., the biometric login audit that found the dual passkey system mismatch)                          |
+Key measures include:
 
-### OpenAI Codex — Implementation & Test Generation
+- authentication-by-default API protection
+- trusted origin validation for selected requests
+- rate limiting on sensitive endpoints
+- Supabase Row-Level Security for user data isolation
+- secrets scanning in CI
+- environment variable separation with `.env.example`
+- WebAuthn / passkey support
+- schema validation for structured extraction workflows
 
-Codex is used for:
+For full details, see [SECURITY.md](./SECURITY.md).
 
-| Task                            | Description                                                                                                                    |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Unit test generation**        | Given a new route handler or store action, Codex generates Vitest test cases covering happy path, auth failure, and edge cases |
-| **Regression test scaffolding** | After each bug fix, Codex generates regression tests that prove the specific failure mode cannot recur                         |
-| **i18n key scaffolding**        | Codex generates translation key entries across all 35 locale files when new UI strings are added                               |
-| **Migration authoring**         | Codex drafts Supabase migration SQL from schema descriptions, which is then reviewed and applied via `supabase/migrations/`    |
+## Screenshots
 
-### Syllabus-as-Code Documentation Suite
+Add screenshots here.
 
-The project maintains a living documentation suite that is **generated and validated by AI**:
+Suggested screenshots:
 
-- `docs/api/API_REFERENCE.md` — every route handler is documented with request/response schemas; Claude validates these against the actual TypeScript types on each significant change
-- `docs/architecture/ARCHITECTURE.md` — the architecture document is used as a constraint document by Claude during code review; it is updated when architectural decisions change
-- `CHANGELOG.md` — structured `Raouf:` protocol entries capture scope, root cause, files changed, verification commands, and follow-ups for every change; this log is the primary context Claude reads at the start of each session
+- Home/dashboard
+- Calendar or deadline view
+- Campus map/navigation page
+- Mobile responsive layout
 
-This workflow means the project's AI assistants have **persistent, structured memory of every decision** — not just the current state of the code.
+Example:
 
-### Quality Gate
-
-```bash
-npm run check
-# Runs: secrets scan → format → typecheck → lint → 503 tests → build
+```md
+![Dashboard](./docs/images/dashboard.png)
+![Calendar](./docs/images/calendar.png)
+![Map](./docs/images/map.png)
 ```
 
-All 503 tests across 92 test files must pass before any change is merged or deployed.
-
----
-
-## 4. Project Governance
-
-### License
-
-Syllabus Sync is released under the **MIT License** — an OSI-approved, permissive open-source license that allows any university, developer, or organisation to fork, modify, and deploy this platform without restriction.
-
-```
-MIT License
-Copyright (c) 2026 Pouya Alavi and Raouf
-```
-
-Full license text: [LICENSE](./LICENSE)
-
-### Contributing
-
-We welcome contributions from students, developers, and university IT staff. Contribution pathways:
-
-- **Bug reports** — open a GitHub Issue with reproduction steps
-- **Feature requests** — open a GitHub Discussion before implementing significant features
-- **Pull requests** — see [CONTRIBUTING.md](./CONTRIBUTING.md) for the PR checklist, coding standards, and review process
-- **University forks** — if you are adapting this for another institution, we encourage upstream PRs for institution-agnostic improvements
-
-All contributors must adhere to the [Code of Conduct](./CODE_OF_CONDUCT.md).
-
-### Roadmap & Priorities
-
-| Priority | Item                                                                                            |
-| -------- | ----------------------------------------------------------------------------------------------- |
-| P0       | Generalise the LLM OCR extraction pipeline as a standalone package (`@syllabus-sync/extractor`) |
-| P0       | Publish the Zod schema contracts as a versioned npm package for agent interoperability          |
-| P1       | Add University of Sydney and UNSW as reference dataset forks                                    |
-| P1       | MCP (Model Context Protocol) server exposing the syllabus data API for direct agent integration |
-| P2       | Flutter mobile client consuming the existing API surface                                        |
-| P2       | Federated identity via institution SSO (SAML/OIDC)                                              |
-
-### Maintainers
-
-| Name        | Role                                              |
-| ----------- | ------------------------------------------------- |
-| Raouf       | Lead maintainer — security, AI workflows, backend |
-| Pouya Alavi | Co-maintainer — architecture, infrastructure      |
-
----
-
-## 5. Current Runtime Stack
-
-| Layer          | Implementation                                                   |
-| -------------- | ---------------------------------------------------------------- |
-| App framework  | Next.js 16 App Router                                            |
-| UI runtime     | React 19                                                         |
-| Language       | TypeScript 5                                                     |
-| Styling        | Tailwind CSS 4, Radix UI primitives, custom `mq-*` design tokens |
-| State          | Zustand                                                          |
-| Data/auth      | Supabase SSR + Supabase Postgres (RLS enforced)                  |
-| Email          | Resend                                                           |
-| Error tracking | Sentry (client, server, edge)                                    |
-| Tests          | Vitest + Testing Library (503 tests, 92 files)                   |
-| CI/CD          | GitHub Actions (`ci-cd.yml`)                                     |
-| Deployment     | Vercel                                                           |
-
----
 
 ## 6. Repository Layout
 
@@ -258,7 +190,7 @@ infra/              Docker assets
 lib/                Stores, hooks, services, security, utilities, Supabase clients
 locales/            35 locale dictionaries
 public/             Static assets, icons, map tiles, overlays, service worker
-supabase/           Canonical migration history and Supabase notes
+Supabase/           Canonical migration history and Supabase notes
 tests/              Vitest suites (92 files)
 tools/              Repo utilities (i18n, security, exports, Vercel, load testing)
 ```
@@ -279,7 +211,7 @@ npm install
 cp .env.example .env.local
 # Fill in Supabase, Google Maps, and Resend credentials
 
-# 3. Start development server
+# 3. Start the development server
 npm run dev
 ```
 
