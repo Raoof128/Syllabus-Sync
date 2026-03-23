@@ -263,11 +263,11 @@ Built with the support of the open-source community. This project benefits from:
 
 <div align="center">
 
-### `> ping --author`
+### `> ping --authors`
 
 ```
-> Target     : Pouya Alavi Naeini — Full-Stack Developer
-> University : Macquarie University, Sydney NSW
+> Target     : Pouya Alavi Naeini — Front-end Developer , Raouf Abedini — Back-end Developer
+> University : Macquarie University, Sydney, NSW
 > Status     : [●] ONLINE — open to grad & junior opportunities
 ```
 
