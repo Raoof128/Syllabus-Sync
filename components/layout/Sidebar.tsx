@@ -214,7 +214,7 @@ const Sidebar = memo(() => {
       <button
         ref={menuButtonRef}
         type="button"
-        className="md:hidden fixed top-3 left-3 z-[60] p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl hover:bg-mq-red active:scale-95 transition-all duration-200 touch-manipulation min-h-11 min-w-11 flex items-center justify-center"
+        className="sidebar-mobile-hamburger md:hidden fixed top-3 left-3 z-[60] p-3 bg-mq-background rounded-mq-lg shadow-mq-lg border border-mq-border hover:shadow-mq-xl hover:bg-mq-red active:scale-95 transition-all duration-200 touch-manipulation min-h-11 min-w-11 flex items-center justify-center"
         onClick={(e) => {
           e.stopPropagation();
           toggleMobileMenu();

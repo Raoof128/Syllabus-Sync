@@ -877,6 +877,7 @@ export default function CalendarClient() {
               units={filteredUnits}
               deadlines={filteredDeadlines}
               events={filteredEvents}
+              todos={todos}
               onUnitClick={(u) => {
                 setSelectedUnit(u);
                 setUnitDetailOpen(true);
@@ -891,6 +892,10 @@ export default function CalendarClient() {
                 }
               }}
               onEventClick={handleEventClick}
+              onTodoClick={(todo) => {
+                setSelectedTodo(todo);
+                setTodoDetailOpen(true);
+              }}
               onGoToToday={goToToday}
               showMQKeyDates={filters.showMQKeyDates}
               mqProgramFilter={filters.mqPrograms}

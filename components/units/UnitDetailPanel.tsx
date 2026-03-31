@@ -207,7 +207,7 @@ export default function UnitDetailPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-2xl max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <div className="flex flex-wrap items-start gap-3">
             <div

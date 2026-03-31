@@ -124,7 +124,7 @@ export default function AssignmentDetailPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <div

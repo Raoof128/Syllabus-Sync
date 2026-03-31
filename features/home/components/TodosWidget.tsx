@@ -76,7 +76,7 @@ const TodosWidget = memo(() => {
   };
 
   return (
-    <CardSolid className="h-full flex flex-col">
+    <CardSolid className="h-full flex flex-col overflow-hidden">
       <CardHeader
         className="flex flex-row items-center justify-between gap-2"
         style={{
@@ -84,10 +84,10 @@ const TodosWidget = memo(() => {
           WebkitTextFillColor: 'var(--mq-content)',
         }}
       >
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <CardTitle className="flex items-center gap-2 truncate">
             <CheckSquare className="h-5 w-5 shrink-0" />
-            {t('todos')}
+            <span className="truncate">{t('todos')}</span>
           </CardTitle>
           {isHydrated && totalPending > 0 && (
             <Badge
@@ -164,7 +164,7 @@ const TodosWidget = memo(() => {
                 <div
                   key={todo.id}
                   className={cn(
-                    'group relative flex items-start gap-3 p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 focus:ring-offset-mq-card-background focus:bg-mq-primary/10 focus:border-mq-primary/40 focus:shadow-sm',
+                    'group relative flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg border transition-all duration-300 hover:translate-x-1 cursor-pointer overflow-hidden focus:outline-none focus:ring-2 focus:ring-mq-primary/50 focus:ring-offset-2 focus:ring-offset-mq-card-background focus:bg-mq-primary/10 focus:border-mq-primary/40 focus:shadow-sm',
                     isOverdue
                       ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
                       : 'bg-mq-background-secondary border-transparent hover:border-mq-primary/20 hover:bg-mq-hover-background',
@@ -196,22 +196,22 @@ const TodosWidget = memo(() => {
                   />
 
                   {/* Todo info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <div className="flex items-center justify-between gap-1.5 sm:gap-2 mb-1">
+                      <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleComplete(todo.id);
                           }}
-                          className="shrink-0 p-1.5 -m-1.5 hover:bg-mq-hover-background rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
+                          className="shrink-0 p-1 sm:p-1.5 -m-1 sm:-m-1.5 hover:bg-mq-hover-background rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-mq-primary/50"
                           aria-label={todo.completed ? t('markIncomplete') : t('markComplete')}
                         >
                           {todo.completed ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-500" />
+                            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                           ) : (
-                            <Circle className="h-5 w-5 text-mq-content-tertiary hover:text-mq-primary" />
+                            <Circle className="h-4 w-4 sm:h-5 sm:w-5 text-mq-content-tertiary hover:text-mq-primary" />
                           )}
                         </button>
                         <h4
@@ -225,9 +225,9 @@ const TodosWidget = memo(() => {
                           {todo.title}
                         </h4>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                         {isOverdue && (
-                          <span className="text-[10px] font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/40 px-1.5 py-0.5 rounded">
+                          <span className="hidden sm:inline text-[10px] font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-950/40 px-1.5 py-0.5 rounded">
                             {t('overdueLabel')}
                           </span>
                         )}
@@ -238,15 +238,16 @@ const TodosWidget = memo(() => {
                           )}
                           variant="neutral"
                         >
-                          {t(`priority_${todo.priority}` as TranslationKey)}
+                          {isOverdue
+                            ? t('overdueLabel')
+                            : t(`priority_${todo.priority}` as TranslationKey)}
                         </Badge>
                       </div>
                     </div>
                     {dueDate && (
-                      <div className="flex items-center gap-1 text-sm text-mq-content-secondary">
-                        <Clock className="h-3.5 w-3.5 shrink-0" />
-                        <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
-                          {isOverdue && `${t('overdue')} • `}
+                      <div className="flex items-center gap-1 text-xs sm:text-sm text-mq-content-secondary">
+                        <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                        <span className={cn('truncate', isOverdue && 'text-red-600 font-medium')}>
                           {formatDueDate(dueDate)}
                         </span>
                       </div>

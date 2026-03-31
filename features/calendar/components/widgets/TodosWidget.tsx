@@ -72,12 +72,12 @@ export default function TodosWidget({
     >
       <div
         id={CALENDAR_WIDGET_IDS.reminder}
-        className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border"
+        className="mq-magic-card-content p-0 bg-mq-card-background border border-mq-border overflow-hidden"
         ref={widgetRef}
       >
         <Card
           variant="glass"
-          className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background"
+          className="border border-mq-border shadow-none calendar-glass-solid bg-mq-card-background overflow-hidden"
         >
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center justify-between">
@@ -127,7 +127,7 @@ export default function TodosWidget({
                     <div
                       key={todo.id}
                       className={cn(
-                        'group flex items-center gap-3 p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm',
+                        'group flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-md border-l-4 border border-mq-border bg-mq-background-secondary transition-all cursor-pointer hover:bg-mq-surface hover:shadow-sm overflow-hidden',
                         todo.completed && 'opacity-60 grayscale',
                         isOverdue && 'opacity-70 bg-red-500/5',
                         isHighlighted && 'ring-2 ring-mq-primary ring-offset-1 animate-pulse',
@@ -150,7 +150,7 @@ export default function TodosWidget({
                           toggleTodoComplete(todo.id);
                         }}
                         className={cn(
-                          'text-mq-content-secondary hover:text-mq-primary transition-colors',
+                          'shrink-0 text-mq-content-secondary hover:text-mq-primary transition-colors',
                           todo.completed ? 'text-green-600 dark:text-green-400' : '',
                         )}
                       >
@@ -160,8 +160,8 @@ export default function TodosWidget({
                           <Circle className="h-4 w-4 text-mq-content-secondary" />
                         )}
                       </button>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <div className="flex items-center justify-between gap-1">
                           <h4
                             className={cn(
                               'font-medium text-sm truncate',
@@ -174,7 +174,7 @@ export default function TodosWidget({
                           <Badge
                             className={cn(
                               PRIORITY_COLORS[todo.priority],
-                              'ml-2 text-[10px] h-4 px-1',
+                              'ml-1 text-[10px] h-4 px-1 shrink-0',
                               isOverdue && 'opacity-70',
                             )}
                             variant="neutral"
@@ -204,7 +204,7 @@ export default function TodosWidget({
                         onToggleNotification={() => toggleTodoNotification(todo.id)}
                         variant="compact"
                         stopPropagation
-                        className="action-buttons-auto"
+                        className="action-buttons-auto shrink-0"
                       />
                     </div>
                   );

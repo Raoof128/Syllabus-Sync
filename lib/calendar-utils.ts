@@ -190,7 +190,7 @@ export interface CalendarItem {
   startMin: number;
   endHour: number;
   endMin: number;
-  type: 'unit' | 'deadline' | 'event';
+  type: 'unit' | 'deadline' | 'event' | 'todo';
   data: unknown;
 }
 

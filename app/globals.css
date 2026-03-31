@@ -271,3 +271,14 @@
 .dark .action-buttons-auto {
   opacity: 1 !important;
 }
+
+/* ============================================
+   HIDE HAMBURGER WHEN DIALOG IS OPEN
+   ============================================
+   Radix Dialog adds data-scroll-locked to <html>
+   when a modal dialog is open. Hide the mobile
+   hamburger button so it doesn't overlay the panel.
+*/
+html[data-scroll-locked] .sidebar-mobile-hamburger {
+  display: none !important;
+}

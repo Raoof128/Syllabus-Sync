@@ -13,22 +13,24 @@ import {
   calculateOverlapGroups,
   CalendarItem,
 } from '@/lib/calendar-utils';
-import { Unit, Deadline, Event, ClassTime } from '@/lib/types';
+import { Unit, Deadline, Event, ClassTime, Todo } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { TranslationKey } from '@/lib/i18n/translations';
 import { formatLocation, formatScheduleTime } from '@/lib/utils/locale';
 import { getMQKeyDatesForDay, PROGRAM_STYLES, MQProgram } from '@/data/mqKeyDates';
-import { CalendarClock } from 'lucide-react';
+import { CalendarClock, CheckSquare } from 'lucide-react';
 
 interface DayViewProps {
   date: Date;
   units: Unit[];
   deadlines: Deadline[];
   events: Event[];
+  todos?: Todo[];
   onUnitClick: (unit: Unit) => void;
   onDeadlineClick: (deadline: Deadline) => void;
   onEventClick: (event: Event) => void;
+  onTodoClick?: (todo: Todo) => void;
   onGoToToday?: () => void;
   showMQKeyDates?: boolean;
   mqProgramFilter?: MQProgram[];
@@ -39,9 +41,11 @@ export default function DayView({
   units,
   deadlines,
   events,
+  todos = [],
   onUnitClick,
   onDeadlineClick,
   onEventClick,
+  onTodoClick,
   onGoToToday,
   showMQKeyDates = true,
   mqProgramFilter,
@@ -72,10 +76,16 @@ export default function DayView({
       return dayjs(e.date).isSame(dayDate, 'day');
     });
 
-    return { dayUnits, dayDeadlines, dayEvents };
+    // 4. Todos with due dates
+    const dayTodos = todos.filter((todo) => {
+      if (!todo.dueDate) return false;
+      return dayjs(todo.dueDate).isSame(dayDate, 'day');
+    });
+
+    return { dayUnits, dayDeadlines, dayEvents, dayTodos };
   };
 
-  const { dayUnits, dayDeadlines, dayEvents } = getItemsForDay();
+  const { dayUnits, dayDeadlines, dayEvents, dayTodos } = getItemsForDay();
 
   // Prepare items for overlap calculation
   const calendarItems: CalendarItem[] = [];
@@ -126,6 +136,24 @@ export default function DayView({
         endMin: timeInfo.endMin,
         type: 'event',
         data: event,
+      });
+    }
+  });
+
+  // Add todos
+  dayTodos.forEach((todo) => {
+    const dueDayjs = dayjs(todo.dueDate);
+    const hours = dueDayjs.hour();
+    const minutes = dueDayjs.minute();
+    if (hours >= START_HOUR) {
+      calendarItems.push({
+        id: `todo-${todo.id}`,
+        startHour: hours,
+        startMin: minutes,
+        endHour: hours + 1,
+        endMin: minutes,
+        type: 'todo',
+        data: todo,
       });
     }
   });
@@ -383,6 +411,64 @@ export default function DayView({
                 >
                   <div className="font-bold truncate">{event.title}</div>
                   <div className="text-[10px] opacity-90 truncate">{event.location}</div>
+                </button>
+              );
+            })}
+
+            {/* Todos */}
+            {dayTodos.map((todo) => {
+              const dueDayjs = dayjs(todo.dueDate);
+              const hours = dueDayjs.hour();
+              const minutes = dueDayjs.minute();
+              const posInfo = getTimePositionAndHeight(hours, minutes, hours + 1, minutes);
+
+              if (!posInfo || hours < START_HOUR) return null;
+
+              const todoColor =
+                todo.color ||
+                (todo.priority === 'High'
+                  ? '#ef4444'
+                  : todo.priority === 'Medium'
+                    ? '#f59e0b'
+                    : '#22c55e');
+
+              const itemId = `todo-${todo.id}`;
+              const overlap = overlapInfo.get(itemId) || {
+                column: 0,
+                totalColumns: 1,
+              };
+              const width = `calc((100% - 8px) / ${overlap.totalColumns})`;
+              const left = `calc(4px + (100% - 8px) * ${overlap.column} / ${overlap.totalColumns})`;
+
+              return (
+                <button
+                  key={itemId}
+                  type="button"
+                  onClick={() => onTodoClick?.(todo)}
+                  className={cn(
+                    'absolute text-left px-2 py-1 rounded-md shadow-sm text-xs font-medium z-10 border-l-4 transition-all hover:brightness-95',
+                    todo.completed && 'opacity-50 line-through',
+                  )}
+                  style={{
+                    top: posInfo.top,
+                    height: Math.max(posInfo.height, 44),
+                    left,
+                    width,
+                    backgroundColor: `${todoColor}22`,
+                    borderLeftColor: todoColor,
+                    borderColor: `${todoColor}44`,
+                    borderWidth: '1px',
+                    borderLeftWidth: '4px',
+                    color: todoColor,
+                  }}
+                >
+                  <div className="flex items-center gap-1">
+                    <CheckSquare className="h-3 w-3 shrink-0" />
+                    <span className="font-bold truncate">{todo.title}</span>
+                  </div>
+                  <div className="text-[10px] opacity-90 mt-0.5">
+                    {dayjs(todo.dueDate).format('h:mm A')}
+                  </div>
                 </button>
               );
             })}
