@@ -128,19 +128,16 @@ export function useCalendarHighlights(
     }
   }, [highlightedDeadlineId]);
 
+  // Open the detail dialog (guarded by processedRef so it only fires once)
   useEffect(() => {
-    if (!highlightedDeadlineId) return;
+    if (!hasHydrated || !highlightedDeadlineId) return;
     if (processedDeadlineHighlightRef.current === highlightedDeadlineId) return;
 
     const highlightedDeadline = deadlines.find((d) => d.id === highlightedDeadlineId);
 
     processedDeadlineHighlightRef.current = highlightedDeadlineId;
 
-    const scrollTimer = window.setTimeout(() => {
-      // Scroll to the specific deadline element, or fall back to the widget
-      const deadlineElement = deadlineRefs.current.get(highlightedDeadlineId);
-      scrollIfNotVisible(deadlineElement ?? assignmentsWidgetRef.current, 'center');
-
+    const timer = window.setTimeout(() => {
       if (highlightedDeadline) {
         if (highlightedDeadline.type === 'Exam' || highlightedDeadline.type === 'Quiz') {
           setSelectedExam(highlightedDeadline);
@@ -152,28 +149,29 @@ export function useCalendarHighlights(
       }
     }, 300);
 
-    // Clear URL param promptly so closing the dialog doesn't re-trigger
+    return () => clearTimeout(timer);
+  }, [
+    highlightedDeadlineId,
+    deadlines,
+    hasHydrated,
+    setSelectedExam,
+    setExamDetailOpen,
+    setSelectedAssignment,
+    setAssignmentDetailOpen,
+  ]);
+
+  // Clear URL param after 3s (separate effect — won't be canceled by data changes)
+  useEffect(() => {
+    if (!highlightedDeadlineId) return;
     const clearTimer = window.setTimeout(() => {
       const url = new URL(window.location.href);
       if (url.searchParams.has('highlightDeadline')) {
         url.searchParams.delete('highlightDeadline');
         window.history.replaceState({}, '', url.toString());
       }
-    }, 500);
-
-    return () => {
-      clearTimeout(scrollTimer);
-      clearTimeout(clearTimer);
-    };
-  }, [
-    highlightedDeadlineId,
-    deadlines,
-    scrollIfNotVisible,
-    setSelectedExam,
-    setExamDetailOpen,
-    setSelectedAssignment,
-    setAssignmentDetailOpen,
-  ]);
+    }, 3000);
+    return () => clearTimeout(clearTimer);
+  }, [highlightedDeadlineId]);
 
   // 3. Highlighted Todo
   const highlightedTodoId = useMemo(() => searchParams.get('highlightTodo'), [searchParams]);
@@ -185,6 +183,7 @@ export function useCalendarHighlights(
     }
   }, [highlightedTodoId]);
 
+  // Open the detail dialog (guarded by processedRef so it only fires once)
   useEffect(() => {
     if (!hasHydrated || !highlightedTodoId) return;
     if (processedTodoHighlightRef.current === highlightedTodoId) return;
@@ -199,6 +198,12 @@ export function useCalendarHighlights(
       setTodoDetailOpen(true);
     }, 300);
 
+    return () => clearTimeout(timer);
+  }, [highlightedTodoId, todos, hasHydrated, setSelectedTodo, setTodoDetailOpen]);
+
+  // Clear URL param after 3s (separate effect — won't be canceled by data changes)
+  useEffect(() => {
+    if (!highlightedTodoId) return;
     const clearTimer = window.setTimeout(() => {
       const url = new URL(window.location.href);
       if (url.searchParams.has('highlightTodo')) {
@@ -206,12 +211,8 @@ export function useCalendarHighlights(
         window.history.replaceState({}, '', url.toString());
       }
     }, 3000);
-
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(clearTimer);
-    };
-  }, [highlightedTodoId, todos, hasHydrated, setSelectedTodo, setTodoDetailOpen]);
+    return () => clearTimeout(clearTimer);
+  }, [highlightedTodoId]);
 
   // 4. Highlighted Event
   const highlightedEventId = useMemo(() => searchParams.get('highlightEvent'), [searchParams]);

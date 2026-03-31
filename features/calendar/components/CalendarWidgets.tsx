@@ -103,18 +103,20 @@ export default function CalendarWidgets({
     'events' | 'todos' | 'units' | 'assignments' | 'exams' | null
   >(null);
 
-  // State for individual event highlight that auto-clears after 3 seconds
+  // State for individual highlight auto-clear after 3 seconds
   const [eventHighlightDismissed, setEventHighlightDismissed] = useState(false);
+  const [deadlineHighlightDismissed, setDeadlineHighlightDismissed] = useState(false);
+  const [todoHighlightDismissed, setTodoHighlightDismissed] = useState(false);
 
   // Track if we've processed the current URL params to prevent re-processing
   const hasProcessedCurrentHighlight = useRef(false);
 
   const deadlineHighlightActive =
-    Boolean(highlightedDeadlineId) ||
+    (Boolean(highlightedDeadlineId) && !deadlineHighlightDismissed) ||
     sectionHighlightActive === 'assignments' ||
     intentHighlightTarget === 'assignment';
   const todoHighlightActive =
-    Boolean(highlightedTodoId) ||
+    (Boolean(highlightedTodoId) && !todoHighlightDismissed) ||
     sectionHighlightActive === 'todos' ||
     intentHighlightTarget === 'reminder';
   const eventHighlightActive =
@@ -148,20 +150,33 @@ export default function CalendarWidgets({
     [isElementInViewport],
   );
 
+  // Guard: only scroll once per deadline highlight
+  const deadlineScrolledRef = useRef<string | null>(null);
+
+  // Reset the guard when the highlight ID changes
+  useEffect(() => {
+    if (highlightedDeadlineId !== deadlineScrolledRef.current) {
+      deadlineScrolledRef.current = null;
+    }
+  }, [highlightedDeadlineId]);
+
   // Scroll Effects
   useEffect(() => {
-    if (highlightedDeadlineId && assignmentsWidgetRef.current) {
-      // Check if it's an exam or assignment to scroll to correct widget
-      const deadline = deadlines.find((d) => d.id === highlightedDeadlineId);
-      const targetRef =
-        deadline?.type === 'Exam' || deadline?.type === 'Quiz'
-          ? examsWidgetRef.current
-          : assignmentsWidgetRef.current;
+    if (!highlightedDeadlineId || deadlineScrolledRef.current === highlightedDeadlineId) return;
 
-      setTimeout(() => {
-        scrollIfNotVisible(targetRef);
-      }, 100);
-    }
+    const deadline = deadlines.find((d) => d.id === highlightedDeadlineId);
+    if (!deadline) return; // data not loaded yet — wait for next render
+
+    deadlineScrolledRef.current = highlightedDeadlineId;
+
+    const targetRef =
+      deadline.type === 'Exam' || deadline.type === 'Quiz'
+        ? examsWidgetRef.current
+        : assignmentsWidgetRef.current;
+
+    setTimeout(() => {
+      scrollIfNotVisible(targetRef);
+    }, 100);
   }, [highlightedDeadlineId, deadlines, scrollIfNotVisible, assignmentsWidgetRef, examsWidgetRef]);
 
   useEffect(() => {
@@ -203,6 +218,38 @@ export default function CalendarWidgets({
       };
     }
   }, [highlightedEventId]);
+
+  // Auto-dismiss deadline highlight after 3 seconds
+  useEffect(() => {
+    if (highlightedDeadlineId) {
+      const resetTimer = setTimeout(() => {
+        setDeadlineHighlightDismissed(false);
+      }, 0);
+      const dismissTimer = setTimeout(() => {
+        setDeadlineHighlightDismissed(true);
+      }, 3000);
+      return () => {
+        clearTimeout(resetTimer);
+        clearTimeout(dismissTimer);
+      };
+    }
+  }, [highlightedDeadlineId]);
+
+  // Auto-dismiss todo highlight after 3 seconds
+  useEffect(() => {
+    if (highlightedTodoId) {
+      const resetTimer = setTimeout(() => {
+        setTodoHighlightDismissed(false);
+      }, 0);
+      const dismissTimer = setTimeout(() => {
+        setTodoHighlightDismissed(true);
+      }, 3000);
+      return () => {
+        clearTimeout(resetTimer);
+        clearTimeout(dismissTimer);
+      };
+    }
+  }, [highlightedTodoId]);
 
   // Handle section scroll from home page "View All" links
   useEffect(() => {
