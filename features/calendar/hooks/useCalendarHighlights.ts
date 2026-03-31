@@ -120,20 +120,26 @@ export function useCalendarHighlights(
     [searchParams],
   );
 
+  const processedDeadlineHighlightRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (highlightedDeadlineId && processedDeadlineHighlightRef.current !== highlightedDeadlineId) {
+      processedDeadlineHighlightRef.current = null;
+    }
+  }, [highlightedDeadlineId]);
+
   useEffect(() => {
     if (!highlightedDeadlineId) return;
+    if (processedDeadlineHighlightRef.current === highlightedDeadlineId) return;
 
     const highlightedDeadline = deadlines.find((d) => d.id === highlightedDeadlineId);
 
-    const scrollTimer = window.setTimeout(() => {
-      scrollIfNotVisible(assignmentsWidgetRef.current, 'start');
+    processedDeadlineHighlightRef.current = highlightedDeadlineId;
 
+    const scrollTimer = window.setTimeout(() => {
+      // Scroll to the specific deadline element, or fall back to the widget
       const deadlineElement = deadlineRefs.current.get(highlightedDeadlineId);
-      if (deadlineElement) {
-        setTimeout(() => {
-          scrollIfNotVisible(deadlineElement, 'center');
-        }, 400);
-      }
+      scrollIfNotVisible(deadlineElement ?? assignmentsWidgetRef.current, 'center');
 
       if (highlightedDeadline) {
         if (highlightedDeadline.type === 'Exam' || highlightedDeadline.type === 'Quiz') {
@@ -146,13 +152,14 @@ export function useCalendarHighlights(
       }
     }, 300);
 
+    // Clear URL param promptly so closing the dialog doesn't re-trigger
     const clearTimer = window.setTimeout(() => {
       const url = new URL(window.location.href);
       if (url.searchParams.has('highlightDeadline')) {
         url.searchParams.delete('highlightDeadline');
         window.history.replaceState({}, '', url.toString());
       }
-    }, 3000);
+    }, 500);
 
     return () => {
       clearTimeout(scrollTimer);
