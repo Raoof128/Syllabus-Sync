@@ -226,8 +226,8 @@ export default function AssignmentForm({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md">
-          <DialogHeader className="mb-4">
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md">
+          <DialogHeader className="mb-2 sm:mb-4">
             <DialogTitle>
               {editAssignment
                 ? t('editAssignment' as TranslationKey)
@@ -240,7 +240,7 @@ export default function AssignmentForm({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-3 sm:space-y-4 py-1 sm:py-4">
             {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="assignment-title">

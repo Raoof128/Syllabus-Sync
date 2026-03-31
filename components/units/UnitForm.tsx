@@ -269,7 +269,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-2xl max-h-[calc(100dvh-2rem)] sm:max-h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>{editUnit ? t('editUnit') : t('addNewUnit')}</DialogTitle>
           <DialogDescription>
@@ -277,7 +277,7 @@ export default function UnitForm({ open, onOpenChange, editUnit }: UnitFormProps
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4 flex-1 overflow-y-auto min-h-0 pr-1">
+        <div className="space-y-4 sm:space-y-6 py-1 sm:py-4 flex-1 overflow-y-auto min-h-0 pr-1">
           {/* MQ Unit Search - Combined Code and Name */}
           <div className="space-y-2">
             <Label>

@@ -235,7 +235,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editDeadline ? t('editDeadline') : t('addNewDeadline')}</DialogTitle>
             <DialogDescription>
@@ -243,7 +243,7 @@ export default function DeadlineForm({ open, onOpenChange, editDeadline }: Deadl
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-3 sm:space-y-4 py-1 sm:py-4">
             <div className="space-y-2">
               <Label htmlFor="title">
                 {t('title')} <span className="text-mq-error">*</span>

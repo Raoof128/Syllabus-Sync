@@ -1291,7 +1291,7 @@ export default function CalendarClient() {
           }
         }}
       >
-        <DialogContent className="max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto">
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/30 flex items-center justify-center">
@@ -1343,7 +1343,7 @@ export default function CalendarClient() {
                 }
               }
             }}
-            className="space-y-4"
+            className="space-y-3 sm:space-y-4"
           >
             {/* Task Title - Required */}
             <div>

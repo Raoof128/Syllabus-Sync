@@ -249,7 +249,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editExam ? t('editExam' as TranslationKey) : t('addExam' as TranslationKey)}
@@ -261,7 +261,7 @@ export default function ExamForm({ open, onOpenChange, editExam }: ExamFormProps
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-3 sm:space-y-4 py-1 sm:py-4">
             {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="exam-title">

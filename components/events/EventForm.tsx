@@ -354,7 +354,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-3 sm:space-y-4 py-1 sm:py-4">
           {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="event-title">
