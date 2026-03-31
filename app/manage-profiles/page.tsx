@@ -4,7 +4,6 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { ProfileHeader } from './components/ProfileHeader';
 import { PersonalInfoCard } from './components/PersonalInfoCard';
 import { AcademicInfoCard } from './components/AcademicInfoCard';
-import { ReminderSettings } from './components/ReminderSettings';
 import { SecurityCard } from './components/SecurityCard';
 import { useProfileManager } from './hooks/useProfileManager';
 import { Button } from '@/components/ui/mq/button';
@@ -57,14 +56,14 @@ export default function ManageProfilesPage() {
 
   return (
     <div className="container mx-auto max-w-4xl px-3 py-4 sm:px-4 sm:py-6 lg:py-8">
-      {/* Back to Settings */}
+      {/* Back to Home */}
       <div className="mb-4 sm:mb-6">
         <Link
-          href="/settings"
+          href="/home"
           className="inline-flex items-center gap-1.5 text-sm text-mq-content-secondary hover:text-mq-content transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t('settings')}
+          {t('home')}
         </Link>
       </div>
 
@@ -75,9 +74,6 @@ export default function ManageProfilesPage() {
         <PersonalInfoCard form={form} email={currentProfile.email} disabled={isSaving} />
 
         <AcademicInfoCard form={form} disabled={isSaving} />
-
-        {/* Reminders stay separate from Zod form for instant toggling */}
-        <ReminderSettings disabled={isSaving} />
 
         {/* Account Security & Sessions */}
         <SecurityCard />
