@@ -1,16 +1,16 @@
 'use client';
 
 import { memo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/mq/button';
 import { Shield, Lock, Laptop } from 'lucide-react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { MagicCard } from '@/components/ui/MagicCard';
 import { SessionsList } from '@/features/settings/components/privacy/SessionsList';
+import { ChangePasswordDialog } from '@/features/settings/components/privacy/ChangePasswordDialog';
 
 export const SecurityCard = memo(() => {
   const { t } = useTypedTranslation();
-  const router = useRouter();
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showSessionsDialog, setShowSessionsDialog] = useState(false);
 
   return (
@@ -44,7 +44,7 @@ export const SecurityCard = memo(() => {
                   variant="ghost"
                   size="sm"
                   className="w-full sm:w-auto bg-mq-button-secondary hover:bg-mq-hover-background text-mq-content"
-                  onClick={() => router.push('/reset-password?from=settings')}
+                  onClick={() => setShowPasswordDialog(true)}
                 >
                   {t('changePassword')}
                 </Button>
@@ -79,6 +79,7 @@ export const SecurityCard = memo(() => {
         </div>
       </MagicCard>
 
+      <ChangePasswordDialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog} t={t} />
       <SessionsList open={showSessionsDialog} onOpenChange={setShowSessionsDialog} t={t} />
     </>
   );
