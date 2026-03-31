@@ -111,10 +111,18 @@ export default function CalendarWidgets({
   // Track if we've processed the current URL params to prevent re-processing
   const hasProcessedCurrentHighlight = useRef(false);
 
-  const deadlineHighlightActive =
-    (Boolean(highlightedDeadlineId) && !deadlineHighlightDismissed) ||
+  // Determine which widget the highlighted deadline belongs to
+  const highlightedDeadline = highlightedDeadlineId
+    ? deadlines.find((d) => d.id === highlightedDeadlineId)
+    : null;
+  const isHighlightedDeadlineExam =
+    highlightedDeadline?.type === 'Exam' || highlightedDeadline?.type === 'Quiz';
+
+  const assignmentHighlightActive =
+    (Boolean(highlightedDeadlineId) && !deadlineHighlightDismissed && !isHighlightedDeadlineExam) ||
     sectionHighlightActive === 'assignments' ||
     intentHighlightTarget === 'assignment';
+  const deadlineHighlightActive = assignmentHighlightActive;
   const todoHighlightActive =
     (Boolean(highlightedTodoId) && !todoHighlightDismissed) ||
     sectionHighlightActive === 'todos' ||
@@ -124,7 +132,9 @@ export default function CalendarWidgets({
     sectionHighlightActive === 'events' ||
     intentHighlightTarget === 'event';
   const examsHighlightActive =
-    sectionHighlightActive === 'exams' || intentHighlightTarget === 'exam';
+    (Boolean(highlightedDeadlineId) && !deadlineHighlightDismissed && isHighlightedDeadlineExam) ||
+    sectionHighlightActive === 'exams' ||
+    intentHighlightTarget === 'exam';
   const unitsHighlightActive =
     sectionHighlightActive === 'units' || intentHighlightTarget === 'unit';
 
@@ -310,7 +320,7 @@ export default function CalendarWidgets({
           onDeleteExam={onDeleteExam}
           highlightedDeadlineId={highlightedDeadlineId}
           widgetRef={examsWidgetRef}
-          deadlineHighlightActive={deadlineHighlightActive || examsHighlightActive}
+          deadlineHighlightActive={examsHighlightActive}
         />
 
         <UnitsWidget
