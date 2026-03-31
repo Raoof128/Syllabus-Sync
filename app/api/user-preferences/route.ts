@@ -16,9 +16,15 @@ const UpdatePreferencesSchema = z.object({
   deadline_notifications_enabled: z.boolean().optional(),
   class_notifications_enabled: z.boolean().optional(),
   event_notifications_enabled: z.boolean().optional(),
+  assignment_notifications_enabled: z.boolean().optional(),
+  exam_notifications_enabled: z.boolean().optional(),
+  todo_notifications_enabled: z.boolean().optional(),
   deadline_reminder_timing_minutes: z.number().int().min(0).optional(),
   class_reminder_timing_minutes: z.number().int().min(0).optional(),
   event_reminder_timing_minutes: z.number().int().min(0).optional(),
+  assignment_reminder_timing_minutes: z.number().int().min(0).optional(),
+  exam_reminder_timing_minutes: z.number().int().min(0).optional(),
+  todo_reminder_timing_minutes: z.number().int().min(0).optional(),
 });
 
 export async function GET(request: Request) {

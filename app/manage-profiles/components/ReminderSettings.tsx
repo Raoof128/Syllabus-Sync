@@ -5,7 +5,7 @@ import { TranslationKey } from '@/lib/i18n/translations';
 import { useNotificationPreferencesStore } from '@/lib/store/notificationPreferencesStore';
 import { useProfilesStore, UserProfile } from '@/lib/store/profilesStore';
 import { MagicCard } from '@/components/ui/MagicCard';
-import { Bell, Calendar, Clock, Mail, BookOpen, GraduationCap } from 'lucide-react';
+import { Bell, Calendar, Clock, Mail, FileText, GraduationCap, CheckSquare } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -47,20 +47,28 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
 
   // Notification Store for push/reminders
   const {
-    deadlinesEnabled,
     classesEnabled,
     eventsEnabled,
-    deadlineReminderTiming,
+    assignmentsEnabled,
+    examsEnabled,
+    todosEnabled,
     classReminderTiming,
     eventReminderTiming,
+    assignmentReminderTiming,
+    examReminderTiming,
+    todoReminderTiming,
     pushEnabled,
-    setDeadlinesEnabled,
     setClassesEnabled,
     setEventsEnabled,
+    setAssignmentsEnabled,
+    setExamsEnabled,
+    setTodosEnabled,
     setPushEnabled,
-    setDeadlineReminderTiming,
     setClassReminderTiming,
     setEventReminderTiming,
+    setAssignmentReminderTiming,
+    setExamReminderTiming,
+    setTodoReminderTiming,
   } = useNotificationPreferencesStore();
 
   const togglePreference = async (key: keyof UserProfile['preferences']) => {
@@ -146,6 +154,72 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
   );
 
   if (!currentProfile) return null;
+
+  const ReminderRow = ({
+    icon: Icon,
+    label,
+    description,
+    enabled,
+    timing,
+    onToggle,
+    onTimingChange,
+    timings,
+    isSaving,
+    disabled: rowDisabled,
+    t: translate,
+  }: {
+    icon: React.ElementType;
+    label: string;
+    description: string;
+    enabled: boolean;
+    timing: number;
+    onToggle: () => void;
+    onTimingChange: (value: string) => void;
+    timings: typeof REMINDER_TIMINGS;
+    isSaving: boolean;
+    disabled: boolean;
+    t: (key: TranslationKey) => string;
+  }) => (
+    <div className="space-y-2 p-3 rounded-mq border border-mq-border/60 hover:border-mq-border transition-colors">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3 min-w-0">
+          <Icon className="h-4.5 w-4.5 text-mq-content-tertiary flex-shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-mq-content">{label}</p>
+            <p className="text-xs text-mq-content-tertiary break-words leading-relaxed">
+              {description}
+            </p>
+          </div>
+        </div>
+        <div className="sm:flex-shrink-0">
+          <ToggleSwitch
+            checked={enabled}
+            onChange={onToggle}
+            ariaLabel={label}
+            disabled={isSaving}
+          />
+        </div>
+      </div>
+      {enabled && (
+        <Select
+          value={timing.toString()}
+          onValueChange={onTimingChange}
+          disabled={isSaving || rowDisabled}
+        >
+          <SelectTrigger className="mt-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {timings.map((t) => (
+              <SelectItem key={t.value} value={t.value.toString()}>
+                {translate(t.labelKey as TranslationKey)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+    </div>
+  );
 
   const ToggleRow = ({
     icon: Icon,
@@ -233,7 +307,7 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
         </div>
       </MagicCard>
 
-      {/* Reminder Settings (Deadlines/Events) */}
+      {/* Reminder Settings (Assignments/Exams/Class/Events/Todos) */}
       <MagicCard isLiquidEnhanced>
         <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
           {/* Section Header */}
@@ -245,140 +319,100 @@ export function ReminderSettings({ disabled }: ReminderSettingsProps) {
           </div>
 
           <div className="p-5 sm:p-6 pt-4 space-y-3">
-            {/* Deadline Reminders */}
-            <div className="space-y-2 p-3 rounded-mq border border-mq-border/60 hover:border-mq-border transition-colors">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3 min-w-0">
-                  <BookOpen className="h-4.5 w-4.5 text-mq-content-tertiary flex-shrink-0 mt-0.5" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-mq-content">{t('deadlineReminders')}</p>
-                    <p className="text-xs text-mq-content-tertiary break-words leading-relaxed">
-                      {t('deadlineRemindersDesc')}
-                    </p>
-                  </div>
-                </div>
-                <div className="sm:flex-shrink-0">
-                  <ToggleSwitch
-                    checked={deadlinesEnabled}
-                    onChange={() => {
-                      void saveReminderSetting(() => setDeadlinesEnabled(!deadlinesEnabled));
-                    }}
-                    ariaLabel={t('deadlineReminders' as TranslationKey)}
-                    disabled={isSavingReminderSettings}
-                  />
-                </div>
-              </div>
-              {deadlinesEnabled && (
-                <Select
-                  value={deadlineReminderTiming.toString()}
-                  onValueChange={(value) => {
-                    void saveReminderSetting(() => setDeadlineReminderTiming(parseInt(value, 10)));
-                  }}
-                  disabled={isSavingReminderSettings || disabled}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {REMINDER_TIMINGS.map((timing) => (
-                      <SelectItem key={timing.value} value={timing.value.toString()}>
-                        {t(timing.labelKey as TranslationKey)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
+            {/* Assignment Reminders */}
+            <ReminderRow
+              icon={FileText}
+              label={t('assignmentReminders' as TranslationKey)}
+              description={t('assignmentRemindersDesc' as TranslationKey)}
+              enabled={assignmentsEnabled}
+              timing={assignmentReminderTiming}
+              onToggle={() => {
+                void saveReminderSetting(() => setAssignmentsEnabled(!assignmentsEnabled));
+              }}
+              onTimingChange={(value) => {
+                void saveReminderSetting(() => setAssignmentReminderTiming(parseInt(value, 10)));
+              }}
+              timings={REMINDER_TIMINGS}
+              isSaving={isSavingReminderSettings}
+              disabled={disabled}
+              t={t}
+            />
+
+            {/* Exam Reminders */}
+            <ReminderRow
+              icon={GraduationCap}
+              label={t('examReminders' as TranslationKey)}
+              description={t('examRemindersDesc' as TranslationKey)}
+              enabled={examsEnabled}
+              timing={examReminderTiming}
+              onToggle={() => {
+                void saveReminderSetting(() => setExamsEnabled(!examsEnabled));
+              }}
+              onTimingChange={(value) => {
+                void saveReminderSetting(() => setExamReminderTiming(parseInt(value, 10)));
+              }}
+              timings={REMINDER_TIMINGS}
+              isSaving={isSavingReminderSettings}
+              disabled={disabled}
+              t={t}
+            />
 
             {/* Class Reminders */}
-            <div className="space-y-2 p-3 rounded-mq border border-mq-border/60 hover:border-mq-border transition-colors">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3 min-w-0">
-                  <GraduationCap className="h-4.5 w-4.5 text-mq-content-tertiary flex-shrink-0 mt-0.5" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-mq-content">{t('classReminders')}</p>
-                    <p className="text-xs text-mq-content-tertiary break-words leading-relaxed">
-                      {t('classRemindersDesc')}
-                    </p>
-                  </div>
-                </div>
-                <div className="sm:flex-shrink-0">
-                  <ToggleSwitch
-                    checked={classesEnabled}
-                    onChange={() => {
-                      void saveReminderSetting(() => setClassesEnabled(!classesEnabled));
-                    }}
-                    ariaLabel={t('classReminders' as TranslationKey)}
-                    disabled={isSavingReminderSettings}
-                  />
-                </div>
-              </div>
-              {classesEnabled && (
-                <Select
-                  value={classReminderTiming.toString()}
-                  onValueChange={(value) => {
-                    void saveReminderSetting(() => setClassReminderTiming(parseInt(value, 10)));
-                  }}
-                  disabled={isSavingReminderSettings || disabled}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {REMINDER_TIMINGS.filter((t) => t.value <= 120).map((timing) => (
-                      <SelectItem key={timing.value} value={timing.value.toString()}>
-                        {t(timing.labelKey as TranslationKey)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
+            <ReminderRow
+              icon={Calendar}
+              label={t('classReminders')}
+              description={t('classRemindersDesc')}
+              enabled={classesEnabled}
+              timing={classReminderTiming}
+              onToggle={() => {
+                void saveReminderSetting(() => setClassesEnabled(!classesEnabled));
+              }}
+              onTimingChange={(value) => {
+                void saveReminderSetting(() => setClassReminderTiming(parseInt(value, 10)));
+              }}
+              timings={REMINDER_TIMINGS.filter((t) => t.value <= 120)}
+              isSaving={isSavingReminderSettings}
+              disabled={disabled}
+              t={t}
+            />
 
             {/* Event Reminders */}
-            <div className="space-y-2 p-3 rounded-mq border border-mq-border/60 hover:border-mq-border transition-colors">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3 min-w-0">
-                  <Calendar className="h-4.5 w-4.5 text-mq-content-tertiary flex-shrink-0 mt-0.5" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-mq-content">{t('eventReminders')}</p>
-                    <p className="text-xs text-mq-content-tertiary break-words leading-relaxed">
-                      {t('eventRemindersDesc')}
-                    </p>
-                  </div>
-                </div>
-                <div className="sm:flex-shrink-0">
-                  <ToggleSwitch
-                    checked={eventsEnabled}
-                    onChange={() => {
-                      void saveReminderSetting(() => setEventsEnabled(!eventsEnabled));
-                    }}
-                    ariaLabel={t('eventReminders' as TranslationKey)}
-                    disabled={isSavingReminderSettings}
-                  />
-                </div>
-              </div>
-              {eventsEnabled && (
-                <Select
-                  value={eventReminderTiming.toString()}
-                  onValueChange={(value) => {
-                    void saveReminderSetting(() => setEventReminderTiming(parseInt(value, 10)));
-                  }}
-                  disabled={isSavingReminderSettings || disabled}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {REMINDER_TIMINGS.map((timing) => (
-                      <SelectItem key={timing.value} value={timing.value.toString()}>
-                        {t(timing.labelKey as TranslationKey)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
+            <ReminderRow
+              icon={Calendar}
+              label={t('eventReminders')}
+              description={t('eventRemindersDesc')}
+              enabled={eventsEnabled}
+              timing={eventReminderTiming}
+              onToggle={() => {
+                void saveReminderSetting(() => setEventsEnabled(!eventsEnabled));
+              }}
+              onTimingChange={(value) => {
+                void saveReminderSetting(() => setEventReminderTiming(parseInt(value, 10)));
+              }}
+              timings={REMINDER_TIMINGS}
+              isSaving={isSavingReminderSettings}
+              disabled={disabled}
+              t={t}
+            />
+
+            {/* Todo Reminders */}
+            <ReminderRow
+              icon={CheckSquare}
+              label={t('todoReminders' as TranslationKey)}
+              description={t('todoRemindersDesc' as TranslationKey)}
+              enabled={todosEnabled}
+              timing={todoReminderTiming}
+              onToggle={() => {
+                void saveReminderSetting(() => setTodosEnabled(!todosEnabled));
+              }}
+              onTimingChange={(value) => {
+                void saveReminderSetting(() => setTodoReminderTiming(parseInt(value, 10)));
+              }}
+              timings={REMINDER_TIMINGS}
+              isSaving={isSavingReminderSettings}
+              disabled={disabled}
+              t={t}
+            />
           </div>
         </div>
       </MagicCard>

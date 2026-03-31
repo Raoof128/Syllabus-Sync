@@ -19,11 +19,17 @@ export interface NotificationPreferences {
   deadlinesEnabled: boolean;
   classesEnabled: boolean;
   eventsEnabled: boolean;
+  assignmentsEnabled: boolean;
+  examsEnabled: boolean;
+  todosEnabled: boolean;
 
   // Reminder timing (minutes before)
   deadlineReminderTiming: number; // e.g., 1440 = 24 hours, 60 = 1 hour
   classReminderTiming: number; // e.g., 15 = 15 minutes before
   eventReminderTiming: number; // e.g., 60 = 1 hour before
+  assignmentReminderTiming: number;
+  examReminderTiming: number;
+  todoReminderTiming: number;
 
   // Push notifications master toggle
   pushEnabled: boolean;
@@ -53,10 +59,16 @@ interface NotificationPreferencesState extends NotificationPreferences {
   setDeadlinesEnabled: (enabled: boolean) => Promise<boolean>;
   setClassesEnabled: (enabled: boolean) => Promise<boolean>;
   setEventsEnabled: (enabled: boolean) => Promise<boolean>;
+  setAssignmentsEnabled: (enabled: boolean) => Promise<boolean>;
+  setExamsEnabled: (enabled: boolean) => Promise<boolean>;
+  setTodosEnabled: (enabled: boolean) => Promise<boolean>;
   setPushEnabled: (enabled: boolean) => Promise<boolean>;
   setDeadlineReminderTiming: (minutes: number) => Promise<boolean>;
   setClassReminderTiming: (minutes: number) => Promise<boolean>;
   setEventReminderTiming: (minutes: number) => Promise<boolean>;
+  setAssignmentReminderTiming: (minutes: number) => Promise<boolean>;
+  setExamReminderTiming: (minutes: number) => Promise<boolean>;
+  setTodoReminderTiming: (minutes: number) => Promise<boolean>;
   dismissDefaultReminder: (key: string) => void;
   reschedulePending: () => void;
   scheduleDeadlineReminder: (
@@ -88,9 +100,15 @@ type ServerNotificationPreferences = {
   deadline_notifications_enabled?: boolean | null;
   class_notifications_enabled?: boolean | null;
   event_notifications_enabled?: boolean | null;
+  assignment_notifications_enabled?: boolean | null;
+  exam_notifications_enabled?: boolean | null;
+  todo_notifications_enabled?: boolean | null;
   deadline_reminder_timing_minutes?: number | null;
   class_reminder_timing_minutes?: number | null;
   event_reminder_timing_minutes?: number | null;
+  assignment_reminder_timing_minutes?: number | null;
+  exam_reminder_timing_minutes?: number | null;
+  todo_reminder_timing_minutes?: number | null;
 };
 
 /** Convert a timing in minutes to a human-readable label */
@@ -151,9 +169,15 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
       deadlinesEnabled: true,
       classesEnabled: true,
       eventsEnabled: true,
+      assignmentsEnabled: true,
+      examsEnabled: true,
+      todosEnabled: true,
       deadlineReminderTiming: 1440, // 24 hours
       classReminderTiming: 15, // 15 minutes
       eventReminderTiming: 60, // 1 hour
+      assignmentReminderTiming: 1440, // 24 hours
+      examReminderTiming: 1440, // 24 hours
+      todoReminderTiming: 60, // 1 hour
       pushEnabled: true,
       scheduledReminders: {},
       pendingReminders: {},
@@ -175,12 +199,23 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
               serverPreferences.deadline_notifications_enabled ?? state.deadlinesEnabled,
             classesEnabled: serverPreferences.class_notifications_enabled ?? state.classesEnabled,
             eventsEnabled: serverPreferences.event_notifications_enabled ?? state.eventsEnabled,
+            assignmentsEnabled:
+              serverPreferences.assignment_notifications_enabled ?? state.assignmentsEnabled,
+            examsEnabled: serverPreferences.exam_notifications_enabled ?? state.examsEnabled,
+            todosEnabled: serverPreferences.todo_notifications_enabled ?? state.todosEnabled,
             deadlineReminderTiming:
               serverPreferences.deadline_reminder_timing_minutes ?? state.deadlineReminderTiming,
             classReminderTiming:
               serverPreferences.class_reminder_timing_minutes ?? state.classReminderTiming,
             eventReminderTiming:
               serverPreferences.event_reminder_timing_minutes ?? state.eventReminderTiming,
+            assignmentReminderTiming:
+              serverPreferences.assignment_reminder_timing_minutes ??
+              state.assignmentReminderTiming,
+            examReminderTiming:
+              serverPreferences.exam_reminder_timing_minutes ?? state.examReminderTiming,
+            todoReminderTiming:
+              serverPreferences.todo_reminder_timing_minutes ?? state.todoReminderTiming,
           }));
         }
 
@@ -240,6 +275,36 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
           notificationService.setNotificationTypeEnabled('events', previousEnabled);
           set({ eventsEnabled: previousEnabled });
         }
+        return persisted;
+      },
+
+      setAssignmentsEnabled: async (enabled: boolean) => {
+        const prev = get().assignmentsEnabled;
+        set({ assignmentsEnabled: enabled });
+        const persisted = await persistServerNotificationPreferences({
+          assignment_notifications_enabled: enabled,
+        });
+        if (!persisted) set({ assignmentsEnabled: prev });
+        return persisted;
+      },
+
+      setExamsEnabled: async (enabled: boolean) => {
+        const prev = get().examsEnabled;
+        set({ examsEnabled: enabled });
+        const persisted = await persistServerNotificationPreferences({
+          exam_notifications_enabled: enabled,
+        });
+        if (!persisted) set({ examsEnabled: prev });
+        return persisted;
+      },
+
+      setTodosEnabled: async (enabled: boolean) => {
+        const prev = get().todosEnabled;
+        set({ todosEnabled: enabled });
+        const persisted = await persistServerNotificationPreferences({
+          todo_notifications_enabled: enabled,
+        });
+        if (!persisted) set({ todosEnabled: prev });
         return persisted;
       },
 
@@ -314,6 +379,36 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         if (!persisted) {
           set({ eventReminderTiming: previousTiming });
         }
+        return persisted;
+      },
+
+      setAssignmentReminderTiming: async (minutes: number) => {
+        const prev = get().assignmentReminderTiming;
+        set({ assignmentReminderTiming: minutes });
+        const persisted = await persistServerNotificationPreferences({
+          assignment_reminder_timing_minutes: minutes,
+        });
+        if (!persisted) set({ assignmentReminderTiming: prev });
+        return persisted;
+      },
+
+      setExamReminderTiming: async (minutes: number) => {
+        const prev = get().examReminderTiming;
+        set({ examReminderTiming: minutes });
+        const persisted = await persistServerNotificationPreferences({
+          exam_reminder_timing_minutes: minutes,
+        });
+        if (!persisted) set({ examReminderTiming: prev });
+        return persisted;
+      },
+
+      setTodoReminderTiming: async (minutes: number) => {
+        const prev = get().todoReminderTiming;
+        set({ todoReminderTiming: minutes });
+        const persisted = await persistServerNotificationPreferences({
+          todo_reminder_timing_minutes: minutes,
+        });
+        if (!persisted) set({ todoReminderTiming: prev });
         return persisted;
       },
 
@@ -873,9 +968,15 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
           deadlinesEnabled: true,
           classesEnabled: true,
           eventsEnabled: true,
+          assignmentsEnabled: true,
+          examsEnabled: true,
+          todosEnabled: true,
           deadlineReminderTiming: 1440,
           classReminderTiming: 15,
           eventReminderTiming: 60,
+          assignmentReminderTiming: 1440,
+          examReminderTiming: 1440,
+          todoReminderTiming: 60,
           pushEnabled: true,
           scheduledReminders: {},
           pendingReminders: {},
@@ -890,9 +991,15 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
         deadlinesEnabled: state.deadlinesEnabled,
         classesEnabled: state.classesEnabled,
         eventsEnabled: state.eventsEnabled,
+        assignmentsEnabled: state.assignmentsEnabled,
+        examsEnabled: state.examsEnabled,
+        todosEnabled: state.todosEnabled,
         deadlineReminderTiming: state.deadlineReminderTiming,
         classReminderTiming: state.classReminderTiming,
         eventReminderTiming: state.eventReminderTiming,
+        assignmentReminderTiming: state.assignmentReminderTiming,
+        examReminderTiming: state.examReminderTiming,
+        todoReminderTiming: state.todoReminderTiming,
         pushEnabled: state.pushEnabled,
         pendingReminders: state.pendingReminders,
         dismissedDefaultReminders: state.dismissedDefaultReminders,
