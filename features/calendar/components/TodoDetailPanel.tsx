@@ -84,15 +84,15 @@ export default function TodoDetailPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
             {todo.title}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-3 sm:space-y-6 py-1 sm:py-4">
           {/* Status and Quick Actions */}
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex items-center gap-2">
@@ -190,7 +190,7 @@ export default function TodoDetailPanel({
 
           {/* Description */}
           {todo.description && (
-            <div className="p-4 rounded-lg border border-mq-border bg-mq-card-background">
+            <div className="p-3 rounded-lg border border-mq-border bg-mq-card-background">
               <div className="flex items-center gap-2 text-mq-content-secondary text-xs mb-2">
                 <CheckSquare className="h-3.5 w-3.5" />
                 {t('description' as TranslationKey)}

@@ -124,9 +124,9 @@ export default function AssignmentDetailPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <div
               className="w-3 h-3 rounded-full flex-shrink-0"
               style={{ backgroundColor: color }}
@@ -135,7 +135,7 @@ export default function AssignmentDetailPanel({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-3 sm:space-y-6 py-1 sm:py-4">
           {/* Status and Quick Actions */}
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export default function AssignmentDetailPanel({
           {unit && (
             <div
               className={cn(
-                'p-4 rounded-lg border border-mq-border bg-mq-card-background',
+                'p-3 rounded-lg border border-mq-border bg-mq-card-background',
                 onUnitClick &&
                   'cursor-pointer hover:border-mq-primary/50 hover:bg-mq-hover-background transition-colors',
               )}

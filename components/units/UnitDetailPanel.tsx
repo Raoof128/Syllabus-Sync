@@ -207,17 +207,17 @@ export default function UnitDetailPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-2xl max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-2xl overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <div className="flex flex-wrap items-start gap-3">
+          <div className="flex flex-wrap items-start gap-2 sm:gap-3">
             <div
-              className="w-12 h-12 rounded-lg flex items-center justify-center"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: `${unit.color}20` }}
             >
-              <BookOpen className="h-6 w-6" style={{ color: unit.color }} />
+              <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: unit.color }} />
             </div>
             <div>
-              <DialogTitle className="text-xl">{unit.code}</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl">{unit.code}</DialogTitle>
               <p className="text-sm text-mq-content-secondary">{unit.name}</p>
             </div>
             <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
@@ -316,7 +316,7 @@ export default function UnitDetailPanel({
         </div>
 
         {/* Deadlines List */}
-        <div className="flex-1 overflow-y-auto space-y-4 py-2">
+        <div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 py-1 sm:py-2">
           {unitDeadlines.all.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-mq-content-tertiary">
