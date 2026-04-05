@@ -58,6 +58,26 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-05 (Australia/Sydney)
+
+**Raouf:**
+
+- **Scope:** Fix Select Dropdowns Not Opening Inside Dialogs
+- **Summary:** Diagnosed and fixed two root causes preventing Radix Select dropdowns from opening inside dialogs. (1) `SelectContent` had `z-50` while Dialog uses `z-[70]`, causing portals to render behind the overlay. Fixed by bumping to `z-[80]`. (2) `ReminderModal` called `e.preventDefault()` unconditionally in `onPointerDownOutside`/`onInteractOutside`, blocking Select portal interactions. Fixed by guarding against `[data-radix-popper-content-wrapper]` targets.
+- **Files Changed:** `components/ui/select.tsx`, `components/ui/ReminderModal.tsx`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 876/878 tests pass (2 pre-existing signup failures unrelated) ✅.
+- **Follow-ups:** None.
+
+### 2026-04-01 (Australia/Sydney)
+
+**Raouf:**
+
+- **Scope:** Git Rebase & Documentation Sync
+- **Summary:** Resolved a complex 3-step interactive rebase conflict in `README.md`. Synthesized an integrated "Super README" by merging high-impact visual portfolio assets (Typing SVG, dynamic screenshots) from the local branch with the deep technical engineering narrative (Zero-Trust architecture, AI-native Codex workflows) from the documentation overhaul branch. Finalized the rebase and synchronized the repository state.
+- **Files Changed:** `README.md`.
+- **Verification:** Git rebase completed successfully; `README.md` structural integrity and link parity verified; repository status confirmed clean and synced with `origin/main`.
+- **Follow-ups:** None.
+
 ### 2026-03-21 (Australia/Sydney)
 
 **Raouf:**

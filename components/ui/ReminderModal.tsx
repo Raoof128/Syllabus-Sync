@@ -263,8 +263,15 @@ export default function ReminderModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="sm:max-w-md"
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onInteractOutside={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => {
+          // Allow interactions with Radix UI portals (e.g. Select dropdowns) rendered outside this dialog
+          if ((e.target as Element).closest?.('[data-radix-popper-content-wrapper]')) return;
+          e.preventDefault();
+        }}
+        onInteractOutside={(e) => {
+          if ((e.target as Element).closest?.('[data-radix-popper-content-wrapper]')) return;
+          e.preventDefault();
+        }}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
