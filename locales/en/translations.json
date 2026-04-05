@@ -577,6 +577,7 @@
   "emailNotificationsDesc": "Receive important updates via email",
   "emailReminders": "Email Reminders",
   "emailRemindersDesc": "Get email reminders for upcoming deadlines",
+  "emailDeliveryComingSoon": "Your preferences are saved, but scheduled email reminders are not yet being sent. We're building the email delivery pipeline — push notifications and in-app reminders already work correctly.",
   "pushNotifications": "Push Notifications",
   "pushNotificationsDesc": "Receive push notifications on this device",
   "reminderSettings": "Reminder Settings",

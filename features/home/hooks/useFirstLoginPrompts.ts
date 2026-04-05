@@ -53,6 +53,15 @@ export function useFirstLoginPrompts(): void {
       /* ignore — flag will simply re-fire next login, which is fine */
     }
 
+    // Fresh login detected → force-rehydrate notification preferences from the
+    // server for the *currently* authenticated user. This covers the
+    // logout→login-in-same-tab path, where `useNotificationScheduler`'s
+    // `initializedRef` has already flipped to true and would otherwise keep
+    // the previous user's in-memory prefs (pushEnabled, per-type toggles,
+    // reminder timings) around until a hard refresh. `resetAllStores()` on
+    // logout clears the old state; this line reloads the new user's state.
+    void useNotificationPreferencesStore.getState().initialize();
+
     // Run both prompts in parallel so the browser shows them one after the
     // other naturally (Chrome queues permission prompts). We don't await them
     // in the useEffect callback because we want the Home UI to render

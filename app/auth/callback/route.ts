@@ -1,5 +1,6 @@
 import { createServerClient } from '@/lib/supabase/server';
 import { isValidRedirect } from '@/lib/utils/security';
+import { checkSignInProvider } from '@/lib/auth/providerGuard';
 import { NextResponse } from 'next/server';
 
 /**
@@ -128,6 +129,22 @@ export async function GET(request: Request) {
   const isOAuthSignIn = isOAuthFlow || (provider && provider !== 'email');
 
   if (isOAuthSignIn && data?.user) {
+    // Provider guard: enforce "signup provider wins" rule. If this user originally
+    // signed up with email/password, block the Google sign-in attempt — even if
+    // Supabase auto-linked the identities. See lib/auth/providerGuard.ts.
+    const guard = checkSignInProvider(data.user, 'google');
+    if (!guard.allowed) {
+      try {
+        await supabase.auth.signOut();
+      } catch (signOutError) {
+        console.warn('Provider-guard signOut failed (non-fatal):', signOutError);
+      }
+      const loginUrl = new URL('/login', requestUrl.origin);
+      loginUrl.searchParams.set('error', 'provider_mismatch');
+      loginUrl.searchParams.set('signup_provider', guard.signupProvider);
+      return NextResponse.redirect(loginUrl);
+    }
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('faculty, course, year')

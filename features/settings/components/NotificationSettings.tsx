@@ -414,6 +414,29 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
                   />
                 </div>
               </div>
+
+              {/*
+                Honesty disclaimer (2026-04-06): the two email toggles above persist
+                to `profiles.preferences.{notifications, emailReminders}` correctly,
+                but no server-side worker currently reads those flags to actually
+                send email. Auth/verification emails DO go out via Resend, but
+                scheduled study reminders / deadline digests do not. Rather than
+                hide the toggles (users want them) or fake success, we surface the
+                limitation here. Remove this banner when the email-reminder cron
+                pipeline ships. See MEMORY.md → "Deliberate UX/Security Tradeoffs".
+              */}
+              <div
+                className="p-3 rounded-mq-lg border border-mq-border bg-mq-background-secondary"
+                data-testid="email-pipeline-notice"
+                role="note"
+              >
+                <div className="flex items-start gap-3">
+                  <Info className="h-4 w-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <p className="text-mq-xs text-mq-content-secondary">
+                    {t('emailDeliveryComingSoon' as TranslationKey)}
+                  </p>
+                </div>
+              </div>
             </>
           )}
 

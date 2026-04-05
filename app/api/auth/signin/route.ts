@@ -11,6 +11,7 @@ import {
 import { loginLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { emailKeyPrefix } from '@/lib/security/identifiers';
+import { checkSignInProvider, buildMismatchMessage } from '@/lib/auth/providerGuard';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -155,6 +156,39 @@ export async function POST(request: NextRequest) {
     }
 
     if (error) {
+      // Provider-guard upgrade: when password sign-in fails with "Invalid login
+      // credentials", one cause is that the user signed up with Google and has
+      // no password identity. In that case we want to show the specific
+      // provider-mismatch message instead of the generic error — the user has
+      // already opted for UX clarity over enumeration resistance for signup
+      // (see MEMORY.md), and the same trade-off applies here.
+      try {
+        const adminClient = createAdminClient();
+        if (adminClient) {
+          const { data: lookup } = await adminClient.rpc('lookup_user_by_email', {
+            lookup_email: email,
+          });
+          const row = Array.isArray(lookup) ? lookup[0] : lookup;
+          if (row?.user_id) {
+            const { data: full } = await adminClient.auth.admin.getUserById(row.user_id);
+            const guard = checkSignInProvider(full?.user ?? null, 'email');
+            if (!guard.allowed) {
+              const response = jsonError(
+                buildMismatchMessage(guard.signupProvider),
+                401,
+                ERROR_CODES.UNAUTHORIZED,
+                { signupProvider: guard.signupProvider },
+              );
+              response.headers.set('X-RateLimit-Remaining', remaining.toString());
+              return response;
+            }
+          }
+        }
+      } catch (guardError) {
+        // Non-fatal: fall through to the generic error below.
+        logger.warn('Provider-guard lookup failed on signin error path', guardError);
+      }
+
       // SECURITY: Return generic error to prevent account enumeration
       // Log the actual error server-side for debugging
       console.warn('Signin failed:', {
@@ -162,6 +196,28 @@ export async function POST(request: NextRequest) {
         error: error.message,
       });
       const response = jsonError(GENERIC_AUTH_ERROR, 401, ERROR_CODES.UNAUTHORIZED);
+      response.headers.set('X-RateLimit-Remaining', remaining.toString());
+      return response;
+    }
+
+    // Provider-guard on successful sign-in: handles the edge case where a user
+    // has both email+google identities linked (e.g. Supabase auto-linking after
+    // a prior OAuth attempt). Rule: "signup provider wins." If the earliest
+    // identity is not 'email', reject this password sign-in and signOut the
+    // session we just minted.
+    const guard = checkSignInProvider(data.user, 'email');
+    if (!guard.allowed) {
+      try {
+        await supabase.auth.signOut();
+      } catch (signOutError) {
+        logger.warn('Provider-guard signOut failed (non-fatal)', signOutError);
+      }
+      const response = jsonError(
+        buildMismatchMessage(guard.signupProvider),
+        401,
+        ERROR_CODES.UNAUTHORIZED,
+        { signupProvider: guard.signupProvider },
+      );
       response.headers.set('X-RateLimit-Remaining', remaining.toString());
       return response;
     }

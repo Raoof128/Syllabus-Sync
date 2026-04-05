@@ -30,7 +30,13 @@ const ZUSTAND_STORAGE_KEYS = [
   'profiles-storage', // lib/store/profilesStore.ts
   'syllabus-sync-gamification', // lib/store/gamificationStore.ts
   'todos-storage', // lib/store/todosStore.ts
-  'notification-preferences-storage', // lib/store/notificationPreferencesStore.ts
+  // IMPORTANT: must match the `name` in notificationPreferencesStore.ts persist config.
+  // Previously mis-keyed as 'notification-preferences-storage', which meant the prefs
+  // persisted store was NOT cleared on logout — the previous user's toggles leaked
+  // into the next user's session until server /api/user-preferences overwrote them.
+  'notification-prefs', // lib/store/notificationPreferencesStore.ts
+  // Legacy key kept for one release to clean up stale entries on existing devices.
+  'notification-preferences-storage',
 ] as const;
 
 /**
@@ -175,7 +181,11 @@ export async function resetAllStores(): Promise<void> {
     useNotificationsStore.getState().clearNotifications();
     useGamificationStore.getState().reset();
     useTodosStore.getState().clearTodos();
-    useNotificationPreferencesStore.getState().clearAllReminders();
+    // Full reset (not just clearAllReminders) — otherwise the previous user's
+    // pushEnabled / type-toggles / timing prefs persist in memory until the next
+    // user's /api/user-preferences GET overwrites them, causing a brief window
+    // where the wrong toggles flash in the Settings UI.
+    useNotificationPreferencesStore.getState().reset();
 
     devLog.auth.info('All stores reset on logout');
   } catch (error) {

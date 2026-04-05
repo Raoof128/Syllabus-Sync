@@ -110,6 +110,14 @@ export default function LoginClient() {
         // Fallback for specific known errors to maintain current UI behavior
         if (result.error === 'invalid_credentials') {
           setGeneralError(t('loginErrorInvalidCredentials'));
+        } else if (result.error === 'provider_mismatch') {
+          // Exact copy requested by product: the user signed up with a
+          // different provider and must use that one instead.
+          const msg =
+            result.signupProvider === 'google'
+              ? 'You already signed up with Google. Please continue with your Google account.'
+              : 'You already signed up with email. Please log in with your email and password.';
+          setGeneralError(msg);
         } else if (result.error === 'email_not_confirmed') {
           setGeneralError(t('loginErrorEmailNotConfirmed'));
           setShowResendVerification(true);
@@ -452,7 +460,12 @@ export default function LoginClient() {
                       ? t('oauthSignInFailed')
                       : callbackError === 'verification_failed'
                         ? t('verificationLinkUsed')
-                        : t('loginErrorFailed')}
+                        : callbackError === 'provider_mismatch'
+                          ? // Exact copy requested: mirror the password-path message.
+                            searchParams.get('signup_provider') === 'email'
+                            ? 'You already signed up with email. Please log in with your email and password.'
+                            : 'You already signed up with Google. Please continue with your Google account.'
+                          : t('loginErrorFailed')}
                   </div>
                   {callbackError === 'oauth_failed' && (
                     <Button

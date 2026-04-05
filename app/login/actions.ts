@@ -1,11 +1,13 @@
 'use server';
 
 import { createServerClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { loginSchema, LoginFormData } from './schemas/loginSchema';
 import { headers } from 'next/headers';
 import { loginLimiter } from '@/lib/services/rateLimitService';
 import { getClientIPFromHeaders } from '@/lib/security/ip';
 import { emailKeyPrefix } from '@/lib/security/identifiers';
+import { checkSignInProvider, type SignupProvider } from '@/lib/auth/providerGuard';
 import { logger } from '@/lib/logger';
 
 export interface MFAFactorInfo {
@@ -21,6 +23,8 @@ export interface LoginResult {
   retryAfter?: number;
   mfaRequired?: boolean;
   availableFactors?: MFAFactorInfo[];
+  /** Set when error === 'provider_mismatch' — tells the client which provider the user actually signed up with. */
+  signupProvider?: SignupProvider;
 }
 
 function maskEmailForLogs(email: string): string {
@@ -72,6 +76,38 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
       return { error: 'email_not_confirmed' };
     }
 
+    // Provider-guard upgrade: if the user signed up with Google, there is no
+    // password identity, so signInWithPassword fails with "Invalid login
+    // credentials". Detect that case via admin lookup and return the specific
+    // provider-mismatch error instead of the generic "invalid credentials".
+    try {
+      const adminClient = createAdminClient();
+      if (adminClient) {
+        const { data: lookup } = await adminClient.rpc('lookup_user_by_email', {
+          lookup_email: result.data.email,
+        });
+        const row = Array.isArray(lookup) ? lookup[0] : lookup;
+        if (row?.user_id) {
+          const { data: full } = await adminClient.auth.admin.getUserById(row.user_id);
+          const guard = checkSignInProvider(full?.user ?? null, 'email');
+          if (!guard.allowed) {
+            logger.info('Login blocked: provider mismatch', {
+              email_hint: emailHint,
+              signup_provider: guard.signupProvider,
+            });
+            return {
+              error: 'provider_mismatch',
+              signupProvider: guard.signupProvider,
+            };
+          }
+        }
+      }
+    } catch (guardError) {
+      // Non-fatal: fall through to generic error. Do NOT leak guard failures
+      // to the client.
+      logger.warn('Provider-guard lookup failed on loginAction error path', guardError);
+    }
+
     return { error: 'invalid_credentials' };
   }
 
@@ -79,6 +115,27 @@ export async function loginAction(data: LoginFormData): Promise<LoginResult> {
   if (signInData?.user && !signInData.user.email_confirmed_at) {
     logger.warn('Login blocked: email not verified', { email_hint: emailHint });
     return { error: 'email_not_confirmed' };
+  }
+
+  // Provider-guard on successful password sign-in: catches the edge case
+  // where a user has both email+google identities linked (e.g. Supabase
+  // auto-linking after an OAuth attempt). If the earliest identity is NOT
+  // email, reject and signOut. See lib/auth/providerGuard.ts for the rule.
+  const guard = checkSignInProvider(signInData?.user ?? null, 'email');
+  if (!guard.allowed) {
+    try {
+      await supabase.auth.signOut();
+    } catch (signOutError) {
+      logger.warn('Provider-guard signOut failed (non-fatal)', signOutError);
+    }
+    logger.info('Login blocked after success: provider mismatch', {
+      email_hint: emailHint,
+      signup_provider: guard.signupProvider,
+    });
+    return {
+      error: 'provider_mismatch',
+      signupProvider: guard.signupProvider,
+    };
   }
 
   // 4. Check MFA status — if user has enrolled MFA factors, require aal2
