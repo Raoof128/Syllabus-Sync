@@ -259,6 +259,21 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // SECURITY: Detect already-confirmed email addresses.
+      // When signUp is called with an existing confirmed email, Supabase returns
+      // a user with an empty `identities` array and does NOT send a confirmation
+      // email. Without this check, the code would proceed to upsert the profile
+      // (corrupting existing data) and show "check your email" even though no
+      // email was sent.
+      const identities = authData.user?.identities ?? [];
+      if (authData.user && identities.length === 0) {
+        logger.info('Signup attempt for existing confirmed email', {
+          email_hint: `${email.substring(0, 3)}***`,
+        });
+        // SECURITY: Return generic success to prevent account enumeration
+        return jsonSuccess({ message: GENERIC_SIGNUP_SUCCESS });
+      }
+
       createdUser = authData.user ? { id: authData.user.id } : null;
     }
 

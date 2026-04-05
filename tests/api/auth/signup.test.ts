@@ -92,9 +92,12 @@ describe('signup API', () => {
     const adminClient = makeAdminClient();
     createAdminClientMock.mockReturnValue(adminClient);
 
-    // Mock the server client with signUp that returns a user
+    // Mock the server client with signUp that returns a user with identities
     const signUpMock = vi.fn().mockResolvedValue({
-      data: { user: { id: 'user-1' }, session: null },
+      data: {
+        user: { id: 'user-1', identities: [{ id: 'ident-1' }] },
+        session: null,
+      },
       error: null,
     });
     createServerClientMock.mockReturnValue({
@@ -109,8 +112,8 @@ describe('signup API', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: 'student@example.com',
-        password: 'A'.repeat(11) + '1',
-        confirmPassword: 'A'.repeat(11) + '1',
+        password: `${'A'.repeat(11)}1`,
+        confirmPassword: `${'A'.repeat(11)}1`,
         agreedToTerms: true,
         _gotcha: '',
         fullName: 'Test Student',
@@ -150,8 +153,8 @@ describe('signup API', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: 'bot@example.com',
-        password: 'A'.repeat(11) + '1',
-        confirmPassword: 'A'.repeat(11) + '1',
+        password: `${'A'.repeat(11)}1`,
+        confirmPassword: `${'A'.repeat(11)}1`,
         agreedToTerms: true,
         _gotcha: 'hello',
         fullName: 'Bot',
@@ -169,5 +172,92 @@ describe('signup API', () => {
     expect(json.success).toBe(true);
     // Honeypot should prevent signup from happening
     expect(signUpMock).not.toHaveBeenCalled();
+  });
+
+  it('returns generic success for existing confirmed email (empty identities)', async () => {
+    const adminClient = makeAdminClient();
+    createAdminClientMock.mockReturnValue(adminClient);
+
+    // Supabase returns a user with empty identities for existing confirmed emails
+    const signUpMock = vi.fn().mockResolvedValue({
+      data: {
+        user: { id: 'fake-obfuscated-id', identities: [], email: 'existing@example.com' },
+        session: null,
+      },
+      error: null,
+    });
+    createServerClientMock.mockReturnValue({
+      auth: { signUp: signUpMock },
+      from: vi.fn(),
+    });
+
+    const { POST } = await import('@/app/api/auth/signup/route');
+
+    const req = new NextRequest('http://localhost/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'existing@example.com',
+        password: `${'A'.repeat(11)}1`,
+        confirmPassword: `${'A'.repeat(11)}1`,
+        agreedToTerms: true,
+        _gotcha: '',
+        fullName: 'Existing User',
+        studentId: '99999999',
+        faculty: 'Science',
+        course: 'CS',
+        year: '2026',
+      }),
+    });
+
+    const res = await POST(req);
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.success).toBe(true);
+    // Should NOT attempt to upsert profile for an already-existing user
+    expect(adminClient.from).not.toHaveBeenCalledWith('profiles');
+    expect(adminClient.from).not.toHaveBeenCalledWith('gamification_profiles');
+  });
+
+  it('returns generic success when Supabase reports already registered error', async () => {
+    const adminClient = makeAdminClient();
+    createAdminClientMock.mockReturnValue(adminClient);
+
+    const signUpMock = vi.fn().mockResolvedValue({
+      data: { user: null, session: null },
+      error: { message: 'User already registered', status: 422 },
+    });
+    createServerClientMock.mockReturnValue({
+      auth: { signUp: signUpMock },
+      from: vi.fn(),
+    });
+
+    const { POST } = await import('@/app/api/auth/signup/route');
+
+    const req = new NextRequest('http://localhost/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'taken@example.com',
+        password: `${'A'.repeat(11)}1`,
+        confirmPassword: `${'A'.repeat(11)}1`,
+        agreedToTerms: true,
+        _gotcha: '',
+        fullName: 'Taken User',
+        studentId: '88888888',
+        faculty: 'Science',
+        course: 'CS',
+        year: '2026',
+      }),
+    });
+
+    const res = await POST(req);
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.success).toBe(true);
+    // Should NOT attempt to upsert profile
+    expect(adminClient.from).not.toHaveBeenCalledWith('profiles');
   });
 });
