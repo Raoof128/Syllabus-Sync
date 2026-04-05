@@ -18,6 +18,14 @@ export async function GET(request: Request) {
   const error = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
   const type = requestUrl.searchParams.get('type'); // Supabase sends type=recovery for password reset
+  // `flow` is set by our own client code (SignupClient / LoginClient) before kicking off
+  // an OAuth sign-in. It is the *authoritative* signal that this callback hit is a real
+  // OAuth round-trip rather than an email verification link. We cannot rely on
+  // `redirectTo === '/home'` alone because Supabase sometimes normalizes or strips query
+  // params during the OAuth hop, causing legitimate OAuth flows to fall into the
+  // "email prefetch" branch and show a confusing "may already be verified" banner.
+  const flow = requestUrl.searchParams.get('flow'); // 'oauth' | null
+  const isOAuthFlow = flow === 'oauth';
   const rawRedirect =
     requestUrl.searchParams.get('redirectTo') ?? requestUrl.searchParams.get('next');
   const redirectTo = isValidRedirect(rawRedirect) ? rawRedirect! : '/home';
@@ -63,18 +71,12 @@ export async function GET(request: Request) {
       return NextResponse.redirect(resetUrl);
     }
 
-    // Hybrid-A: PKCE code exchange failure on a non-recovery flow is almost
-    // always an email-link prefetch (Gmail/Outlook/corporate proxy scanner
-    // consumed the one-time code) — the server-side effect (email marked
-    // verified) already happened on the bot's hit. Default to optimistic
-    // soft-success. Only fall through to the scary error path when we can
-    // positively identify a real OAuth sign-in flow (redirectTo=/home was
-    // set by SignupClient.handleGoogleLogin and LoginClient's OAuth button).
-    const isOAuthFlow =
-      rawRedirect === '/home' ||
-      rawRedirect?.startsWith('/home?') ||
-      rawRedirect?.startsWith('/home/');
-
+    // Hybrid-A: PKCE code exchange failure on a non-recovery, non-OAuth flow is
+    // almost always an email-link prefetch (Gmail/Outlook/corporate proxy scanner
+    // consumed the one-time code) — the server-side effect (email marked verified)
+    // already happened on the bot's hit. Default to optimistic soft-success. We
+    // only show the scary error path when `flow=oauth` explicitly marks this as a
+    // real OAuth attempt (set by SignupClient/LoginClient before signInWithOAuth).
     if (!isOAuthFlow) {
       const loginUrl = new URL('/login', requestUrl.origin);
       loginUrl.searchParams.set('verified', '1');
@@ -110,12 +112,22 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/reset-password?recovery=1', requestUrl.origin));
   }
 
-  // For OAuth sign-ins (not email/magic-link), check if profile is complete.
-  // Skip this for email-based flows where the user already went through signup.
-  const isOAuthSignIn =
-    data?.user?.app_metadata?.provider && data.user.app_metadata.provider !== 'email';
+  // Decide the post-exchange destination.
+  //
+  // There are two ways we reach a successful exchange here:
+  //   (a) OAuth sign-in (Google) — `flow=oauth` is set. The user explicitly wants to
+  //       be signed in. If their profile is incomplete (new user), route them through
+  //       /onboarding to collect faculty/course/year before /home.
+  //   (b) Email verification link (signup confirmation) — no `flow` param. The exchange
+  //       succeeds and the side-effect we wanted (email_confirmed_at set on auth.users)
+  //       has already occurred. BUT the user asked that clicking the verify link should
+  //       NOT auto-log them in — they want to land on the login page with a green
+  //       "email verified" banner and sign in manually. So we explicitly sign out the
+  //       session we just created before redirecting to /login?verified=1.
+  const provider = data?.user?.app_metadata?.provider;
+  const isOAuthSignIn = isOAuthFlow || (provider && provider !== 'email');
 
-  if (isOAuthSignIn) {
+  if (isOAuthSignIn && data?.user) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('faculty, course, year')
@@ -128,9 +140,23 @@ export async function GET(request: Request) {
       onboardingUrl.searchParams.set('next', redirectTo);
       return NextResponse.redirect(onboardingUrl);
     }
+    // OAuth sign-in with complete profile — let them through to /home.
+    return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
   }
 
-  // Normal flow: redirect to the validated target.
-  // The session cookie is now set and the proxy will recognize the user.
-  return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
+  // Email verification path: the email is now confirmed server-side. Drop the
+  // session cookie we just minted and bounce the user back to /login so they sign
+  // in explicitly. The `verified=1` flag triggers the green success banner in
+  // LoginClient (distinct from `verified=1&from=email_link` which is the soft
+  // fallback for PKCE failures).
+  try {
+    await supabase.auth.signOut();
+  } catch (signOutError) {
+    // Non-fatal: cookie may persist briefly but the user is redirected to /login
+    // either way and will re-authenticate.
+    console.warn('Post-verification signOut failed (non-fatal):', signOutError);
+  }
+  const verifiedLoginUrl = new URL('/login', requestUrl.origin);
+  verifiedLoginUrl.searchParams.set('verified', '1');
+  return NextResponse.redirect(verifiedLoginUrl);
 }

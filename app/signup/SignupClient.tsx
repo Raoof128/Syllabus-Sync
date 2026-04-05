@@ -68,6 +68,9 @@ export default function SignupClient() {
 
       const callbackUrl = new URL('/auth/callback', window.location.origin);
       callbackUrl.searchParams.set('redirectTo', '/home');
+      // Explicit marker so the callback can distinguish a real OAuth round-trip from
+      // an email-verification link prefetch. See app/auth/callback/route.ts.
+      callbackUrl.searchParams.set('flow', 'oauth');
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

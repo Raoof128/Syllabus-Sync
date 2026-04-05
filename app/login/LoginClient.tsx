@@ -138,6 +138,13 @@ export default function LoginClient() {
       setIsSuccess(true);
       toastUtils.success(t('welcomeBack'), t('loginSuccess'));
 
+      // Mark first-login prompts pending so /home can request notification +
+      // geolocation permissions once the user lands there.
+      const { markFirstLoginPromptsPending } = await import(
+        '@/features/home/hooks/useFirstLoginPrompts'
+      );
+      markFirstLoginPromptsPending();
+
       // Listen for auth state change to redirect when session is fully mounted
       const { createBrowserClient } = await import('@/lib/supabase/client');
       const supabase = createBrowserClient();
@@ -186,8 +193,12 @@ export default function LoginClient() {
   // Passkey Login Handler
   const handlePasskeyLogin = () => {
     setGeneralError(null);
-    loginWithPasskey(email, () => {
+    loginWithPasskey(email, async () => {
       setIsSuccess(true);
+      const { markFirstLoginPromptsPending } = await import(
+        '@/features/home/hooks/useFirstLoginPrompts'
+      );
+      markFirstLoginPromptsPending();
       setTimeout(() => {
         window.location.href = redirectTo;
       }, 800);
@@ -321,6 +332,9 @@ export default function LoginClient() {
       // and then redirects the user to the validated `redirectTo` path.
       const callbackUrl = new URL('/auth/callback', window.location.origin);
       callbackUrl.searchParams.set('redirectTo', redirectTo);
+      // Explicit marker so the callback can distinguish a real OAuth round-trip from
+      // an email-verification link prefetch. See app/auth/callback/route.ts.
+      callbackUrl.searchParams.set('flow', 'oauth');
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -478,10 +492,14 @@ export default function LoginClient() {
             <MFAChallenge
               t={t}
               factors={mfaState.factors}
-              onSuccess={() => {
+              onSuccess={async () => {
                 setMfaState(null);
                 setIsSuccess(true);
                 toastUtils.success(t('welcomeBack'), t('loginSuccess'));
+                const { markFirstLoginPromptsPending } = await import(
+                  '@/features/home/hooks/useFirstLoginPrompts'
+                );
+                markFirstLoginPromptsPending();
                 setTimeout(() => {
                   window.location.href = redirectTo;
                 }, 800);

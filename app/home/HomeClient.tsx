@@ -35,10 +35,10 @@ import WeekHeatStrip from '@/features/home/components/WeekHeatStrip';
 
 import {
   useHomeUser,
-  useSampleSeeding,
   useHomeData,
   useHomeEventListeners,
   useHomeErrorBoundary,
+  useFirstLoginPrompts,
 } from '@/features/home/hooks';
 import { AuthUser } from '@/features/home/types';
 import { useCalendarIntentStore } from '@/lib/store/calendarIntentStore';
@@ -55,9 +55,11 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
 
   const { hasError, errorMessage, handleErrorRecovery } = useHomeErrorBoundary();
   const { displayName, hasHydrated } = useHomeUser(initialUser);
-  useSampleSeeding();
   const { units, hasUnits, unitStats } = useHomeData();
   useHomeEventListeners();
+  // One-shot permission prompts after a fresh login / onboarding completion.
+  // Reads a sessionStorage flag set by login success handlers; no-op otherwise.
+  useFirstLoginPrompts();
 
   const [fabOpen, setFabOpen] = useState(false);
   const portalTarget = typeof document === 'undefined' ? null : document.body;

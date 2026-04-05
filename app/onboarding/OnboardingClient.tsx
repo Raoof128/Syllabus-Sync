@@ -82,6 +82,12 @@ export default function OnboardingClient() {
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error?.message || t('failedToSave'));
       }
+      // New OAuth users reach /home for the first time via this path — mark the
+      // first-login prompt flag so the permission dialogs fire after redirect.
+      const { markFirstLoginPromptsPending } = await import(
+        '@/features/home/hooks/useFirstLoginPrompts'
+      );
+      markFirstLoginPromptsPending();
       router.push(next);
     } catch (err) {
       setServerError(err instanceof Error ? err.message : t('unexpectedError'));
