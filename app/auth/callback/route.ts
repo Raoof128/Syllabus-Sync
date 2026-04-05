@@ -63,19 +63,19 @@ export async function GET(request: Request) {
       return NextResponse.redirect(resetUrl);
     }
 
-    // Hybrid-A: signup email verification via PKCE frequently "fails" here
-    // because a link-scanning bot (Gmail/Outlook/corporate proxy) has already
-    // consumed the one-time code — but the server-side effect (email marked
-    // verified) still took place. Detect the signup flow by the redirectTo
-    // we set during signUp (`/login?verified=1`) and treat it optimistically:
-    // send the user to login with a soft-success banner instead of a scary
-    // error. True OAuth failures (redirectTo=/home or other) still get the
-    // retry-style error.
-    const looksLikeSignupVerification =
-      rawRedirect === '/login?verified=1' ||
-      (rawRedirect?.startsWith('/login') && rawRedirect.includes('verified=1'));
+    // Hybrid-A: PKCE code exchange failure on a non-recovery flow is almost
+    // always an email-link prefetch (Gmail/Outlook/corporate proxy scanner
+    // consumed the one-time code) — the server-side effect (email marked
+    // verified) already happened on the bot's hit. Default to optimistic
+    // soft-success. Only fall through to the scary error path when we can
+    // positively identify a real OAuth sign-in flow (redirectTo=/home was
+    // set by SignupClient.handleGoogleLogin and LoginClient's OAuth button).
+    const isOAuthFlow =
+      rawRedirect === '/home' ||
+      rawRedirect?.startsWith('/home?') ||
+      rawRedirect?.startsWith('/home/');
 
-    if (looksLikeSignupVerification) {
+    if (!isOAuthFlow) {
       const loginUrl = new URL('/login', requestUrl.origin);
       loginUrl.searchParams.set('verified', '1');
       loginUrl.searchParams.set('from', 'email_link');
@@ -83,7 +83,7 @@ export async function GET(request: Request) {
     }
 
     const loginUrl = new URL('/login', requestUrl.origin);
-    loginUrl.searchParams.set('error', 'verification_failed');
+    loginUrl.searchParams.set('error', 'oauth_failed');
     if (isValidRedirect(rawRedirect)) {
       loginUrl.searchParams.set('redirectTo', rawRedirect!);
     }
