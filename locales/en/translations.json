@@ -1959,6 +1959,7 @@
   "validation.passwordsMismatch": "Passwords do not match",
   "signupConfirmationSent": "We've sent a verification email to {{email}}. Please click the link in the email to activate your account.",
   "signupConfirmationHint": "Didn't receive the email? Check your spam folder or try signing up again.",
+  "signupFailed": "Sign up failed",
   "setReminderDesc": "Get notified before this item is due",
   "enableReminder": "Enable reminder",
   "selectTiming": "Select timing",

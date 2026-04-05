@@ -215,9 +215,14 @@ export default function SignupClient() {
         const target = (typeof result.error === 'object' && result.error?.details?.target) || null;
 
         if (target === 'email') {
+          // Jump back to step 1 and show the error in THREE places so the user
+          // can't miss it: top-level banner (serverError), inline field error,
+          // and a toast. The previous behavior cleared serverError, which made
+          // the bounce-back look silent when triggered from step 2.
           setStep('auth');
           setError('email', { type: 'server', message: errorMessage });
-          setServerError(null);
+          setServerError(errorMessage);
+          toastUtils.error(t('signupFailed'), errorMessage);
           return;
         }
 
