@@ -52,6 +52,7 @@ describe('NotificationSettings', () => {
   const mockT = vi.fn((key: string) => {
     const translations: Record<string, string> = {
       notifications: 'Notifications',
+      notificationPreferences: 'Notifications',
       deadlineReminders: 'Deadline Reminders',
       deadlineRemindersDesc: 'Get notified before deadlines',
       classReminders: 'Class Reminders',

@@ -3,14 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SecurityCard } from '@/app/manage-profiles/components/SecurityCard';
 
-// Mock next/navigation
-const mockRouterPush = vi.fn();
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: mockRouterPush,
-  }),
-}));
-
 // Mock useTypedTranslation
 vi.mock('@/lib/hooks/useTypedTranslation', () => ({
   useTypedTranslation: () => ({
@@ -25,6 +17,12 @@ vi.mock('@/lib/hooks/useTypedTranslation', () => ({
       return translations[key] || key;
     },
   }),
+}));
+
+// Mock ChangePasswordDialog component
+vi.mock('@/features/settings/components/privacy/ChangePasswordDialog', () => ({
+  ChangePasswordDialog: ({ open }: { open: boolean }) =>
+    open ? <div data-testid="password-dialog">Change Password Dialog</div> : null,
 }));
 
 // Mock SessionsList component
@@ -47,11 +45,11 @@ describe('SecurityCard', () => {
     expect(screen.getByText('View and manage active sessions')).toBeInTheDocument();
   });
 
-  it('navigates to reset-password when change password button is clicked', () => {
+  it('opens change password dialog when change password button is clicked', () => {
     render(<SecurityCard />);
     const buttons = screen.getAllByRole('button', { name: 'Change Password' });
-    fireEvent.click(buttons[0]); // Both the container and the button have the label if not careful, but let's just pick one
-    expect(mockRouterPush).toHaveBeenCalledWith('/reset-password?from=settings');
+    fireEvent.click(buttons[0]);
+    expect(screen.getByTestId('password-dialog')).toBeInTheDocument();
   });
 
   it('opens sessions dialog when manage sessions button is clicked', () => {
