@@ -62,6 +62,26 @@ export async function GET(request: Request) {
       );
       return NextResponse.redirect(resetUrl);
     }
+
+    // Hybrid-A: signup email verification via PKCE frequently "fails" here
+    // because a link-scanning bot (Gmail/Outlook/corporate proxy) has already
+    // consumed the one-time code — but the server-side effect (email marked
+    // verified) still took place. Detect the signup flow by the redirectTo
+    // we set during signUp (`/login?verified=1`) and treat it optimistically:
+    // send the user to login with a soft-success banner instead of a scary
+    // error. True OAuth failures (redirectTo=/home or other) still get the
+    // retry-style error.
+    const looksLikeSignupVerification =
+      rawRedirect === '/login?verified=1' ||
+      (rawRedirect?.startsWith('/login') && rawRedirect.includes('verified=1'));
+
+    if (looksLikeSignupVerification) {
+      const loginUrl = new URL('/login', requestUrl.origin);
+      loginUrl.searchParams.set('verified', '1');
+      loginUrl.searchParams.set('from', 'email_link');
+      return NextResponse.redirect(loginUrl);
+    }
+
     const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', 'verification_failed');
     if (isValidRedirect(rawRedirect)) {

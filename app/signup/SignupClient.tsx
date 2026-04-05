@@ -20,7 +20,7 @@ import { useProfilesStore } from '@/lib/store/profilesStore';
 import { AlertTriangle, Check, Loader2, Mail } from 'lucide-react';
 import { calculatePasswordStrength } from '@/lib/utils/security';
 import clsx from 'clsx';
-import { createSignupSchema } from '@/lib/schemas/auth';
+import { createAuthStepSchema, createSignupSchema } from '@/lib/schemas/auth';
 import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { CourseCombobox } from './components/CourseCombobox';
 import { FacultySelect } from './components/FacultySelect';
@@ -99,10 +99,12 @@ export default function SignupClient() {
   const {
     register,
     handleSubmit,
-    trigger,
     watch,
     control,
     setValue,
+    setError,
+    clearErrors,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -140,19 +142,42 @@ export default function SignupClient() {
     setValue('year', '');
   }, [watchedCourse, setValue]);
 
-  const handleNextStep = async () => {
-    const isValid = await trigger([
+  const handleNextStep = () => {
+    // Validate step 1 *independently* of the full signup schema. Using
+    // `trigger([...])` here was racy at mount: RHF's resolver swaps when the
+    // translation callback reference changes during i18n hydration, and
+    // the top-level `.refine()` forces step-2 fields into the same pass.
+    // A direct `safeParse(getValues())` is synchronous and deterministic.
+    const authStepFields = [
       'email',
       'password',
       'confirmPassword',
       'agreedToTerms',
       '_gotcha',
-    ]);
-    if (isValid) {
-      setStep('profile');
-      setServerError(null);
-      setTimeout(() => fullNameRef.current?.focus(), 100);
+    ] as const;
+
+    authStepFields.forEach((f) => clearErrors(f));
+
+    const authStepSchema = createAuthStepSchema(t);
+    const result = authStepSchema.safeParse(getValues());
+
+    if (!result.success) {
+      // Surface every issue on its own field so the form renders inline errors.
+      for (const issue of result.error.issues) {
+        const field = issue.path[0];
+        if (typeof field === 'string' && (authStepFields as readonly string[]).includes(field)) {
+          setError(field as (typeof authStepFields)[number], {
+            type: 'manual',
+            message: issue.message,
+          });
+        }
+      }
+      return;
     }
+
+    setServerError(null);
+    setStep('profile');
+    setTimeout(() => fullNameRef.current?.focus(), 100);
   };
 
   const onSubmit = async (data: SignupFormData) => {
@@ -183,6 +208,19 @@ export default function SignupClient() {
           typeof result.error === 'string'
             ? result.error
             : result.error?.message || t('unexpectedError');
+
+        // If the API flagged a specific field (e.g. email for "account exists"),
+        // jump back to step 1 and pin the error on that field inline.
+        // jsonError() nests details under error.details.
+        const target = (typeof result.error === 'object' && result.error?.details?.target) || null;
+
+        if (target === 'email') {
+          setStep('auth');
+          setError('email', { type: 'server', message: errorMessage });
+          setServerError(null);
+          return;
+        }
+
         setServerError(errorMessage);
         return;
       }

@@ -58,9 +58,16 @@ function isDevEmail(email: string): boolean {
   return DEV_EMAILS.some((devEmail) => email.toLowerCase() === devEmail);
 }
 
-// SECURITY: Generic message for all signup responses to prevent enumeration
+// SECURITY: Generic success message for normal signup responses.
 const GENERIC_SIGNUP_SUCCESS =
   'If this email is not already registered, you will receive a confirmation email shortly.';
+
+// UX tradeoff: we surface "account already exists" directly instead of hiding
+// it behind GENERIC_SIGNUP_SUCCESS. This weakens account-enumeration resistance
+// (an attacker can now probe which emails are registered) but eliminates the
+// confusing "we sent you an email" message for users who already have an
+// account. Rate-limiting + honeypot above still throttle enumeration attempts.
+const ACCOUNT_EXISTS_MESSAGE = 'An account with this email already exists. Please sign in instead.';
 
 // Server-side translation stub (returns key or basic English)
 const serverT = (key: string): string => {
@@ -207,7 +214,10 @@ export async function POST(request: NextRequest) {
 
         const isAlreadyRegistered = createError.message.toLowerCase().includes('already');
         if (isAlreadyRegistered) {
-          return jsonSuccess({ message: GENERIC_SIGNUP_SUCCESS });
+          logAuthEvent(adminClient, 'signup_existing_email', { ip: clientIP }, request);
+          return jsonError(ACCOUNT_EXISTS_MESSAGE, 409, ERROR_CODES.BAD_REQUEST, {
+            target: 'email',
+          });
         }
 
         return jsonError(
@@ -245,9 +255,9 @@ export async function POST(request: NextRequest) {
         // Map auth errors to specific fields
         const isAlreadyRegistered = authError.message.toLowerCase().includes('already registered');
         if (isAlreadyRegistered) {
-          // SECURITY: Return generic success to prevent account enumeration
-          return jsonSuccess({
-            message: GENERIC_SIGNUP_SUCCESS,
+          logAuthEvent(adminClient, 'signup_existing_email', { ip: clientIP }, request);
+          return jsonError(ACCOUNT_EXISTS_MESSAGE, 409, ERROR_CODES.BAD_REQUEST, {
+            target: 'email',
           });
         }
 
@@ -270,8 +280,10 @@ export async function POST(request: NextRequest) {
         logger.info('Signup attempt for existing confirmed email', {
           email_hint: `${email.substring(0, 3)}***`,
         });
-        // SECURITY: Return generic success to prevent account enumeration
-        return jsonSuccess({ message: GENERIC_SIGNUP_SUCCESS });
+        logAuthEvent(adminClient, 'signup_existing_email', { ip: clientIP }, request);
+        return jsonError(ACCOUNT_EXISTS_MESSAGE, 409, ERROR_CODES.BAD_REQUEST, {
+          target: 'email',
+        });
       }
 
       createdUser = authData.user ? { id: authData.user.id } : null;

@@ -81,6 +81,12 @@ export default function LoginClient() {
   const forceMfa = searchParams.get('mfa') === '1';
   const callbackError = searchParams.get('error');
   const logoutReason = searchParams.get('reason');
+  // Signup email-link soft fallback: /auth/callback redirects here when the
+  // PKCE code was consumed by an email scanner (bot prefetch). The email is
+  // usually already verified, so we show a friendly "please sign in" banner
+  // instead of a scary error.
+  const verifiedFromEmailLink =
+    searchParams.get('verified') === '1' && searchParams.get('from') === 'email_link';
 
   // Computed
   const isGlobalLoading = isSubmitting || isPasskeyLoading || isSuccess || oauthLoading;
@@ -400,12 +406,27 @@ export default function LoginClient() {
             </Alert>
           )}
 
-          {searchParams.get('verified') === '1' && !generalError && !isSuccess && (
+          {verifiedFromEmailLink && !generalError && !isSuccess && (
             <Alert variant="success" className="mb-3">
               <ShieldCheck className="h-4 w-4" />
-              <AlertDescription>{t('emailVerifiedSuccess')}</AlertDescription>
+              <AlertDescription>
+                <div className="space-y-1">
+                  <div>{t('emailLinkVerifiedSoft')}</div>
+                  <div className="text-xs opacity-80">{t('emailLinkVerifiedSoftHint')}</div>
+                </div>
+              </AlertDescription>
             </Alert>
           )}
+
+          {searchParams.get('verified') === '1' &&
+            !verifiedFromEmailLink &&
+            !generalError &&
+            !isSuccess && (
+              <Alert variant="success" className="mb-3">
+                <ShieldCheck className="h-4 w-4" />
+                <AlertDescription>{t('emailVerifiedSuccess')}</AlertDescription>
+              </Alert>
+            )}
 
           {callbackError && !generalError && !isSuccess && (
             <Alert variant="error" className="mb-3">
@@ -416,11 +437,10 @@ export default function LoginClient() {
                     {callbackError === 'oauth_failed'
                       ? t('oauthSignInFailed')
                       : callbackError === 'verification_failed'
-                        ? t('oauthCodeExchangeFailed')
+                        ? t('verificationLinkUsed')
                         : t('loginErrorFailed')}
                   </div>
-                  {(callbackError === 'oauth_failed' ||
-                    callbackError === 'verification_failed') && (
+                  {callbackError === 'oauth_failed' && (
                     <Button
                       type="button"
                       variant="outline"
