@@ -142,8 +142,7 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
         });
         if (result) {
           await fetchProfile({ force: true });
-        }
-        if (!result) {
+        } else {
           toastUtils.error(t('error'), t('failedToUpdateProfile'), {
             id: 'preference-toggle-error-toast',
           });
@@ -211,7 +210,9 @@ const NotificationSettings = memo(({ t }: NotificationSettingsProps) => {
       void setters[type](minutes);
 
       const option = REMINDER_TIMING_OPTIONS.find((o) => o.value === minutes);
-      const timingLabel = option ? t(option.labelKey) : `${minutes} minutes`;
+      const timingLabel = option
+        ? t(option.labelKey)
+        : t('timingMinutes' as TranslationKey, { minutes });
       toastUtils.success(
         t('reminderTimingUpdated'),
         t('reminderTimingUpdatedMsg', { timing: timingLabel }),

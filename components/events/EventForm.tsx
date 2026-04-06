@@ -236,11 +236,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     [],
   );
 
-  const resetForm = useCallback(() => {
-    dispatch({ type: 'RESET', values: getInitialValues(editEvent) });
-  }, [editEvent]);
-
-  const validateForm = (): boolean => {
+  const validateForm = useCallback((): boolean => {
     const formErrors: { [key: string]: string } = {};
 
     if (!title.trim()) {
@@ -264,9 +260,9 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
 
     setErrors(formErrors);
     return Object.keys(formErrors).length === 0;
-  };
+  }, [title, date, time, building, setErrors, t]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!validateForm()) return;
 
     dispatch({ type: 'SET_SAVING', value: true });
@@ -274,14 +270,12 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
     const [year, month, day] = date.split('-').map(Number);
     const dateObj = new Date(year, month - 1, day);
 
-    // Parse time to create startAt timestamp
-    // Supports formats like "2:00 PM", "14:00", "2:00 PM - 4:00 PM"
+    // Parse time to create startAt timestamp (native time input produces HH:MM format)
     const timeStr = time.trim();
     let startAt = dateObj;
-    let allDay = false;
+    const allDay = !timeStr;
 
     if (timeStr) {
-      // Try to parse the start time from various formats
       const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
       if (timeMatch) {
         let hours = parseInt(timeMatch[1], 10);
@@ -293,8 +287,6 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
 
         startAt = new Date(year, month - 1, day, hours, minutes);
       }
-    } else {
-      allDay = true;
     }
 
     const eventData: Event = {
@@ -302,13 +294,13 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
       title: title.trim(),
       description: description.trim(),
       startAt,
-      endAt: undefined, // Could be parsed from "2:00 PM - 4:00 PM" format
+      endAt: undefined,
       allDay,
-      date: startAt, // Computed for backward compatibility in UI (derived from startAt)
-      time: timeStr, // Keep original time string for display
+      date: startAt, // Derived from startAt for backward-compat display usage
+      time: timeStr,
       building: building.trim(),
-      room: room.trim() || undefined, // Optional room field
-      location: room.trim() ? `${building.trim()} ${room.trim()}` : building.trim(), // Legacy field
+      room: room.trim() || undefined,
+      location: room.trim() ? `${building.trim()} ${room.trim()}` : building.trim(),
       category,
       color,
     };
@@ -322,27 +314,44 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
         toastUtils.success(t('eventCreated'), t('eventCreatedMsg'));
       }
       onOpenChange(false);
+    } catch {
+      toastUtils.error(t('error'), t('failedToSaveEvent' as TranslationKey));
     } finally {
       dispatch({ type: 'SET_SAVING', value: false });
     }
-  };
+  }, [
+    validateForm,
+    date,
+    time,
+    title,
+    description,
+    building,
+    room,
+    category,
+    color,
+    editEvent,
+    addEvent,
+    updateEvent,
+    onOpenChange,
+    t,
+  ]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (editEvent) {
       removeEvent(editEvent.id);
       toastUtils.success(t('eventDeleted'), t('eventDeletedMsg'));
       setShowDeleteConfirm(false);
       onOpenChange(false);
     }
-  };
+  }, [editEvent, removeEvent, setShowDeleteConfirm, onOpenChange, t]);
 
-  const handleOpenChange = (newOpen: boolean) => {
-    if (newOpen) {
-      // Reset form when opening
-      resetForm();
-    }
-    onOpenChange(newOpen);
-  };
+  // Reset is handled by the useEffect above when `open` changes; no need to call it here too.
+  const handleOpenChange = useCallback(
+    (newOpen: boolean) => {
+      onOpenChange(newOpen);
+    },
+    [onOpenChange],
+  );
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -493,6 +502,7 @@ export default function EventForm({ open, onOpenChange, editEvent }: EventFormPr
                   style={{ backgroundColor: colorOption.value }}
                   title={t(colorOption.translationKey as TranslationKey)}
                   aria-label={t(colorOption.translationKey as TranslationKey)}
+                  aria-pressed={color === colorOption.value}
                 />
               ))}
             </div>

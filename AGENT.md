@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-06 (Australia/Sydney) — Event Settings
+
+**Raouf:**
+
+- **Scope:** Event Settings Page Bug Hunt & Production Hardening
+- **Summary:** Reviewed 4 event-settings files. Found and fixed 15 issues: `EventForm.handleSave` had no `catch` block — silent failure on API error → added `toastUtils.error`; redundant double-reset (both `handleOpenChange` + `useEffect` called RESET) → removed `resetForm` call and unused function; `handleSave`, `handleDelete`, `validateForm`, `handleOpenChange` not memoized → `useCallback` applied; color picker buttons missing `aria-pressed` → added; misleading `endAt` comment removed. `EventDetailPanel`: raw `text-emerald-600`/`text-amber-600` status colors → MQ tokens; raw nav button hover classes → MQ tokens; hardcoded hex colors in `categoryColors` → CSS custom properties (`var(--mq-info)` etc.) to respect theming; `handleNavigationClick` not memoized → `useCallback`. Settings layout: nav buttons missing `type="button"` + `aria-current="page"`; raw Tailwind icon colors → MQ tokens; `navigateToSection` not memoized → `useCallback`. `NotificationSettings`: double `if (!result)` → `if...else`; hardcoded `'minutes'` fallback → i18n `timingMinutes` key.
+- **Files Changed:** `components/events/EventForm.tsx`, `components/events/EventDetailPanel.tsx`, `app/settings/layout.tsx`, `features/settings/components/NotificationSettings.tsx`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+- **Follow-ups:** None.
+
 ### 2026-04-06 (Australia/Sydney) — Event Feed
 
 **Raouf:**

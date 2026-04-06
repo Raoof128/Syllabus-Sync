@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
+import { useCallback } from 'react';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useHydration } from '@/lib/hooks/useHydration';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -23,35 +24,35 @@ const SECTIONS: {
     id: 'general',
     icon: Layout,
     labelKey: 'settings_general',
-    color: 'text-blue-500',
+    color: 'text-mq-info',
     path: '/settings/general',
   },
   {
     id: 'appearance',
     icon: Palette,
     labelKey: 'settings_appearance',
-    color: 'text-purple-500',
+    color: 'text-mq-purple',
     path: '/settings/appearance',
   },
   {
     id: 'security',
     icon: Shield,
     labelKey: 'security',
-    color: 'text-green-500',
+    color: 'text-mq-success',
     path: '/settings/security',
   },
   {
     id: 'experience',
     icon: Sparkles,
     labelKey: 'settings_experience',
-    color: 'text-amber-500',
+    color: 'text-mq-warning',
     path: '/settings/experience',
   },
   {
     id: 'about',
     icon: Info,
     labelKey: 'settings_about',
-    color: 'text-slate-500',
+    color: 'text-mq-content-secondary',
     path: '/settings/about',
   },
 ];
@@ -66,9 +67,12 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
   const activeSectionId =
     SECTIONS.find((section) => pathname?.startsWith(section.path))?.id || 'general';
 
-  const navigateToSection = (path: string) => {
-    router.push(path);
-  };
+  const navigateToSection = useCallback(
+    (path: string) => {
+      router.push(path);
+    },
+    [router],
+  );
 
   return (
     <div className="min-h-screen text-mq-content transition-colors duration-300">
@@ -99,6 +103,8 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
               return (
                 <button
                   key={section.id}
+                  type="button"
+                  aria-current={isActive ? 'page' : undefined}
                   onClick={() => navigateToSection(section.path)}
                   className={cn(
                     'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap',
@@ -129,6 +135,8 @@ function SettingsLayout({ children }: { children?: React.ReactNode }) {
               return (
                 <button
                   key={section.id}
+                  type="button"
+                  aria-current={isActive ? 'page' : undefined}
                   onClick={() => navigateToSection(section.path)}
                   className={cn(
                     'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative',

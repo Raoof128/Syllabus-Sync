@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Event } from '@/lib/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/mq/badge';
@@ -35,18 +35,18 @@ export default function EventDetailPanel({
   const [navBuildingId, setNavBuildingId] = useState('');
   const [navRoom, setNavRoom] = useState<string | undefined>(undefined);
 
-  // Get the color (from event custom color or category default)
+  // Get the color (from event custom color or category CSS variable fallback)
+  // CSS custom properties are used so theming is respected without hardcoded hex values.
   const color = useMemo(() => {
-    if (!event) return '#A6192E';
+    if (!event) return 'var(--mq-primary)';
     if (event.color) return event.color;
-    // Default category colors
     const categoryColors: Record<string, string> = {
-      Career: '#3B82F6',
-      Social: '#8B5CF6',
-      Academic: '#10B981',
-      'Free Food': '#F59E0B',
+      Career: 'var(--mq-info)',
+      Social: 'var(--mq-purple)',
+      Academic: 'var(--mq-success)',
+      'Free Food': 'var(--mq-warning)',
     };
-    return categoryColors[event.category] || '#A6192E';
+    return categoryColors[event.category] ?? 'var(--mq-primary)';
   }, [event]);
 
   // Get location display - must be before early return
@@ -64,11 +64,11 @@ export default function EventDetailPanel({
     return null;
   }, [event]);
 
-  const handleNavigationClick = (buildingId: string, room?: string) => {
+  const handleNavigationClick = useCallback((buildingId: string, room?: string) => {
     setNavBuildingId(buildingId);
     setNavRoom(room);
     setNavDialogOpen(true);
-  };
+  }, []);
 
   // Early return after all hooks
   if (!event) return null;
@@ -183,8 +183,8 @@ export default function EventDetailPanel({
                 className={cn(
                   'font-medium text-sm',
                   status === 'past' && 'text-mq-content-tertiary',
-                  status === 'today' && 'text-emerald-600',
-                  status === 'tomorrow' && 'text-amber-600',
+                  status === 'today' && 'text-mq-success',
+                  status === 'tomorrow' && 'text-mq-warning',
                 )}
               >
                 {getTimeRemaining()}
@@ -235,7 +235,7 @@ export default function EventDetailPanel({
                 <button
                   type="button"
                   onClick={() => handleNavigationClick(event.building!, event.room)}
-                  className="p-2 rounded-lg text-mq-content-secondary hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20 transition-colors"
+                  className="p-2 rounded-lg text-mq-content-secondary hover:text-mq-success hover:bg-mq-success/10 transition-colors"
                   aria-label={t('navigateToBuildingAria', { building: event.building })}
                 >
                   <Navigation className="h-4 w-4" aria-hidden="true" />

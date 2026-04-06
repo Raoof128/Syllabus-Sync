@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Event Settings Page Bug Hunt & Production Hardening — 2026-04-06
+
+**Scope:** Bug fixes, performance, accessibility, and MQ token compliance across 4 event-settings files
+
+1. **`EventForm.tsx` — silent failure on save:** `handleSave` had no `catch` block — if `addEvent`/`updateEvent` threw, the dialog stayed open with the spinner stuck and the user received zero feedback. Added `catch` with `toastUtils.error`.
+2. **`EventForm.tsx` — redundant double-reset:** `handleOpenChange` called `resetForm()` when `newOpen === true`, but the `useEffect` already dispatches RESET whenever `open` changes. Removed the redundant `resetForm()` call (and the now-unused `resetForm` function).
+3. **`EventForm.tsx` — `handleSave`, `handleDelete`, `validateForm` not memoized:** All three were recreated on every render; `handleSave` and `handleDelete` are passed as `onClick` props. Wrapped all three in `useCallback` with correct dependency arrays. `handleOpenChange` also memoized.
+4. **`EventForm.tsx` — color picker missing `aria-pressed`:** Screen readers had no way to identify which color is currently selected. Added `aria-pressed={color === colorOption.value}` to each color button.
+5. **`EventForm.tsx` — misleading dead comment on `endAt`:** `endAt: undefined // Could be parsed from "2:00 PM - 4:00 PM" format` was misleading — the input is `type="time"` (HH:MM only). Removed the misleading comment.
+6. **`EventDetailPanel.tsx` — non-MQ status colors:** `text-emerald-600` (today) and `text-amber-600` (tomorrow) replaced with `text-mq-success` and `text-mq-warning`.
+7. **`EventDetailPanel.tsx` — non-MQ navigation button hover classes:** `hover:text-emerald-600 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/20` replaced with `hover:text-mq-success hover:bg-mq-success/10`.
+8. **`EventDetailPanel.tsx` — hardcoded hex colors in `useMemo`:** The category dot colors used hex strings (`#3B82F6`, `#8B5CF6`, etc.) in `style={{ backgroundColor }}`. Replaced with CSS custom properties (`var(--mq-info)`, `var(--mq-purple)`, `var(--mq-success)`, `var(--mq-warning)`, `var(--mq-primary)`) to respect theming.
+9. **`EventDetailPanel.tsx` — `handleNavigationClick` not memoized:** Passed to a `button`'s `onClick` but recreated every render. Wrapped in `useCallback`.
+10. **`app/settings/layout.tsx` — nav buttons missing `type="button"`:** Both mobile and desktop nav buttons lacked `type="button"`, risking accidental form submission. Added to all buttons.
+11. **`app/settings/layout.tsx` — nav buttons missing `aria-current="page"`:** Screen readers couldn't identify the active settings section. Added `aria-current={isActive ? 'page' : undefined}` to all nav buttons.
+12. **`app/settings/layout.tsx` — raw Tailwind colors for section icons:** `text-blue-500`, `text-purple-500`, `text-green-500`, `text-amber-500`, `text-slate-500` replaced with MQ tokens: `text-mq-info`, `text-mq-purple`, `text-mq-success`, `text-mq-warning`, `text-mq-content-secondary`.
+13. **`app/settings/layout.tsx` — `navigateToSection` not memoized:** Recreated on every render and passed as `onClick` to multiple buttons. Wrapped in `useCallback([router])`.
+14. **`NotificationSettings.tsx` — double `if (!result)` pattern:** Two separate `if` checks on the same `result` value was confusing and implied independent logic. Refactored to a clean `if...else`.
+15. **`NotificationSettings.tsx` — hardcoded `'minutes'` in timing fallback:** `${minutes} minutes` bypassed i18n. Replaced with `t('timingMinutes', { minutes })`.
+
+**Files Changed:**
+
+- `components/events/EventForm.tsx`
+- `components/events/EventDetailPanel.tsx`
+- `app/settings/layout.tsx`
+- `features/settings/components/NotificationSettings.tsx`
+
+**Verification:**
+
+- TypeScript: `npm run typecheck` — clean ✅
+- Lint: `npm run lint` — Lint OK ✅
+- Tests: 874/878 passed ✅ (4 pre-existing signup failures, unrelated)
+
+---
+
 ### Raouf: Event Feed Page Bug Hunt & Production Hardening — 2026-04-06
 
 **Scope:** Bug fixes, performance, accessibility, type safety, i18n, and MQ token compliance across 12 feed files
