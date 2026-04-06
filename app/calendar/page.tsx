@@ -94,7 +94,12 @@ export const metadata: Metadata = {
 // Skeleton loader for calendar page
 function CalendarSkeleton() {
   return (
-    <div className="container mx-auto max-w-7xl animate-pulse px-3 py-4 sm:px-6 sm:py-6">
+    <div
+      role="status"
+      aria-label="Loading calendar"
+      aria-busy="true"
+      className="container mx-auto max-w-7xl animate-pulse px-3 py-4 sm:px-6 sm:py-6"
+    >
       {/* Header skeleton */}
       <div className="mb-8">
         <div className="mb-2 h-10 w-40 rounded-mq bg-mq-background-secondary sm:w-48" />
@@ -132,7 +137,6 @@ export default function CalendarPage() {
       <main
         id="main-content"
         className="calendar-page container mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6"
-        role="main"
       >
         {/* Structured Data for Calendar (JSON-LD) */}
         <script

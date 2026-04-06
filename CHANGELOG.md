@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Calendar Page Bug Hunt & Production Hardening — 2026-04-06
+
+**Scope:** Bug fixes, performance, accessibility, and type safety across 6 calendar files
+
+1. **`CalendarClient.tsx` — view buttons broke URL sync:** Three desktop view-toggle buttons called `setView(...)` directly, bypassing `handleViewChange`. This meant switching views didn't update the URL, breaking deep-links, back/forward navigation, and share-by-URL. Fixed by destructuring `handleViewChange` from `useCalendarView()` and wiring it to all three buttons. Also added `aria-pressed` to each button for screen-reader active-state indication.
+2. **`CalendarClient.tsx` — `isToday` variable shadowing:** Inside the mobile day-row `map`, a local `const isToday` shadowed the outer `isToday` from `useCalendarView`. Renamed the inner variable to `isDayToday` to eliminate the ambiguity and prevent latent bugs.
+3. **`CalendarClient.tsx` — timezone bug in todo form:** `new Date(editTodoDueDate)` creates a UTC midnight Date object. When combined with `setHours` (which applies local time), the resulting `dueDate` is wrong in any timezone west of UTC. Fixed by using `dayjs(editTodoDueDate).hour(...).minute(...).toDate()` which stays in local time throughout.
+4. **`CalendarClient.tsx` — non-memoized handler functions:** 9 local handlers (`handleDeleteAssignment`, `confirmDeleteAssignment`, `handleDeleteExam`, `confirmDeleteExam`, `confirmDeleteDeadline`, `handleDeleteEvent`, `confirmDeleteEvent`, `handleDeleteTodo`, `confirmDeleteUnit`, `handleUnitDetailOpenChange`, `getUnitsForDay`, `getItemsForDay`) were re-created on every render, giving child components fresh prop references every render. Wrapped all in `useCallback` with correct dependencies.
+5. **`CalendarClient.tsx` — mobile day buttons inaccessible:** Day buttons in the mobile date selector showed only a letter + number with no accessible name. Added `aria-label` with full weekday name and day number (plus "(today)" suffix) and `aria-hidden` on the decorative spans. Also destructured `formatWeekdayLong` from `useCalendarGetters` for this.
+6. **`useCalendarHighlights.ts` — event highlight re-fires on store refresh:** The event-highlight effect lacked a `processedRef` guard that unit/deadline/todo highlights all have. On any Zustand store update that re-ran the effect, the detail dialog re-opened. Added `processedEventHighlightRef` and the standard reset guard to match the other highlight patterns.
+7. **`useCalendarView.ts` — dead condition `hours >= 24`:** `dayjs().hour()` returns 0–23, making the `|| hours >= 24` branch unreachable. Removed it and added an explanatory comment.
+8. **`useCalendarData.ts` — duplicate imports:** `createBrowserClient` and `isSupabaseConfigured` were imported from `@/lib/supabase/client` on two separate lines. Merged into one.
+9. **`useCalendarDialogs.ts` — hardcoded `'#10b981'` hex colour:** The default todo colour violated AGENT.md's "no hardcoded hex values" rule. Replaced with `DEFAULT_TODO_COLOR = UNIT_COLORS[3].value` (sourced from `@/lib/config`).
+10. **`page.tsx` — inaccessible loading skeleton + redundant ARIA role:** `CalendarSkeleton` had no `role="status"`, `aria-busy`, or `aria-label`. Added all three. Also removed `role="main"` from the `<main>` element — `<main>` already carries the landmark implicitly.
+
+**Files Changed:**
+
+- `app/calendar/page.tsx`
+- `app/calendar/CalendarClient.tsx`
+- `features/calendar/hooks/useCalendarView.ts`
+- `features/calendar/hooks/useCalendarHighlights.ts`
+- `features/calendar/hooks/useCalendarData.ts`
+- `features/calendar/hooks/useCalendarDialogs.ts`
+
+**Verification:**
+
+- TypeScript: `npm run typecheck` — clean ✅
+- Lint: `npm run lint` — clean ✅
+- Tests: 874/878 passed ✅ (4 pre-existing signup failures, unrelated)
+
+---
+
 ### Raouf: Home Page Bug Hunt & Production Hardening — 2026-04-06
 
 **Scope:** Bug fixes, performance, accessibility, and type safety across 7 home-page files

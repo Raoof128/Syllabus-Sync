@@ -109,6 +109,7 @@ export default function CalendarClient() {
   const {
     view,
     setView,
+    handleViewChange,
     currentWeekStart,
     mobileSelectedDayIndex,
     setMobileSelectedDayIndex,
@@ -361,8 +362,14 @@ export default function CalendarClient() {
   });
 
   // 6. Getters Hook
-  const { formatDayNumber, formatMonthYear, formatWeekRange, formatWeekdayShort, formatTimeShort } =
-    useCalendarGetters(filteredUnits, filteredDeadlines, filteredEvents);
+  const {
+    formatDayNumber,
+    formatMonthYear,
+    formatWeekRange,
+    formatWeekdayShort,
+    formatWeekdayLong,
+    formatTimeShort,
+  } = useCalendarGetters(filteredUnits, filteredDeadlines, filteredEvents);
 
   // 7. Live Collaboration Hook - activates when a shared schedule is selected
   // scheduleId is null until shared schedules feature is enabled (no-op when null)
@@ -382,96 +389,113 @@ export default function CalendarClient() {
     collabUserProfile,
   );
 
-  // Local Helpers
-  const handleDeleteAssignment = (assignment: Deadline) => {
-    setAssignmentToDelete(assignment);
-    setAssignmentDeleteConfirmOpen(true);
-  };
+  // Local Helpers — memoized so stable references are passed to child components.
+  const handleDeleteAssignment = useCallback(
+    (assignment: Deadline) => {
+      setAssignmentToDelete(assignment);
+      setAssignmentDeleteConfirmOpen(true);
+    },
+    [setAssignmentToDelete, setAssignmentDeleteConfirmOpen],
+  );
 
-  const confirmDeleteAssignment = () => {
+  const confirmDeleteAssignment = useCallback(() => {
     if (assignmentToDelete) {
       removeDeadline(assignmentToDelete.id);
       setAssignmentDeleteConfirmOpen(false);
       setAssignmentToDelete(null);
     }
-  };
+  }, [assignmentToDelete, removeDeadline, setAssignmentDeleteConfirmOpen, setAssignmentToDelete]);
 
-  const handleDeleteExam = (exam: Deadline) => {
-    setExamToDelete(exam);
-    setExamDeleteConfirmOpen(true);
-  };
+  const handleDeleteExam = useCallback(
+    (exam: Deadline) => {
+      setExamToDelete(exam);
+      setExamDeleteConfirmOpen(true);
+    },
+    [setExamToDelete, setExamDeleteConfirmOpen],
+  );
 
-  const confirmDeleteExam = () => {
+  const confirmDeleteExam = useCallback(() => {
     if (examToDelete) {
       removeDeadline(examToDelete.id);
       setExamDeleteConfirmOpen(false);
       setExamToDelete(null);
     }
-  };
+  }, [examToDelete, removeDeadline, setExamDeleteConfirmOpen, setExamToDelete]);
 
-  const confirmDeleteDeadline = () => {
+  const confirmDeleteDeadline = useCallback(() => {
     if (deadlineToDelete) {
       removeDeadline(deadlineToDelete.id);
       setDeadlineDeleteConfirmOpen(false);
       setDeadlineToDelete(null);
     }
-  };
+  }, [deadlineToDelete, removeDeadline, setDeadlineDeleteConfirmOpen, setDeadlineToDelete]);
 
-  const handleDeleteEvent = (event: Event) => {
-    setEventToDelete(event);
-    setEventDeleteConfirmOpen(true);
-  };
+  const handleDeleteEvent = useCallback(
+    (event: Event) => {
+      setEventToDelete(event);
+      setEventDeleteConfirmOpen(true);
+    },
+    [setEventToDelete, setEventDeleteConfirmOpen],
+  );
 
-  const confirmDeleteEvent = () => {
+  const confirmDeleteEvent = useCallback(() => {
     if (eventToDelete) {
       removeEvent(eventToDelete.id);
       setEventDeleteConfirmOpen(false);
       setEventToDelete(null);
     }
-  };
+  }, [eventToDelete, removeEvent, setEventDeleteConfirmOpen, setEventToDelete]);
 
-  const handleDeleteTodo = (todo: Todo) => {
-    setTodoToDelete({ id: todo.id, title: todo.title });
-    setTodoDeleteConfirmOpen(true);
-  };
+  const handleDeleteTodo = useCallback(
+    (todo: Todo) => {
+      setTodoToDelete({ id: todo.id, title: todo.title });
+      setTodoDeleteConfirmOpen(true);
+    },
+    [setTodoToDelete, setTodoDeleteConfirmOpen],
+  );
 
-  const handleNotifyTodo = (_todo: Todo) => {
-    // Notification logic would go here
-  };
+  // No-op stub — notification logic will be wired up when the feature ships.
+  const handleNotifyTodo = useCallback((_todo: Todo) => {}, []);
 
-  const confirmDeleteUnit = () => {
+  const confirmDeleteUnit = useCallback(() => {
     if (unitToDelete) {
-      // Remove all deadlines associated with this unit (cascade delete)
+      // Cascade-delete all deadlines for this unit, then remove the unit itself
       removeDeadlinesByUnit(unitToDelete.id, unitToDelete.code);
-      // Then remove the unit itself
       removeUnit(unitToDelete.id);
       setDeleteConfirmOpen(false);
       setUnitToDelete(null);
     }
-  };
+  }, [unitToDelete, removeDeadlinesByUnit, removeUnit, setDeleteConfirmOpen, setUnitToDelete]);
 
-  const handleUnitDetailOpenChange = (open: boolean) => {
-    setUnitDetailOpen(open);
-  };
+  const handleUnitDetailOpenChange = useCallback(
+    (open: boolean) => setUnitDetailOpen(open),
+    [setUnitDetailOpen],
+  );
 
-  // Get unit schedules for a specific day (used in mobile view/helpers)
-  const getUnitsForDay = (date: Date) => {
-    const dayName = dayjs(date).locale('en').format('dddd');
-    return filteredUnits.flatMap((unit) =>
-      unit.schedule
-        .filter((s: ClassTime) => s.day === dayName)
-        .map((s: ClassTime) => ({ ...unit, schedule: [s] })),
-    );
-  };
+  // Get unit schedules for a specific day (week-view column renderer)
+  const getUnitsForDay = useCallback(
+    (date: Date) => {
+      const dayName = dayjs(date).locale('en').format('dddd');
+      return filteredUnits.flatMap((unit) =>
+        unit.schedule
+          .filter((s: ClassTime) => s.day === dayName)
+          .map((s: ClassTime) => ({ ...unit, schedule: [s] })),
+      );
+    },
+    [filteredUnits],
+  );
 
-  const getItemsForDay = (date: Date) => {
-    const dayDeadlines = filteredDeadlines.filter((d) => dayjs(d.dueDate).isSame(date, 'day'));
-    const dayEvents = filteredEvents.filter((e) => {
-      const eventDate = e.startAt || e.date;
-      return dayjs(eventDate).isSame(date, 'day');
-    });
-    return { dayDeadlines, dayEvents };
-  };
+  const getItemsForDay = useCallback(
+    (date: Date) => {
+      const dayDeadlines = filteredDeadlines.filter((d) => dayjs(d.dueDate).isSame(date, 'day'));
+      const dayEvents = filteredEvents.filter((e) => {
+        const eventDate = e.startAt || e.date;
+        return dayjs(eventDate).isSame(date, 'day');
+      });
+      return { dayDeadlines, dayEvents };
+    },
+    [filteredDeadlines, filteredEvents],
+  );
 
   if (!hasHydrated) {
     return null;
@@ -516,22 +540,29 @@ export default function CalendarClient() {
         <div className="flex overflow-x-auto pb-2 px-2 gap-2 scrollbar-hide -webkit-overflow-scrolling-touch">
           {weekDays.map((date, index) => {
             const isSelected = index === mobileSelectedDayIndex;
-            const isToday = dayjs(date).isSame(dayjs(), 'day');
+            // Renamed from `isToday` to avoid shadowing the outer `isToday` from useCalendarView
+            const isDayToday = dayjs(date).isSame(dayjs(), 'day');
 
             return (
               <button
                 key={index}
                 onClick={() => setMobileSelectedDayIndex(index)}
+                aria-label={`${formatWeekdayLong(date)} ${formatDayNumber(date)}${isDayToday ? ` (${t('today')})` : ''}`}
+                aria-pressed={isSelected}
                 className={cn(
                   'flex flex-col items-center justify-center min-w-[3.5rem] py-2 rounded-lg transition-colors',
                   isSelected
                     ? 'bg-mq-primary text-white'
                     : 'bg-mq-background text-mq-content hover:bg-mq-background-hover',
-                  isToday && !isSelected && 'border border-mq-primary text-mq-primary',
+                  isDayToday && !isSelected && 'border border-mq-primary text-mq-primary',
                 )}
               >
-                <span className="text-xs font-medium opacity-80">{formatWeekdayShort(date)}</span>
-                <span className="text-lg font-bold">{formatDayNumber(date)}</span>
+                <span className="text-xs font-medium opacity-80" aria-hidden="true">
+                  {formatWeekdayShort(date)}
+                </span>
+                <span className="text-lg font-bold" aria-hidden="true">
+                  {formatDayNumber(date)}
+                </span>
               </button>
             );
           })}
@@ -554,24 +585,27 @@ export default function CalendarClient() {
                 <Button
                   variant={view === 'day' ? 'secondary' : 'ghost'}
                   size="sm"
-                  onClick={() => setView('day')}
+                  onClick={() => handleViewChange('day')}
                   className="text-sm"
+                  aria-pressed={view === 'day'}
                 >
                   {t('dayView')}
                 </Button>
                 <Button
                   variant={view === 'week' ? 'secondary' : 'ghost'}
                   size="sm"
-                  onClick={() => setView('week')}
+                  onClick={() => handleViewChange('week')}
                   className="text-sm"
+                  aria-pressed={view === 'week'}
                 >
                   {t('weekView')}
                 </Button>
                 <Button
                   variant={view === 'agenda' ? 'secondary' : 'ghost'}
                   size="sm"
-                  onClick={() => setView('agenda')}
+                  onClick={() => handleViewChange('agenda')}
                   className="text-sm"
+                  aria-pressed={view === 'agenda'}
                 >
                   {t('agendaView')}
                 </Button>
@@ -1306,14 +1340,18 @@ export default function CalendarClient() {
               if (editTodoTitle.trim() && editTodoDueDate && !todoSaving) {
                 setTodoSaving(true);
                 try {
-                  // Build due date (required)
-                  const dueDate = new Date(editTodoDueDate);
-                  if (editTodoDueTime) {
-                    const [hours, minutes] = editTodoDueTime.split(':').map(Number);
-                    dueDate.setHours(hours, minutes, 0, 0);
-                  } else {
-                    dueDate.setHours(23, 59, 59, 999);
-                  }
+                  // Build due date (required).
+                  // Use dayjs to parse the date string in LOCAL time — `new Date('YYYY-MM-DD')`
+                  // parses as UTC midnight, which becomes the previous day in timezones west of UTC.
+                  const [hours, minutes] = editTodoDueTime
+                    ? editTodoDueTime.split(':').map(Number)
+                    : [23, 59];
+                  const dueDate = dayjs(editTodoDueDate)
+                    .hour(hours)
+                    .minute(minutes)
+                    .second(editTodoDueTime ? 0 : 59)
+                    .millisecond(editTodoDueTime ? 0 : 999)
+                    .toDate();
 
                   if (editingTodo) {
                     await updateTodo(editingTodo.id, {

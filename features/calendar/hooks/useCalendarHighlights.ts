@@ -216,11 +216,23 @@ export function useCalendarHighlights(
 
   // 4. Highlighted Event
   const highlightedEventId = useMemo(() => searchParams.get('highlightEvent'), [searchParams]);
+  const processedEventHighlightRef = useRef<string | null>(null);
 
+  // Reset the guard whenever the ID changes so a new deep-link always fires.
   useEffect(() => {
-    if (!highlightedEventId) return;
+    if (highlightedEventId && processedEventHighlightRef.current !== highlightedEventId) {
+      processedEventHighlightRef.current = null;
+    }
+  }, [highlightedEventId]);
+
+  // Open the detail dialog only once per highlight ID — prevents re-opening on every
+  // store refresh (which re-runs this effect because `events` is in the dep array).
+  useEffect(() => {
+    if (!hasHydrated || !highlightedEventId) return;
+    if (processedEventHighlightRef.current === highlightedEventId) return;
 
     const highlightedEvent = events.find((e) => e.id === highlightedEventId);
+    processedEventHighlightRef.current = highlightedEventId;
 
     const timer = window.setTimeout(() => {
       if (highlightedEvent) {
@@ -241,7 +253,7 @@ export function useCalendarHighlights(
       clearTimeout(timer);
       clearTimeout(clearTimer);
     };
-  }, [highlightedEventId, events, setSelectedEvent, setEventDetailOpen]);
+  }, [highlightedEventId, events, hasHydrated, setSelectedEvent, setEventDetailOpen]);
 
   // 5. Highlighted Widget
   const highlightedWidget = useMemo(() => searchParams.get('highlightWidget'), [searchParams]);

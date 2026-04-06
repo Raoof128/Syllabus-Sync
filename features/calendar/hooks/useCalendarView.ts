@@ -286,12 +286,13 @@ export function useCalendarView() {
     [view, goToPreviousDay, goToNextDay, goToPreviousWeek, goToNextWeek, goToToday, goToThisWeek],
   );
 
-  // Red Line Position
+  // Red Line Position — visible only while within the calendar's display range (START_HOUR onward).
+  // `hours >= 24` was dead code: dayjs().hour() returns 0–23, so it could never be true.
   const computeCurrentTimePosition = () => {
     const now = dayjs();
     const hours = now.hour();
     const minutes = now.minute();
-    if (hours < START_HOUR || hours >= 24) return null;
+    if (hours < START_HOUR) return null;
     return (hours - START_HOUR) * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
   };
 

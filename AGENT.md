@@ -58,7 +58,17 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
-### 2026-04-06 (Australia/Sydney)
+### 2026-04-06 (Australia/Sydney) — Calendar
+
+**Raouf:**
+
+- **Scope:** Calendar Page Bug Hunt & Production Hardening
+- **Summary:** Reviewed all 6 calendar files. Found and fixed 10 issues: view-toggle buttons calling `setView` directly (broke URL sync) → switched to `handleViewChange`; `isToday` variable shadowing in mobile day row; timezone bug in todo form date construction (`new Date(dateString)` parses UTC); event highlight effect missing `processedRef` guard (re-fired on every store refresh); dead `hours >= 24` condition in `computeCurrentTimePosition`; duplicate supabase imports; hardcoded `'#10b981'` hex colour; inaccessible loading skeleton in `page.tsx`; redundant `role="main"` on `<main>`; mobile day buttons with no `aria-label`. Also memoized 9 local handler functions and added `aria-pressed` to view toggle buttons.
+- **Files Changed:** `app/calendar/page.tsx`, `app/calendar/CalendarClient.tsx`, `features/calendar/hooks/useCalendarView.ts`, `features/calendar/hooks/useCalendarHighlights.ts`, `features/calendar/hooks/useCalendarData.ts`, `features/calendar/hooks/useCalendarDialogs.ts`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+- **Follow-ups:** None.
+
+### 2026-04-06 (Australia/Sydney) — Home
 
 **Raouf:**
 

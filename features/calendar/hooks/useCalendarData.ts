@@ -4,8 +4,7 @@ import { useEventsStore } from '@/lib/store/eventsStore';
 import { useUnitsStore } from '@/lib/store/unitsStore';
 import { useTodosStore } from '@/lib/store/todosStore';
 import { useHydration } from '@/lib/hooks';
-import { createBrowserClient } from '@/lib/supabase/client';
-import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
 
 export function useCalendarData() {
   const deadlines = useDeadlinesStore((state) => state.deadlines);

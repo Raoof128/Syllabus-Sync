@@ -1,6 +1,10 @@
 import { useState, useCallback } from 'react';
 import { Deadline, Event, Unit, Todo } from '@/lib/types';
+import { UNIT_COLORS } from '@/lib/config';
 import dayjs from 'dayjs';
+
+// Green (#10b981) is UNIT_COLORS[3] — the default colour for new todos.
+const DEFAULT_TODO_COLOR = UNIT_COLORS[3].value;
 
 export function useCalendarDialogs() {
   // Dialog states
@@ -26,7 +30,7 @@ export function useCalendarDialogs() {
   const [editTodoPriority, setEditTodoPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
   const [editTodoDueDate, setEditTodoDueDate] = useState('');
   const [editTodoDueTime, setEditTodoDueTime] = useState('');
-  const [editTodoColor, setEditTodoColor] = useState<string>('#10b981');
+  const [editTodoColor, setEditTodoColor] = useState<string>(DEFAULT_TODO_COLOR);
 
   // Detail panel states
   const [unitDetailOpen, setUnitDetailOpen] = useState(false);
@@ -118,7 +122,7 @@ export function useCalendarDialogs() {
     setEditTodoPriority('Medium');
     setEditTodoDueDate('');
     setEditTodoDueTime('');
-    setEditTodoColor('#10b981');
+    setEditTodoColor(DEFAULT_TODO_COLOR);
     setTodoDialogOpen(true);
   }, []);
 
@@ -126,7 +130,7 @@ export function useCalendarDialogs() {
     setEditingTodo(todo);
     setEditTodoTitle(todo.title);
     setEditTodoPriority(todo.priority);
-    setEditTodoColor(todo.color || '#10b981');
+    setEditTodoColor(todo.color || DEFAULT_TODO_COLOR);
     if (todo.dueDate) {
       const date = new Date(todo.dueDate);
       setEditTodoDueDate(dayjs(date).format('YYYY-MM-DD'));
