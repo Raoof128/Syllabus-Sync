@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-06 (Australia/Sydney) — Event Feed
+
+**Raouf:**
+
+- **Scope:** Event Feed Page Bug Hunt & Production Hardening
+- **Summary:** Deep-reviewed all 18 feed-page files. Found and fixed 15 issues: time filters in `usePublicFeed` missing lower bound (past events shown); dead unreachable block in `useFeedLogic` `handleRemindMe`; `setTimeRange('upcoming')` for highlight (past highlighted events immediately hidden) → changed to `'all'`; memory leak in recursive `scrollToHighlight` setTimeout (only first timer cleaned up) → track all timers in array; `TimeRange` type missing `'all'` union member; time-range and category filter buttons missing `type="button"` and `aria-pressed`; `FeedSkeletons` missing ARIA status semantics; two dead dialog state vars (`statsDialogOpen`, `announcementsDialogOpen`) in `FeedSidebar` — removed along with their never-reachable Dialog JSX; also added Space key to categories card; `FeedClient` delete modal using raw `bg-red-*` classes → `mq-error` tokens; `PublicEventCard` non-MQ `categoryColors` and `bg-emerald-*` added-state → MQ tokens; `FeaturedEventsBanner` non-MQ `categoryGradients`, missing `aria-label` on prev/next buttons, missing `aria-current` on active dot → fixed all; `EventDetailModal` same gradient and added-state issues → MQ tokens; `AnnouncementsSection` non-MQ `typeStyles` → MQ tokens; `QuickStats` non-MQ `CategoryBar`/`StatCard` colors + hardcoded `'en-AU'` locale + non-MQ `EventCard` categoryColors → MQ tokens + `localeMap`; `PublicFeedFilters` wrong Input import path (`@/components/ui/input` → `@/components/ui/mq/input`).
+- **Files Changed:** `features/feed/hooks/usePublicFeed.ts`, `features/feed/hooks/useFeedLogic.ts`, `features/feed/components/FeedFilters.tsx`, `features/feed/components/FeedSkeletons.tsx`, `features/feed/components/FeedSidebar.tsx`, `app/feed/FeedClient.tsx`, `features/feed/components/PublicEventCard.tsx`, `features/feed/components/FeaturedEventsBanner.tsx`, `features/feed/components/EventDetailModal.tsx`, `features/feed/components/AnnouncementsSection.tsx`, `features/feed/components/QuickStats.tsx`, `features/feed/components/PublicFeedFilters.tsx`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+- **Follow-ups:** None.
+
 ### 2026-04-06 (Australia/Sydney) — Map
 
 **Raouf:**

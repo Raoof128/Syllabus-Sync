@@ -26,28 +26,28 @@ interface Announcement {
 
 const typeStyles = {
   new: {
-    badge: 'bg-emerald-500 text-white',
+    badge: 'bg-mq-success text-white',
     icon: Sparkles,
-    iconClass: 'text-emerald-500',
-    bgClass: 'hover:border-emerald-500/30',
+    iconClass: 'text-mq-success',
+    bgClass: 'hover:border-mq-success/30',
   },
   info: {
-    badge: 'bg-blue-500 text-white',
+    badge: 'bg-mq-info text-white',
     icon: Info,
-    iconClass: 'text-blue-500',
-    bgClass: 'hover:border-blue-500/30',
+    iconClass: 'text-mq-info',
+    bgClass: 'hover:border-mq-info/30',
   },
   warning: {
-    badge: 'bg-amber-500 text-white',
+    badge: 'bg-mq-warning text-white',
     icon: AlertCircle,
-    iconClass: 'text-amber-500',
-    bgClass: 'hover:border-amber-500/30',
+    iconClass: 'text-mq-warning',
+    bgClass: 'hover:border-mq-warning/30',
   },
   highlight: {
-    badge: 'bg-purple-500 text-white',
+    badge: 'bg-mq-purple text-white',
     icon: Megaphone,
-    iconClass: 'text-purple-500',
-    bgClass: 'hover:border-purple-500/30',
+    iconClass: 'text-mq-purple',
+    bgClass: 'hover:border-mq-purple/30',
   },
 };
 

@@ -97,8 +97,8 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
           icon={Users}
           label={t('thisWeek')}
           value={stats.thisWeek}
-          color="text-purple-500"
-          bgColor="bg-purple-500/10"
+          color="text-mq-purple"
+          bgColor="bg-mq-purple/10"
           onClick={() => openDialog(t('thisWeek'), stats.thisWeekEvents)}
         />
       </div>
@@ -114,7 +114,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
             label={t('career')}
             count={stats.career}
             total={stats.total}
-            color="bg-blue-500"
+            color="bg-mq-info"
             onClick={() => openDialog(t('career'), stats.careerEvents)}
           />
           <CategoryBar
@@ -122,7 +122,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
             label={t('academic')}
             count={stats.academic}
             total={stats.total}
-            color="bg-emerald-500"
+            color="bg-mq-success"
             onClick={() => openDialog(t('academic'), stats.academicEvents)}
           />
           <CategoryBar
@@ -130,7 +130,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
             label={t('social')}
             count={stats.social}
             total={stats.total}
-            color="bg-purple-500"
+            color="bg-mq-purple"
             onClick={() => openDialog(t('social'), stats.socialEvents)}
           />
           <CategoryBar
@@ -138,7 +138,7 @@ export const QuickStats = memo(({ events, className }: QuickStatsProps) => {
             label={t('freeFood')}
             count={stats.freeFood}
             total={stats.total}
-            color="bg-amber-500"
+            color="bg-mq-warning"
             onClick={() => openDialog(t('freeFood'), stats.freeFoodEvents)}
           />
         </div>
@@ -303,23 +303,35 @@ interface EventCardProps {
 }
 
 function EventCard({ event, onClick, expanded }: EventCardProps) {
-  const { t } = useTypedTranslation();
+  const { t, language } = useTypedTranslation();
+  const localeMap: Record<string, string> = {
+    en: 'en-AU',
+    es: 'es-ES',
+    fa: 'fa-IR',
+    zh: 'zh-CN',
+    ar: 'ar-SA',
+    hi: 'hi-IN',
+    ko: 'ko-KR',
+    ja: 'ja-JP',
+  };
+  const locale = localeMap[language] || 'en-AU';
+
   const categoryColors: Record<string, string> = {
-    Career: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-    Social: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-    Academic: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-    'Free Food': 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+    Career: 'bg-mq-info/10 text-mq-info border-mq-info/20',
+    Social: 'bg-mq-purple/10 text-mq-purple border-mq-purple/20',
+    Academic: 'bg-mq-success/10 text-mq-success border-mq-success/20',
+    'Free Food': 'bg-mq-warning/10 text-mq-warning border-mq-warning/20',
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-AU', {
+    return date.toLocaleTimeString(locale, {
       hour: 'numeric',
       minute: '2-digit',
     });
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-AU', {
+    return date.toLocaleDateString(locale, {
       weekday: 'short',
       month: 'short',
       day: 'numeric',

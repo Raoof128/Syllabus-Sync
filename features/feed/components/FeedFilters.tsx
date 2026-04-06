@@ -11,7 +11,7 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { cn } from '@/lib/utils';
 
-export type TimeRange = 'today' | 'week' | 'upcoming';
+export type TimeRange = 'today' | 'week' | 'upcoming' | 'all';
 export type SortMode = 'soonest' | 'newest' | 'popular';
 export type CategoryFilter = 'All' | 'Academic' | 'Career' | 'Social' | 'Free Food';
 
@@ -72,6 +72,8 @@ export function FeedFilters({
             {(['today', 'week', 'upcoming'] as TimeRange[]).map((range) => (
               <button
                 key={range}
+                type="button"
+                aria-pressed={timeRange === range}
                 onClick={() => onTimeRangeChange(range)}
                 className={cn(
                   'px-3 py-1.5 text-xs font-medium rounded transition-colors',
@@ -94,6 +96,8 @@ export function FeedFilters({
           return (
             <button
               key={filter}
+              type="button"
+              aria-pressed={isActive}
               onClick={() => onFilterChange(filter)}
               className={cn(
                 'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border transition-all whitespace-nowrap',

@@ -85,27 +85,33 @@ export function useFeedLogic() {
   useEffect(() => {
     if (highlightEventId) {
       setHighlightedEvent(highlightEventId);
-      setTimeRange('upcoming'); // Ensure we can see it if it's upcoming (or maybe 'all'?)
+      setTimeRange('all'); // Use 'all' so past highlighted events are still visible
 
       highlightAttemptsRef.current = 0;
+
+      // Track all timers so they can be cleaned up on unmount
+      const timers: ReturnType<typeof setTimeout>[] = [];
 
       const scrollToHighlight = () => {
         const eventElement = eventRefs.current.get(highlightEventId);
         if (eventElement) {
           eventElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          setTimeout(() => {
+          const clearTimer = setTimeout(() => {
             setHighlightedEvent(null);
           }, 5000);
+          timers.push(clearTimer);
           return;
         }
         if (highlightAttemptsRef.current < 3) {
           highlightAttemptsRef.current += 1;
-          setTimeout(scrollToHighlight, 200);
+          const retryTimer = setTimeout(scrollToHighlight, 200);
+          timers.push(retryTimer);
         }
       };
 
-      const timer = setTimeout(scrollToHighlight, 300);
-      return () => clearTimeout(timer);
+      const initialTimer = setTimeout(scrollToHighlight, 300);
+      timers.push(initialTimer);
+      return () => timers.forEach(clearTimeout);
     }
   }, [highlightEventId]);
 
@@ -131,12 +137,6 @@ export function useFeedLogic() {
             return next;
           });
         }
-        return;
-      }
-
-      // Already reminded for this event
-      if (remindedEvents.has(eventId)) {
-        toastUtils.info(t('eventReminderAlreadyTitle'), t('eventReminderAlreadyMsg'));
         return;
       }
 

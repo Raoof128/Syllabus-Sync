@@ -70,20 +70,22 @@ export function usePublicFeed() {
       result = result.filter((e) => e.category === categoryFilter);
     }
 
-    // Time filter
+    // Time filter — lower bound (>= startOfDay / now) ensures past events are excluded
     const now = new Date();
     if (timeFilter === 'today') {
+      const startOfDay = new Date(now);
+      startOfDay.setHours(0, 0, 0, 0);
       const endOfDay = new Date(now);
       endOfDay.setHours(23, 59, 59, 999);
-      result = result.filter((e) => e.startAt <= endOfDay);
+      result = result.filter((e) => e.startAt >= startOfDay && e.startAt <= endOfDay);
     } else if (timeFilter === 'week') {
       const endOfWeek = new Date(now);
       endOfWeek.setDate(now.getDate() + 7);
-      result = result.filter((e) => e.startAt <= endOfWeek);
+      result = result.filter((e) => e.startAt >= now && e.startAt <= endOfWeek);
     } else if (timeFilter === 'month') {
       const endOfMonth = new Date(now);
       endOfMonth.setMonth(now.getMonth() + 1);
-      result = result.filter((e) => e.startAt <= endOfMonth);
+      result = result.filter((e) => e.startAt >= now && e.startAt <= endOfMonth);
     }
 
     // Sort

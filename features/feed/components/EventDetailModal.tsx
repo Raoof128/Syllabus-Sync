@@ -12,10 +12,10 @@ import { buildings } from '@/features/map/lib/buildings';
 import { NavigationPreferenceDialog } from '@/components/ui/NavigationPreferenceDialog';
 
 const categoryStyles: Record<string, { gradient: string; icon: string }> = {
-  Career: { gradient: 'from-blue-500 to-blue-700', icon: '💼' },
-  Social: { gradient: 'from-purple-500 to-purple-700', icon: '🎉' },
-  Academic: { gradient: 'from-emerald-500 to-emerald-700', icon: '📚' },
-  'Free Food': { gradient: 'from-amber-500 to-orange-600', icon: '🍕' },
+  Career: { gradient: 'from-mq-info to-mq-info/70', icon: '💼' },
+  Social: { gradient: 'from-mq-purple to-mq-purple/70', icon: '🎉' },
+  Academic: { gradient: 'from-mq-success to-mq-success/70', icon: '📚' },
+  'Free Food': { gradient: 'from-mq-warning to-mq-warning/70', icon: '🍕' },
 };
 
 interface EventDetailModalProps {
@@ -188,7 +188,7 @@ export const EventDetailModal = memo(
                   className={cn(
                     'w-full gap-2 transition-all',
                     isAdded
-                      ? 'bg-emerald-600 hover:bg-emerald-600 border-emerald-600'
+                      ? 'bg-mq-success hover:bg-mq-success/90 border-mq-success'
                       : 'bg-mq-primary hover:bg-mq-primary-dark',
                   )}
                 >

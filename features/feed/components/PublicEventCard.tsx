@@ -15,32 +15,32 @@ const categoryColors: Record<
   { bg: string; text: string; border: string; icon: string; gradient: string }
 > = {
   Career: {
-    bg: 'bg-blue-50 dark:bg-blue-950/30',
-    text: 'text-blue-700 dark:text-blue-400',
-    border: 'border-blue-200 dark:border-blue-800',
+    bg: 'bg-mq-info/10',
+    text: 'text-mq-info',
+    border: 'border-mq-info/20',
     icon: '💼',
-    gradient: 'from-blue-500/10 to-blue-600/5',
+    gradient: 'from-mq-info/10 to-mq-info/5',
   },
   Social: {
-    bg: 'bg-purple-50 dark:bg-purple-950/30',
-    text: 'text-purple-700 dark:text-purple-400',
-    border: 'border-purple-200 dark:border-purple-800',
+    bg: 'bg-mq-purple/10',
+    text: 'text-mq-purple',
+    border: 'border-mq-purple/20',
     icon: '🎉',
-    gradient: 'from-purple-500/10 to-purple-600/5',
+    gradient: 'from-mq-purple/10 to-mq-purple/5',
   },
   Academic: {
-    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-    text: 'text-emerald-700 dark:text-emerald-400',
-    border: 'border-emerald-200 dark:border-emerald-800',
+    bg: 'bg-mq-success/10',
+    text: 'text-mq-success',
+    border: 'border-mq-success/20',
     icon: '📚',
-    gradient: 'from-emerald-500/10 to-emerald-600/5',
+    gradient: 'from-mq-success/10 to-mq-success/5',
   },
   'Free Food': {
-    bg: 'bg-amber-50 dark:bg-amber-950/30',
-    text: 'text-amber-700 dark:text-amber-500',
-    border: 'border-amber-200 dark:border-amber-800',
+    bg: 'bg-mq-warning/10',
+    text: 'text-mq-warning',
+    border: 'border-mq-warning/20',
     icon: '🍕',
-    gradient: 'from-amber-500/10 to-orange-500/5',
+    gradient: 'from-mq-warning/10 to-mq-warning/5',
   },
 };
 
@@ -107,7 +107,7 @@ export const PublicEventCard = memo(
           <div
             className={cn(
               'h-1.5 rounded-t-2xl relative z-10',
-              categoryStyle.bg.replace('bg-', 'bg-').replace('/30', ''),
+              categoryStyle.bg,
             )}
           />
 
@@ -191,7 +191,7 @@ export const PublicEventCard = memo(
               disabled={isAdding || isAdded}
               className={cn(
                 'flex-1 gap-2 transition-all font-medium',
-                isAdded && 'bg-emerald-600 hover:bg-emerald-700 border-emerald-600 text-white',
+                isAdded && 'bg-mq-success hover:bg-mq-success/90 border-mq-success text-white',
               )}
             >
               {isAdding ? (

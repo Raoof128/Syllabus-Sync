@@ -1,7 +1,7 @@
 'use client';
 
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/mq/input';
 import { Button } from '@/components/ui/mq/button';
 import { Badge } from '@/components/ui/mq/badge';
 import {

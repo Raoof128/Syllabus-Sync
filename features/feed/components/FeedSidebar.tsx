@@ -55,8 +55,6 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
   const { t } = useTypedTranslation();
 
   // Dialog states
-  const [statsDialogOpen, setStatsDialogOpen] = useState(false);
-  const [announcementsDialogOpen, setAnnouncementsDialogOpen] = useState(false);
   const [categoriesDialogOpen, setCategoriesDialogOpen] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
   const [selectedStat, setSelectedStat] = useState<'total' | 'thisWeek' | 'freeFood' | null>(null);
@@ -303,7 +301,12 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
                 onClick={() => setCategoriesDialogOpen(true)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && setCategoriesDialogOpen(true)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setCategoriesDialogOpen(true);
+                  }
+                }}
               >
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center justify-between text-lg">
@@ -364,59 +367,6 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
           </MagicCard>
         </ScrollReveal>
       </aside>
-
-      {/* Stats Detail Dialog */}
-      <Dialog open={statsDialogOpen} onOpenChange={setStatsDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-mq-primary" />
-              {t('eventStatistics')}
-            </DialogTitle>
-            <DialogDescription>{t('eventsOverview')}</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 mt-4">
-            <div className="p-4 bg-mq-info/10 rounded-mq-lg border border-mq-info/20">
-              <div className="flex items-center justify-between mb-2">
-                <span className="flex items-center gap-2 font-medium">
-                  <Calendar className="h-5 w-5 text-mq-info" />
-                  {t('totalEvents')}
-                </span>
-                <span className="text-2xl font-bold text-mq-info">{stats.total}</span>
-              </div>
-              <p className="text-mq-sm text-mq-content-secondary">{t('totalEventsDesc')}</p>
-            </div>
-
-            <div className="p-4 bg-mq-purple/10 rounded-mq-lg border border-mq-purple/20">
-              <div className="flex items-center justify-between mb-2">
-                <span className="flex items-center gap-2 font-medium">
-                  <Users className="h-5 w-5 text-mq-purple" />
-                  {t('thisWeek')}
-                </span>
-                <span className="text-2xl font-bold text-mq-purple">{stats.thisWeek}</span>
-              </div>
-              <p className="text-mq-sm text-mq-content-secondary">{t('thisWeekEventsDesc')}</p>
-            </div>
-
-            <div className="p-4 bg-mq-warning/10 rounded-mq-lg border border-mq-warning/20">
-              <div className="flex items-center justify-between mb-2">
-                <span className="flex items-center gap-2 font-medium">
-                  <span className="text-xl">🍕</span>
-                  {t('freeFood')}
-                </span>
-                <span className="text-2xl font-bold text-mq-warning">{stats.freeFood}</span>
-              </div>
-              <p className="text-mq-sm text-mq-content-secondary">{t('freeFoodEventsDesc')}</p>
-            </div>
-
-            <div className="flex items-center gap-2 p-3 bg-mq-background-secondary rounded-mq-lg">
-              <Sparkles className="h-4 w-4 text-mq-primary" />
-              <p className="text-mq-sm text-mq-content-secondary">{t('filterByCategoryDesc')}</p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Individual Stat Detail Dialog */}
       <Dialog open={!!selectedStat} onOpenChange={(open) => !open && setSelectedStat(null)}>
@@ -529,48 +479,6 @@ const FeedSidebarComponent = ({ stats, categoryStats, onCategoryClick }: FeedSid
               </div>
             </>
           )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Announcements Detail Dialog */}
-      <Dialog open={announcementsDialogOpen} onOpenChange={setAnnouncementsDialogOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Megaphone className="h-5 w-5 text-mq-primary" />
-              {t('announcements')}
-            </DialogTitle>
-            <DialogDescription>{t('importantUpdates')}</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 mt-4 max-h-[60vh] overflow-y-auto">
-            {announcements.map((announcement) => (
-              <button
-                key={announcement.id}
-                onClick={() => handleAnnouncementClick(announcement)}
-                className={`w-full text-left p-4 rounded-mq-lg border hover:shadow-md transition-all ${
-                  announcement.type === 'featured'
-                    ? 'bg-mq-primary/10 border-mq-primary/20 hover:bg-mq-primary/15'
-                    : announcement.type === 'new'
-                      ? 'bg-mq-success/10 border-mq-success/20 hover:bg-mq-success/15'
-                      : 'bg-mq-info/10 border-mq-info/20 hover:bg-mq-info/15'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <Badge className={`${getBadgeStyle(announcement.type)} flex-shrink-0`}>
-                    {getBadgeLabel(announcement.type)}
-                  </Badge>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-mq-content">{announcement.title}</h4>
-                    <p className="text-mq-sm text-mq-content-secondary mt-1">
-                      {announcement.description}
-                    </p>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-mq-content-tertiary flex-shrink-0" />
-                </div>
-              </button>
-            ))}
-          </div>
         </DialogContent>
       </Dialog>
 

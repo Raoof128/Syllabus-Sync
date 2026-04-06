@@ -4,6 +4,49 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Event Feed Page Bug Hunt & Production Hardening — 2026-04-06
+
+**Scope:** Bug fixes, performance, accessibility, type safety, i18n, and MQ token compliance across 12 feed files
+
+1. **`usePublicFeed.ts` — time filters showed past events:** `today`, `week`, and `month` branches had no lower bound, so past events leaked through. Fixed by adding `>= startOfDay` (today) and `>= now` (week/month) guards, plus a proper `endOfDay` window for today.
+2. **`useFeedLogic.ts` — dead code block:** The second `if (remindedEvents.has(eventId))` check at line 138 was unreachable — the identical guard at line 115 already returned early. Removed the dead block.
+3. **`useFeedLogic.ts` — wrong `timeRange` for highlight:** `setTimeRange('upcoming')` meant highlighted past events were immediately filtered out. Changed to `setTimeRange('all')` so the highlighted event is always visible regardless of time.
+4. **`useFeedLogic.ts` — memory leak in recursive `scrollToHighlight`:** Only the first `setTimeout` was returned in the cleanup function; the recursive retry and the 5 s clear timer were never cancelled on unmount. Replaced with a `timers[]` array that `clearTimeout`s every timer in the cleanup.
+5. **`FeedFilters.tsx` — `TimeRange` type missing `'all'`:** Added `'all'` to the union so the `setTimeRange('all')` call in `useFeedLogic` is type-safe.
+6. **`FeedFilters.tsx` — filter/time buttons missing `type="button"` and `aria-pressed`:** Both the time-range toggle buttons and category chip buttons lacked `type="button"` (could submit a parent form) and `aria-pressed` (screen readers had no active-state indication). Added both to all buttons.
+7. **`FeedSkeletons.tsx` — loading skeleton invisible to screen readers:** `FeedSkeletons` had no ARIA semantics. Wrapped in a `<div role="status" aria-busy="true" aria-label="Loading events">` to match the project pattern.
+8. **`FeedSidebar.tsx` — dead `statsDialogOpen` and `announcementsDialogOpen` states:** Both state variables were declared and their dialogs rendered, but no UI element ever toggled them open. Removed both state variables and their Dialog JSX. Also added Space key support (`e.key === ' '`) to the categories card `onKeyDown`.
+9. **`FeedClient.tsx` — hardcoded red color classes in delete modal:** `bg-red-100`, `text-red-500`, and `bg-red-500 hover:bg-red-600` violated the "no hardcoded hex/raw Tailwind colors" rule. Replaced with `bg-mq-error/10`, `ring-mq-error/20`, `text-mq-error`, `bg-mq-error hover:bg-mq-error/90`.
+10. **`PublicEventCard.tsx` — non-MQ `categoryColors` and `bg-emerald-600` added-state:** All category color classes (`bg-blue-50`, `text-blue-700`, etc.) replaced with MQ tokens (`bg-mq-info/10 text-mq-info border-mq-info/20`, etc.). The "added to calendar" button state `bg-emerald-600 hover:bg-emerald-700` replaced with `bg-mq-success hover:bg-mq-success/90 border-mq-success`. Also simplified the redundant `categoryStyle.bg.replace(...)` no-op to `categoryStyle.bg`.
+11. **`FeaturedEventsBanner.tsx` — non-MQ `categoryGradients`, missing nav/dot ARIA:** `from-blue-600 to-blue-800` etc. replaced with `from-mq-info to-mq-info/70` etc. Previous/next nav buttons missing `aria-label` and `aria-hidden` on their icons. Dot buttons missing `type="button"` and `aria-current`.
+12. **`EventDetailModal.tsx` — non-MQ `categoryStyles` gradients and `bg-emerald-600` added-state:** `from-blue-500 to-blue-700` etc. replaced with `from-mq-info to-mq-info/70` etc. Added-state button `bg-emerald-600 hover:bg-emerald-600` replaced with `bg-mq-success hover:bg-mq-success/90 border-mq-success`.
+13. **`AnnouncementsSection.tsx` — non-MQ `typeStyles` colors:** `bg-emerald-500`, `bg-blue-500`, `bg-amber-500`, `bg-purple-500` and their `text-` / `hover:border-` variants replaced with MQ tokens (`bg-mq-success`, `bg-mq-info`, `bg-mq-warning`, `bg-mq-purple`).
+14. **`QuickStats.tsx` — non-MQ `CategoryBar` colors, non-MQ `StatCard` color, and hardcoded `'en-AU'` locale:** `bg-blue-500`, `bg-emerald-500`, `bg-purple-500`, `bg-amber-500` in `CategoryBar` replaced with `bg-mq-info`, `bg-mq-success`, `bg-mq-purple`, `bg-mq-warning`. `text-purple-500/bg-purple-500/10` in `StatCard` replaced with `text-mq-purple/bg-mq-purple/10`. `EventCard` hardcoded `'en-AU'` in both `toLocaleTimeString` and `toLocaleDateString`; replaced with a `localeMap` driven by `useTypedTranslation().language`. `EventCard` `categoryColors` also replaced with MQ tokens. Merged two `useTypedTranslation()` calls into one.
+15. **`PublicFeedFilters.tsx` — wrong Input import path:** `@/components/ui/input` (base shadcn) replaced with `@/components/ui/mq/input` (MQ-themed wrapper) for visual consistency.
+
+**Files Changed:**
+
+- `features/feed/hooks/usePublicFeed.ts`
+- `features/feed/hooks/useFeedLogic.ts`
+- `features/feed/components/FeedFilters.tsx`
+- `features/feed/components/FeedSkeletons.tsx`
+- `features/feed/components/FeedSidebar.tsx`
+- `app/feed/FeedClient.tsx`
+- `features/feed/components/PublicEventCard.tsx`
+- `features/feed/components/FeaturedEventsBanner.tsx`
+- `features/feed/components/EventDetailModal.tsx`
+- `features/feed/components/AnnouncementsSection.tsx`
+- `features/feed/components/QuickStats.tsx`
+- `features/feed/components/PublicFeedFilters.tsx`
+
+**Verification:**
+
+- TypeScript: `npm run typecheck` — clean (no source-file errors) ✅
+- Lint: `npm run lint` — Lint OK ✅
+- Tests: 874/878 passed ✅ (4 pre-existing signup failures, unrelated)
+
+---
+
 ### Raouf: Map Page Bug Hunt & Production Hardening — 2026-04-06
 
 **Scope:** Bug fixes, performance, accessibility, type safety, and i18n compliance across 5 map files

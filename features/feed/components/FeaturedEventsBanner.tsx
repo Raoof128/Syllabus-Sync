@@ -11,10 +11,10 @@ import type { TranslationKey } from '@/lib/i18n/translations';
 import { useHydration } from '@/lib/hooks';
 
 const categoryGradients: Record<string, string> = {
-  Career: 'from-blue-600 to-blue-800',
-  Social: 'from-purple-600 to-purple-800',
-  Academic: 'from-emerald-600 to-emerald-800',
-  'Free Food': 'from-amber-500 to-orange-600',
+  Career: 'from-mq-info to-mq-info/70',
+  Social: 'from-mq-purple to-mq-purple/70',
+  Academic: 'from-mq-success to-mq-success/70',
+  'Free Food': 'from-mq-warning to-mq-warning/70',
 };
 
 const categoryIcons: Record<string, string> = {
@@ -181,24 +181,26 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
             <Button
               variant="ghost"
               size="icon"
+              aria-label={t('previousEvent' as TranslationKey)}
               onClick={(e) => {
                 e.stopPropagation();
                 goToPrevious();
               }}
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
+              aria-label={t('nextEvent' as TranslationKey)}
               onClick={(e) => {
                 e.stopPropagation();
                 goToNext();
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm"
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-5 w-5" aria-hidden="true" />
             </Button>
           </>
         )}
@@ -209,6 +211,7 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
             {events.map((_, index) => (
               <button
                 key={index}
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsAutoPlaying(false);
@@ -219,6 +222,7 @@ export const FeaturedEventsBanner = memo(({ events, onEventClick }: FeaturedEven
                   index === safeIndex ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60',
                 )}
                 aria-label={t('goToEventAria' as TranslationKey, { index: index + 1 })}
+                aria-current={index === safeIndex ? 'true' : undefined}
               />
             ))}
           </div>
