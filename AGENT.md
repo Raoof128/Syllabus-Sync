@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-06 (Australia/Sydney) — About, Contact, Terms & Privacy Pages
+
+**Raouf:**
+
+- **Scope:** About, Contact, Terms & Privacy Pages Bug Hunt & Production Hardening
+- **Summary:** 22 issues fixed across 8 files. All 4 pages used `'use client'` at the page level → no metadata, breaking SEO for all public pages → split each into RSC `page.tsx` (metadata + ARIA skeleton + Suspense) + `*-client.tsx` (client component). All 4 hero banners had hardcoded hex → MQ tokens: `from-[#8B1525] via-[#A6192E] to-[#76232f]` → `from-mq-red-deep via-mq-primary to-mq-red-deep`; `text-[#FFB81C]`/`bg-[#FFB81C]` → `text-mq-warning`/`bg-mq-warning`. About: `group` missing on CTA Link (broken `group-hover` animation); sections missing `aria-labelledby`; missing `<main>`. Contact: `text-mq-danger` → `text-mq-error` (token didn't exist → invisible errors); `group` missing on helpful-links article (migrated to scoped `group/link`); `maxLength` added to email (254) + textarea (2000); error `<p>` now has `id` + `role="alert"` + textarea `aria-describedby`; `noValidate` added; missing `<main>`. Terms: `ArrowLeft` `aria-hidden`; `scroll-mt-8` on sections; `<main>`. Privacy: `ArrowLeft` `aria-hidden`; table row keys from index to `row[0]`; mailto subject `encodeURIComponent`-encoded; `scroll-mt-8` + `aria-labelledby` on all 14 sections; `<main>`.
+- **Files Changed:** `app/about/page.tsx`, `app/about/about-client.tsx`, `app/contact/page.tsx`, `app/contact/contact-client.tsx`, `app/terms/page.tsx`, `app/terms/terms-client.tsx`, `app/privacy/page.tsx`, `app/privacy/privacy-client.tsx`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+- **Follow-ups:** None.
+
 ### 2026-04-06 (Australia/Sydney) — Reset Password Page
 
 **Raouf:**

@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: About, Contact, Terms & Privacy Pages Bug Hunt & Production Hardening — 2026-04-06
+
+**Scope:** Bug fixes, SEO, accessibility, design token compliance, and performance across 4 public pages.
+
+**Summary:** Deep-reviewed all 4 public pages. Found and fixed 22 issues across 8 files (4 RSC wrappers + 4 client components). All 4 pages were `'use client'` at the page file level — metadata could not be exported, breaking SEO for all public-facing pages. Resolved by splitting each page into an RSC `page.tsx` (exports `metadata` + `Suspense` wrapper with ARIA-compliant loading skeleton) and a `*-client.tsx` (client component, following the established pattern from login/signup/reset-password). All 4 hero banners had hardcoded hex colors: `from-[#8B1525] via-[#A6192E] to-[#76232f]` → `from-mq-red-deep via-mq-primary to-mq-red-deep`; `text-[#FFB81C]` → `text-mq-warning`; `bg-[#FFB81C]/10` → `bg-mq-warning/10`; `bg-[#FFB81C]` → `bg-mq-warning`; `from-[#76232f]/50` → `from-mq-red-deep/50`. About page: CTA `<Link>` missing `group` class — `group-hover:translate-x-0.5` on `ArrowRight` never fired → added `group`; sections missing `aria-labelledby` and h2s missing matching `id` attributes → added; missing `<main>` landmark → added. Contact page: `text-mq-danger` used for error text — this token is NOT defined in the Tailwind config (only `mq-error` exists), making error messages invisible → corrected to `text-mq-error`; helpful-links `<article>` missing `group` class — `group-hover:opacity-100` on `ArrowRight` never fired → migrated to scoped `group/link` + `group-hover/link:opacity-100` pattern; email input and feedback textarea had no `maxLength` → added `maxLength={254}` and `maxLength={2000}`; error `<p>` missing `id` + `role="alert"` and textarea missing `aria-describedby` → error never announced to screen readers, fixed with matching `id="feedback-error"` and `aria-describedby`; added `noValidate` to form (browser native validation bypassed in favour of custom); missing `<main>` landmark → added. Terms page: `ArrowLeft` icon missing `aria-hidden="true"` → added; all `<section>` elements missing `scroll-mt-8` — TOC anchor links scrolled the heading behind the sticky nav → added; sections now have `aria-labelledby` + h2 `id` pairs; missing `<main>` → added. Privacy page: `ArrowLeft` icon missing `aria-hidden="true"` → added; `TABLE_ROWS` extracted to module-level constant, table rows now keyed by `row[0]` (stable translation key) instead of array index; privacy complaint `mailto:` subject not `encodeURIComponent`-encoded — spaces in subject broke some email clients → computed `privacyComplaintHref` with encoded subject in component body; `scroll-mt-8` added to all 14 sections; `aria-labelledby` + h2 `id` on all 14 sections; missing `<main>` → added.
+
+**Files Changed:** `app/about/page.tsx`, `app/about/about-client.tsx` (new), `app/contact/page.tsx`, `app/contact/contact-client.tsx` (new), `app/terms/page.tsx`, `app/terms/terms-client.tsx` (new), `app/privacy/page.tsx`, `app/privacy/privacy-client.tsx` (new).
+
+**Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+
+**Follow-ups:** None.
+
+---
+
 ### Raouf: Reset Password Page Bug Hunt & Production Hardening — 2026-04-06
 
 **Scope:** Bug fixes, performance, accessibility, i18n/token compliance, and code quality across 2 reset-password page files.
