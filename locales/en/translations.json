@@ -1624,6 +1624,8 @@
   "loginErrorEmailNotConfirmed": "Please check your email to confirm your account",
   "loginErrorTooManyRequests": "Too many login attempts. Please wait a few minutes.",
   "loginErrorFailed": "Login failed. Please try again.",
+  "loginErrorProviderMismatchGoogle": "You already signed up with Google. Please continue with your Google account.",
+  "loginErrorProviderMismatchEmail": "You already signed up with email. Please log in with your email and password.",
   "oauthSignInFailed": "Google sign-in failed. Please try again or use email and password.",
   "oauthSessionExpired": "Sign-in session expired. Please try again.",
   "oauthCodeExchangeFailed": "Google sign-in could not be completed. The authorization code expired or was already used. Please try again.",

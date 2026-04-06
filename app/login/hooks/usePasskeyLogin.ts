@@ -3,6 +3,7 @@ import { toastUtils } from '@/lib/utils/toast';
 import { API_ROUTES } from '@/lib/constants/config';
 import { base64UrlToUint8Array, bufferToBase64Url } from '@/lib/utils/passkey';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
+import { logger } from '@/lib/logger';
 
 export function usePasskeyLogin() {
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
@@ -82,7 +83,7 @@ export function usePasskeyLogin() {
         toastUtils.success(t('welcomeBack'), t('loginSuccess'));
         onSuccess();
       } catch (err) {
-        console.error(err);
+        logger.error('Passkey login failed:', err);
         toastUtils.error(
           t('loginErrorFailed'),
           err instanceof Error ? err.message : t('unexpectedError'),

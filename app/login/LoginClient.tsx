@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -20,6 +20,7 @@ import { createLoginSchema, type LoginFormData } from './schemas/loginSchema';
 import { loginAction, type MFAFactorInfo } from './actions';
 import { usePasskeyLogin } from './hooks/usePasskeyLogin';
 import { MFAChallenge } from './components/MFAChallenge';
+import { cn } from '@/lib/utils';
 import {
   AlertTriangle,
   Eye,
@@ -36,7 +37,7 @@ export default function LoginClient() {
   const { loginWithPasskey, isPasskeyLoading } = usePasskeyLogin();
 
   // Form Management
-  const localLoginSchema = createLoginSchema(t);
+  const localLoginSchema = useMemo(() => createLoginSchema(t), [t]);
   const {
     register,
     handleSubmit,
@@ -111,13 +112,11 @@ export default function LoginClient() {
         if (result.error === 'invalid_credentials') {
           setGeneralError(t('loginErrorInvalidCredentials'));
         } else if (result.error === 'provider_mismatch') {
-          // Exact copy requested by product: the user signed up with a
-          // different provider and must use that one instead.
-          const msg =
+          setGeneralError(
             result.signupProvider === 'google'
-              ? 'You already signed up with Google. Please continue with your Google account.'
-              : 'You already signed up with email. Please log in with your email and password.';
-          setGeneralError(msg);
+              ? t('loginErrorProviderMismatchGoogle')
+              : t('loginErrorProviderMismatchEmail'),
+          );
         } else if (result.error === 'email_not_confirmed') {
           setGeneralError(t('loginErrorEmailNotConfirmed'));
           setShowResendVerification(true);
@@ -199,7 +198,7 @@ export default function LoginClient() {
   };
 
   // Passkey Login Handler
-  const handlePasskeyLogin = () => {
+  const handlePasskeyLogin = useCallback(() => {
     setGeneralError(null);
     loginWithPasskey(email, async () => {
       setIsSuccess(true);
@@ -211,7 +210,7 @@ export default function LoginClient() {
         window.location.href = redirectTo;
       }, 800);
     });
-  };
+  }, [email, loginWithPasskey, redirectTo]);
 
   // If the proxy detected an aal1 session that must be upgraded to aal2, automatically
   // load factors and show the MFA challenge on the login page.
@@ -322,7 +321,7 @@ export default function LoginClient() {
     };
   }, [email]);
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = useCallback(async () => {
     if (!isSupabaseConfigured()) {
       toastUtils.error(t('oauthRequired'), t('googleOAuthDesc'));
       return;
@@ -369,7 +368,7 @@ export default function LoginClient() {
       toastUtils.error(t('loginErrorFailed'), t('unexpectedError'));
       setOauthLoading(false);
     }
-  };
+  }, [redirectTo, t]);
 
   return (
     <div className="login-page min-h-[100dvh] flex items-start lg:items-center justify-center bg-mq-background px-2 py-2 sm:px-4 sm:py-4 lg:p-0 relative overflow-y-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -461,10 +460,9 @@ export default function LoginClient() {
                       : callbackError === 'verification_failed'
                         ? t('verificationLinkUsed')
                         : callbackError === 'provider_mismatch'
-                          ? // Exact copy requested: mirror the password-path message.
-                            searchParams.get('signup_provider') === 'email'
-                            ? 'You already signed up with email. Please log in with your email and password.'
-                            : 'You already signed up with Google. Please continue with your Google account.'
+                          ? searchParams.get('signup_provider') === 'email'
+                            ? t('loginErrorProviderMismatchEmail')
+                            : t('loginErrorProviderMismatchGoogle')
                           : t('loginErrorFailed')}
                   </div>
                   {callbackError === 'oauth_failed' && (
@@ -539,9 +537,13 @@ export default function LoginClient() {
                   autoComplete="email"
                   disabled={isGlobalLoading}
                   className="h-12 rounded-xl text-mq-content font-medium"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? 'email-error' : undefined}
                 />
                 {errors.email && (
-                  <p className="text-xs text-red-500 font-medium ml-1">{errors.email.message}</p>
+                  <p id="email-error" className="text-xs text-mq-error font-medium ml-1">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
@@ -556,6 +558,8 @@ export default function LoginClient() {
                     autoComplete="current-password"
                     disabled={isGlobalLoading}
                     className="pr-10 h-12 rounded-xl text-mq-content font-medium"
+                    aria-invalid={!!errors.password}
+                    aria-describedby={errors.password ? 'password-error' : undefined}
                   />
                   <button
                     type="button"
@@ -569,7 +573,9 @@ export default function LoginClient() {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-xs text-red-500 font-medium ml-1">{errors.password.message}</p>
+                  <p id="password-error" className="text-xs text-mq-error font-medium ml-1">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
 
@@ -577,7 +583,6 @@ export default function LoginClient() {
                 <Link
                   href="/reset-password"
                   className="text-mq-primary hover:underline font-bold"
-                  aria-disabled={isGlobalLoading}
                   onClick={() => setGeneralError(null)}
                 >
                   {t('forgotPassword')}
@@ -617,13 +622,14 @@ export default function LoginClient() {
                   <div className="flex flex-wrap gap-2">
                     {/* Biometric / Passkey Status */}
                     <span
-                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${
+                      className={cn(
+                        'inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium',
                         passkeyStatus === 'available'
                           ? 'bg-mq-success/10 text-mq-success'
                           : passkeyStatus === 'checking'
                             ? 'bg-mq-content-secondary/10 text-mq-content-secondary'
-                            : 'bg-mq-content-secondary/10 text-mq-content-tertiary'
-                      }`}
+                            : 'bg-mq-content-secondary/10 text-mq-content-tertiary',
+                      )}
                     >
                       <Fingerprint className="h-3 w-3" aria-hidden="true" />
                       {passkeyStatus === 'checking'
@@ -637,11 +643,12 @@ export default function LoginClient() {
 
                     {/* MFA Status */}
                     <span
-                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${
+                      className={cn(
+                        'inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium',
                         mfaEnabled
                           ? 'bg-mq-success/10 text-mq-success'
-                          : 'bg-mq-content-secondary/10 text-mq-content-tertiary'
-                      }`}
+                          : 'bg-mq-content-secondary/10 text-mq-content-tertiary',
+                      )}
                     >
                       <ShieldCheck className="h-3 w-3" aria-hidden="true" />
                       {mfaEnabled ? t('twoFactorAuth') : t('twoFactorAuthOff')}
@@ -653,11 +660,10 @@ export default function LoginClient() {
               <Button
                 type="button"
                 variant="outline"
-                className={`h-12 w-full rounded-full flex items-center justify-center gap-2 font-bold ${
-                  passkeyStatus === 'available'
-                    ? 'border-mq-success/30 hover:border-mq-success/50'
-                    : ''
-                }`}
+                className={cn(
+                  'h-12 w-full rounded-full flex items-center justify-center gap-2 font-bold',
+                  passkeyStatus === 'available' && 'border-mq-success/30 hover:border-mq-success/50',
+                )}
                 onClick={handlePasskeyLogin}
                 disabled={isGlobalLoading || !email || passkeyStatus !== 'available'}
               >
@@ -732,10 +738,10 @@ export default function LoginClient() {
               <p className="uppercase tracking-[0.16em] sm:tracking-[0.2em] text-xs text-mq-primary font-semibold">
                 {t('campusNavigation')}
               </p>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-[#18181b]">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-mq-content">
                 {t('loginHeroTitle')}
               </h2>
-              <p className="text-sm sm:text-base max-w-xl text-[#3f3f46]">
+              <p className="text-sm sm:text-base max-w-xl text-mq-content-secondary">
                 {t('loginHeroDescription')}
               </p>
             </div>

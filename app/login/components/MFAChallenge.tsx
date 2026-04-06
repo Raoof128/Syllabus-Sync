@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/mq/button';
 import { Input } from '@/components/ui/mq/input';
 import { Shield, Loader2, AlertTriangle, Smartphone, ArrowLeft } from 'lucide-react';
@@ -35,6 +35,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
+  const cooldownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Auto-select the first TOTP factor, or fall back to phone
   useEffect(() => {
@@ -134,6 +135,13 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
     [factors],
   );
 
+  // Cleanup cooldown interval on unmount to prevent memory leak
+  useEffect(() => {
+    return () => {
+      if (cooldownIntervalRef.current) clearInterval(cooldownIntervalRef.current);
+    };
+  }, []);
+
   const handleResendSMS = useCallback(async () => {
     if (!selectedFactor || selectedFactor.type !== 'phone' || resendCooldown > 0) return;
 
@@ -143,10 +151,11 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
 
       // Start cooldown
       setResendCooldown(60);
-      const interval = setInterval(() => {
+      if (cooldownIntervalRef.current) clearInterval(cooldownIntervalRef.current);
+      cooldownIntervalRef.current = setInterval(() => {
         setResendCooldown((prev) => {
           if (prev <= 1) {
-            clearInterval(interval);
+            if (cooldownIntervalRef.current) clearInterval(cooldownIntervalRef.current);
             return 0;
           }
           return prev - 1;
@@ -202,11 +211,18 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
           autoFocus
           autoComplete="one-time-code"
           disabled={isLoading || attemptsLeft <= 0}
+          aria-label={t('twoStepVerification' as TranslationKey)}
+          aria-describedby={error ? 'mfa-error' : undefined}
+          aria-invalid={!!error}
         />
 
         {error && (
-          <div className="flex items-center gap-2 text-red-500 text-xs sm:text-sm justify-center text-center">
-            <AlertTriangle className="h-4 w-4" />
+          <div
+            id="mfa-error"
+            role="alert"
+            className="flex items-center gap-2 text-mq-error text-xs sm:text-sm justify-center text-center"
+          >
+            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
             <span className="break-words">{error}</span>
           </div>
         )}
@@ -214,6 +230,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
 
       {/* Submit Button */}
       <Button
+        type="button"
         onClick={handleVerify}
         disabled={isLoading || code.length !== 6 || attemptsLeft <= 0}
         className="w-full h-12 font-bold"
@@ -232,6 +249,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
       {selectedFactor?.type === 'phone' && (
         <div className="text-center">
           <Button
+            type="button"
             variant="ghost"
             size="sm"
             onClick={handleResendSMS}
@@ -249,6 +267,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
       {hasMultipleFactorTypes && (
         <div className="border-t border-mq-border pt-4">
           <Button
+            type="button"
             variant="ghost"
             size="sm"
             className="w-full text-xs text-mq-content-secondary"
@@ -265,6 +284,7 @@ export function MFAChallenge({ t, factors, onSuccess, onCancel }: MFAChallengePr
       {/* Back Button */}
       <div className="text-center">
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           onClick={onCancel}
