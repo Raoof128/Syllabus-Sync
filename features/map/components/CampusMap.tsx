@@ -510,7 +510,7 @@ const CampusMap = forwardRef<CampusMapRef, CampusMapProps>(
                   cx="12"
                   cy="12"
                   r="2"
-                  fill={locationStatus === 'found' ? '#4285F4' : 'currentColor'}
+                  fill={locationStatus === 'found' ? 'var(--mq-primary)' : 'currentColor'}
                   stroke="none"
                 />
                 <line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" strokeWidth="2" />

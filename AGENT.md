@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-06 (Australia/Sydney) — Map
+
+**Raouf:**
+
+- **Scope:** Map Page Bug Hunt & Production Hardening
+- **Summary:** Reviewed all map files (MapClient.tsx, CampusMap.tsx, CampusMapHUD.tsx, MapPageSkeleton.tsx, position-editor/page.tsx, RouteAnnouncer.tsx, GoogleMapController.tsx, CampusMap.tsx, hooks, lib). Found and fixed 10 issues: URL truncation always appended `...` even for short URLs; redundant `document.title` useEffect overriding Next.js metadata; `selectedBuildingName={selectedBuilding?.id}` semantic mismatch (passing building code instead of human-readable name to screen reader announcements); duplicate `{/* Combined Map Wrapper */}` comment; three non-memoized inline arrow functions passed as props to CampusMapHUD (`onStartNavigation`, `onStopNavigation`, `onClearExternalPlace`) — memoized with `useCallback`; inaccessible `MapPageSkeleton` missing ARIA semantics; `position-editor/page.tsx` using non-MQ semantic Tailwind classes; hardcoded hex `bg-[#d2e3fc] dark:bg-[#1a3a5c]` in Google Maps selected-building highlight; category displayed via manual JS capitalization instead of i18n via `BUILDING_CATEGORY_LABELS`; hardcoded `'#4285F4'` hex in CampusMap SVG fill → replaced with `var(--mq-primary)`.
+- **Files Changed:** `features/map/components/MapClient.tsx`, `features/map/components/CampusMap.tsx`, `features/map/components/CampusMapHUD.tsx`, `features/map/components/MapPageSkeleton.tsx`, `app/map/position-editor/page.tsx`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+- **Follow-ups:** None.
+
 ### 2026-04-06 (Australia/Sydney) — Calendar
 
 **Raouf:**

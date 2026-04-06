@@ -21,8 +21,6 @@ import { TranslatedMapErrorBoundary } from './MapErrorBoundary';
 import { MapLoadingSkeleton } from './MapSkeleton';
 import CampusMapHUD from './CampusMapHUD';
 import { RouteAnnouncer } from './RouteAnnouncer';
-import { APP_CONFIG } from '@/lib/config';
-
 import { Badge } from '@/components/ui/mq/badge';
 import { Button } from '@/components/ui/mq/button';
 import { UNIVERSITY_CONFIG } from '@/lib/config';
@@ -273,7 +271,9 @@ export default function MapClient() {
 
     try {
       await navigator.clipboard.writeText(url.toString());
-      toastUtils.success(t('copied'), `${url.toString().substring(0, 50)}...`);
+      const urlStr = url.toString();
+      const preview = urlStr.length > 50 ? `${urlStr.substring(0, 50)}...` : urlStr;
+      toastUtils.success(t('copied'), preview);
     } catch {
       toastUtils.error(t('error'), t('tryAgain'));
     }
@@ -410,14 +410,10 @@ export default function MapClient() {
     [language, searchParams, t],
   );
 
-  // Ensure a non-empty document title for accessibility scanners
-  useEffect(() => {
-    try {
-      document.title = t('mapMetaTitle', { appName: APP_CONFIG.name });
-    } catch {
-      // ignore
-    }
-  }, [t]);
+  // Memoized CampusMapHUD callbacks — prevents child re-renders on every MapClient render
+  const handleStartNavigation = useCallback(() => campusMapRef.current?.startNavigation(), []);
+  const handleStopNavigation = useCallback(() => campusMapRef.current?.stopNavigation(), []);
+  const handleClearExternalPlace = useCallback(() => setExternalDestination(null), []);
 
   useEffect(() => {
     if (mapView !== 'campus') {
@@ -485,7 +481,7 @@ export default function MapClient() {
         <RouteAnnouncer
           navState={navState}
           locationStatus={locationStatus}
-          selectedBuildingName={selectedBuilding?.id}
+          selectedBuildingName={selectedBuilding?.name}
         />
 
         {/* Header */}
@@ -644,7 +640,6 @@ export default function MapClient() {
         )}
 
         {/* Combined Map Wrapper */}
-        {/* Combined Map Wrapper */}
         <div className="mb-6 w-full max-w-none">
           <div className="flex items-center justify-between flex-wrap gap-3 mb-3 px-1">
             <div className="w-full sm:w-auto">
@@ -794,14 +789,14 @@ export default function MapClient() {
                 buildings={sidebarBuildings}
                 buildingSearch={buildingSearch}
                 setBuildingSearch={setBuildingSearch}
-                onStartNavigation={() => campusMapRef.current?.startNavigation()}
-                onStopNavigation={() => campusMapRef.current?.stopNavigation()}
+                onStartNavigation={handleStartNavigation}
+                onStopNavigation={handleStopNavigation}
                 isNavigating={navState?.isNavigating || false}
                 isGoogleMode={mapView === 'google'}
                 placeSuggestions={mapView === 'google' ? placeSuggestions : undefined}
                 isLoadingPlaces={mapView === 'google' ? isLoadingPlaces : undefined}
                 onSelectPlace={mapView === 'google' ? handleSelectPlace : undefined}
-                onClearExternalPlace={() => setExternalDestination(null)}
+                onClearExternalPlace={handleClearExternalPlace}
                 selectedPlaceLabel={externalDestination?.label}
                 isFocusedMode={isFocusedMode}
                 isStreetViewActive={mapView === 'google' ? isStreetViewActive : false}

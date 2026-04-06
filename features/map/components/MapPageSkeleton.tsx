@@ -6,7 +6,12 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 export function MapPageSkeleton() {
   const { t } = useTypedTranslation();
   return (
-    <div className="container mx-auto max-w-7xl animate-pulse px-3 py-4 sm:p-4">
+    <div
+      className="container mx-auto max-w-7xl animate-pulse px-3 py-4 sm:p-4"
+      role="status"
+      aria-label={t('loadingMap')}
+      aria-busy="true"
+    >
       {/* Header skeleton */}
       <div className="mb-6">
         <div className="mb-2 h-10 w-40 rounded-mq bg-mq-background-secondary sm:w-48" />

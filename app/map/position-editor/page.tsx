@@ -7,10 +7,10 @@ function PositionEditorLoading() {
   const { t } = useTypedTranslation();
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
+    <div className="flex h-screen w-full items-center justify-center bg-mq-background">
       <div className="text-center">
-        <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-red-600 border-t-transparent mx-auto" />
-        <p className="text-gray-600 dark:text-gray-400">{t('loadingPositionEditor')}</p>
+        <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-mq-primary border-t-transparent mx-auto" />
+        <p className="text-mq-content-secondary">{t('loadingPositionEditor')}</p>
       </div>
     </div>
   );

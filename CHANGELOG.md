@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Map Page Bug Hunt & Production Hardening — 2026-04-06
+
+**Scope:** Bug fixes, performance, accessibility, type safety, and i18n compliance across 5 map files
+
+1. **`MapClient.tsx` — URL truncation always appended `...`:** `copyShareableURL` used `url.toString().substring(0, 50)}...` unconditionally, appending `...` even for short URLs. Fixed by only adding the ellipsis when `urlStr.length > 50`.
+2. **`MapClient.tsx` — redundant `document.title` effect:** A `useEffect` set `document.title` at runtime, which is redundant with (and can flicker against) the `metadata` export in `app/map/page.tsx` that Next.js App Router already injects as a `<title>` tag. Removed the effect.
+3. **`MapClient.tsx` — `selectedBuildingName` semantic mismatch:** `RouteAnnouncer` received `selectedBuilding?.id` (e.g. "C5C") as the building name for screen reader announcements (e.g. "Navigating to C5C"). Fixed by passing `selectedBuilding?.name` (the human-readable English name).
+4. **`MapClient.tsx` — duplicate comment:** `{/* Combined Map Wrapper */}` appeared twice on consecutive lines (646–647). Removed the duplicate.
+5. **`MapClient.tsx` — non-memoized CampusMapHUD callbacks:** Three inline arrow functions were passed as props to `CampusMapHUD` — `onStartNavigation`, `onStopNavigation`, and `onClearExternalPlace` — recreated on every render, forcing unnecessary child re-renders. Extracted and memoized all three with `useCallback`.
+6. **`MapPageSkeleton.tsx` — inaccessible loading skeleton:** The outer `<div>` had no ARIA semantics, making the page-level Suspense fallback invisible to screen readers. Added `role="status"`, `aria-label={t('loadingMap')}`, and `aria-busy="true"`.
+7. **`position-editor/page.tsx` — non-MQ semantic Tailwind classes:** `PositionEditorLoading` used `bg-gray-100 dark:bg-gray-900` (background), `text-gray-600 dark:text-gray-400` (text), and `border-red-600` (spinner). Replaced with `bg-mq-background`, `text-mq-content-secondary`, and `border-mq-primary`.
+8. **`CampusMapHUD.tsx` — hardcoded hex colours:** The Google Maps-mode selected building highlight used `bg-[#d2e3fc] dark:bg-[#1a3a5c]`. Replaced with `bg-mq-primary/15 dark:bg-mq-primary/10` to use the MQ primary token.
+9. **`CampusMapHUD.tsx` — category capitalized in JSX instead of i18n:** The selected building card displayed the category using `charAt(0).toUpperCase() + slice(1)` (raw JavaScript string manipulation, bypassing i18n). Fixed by importing `BUILDING_CATEGORY_LABELS` from `@/features/map/lib/buildings` and using `t(BUILDING_CATEGORY_LABELS[selectedBuilding.category])`, consistent with how `CampusMap.tsx` already renders the same data. Also merged the two separate `@/features/map/lib/buildings` import lines into one.
+10. **`CampusMap.tsx` — hardcoded `#4285F4` hex in SVG fill:** The "locate me" button SVG used `fill="#4285F4"` (Google blue) to indicate GPS found. Replaced with `fill="var(--mq-primary)"` to respect the MQ brand token system.
+
+**Files Changed:**
+
+- `features/map/components/MapClient.tsx`
+- `features/map/components/MapPageSkeleton.tsx`
+- `features/map/components/CampusMapHUD.tsx`
+- `features/map/components/CampusMap.tsx`
+- `app/map/position-editor/page.tsx`
+
+**Verification:**
+
+- TypeScript: `npm run typecheck` — clean (no map-source errors) ✅
+- Lint: `npm run lint` — clean ✅
+- Tests: 874/878 passed ✅ (4 pre-existing signup failures, unrelated)
+
+---
+
 ### Raouf: Calendar Page Bug Hunt & Production Hardening — 2026-04-06
 
 **Scope:** Bug fixes, performance, accessibility, and type safety across 6 calendar files

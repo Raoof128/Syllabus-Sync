@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Badge } from '@/components/ui/mq/badge';
-import type { Building } from '@/features/map/lib/buildings';
+import { BUILDING_CATEGORY_LABELS, type Building } from '@/features/map/lib/buildings';
 import type { GooglePlaceSuggestion } from '@/features/map/hooks/useGooglePlacesSearch';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { cn } from '@/lib/utils';
@@ -240,7 +240,7 @@ export default function CampusMapHUD({
                             className={cn(
                               'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors',
                               isSelected
-                                ? 'bg-[#d2e3fc] dark:bg-[#1a3a5c]'
+                                ? 'bg-mq-primary/15 dark:bg-mq-primary/10'
                                 : 'hover:bg-mq-hover-background',
                             )}
                           >
@@ -513,8 +513,7 @@ export default function CampusMapHUD({
               <div className="space-y-2 mt-3">
                 {selectedBuilding?.category && (
                   <Badge variant="neutral" className="bg-mq-background/50 text-xs">
-                    {selectedBuilding.category.charAt(0).toUpperCase() +
-                      selectedBuilding.category.slice(1)}
+                    {t(BUILDING_CATEGORY_LABELS[selectedBuilding.category])}
                   </Badge>
                 )}
               </div>
