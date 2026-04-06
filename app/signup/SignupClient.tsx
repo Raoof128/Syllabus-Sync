@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, Controller } from 'react-hook-form';
@@ -19,7 +19,7 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { AlertTriangle, Check, Loader2, Mail } from 'lucide-react';
 import { calculatePasswordStrength } from '@/lib/utils/security';
-import clsx from 'clsx';
+import { cn } from '@/lib/utils';
 import { createAuthStepSchema, createSignupSchema } from '@/lib/schemas/auth';
 import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { CourseCombobox } from './components/CourseCombobox';
@@ -41,7 +41,7 @@ export default function SignupClient() {
   const router = useRouter();
   const addProfile = useProfilesStore((state) => state.addProfile);
 
-  const signupSchema = createSignupSchema(t);
+  const signupSchema = useMemo(() => createSignupSchema(t), [t]);
 
   const [step, setStep] = useState<'auth' | 'profile' | 'confirmation'>('auth');
   const [serverError, setServerError] = useState<string | null>(null);
@@ -51,8 +51,12 @@ export default function SignupClient() {
   // Focus management
   const fullNameRef = useRef<HTMLInputElement>(null);
 
+  // Faculty/course cascade guards — prevent reset on mount
+  const prevFacultyRef = useRef<string>('');
+  const prevCourseRef = useRef<string>('');
+
   // OAuth login handler
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = useCallback(async () => {
     if (!isSupabaseConfigured()) {
       toastUtils.error(t('oauthRequired'), t('googleOAuthDesc'));
       return;
@@ -97,7 +101,7 @@ export default function SignupClient() {
       toastUtils.error(t('loginErrorFailed'), t('unexpectedError'));
       setOauthLoading(false);
     }
-  };
+  }, [t]);
 
   const {
     register,
@@ -134,18 +138,27 @@ export default function SignupClient() {
   const watchedCourse = watch('course');
   const yearOptions = watchedCourse ? getYearOptions(watchedCourse) : [];
 
-  // Reset course when faculty changes:
+  // Destructure fullName register ref so we can merge it with our own focus ref
+  const { ref: registerFullNameRef, ...registerFullNameProps } = register('fullName');
+
+  // Reset course+year when faculty changes (ref guard prevents reset on mount)
   useEffect(() => {
-    setValue('course', '');
-    setValue('year', '');
+    if (prevFacultyRef.current !== watchedFaculty) {
+      prevFacultyRef.current = watchedFaculty ?? '';
+      setValue('course', '');
+      setValue('year', '');
+    }
   }, [watchedFaculty, setValue]);
 
-  // Reset year when course changes:
+  // Reset year when course changes (ref guard prevents reset on mount)
   useEffect(() => {
-    setValue('year', '');
+    if (prevCourseRef.current !== watchedCourse) {
+      prevCourseRef.current = watchedCourse ?? '';
+      setValue('year', '');
+    }
   }, [watchedCourse, setValue]);
 
-  const handleNextStep = () => {
+  const handleNextStep = useCallback(() => {
     // Validate step 1 *independently* of the full signup schema. Using
     // `trigger([...])` here was racy at mount: RHF's resolver swaps when the
     // translation callback reference changes during i18n hydration, and
@@ -181,7 +194,7 @@ export default function SignupClient() {
     setServerError(null);
     setStep('profile');
     setTimeout(() => fullNameRef.current?.focus(), 100);
-  };
+  }, [t, clearErrors, getValues, setError]);
 
   const onSubmit = async (data: SignupFormData) => {
     setServerError(null);
@@ -272,7 +285,7 @@ export default function SignupClient() {
           sizes="100vw"
           quality={60}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
+        <div className="absolute inset-0 bg-gradient-to-b from-mq-navy-900/88 via-mq-background/80 to-mq-background/95" />
       </div>
 
       {/* Scrollable content */}
@@ -323,7 +336,7 @@ export default function SignupClient() {
                   <button
                     type="button"
                     onClick={() => step === 'profile' && setStep('auth')}
-                    className={clsx(
+                    className={cn(
                       'flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors text-xs font-semibold',
                       step === 'auth'
                         ? 'bg-mq-primary/15 text-mq-primary border border-mq-primary/20'
@@ -339,13 +352,13 @@ export default function SignupClient() {
                     {t('stepAccount')}
                   </button>
                   <div
-                    className={clsx(
+                    className={cn(
                       'w-8 h-0.5 rounded-full',
                       step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border',
                     )}
                   />
                   <div
-                    className={clsx(
+                    className={cn(
                       'flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border',
                       step === 'profile'
                         ? 'bg-mq-primary/15 text-mq-primary border-mq-primary/20'
@@ -353,7 +366,7 @@ export default function SignupClient() {
                     )}
                   >
                     <div
-                      className={clsx(
+                      className={cn(
                         'w-2 h-2 rounded-full',
                         step === 'profile' ? 'bg-mq-primary' : 'bg-mq-border',
                       )}
@@ -377,17 +390,17 @@ export default function SignupClient() {
                 {/* Honeypot field */}
                 <input
                   {...register('_gotcha')}
-                  style={{ display: 'none' }}
+                  className="hidden"
                   tabIndex={-1}
                   autoComplete="off"
                   aria-hidden="true"
                 />
 
                 {/* ── Step 1: Authentication ── */}
-                <div className={clsx('space-y-4', step !== 'auth' && 'hidden')}>
+                <div className={cn('space-y-4', step !== 'auth' && 'hidden')}>
                   <div className="space-y-2">
                     <Label htmlFor="email" className="font-bold text-mq-content">
-                      {t('email')} <span className="text-red-500">*</span>
+                      {t('email')} <span className="text-mq-error">*</span>
                     </Label>
                     <Input
                       id="email"
@@ -396,13 +409,19 @@ export default function SignupClient() {
                       disabled={isSubmitting}
                       className="h-12 rounded-xl"
                       {...register('email')}
+                      aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? 'email-error' : undefined}
                     />
-                    {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+                    {errors.email && (
+                      <p id="email-error" className="text-xs text-mq-error">
+                        {errors.email.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="password" className="font-bold text-mq-content">
-                      {t('password')} <span className="text-red-500">*</span>
+                      {t('password')} <span className="text-mq-error">*</span>
                     </Label>
                     <PasswordInput
                       id="password"
@@ -410,9 +429,13 @@ export default function SignupClient() {
                       maxLength={64}
                       className="h-12 rounded-xl"
                       {...register('password')}
+                      aria-invalid={!!errors.password}
+                      aria-describedby={errors.password ? 'password-error' : undefined}
                     />
                     {errors.password && (
-                      <p className="text-xs text-red-500">{errors.password.message}</p>
+                      <p id="password-error" className="text-xs text-mq-error">
+                        {errors.password.message}
+                      </p>
                     )}
 
                     {/* Visual Password Feedback */}
@@ -422,7 +445,7 @@ export default function SignupClient() {
                           {[0, 1, 2, 3, 4].map((idx) => (
                             <div
                               key={idx}
-                              className={clsx(
+                              className={cn(
                                 'flex-1 rounded-full transition-colors',
                                 idx <= passwordStrength.score
                                   ? passwordStrength.color
@@ -433,9 +456,9 @@ export default function SignupClient() {
                         </div>
                         <div className="flex justify-between items-center">
                           <p
-                            className={clsx(
+                            className={cn(
                               'text-xs font-medium',
-                              passwordStrength.score < 2 ? 'text-red-500' : 'text-green-600',
+                              passwordStrength.score < 2 ? 'text-mq-error' : 'text-mq-success',
                             )}
                           >
                             {passwordStrength.label}
@@ -455,7 +478,7 @@ export default function SignupClient() {
 
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword" className="font-bold text-mq-content">
-                      {t('confirmPassword')} <span className="text-red-500">*</span>
+                      {t('confirmPassword')} <span className="text-mq-error">*</span>
                     </Label>
                     <PasswordInput
                       id="confirmPassword"
@@ -463,9 +486,13 @@ export default function SignupClient() {
                       maxLength={64}
                       className="h-12 rounded-xl"
                       {...register('confirmPassword')}
+                      aria-invalid={!!errors.confirmPassword}
+                      aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
                     />
                     {errors.confirmPassword && (
-                      <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
+                      <p id="confirmPassword-error" className="text-xs text-mq-error">
+                        {errors.confirmPassword.message}
+                      </p>
                     )}
                   </div>
 
@@ -476,9 +503,11 @@ export default function SignupClient() {
                       className="mt-1 h-4 w-4 rounded border-mq-border text-mq-primary focus:ring-mq-primary"
                       disabled={isSubmitting}
                       {...register('agreedToTerms')}
+                      aria-invalid={!!errors.agreedToTerms}
+                      aria-describedby={errors.agreedToTerms ? 'agreedToTerms-error' : undefined}
                     />
                     <label htmlFor="terms" className="text-sm text-mq-content-secondary">
-                      <span className="text-red-500">*</span> {t('agreeToTerms')}{' '}
+                      <span className="text-mq-error">*</span> {t('agreeToTerms')}{' '}
                       <Link href="/terms" className="text-mq-primary hover:underline font-medium">
                         {t('termsOfService')}
                       </Link>{' '}
@@ -489,7 +518,9 @@ export default function SignupClient() {
                     </label>
                   </div>
                   {errors.agreedToTerms && (
-                    <p className="text-xs text-red-500">{errors.agreedToTerms.message}</p>
+                    <p id="agreedToTerms-error" className="text-xs text-mq-error">
+                      {errors.agreedToTerms.message}
+                    </p>
                   )}
 
                   {/* APP 5 Collection Notice */}
@@ -555,30 +586,34 @@ export default function SignupClient() {
                 </div>
 
                 {/* ── Step 2: Profile ── */}
-                <div className={clsx('space-y-4', step !== 'profile' && 'hidden')}>
+                <div className={cn('space-y-4', step !== 'profile' && 'hidden')}>
                   <div className="space-y-2">
                     <Label htmlFor="fullName" className="font-bold text-mq-content">
-                      {t('fullName')} <span className="text-red-500">*</span>
+                      {t('fullName')} <span className="text-mq-error">*</span>
                     </Label>
                     <Input
                       id="fullName"
                       placeholder={t('enterFullName')}
                       disabled={isSubmitting}
                       className="h-12 rounded-xl"
-                      {...register('fullName')}
+                      {...registerFullNameProps}
                       ref={(e) => {
-                        register('fullName').ref(e);
+                        registerFullNameRef(e);
                         fullNameRef.current = e;
                       }}
+                      aria-invalid={!!errors.fullName}
+                      aria-describedby={errors.fullName ? 'fullName-error' : undefined}
                     />
                     {errors.fullName && (
-                      <p className="text-xs text-red-500">{errors.fullName.message}</p>
+                      <p id="fullName-error" className="text-xs text-mq-error">
+                        {errors.fullName.message}
+                      </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="studentId" className="font-bold text-mq-content">
-                      {t('studentId')} <span className="text-red-500">*</span>
+                      {t('studentId')} <span className="text-mq-error">*</span>
                     </Label>
                     <Input
                       id="studentId"
@@ -586,16 +621,20 @@ export default function SignupClient() {
                       disabled={isSubmitting}
                       className="h-12 rounded-xl"
                       {...register('studentId')}
+                      aria-invalid={!!errors.studentId}
+                      aria-describedby={errors.studentId ? 'studentId-error' : undefined}
                     />
                     {errors.studentId && (
-                      <p className="text-xs text-red-500">{errors.studentId.message}</p>
+                      <p id="studentId-error" className="text-xs text-mq-error">
+                        {errors.studentId.message}
+                      </p>
                     )}
                   </div>
 
                   {/* Faculty */}
                   <div className="space-y-2">
                     <Label htmlFor="faculty" className="font-bold text-mq-content">
-                      {t('faculty')} <span className="text-red-500">*</span>
+                      {t('faculty')} <span className="text-mq-error">*</span>
                     </Label>
                     <Controller
                       name="faculty"
@@ -605,18 +644,21 @@ export default function SignupClient() {
                           value={field.value ?? ''}
                           onChange={field.onChange}
                           placeholder={t('selectFaculty')}
+                          error={!!errors.faculty}
                         />
                       )}
                     />
                     {errors.faculty && (
-                      <p className="text-xs text-red-500">{errors.faculty.message}</p>
+                      <p id="faculty-error" className="text-xs text-mq-error">
+                        {errors.faculty.message}
+                      </p>
                     )}
                   </div>
 
                   {/* Course — searchable combobox */}
                   <div className="space-y-2">
                     <Label htmlFor="course" className="font-bold text-mq-content">
-                      {t('course')} <span className="text-red-500">*</span>
+                      {t('course')} <span className="text-mq-error">*</span>
                     </Label>
                     <Controller
                       name="course"
@@ -632,14 +674,16 @@ export default function SignupClient() {
                       )}
                     />
                     {errors.course && (
-                      <p className="text-xs text-red-500">{errors.course.message}</p>
+                      <p id="course-error" className="text-xs text-mq-error">
+                        {errors.course.message}
+                      </p>
                     )}
                   </div>
 
                   {/* Year of Study */}
                   <div className="space-y-2">
                     <Label htmlFor="year" className="font-bold text-mq-content">
-                      {t('year')} <span className="text-red-500">*</span>
+                      {t('year')} <span className="text-mq-error">*</span>
                     </Label>
                     <Controller
                       name="year"
@@ -651,10 +695,12 @@ export default function SignupClient() {
                           disabled={isSubmitting || !watchedCourse}
                         >
                           <SelectTrigger
-                            className={clsx(
+                            className={cn(
                               'w-full h-12 rounded-xl border-mq-border focus:ring-[3px] focus:border-mq-focus focus:ring-mq-focus/40 bg-mq-input-background',
-                              errors.year && 'border-red-500',
+                              errors.year && 'border-mq-error',
                             )}
+                            aria-invalid={!!errors.year}
+                            aria-describedby={errors.year ? 'year-error' : undefined}
                           >
                             <SelectValue
                               placeholder={
@@ -676,7 +722,11 @@ export default function SignupClient() {
                         </Select>
                       )}
                     />
-                    {errors.year && <p className="text-xs text-red-500">{errors.year.message}</p>}
+                    {errors.year && (
+                      <p id="year-error" className="text-xs text-mq-error">
+                        {errors.year.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex gap-2 pt-2">
@@ -691,10 +741,7 @@ export default function SignupClient() {
                     </Button>
                     <Button
                       type="submit"
-                      className={clsx(
-                        'flex-1 h-12 rounded-xl font-bold',
-                        isSubmitting ? 'opacity-50 cursor-not-allowed' : '',
-                      )}
+                      className="flex-1 h-12 rounded-xl font-bold"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}

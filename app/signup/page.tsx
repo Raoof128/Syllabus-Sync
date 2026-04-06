@@ -21,7 +21,12 @@ export const metadata: Metadata = {
 // V3.1: Loading skeleton for signup page
 function SignupSkeleton() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-mq-background">
+    <div
+      role="status"
+      aria-busy="true"
+      aria-label="Loading sign up"
+      className="min-h-screen flex items-center justify-center bg-mq-background"
+    >
       <div className="w-full max-w-md p-8">
         {/* Logo skeleton */}
         <div className="flex justify-center mb-8">

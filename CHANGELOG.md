@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Sign Up Page Bug Hunt & Production Hardening — 2026-04-06
+
+**Scope:** Bug fixes, performance, accessibility, i18n/token compliance, and code quality across 4 signup page files.
+
+**Summary:** Deep-reviewed all 4 signup page files. Found and fixed 19 issues: `page.tsx` `SignupSkeleton` missing `role="status"`, `aria-busy="true"`, `aria-label` ARIA semantics → added. `SignupClient.tsx`: replaced `import clsx from 'clsx'` with `import { cn } from '@/lib/utils'` (project standard — tailwind-merge wrapper) and updated all 6 `clsx()` callsites to `cn()`; `signupSchema` recreated every render → `useMemo`; `handleGoogleLogin` not memoized → `useCallback`; `handleNextStep` not memoized → `useCallback`; `useEffect` faculty/course cascade resets fired on mount (setting empty to empty is harmless but antipattern) → added `prevFacultyRef`/`prevCourseRef` guards; `fullNameRef` callback called `register('fullName')` inside the ref on every render → destructured `registerFullNameRef` + `registerFullNameProps` at top level; all `text-red-500` on error messages (9 occurrences) → `text-mq-error`; all required `*` asterisks (6 occurrences) `text-red-500` → `text-mq-error`; password strength label `text-red-500`/`text-green-600` → `text-mq-error`/`text-mq-success`; year `SelectTrigger` `border-red-500` → `border-mq-error` + added `aria-invalid`/`aria-describedby`; submit button redundant `opacity-50 cursor-not-allowed` class (already handled by `disabled`) → removed; `aria-invalid`/`aria-describedby` added to all 8 form inputs with matching `id` on error paragraphs; honeypot `style={{ display: 'none' }}` inline style → `className="hidden"`; background gradient `from-[#001528]/88` hardcoded hex → `from-mq-navy-900/88`; passed `error={!!errors.faculty}` to `FacultySelect` (previously had no way to show red trigger border on validation). `CourseCombobox.tsx`: `border-red-500` → `border-mq-error`; `updateDropdownPosition` not memoized (called in effect and toggle handler) → `useCallback` + added to useEffect dep array; search input missing `aria-label` → added; Escape key on search input didn't close dropdown and return focus → added `onKeyDown` handler. `FacultySelect.tsx`: added `error?: boolean` prop and conditional `border-mq-error`/`border-mq-border` + `aria-invalid` on the trigger.
+
+**Files Changed:** `app/signup/page.tsx`, `app/signup/SignupClient.tsx`, `app/signup/components/CourseCombobox.tsx`, `app/signup/components/FacultySelect.tsx`.
+
+**Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+
+**Follow-ups:** None.
+
+---
+
+### Raouf: Login Page Bug Hunt & Production Hardening — 2026-04-06
+
+**Scope:** Bug fixes, performance, accessibility, i18n completeness, and design token compliance across 4 login page files.
+
+**Summary:** Deep-reviewed all 6 login page files. Found and fixed 15 issues: `LoginClient.tsx` had `localLoginSchema` recreated on every render → `useMemo`; `text-red-500` on email/password error messages → `text-mq-error`; `aria-invalid`/`aria-describedby` missing on both form inputs; hardcoded English provider-mismatch error strings in two separate locations — `onSubmit` handler and `callbackError` banner → both now use `t('loginErrorProviderMismatchGoogle')` / `t('loginErrorProviderMismatchEmail')` (keys added to `locales/en/translations.json`); hardcoded hex `text-[#18181b]`/`text-[#3f3f46]` in right panel hero copy → `text-mq-content`/`text-mq-content-secondary`; template literal `className` on passkey badge, MFA badge, and passkey button → `cn()`; `handlePasskeyLogin` not memoized → `useCallback`; `handleGoogleLogin` not memoized → `useCallback`; misleading `aria-disabled` on `<Link>` tag (attribute is non-functional on anchors and doesn't prevent navigation) → removed. `page.tsx` `LoginSkeleton` missing `role="status"`, `aria-busy="true"`, `aria-label` ARIA semantics → added. `MFAChallenge.tsx` error container used `text-red-500` → `text-mq-error`; all 4 buttons missing `type="button"` → added; code input missing `aria-label`, `aria-describedby`, `aria-invalid` → added; error container missing `role="alert"` → added; resend cooldown `setInterval` had no cleanup on unmount — if component unmounted mid-countdown the interval continued running → added `cooldownIntervalRef` (persisted in `useRef`) plus a cleanup `useEffect`. `usePasskeyLogin.ts` had `console.error(err)` on catch → `logger.error`.
+
+**Files Changed:** `app/login/LoginClient.tsx`, `app/login/page.tsx`, `app/login/components/MFAChallenge.tsx`, `app/login/hooks/usePasskeyLogin.ts`, `locales/en/translations.json`.
+
+**Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+
+**Follow-ups:** None.
+
+---
+
 ### Raouf: Manage Profiles Page Bug Hunt & Production Hardening — 2026-04-06
 
 **Scope:** Bug fixes, performance, accessibility, design token compliance, and security hardening across 9 manage-profiles files.

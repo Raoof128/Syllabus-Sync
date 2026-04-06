@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo, startTransition } from 'react';
+import { useState, useRef, useEffect, useMemo, startTransition, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { getCoursesByFaculty, DEGREE_TYPE_LABELS, DEGREE_TYPE_ORDER } from '@/lib/data/mq-courses';
@@ -31,7 +31,7 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
   }, []);
 
   // Compute fixed-position coords from trigger's bounding rect
-  const updateDropdownPosition = () => {
+  const updateDropdownPosition = useCallback(() => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       setDropdownStyle({
@@ -42,7 +42,7 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
         zIndex: 9999,
       });
     }
-  };
+  }, []);
 
   // Close dropdown on outside click (check both trigger and dropdown)
   useEffect(() => {
@@ -72,7 +72,7 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
       window.removeEventListener('scroll', update, true);
       window.removeEventListener('resize', update);
     };
-  }, [open]);
+  }, [open, updateDropdownPosition]);
 
   // Focus search input when dropdown opens
   useEffect(() => {
@@ -147,7 +147,7 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
           'focus-visible:ring-[3px] focus-visible:border-mq-focus focus-visible:ring-mq-focus/40',
           'disabled:cursor-not-allowed disabled:opacity-50',
           'h-9',
-          error ? 'border-red-500' : 'border-mq-border',
+          error ? 'border-mq-error' : 'border-mq-border',
           open && 'border-mq-focus ring-[3px] ring-mq-focus/40',
         )}
       >
@@ -201,7 +201,15 @@ export function CourseCombobox({ value, onChange, disabled, error, facultyFilter
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    e.stopPropagation();
+                    setOpen(false);
+                    triggerRef.current?.focus();
+                  }
+                }}
                 placeholder={t('searchCoursesPlaceholder')}
+                aria-label={t('searchCoursesPlaceholder')}
                 className="flex-1 bg-transparent text-sm text-mq-content placeholder:text-mq-content-tertiary outline-none"
               />
               {query && (

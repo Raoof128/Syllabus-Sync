@@ -58,6 +58,26 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-06 (Australia/Sydney) — Sign Up Page
+
+**Raouf:**
+
+- **Scope:** Sign Up Page Bug Hunt & Production Hardening
+- **Summary:** Reviewed all 4 signup files. Found and fixed 19 issues: `SignupSkeleton` missing ARIA status semantics → added. `SignupClient`: `clsx` → `cn` throughout (6 callsites); `signupSchema` → `useMemo`; `handleGoogleLogin` + `handleNextStep` → `useCallback`; `useEffect` cascade resets added `prevFacultyRef`/`prevCourseRef` guards; `fullNameRef` callback anti-pattern (called `register('fullName')` inside ref on every render) → destructured at top level; all `text-red-500` (9×) → `text-mq-error`; all required `*` spans (6×) → `text-mq-error`; password strength `text-red-500`/`text-green-600` → `text-mq-error`/`text-mq-success`; year `SelectTrigger` `border-red-500` → `border-mq-error`; submit button redundant disabled-state classes removed; `aria-invalid`/`aria-describedby` + error `id` on all 8 inputs; honeypot inline `style` → `className="hidden"`; background `from-[#001528]/88` → `from-mq-navy-900/88`; `error` prop passed to `FacultySelect`. `CourseCombobox`: `border-red-500` → `border-mq-error`; `updateDropdownPosition` → `useCallback`; search input `aria-label` added; Escape from search closes dropdown and returns focus. `FacultySelect`: `error` prop + `border-mq-error`/`aria-invalid` on trigger.
+- **Files Changed:** `app/signup/page.tsx`, `app/signup/SignupClient.tsx`, `app/signup/components/CourseCombobox.tsx`, `app/signup/components/FacultySelect.tsx`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+- **Follow-ups:** None.
+
+### 2026-04-06 (Australia/Sydney) — Login Page
+
+**Raouf:**
+
+- **Scope:** Login Page Bug Hunt & Production Hardening
+- **Summary:** Reviewed all 6 login page files. Found and fixed 15 issues: `localLoginSchema` recreated every render → `useMemo`; `text-red-500` on both field error messages → `text-mq-error`; `aria-invalid`/`aria-describedby` missing on email + password inputs; hardcoded provider-mismatch English strings in two locations → `t('loginErrorProviderMismatchGoogle')` / `t('loginErrorProviderMismatchEmail')` (keys added to translations.json); hardcoded `text-[#18181b]`/`text-[#3f3f46]` in right panel → MQ tokens; template literal classNames → `cn()`; `handlePasskeyLogin` + `handleGoogleLogin` not memoized → `useCallback`; misleading `aria-disabled` on `<Link>` (non-functional on anchors) → removed. `LoginSkeleton` missing ARIA status semantics → added. `MFAChallenge` `text-red-500` → `text-mq-error`; all 4 buttons missing `type="button"`; code input missing `aria-label`/`aria-invalid`/`aria-describedby`; error div missing `role="alert"`; resend interval leaked on unmount → `cooldownIntervalRef` + cleanup `useEffect`. `usePasskeyLogin` `console.error` → `logger.error`.
+- **Files Changed:** `app/login/LoginClient.tsx`, `app/login/page.tsx`, `app/login/components/MFAChallenge.tsx`, `app/login/hooks/usePasskeyLogin.ts`, `locales/en/translations.json`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+- **Follow-ups:** None.
+
 ### 2026-04-06 (Australia/Sydney) — Manage Profiles
 
 **Raouf:**
