@@ -19,7 +19,12 @@ export const metadata: Metadata = {
 
 function ResetPasswordSkeleton() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-mq-background p-4">
+    <div
+      role="status"
+      aria-busy="true"
+      aria-label="Loading reset password"
+      className="min-h-screen flex items-center justify-center bg-mq-background p-4"
+    >
       <div className="w-full max-w-md p-6 rounded-2xl border border-mq-border bg-mq-card-background">
         <div className="h-7 w-44 bg-mq-border rounded animate-pulse mb-3" />
         <div className="h-4 w-64 bg-mq-border rounded animate-pulse mb-8" />

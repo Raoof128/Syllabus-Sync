@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Reset Password Page Bug Hunt & Production Hardening — 2026-04-06
+
+**Scope:** Bug fixes, performance, accessibility, i18n/token compliance, and code quality across 2 reset-password page files.
+
+**Summary:** Deep-reviewed all 2 reset-password files. Found and fixed 15 issues: `page.tsx` `ResetPasswordSkeleton` missing `role="status"`, `aria-busy="true"`, `aria-label` ARIA semantics → added. `reset-password-client.tsx`: module-level `requestSchema` recreated on every import → moved into component as `useMemo`; unsafe `tStr = t as (key: string) => string` cast used across 7 callsites → removed cast, replaced all `tStr(...)` with direct `t(...)` (typed); `setSchema` dep array referenced `tStr` instead of `t` → fixed; both `z.string().min()` validation calls in `setSchema` missing translation key → added `t('validation.passwordTooShort')`; `console.error` × 2 on auth/code exchange errors → `logger.error`; `setMode` called directly in auth listener creating stale closure risk on every mode change → replaced with `modeRef` pattern: `modeRef` synced via `useEffect(() => { modeRef.current = mode; }, [mode])` and listener reads `modeRef.current` without re-subscribing; `onRequest` not memoized → `useCallback([t])`; `onSet` not memoized → `useCallback([isAuthenticated, supabase.auth, t])`; auth listener had `mode` in dependency array (caused unnecessary re-subscribe on each mode transition) → removed from deps; all 3 `from-[#001528]/88` hardcoded hex in gradient overlays → `from-mq-navy-900/88`; loading container missing `role="status"` + `aria-live="polite"` → added; `Loader2` missing `aria-hidden="true"` → added; success state `bg-green-500/15 border-green-500/20 text-green-500` → `bg-mq-success/15 border-mq-success/20 text-mq-success`; icon `aria-hidden` missing on `CheckCircle2`/`XCircle` in alerts; `aria-invalid`/`aria-describedby` missing on all 3 form inputs (email, newPassword, confirmPassword) → added with matching `id` on error paragraphs; `Mail`/`Eye`/`EyeOff` decorative icons missing `aria-hidden="true"` → added; both `text-red-500` error paragraph classes → `text-mq-error`.
+
+**Files Changed:** `app/reset-password/page.tsx`, `app/reset-password/reset-password-client.tsx`.
+
+**Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+
+**Follow-ups:** None.
+
+---
+
 ### Raouf: Sign Up Page Bug Hunt & Production Hardening — 2026-04-06
 
 **Scope:** Bug fixes, performance, accessibility, i18n/token compliance, and code quality across 4 signup page files.

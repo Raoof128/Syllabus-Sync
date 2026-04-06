@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-06 (Australia/Sydney) — Reset Password Page
+
+**Raouf:**
+
+- **Scope:** Reset Password Page Bug Hunt & Production Hardening
+- **Summary:** Reviewed all 2 reset-password files. Found and fixed 15 issues: `ResetPasswordSkeleton` missing ARIA status semantics → added. `reset-password-client.tsx`: module-level `requestSchema` → `useMemo`; unsafe `tStr` cast removed, all 7 callsites → direct `t()`; `setSchema` deps fixed from `tStr` → `t`; both `z.string().min()` in `setSchema` missing translation key → added `t('validation.passwordTooShort')`; `console.error` × 2 → `logger.error`; stale-closure risk in auth listener (`mode` directly in callback) → `modeRef` pattern using `useEffect(() => { modeRef.current = mode; }, [mode])` so listener reads current mode without re-subscribing; `onRequest` + `onSet` → `useCallback`; all 3 `from-[#001528]/88` → `from-mq-navy-900/88`; loading container missing `role="status"` + `aria-live="polite"` → added; `Loader2` missing `aria-hidden` → added; success icon colors `bg-green-500/15 border-green-500/20 text-green-500` → MQ success tokens; icon `aria-hidden` on `CheckCircle2`/`XCircle` in alerts; `aria-invalid`/`aria-describedby` added to all 3 form inputs with matching error `id` attributes; `Mail`/`Eye`/`EyeOff` decorative icons → `aria-hidden="true"`; `text-red-500` × 2 → `text-mq-error`.
+- **Files Changed:** `app/reset-password/page.tsx`, `app/reset-password/reset-password-client.tsx`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+- **Follow-ups:** None.
+
 ### 2026-04-06 (Australia/Sydney) — Sign Up Page
 
 **Raouf:**

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -16,13 +16,10 @@ import { API_ROUTES, SECURITY_CONFIG } from '@/lib/constants/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import { toastUtils } from '@/lib/utils/toast';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 type Mode = 'request' | 'set' | 'loading' | 'success';
 
-const requestSchema = z.object({
-  email: z.string().trim().toLowerCase().email(),
-});
-
-type RequestForm = z.infer<typeof requestSchema>;
+type RequestForm = { email: string };
 type SetForm = {
   newPassword: string;
   confirmPassword: string;
@@ -46,10 +43,15 @@ export default function ResetPasswordClient() {
   const [hashChecked, setHashChecked] = useState(false);
 
   const [mode, setMode] = useState<Mode>('request');
-  const tStr = t as (key: string) => string;
+  // Track mode in a ref so the auth-state listener callback always sees the
+  // current value without needing to re-subscribe on every mode change.
+  const modeRef = useRef<Mode>('request');
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   const [generalError, setGeneralError] = useState<string | null>(
-    errorParam ? errorDescription || tStr('invalidResetLink') : null,
+    errorParam ? errorDescription || t('invalidResetLink') : null,
   );
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -80,7 +82,7 @@ export default function ResetPasswordClient() {
         queueMicrotask(() => setMode('loading'));
       }
     }
-  }, [code, recovery, hashChecked]);
+  }, [code, recovery, hashChecked, setMode]);
 
   // Handle Supabase auth
   useEffect(() => {
@@ -102,16 +104,16 @@ export default function ResetPasswordClient() {
         try {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
-            console.error('Code exchange error:', error.message);
-            setGeneralError(tStr('invalidResetLink'));
+            logger.error('Code exchange error:', error.message);
+            setGeneralError(t('invalidResetLink'));
             setMode('request');
           } else {
             setIsAuthenticated(true);
             setMode('set');
           }
         } catch (err) {
-          console.error('Code exchange exception:', err);
-          setGeneralError(tStr('invalidResetLink'));
+          logger.error('Code exchange exception:', err);
+          setGeneralError(t('invalidResetLink'));
           setMode('request');
         }
         return;
@@ -132,11 +134,17 @@ export default function ResetPasswordClient() {
     };
 
     if (mode === 'loading') {
+      // Brief delay lets Supabase process the hash fragment / auth state change
+      // before we query the session — avoids a race where getSession() returns
+      // null because the token hasn't been written to storage yet.
       setTimeout(handleAuth, 500);
     }
-  }, [code, mode, supabase.auth, authChecked, hasHashFragment, tStr]);
+  }, [code, mode, supabase.auth, authChecked, hasHashFragment, t, setMode]);
 
-  // Listen for auth state changes
+  // Listen for Supabase auth state changes.
+  // Uses modeRef (not mode state) so the callback always reads the current mode
+  // without re-subscribing on every mode transition — avoids a window where
+  // events could be missed during the loading → set handoff.
   useEffect(() => {
     const {
       data: { subscription },
@@ -144,14 +152,23 @@ export default function ResetPasswordClient() {
       if (event === 'PASSWORD_RECOVERY' && session) {
         setIsAuthenticated(true);
         setMode('set');
-      } else if (event === 'SIGNED_IN' && session && mode === 'loading') {
+      } else if (event === 'SIGNED_IN' && session && modeRef.current === 'loading') {
         setIsAuthenticated(true);
         setMode('set');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase.auth, mode]);
+  }, [supabase.auth, setMode, setIsAuthenticated]);
+
+  // Schemas with translated error messages
+  const requestSchema = useMemo(
+    () =>
+      z.object({
+        email: z.string().min(1, t('loginEmailRequired')).email(t('loginValidEmail')).trim().toLowerCase(),
+      }),
+    [t],
+  );
 
   const requestForm = useForm<RequestForm>({
     resolver: zodResolver(requestSchema),
@@ -163,14 +180,18 @@ export default function ResetPasswordClient() {
     () =>
       z
         .object({
-          newPassword: z.string().min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH),
-          confirmPassword: z.string().min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH),
+          newPassword: z
+            .string()
+            .min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH, t('validation.passwordTooShort')),
+          confirmPassword: z
+            .string()
+            .min(SECURITY_CONFIG.MIN_PASSWORD_LENGTH, t('validation.passwordTooShort')),
         })
         .refine((v) => v.newPassword === v.confirmPassword, {
-          message: tStr('passwordsDoNotMatch'),
+          message: t('passwordsDoNotMatch'),
           path: ['confirmPassword'],
         }),
-    [tStr],
+    [t],
   );
 
   const setForm = useForm<SetForm>({
@@ -181,53 +202,59 @@ export default function ResetPasswordClient() {
 
   const isSubmitting = requestForm.formState.isSubmitting || setForm.formState.isSubmitting;
 
-  const onRequest = async (data: RequestForm) => {
-    setGeneralError(null);
-    setSuccess(false);
+  const onRequest = useCallback(
+    async (data: RequestForm) => {
+      setGeneralError(null);
+      setSuccess(false);
 
-    try {
-      const res = await fetch(API_ROUTES.AUTH.PASSWORD_REQUEST_RESET, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email }),
-      });
+      try {
+        const res = await fetch(API_ROUTES.AUTH.PASSWORD_REQUEST_RESET, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: data.email }),
+        });
 
-      if (!res.ok) {
+        if (!res.ok) {
+          setGeneralError(t('unexpectedError'));
+          return;
+        }
+
+        setSuccess(true);
+        toastUtils.success(t('resetPasswordSent'), t('resetPasswordSentDesc'));
+      } catch {
         setGeneralError(t('unexpectedError'));
+      }
+    },
+    [t],
+  );
+
+  const onSet = useCallback(
+    async (data: SetForm) => {
+      setGeneralError(null);
+
+      if (!isAuthenticated) {
+        setGeneralError(t('sessionExpiredResetLink'));
         return;
       }
 
-      setSuccess(true);
-      toastUtils.success(t('resetPasswordSent'), t('resetPasswordSentDesc'));
-    } catch {
-      setGeneralError(t('unexpectedError'));
-    }
-  };
+      try {
+        const { error } = await supabase.auth.updateUser({
+          password: data.newPassword,
+        });
 
-  const onSet = async (data: SetForm) => {
-    setGeneralError(null);
+        if (error) {
+          setGeneralError(t('failedToUpdatePassword'));
+          return;
+        }
 
-    if (!isAuthenticated) {
-      setGeneralError(tStr('sessionExpiredResetLink'));
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: data.newPassword,
-      });
-
-      if (error) {
-        setGeneralError(tStr('failedToUpdatePassword'));
-        return;
+        await supabase.auth.signOut();
+        setMode('success');
+      } catch {
+        setGeneralError(t('unexpectedError'));
       }
-
-      await supabase.auth.signOut();
-      setMode('success');
-    } catch {
-      setGeneralError(t('unexpectedError'));
-    }
-  };
+    },
+    [isAuthenticated, supabase.auth, t],
+  );
 
   // ── Loading state ──
   if (mode === 'loading') {
@@ -243,10 +270,10 @@ export default function ResetPasswordClient() {
             sizes="100vw"
             quality={60}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
+          <div className="absolute inset-0 bg-gradient-to-b from-mq-navy-900/88 via-mq-background/80 to-mq-background/95" />
         </div>
-        <div className="relative z-10 text-center">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto text-mq-primary" />
+        <div role="status" aria-live="polite" className="relative z-10 text-center">
+          <Loader2 className="h-10 w-10 animate-spin mx-auto text-mq-primary" aria-hidden="true" />
           <p className="mt-4 text-mq-content-secondary font-medium">{t('verifying')}</p>
         </div>
       </div>
@@ -267,7 +294,7 @@ export default function ResetPasswordClient() {
             sizes="100vw"
             quality={60}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
+          <div className="absolute inset-0 bg-gradient-to-b from-mq-navy-900/88 via-mq-background/80 to-mq-background/95" />
         </div>
         <div className="relative z-10 w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="bg-mq-card-background/85 backdrop-blur-xl border border-mq-border/30 rounded-2xl shadow-[0_18px_70px_rgba(0,0,0,0.3)] p-8 text-center space-y-6">
@@ -282,8 +309,8 @@ export default function ResetPasswordClient() {
               />
             </div>
             <div className="flex justify-center">
-              <div className="w-16 h-16 rounded-full bg-green-500/15 border border-green-500/20 flex items-center justify-center">
-                <CheckCircle2 className="h-9 w-9 text-green-500" />
+              <div className="w-16 h-16 rounded-full bg-mq-success/15 border border-mq-success/20 flex items-center justify-center">
+                <CheckCircle2 className="h-9 w-9 text-mq-success" aria-hidden="true" />
               </div>
             </div>
             <div className="space-y-2">
@@ -316,7 +343,7 @@ export default function ResetPasswordClient() {
           sizes="100vw"
           quality={60}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#001528]/88 via-mq-background/80 to-mq-background/95" />
+        <div className="absolute inset-0 bg-gradient-to-b from-mq-navy-900/88 via-mq-background/80 to-mq-background/95" />
       </div>
 
       {/* Scrollable content */}
@@ -343,14 +370,14 @@ export default function ResetPasswordClient() {
 
             {generalError && (
               <Alert variant="error">
-                <XCircle className="h-4 w-4" />
+                <XCircle className="h-4 w-4" aria-hidden="true" />
                 <AlertDescription>{generalError}</AlertDescription>
               </Alert>
             )}
 
             {success && mode === 'request' && (
-              <Alert>
-                <CheckCircle2 className="h-4 w-4" />
+              <Alert variant="success">
+                <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
                 <AlertDescription>{t('resetPasswordSentDesc')}</AlertDescription>
               </Alert>
             )}
@@ -369,11 +396,18 @@ export default function ResetPasswordClient() {
                       disabled={isSubmitting}
                       className="h-12 rounded-xl pr-10"
                       {...requestForm.register('email')}
+                      aria-invalid={!!requestForm.formState.errors.email}
+                      aria-describedby={
+                        requestForm.formState.errors.email ? 'email-error' : undefined
+                      }
                     />
-                    <Mail className="h-4 w-4 text-mq-content-secondary absolute right-3 top-1/2 -translate-y-1/2" />
+                    <Mail
+                      className="h-4 w-4 text-mq-content-secondary absolute right-3 top-1/2 -translate-y-1/2"
+                      aria-hidden="true"
+                    />
                   </div>
                   {requestForm.formState.errors.email?.message && (
-                    <p className="text-xs text-red-500 font-medium ml-1">
+                    <p id="email-error" className="text-xs text-mq-error font-medium ml-1">
                       {requestForm.formState.errors.email.message}
                     </p>
                   )}
@@ -414,6 +448,10 @@ export default function ResetPasswordClient() {
                       disabled={isSubmitting}
                       className="h-12 rounded-xl pr-10"
                       {...setForm.register('newPassword')}
+                      aria-invalid={!!setForm.formState.errors.newPassword}
+                      aria-describedby={
+                        setForm.formState.errors.newPassword ? 'newPassword-error' : undefined
+                      }
                     />
                     <button
                       type="button"
@@ -423,11 +461,15 @@ export default function ResetPasswordClient() {
                       aria-pressed={showPassword}
                       disabled={isSubmitting}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" aria-hidden="true" />
+                      ) : (
+                        <Eye className="h-4 w-4" aria-hidden="true" />
+                      )}
                     </button>
                   </div>
                   {setForm.formState.errors.newPassword?.message && (
-                    <p className="text-xs text-red-500 font-medium ml-1">
+                    <p id="newPassword-error" className="text-xs text-mq-error font-medium ml-1">
                       {setForm.formState.errors.newPassword.message}
                     </p>
                   )}
@@ -444,9 +486,15 @@ export default function ResetPasswordClient() {
                     disabled={isSubmitting}
                     className="h-12 rounded-xl"
                     {...setForm.register('confirmPassword')}
+                    aria-invalid={!!setForm.formState.errors.confirmPassword}
+                    aria-describedby={
+                      setForm.formState.errors.confirmPassword
+                        ? 'confirmPassword-error'
+                        : undefined
+                    }
                   />
                   {setForm.formState.errors.confirmPassword?.message && (
-                    <p className="text-xs text-red-500 font-medium ml-1">
+                    <p id="confirmPassword-error" className="text-xs text-mq-error font-medium ml-1">
                       {setForm.formState.errors.confirmPassword.message}
                     </p>
                   )}
@@ -477,7 +525,7 @@ export default function ResetPasswordClient() {
           </div>
 
           <p className="text-xs text-mq-content-secondary text-center mt-4">
-            {mode === 'request' ? tStr('revealEmailNote') : t('resetLinkExpireNote')}
+            {mode === 'request' ? t('revealEmailNote') : t('resetLinkExpireNote')}
           </p>
         </div>
       </div>
