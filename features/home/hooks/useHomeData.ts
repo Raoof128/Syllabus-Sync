@@ -14,10 +14,8 @@ export function useHomeData() {
   const initialLoadDone = useRef(false);
 
   const units = useUnitsStore((state) => state.units);
-  const _isLoadingUnits = useUnitsStore((state) => state.isLoading);
   const forceRefreshUnits = useUnitsStore((state) => state.forceRefresh);
 
-  const _isLoadingDeadlines = useDeadlinesStore((state) => state.isLoading);
   const forceRefreshDeadlines = useDeadlinesStore((state) => state.forceRefresh);
   const forceRefreshTodos = useTodosStore((state) => state.forceRefresh);
   const forceRefreshEvents = useEventsStore((state) => state.forceRefresh);

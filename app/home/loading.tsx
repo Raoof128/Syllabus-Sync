@@ -3,7 +3,12 @@
 // Skeleton loader for home page - provides meaningful first paint
 export default function HomeLoading() {
   return (
-    <div className="container mx-auto p-6 max-w-7xl animate-pulse">
+    <div
+      role="status"
+      aria-label="Loading dashboard"
+      aria-busy="true"
+      className="container mx-auto p-6 max-w-7xl animate-pulse"
+    >
       {/* Header skeleton (Greeting + Right side action) */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div className="space-y-2">

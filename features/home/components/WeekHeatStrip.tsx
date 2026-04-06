@@ -12,7 +12,7 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { useHydration } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
-import { motion, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 
 export default function WeekHeatStrip() {
   const { t } = useTypedTranslation();
@@ -289,7 +289,7 @@ export default function WeekHeatStrip() {
                 </div>
               ) : (
                 <div className="w-full flex items-end justify-center">
-                  <motion.div
+                  <m.div
                     initial={{ scaleY: 0 }}
                     animate={{ scaleY: 1 }}
                     transition={{

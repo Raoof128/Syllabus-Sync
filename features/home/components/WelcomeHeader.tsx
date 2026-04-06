@@ -140,8 +140,7 @@ export function WelcomeHeader({
   // Build the greeting text
   const greeting = displayName ? `${t('welcome')}, ${displayName}!` : `${t('welcome')}!`;
 
-  // Get the translated message using the selected key
-  const message = messageKey ? t(messageKey as 'welcomeMsg1') : t('dayAtGlance');
+  const message = t(messageKey as 'welcomeMsg1');
 
   return (
     <div className={`flex flex-col md:flex-row md:items-end justify-between gap-4 ${className}`}>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useProfilesStore } from '@/lib/store/profilesStore';
 import { useHydration } from '@/lib/hooks';
 import { createBrowserClient, isSupabaseConfigured } from '@/lib/supabase/client';
@@ -60,8 +60,8 @@ export function useHomeUser(initialUser: AuthUser | null = null) {
     }
   }, [hasHydrated, profiles, currentProfileId, setCurrentProfile]);
 
-  // Get display name for welcome message
-  const displayName = (() => {
+  // Derive display name once; recompute only when the user or active profile changes.
+  const displayName = useMemo(() => {
     if (currentProfile?.name) return currentProfile.name;
     if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
     if (user?.user_metadata?.name) return user.user_metadata.name;
@@ -76,7 +76,7 @@ export function useHomeUser(initialUser: AuthUser | null = null) {
       }
     }
     return null;
-  })();
+  }, [user, currentProfile]);
 
   return {
     user,

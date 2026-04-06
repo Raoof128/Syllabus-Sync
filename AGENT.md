@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-06 (Australia/Sydney)
+
+**Raouf:**
+
+- **Scope:** Home Page Bug Hunt & Production Hardening
+- **Summary:** Deep-reviewed all 7 home page files (app/page.tsx, app/home/page.tsx, HomeClient.tsx, loading.tsx, AuthRedirectHandler.tsx, and features/home hooks + components). Found and fixed 9 issues: duplicate ARIA landmark labels, unsafe `window.location.href` navigation in error state, `supabase` client recreated on every render in AuthRedirectHandler, two unused Zustand store subscriptions causing needless re-renders in `useHomeData`, `displayName` IIFE not memoized in `useHomeUser`, `motion` bypassing `LazyMotion` in `WeekHeatStrip`, inaccessible skeleton in `loading.tsx`, and dead fallback branch in `WelcomeHeader`.
+- **Files Changed:** `app/home/HomeClient.tsx`, `app/home/loading.tsx`, `app/AuthRedirectHandler.tsx`, `features/home/hooks/useHomeData.ts`, `features/home/hooks/useHomeUser.ts`, `features/home/components/WeekHeatStrip.tsx`, `features/home/components/WelcomeHeader.tsx`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures unrelated) ✅.
+- **Follow-ups:** None.
+
 ### 2026-04-05 (Australia/Sydney)
 
 **Raouf:**

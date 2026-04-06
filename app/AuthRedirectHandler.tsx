@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
+import type { Session } from '@supabase/supabase-js';
 import { Loader2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { logger } from '@/lib/logger';
@@ -27,7 +28,10 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const handledRef = useRef(false);
-  const supabase = createBrowserClient();
+  // Memoize the client so it's created once per mount, not on every render.
+  // createBrowserClient() is a singleton internally, but useMemo makes the
+  // intent explicit and satisfies the react-hooks/refs lint rule.
+  const supabase = useMemo(() => createBrowserClient(), []);
 
   // Memoized handler for setting error state
   const handleError = useCallback((message: string) => {
@@ -116,7 +120,7 @@ export default function AuthRedirectHandler({ fallbackRedirect }: AuthRedirectHa
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event: string, session: unknown) => {
+    } = supabase.auth.onAuthStateChange((event: string, session: Session | null) => {
       if (handledRef.current) return;
 
       logger.info('AuthRedirectHandler: Auth state change:', { event });

@@ -62,6 +62,10 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
   useFirstLoginPrompts();
 
   const [fabOpen, setFabOpen] = useState(false);
+  // Portal target is always document.body on the client. React's hydration
+  // algorithm does not compare portal content at the component's mount point
+  // (portals are teleported outside the tree), so the server/client difference
+  // here is safe — no hydration mismatch is produced.
   const portalTarget = typeof document === 'undefined' ? null : document.body;
 
   // Close FAB menu on Escape key
@@ -97,7 +101,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
             <Button onClick={handleErrorRecovery} className="mr-3">
               {t('tryAgain')}
             </Button>
-            <Button variant="secondary" onClick={() => (window.location.href = '/')}>
+            <Button variant="secondary" onClick={() => router.push('/')}>
               {t('goHome')}
             </Button>
           </div>
@@ -284,10 +288,7 @@ export default function HomeClient({ initialUser = null }: HomeClientProps) {
         </ScrollReveal>
 
         {/* Events and Todo Grid */}
-        <section
-          className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 2xl:max-w-[1600px] 2xl:mx-auto"
-          aria-label={t('dashboardOverview')}
-        >
+        <section className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-6 2xl:max-w-[1600px] 2xl:mx-auto">
           <ScrollReveal delay={0.35}>
             <UserEventsWidget />
           </ScrollReveal>
