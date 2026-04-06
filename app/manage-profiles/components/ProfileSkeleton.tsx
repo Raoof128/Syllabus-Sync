@@ -2,7 +2,12 @@
 
 export function ProfileSkeleton() {
   return (
-    <div className="container mx-auto max-w-4xl px-3 py-4 sm:px-4 sm:py-6 lg:py-8">
+    <div
+      role="status"
+      aria-busy="true"
+      aria-label="Loading profile"
+      className="container mx-auto max-w-4xl px-3 py-4 sm:px-4 sm:py-6 lg:py-8"
+    >
       {/* Back link skeleton */}
       <div className="mb-4 sm:mb-6">
         <div className="h-4 w-20 rounded bg-mq-border animate-pulse" />

@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Manage Profiles Page Bug Hunt & Production Hardening — 2026-04-06
+
+**Scope:** Bug fixes, performance, accessibility, design token compliance, and security hardening across 9 manage-profiles files.
+
+**Summary:** Deep-reviewed all 12 manage-profiles files. Found and fixed 18 issues: `PersonalInfoCard` had `border-red-500`/`text-red-500` error styling → `border-mq-error`/`text-mq-error`; email input missing `id="email"` breaking Label association; `aria-describedby` missing on all three fields with error states → added with matching `id` on error paragraphs; hardcoded student ID placeholder `"12345678"` → `t('studentIdPlaceholder')`. `AcademicInfoCard` had hardcoded hex colors `bg-[#FFB81C]/15` + `text-[#c08c00]` on section icon → `bg-mq-warning/15` + `text-mq-warning`; `text-red-500`/`border-red-500` error styling on all three fields → `mq-error` tokens; `aria-describedby` and `aria-invalid` missing from year SelectTrigger. `error.tsx` had `bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400` → `bg-mq-error/10 text-mq-error`. `ProfileSkeleton` missing `role="status"`, `aria-busy="true"`, `aria-label` ARIA semantics. `page.tsx` reload button missing `type="button"`; `RefreshCw` className used string template literal instead of `cn()` utility — fixed both. `ProfileHeader` missing file MIME type validation (only size was checked — non-image files could be uploaded) → added `file.type.startsWith('image/')` guard; `handleAvatarChange` not memoized → `useCallback`. `useProfileManager` had `profileSchema` recreated on every render → `useMemo`; dead code in `onSubmit` error branch where first `if` set `errorMessage` to the same default value → collapsed to single `else if`; `reloadProfile` always fired success toast even when `fetchProfile()` threw → wrapped in try/catch. `actions.ts` had unprofessional rate-limit error message → neutral language; misleading catch label "Validation failed" on a `revalidatePath` error → corrected to "Cache revalidation failed"; hardcoded success message tidied. `profilesStore.ts` had redundant `console.error` immediately before `errorHandler.logError` → removed; hardcoded verbose avatar error toast → shortened.
+
+**Files Changed:** `app/manage-profiles/components/PersonalInfoCard.tsx`, `app/manage-profiles/components/AcademicInfoCard.tsx`, `app/manage-profiles/error.tsx`, `app/manage-profiles/components/ProfileSkeleton.tsx`, `app/manage-profiles/page.tsx`, `app/manage-profiles/components/ProfileHeader.tsx`, `app/manage-profiles/hooks/useProfileManager.ts`, `app/manage-profiles/actions.ts`, `lib/store/profilesStore.ts`.
+
+**Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+
+**Follow-ups:** None.
+
+---
+
 ### Raouf: Event Settings Page Bug Hunt & Production Hardening — 2026-04-06
 
 **Scope:** Bug fixes, performance, accessibility, and MQ token compliance across 4 event-settings files

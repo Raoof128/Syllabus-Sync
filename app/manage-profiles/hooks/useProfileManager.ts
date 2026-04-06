@@ -1,4 +1,4 @@
-import { useEffect, useOptimistic, startTransition, useRef } from 'react';
+import { useEffect, useOptimistic, startTransition, useRef, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useProfilesStore } from '@/lib/store/profilesStore';
@@ -34,7 +34,7 @@ function normalizeStudentId(studentId: string | undefined | null): string {
 
 export function useProfileManager() {
   const { t } = useTypedTranslation();
-  const profileSchema = createProfileSchema(t);
+  const profileSchema = useMemo(() => createProfileSchema(t), [t]);
 
   // Use selector to get current profile safely
   const currentProfile = useProfilesStore((state) =>
@@ -151,24 +151,21 @@ export function useProfileManager() {
       // Handle server validation failures or messages
       let errorMessage = t('validationFailed');
 
-      if ('error' in result && result.error) {
-        errorMessage = t('validationFailed');
-      } else if ('message' in result) {
+      if ('message' in result) {
         errorMessage = result.message || t('unexpectedError');
       }
 
       toastUtils.error(t('error'), errorMessage);
-
-      // Reset form to previous valid server state to undo optimistic UI if we want strict consistency
-      // Or keep user input to let them fix it. Keeping user input is usually better UX for form errors.
-      // However, if the error is "server totally failed", maybe revert.
-      // For now, we leave the form state as is so they can fix errors.
     }
   };
 
   const reloadProfile = async () => {
-    await fetchProfile();
-    toastUtils.success(t('profileReloaded'), t('profileReloadedMsg'));
+    try {
+      await fetchProfile();
+      toastUtils.success(t('profileReloaded'), t('profileReloadedMsg'));
+    } catch {
+      toastUtils.error(t('error'), t('databaseConnectionFailed'));
+    }
   };
 
   return {

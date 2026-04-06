@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/mq/button';
 import { Save, Loader2, User as UserIcon, ArrowLeft, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { MagicCard } from '@/components/ui/MagicCard';
+import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { ProfileSkeleton } from './components/ProfileSkeleton';
 
@@ -81,11 +82,12 @@ export default function ManageProfilesPage() {
         {/* Reload button — subtle at the bottom */}
         <div className="flex justify-center pt-1 pb-16">
           <button
+            type="button"
             onClick={reloadProfile}
             disabled={isProfileLoading || isSaving}
             className="flex items-center gap-1.5 text-xs text-mq-content-tertiary hover:text-mq-content-secondary transition-colors disabled:opacity-40"
           >
-            <RefreshCw className={`h-3 w-3 ${isProfileLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={cn('h-3 w-3', isProfileLoading && 'animate-spin')} />
             {isProfileLoading ? t('reloading') : t('reloadFromServer')}
           </button>
         </div>

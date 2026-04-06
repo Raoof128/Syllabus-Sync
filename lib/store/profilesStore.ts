@@ -426,10 +426,7 @@ export const useProfilesStore = create<ProfilesState>()(
                   : p,
               ),
             }));
-            toastUtils.error(
-              'Avatar upload failed',
-              'Your avatar could not be saved. Please try again.',
-            );
+            toastUtils.error('Avatar upload failed', 'Could not save avatar. Please try again.');
           }
         }
 
@@ -471,7 +468,6 @@ export const useProfilesStore = create<ProfilesState>()(
             }));
 
             const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error('[ProfilesStore] Update failed:', errorMessage);
             errorHandler.logError(
               error instanceof Error ? error : new Error('Failed to update profile'),
               'ProfilesStore.updateProfile',

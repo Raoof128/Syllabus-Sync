@@ -44,19 +44,25 @@ export function PersonalInfoCard({ form, email, disabled }: Props) {
               {...register('name')}
               placeholder={t('enterFullName')}
               disabled={disabled}
-              className={errors.name ? 'border-red-500' : ''}
+              className={errors.name ? 'border-mq-error' : ''}
               aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? 'name-error' : undefined}
             />
-            {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
+            {errors.name && (
+              <p id="name-error" className="text-mq-error text-xs">
+                {errors.name.message}
+              </p>
+            )}
           </div>
 
           {/* Read Only Email */}
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium text-mq-content-secondary">
+            <Label htmlFor="email" className="text-sm font-medium text-mq-content-secondary">
               {t('emailAddress')}
             </Label>
             <div className="relative">
               <Input
+                id="email"
                 value={email}
                 disabled
                 className="bg-mq-background-subtle opacity-70 cursor-not-allowed pr-9"
@@ -74,14 +80,19 @@ export function PersonalInfoCard({ form, email, disabled }: Props) {
             <Input
               id="studentId"
               {...register('studentId')}
-              placeholder="12345678"
+              placeholder={t('studentIdPlaceholder')}
               maxLength={8}
               inputMode="numeric"
               disabled={disabled}
-              className={errors.studentId ? 'border-red-500' : ''}
+              className={errors.studentId ? 'border-mq-error' : ''}
               aria-invalid={!!errors.studentId}
+              aria-describedby={errors.studentId ? 'studentId-error' : undefined}
             />
-            {errors.studentId && <p className="text-red-500 text-xs">{errors.studentId.message}</p>}
+            {errors.studentId && (
+              <p id="studentId-error" className="text-mq-error text-xs">
+                {errors.studentId.message}
+              </p>
+            )}
           </div>
         </div>
       </div>

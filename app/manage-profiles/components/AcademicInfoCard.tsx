@@ -77,8 +77,8 @@ export function AcademicInfoCard({ form, disabled }: Props) {
       <div className="mq-magic-card-content bg-mq-card-background border border-mq-border">
         {/* Section Header */}
         <div className="flex items-center gap-3 p-5 sm:p-6 pb-0">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#FFB81C]/15">
-            <GraduationCap className="h-4 w-4 text-[#c08c00]" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-mq-warning/15">
+            <GraduationCap className="h-4 w-4 text-mq-warning" />
           </div>
           <h2 className="text-lg font-semibold text-mq-content">{t('academicInfo')}</h2>
         </div>
@@ -101,7 +101,11 @@ export function AcademicInfoCard({ form, disabled }: Props) {
                 />
               )}
             />
-            {errors.faculty && <p className="text-red-500 text-xs">{errors.faculty.message}</p>}
+            {errors.faculty && (
+              <p id="faculty-error" className="text-mq-error text-xs">
+                {errors.faculty.message}
+              </p>
+            )}
           </div>
 
           {/* Course — searchable combobox */}
@@ -122,7 +126,11 @@ export function AcademicInfoCard({ form, disabled }: Props) {
                 />
               )}
             />
-            {errors.course && <p className="text-red-500 text-xs">{errors.course.message}</p>}
+            {errors.course && (
+              <p id="course-error" className="text-mq-error text-xs">
+                {errors.course.message}
+              </p>
+            )}
           </div>
 
           {/* Year Select — dynamic based on course */}
@@ -137,7 +145,11 @@ export function AcademicInfoCard({ form, disabled }: Props) {
                   onValueChange={field.onChange}
                   disabled={disabled || !watchedCourse}
                 >
-                  <SelectTrigger className={errors.year ? 'border-red-500' : ''}>
+                  <SelectTrigger
+                    className={errors.year ? 'border-mq-error' : ''}
+                    aria-invalid={!!errors.year}
+                    aria-describedby={errors.year ? 'year-error' : undefined}
+                  >
                     <SelectValue
                       placeholder={watchedCourse ? t('yearPlaceholder') : t('selectCourseFirst')}
                     />
@@ -156,7 +168,11 @@ export function AcademicInfoCard({ form, disabled }: Props) {
                 </Select>
               )}
             />
-            {errors.year && <p className="text-red-500 text-xs">{errors.year.message}</p>}
+            {errors.year && (
+              <p id="year-error" className="text-mq-error text-xs">
+                {errors.year.message}
+              </p>
+            )}
           </div>
         </div>
       </div>

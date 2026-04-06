@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-06 (Australia/Sydney) — Manage Profiles
+
+**Raouf:**
+
+- **Scope:** Manage Profiles Page Bug Hunt & Production Hardening
+- **Summary:** Reviewed all 12 manage-profiles files. Found and fixed 18 issues: `PersonalInfoCard` raw `border-red-500`/`text-red-500` → `mq-error` tokens; email input missing `id` attribute; `aria-describedby` missing on all error-capable fields + error `<p>` missing `id`; hardcoded student ID placeholder → `t('studentIdPlaceholder')`. `AcademicInfoCard` hardcoded hex `bg-[#FFB81C]/15` + `text-[#c08c00]` → `bg-mq-warning/15` + `text-mq-warning`; `text-red-500`/`border-red-500` → `mq-error` tokens; year SelectTrigger missing `aria-invalid`/`aria-describedby`. `error.tsx` raw `bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400` → `bg-mq-error/10 text-mq-error`. `ProfileSkeleton` missing ARIA status semantics. `page.tsx` reload button missing `type="button"`; `RefreshCw` template literal → `cn()`. `ProfileHeader` no MIME type validation before FileReader → added `file.type.startsWith('image/')` guard; `handleAvatarChange` not memoized → `useCallback`. `useProfileManager` `profileSchema` recreated every render → `useMemo`; dead code in error branch collapsed; `reloadProfile` always fired success toast → try/catch guard. `actions.ts` unprofessional rate-limit message → neutral; misleading "Validation failed" catch label → "Cache revalidation failed". `profilesStore.ts` redundant `console.error` before `errorHandler.logError` removed.
+- **Files Changed:** `app/manage-profiles/components/PersonalInfoCard.tsx`, `app/manage-profiles/components/AcademicInfoCard.tsx`, `app/manage-profiles/error.tsx`, `app/manage-profiles/components/ProfileSkeleton.tsx`, `app/manage-profiles/page.tsx`, `app/manage-profiles/components/ProfileHeader.tsx`, `app/manage-profiles/hooks/useProfileManager.ts`, `app/manage-profiles/actions.ts`, `lib/store/profilesStore.ts`.
+- **Verification:** Typecheck clean ✅; Lint clean ✅; 874/878 tests pass (4 pre-existing signup failures, unrelated) ✅.
+- **Follow-ups:** None.
+
 ### 2026-04-06 (Australia/Sydney) — Event Settings
 
 **Raouf:**

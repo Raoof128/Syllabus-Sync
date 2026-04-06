@@ -8,7 +8,7 @@ import { Camera, Mail, IdCard, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { BRAND_COLORS } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 interface ProfileHeaderProps {
   profile: UserProfile;
@@ -20,37 +20,46 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
   const { updateProfile } = useProfilesStore();
   const [isAvatarSaving, setIsAvatarSaving] = useState(false);
 
-  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    // Reset input immediately so the same file can be re-selected after failure
-    event.target.value = '';
-    if (!file) return;
+  const handleAvatarChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      // Reset input immediately so the same file can be re-selected after failure
+      event.target.value = '';
+      if (!file) return;
 
-    // Security Check: 2MB Limit
-    if (file.size > 2 * 1024 * 1024) {
-      toastUtils.error(t('error'), t('fileSizeExceedsLimit' as TranslationKey));
-      return;
-    }
-
-    const profileId = profile.id;
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const result = e.target?.result as string;
-      setIsAvatarSaving(true);
-      try {
-        const updated = await updateProfile(profileId, { avatar: result });
-        if (updated) {
-          toastUtils.success(t('profileUpdated'), t('avatarUpdated'));
-        }
-        // If null, upload failed — store already shows error toast and reverts
-      } catch {
-        toastUtils.error(t('error'), t('failedToUpdateProfile'));
-      } finally {
-        setIsAvatarSaving(false);
+      // Security Check: MIME type must be an image
+      if (!file.type.startsWith('image/')) {
+        toastUtils.error(t('error'), t('fileSizeExceedsLimit' as TranslationKey));
+        return;
       }
-    };
-    reader.readAsDataURL(file);
-  };
+
+      // Security Check: 2MB Limit
+      if (file.size > 2 * 1024 * 1024) {
+        toastUtils.error(t('error'), t('fileSizeExceedsLimit' as TranslationKey));
+        return;
+      }
+
+      const profileId = profile.id;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const result = e.target?.result as string;
+        setIsAvatarSaving(true);
+        try {
+          const updated = await updateProfile(profileId, { avatar: result });
+          if (updated) {
+            toastUtils.success(t('profileUpdated'), t('avatarUpdated'));
+          }
+          // If null, upload failed — store already shows error toast and reverts
+        } catch {
+          toastUtils.error(t('error'), t('failedToUpdateProfile'));
+        } finally {
+          setIsAvatarSaving(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    },
+    [profile.id, updateProfile, t],
+  );
 
   return (
     <MagicCard isLiquidEnhanced>

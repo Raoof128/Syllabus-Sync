@@ -9,7 +9,7 @@ export async function updateProfileAction(profileId: string, data: ProfileFormVa
   const limit = await checkRateLimit(20, 60 * 1000);
 
   if (!limit.success) {
-    return { success: false, error: 'Too many requests. Chill out, hacker.' };
+    return { success: false, error: 'Too many requests. Please try again later.' };
   }
 
   // 1. SECURITY: Validate inputs on the server again
@@ -23,9 +23,9 @@ export async function updateProfileAction(profileId: string, data: ProfileFormVa
     // 2. CACHE: Refresh the page data after the store persists via API
     revalidatePath('/manage-profiles');
 
-    return { success: true, message: 'Profile updated successfully' };
+    return { success: true, message: 'Profile updated.' };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return { success: false, message: `Validation failed: ${message}` };
+    return { success: false, message: `Cache revalidation failed: ${message}` };
   }
 }

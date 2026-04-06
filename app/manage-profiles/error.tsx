@@ -21,8 +21,8 @@ export default function Error({
 
   return (
     <div className="flex min-h-[50vh] px-4 py-8 flex-col items-center justify-center gap-4 text-center">
-      <div className="rounded-full bg-red-100 p-4 dark:bg-red-900/20">
-        <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
+      <div className="rounded-full bg-mq-error/10 p-4">
+        <AlertTriangle className="h-8 w-8 text-mq-error" />
       </div>
       <div className="space-y-2">
         <h2 className="text-xl font-bold text-mq-content">{t('somethingWentWrong')}</h2>
