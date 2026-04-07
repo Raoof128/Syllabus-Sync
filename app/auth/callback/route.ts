@@ -164,15 +164,20 @@ export async function GET(request: Request) {
   // Email verification path: the email is now confirmed server-side. Drop the
   // session cookie we just minted and bounce the user back to /login so they sign
   // in explicitly. The `verified=1` flag triggers the green success banner in
-  // LoginClient (distinct from `verified=1&from=email_link` which is the soft
-  // fallback for PKCE failures).
+  // LoginClient.
   try {
     await supabase.auth.signOut();
   } catch (signOutError) {
-    // Non-fatal: cookie may persist briefly but the user is redirected to /login
-    // either way and will re-authenticate.
     console.warn('Post-verification signOut failed (non-fatal):', signOutError);
   }
+
+  // If we have a validated redirectTo that isn't just bouncing back to login,
+  // honor it. This allows signup-confirmation emails to land the user on
+  // their intended destination (e.g., /map or /home) after they sign in.
+  if (redirectTo && redirectTo !== '/login') {
+    return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
+  }
+
   const verifiedLoginUrl = new URL('/login', requestUrl.origin);
   verifiedLoginUrl.searchParams.set('verified', '1');
   return NextResponse.redirect(verifiedLoginUrl);

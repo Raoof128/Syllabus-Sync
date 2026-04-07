@@ -256,9 +256,7 @@ export async function POST(request: NextRequest) {
         const isAlreadyRegistered = authError.message.toLowerCase().includes('already registered');
         if (isAlreadyRegistered) {
           logAuthEvent(adminClient, 'signup_existing_email', { ip: clientIP }, request);
-          return jsonError(ACCOUNT_EXISTS_MESSAGE, 409, ERROR_CODES.BAD_REQUEST, {
-            target: 'email',
-          });
+          return jsonSuccess({ message: GENERIC_SIGNUP_SUCCESS });
         }
 
         return jsonError(
@@ -281,9 +279,7 @@ export async function POST(request: NextRequest) {
           email_hint: `${email.substring(0, 3)}***`,
         });
         logAuthEvent(adminClient, 'signup_existing_email', { ip: clientIP }, request);
-        return jsonError(ACCOUNT_EXISTS_MESSAGE, 409, ERROR_CODES.BAD_REQUEST, {
-          target: 'email',
-        });
+        return jsonSuccess({ message: GENERIC_SIGNUP_SUCCESS });
       }
 
       createdUser = authData.user ? { id: authData.user.id } : null;

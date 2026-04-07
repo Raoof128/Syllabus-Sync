@@ -177,6 +177,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 - **Verification:** Typecheck clean ✅; Lint clean ✅; 876/878 tests pass (2 pre-existing signup failures unrelated) ✅.
 - **Follow-ups:** None.
 
+### 2026-04-07 (Australia/Sydney)
+
+**Raouf:**
+
+- **Scope:** CI/CD Test Suite Remediation
+- **Summary:** Fixed four critical test failures in the authentication pipeline. Corrected `app/auth/callback/route.ts` to honor the `redirectTo` parameter during email verification (allowing users to land on `/map` or `/home` after signing in). Aligned `app/api/auth/signup/route.ts` with security mandates and existing test expectations by ensuring "already registered" attempts return a `200 OK` generic success message, preventing account enumeration.
+- **Files Changed:** `app/auth/callback/route.ts`, `app/api/auth/signup/route.ts`.
+- **Verification:** Successfully ran the full test suite locally (878 tests passed across 94 files); specific regression tests for auth callback redirects and signup enumeration confirmed passing.
+- **Follow-ups:** None.
+
 ### 2026-04-01 (Australia/Sydney)
 
 **Raouf:**

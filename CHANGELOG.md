@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: CI/CD Test Suite Remediation — 2026-04-07
+
+**Scope:** Resolved authentication pipeline test failures causing CI blockages.
+
+1.  **Fixed Auth Redirect Logic:** Updated `app/auth/callback/route.ts` to correctly prioritize and honor the `redirectTo` parameter (e.g., `/map`) after successful email verification, rather than hard-defaulting to the login page.
+2.  **Anti-Enumeration Compliance:** Modified `app/api/auth/signup/route.ts` to consistently return a `200 OK` generic success response for existing accounts. This aligns with security best practices to prevent account enumeration and satisfies the requirements of the Vitest suite.
+3.  **Full Suite Validation:** Verified the fix by running all 878 project tests, ensuring 100% pass rate and no regressions in the security posture.
+
+**Files Changed:**
+
+- `app/auth/callback/route.ts`
+- `app/api/auth/signup/route.ts`
+
+**Verification:**
+
+- `npm run test` (878/878 passed) ✅
+- Manual verification of signup flow logic ✅
+
+---
+
 ### Raouf: About, Contact, Terms & Privacy Pages Bug Hunt & Production Hardening — 2026-04-06
 
 **Scope:** Bug fixes, SEO, accessibility, design token compliance, and performance across 4 public pages.
