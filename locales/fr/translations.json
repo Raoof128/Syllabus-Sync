@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Clé d’accès",
   "authenticationFailed": "Échec de l’authentification.",
   "contact_emailSubject": "{{appName}} contact et commentaires",
-  "contact_notProvided": "Non fourni"
+  "contact_notProvided": "Non fourni",
+  "emailDeliveryComingSoon": "Vos préférences sont enregistrées, mais les rappels par e-mail programmés ne sont pas encore envoyés. Nous construisons actuellement le système d'envoi d'e-mails — les notifications push et les rappels dans l'application fonctionnent déjà correctement.",
+  "assignmentReminders": "Rappels de devoirs",
+  "assignmentRemindersDesc": "Soyez informé des devoirs à venir",
+  "examReminders": "Rappels d'examens",
+  "examRemindersDesc": "Soyez informé avant les examens",
+  "todoReminders": "Rappels de tâches",
+  "todoRemindersDesc": "Soyez rappelé des tâches à venir",
+  "loginErrorProviderMismatchGoogle": "Vous vous êtes déjà inscrit avec Google. Veuillez continuer avec votre compte Google.",
+  "loginErrorProviderMismatchEmail": "Vous vous êtes déjà inscrit par e-mail. Veuillez vous connecter avec votre e-mail et votre mot de passe.",
+  "emailLinkVerifiedSoft": "Votre e-mail est peut-être déjà vérifié. Veuillez vous connecter avec votre nouveau compte.",
+  "emailLinkVerifiedSoftHint": "Si vous ne pouvez toujours pas vous connecter, demandez un nouvel e-mail de vérification.",
+  "verificationLinkUsed": "Ce lien de vérification a déjà été utilisé ou a expiré. Si vous n'avez pas encore vérifié votre compte, veuillez en demander un nouveau.",
+  "signupFailed": "Échec de l'inscription",
+  "opensInNewTab": " (s'ouvre dans un nouvel onglet)",
+  "loadingEvents": "Chargement des événements",
+  "deadlines": "Échéances",
+  "heroSection": "Section Hero"
 }

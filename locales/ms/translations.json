@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Kunci laluan",
   "authenticationFailed": "Pengesahan gagal.",
   "contact_emailSubject": "{{appName}} hubungan dan maklum balas",
-  "contact_notProvided": "Tidak diberikan"
+  "contact_notProvided": "Tidak diberikan",
+  "emailDeliveryComingSoon": "Pilihan anda telah disimpan, tetapi peringatan e-mel berjadual belum lagi dihantar. Kami sedang membina saluran penghantaran e-mel — pemberitahuan tolak dan peringatan dalam aplikasi sudah berfungsi dengan betul.",
+  "assignmentReminders": "Peringatan Tugasan",
+  "assignmentRemindersDesc": "Dapatkan pemberitahuan tentang tugasan akan datang",
+  "examReminders": "Peringatan Peperiksaan",
+  "examRemindersDesc": "Dapatkan pemberitahuan sebelum peperiksaan",
+  "todoReminders": "Peringatan Tugasan To-do",
+  "todoRemindersDesc": "Dapatkan peringatan tentang tugasan to-do akan datang",
+  "loginErrorProviderMismatchGoogle": "Anda telah mendaftar dengan Google. Sila teruskan dengan akaun Google anda.",
+  "loginErrorProviderMismatchEmail": "Anda telah mendaftar dengan e-mel. Sila log masuk dengan e-mel dan kata laluan anda.",
+  "emailLinkVerifiedSoft": "E-mel anda mungkin telah disahkan. Sila log masuk dengan akaun baru anda.",
+  "emailLinkVerifiedSoftHint": "Jika anda masih tidak boleh log masuk, minta e-mel pengesahan baru.",
+  "verificationLinkUsed": "Pautan pengesahan ini telah digunakan atau telah tamat tempoh. Jika anda belum mengesahkan lagi, sila minta yang baru.",
+  "signupFailed": "Pendaftaran gagal",
+  "opensInNewTab": " (dibuka dalam tab baru)",
+  "loadingEvents": "Memuatkan acara",
+  "deadlines": "Tarikh Akhir",
+  "heroSection": "Hero Section"
 }

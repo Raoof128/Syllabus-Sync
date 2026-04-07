@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Adgangsnøgle",
   "authenticationFailed": "Godkendelse mislykkedes.",
   "contact_emailSubject": "{{appName}} kontakt og feedback",
-  "contact_notProvided": "Ikke angivet"
+  "contact_notProvided": "Ikke angivet",
+  "emailDeliveryComingSoon": "Dine præferencer er gemt, men planlagte e-mail-påmindelser sendes endnu ikke. Vi bygger e-mail-leveringssystemet — push-meddelelser og påmindelser i appen fungerer allerede korrekt.",
+  "assignmentReminders": "Opgavepåmindelser",
+  "assignmentRemindersDesc": "Få besked om kommende opgaver",
+  "examReminders": "Eksamenspåmindelser",
+  "examRemindersDesc": "Få besked før eksamener",
+  "todoReminders": "To-do-påmindelser",
+  "todoRemindersDesc": "Få påmindelser om kommende to-do-punkter",
+  "loginErrorProviderMismatchGoogle": "Du har allerede tilmeldt dig med Google. Fortsæt venligst med din Google-konto.",
+  "loginErrorProviderMismatchEmail": "Du har allerede tilmeldt dig med e-mail. Log venligst ind med din e-mail og adgangskode.",
+  "emailLinkVerifiedSoft": "Din e-mail er muligvis allerede bekræftet. Log venligst ind med din nye konto.",
+  "emailLinkVerifiedSoftHint": "Hvis du stadig ikke kan logge ind, skal du anmode om en ny bekræftelses-e-mail.",
+  "verificationLinkUsed": "Dette bekræftelseslink er allerede blevet brugt eller er udløbet. Hvis du ikke har bekræftet endnu, skal du anmode om et nyt.",
+  "signupFailed": "Tilmelding mislykkedes",
+  "opensInNewTab": " (åbner i ny fane)",
+  "loadingEvents": "Indlæser begivenheder",
+  "deadlines": "Deadlines",
+  "heroSection": "Hero-sektion"
 }

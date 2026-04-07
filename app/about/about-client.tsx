@@ -58,7 +58,7 @@ export default function AboutClient() {
     <div className="min-h-screen bg-mq-background">
       {/* ── Hero ── */}
       <section
-        aria-label="Hero"
+        aria-label={t('heroSection')}
         className="relative overflow-hidden border-b border-mq-border bg-gradient-to-br from-mq-red-deep via-mq-primary to-mq-red-deep"
       >
         <div

@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Geçiş anahtarı",
   "authenticationFailed": "Kimlik doğrulama başarısız oldu.",
   "contact_emailSubject": "{{appName}} iletişim ve geri bildirim",
-  "contact_notProvided": "Belirtilmedi"
+  "contact_notProvided": "Belirtilmedi",
+  "emailDeliveryComingSoon": "Tercihleriniz kaydedildi, ancak planlanmış e-posta hatırlatıcıları henüz gönderilmiyor. E-posta gönderim sistemini kuruyoruz — anlık bildirimler ve uygulama içi hatırlatıcılar zaten düzgün çalışıyor.",
+  "assignmentReminders": "Ödev Hatırlatıcıları",
+  "assignmentRemindersDesc": "Yaklaşan ödevler hakkında bildirim alın",
+  "examReminders": "Sınav Hatırlatıcıları",
+  "examRemindersDesc": "Sınavlardan önce bildirim alın",
+  "todoReminders": "Yapılacaklar Hatırlatıcıları",
+  "todoRemindersDesc": "Yaklaşan yapılacaklar hakkında hatırlatıcı alın",
+  "loginErrorProviderMismatchGoogle": "Zaten Google ile kayoldunuz. Lütfen Google hesabınızla devam edin.",
+  "loginErrorProviderMismatchEmail": "Zaten e-posta ile kaydoldunuz. Lütfen e-posta adresiniz ve şifrenizle giriş yapın.",
+  "emailLinkVerifiedSoft": "E-postanız zaten doğrulanmış olabilir. Lütfen yeni hesabınızla giriş yapın.",
+  "emailLinkVerifiedSoftHint": "Hala giriş yapamıyorsanız, yeni bir doğrulama e-postası isteyin.",
+  "verificationLinkUsed": "Bu doğrulama bağlantısı zaten kullanılmış veya süresi dolmuş. Henüz doğrulamadıysanız lütfen yeni bir tane isteyin.",
+  "signupFailed": "Kayıt başarısız",
+  "opensInNewTab": " (yeni sekmede açılır)",
+  "loadingEvents": "Etkinlikler yükleniyor",
+  "deadlines": "Son Tarihler",
+  "heroSection": "Kahraman Bölümü"
 }

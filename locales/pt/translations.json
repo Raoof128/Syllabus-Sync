@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Chave de acesso",
   "authenticationFailed": "A autenticação falhou.",
   "contact_emailSubject": "{{appName}} contacto e feedback",
-  "contact_notProvided": "Não fornecido"
+  "contact_notProvided": "Não fornecido",
+  "emailDeliveryComingSoon": "Suas preferências foram salvas, mas os lembretes por e-mail agendados ainda não estão sendo enviados. Estamos construindo o sistema de envio de e-mails — as notificações push e os lembretes no aplicativo já funcionam corretamente.",
+  "assignmentReminders": "Lembretes de trabalhos",
+  "assignmentRemindersDesc": "Receba notificações sobre os próximos trabalhos",
+  "examReminders": "Lembretes de exames",
+  "examRemindersDesc": "Receba notificações antes dos exames",
+  "todoReminders": "Lembretes de tarefas",
+  "todoRemindersDesc": "Receba lembretes sobre as próximas tarefas",
+  "loginErrorProviderMismatchGoogle": "Você já se inscreveu com o Google. Por favor, continue com sua conta do Google.",
+  "loginErrorProviderMismatchEmail": "Você já se inscreveu com e-mail. Por favor, faça login com seu e-mail e senha.",
+  "emailLinkVerifiedSoft": "Seu e-mail já pode ter sido verificado. Por favor, faça login com sua nova conta.",
+  "emailLinkVerifiedSoftHint": "Se você ainda não conseguir fazer login, solicite um novo e-mail de verificação.",
+  "verificationLinkUsed": "Este link de verificação já foi usado ou expirou. Se você ainda não verificou, solicite um novo.",
+  "signupFailed": "Falha na inscrição",
+  "opensInNewTab": " (abre em uma nova guia)",
+  "loadingEvents": "Carregando eventos",
+  "deadlines": "Prazos",
+  "heroSection": "Seção Hero"
 }

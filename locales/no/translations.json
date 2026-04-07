@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Tilgangsnøkkel",
   "authenticationFailed": "Autentisering mislyktes.",
   "contact_emailSubject": "{{appName}} kontakt og tilbakemelding",
-  "contact_notProvided": "Ikke oppgitt"
+  "contact_notProvided": "Ikke oppgitt",
+  "emailDeliveryComingSoon": "Dine preferanser er lagret, men planlagte e-postpåminnelser sendes ikke ennå. Vi bygger e-postleveringssystemet — push-varsler og påminnelser i appen fungerer allerede riktig.",
+  "assignmentReminders": "Oppgavepåminnelser",
+  "assignmentRemindersDesc": "Få varsel om kommende oppgaver",
+  "examReminders": "Eksamenspåminnelser",
+  "examRemindersDesc": "Få varsel før eksamener",
+  "todoReminders": "Gjøremålspåminnelser",
+  "todoRemindersDesc": "Få påminnelse om kommende gjøremål",
+  "loginErrorProviderMismatchGoogle": "Du har allerede registrert deg med Google. Vennligst fortsett med Google-kontoen din.",
+  "loginErrorProviderMismatchEmail": "Du har allerede registrert deg med e-post. Vennligst logg inn med e-post og passord.",
+  "emailLinkVerifiedSoft": "E-posten din kan allerede være bekreftet. Vennligst logg inn med din nye konto.",
+  "emailLinkVerifiedSoftHint": "Hvis du fortsatt ikke kan logge inn, be om en ny bekreftelses-e-post.",
+  "verificationLinkUsed": "Denne bekreftelseslenken er allerede brukt eller er utløpt. Hvis du ikke har bekreftet ennå, vennligst be om en ny.",
+  "signupFailed": "Registrering mislyktes",
+  "opensInNewTab": " (åpnes i ny fane)",
+  "loadingEvents": "Laster hendelser",
+  "deadlines": "Frister",
+  "heroSection": "Hero-seksjon"
 }

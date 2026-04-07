@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Přístupový klíč",
   "authenticationFailed": "Ověření selhalo.",
   "contact_emailSubject": "{{appName}} kontakt a zpětná vazba",
-  "contact_notProvided": "Neuvedeno"
+  "contact_notProvided": "Neuvedeno",
+  "emailDeliveryComingSoon": "Vaše předvolby jsou uloženy, ale naplánovaná e-mailová připomenutí se zatím neodesílají. Budujeme systém pro doručování e-mailů – push oznámení a připomenutí v aplikaci již fungují správně.",
+  "assignmentReminders": "Připomenutí úkolů",
+  "assignmentRemindersDesc": "Dostávejte oznámení o nadcházejících úkolech",
+  "examReminders": "Připomenutí zkoušek",
+  "examRemindersDesc": "Dostávejte oznámení před zkouškami",
+  "todoReminders": "Připomenutí úkolů (to-do)",
+  "todoRemindersDesc": "Dostávejte připomenutí o nadcházejících položkách seznamu úkolů",
+  "loginErrorProviderMismatchGoogle": "Již jste se zaregistrovali pomocí Google. Pokračujte prosím se svým účtem Google.",
+  "loginErrorProviderMismatchEmail": "Již jste se zaregistrovali pomocí e-mailu. Přihlaste se prosím pomocí svého e-mailu a hesla.",
+  "emailLinkVerifiedSoft": "Váš e-mail již může být ověřen. Přihlaste se prosím pomocí svého nového účtu.",
+  "emailLinkVerifiedSoftHint": "Pokud se stále nemůžete přihlásit, požádejte o nový ověřovací e-mail.",
+  "verificationLinkUsed": "Tento ověřovací odkaz již byl použit nebo vypršela jeho platnost. Pokud jste se ještě neověřili, požádejte o nový.",
+  "signupFailed": "Registrace se nezdařila",
+  "opensInNewTab": " (otevře se v nové kartě)",
+  "loadingEvents": "Načítání událostí",
+  "deadlines": "Termíny",
+  "heroSection": "Hero Section"
 }

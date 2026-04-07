@@ -2428,5 +2428,9 @@
   "passkeyDefaultName": "Passkey",
   "authenticationFailed": "Authentication failed.",
   "contact_emailSubject": "{{appName}} Contact & Feedback",
-  "contact_notProvided": "Not provided"
+  "contact_notProvided": "Not provided",
+  "deadlines": "Deadlines",
+  "heroSection": "Hero Section",
+  "opensInNewTab": " (opens in new tab)",
+  "loadingEvents": "Loading events"
 }

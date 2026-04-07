@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Clave de acceso",
   "authenticationFailed": "La autenticación falló.",
   "contact_emailSubject": "{{appName}} contacto y comentarios",
-  "contact_notProvided": "No proporcionado"
+  "contact_notProvided": "No proporcionado",
+  "emailDeliveryComingSoon": "Tus preferencias se guardaron, pero los recordatorios por correo electrónico programados aún no se están enviando. Estamos construyendo el sistema de entrega — las notificaciones push y los recordatorios en la aplicación ya funcionan correctamente.",
+  "assignmentReminders": "Recordatorios de tareas",
+  "assignmentRemindersDesc": "Recibe notificaciones sobre tus próximas tareas",
+  "examReminders": "Recordatorios de exámenes",
+  "examRemindersDesc": "Recibe notificaciones antes de los exámenes",
+  "todoReminders": "Recordatorios de tareas pendientes",
+  "todoRemindersDesc": "Recibe recordatorios sobre tus tareas pendientes próximas",
+  "loginErrorProviderMismatchGoogle": "Ya te registraste con Google. Por favor, continúa con tu cuenta de Google.",
+  "loginErrorProviderMismatchEmail": "Ya te registraste con correo electrónico. Por favor, inicia sesión con tu correo y contraseña.",
+  "emailLinkVerifiedSoft": "Es posible que tu correo ya esté verificado. Por favor, inicia sesión con tu nueva cuenta.",
+  "emailLinkVerifiedSoftHint": "Si aún no puedes iniciar sesión, solicita un nuevo correo de verificación.",
+  "verificationLinkUsed": "Este enlace de verificación ya se ha utilizado o ha caducado. Si aún no te has verificado, solicita uno nuevo.",
+  "signupFailed": "Error al registrarse",
+  "opensInNewTab": " (abre en una pestaña nueva)",
+  "loadingEvents": "Cargando eventos",
+  "deadlines": "Plazos",
+  "heroSection": "Sección Hero"
 }

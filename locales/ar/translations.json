@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "مفتاح مرور",
   "authenticationFailed": "فشلت المصادقة.",
   "contact_emailSubject": "{{appName}} التواصل والملاحظات",
-  "contact_notProvided": "غير متوفر"
+  "contact_notProvided": "غير متوفر",
+  "emailDeliveryComingSoon": "تم حفظ تفضيلاتك، ولكن لم يتم إرسال تذكيرات البريد الإلكتروني المجدولة بعد. نحن نعمل حاليًا على بناء نظام تسليم البريد الإلكتروني — تعمل إشعارات الدفع والتذكيرات داخل التطبيق بشكل صحيح بالفعل.",
+  "assignmentReminders": "تذكيرات الواجبات",
+  "assignmentRemindersDesc": "احصل على إشعارات بشأن الواجبات القادمة",
+  "examReminders": "تذكيرات الامتحانات",
+  "examRemindersDesc": "احصل على إشعارات قبل الامتحانات",
+  "todoReminders": "تذكيرات قائمة المهام",
+  "todoRemindersDesc": "احصل على تذكيرات بشأن مهامك القادمة",
+  "loginErrorProviderMismatchGoogle": "لقد قمت بالتسجيل مسبقًا باستخدام Google. يرجى المتابعة باستخدام حساب Google الخاص بك.",
+  "loginErrorProviderMismatchEmail": "لقد قمت بالتسجيل مسبقًا باستخدام البريد الإلكتروني. يرجى تسجيل الدخول باستخدام بريدك الإلكتروني وكلمة المرور.",
+  "emailLinkVerifiedSoft": "قد يكون بريدك الإلكتروني قد تم التحقق منه بالفعل. يرجى تسجيل الدخول بحسابك الجديد.",
+  "emailLinkVerifiedSoftHint": "إذا كنت لا تزال غير قادر على تسجيل الدخول، اطلب رابط تحقق جديدًا.",
+  "verificationLinkUsed": "تم استخدام رابط التحقق هذا بالفعل أو انتهت صلاحيته. إذا لم تكن قد تحققت بعد، يرجى طلب رابط جديد.",
+  "signupFailed": "فشل التسجيل",
+  "opensInNewTab": " (يفتح في علامة تبويب جديدة)",
+  "loadingEvents": "جاري تحميل الأحداث",
+  "deadlines": "المواعيد النهائية",
+  "heroSection": "قسم هيرو"
 }

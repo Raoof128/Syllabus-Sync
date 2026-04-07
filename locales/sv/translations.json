@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Passnyckel",
   "authenticationFailed": "Autentisering misslyckades.",
   "contact_emailSubject": "{{appName}} kontakt och feedback",
-  "contact_notProvided": "Inte angivet"
+  "contact_notProvided": "Inte angivet",
+  "emailDeliveryComingSoon": "Dina inställningar har sparats, men schemalagda e-postpåminnelser skickas inte ännu. Vi bygger just nu e-postleveranssystemet — push-notiser och påminnelser i appen fungerar redan korrekt.",
+  "assignmentReminders": "Uppgiftspåminnelser",
+  "assignmentRemindersDesc": "Få aviseringar om kommande uppgifter",
+  "examReminders": "Examenpåminnelser",
+  "examRemindersDesc": "Få aviseringar före tentor",
+  "todoReminders": "Att göra-påminnelser",
+  "todoRemindersDesc": "Få påminnelser om kommande att göra-punkter",
+  "loginErrorProviderMismatchGoogle": "Du har redan registrerat dig med Google. Vänligen fortsätt med ditt Google-konto.",
+  "loginErrorProviderMismatchEmail": "Du har allerede registrerat dig med e-post. Vänligen logga in med din e-post och ditt lösenord.",
+  "emailLinkVerifiedSoft": "Din e-post kan redan vara verifierad. Vänligen logga in med ditt nya konto.",
+  "emailLinkVerifiedSoftHint": "Om du fortfarande inte kan logga in, begär ett nytt verifieringsmejl.",
+  "verificationLinkUsed": "Denna verifieringslänk har redan använts eller har gått ut. Om du inte har verifierat dig än, begär en ny.",
+  "signupFailed": "Registreringen misslyckades",
+  "opensInNewTab": " (öppnas i ny flik)",
+  "loadingEvents": "Laddar händelser",
+  "deadlines": "Deadlines",
+  "heroSection": "Hero-sektion"
 }

@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Κλειδί πρόσβασης",
   "authenticationFailed": "Η επαλήθευση απέτυχε.",
   "contact_emailSubject": "{{appName}} επικοινωνία και σχόλια",
-  "contact_notProvided": "Δεν δόθηκε"
+  "contact_notProvided": "Δεν δόθηκε",
+  "emailDeliveryComingSoon": "Οι προτιμήσεις σας αποθηκεύτηκαν, αλλά οι προγραμματισμένες υπενθυμίσεις μέσω email δεν στέλνονται ακόμα. Χτίζουμε το σύστημα παράδοσης email — οι ειδοποιήσεις push και οι υπενθυμίσεις εντός της εφαρμογής λειτουργούν ήδη σωστά.",
+  "assignmentReminders": "Υπενθυμίσεις εργασιών",
+  "assignmentRemindersDesc": "Λάβετε ειδοποιήσεις για επερχόμενες εργασίες",
+  "examReminders": "Υπενθυμίσεις εξετάσεων",
+  "examRemindersDesc": "Λάβετε ειδοποιήσεις πριν από τις εξετάσεις",
+  "todoReminders": "Υπενθυμίσεις λίστας καθηκόντων",
+  "todoRemindersDesc": "Λάβετε υπενθυμίσεις για επερχόμενα καθήκοντα",
+  "loginErrorProviderMismatchGoogle": "Έχετε ήδη εγγραφεί με την Google. Παρακαλώ συνεχίστε με τον λογαριασμό σας Google.",
+  "loginErrorProviderMismatchEmail": "Έχετε ήδη εγγραφεί με email. Παρακαλώ συνδεθείτε με το email και τον κωδικό πρόσβασής σας.",
+  "emailLinkVerifiedSoft": "Το email σας μπορεί να έχει ήδη επαληθευτεί. Παρακαλώ συνδεθείτε με τον νέο σας λογαριασμό.",
+  "emailLinkVerifiedSoftHint": "Εάν εξακολουθείτε να μην μπορείτε να συνδεθείτε, ζητήστε ένα νέο email επαλήθευσης.",
+  "verificationLinkUsed": "Αυτός ο σύνδεσμος επαλήθευσης έχει ήδη χρησιμοποιηθεί ή έχει λήξει. Εάν δεν έχετε κάνει ακόμα επαλήθευση, παρακαλούμε ζητήστε έναν νέο.",
+  "signupFailed": "Η εγγραφή απέτυχε",
+  "opensInNewTab": " (ανοίγει σε νέα καρτέλα)",
+  "loadingEvents": "Φόρτωση εκδηλώσεων",
+  "deadlines": "Προθεσμίες",
+  "heroSection": "Ενότητα Hero"
 }

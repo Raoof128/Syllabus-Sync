@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Passiavain",
   "authenticationFailed": "Todennus epäonnistui.",
   "contact_emailSubject": "{{appName}} yhteydenotto ja palaute",
-  "contact_notProvided": "Ei annettu"
+  "contact_notProvided": "Ei annettu",
+  "emailDeliveryComingSoon": "Asetuksesi on tallennettu, mutta aikataulutettuja sähköpostimuistutuksia ei vielä lähetetä. Rakennamme parhaillaan sähköpostien toimitusjärjestelmää — push-ilmoitukset ja sovelluksen sisäiset muistutukset toimivat jo oikein.",
+  "assignmentReminders": "Tehtävämuistutukset",
+  "assignmentRemindersDesc": "Saa ilmoituksia tulevista tehtävistä",
+  "examReminders": "Koemuistutukset",
+  "examRemindersDesc": "Saa ilmoituksia ennen kokeita",
+  "todoReminders": "To-do-muistutukset",
+  "todoRemindersDesc": "Saa muistutuksia tulevista to-do-tehtävistä",
+  "loginErrorProviderMismatchGoogle": "Olet jo rekisteröitynyt Google-tilillä. Jatka Google-tililläsi.",
+  "loginErrorProviderMismatchEmail": "Olet jo rekisteröitynyt sähköpostilla. Kirjaudu sisään sähköpostillasi ja salasanallasi.",
+  "emailLinkVerifiedSoft": "Sähköpostisi on saattanut jo tulla vahvistetuksi. Kirjaudu sisään uudella tililläsi.",
+  "emailLinkVerifiedSoftHint": "Jos et vieläkään pysty kirjautumaan, pyydä uusi vahvistussähköposti.",
+  "verificationLinkUsed": "Tämä vahvistuslinkki on jo käytetty tai se on vanhentunut. Jos et ole vielä vahvistanut tiliäsi, pyydä uusi linkki.",
+  "signupFailed": "Rekisteröityminen epäonnistui",
+  "opensInNewTab": " (avautuu uudessa välilehdessä)",
+  "loadingEvents": "Ladataan tapahtumia",
+  "deadlines": "Määräajat",
+  "heroSection": "Hero-osio"
 }

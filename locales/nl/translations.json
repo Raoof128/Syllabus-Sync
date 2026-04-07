@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Toegangssleutel",
   "authenticationFailed": "Authenticatie mislukt.",
   "contact_emailSubject": "{{appName}} contact en feedback",
-  "contact_notProvided": "Niet opgegeven"
+  "contact_notProvided": "Niet opgegeven",
+  "emailDeliveryComingSoon": "Je voorkeuren zijn opgeslagen, maar geplande e-mailherinneringen worden nog niet verzonden. We bouwen momenteel aan het e-mailverzendingssysteem — pushmeldingen en in-app herinneringen werken al correct.",
+  "assignmentReminders": "Herinneringen voor opdrachten",
+  "assignmentRemindersDesc": "Ontvang meldingen over komende opdrachten",
+  "examReminders": "Herinneringen voor examens",
+  "examRemindersDesc": "Ontvang meldingen vóór examens",
+  "todoReminders": "To-do-herinneringen",
+  "todoRemindersDesc": "Ontvang herinneringen over komende to-do-items",
+  "loginErrorProviderMismatchGoogle": "Je hebt je al aangemeld met Google. Ga verder met je Google-account.",
+  "loginErrorProviderMismatchEmail": "Je hebt je al aangemeld met e-mail. Log in met je e-mailadres en wachtwoord.",
+  "emailLinkVerifiedSoft": "Je e-mailadres is mogelijk al geverifieerd. Log in met je nieuwe account.",
+  "emailLinkVerifiedSoftHint": "Als je nog steeds niet kunt inloggen, vraag dan een nieuwe verificatie-e-mail aan.",
+  "verificationLinkUsed": "Deze verificatielink is al gebruikt of is verlopen. Als je nog niet hebt geverifieerd, vraag dan een nieuwe aan.",
+  "signupFailed": "Aanmelden mislukt",
+  "opensInNewTab": " (opent in nieuw tabblad)",
+  "loadingEvents": "Evenementen laden",
+  "deadlines": "Deadlines",
+  "heroSection": "Hero-sectie"
 }

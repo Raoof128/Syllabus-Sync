@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "พาสคีย์",
   "authenticationFailed": "การยืนยันตัวตนล้มเหลว",
   "contact_emailSubject": "{{appName}} ติดต่อและข้อเสนอแนะ",
-  "contact_notProvided": "ไม่ได้ระบุ"
+  "contact_notProvided": "ไม่ได้ระบุ",
+  "emailDeliveryComingSoon": "บันทึกการตั้งค่าของคุณแล้ว แต่ยังไม่ได้ส่งอีเมลแจ้งเตือนตามกำหนดการ เรากำลังสร้างระบบส่งอีเมล — การแจ้งเตือนแบบพุชและการแจ้งเตือนในแอปทำงานได้อย่างถูกต้องแล้ว",
+  "assignmentReminders": "การแจ้งเตือนงานที่ได้รับมอบหมาย",
+  "assignmentRemindersDesc": "รับการแจ้งเตือนเกี่ยวกับงานที่กำลังจะมาถึง",
+  "examReminders": "การแจ้งเตือนการสอบ",
+  "examRemindersDesc": "รับการแจ้งเตือนก่อนสอบ",
+  "todoReminders": "การแจ้งเตือนรายการสิ่งที่ต้องทำ",
+  "todoRemindersDesc": "รับการแจ้งเตือนเกี่ยวกับสิ่งที่ต้องทำที่กำลังจะมาถึง",
+  "loginErrorProviderMismatchGoogle": "คุณได้ลงทะเบียนด้วย Google แล้ว โปรดดำเนินการต่อด้วยบัญชี Google ของคุณ",
+  "loginErrorProviderMismatchEmail": "คุณได้ลงทะเบียนด้วยอีเมลแล้ว โปรดเข้าสู่ระบบด้วยอีเมลและรหัสผ่านของคุณ",
+  "emailLinkVerifiedSoft": "อีเมลของคุณอาจได้รับการยืนยันแล้ว โปรดลงชื่อเข้าใช้ด้วยบัญชีใหม่ของคุณ",
+  "emailLinkVerifiedSoftHint": "หากคุณยังไม่สามารถลงชื่อเข้าใช้ได้ โปรดขออีเมลยืนยันใหม่",
+  "verificationLinkUsed": "ลิงก์ยืนยันนี้ถูกใช้งานแล้วหรือหมดอายุแล้ว หากคุณยังไม่ได้ยืนยัน โปรดขอลิงก์ใหม่",
+  "signupFailed": "การลงทะเบียนล้มเหลว",
+  "opensInNewTab": " (เปิดในแท็บใหม่)",
+  "loadingEvents": "กำลังโหลดกิจกรรม",
+  "deadlines": "กำหนดส่ง",
+  "heroSection": "Hero Section"
 }

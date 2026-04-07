@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Cheie de acces",
   "authenticationFailed": "Autentificarea a eșuat.",
   "contact_emailSubject": "{{appName}} contact și feedback",
-  "contact_notProvided": "Neprecizat"
+  "contact_notProvided": "Neprecizat",
+  "emailDeliveryComingSoon": "Preferințele tale au fost salvate, dar mementourile prin e-mail programate nu sunt încă trimise. Construim sistemul de livrare a e-mailurilor — notificările push și mementourile din aplicație funcționează deja corect.",
+  "assignmentReminders": "Mementouri teme",
+  "assignmentRemindersDesc": "Primește notificări despre temele viitoare",
+  "examReminders": "Mementouri examene",
+  "examRemindersDesc": "Primește notificări înainte de examene",
+  "todoReminders": "Mementouri activități",
+  "todoRemindersDesc": "Primește mementouri despre activitățile viitoare",
+  "loginErrorProviderMismatchGoogle": "Te-ai înregistrat deja cu Google. Te rugăm să continui cu contul tău Google.",
+  "loginErrorProviderMismatchEmail": "Te-ai înregistrat deja cu e-mailul. Te rugăm să te autentifici cu e-mailul și parola ta.",
+  "emailLinkVerifiedSoft": "Este posibil ca e-mailul tău să fie deja verificat. Te rugăm să te autentifici cu noul tău cont.",
+  "emailLinkVerifiedSoftHint": "Dacă tot nu te poți autentifica, solicită un nou e-mail de verificare.",
+  "verificationLinkUsed": "Acest link de verificare a fost deja utilizat sau a expirat. Dacă nu te-ai verificat încă, te rugăm să soliciți unul nou.",
+  "signupFailed": "Înregistrarea a eșuat",
+  "opensInNewTab": " (se deschide într-o filă nouă)",
+  "loadingEvents": "Se încarcă evenimentele",
+  "deadlines": "Termene limită",
+  "heroSection": "Hero Section"
 }

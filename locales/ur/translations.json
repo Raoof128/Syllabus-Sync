@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "پاس کی",
   "authenticationFailed": "توثیق ناکام ہوگئی۔",
   "contact_emailSubject": "{{appName}} رابطہ اور رائے",
-  "contact_notProvided": "فراہم نہیں کیا گیا"
+  "contact_notProvided": "فراہم نہیں کیا گیا",
+  "emailDeliveryComingSoon": "آپ کی ترجیحات محفوظ کر لی گئی ہیں، لیکن ابھی شیڈول شدہ ای میل ریمائنڈرز نہیں بھیجے جا رہے ہیں۔ ہم ای میل ڈیلیوری سسٹم تیار کر رہے ہیں — پش نوٹیفیکیشنز اور ان-ایپ ریمائنڈرز پہلے ہی درست طریقے سے کام کر رہے ہیں۔",
+  "assignmentReminders": "اسائنمنٹ ریمائنڈرز",
+  "assignmentRemindersDesc": "آنے والی اسائنمنٹس کے بارے میں اطلاع حاصل کریں",
+  "examReminders": "امتحان ریمائنڈرز",
+  "examRemindersDesc": "امتحانات سے پہلے اطلاع حاصل کریں",
+  "todoReminders": "ٹو-ڈو ریمائنڈرز",
+  "todoRemindersDesc": "آنے والے ٹو-ڈو آئٹمز کے بارے میں ریمائنڈر حاصل کریں",
+  "loginErrorProviderMismatchGoogle": "آپ پہلے ہی Google کے ذریعے سائن اپ کر چکے ہیں۔ براہ کرم اپنے Google اکاؤنٹ کے ساتھ جاری رکھیں۔",
+  "loginErrorProviderMismatchEmail": "آپ پہلے ہی ای میل کے ذریعے سائن اپ کر چکے ہیں۔ براہ کرم اپنی ای میل اور پاس ورڈ کے ساتھ لاگ ان کریں۔",
+  "emailLinkVerifiedSoft": "آپ کی ای میل پہلے ہی تصدیق شدہ ہو سکتی ہے۔ براہ کرم اپنے نئے اکاؤنٹ سے سائن ان کریں۔",
+  "emailLinkVerifiedSoftHint": "اگر آپ اب بھی سائن ان نہیں کر پا رہے ہیں تو، تصدیق کے لیے نئی ای میل کی درخواست کریں۔",
+  "verificationLinkUsed": "تصدیق کا یہ لنک پہلے ہی استعمال ہو چکا ہے یا اس کی میعاد ختم ہو چکی ہے۔ اگر آپ نے ابھی تک تصدیق نہیں کی ہے تو براہ کرم نئے لنک کی درخواست کریں۔",
+  "signupFailed": "سائن اپ ناکام رہا",
+  "opensInNewTab": " (نئی ٹیب میں کھلتا ہے)",
+  "loadingEvents": "ایونٹس لوڈ ہو رہے ہیں",
+  "deadlines": "ڈیڈ لائنز",
+  "heroSection": "Hero Section"
 }

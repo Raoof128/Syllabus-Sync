@@ -58,6 +58,15 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-04-06 (Australia/Sydney) — Internationalization Update
+
+**Raouf:**
+- **Scope:** i18n Expansion (34 Locales)
+- **Summary:** Added missing `heroSection`, `opensInNewTab`, and `loadingEvents` keys to all 34 translation files in `locales/`. Used localized translations for major languages (Arabic, German, Spanish, French, Italian, Portuguese, Chinese, Japanese, etc.) and English fallbacks for others. `heroSection` is used for ARIA labels on hero sections; `opensInNewTab` provides an accessible suffix for links; `loadingEvents` is used for screen reader status updates during feed loading.
+- **Files Changed:** `locales/*/translations.json` (34 files).
+- **Verification:** Ran `npm run check:i18n` — all 35 locales validated successfully ✅.
+- **Follow-ups:** None.
+
 ### 2026-04-06 (Australia/Sydney) — About, Contact, Terms & Privacy Pages
 
 **Raouf:**

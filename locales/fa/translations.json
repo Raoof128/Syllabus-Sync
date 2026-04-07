@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "کلید عبور",
   "authenticationFailed": "احراز هویت ناموفق بود.",
   "contact_emailSubject": "{{appName}} تماس و بازخورد",
-  "contact_notProvided": "ارائه نشده"
+  "contact_notProvided": "ارائه نشده",
+  "emailDeliveryComingSoon": "تنظیمات شما ذخیره شد، اما یادآوری‌های ایمیلی زمان‌بندی شده هنوز ارسال نمی‌شوند. ما در حال ساخت سیستم ارسال ایمیل هستیم — اعلان‌های آنی (push) و یادآوری‌های درون‌برنامه‌ای در حال حاضر به درستی کار می‌کنند.",
+  "assignmentReminders": "یادآوری‌های تکالیف",
+  "assignmentRemindersDesc": "دریافت اعلان برای تکالیف آینده",
+  "examReminders": "یادآوری‌های امتحانات",
+  "examRemindersDesc": "دریافت اعلان قبل از امتحانات",
+  "todoReminders": "یادآوری‌های لیست کارها",
+  "todoRemindersDesc": "دریافت یادآوری برای کارهای آینده",
+  "loginErrorProviderMismatchGoogle": "شما قبلاً با گوگل ثبت‌نام کرده‌اید. لطفاً با حساب گوگل خود ادامه دهید.",
+  "loginErrorProviderMismatchEmail": "شما قبلاً با ایمیل ثبت‌نام کرده‌اید. لطفاً با ایمیل و رمز عبور خود وارد شوید.",
+  "emailLinkVerifiedSoft": "ممکن است ایمیل شما قبلاً تأیید شده باشد. لطفاً با حساب جدید خود وارد شوید.",
+  "emailLinkVerifiedSoftHint": "اگر هنوز نمی‌توانید وارد شوید، درخواست یک ایمیل تأیید جدید بدهید.",
+  "verificationLinkUsed": "این لینک تأیید قبلاً استفاده شده یا منقضی شده است. اگر هنوز تأیید نکرده‌اید، لطفاً درخواست لینک جدید بدهید.",
+  "signupFailed": "ثبت‌نام ناموفق بود",
+  "opensInNewTab": " (در برگه جدید باز می‌شود)",
+  "loadingEvents": "در حال بارگذاری رویدادها",
+  "deadlines": "مهلت‌ها",
+  "heroSection": "Hero Section"
 }

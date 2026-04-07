@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Chiave di accesso",
   "authenticationFailed": "Autenticazione non riuscita.",
   "contact_emailSubject": "{{appName}} contatto e feedback",
-  "contact_notProvided": "Non fornito"
+  "contact_notProvided": "Non fornito",
+  "emailDeliveryComingSoon": "Le tue preferenze sono state salvate, ma i promemoria via email pianificati non sono ancora stati inviati. Stiamo costruendo il sistema di invio — le notifiche push e i promemoria in-app funzionano già correttamente.",
+  "assignmentReminders": "Promemoria compiti",
+  "assignmentRemindersDesc": "Ricevi notifiche sui prossimi compiti",
+  "examReminders": "Promemoria esami",
+  "examRemindersDesc": "Ricevi notifiche prima degli esami",
+  "todoReminders": "Promemoria cose da fare",
+  "todoRemindersDesc": "Ricevi promemoria sulle prossime cose da fare",
+  "loginErrorProviderMismatchGoogle": "Ti sei già registrato con Google. Per favore, continua con il tuo account Google.",
+  "loginErrorProviderMismatchEmail": "Ti sei già registrato con l'email. Per favore, accedi con la tua email e password.",
+  "emailLinkVerifiedSoft": "La tua email potrebbe essere già stata verificata. Per favore, accedi con il tuo nuovo account.",
+  "emailLinkVerifiedSoftHint": "Se non riesci ancora ad accedere, richiedi una nuova email di verifica.",
+  "verificationLinkUsed": "Questo link di verifica è già stato utilizzato o è scaduto. Se non hai ancora verificato, richiedine uno nuovo.",
+  "signupFailed": "Registrazione fallita",
+  "opensInNewTab": " (si apre in una nuova scheda)",
+  "loadingEvents": "Caricamento eventi",
+  "deadlines": "Scadenze",
+  "heroSection": "Sezione Hero"
 }

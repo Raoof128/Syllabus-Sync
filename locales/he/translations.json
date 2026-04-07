@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "מפתח גישה",
   "authenticationFailed": "האימות נכשל.",
   "contact_emailSubject": "{{appName}} יצירת קשר ומשוב",
-  "contact_notProvided": "לא סופק"
+  "contact_notProvided": "לא סופק",
+  "emailDeliveryComingSoon": "ההעדפות שלך נשמרו, אך תזכורות מתוזמנות באימייל עדיין לא נשלחות. אנו בונים כעת את מערכת משלוח האימיילים — התראות בנייד ותזכורות בתוך האפליקציה כבר עובדות כראוי.",
+  "assignmentReminders": "תזכורות למטלות",
+  "assignmentRemindersDesc": "קבל התראות על מטלות קרובות",
+  "examReminders": "תזכורות למבחנים",
+  "examRemindersDesc": "קבל התראות לפני מבחנים",
+  "todoReminders": "תזכורות למשימות",
+  "todoRemindersDesc": "קבל תזכורות על משימות לביצוע בקרוב",
+  "loginErrorProviderMismatchGoogle": "כבר נרשמת באמצעות Google. אנא המשך עם חשבון Google שלך.",
+  "loginErrorProviderMismatchEmail": "כבר נרשמת באמצעות אימייל. אנא התחבר עם האימייל והסיסמה שלך.",
+  "emailLinkVerifiedSoft": "ייתכן שהאימייל שלך כבר אומת. אנא התחבר עם החשבון החדש שלך.",
+  "emailLinkVerifiedSoftHint": "אם אתה עדיין לא מצליח להתחבר, בקש אימייל אימות חדש.",
+  "verificationLinkUsed": "קישור אימות זה כבר היה בשימוש או שפג תוקפו. אם עדיין לא אימתת, אנא בקש קישור חדש.",
+  "signupFailed": "ההרשמה נכשלה",
+  "opensInNewTab": " (נפתח בלשונית חדשה)",
+  "loadingEvents": "טוען אירועים",
+  "deadlines": "מועדים סופיים",
+  "heroSection": "Hero Section"
 }

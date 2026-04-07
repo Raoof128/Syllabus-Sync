@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "पासकी",
   "authenticationFailed": "प्रमाणीकरण विफल हुआ।",
   "contact_emailSubject": "{{appName}} संपर्क और प्रतिक्रिया",
-  "contact_notProvided": "प्रदान नहीं किया गया"
+  "contact_notProvided": "प्रदान नहीं किया गया",
+  "emailDeliveryComingSoon": "आपकी प्राथमिकताएं सहेज ली गई हैं, लेकिन निर्धारित ईमेल रिमाइंडर अभी नहीं भेजे जा रहे हैं। हम ईमेल वितरण पाइपलाइन बना रहे हैं — पुश नोटिफिकेशन और इन-ऐप रिमाइंडर पहले से ही सही ढंग से काम कर रहे हैं।",
+  "assignmentReminders": "असाइनमेंट रिमाइंडर",
+  "assignmentRemindersDesc": "आगामी असाइनमेंट के बारे में सूचना प्राप्त करें",
+  "examReminders": "परीक्षा रिमाइंडर",
+  "examRemindersDesc": "परीक्षा से पहले सूचना प्राप्त करें",
+  "todoReminders": "टू-डू रिमाइंडर",
+  "todoRemindersDesc": "आगामी टू-डू आइटम के बारे में रिमाइंडर प्राप्त करें",
+  "loginErrorProviderMismatchGoogle": "आप पहले ही Google के साथ साइन अप कर चुके हैं। कृपया अपने Google खाते के साथ जारी रखें।",
+  "loginErrorProviderMismatchEmail": "आप पहले ही ईमेल के साथ साइन अप कर चुके हैं। कृपया अपने ईमेल और पासवर्ड के साथ लॉग इन करें।",
+  "emailLinkVerifiedSoft": "आपका ईमेल पहले से ही सत्यापित हो सकता है। कृपया अपने नए खाते से साइन इन करें।",
+  "emailLinkVerifiedSoftHint": "यदि आप अभी भी साइन इन नहीं कर पा रहे हैं, तो एक नए सत्यापन ईमेल का अनुरोध करें।",
+  "verificationLinkUsed": "यह सत्यापन लिंक पहले ही उपयोग किया जा चुका है या समाप्त हो गया है। यदि आपने अभी तक सत्यापन नहीं किया है, तो कृपया एक नए लिंक का अनुरोध करें।",
+  "signupFailed": "साइन अप विफल रहा",
+  "opensInNewTab": " (नए टैब में खुलता है)",
+  "loadingEvents": "ईवेंट लोड हो रहे हैं",
+  "deadlines": "समय सीमा",
+  "heroSection": "हीरो सेक्शन"
 }

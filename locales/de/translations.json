@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Zugangsschlüssel",
   "authenticationFailed": "Authentifizierung fehlgeschlagen.",
   "contact_emailSubject": "{{appName}} Kontakt und Feedback",
-  "contact_notProvided": "Nicht angegeben"
+  "contact_notProvided": "Nicht angegeben",
+  "emailDeliveryComingSoon": "Deine Einstellungen wurden gespeichert, aber geplante E-Mail-Erinnerungen werden noch nicht gesendet. Wir bauen gerade das E-Mail-Zustellungssystem auf – Push-Benachrichtigungen und In-App-Erinnerungen funktionieren bereits einwandfrei.",
+  "assignmentReminders": "Aufgabenerinnerungen",
+  "assignmentRemindersDesc": "Lass dich über anstehende Aufgaben benachrichtigen",
+  "examReminders": "Prüfungserinnerungen",
+  "examRemindersDesc": "Lass dich vor Prüfungen benachrichtigen",
+  "todoReminders": "To-do-Erinnerungen",
+  "todoRemindersDesc": "Lass dich an anstehende To-do-Punkte erinnern",
+  "loginErrorProviderMismatchGoogle": "Du hast dich bereits mit Google angemeldet. Bitte fahre mit deinem Google-Konto fort.",
+  "loginErrorProviderMismatchEmail": "Du hast dich bereits mit E-Mail angemeldet. Bitte melde dich mit deiner E-Mail-Adresse und deinem Passwort an.",
+  "emailLinkVerifiedSoft": "Deine E-Mail-Adresse wurde möglicherweise bereits verifiziert. Bitte melde dich mit deinem neuen Konto an.",
+  "emailLinkVerifiedSoftHint": "Falls du dich immer noch nicht anmelden kannst, fordere eine neue Verifizierungs-E-Mail an.",
+  "verificationLinkUsed": "Dieser Verifizierungslink wurde bereits verwendet oder ist abgelaufen. Falls du dich noch nicht verifiziert hast, fordere bitte einen neuen an.",
+  "signupFailed": "Registrierung fehlgeschlagen",
+  "opensInNewTab": " (öffnet in neuem Tab)",
+  "loadingEvents": "Lade Ereignisse",
+  "deadlines": "Deadlines",
+  "heroSection": "Hero-Bereich"
 }

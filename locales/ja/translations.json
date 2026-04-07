@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "パスキー",
   "authenticationFailed": "認証に失敗しました。",
   "contact_emailSubject": "{{appName}} お問い合わせとフィードバック",
-  "contact_notProvided": "未入力"
+  "contact_notProvided": "未入力",
+  "emailDeliveryComingSoon": "設定は保存されましたが、スケジュールされたメールリマインダーはまだ送信されていません。現在メール配信パイプラインを構築中です。プッシュ通知とアプリ内リマインダーはすでに正しく機能しています。",
+  "assignmentReminders": "課題のリマインダー",
+  "assignmentRemindersDesc": "今後の課題に関する通知を受け取る",
+  "examReminders": "試験のリマインダー",
+  "examRemindersDesc": "試験前に通知を受け取る",
+  "todoReminders": "ToDoのリマインダー",
+  "todoRemindersDesc": "今後のToDo項目に関するリマインダーを受け取る",
+  "loginErrorProviderMismatchGoogle": "すでにGoogleで登録されています。Googleアカウントで続行してください。",
+  "loginErrorProviderMismatchEmail": "すでにメールアドレスで登録されています。メールアドレスとパスワードでログインしてください。",
+  "emailLinkVerifiedSoft": "メールアドレスはすでに確認済みである可能性があります。新しいアカウントでサインインしてください。",
+  "emailLinkVerifiedSoftHint": "まだサインインできない場合は、新しい確認メールをリクエストしてください。",
+  "verificationLinkUsed": "この確認リンクは既に使用されているか、期限が切れています。まだ確認していない場合は、新しいリンクをリクエストしてください。",
+  "signupFailed": "登録に失敗しました",
+  "opensInNewTab": " (新しいタブで開く)",
+  "loadingEvents": "イベントを読み込み中",
+  "deadlines": "期限",
+  "heroSection": "ヒーローセクション"
 }

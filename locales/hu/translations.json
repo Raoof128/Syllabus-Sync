@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Hozzáférési kulcs",
   "authenticationFailed": "A hitelesítés sikertelen.",
   "contact_emailSubject": "{{appName}} kapcsolat és visszajelzés",
-  "contact_notProvided": "Nincs megadva"
+  "contact_notProvided": "Nincs megadva",
+  "emailDeliveryComingSoon": "A beállításaidat mentettük, de az ütemezett e-mail emlékeztetőket még nem küldjük. Jelenleg építjük az e-mail küldő rendszert — a push értesítések és az alkalmazáson belüli emlékeztetők már megfelelően működnek.",
+  "assignmentReminders": "Feladat emlékeztetők",
+  "assignmentRemindersDesc": "Értesítések kérése a közelgő feladatokról",
+  "examReminders": "Vizsga emlékeztetők",
+  "examRemindersDesc": "Értesítések kérése a vizsgák előtt",
+  "todoReminders": "Teendő emlékeztetők",
+  "todoRemindersDesc": "Emlékeztetők kérése a közelgő teendőkről",
+  "loginErrorProviderMismatchGoogle": "Már regisztráltál a Google-lal. Kérjük, folytasd a Google-fiókoddal.",
+  "loginErrorProviderMismatchEmail": "Már regisztráltál e-maillel. Kérjük, jelentkezz be az e-mail címeddel és jelszavaddal.",
+  "emailLinkVerifiedSoft": "Lehetséges, hogy az e-mail címedet már megerősítették. Kérjük, jelentkezz be az új fiókoddal.",
+  "emailLinkVerifiedSoftHint": "Ha továbbra sem tudsz bejelentkezni, kérj egy új megerősítő e-mailt.",
+  "verificationLinkUsed": "Ezt a megerősítő linket már felhasználták, vagy lejárt a hivatkozás. Ha még nem végezted el a megerősítést, kérj egy újat.",
+  "signupFailed": "A regisztráció sikertelen",
+  "opensInNewTab": " (új lapon nyílik meg)",
+  "loadingEvents": "Események betöltése",
+  "deadlines": "Határidők",
+  "heroSection": "Hero Section"
 }

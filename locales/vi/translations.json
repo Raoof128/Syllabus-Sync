@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Khóa truy cập",
   "authenticationFailed": "Xác thực thất bại.",
   "contact_emailSubject": "{{appName}} liên hệ và phản hồi",
-  "contact_notProvided": "Không cung cấp"
+  "contact_notProvided": "Không cung cấp",
+  "emailDeliveryComingSoon": "Sở thích của bạn đã được lưu, nhưng lời nhắc email theo lịch trình vẫn chưa được gửi. Chúng tôi đang xây dựng hệ thống gửi email — thông báo đẩy và lời nhắc trong ứng dụng đã hoạt động chính xác.",
+  "assignmentReminders": "Nhắc nhở bài tập",
+  "assignmentRemindersDesc": "Nhận thông báo về các bài tập sắp tới",
+  "examReminders": "Nhắc nhở kỳ thi",
+  "examRemindersDesc": "Nhận thông báo trước các kỳ thi",
+  "todoReminders": "Nhắc nhở việc cần làm",
+  "todoRemindersDesc": "Nhận nhắc nhở về các việc cần làm sắp tới",
+  "loginErrorProviderMismatchGoogle": "Bạn đã đăng ký với Google. Vui lòng tiếp tục với tài khoản Google của bạn.",
+  "loginErrorProviderMismatchEmail": "Bạn đã đăng ký bằng email. Vui lòng đăng nhập bằng email và mật khẩu của bạn.",
+  "emailLinkVerifiedSoft": "Email của bạn có thể đã được xác minh. Vui lòng đăng nhập bằng tài khoản mới của bạn.",
+  "emailLinkVerifiedSoftHint": "Nếu bạn vẫn không thể đăng nhập, hãy yêu cầu một email xác minh mới.",
+  "verificationLinkUsed": "Liên kết xác minh này đã được sử dụng hoặc đã hết hạn. Nếu bạn chưa xác minh, vui lòng yêu cầu một liên kết mới.",
+  "signupFailed": "Đăng ký thất bại",
+  "opensInNewTab": " (mở trong tab mới)",
+  "loadingEvents": "Đang tải sự kiện",
+  "deadlines": "Hạn chót",
+  "heroSection": "Phần Hero"
 }

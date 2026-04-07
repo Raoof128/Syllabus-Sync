@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import { cn } from '@/lib/utils';
+import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
 interface EventCardSkeletonProps {
   className?: string;
@@ -102,8 +103,9 @@ export const FeaturedBannerSkeleton = memo(() => {
 FeaturedBannerSkeleton.displayName = 'FeaturedBannerSkeleton';
 
 export const FeedSkeletons = memo(() => {
+  const { t } = useTypedTranslation();
   return (
-    <div role="status" aria-busy="true" aria-label="Loading events">
+    <div role="status" aria-busy="true" aria-label={t('loadingEvents')}>
       <FeaturedBannerSkeleton />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (

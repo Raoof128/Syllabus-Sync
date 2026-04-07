@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Kunci sandi",
   "authenticationFailed": "Autentikasi gagal.",
   "contact_emailSubject": "{{appName}} kontak dan masukan",
-  "contact_notProvided": "Tidak diberikan"
+  "contact_notProvided": "Tidak diberikan",
+  "emailDeliveryComingSoon": "Preferensi Anda telah disimpan, tetapi pengingat email terjadwal belum dikirimkan. Kami sedang membangun sistem pengiriman email — notifikasi push dan pengingat dalam aplikasi sudah berfungsi dengan benar.",
+  "assignmentReminders": "Pengingat Tugas",
+  "assignmentRemindersDesc": "Dapatkan notifikasi tentang tugas mendatang",
+  "examReminders": "Pengingat Ujian",
+  "examRemindersDesc": "Dapatkan notifikasi sebelum ujian",
+  "todoReminders": "Pengingat Daftar Tugas",
+  "todoRemindersDesc": "Dapatkan pengingat tentang daftar tugas mendatang",
+  "loginErrorProviderMismatchGoogle": "Anda sudah mendaftar dengan Google. Silakan lanjutkan dengan akun Google Anda.",
+  "loginErrorProviderMismatchEmail": "Anda sudah mendaftar dengan email. Silakan masuk dengan email dan kata sandi Anda.",
+  "emailLinkVerifiedSoft": "Email Anda mungkin sudah diverifikasi. Silakan masuk dengan akun baru Anda.",
+  "emailLinkVerifiedSoftHint": "Jika Anda masih tidak bisa masuk, minta email verifikasi baru.",
+  "verificationLinkUsed": "Tautan verifikasi ini sudah digunakan atau telah kedaluwarsa. Jika Anda belum memverifikasi, silakan minta yang baru.",
+  "signupFailed": "Pendaftaran gagal",
+  "opensInNewTab": " (terbuka di tab baru)",
+  "loadingEvents": "Memuat acara",
+  "deadlines": "Tenggat Waktu",
+  "heroSection": "Bagian Hero"
 }

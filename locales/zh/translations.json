@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "通行密钥",
   "authenticationFailed": "身份验证失败。",
   "contact_emailSubject": "{{appName}} 联系与反馈",
-  "contact_notProvided": "未提供"
+  "contact_notProvided": "未提供",
+  "emailDeliveryComingSoon": "您的偏好设置已保存，但计划的电子邮件提醒尚未发送。我们正在构建电子邮件投递系统 — 推送通知和应用内提醒已经可以正常使用。",
+  "assignmentReminders": "作业提醒",
+  "assignmentRemindersDesc": "获取有关即将到来的作业的通知",
+  "examReminders": "考试提醒",
+  "examRemindersDesc": "在考试前获取通知",
+  "todoReminders": "待办事项提醒",
+  "todoRemindersDesc": "获取有关即将到来的待办事项的提醒",
+  "loginErrorProviderMismatchGoogle": "您已经使用 Google 注册。请继续使用您的 Google 帐户。",
+  "loginErrorProviderMismatchEmail": "您已经使用电子邮件注册。请使用您的电子邮件和密码登录。",
+  "emailLinkVerifiedSoft": "您的电子邮件可能已经过验证。请使用您的新帐户登录。",
+  "emailLinkVerifiedSoftHint": "如果您仍然无法登录，请申请新的验证邮件。",
+  "verificationLinkUsed": "此验证链接已被使用或已过期。如果您尚未验证，请申请新链接。",
+  "signupFailed": "注册失败",
+  "opensInNewTab": " (在新标签页中打开)",
+  "loadingEvents": "正在加载活动",
+  "deadlines": "截止日期",
+  "heroSection": "英雄区块"
 }

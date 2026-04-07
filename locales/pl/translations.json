@@ -2415,5 +2415,22 @@
   "passkeyDefaultName": "Klucz dostępu",
   "authenticationFailed": "Uwierzytelnianie nie powiodło się.",
   "contact_emailSubject": "{{appName}} kontakt i opinia",
-  "contact_notProvided": "Nie podano"
+  "contact_notProvided": "Nie podano",
+  "emailDeliveryComingSoon": "Twoje preferencje zostały zapisane, ale zaplanowane przypomnienia e-mail nie są jeszcze wysyłane. Budujemy system dostarczania e-maili — powiadomienia push i przypomnienia w aplikacji działają już poprawnie.",
+  "assignmentReminders": "Przypomnienia o zadaniach",
+  "assignmentRemindersDesc": "Otrzymuj powiadomienia o nadchodzących zadaniach",
+  "examReminders": "Przypomnienia o egzaminach",
+  "examRemindersDesc": "Otrzymuj powiadomienia przed egzaminami",
+  "todoReminders": "Przypomnienia o listach to-do",
+  "todoRemindersDesc": "Otrzymuj przypomnienia o nadchodzących elementach listy to-do",
+  "loginErrorProviderMismatchGoogle": "Zarejestrowałeś się już przez Google. Kontynuuj za pomocą swojego konta Google.",
+  "loginErrorProviderMismatchEmail": "Zarejestrowałeś się już przez e-mail. Zaloguj się za pomocą swojego e-maila i hasła.",
+  "emailLinkVerifiedSoft": "Twój e-mail może być już zweryfikowany. Zaloguj się na swoje nowe konto.",
+  "emailLinkVerifiedSoftHint": "Jeśli nadal nie możesz się zalogować, poproś o nowy e-mail weryfikacyjny.",
+  "verificationLinkUsed": "Ten link weryfikacyjny został już użyty lub wygasł. Jeśli jeszcze się ne zweryfikowałeś, poproś o nowy.",
+  "signupFailed": "Rejestracja nie powiodła się",
+  "opensInNewTab": " (otwiera się w nowej karcie)",
+  "loadingEvents": "Ładowanie wydarzeń",
+  "deadlines": "Terminy",
+  "heroSection": "Sekcja Hero"
 }
