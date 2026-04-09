@@ -27,7 +27,7 @@ Syllabus Sync is a production-grade, security-hardened web platform that unifies
 
 Built initially for **Macquarie University**, it is designed to be adaptable to other institutions by swapping academic datasets and configuring environment variables. This project serves as a comprehensive portfolio piece demonstrating advanced full-stack engineering, rigorous cybersecurity implementations, and AI-native development workflows.
 
-**[🔗 Live Demo](https://syllabus-sync-ashy.vercel.app)** &nbsp;·&nbsp; **[📖 Docs](./docs/README.md)** &nbsp;·&nbsp; **[🔐 Security](./SECURITY.md)** &nbsp;·&nbsp; **[🤝 Contributing](./CONTRIBUTING.md)**
+**[🔗 Live Demo](https://syllabus-sync-mq.vercel.app)** &nbsp;·&nbsp; **[📖 Docs](./docs/README.md)** &nbsp;·&nbsp; **[🔐 Security](./SECURITY.md)** &nbsp;·&nbsp; **[🤝 Contributing](./CONTRIBUTING.md)**
 
 <br/>
 
@@ -41,8 +41,8 @@ Traditional university systems are fragmented, leading to missed deadlines, poor
 
 - **Unified Academic Management:** Seamless integration of enrolled units, class times, and assessment deadlines with stress-aware predictive tracking.
 - **Advanced Campus Navigation:** Real-time, fused-heading campus navigation combining OpenStreetMap (Leaflet) and Google Maps Embed APIs, tailored for high-accuracy pedestrian routing.
-- **Enterprise-Grade Security:** A defense-in-depth architecture featuring WebAuthn (Passkeys), hardware-backed MFA, Zero-Trust middleware, and strict Row-Level Security (RLS).
-- **Gamified Engagement:** Secure, anti-abuse XP and streak mechanics to incentivize academic consistency.
+- **Enterprise-Grade Security:** A defence-in-depth architecture featuring WebAuthn (Passkeys), hardware-backed MFA, Zero-Trust middleware, and strict Row-Level Security (RLS).
+- **Gamified Engagement:** Secure, anti-abuse XP and streak mechanics to incentivise academic consistency.
 
 <br/>
 
@@ -139,10 +139,10 @@ Syllabus Sync is built on a modern, edge-ready tech stack designed for scalabili
 
 ## 🔒 Security Posture & Hardening
 
-Security is a structural constraint, with defense-in-depth across every layer.
+Security is a structural constraint, with defence-in-depth across every layer.
 
 - **Authentication:** FIDO2 WebAuthn (Passkeys restricted to platform authenticators), hardware-backed MFA (TOTP), and audited session termination.
-- **Authorization:** Absolute tenant isolation via PostgreSQL Row-Level Security (RLS) at the query execution layer.
+- **Authorisation:** Absolute tenant isolation via PostgreSQL Row-Level Security (RLS) at the query execution layer.
 - **Data Protection:** Encryption at rest (AES-256), in transit (TLS 1.3), and strict Content Security Policy (CSP).
 - **Compliance:** Tamper-evident audit logging for all sensitive system and user operations.
 
@@ -240,7 +240,7 @@ npm install
 # Configure environment
 cp .env.example .env.local
 
-# Initialize database
+# Initialise database
 npx supabase link --project-ref <your-project-ref>
 npx supabase db push
 
