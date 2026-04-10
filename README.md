@@ -23,9 +23,9 @@
 
 > **A production-ready, AI-native platform that transforms static university infrastructure into a secure, high-performance, and cohesive student experience.**
 
-Syllabus Sync is a production-grade, security-hardened web platform that unifies academic scheduling, deadline intelligence, campus navigation, and student engagement into a single, cohesive experience. Built on Next.js 16, React 19, and Supabase with strict TypeScript throughout, it delivers the kind of integrated campus infrastructure that universities promise but rarely ship.
+Syllabus Sync is a production-grade, security-hardened web platform that unifies academic scheduling, deadline intelligence, campus navigation, and student engagement into a single, cohesive experience. Built on Next.js 16, React 19, and Supabase with strict TypeScript throughout, it delivers the integrated campus infrastructure that universities promise but rarely ship.
 
-Built initially for **Macquarie University**, it is designed to be adaptable to other institutions by swapping academic datasets and configuring environment variables. This project serves as a comprehensive portfolio piece demonstrating advanced full-stack engineering, rigorous cybersecurity implementations, and AI-native development workflows.
+Built initially for **Macquarie University**, it is designed to be adaptable to other institutions by swapping academic datasets and configuring environment variables. This project is a comprehensive portfolio piece that shows advanced full-stack engineering, rigorous cybersecurity implementations, and AI-native development workflows.
 
 **[🔗 Live Demo](https://syllabus-sync-mq.vercel.app)** &nbsp;·&nbsp; **[📖 Docs](./docs/README.md)** &nbsp;·&nbsp; **[🔐 Security](./SECURITY.md)** &nbsp;·&nbsp; **[🤝 Contributing](./CONTRIBUTING.md)**
 
@@ -56,7 +56,7 @@ University platforms are often decades-old monoliths with bolted-on features and
 
 1. **A unified campus experience is technically achievable.** Timetables, assessment deadlines, campus wayfinding, weather-aware planning, and gamified engagement belong in one application -- not scattered across five different portals.
 2. **Security and usability are not trade-offs.** This platform implements WebAuthn passkeys, hardware-backed MFA, and Zero-Trust middleware while maintaining sub-second page loads and a frictionless UX.
-3. **AI-augmented engineering produces auditable, production-quality software.** Every architectural decision and security hardening is traced through an immutable changelog, following the **Raouf Change Protocol**.
+3. **AI-augmented engineering produces auditable, production-quality software.** Every architectural decision and security hardening is traced through an immutable changelog.
 
 <br/>
 
@@ -283,7 +283,6 @@ npm run check
 Built with the support of the open-source community. This project benefits from:
 
 - [Anthropic Claude](https://www.anthropic.com/claude) — AI-assisted architecture and security auditing.
-- [OpenAI Codex](https://openai.com/codex) — Automated test generation and migration authoring.
 - [Supabase](https://supabase.com/) — Open-source backend with RLS.
 - [Vercel](https://vercel.com/) — Edge deployment infrastructure.
 
@@ -301,7 +300,7 @@ Built with the support of the open-source community. This project benefits from:
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-6366f1?style=for-the-badge&logo=linkedin&logoColor=ffffff&labelColor=0f172a)](https://www.linkedin.com/in/pouya-alavi/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-22c55e?style=for-the-badge&logo=github&logoColor=ffffff&labelColor=0f172a)](https://github.com/mrpouyaalavi)
-[![Email](https://img.shields.io/badge/Email-Contact-f59e0b?style=for-the-badge&logo=gmail&logoColor=09090b&labelColor=0f172a)](mailto:pouyaalavi1378@gmail.com)
+[![Email](https://img.shields.io/badge/Email-Contact-f59e0b?style=for-the-badge&logo=gmail&logoColor=09090b&labelColor=0f172a)](mailto:pouya@pouyaalavi.dev)
 
 <br/>
 
