@@ -88,14 +88,14 @@ University platforms are often decades-old monoliths with bolted-on features and
 
 ```text
 ╔══════════════════════════════════════════════════════════════════════╗
-║  📄  Syllabus PDF → Structured JSON/Markdown via OCR + LLM pipeline ║
+║  📄  Syllabus PDF → Structured JSON/Markdown via OCR + LLM pipeline  ║
 ║  🗓  Intelligent calendar with automated workload & stress analysis  ║
 ║  🗺  Dual-engine navigation: Leaflet + Google Maps, real-time GPS    ║
 ║  🔐  MFA (TOTP + WebAuthn/Passkey), RLS, CSRF, and rate limiting     ║
 ║  🌍  19 languages · Full RTL · WCAG 2.1 AA · 360px–2560px            ║
 ║  🎮  Gamification: XP, leaderboards, streaks, achievement system     ║
 ║  🔔  Context-aware notifications with multi-channel delivery         ║
-║  ⚡  CI/CD via GitHub Actions · 503 tests · Vercel Edge deployment   ║
+║  ⚡  CI/CD via GitHub Actions · 503 tests · Vercel Edge deployment    ║
 ╚══════════════════════════════════════════════════════════════════════╝
 ```
 
@@ -188,8 +188,8 @@ Released under the **MIT License** — an OSI-approved, permissive open-source l
 ### Maintainers
 | Name | Role |
 | --- | --- |
-| Mohammad Raouf Abedini | Lead maintainer — security, AI workflows, backend |
-| Mohammad Pouya Alavi Naeini | Co-maintainer — architecture, infrastructure |
+| Mohammad Pouya Alavi Naeini | Lead maintainer — architecture, infrastructure |
+| Mohammad Raouf Abedini |  Co-maintainer — security, AI workflows, backend |
 
 <br/>
 
