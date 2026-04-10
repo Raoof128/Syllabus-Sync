@@ -86,7 +86,7 @@ University platforms are often decades-old monoliths with bolted-on features and
 
 ## Key Features
 
-```
+```text
 ╔══════════════════════════════════════════════════════════════════════╗
 ║  📄  Syllabus PDF → Structured JSON/Markdown via OCR + LLM pipeline ║
 ║  🗓  Intelligent calendar with automated workload & stress analysis  ║
@@ -293,7 +293,7 @@ Built with the support of the open-source community. This project benefits from:
 
 ### `> ping --authors`
 
-```
+```text
 > Target     : Pouya Alavi Naeini — Front-end Developer , Raouf Abedini — Back-end Developer
 > University : Macquarie University, Sydney, NSW
 > Status     : [●] ONLINE — open to grad & junior opportunities
