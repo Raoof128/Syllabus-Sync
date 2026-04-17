@@ -293,7 +293,7 @@ Built with the support of the open-source community. This project benefits from:
 ### `> ping --authors`
 
 ```text
-> Target     : Pouya Alavi Naeini — Front-end Developer , Raouf Abedini — Back-end Developer
+> Target     : Pouya Alavi Naeini — Full-Stack Developer , Raouf Abedini — Back-end Developer
 > University : Macquarie University, Sydney, NSW
 > Status     : [●] ONLINE — open to grad & junior opportunities
 ```
