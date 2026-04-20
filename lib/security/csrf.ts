@@ -120,15 +120,8 @@ export function validateOrigin(request: NextRequest): {
     return { valid: true };
   }
 
-  // At least one of origin or referer should be present for browser requests
+  // No origin + no referer = non-browser (curl, Postman, service worker) → allow
   if (!origin && !referer) {
-    // Could be a direct API call (curl, Postman, etc.)
-    // Allow if using API key or other authentication
-    const hasAuthHeader = request.headers.has("authorization");
-    if (hasAuthHeader) {
-      return { valid: true };
-    }
-    // For now, allow - but log for monitoring
     console.warn("CSRF: Request without origin/referer headers", {
       method: request.method,
       path: request.nextUrl.pathname,
@@ -136,15 +129,16 @@ export function validateOrigin(request: NextRequest): {
     return { valid: true };
   }
 
+  const host = request.headers.get("host");
   const allowedOrigins = getAllowedOrigins();
 
-  // Check origin header
+  // Check origin header — same-host check first (handles all deploy aliases)
   if (origin) {
     try {
       const originUrl = new URL(origin);
-      if (!allowedOrigins.includes(originUrl.origin)) {
-        return { valid: false, reason: `Invalid origin: ${origin}` };
-      }
+      if (originUrl.host === host) return { valid: true };
+      if (allowedOrigins.includes(originUrl.origin)) return { valid: true };
+      return { valid: false, reason: `Invalid origin: ${origin}` };
     } catch {
       return { valid: false, reason: "Malformed origin header" };
     }
@@ -154,9 +148,9 @@ export function validateOrigin(request: NextRequest): {
   if (referer && !origin) {
     try {
       const refererUrl = new URL(referer);
-      if (!allowedOrigins.includes(refererUrl.origin)) {
-        return { valid: false, reason: `Invalid referer: ${referer}` };
-      }
+      if (refererUrl.host === host) return { valid: true };
+      if (allowedOrigins.includes(refererUrl.origin)) return { valid: true };
+      return { valid: false, reason: `Invalid referer: ${referer}` };
     } catch {
       return { valid: false, reason: "Malformed referer header" };
     }
@@ -178,19 +172,20 @@ function getAllowedOrigins(): string[] {
     "http://127.0.0.1:3002",
   ];
 
-  // Add production URL
-  if (process.env.NEXT_PUBLIC_APP_URL) {
+  const addUrl = (raw: string | undefined) => {
+    if (!raw) return;
     try {
-      const publicUrl = new URL(process.env.NEXT_PUBLIC_APP_URL);
-      origins.push(publicUrl.origin);
-    } catch {
-      // Ignore invalid URL
-    }
-  }
+      origins.push(new URL(raw).origin);
+    } catch { /* ignore invalid URL */ }
+  };
 
-  // Add Vercel preview URLs
-  if (process.env.VERCEL_URL) {
-    origins.push(`https://${process.env.VERCEL_URL}`);
+  addUrl(process.env.NEXT_PUBLIC_APP_URL);
+
+  // Vercel injects three URL vars per deployment; all must be trusted
+  if (process.env.VERCEL_URL) origins.push(`https://${process.env.VERCEL_URL}`);
+  if (process.env.VERCEL_BRANCH_URL) origins.push(`https://${process.env.VERCEL_BRANCH_URL}`);
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    origins.push(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
   }
 
   return origins;
@@ -296,8 +291,10 @@ function getTrustedOrigins(): Set<string> {
       origins.add(new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin);
     } catch { /* ignore invalid URL */ }
   }
-  if (process.env.VERCEL_URL) {
-    origins.add(`https://${process.env.VERCEL_URL}`);
+  if (process.env.VERCEL_URL) origins.add(`https://${process.env.VERCEL_URL}`);
+  if (process.env.VERCEL_BRANCH_URL) origins.add(`https://${process.env.VERCEL_BRANCH_URL}`);
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    origins.add(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
   }
 
   return origins;
