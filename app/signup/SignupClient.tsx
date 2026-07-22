@@ -487,7 +487,9 @@ export default function SignupClient() {
                       className="h-12 rounded-xl"
                       {...register('confirmPassword')}
                       aria-invalid={!!errors.confirmPassword}
-                      aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                      aria-describedby={
+                        errors.confirmPassword ? 'confirmPassword-error' : undefined
+                      }
                     />
                     {errors.confirmPassword && (
                       <p id="confirmPassword-error" className="text-xs text-mq-error">

@@ -84,9 +84,8 @@ export default function OnboardingClient() {
       }
       // New OAuth users reach /home for the first time via this path — mark the
       // first-login prompt flag so the permission dialogs fire after redirect.
-      const { markFirstLoginPromptsPending } = await import(
-        '@/features/home/hooks/useFirstLoginPrompts'
-      );
+      const { markFirstLoginPromptsPending } =
+        await import('@/features/home/hooks/useFirstLoginPrompts');
       markFirstLoginPromptsPending();
       router.push(next);
     } catch (err) {

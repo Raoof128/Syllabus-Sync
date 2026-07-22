@@ -849,7 +849,10 @@ export default function MapClient() {
                 >
                   <Github className="h-4 w-4" aria-hidden="true" />
                   {t('mqNavCompanionCta')}
-                  <ExternalLink className="h-3.5 w-3.5 text-mq-content-tertiary" aria-hidden="true" />
+                  <ExternalLink
+                    className="h-3.5 w-3.5 text-mq-content-tertiary"
+                    aria-hidden="true"
+                  />
                 </a>
               </div>
             </div>

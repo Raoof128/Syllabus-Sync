@@ -61,6 +61,7 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 ### 2026-07-07 (Australia/Sydney) — App-Icon Logo Rebrand
 
 **Raouf:**
+
 - **Scope:** Replaced the Macquarie University crest logo with the new Syllabus Sync app-icon image across the entire app, including the PWA/favicon icon set and all 35 locale alt-text strings.
 - **Summary:** New master asset `public/syllabus-sync-logo.png` cropped from the supplied app-icon artwork and used to regenerate `favicon.ico`, `apple-touch-icon.png`, and `icon-192/384/512.png`/`maskable-512.png`. All ~25 code references (login, signup, header, sidebar, onboarding, reset-password, OG/Twitter meta, JSON-LD schema, push-notification fallbacks, service worker) repointed from `/MQ_Logo_Final.png` to `/syllabus-sync-logo.png`; old crest file deleted. Service worker cache versions bumped (`v6` → `v7`) to force-refresh cached assets. `mqLogoAlt` translation value switched to a `{{appName}}`-interpolated string in all 35 locales, replacing hardcoded "Macquarie University" wording.
 - **Files Changed:** `public/syllabus-sync-logo.png`, `public/icons/*.png`, `public/apple-touch-icon.png`, `app/favicon.ico`, `public/MQ_Logo_Final.png` (deleted), `app/layout.tsx`, `app/home/page.tsx`, `app/calendar/page.tsx`, `app/map/page.tsx`, `app/feed/page.tsx`, `app/manage-profiles/layout.tsx`, `app/login/LoginClient.tsx`, `app/signup/SignupClient.tsx`, `app/onboarding/OnboardingClient.tsx`, `app/reset-password/reset-password-client.tsx`, `components/layout/Header.tsx`, `components/layout/Sidebar.tsx`, `lib/server/push.ts`, `lib/services/notificationService.ts`, `public/sw.js`, `locales/*/translations.json` (35 files).
@@ -70,6 +71,7 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 ### 2026-04-06 (Australia/Sydney) — Internationalization Update
 
 **Raouf:**
+
 - **Scope:** i18n Expansion (34 Locales)
 - **Summary:** Added missing `heroSection`, `opensInNewTab`, and `loadingEvents` keys to all 34 translation files in `locales/`. Used localized translations for major languages (Arabic, German, Spanish, French, Italian, Portuguese, Chinese, Japanese, etc.) and English fallbacks for others. `heroSection` is used for ARIA labels on hero sections; `opensInNewTab` provides an accessible suffix for links; `loadingEvents` is used for screen reader status updates during feed loading.
 - **Files Changed:** `locales/*/translations.json` (34 files).
@@ -224,3 +226,12 @@ Verification: Documentation-only change; no code modified ✅
 Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and clone command from placeholder to real org/repo path.
 
 ... [rest of AGENT.md content] ...
+
+### 2026-07-22 (Australia/Sydney) — Formatting Baseline Repair
+
+**Raouf:**
+
+- **Scope:** Repaired pre-existing repository formatting drift before the Cloudflare Workers migration.
+- **Summary:** Applied the repository Prettier configuration mechanically to the 47 files reported by the baseline `format:check`; no application logic or Cloudflare migration code was changed.
+- **Verification:** `npm run check` passed.
+- **Follow-ups:** None.

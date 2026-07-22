@@ -18,6 +18,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Formatting Baseline Repair — 2026-07-22
+
+**Scope:** Pre-existing formatting-only baseline repair before the Cloudflare Workers migration.
+
+**Summary:** Applied the repository Prettier configuration mechanically to the 47 files reported by the baseline `format:check`. No application logic or Cloudflare migration code changed.
+
+**Verification:** `npm run check` passed.
+
+**Follow-ups:** None.
+
+---
+
 ### Raouf: CI/CD Test Suite Remediation — 2026-04-07
 
 **Scope:** Resolved authentication pipeline test failures causing CI blockages.

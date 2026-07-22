@@ -1,9 +1,11 @@
 <div align="center">
 
 <!-- Typing animation -->
+
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=20&duration=2800&pause=700&color=6366F1&center=true&vCenter=true&width=860&lines=Student+Experience+Platform+for+Macquarie+University;Academic+Planning+%C2%B7+Deadlines+%C2%B7+Navigation+%C2%B7+Engagement;Next.js+16+%C2%B7+React+19+%C2%B7+TypeScript+%C2%B7+Supabase;Security-Focused+%C2%B7+19+Languages+%C2%B7+WCAG+2.1+AA)](https://readme-typing-svg.demolab.com)
 
 <!-- Badges -->
+
 ![License: MIT](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js_16-000?style=for-the-badge&logo=nextdotjs)
 ![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
@@ -68,12 +70,12 @@ Student tools often lag behind modern web standards — outdated UIs, poor mobil
 
 <div align="center">
 
-| Dashboard | Calendar |
-|:---:|:---:|
+|                                                        Dashboard                                                         |                                                        Calendar                                                         |
+| :----------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------: |
 | <img width="400" alt="Dashboard" src="https://github.com/user-attachments/assets/837072a4-ee98-4d6f-9157-1fdf8ed56a6c"/> | <img width="400" alt="Calendar" src="https://github.com/user-attachments/assets/77548321-6501-4569-9ddf-b9b2bdfce841"/> |
 
-| Campus Map (Leaflet) | Campus Map (Google Maps) |
-|:---:|:---:|
+|                                                   Campus Map (Leaflet)                                                    |                                                 Campus Map (Google Maps)                                                  |
+| :-----------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------: |
 | <img width="400" alt="Campus map" src="https://github.com/user-attachments/assets/fde5eae3-c08a-4d07-a4b1-f9fae80383d2"/> | <img width="400" alt="Google map" src="https://github.com/user-attachments/assets/ecf4f6e9-a341-4467-b54e-1c476bff5c49"/> |
 
 </div>
@@ -111,15 +113,15 @@ Syllabus Sync is built on a modern, edge-ready tech stack designed for scalabili
 
 ### Runtime Stack
 
-| Layer | Technology |
-| --- | --- |
-| **Framework** | Next.js 16 (App Router) |
-| **UI** | React 19, Tailwind CSS 4, Radix UI, Framer Motion |
-| **State** | Zustand (persistent storage, SWR-like caching) |
+| Layer               | Technology                                                 |
+| ------------------- | ---------------------------------------------------------- |
+| **Framework**       | Next.js 16 (App Router)                                    |
+| **UI**              | React 19, Tailwind CSS 4, Radix UI, Framer Motion          |
+| **State**           | Zustand (persistent storage, SWR-like caching)             |
 | **Database & Auth** | Supabase PostgreSQL with enforced Row-Level Security (RLS) |
-| **Infrastructure** | Vercel (Edge Middleware, Serverless Functions) |
-| **Rate Limiting** | Upstash Redis (distributed) |
-| **Error Tracking** | Sentry (client, server, edge) |
+| **Infrastructure**  | Vercel (Edge Middleware, Serverless Functions)             |
+| **Rate Limiting**   | Upstash Redis (distributed)                                |
+| **Error Tracking**  | Sentry (client, server, edge)                              |
 
 ### Key Architectural Decisions
 
@@ -157,19 +159,22 @@ Security is a structural constraint, with defence-in-depth across every layer.
 ## 🎯 Project Governance
 
 ### License
+
 Released under the **MIT License** — an OSI-approved, permissive open-source license.
 
 ### Roadmap & Priorities
+
 - **P0:** Standalone `@syllabus-sync/extractor` package for LLM OCR pipelines.
 - **P1:** Reference dataset forks for USYD and UNSW.
 - **P1:** MCP (Model Context Protocol) server for direct agent integration.
 - **P2:** Federated identity via institution SSO (SAML/OIDC).
 
 ### Maintainers
-| Name | Role |
-| --- | --- |
+
+| Name               | Role                                           |
+| ------------------ | ---------------------------------------------- |
 | Pouya Alavi Naeini | Lead maintainer — architecture, infrastructure |
-| Raouf Abedini |  Co-maintainer — security, backend |
+| Raouf Abedini      | Co-maintainer — security, backend              |
 
 <br/>
 
@@ -206,11 +211,13 @@ tools/              Repo utilities (i18n, security, exports, load testing)
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js `>=22 <23`
 - npm `>=10`
 - Supabase project and Upstash Redis instance
 
 ### Setup
+
 ```bash
 # Clone and install
 git clone https://github.com/mrpouyaalavi/syllabus-sync.git
@@ -229,6 +236,7 @@ npm run dev
 ```
 
 ### Quality Assurance
+
 ```bash
 npm run check
 # Runs: secrets scan → format → typecheck → lint → tests → build
@@ -242,15 +250,15 @@ npm run check
 
 ## Documentation Map
 
-| Document | Path |
-| --- | --- |
-| Architecture | [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md) |
-| Technical Explanation | [TECHNICAL_EXPLANATION.md](./TECHNICAL_EXPLANATION.md) |
-| API Reference | [docs/api/API_REFERENCE.md](./docs/api/API_REFERENCE.md) |
-| Environment Setup | [docs/operations/ENVIRONMENT_SETUP.md](./docs/operations/ENVIRONMENT_SETUP.md) |
-| Deployment Checklist | [docs/operations/deployment-checklist.md](./docs/operations/deployment-checklist.md) |
-| Docs Index | [docs/README.md](./docs/README.md) |
-| Security Policy | [SECURITY.md](./SECURITY.md) |
+| Document              | Path                                                                                 |
+| --------------------- | ------------------------------------------------------------------------------------ |
+| Architecture          | [docs/architecture/ARCHITECTURE.md](./docs/architecture/ARCHITECTURE.md)             |
+| Technical Explanation | [TECHNICAL_EXPLANATION.md](./TECHNICAL_EXPLANATION.md)                               |
+| API Reference         | [docs/api/API_REFERENCE.md](./docs/api/API_REFERENCE.md)                             |
+| Environment Setup     | [docs/operations/ENVIRONMENT_SETUP.md](./docs/operations/ENVIRONMENT_SETUP.md)       |
+| Deployment Checklist  | [docs/operations/deployment-checklist.md](./docs/operations/deployment-checklist.md) |
+| Docs Index            | [docs/README.md](./docs/README.md)                                                   |
+| Security Policy       | [SECURITY.md](./SECURITY.md)                                                         |
 
 <br/>
 
@@ -283,6 +291,6 @@ Built with the support of the open-source community. This project benefits from:
 
 <br/>
 
-*Syllabus Sync is an independent open-source project and is not officially affiliated with Macquarie University.*
+_Syllabus Sync is an independent open-source project and is not officially affiliated with Macquarie University._
 
 </div>

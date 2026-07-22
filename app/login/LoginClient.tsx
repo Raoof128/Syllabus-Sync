@@ -147,9 +147,8 @@ export default function LoginClient() {
 
       // Mark first-login prompts pending so /home can request notification +
       // geolocation permissions once the user lands there.
-      const { markFirstLoginPromptsPending } = await import(
-        '@/features/home/hooks/useFirstLoginPrompts'
-      );
+      const { markFirstLoginPromptsPending } =
+        await import('@/features/home/hooks/useFirstLoginPrompts');
       markFirstLoginPromptsPending();
 
       // Listen for auth state change to redirect when session is fully mounted
@@ -202,9 +201,8 @@ export default function LoginClient() {
     setGeneralError(null);
     loginWithPasskey(email, async () => {
       setIsSuccess(true);
-      const { markFirstLoginPromptsPending } = await import(
-        '@/features/home/hooks/useFirstLoginPrompts'
-      );
+      const { markFirstLoginPromptsPending } =
+        await import('@/features/home/hooks/useFirstLoginPrompts');
       markFirstLoginPromptsPending();
       setTimeout(() => {
         window.location.href = redirectTo;
@@ -508,9 +506,8 @@ export default function LoginClient() {
                 setMfaState(null);
                 setIsSuccess(true);
                 toastUtils.success(t('welcomeBack'), t('loginSuccess'));
-                const { markFirstLoginPromptsPending } = await import(
-                  '@/features/home/hooks/useFirstLoginPrompts'
-                );
+                const { markFirstLoginPromptsPending } =
+                  await import('@/features/home/hooks/useFirstLoginPrompts');
                 markFirstLoginPromptsPending();
                 setTimeout(() => {
                   window.location.href = redirectTo;
@@ -663,7 +660,8 @@ export default function LoginClient() {
                 variant="outline"
                 className={cn(
                   'h-12 w-full rounded-full flex items-center justify-center gap-2 font-bold',
-                  passkeyStatus === 'available' && 'border-mq-success/30 hover:border-mq-success/50',
+                  passkeyStatus === 'available' &&
+                    'border-mq-success/30 hover:border-mq-success/50',
                 )}
                 onClick={handlePasskeyLogin}
                 disabled={isGlobalLoading || !email || passkeyStatus !== 'available'}

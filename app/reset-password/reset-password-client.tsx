@@ -166,7 +166,12 @@ export default function ResetPasswordClient() {
   const requestSchema = useMemo(
     () =>
       z.object({
-        email: z.string().min(1, t('loginEmailRequired')).email(t('loginValidEmail')).trim().toLowerCase(),
+        email: z
+          .string()
+          .min(1, t('loginEmailRequired'))
+          .email(t('loginValidEmail'))
+          .trim()
+          .toLowerCase(),
       }),
     [t],
   );
@@ -489,13 +494,14 @@ export default function ResetPasswordClient() {
                     {...setForm.register('confirmPassword')}
                     aria-invalid={!!setForm.formState.errors.confirmPassword}
                     aria-describedby={
-                      setForm.formState.errors.confirmPassword
-                        ? 'confirmPassword-error'
-                        : undefined
+                      setForm.formState.errors.confirmPassword ? 'confirmPassword-error' : undefined
                     }
                   />
                   {setForm.formState.errors.confirmPassword?.message && (
-                    <p id="confirmPassword-error" className="text-xs text-mq-error font-medium ml-1">
+                    <p
+                      id="confirmPassword-error"
+                      className="text-xs text-mq-error font-medium ml-1"
+                    >
                       {setForm.formState.errors.confirmPassword.message}
                     </p>
                   )}

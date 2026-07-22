@@ -122,7 +122,9 @@ export default function ContactClient() {
                   <FileText className="h-4 w-4 text-mq-primary" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-mq-content">{t('contact_helpfulLinks')}</p>
+                  <p className="text-sm font-semibold text-mq-content">
+                    {t('contact_helpfulLinks')}
+                  </p>
                   <div className="mt-1.5 flex flex-col gap-1.5">
                     {/* Fix: moved `group` from missing parent to the `<a>` itself */}
                     <a
@@ -200,7 +202,10 @@ export default function ContactClient() {
                     ({t('optional')})
                   </span>
                 </label>
-                <p id="contact-email-desc" className="mt-1 text-xs leading-relaxed text-mq-content-secondary">
+                <p
+                  id="contact-email-desc"
+                  className="mt-1 text-xs leading-relaxed text-mq-content-secondary"
+                >
                   {t('contact_emailFieldDesc')}
                 </p>
                 <input
