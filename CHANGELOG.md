@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Sharp Risk-Gate Review Closure — 2026-07-22
+
+**Scope:** Closed all security review findings in the Cloudflare Sharp advisory release gate.
+
+**Summary:** The gate now independently derives runtime reachability from current `.open-next` bytes and every actual esbuild metafile instead of trusting declared status/matches; SHA-256 remains freshness-only. Exact approved Next/OpenNext/Wrangler registry URLs and integrities are enforced, the full npm audit graph is structurally validated and traversed, preview/production evidence is command-bound, and scheduled development plus both dry-run scripts now use build→matching gate→action. The offline suite expanded to 16 adversarial cases.
+
+**Verification:** Node 22 focused tests, formatting, typecheck, staged secret scan, and local audit-exception gate passed. Both deployment profiles remain intentionally blocked because reachability is `unproven`.
+
+**Follow-ups:** Complete the missing OpenNext configuration and require independently derived `proven-absent` evidence for the exact preview or production build before any Cloudflare execution.
+
+---
+
 ### Raouf: Cloudflare Sharp Advisory Risk Gate — 2026-07-22
 
 **Scope:** Added a narrowly scoped upstream Sharp advisory exception for local Cloudflare migration work while retaining a fail-closed deployment gate.

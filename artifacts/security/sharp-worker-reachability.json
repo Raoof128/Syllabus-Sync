@@ -3,6 +3,8 @@
   "assessedAt": "2026-07-22T16:15:37+10:00",
   "runtime": "Node.js v22.23.1",
   "build": {
+    "profile": "preview",
+    "environment": "preview",
     "command": "npm run cf:build",
     "exitCode": 1,
     "outputDirectory": null,

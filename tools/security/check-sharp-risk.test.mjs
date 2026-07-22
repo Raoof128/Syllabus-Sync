@@ -5,9 +5,11 @@ import path from 'node:path';
 import test from 'node:test';
 
 import {
+  authorizeDeployment,
   calculateBuildArtifactDigests,
   evaluateAuditException,
   evaluateDeploymentGate,
+  scanCurrentBuildReachability,
   verifyRecordedBuildArtifacts,
 } from './check-sharp-risk.mjs';
 
@@ -104,10 +106,22 @@ function lockfile() {
       },
       'node_modules/next': {
         version: '16.2.11',
+        resolved: 'https://registry.npmjs.org/next/-/next-16.2.11.tgz',
+        integrity:
+          'sha512-B339zaqbyK8cmxhoAvLrcwoabwCP1wz21zSzfqxqXAemTu2BXnH7tQnfcglKv1vnMUIDBc+Hth7XODQriTZiRQ==',
         optionalDependencies: { sharp: '^0.34.5' },
+      },
+      'node_modules/@opennextjs/cloudflare': {
+        version: '1.20.2',
+        resolved: 'https://registry.npmjs.org/@opennextjs/cloudflare/-/cloudflare-1.20.2.tgz',
+        integrity:
+          'sha512-iFBjABnaDk3be27F5EpxyMLMGPbVnnArFx5I3Y8Rf6BSx5nBV8h0UuJiMKrx3+whDU5ahIy4d8sfbvWvMiF1Kg==',
       },
       'node_modules/wrangler': {
         version: '4.113.0',
+        resolved: 'https://registry.npmjs.org/wrangler/-/wrangler-4.113.0.tgz',
+        integrity:
+          'sha512-ROGzSloJv0y21It6Oc9LaruNcu1tdiQ/XzL3Jc3YkFjzXEMXzTqVhA8vQaGMTdZHTjFP0PVcwAHNgaw3gXu4wA==',
         dependencies: { miniflare: '4.20260721.0' },
       },
       'node_modules/miniflare': {
@@ -119,13 +133,15 @@ function lockfile() {
   };
 }
 
-function reachability(status) {
+function reachability(status, profile = 'preview') {
   return {
     schemaVersion: 1,
     assessedAt: '2026-07-22T16:15:00+10:00',
     runtime: 'Node.js v22.23.1',
     build: {
-      command: 'npm run cf:build',
+      profile,
+      environment: profile,
+      command: profile === 'production' ? 'npm run cf:build:production' : 'npm run cf:build',
       exitCode: status === 'unproven' ? 1 : 0,
       outputDirectory: status === 'unproven' ? null : '.open-next',
       metafile: status === 'unproven' ? null : '.open-next/metafile.json',
@@ -252,6 +268,7 @@ test('deployment rejects missing or malformed reachability evidence', () => {
 test('deployment rejects unproven Sharp Worker reachability', () => {
   const result = evaluateDeploymentGate({
     ...inputs(),
+    profile: 'preview',
     reachability: reachability('unproven'),
   });
 
@@ -262,6 +279,7 @@ test('deployment rejects unproven Sharp Worker reachability', () => {
 test('deployment rejects proven Sharp Worker reachability', () => {
   const result = evaluateDeploymentGate({
     ...inputs(),
+    profile: 'preview',
     reachability: reachability('proven-reachable'),
   });
 
@@ -284,6 +302,7 @@ test('deployment accepts only current proven-absent bundle evidence', async () =
     );
     const result = evaluateDeploymentGate({
       ...inputs(),
+      profile: 'preview',
       reachability: evidence,
     });
     const currentArtifacts = await verifyRecordedBuildArtifacts(evidence, temporaryRoot);
@@ -297,5 +316,177 @@ test('deployment accepts only current proven-absent bundle evidence', async () =
     assert.match(staleArtifacts.errors.join('\n'), /does not match/i);
   } finally {
     await fs.rm(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
+test('current bundle and metafile override forged proven-absent evidence', async () => {
+  const temporaryRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'sharp-risk-gate-scan-'));
+  try {
+    const outputDirectory = path.join(temporaryRoot, '.open-next');
+    await fs.mkdir(outputDirectory);
+    await fs.writeFile(
+      path.join(outputDirectory, 'worker.mjs'),
+      "import sharp from 'sharp'; export default sharp;\n",
+    );
+    await fs.writeFile(path.join(outputDirectory, 'sharp-runtime.node'), 'binary-placeholder');
+    await fs.writeFile(
+      path.join(outputDirectory, 'metafile.json'),
+      JSON.stringify({
+        inputs: { 'node_modules/sharp/lib/index.js': { bytes: 100, imports: [] } },
+        outputs: {
+          '.open-next/worker.mjs': {
+            imports: [{ path: 'sharp', kind: 'import-statement', external: true }],
+            inputs: { 'node_modules/sharp/lib/index.js': { bytesInOutput: 80 } },
+          },
+        },
+      }),
+    );
+    const evidence = reachability('proven-absent');
+    Object.assign(
+      evidence.build,
+      await calculateBuildArtifactDigests(evidence.build, temporaryRoot),
+    );
+    evidence.matches = [];
+
+    const scan = await scanCurrentBuildReachability(evidence.build, temporaryRoot);
+    const authorization = await authorizeDeployment({
+      ...inputs(),
+      profile: 'preview',
+      reachability: evidence,
+      repositoryRoot: temporaryRoot,
+    });
+
+    assert.equal(scan.status, 'proven-reachable');
+    assert.match(JSON.stringify(scan.runtimeMatches), /sharp/i);
+    assert.match(JSON.stringify(scan.runtimeMatches), /sharp-runtime\.node.*path/i);
+    assert.equal(authorization.ok, false);
+    assert.match(authorization.errors.join('\n'), /current.*sharp|runtime.*sharp/i);
+  } finally {
+    await fs.rm(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
+test('rejects npm registry URL and integrity drift', () => {
+  const changedUrl = lockfile();
+  changedUrl.packages['node_modules/next'].resolved = 'https://mirror.invalid/next.tgz';
+  const changedIntegrity = lockfile();
+  changedIntegrity.packages['node_modules/wrangler'].integrity = 'sha512-forged';
+
+  const urlResult = evaluateAuditException({ ...inputs(), lockfile: changedUrl });
+  const integrityResult = evaluateAuditException({ ...inputs(), lockfile: changedIntegrity });
+
+  assert.equal(urlResult.ok, false);
+  assert.match(urlResult.errors.join('\n'), /provenance|registry|resolved/i);
+  assert.equal(integrityResult.ok, false);
+  assert.match(integrityResult.errors.join('\n'), /integrity|provenance/i);
+});
+
+test('rejects malformed and additional Sharp-linked audit paths', () => {
+  const malformedAudit = audit();
+  malformedAudit.vulnerabilities.next.via.push(null);
+  const extraPathAudit = audit();
+  extraPathAudit.vulnerabilities['new-sharp-consumer'] = vulnerability({
+    range: '*',
+    nodes: ['node_modules/new-sharp-consumer'],
+    via: ['sharp'],
+  });
+  extraPathAudit.vulnerabilities['new-sharp-consumer'].name = 'new-sharp-consumer';
+  extraPathAudit.metadata.vulnerabilities.high += 1;
+  extraPathAudit.metadata.vulnerabilities.total += 1;
+
+  const malformed = evaluateAuditException({ ...inputs(), fullAudit: malformedAudit });
+  const additional = evaluateAuditException({ ...inputs(), productionAudit: extraPathAudit });
+
+  assert.equal(malformed.ok, false);
+  assert.match(malformed.errors.join('\n'), /malformed|via/i);
+  assert.equal(additional.ok, false);
+  assert.match(additional.errors.join('\n'), /sharp-linked|unexpected|graph/i);
+});
+
+test('keeps well-formed unrelated advisory sources visible and non-exempt', () => {
+  const fullAudit = audit();
+  const unrelated = advisory();
+  Object.assign(unrelated, {
+    source: 7654321,
+    name: 'unrelated-package',
+    dependency: 'unrelated-package',
+    title: 'Unrelated advisory remains outside the Sharp exception',
+    url: 'https://github.com/advisories/GHSA-1111-2222-3333',
+    severity: 'moderate',
+    range: '<2.0.0',
+  });
+  fullAudit.vulnerabilities['unrelated-package'] = vulnerability({
+    severity: 'moderate',
+    range: '<2.0.0',
+    nodes: ['node_modules/unrelated-package'],
+    via: [unrelated],
+  });
+  fullAudit.vulnerabilities['unrelated-package'].name = 'unrelated-package';
+  fullAudit.metadata.vulnerabilities.moderate += 1;
+  fullAudit.metadata.vulnerabilities.total += 1;
+
+  const result = evaluateAuditException({ ...inputs(), fullAudit });
+
+  assert.equal(result.ok, true, result.errors.join('\n'));
+  assert.ok(result.unrelatedAdvisorySources.includes(7654321));
+});
+
+test('binds preview and production evidence to exact build identities', () => {
+  const preview = evaluateDeploymentGate({
+    ...inputs(),
+    profile: 'preview',
+    reachability: reachability('proven-absent', 'preview'),
+  });
+  const wrongProductionEvidence = evaluateDeploymentGate({
+    ...inputs(),
+    profile: 'production',
+    reachability: reachability('proven-absent', 'preview'),
+  });
+  const production = evaluateDeploymentGate({
+    ...inputs(),
+    profile: 'production',
+    reachability: reachability('proven-absent', 'production'),
+  });
+
+  assert.equal(preview.ok, true, preview.errors.join('\n'));
+  assert.equal(wrongProductionEvidence.ok, false);
+  assert.match(wrongProductionEvidence.errors.join('\n'), /profile|production|command/i);
+  assert.equal(production.ok, true, production.errors.join('\n'));
+});
+
+test('every Cloudflare Worker execution script enforces build then matching gate then action', async () => {
+  const packageJson = JSON.parse(
+    await fs.readFile(new URL('../../package.json', import.meta.url), 'utf8'),
+  );
+  const actionPattern = /(opennextjs-cloudflare (?:preview|deploy|upload)|wrangler (?:dev|deploy))/;
+  const executionScripts = Object.entries(packageJson.scripts)
+    .filter(([name, script]) => name.startsWith('cf:') && actionPattern.test(script))
+    .map(([name, script]) => [
+      name,
+      name.endsWith(':production') || script.includes('--env=production')
+        ? 'production'
+        : 'preview',
+    ]);
+  assert.deepEqual(executionScripts.map(([name]) => name).sort(), [
+    'cf:deploy',
+    'cf:deploy:production',
+    'cf:dev:scheduled',
+    'cf:dry-run',
+    'cf:dry-run:production',
+    'cf:preview',
+    'cf:upload',
+    'cf:upload:production',
+  ]);
+
+  for (const [name, profile] of executionScripts) {
+    const script = packageJson.scripts[name];
+    const build = profile === 'production' ? 'npm run cf:build:production' : 'npm run cf:build';
+    const gate = `npm run security:sharp:deployment-gate -- ${profile}`;
+    const actionIndex = script.search(actionPattern);
+
+    assert.notEqual(script.indexOf(build), -1, `${name} missing ${build}`);
+    assert.notEqual(script.indexOf(gate), -1, `${name} missing ${gate}`);
+    assert.ok(script.indexOf(build) < script.indexOf(gate), `${name} must build before gate`);
+    assert.ok(script.indexOf(gate) < actionIndex, `${name} must gate before action`);
   }
 });

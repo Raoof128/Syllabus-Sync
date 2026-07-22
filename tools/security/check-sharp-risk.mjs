@@ -14,12 +14,29 @@ const SEVERITY_RANK = new Map([
   ['high', 3],
   ['critical', 4],
 ]);
+const SHARP_PATTERN = /(?:^|[^a-z0-9])(?:sharp|libvips|@img)(?:[^a-z0-9]|$)/i;
+const TOOLING_METADATA_EXTENSIONS = new Set(['.map', '.txt', '.md', '.log']);
+const METAFILE_NAME_PATTERN = /(?:metafile.*\.json$|\.meta\.json$)/i;
 
 const EVIDENCE_PATHS = {
   fullAudit: 'artifacts/security/npm-audit-full.json',
   productionAudit: 'artifacts/security/npm-audit-production.json',
   lockfile: 'package-lock.json',
-  reachability: 'artifacts/security/sharp-worker-reachability.json',
+  reachability: {
+    preview: 'artifacts/security/sharp-worker-reachability.json',
+    production: 'artifacts/security/sharp-worker-reachability.production.json',
+  },
+};
+
+const BUILD_PROFILES = {
+  preview: {
+    command: 'npm run cf:build',
+    environment: 'preview',
+  },
+  production: {
+    command: 'npm run cf:build:production',
+    environment: 'production',
+  },
 };
 
 const EXPECTED_ADVISORY = {
@@ -111,6 +128,33 @@ const EXPECTED_DEPENDENCY_PATHS = [
   },
 ];
 
+const EXPECTED_PROVENANCE = [
+  {
+    label: 'Next 16.2.11',
+    packagePath: 'node_modules/next',
+    version: '16.2.11',
+    resolved: 'https://registry.npmjs.org/next/-/next-16.2.11.tgz',
+    integrity:
+      'sha512-B339zaqbyK8cmxhoAvLrcwoabwCP1wz21zSzfqxqXAemTu2BXnH7tQnfcglKv1vnMUIDBc+Hth7XODQriTZiRQ==',
+  },
+  {
+    label: 'OpenNext Cloudflare 1.20.2',
+    packagePath: 'node_modules/@opennextjs/cloudflare',
+    version: '1.20.2',
+    resolved: 'https://registry.npmjs.org/@opennextjs/cloudflare/-/cloudflare-1.20.2.tgz',
+    integrity:
+      'sha512-iFBjABnaDk3be27F5EpxyMLMGPbVnnArFx5I3Y8Rf6BSx5nBV8h0UuJiMKrx3+whDU5ahIy4d8sfbvWvMiF1Kg==',
+  },
+  {
+    label: 'Wrangler 4.113.0',
+    packagePath: 'node_modules/wrangler',
+    version: '4.113.0',
+    resolved: 'https://registry.npmjs.org/wrangler/-/wrangler-4.113.0.tgz',
+    integrity:
+      'sha512-ROGzSloJv0y21It6Oc9LaruNcu1tdiQ/XzL3Jc3YkFjzXEMXzTqVhA8vQaGMTdZHTjFP0PVcwAHNgaw3gXu4wA==',
+  },
+];
+
 function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -119,10 +163,11 @@ function sameStringSet(actual, expected) {
   if (!Array.isArray(actual) || actual.some((value) => typeof value !== 'string')) {
     return false;
   }
-
+  const sortedActual = [...actual].sort();
+  const sortedExpected = [...expected].sort();
   return (
-    actual.length === expected.length &&
-    [...actual].sort().every((value, index) => value === [...expected].sort()[index])
+    sortedActual.length === sortedExpected.length &&
+    sortedActual.every((value, index) => value === sortedExpected[index])
   );
 }
 
@@ -131,82 +176,206 @@ function severityExceedsRecorded(value) {
   return rank === undefined || rank > SEVERITY_RANK.get(MAX_RECORDED_SEVERITY);
 }
 
-function validateAudit(label, audit, errors) {
-  if (!isRecord(audit) || !isRecord(audit.vulnerabilities)) {
-    errors.push(`${label} audit evidence is missing or malformed.`);
-    return;
+function isValidFixAvailable(value) {
+  return (
+    typeof value === 'boolean' ||
+    (isRecord(value) &&
+      typeof value.name === 'string' &&
+      typeof value.version === 'string' &&
+      typeof value.isSemVerMajor === 'boolean')
+  );
+}
+
+function validateAdvisoryObject(label, packageName, entry, errors) {
+  if (
+    !Number.isInteger(entry.source) ||
+    typeof entry.name !== 'string' ||
+    typeof entry.dependency !== 'string' ||
+    typeof entry.title !== 'string' ||
+    typeof entry.url !== 'string' ||
+    !SEVERITY_RANK.has(entry.severity) ||
+    !Array.isArray(entry.cwe) ||
+    entry.cwe.some((value) => typeof value !== 'string') ||
+    !isRecord(entry.cvss) ||
+    typeof entry.cvss.score !== 'number' ||
+    !(entry.cvss.vectorString === null || typeof entry.cvss.vectorString === 'string') ||
+    typeof entry.range !== 'string'
+  ) {
+    errors.push(`${label} audit advisory object is malformed for ${packageName}.`);
+  }
+}
+
+function validateVulnerabilityEntry(label, packageName, vulnerability, errors) {
+  if (
+    !isRecord(vulnerability) ||
+    vulnerability.name !== packageName ||
+    !SEVERITY_RANK.has(vulnerability.severity) ||
+    typeof vulnerability.isDirect !== 'boolean' ||
+    !Array.isArray(vulnerability.via) ||
+    !Array.isArray(vulnerability.effects) ||
+    vulnerability.effects.some((value) => typeof value !== 'string') ||
+    typeof vulnerability.range !== 'string' ||
+    !Array.isArray(vulnerability.nodes) ||
+    vulnerability.nodes.length === 0 ||
+    vulnerability.nodes.some((value) => typeof value !== 'string') ||
+    !isValidFixAvailable(vulnerability.fixAvailable)
+  ) {
+    errors.push(`${label} audit vulnerability entry is malformed for ${packageName}.`);
+    return false;
   }
 
-  const observedSourceIds = [];
-
-  for (const [packageName, expected] of Object.entries(EXPECTED_AUDIT_CHAIN)) {
-    const vulnerability = audit.vulnerabilities[packageName];
-    if (!isRecord(vulnerability)) {
-      errors.push(`${label} audit is missing the ${packageName} Sharp risk path.`);
+  for (const via of vulnerability.via) {
+    if (typeof via === 'string') {
       continue;
     }
+    if (!isRecord(via)) {
+      errors.push(`${label} audit via member is malformed for ${packageName}.`);
+      continue;
+    }
+    validateAdvisoryObject(label, packageName, via, errors);
+  }
+  return true;
+}
+
+function findSharpLinkedPackages(vulnerabilities) {
+  const linked = new Set(['sharp']);
+  for (const [packageName, vulnerability] of Object.entries(vulnerabilities)) {
+    if (!isRecord(vulnerability) || !Array.isArray(vulnerability.via)) continue;
+    if (
+      vulnerability.via.some(
+        (via) =>
+          isRecord(via) &&
+          (via.source === EXPECTED_ADVISORY.source ||
+            via.name === 'sharp' ||
+            via.dependency === 'sharp' ||
+            via.url === EXPECTED_ADVISORY.url),
+      )
+    ) {
+      linked.add(packageName);
+    }
+  }
+
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const [packageName, vulnerability] of Object.entries(vulnerabilities)) {
+      if (
+        linked.has(packageName) ||
+        !isRecord(vulnerability) ||
+        !Array.isArray(vulnerability.via)
+      ) {
+        continue;
+      }
+      if (vulnerability.via.some((via) => typeof via === 'string' && linked.has(via))) {
+        linked.add(packageName);
+        changed = true;
+      }
+    }
+  }
+  return linked;
+}
+
+function validateAudit(label, audit, errors) {
+  if (
+    !isRecord(audit) ||
+    audit.auditReportVersion !== 2 ||
+    !isRecord(audit.vulnerabilities) ||
+    !isRecord(audit.metadata) ||
+    !isRecord(audit.metadata.vulnerabilities)
+  ) {
+    errors.push(`${label} audit evidence is missing or malformed.`);
+    return { unrelatedAdvisorySources: [] };
+  }
+
+  for (const [packageName, vulnerability] of Object.entries(audit.vulnerabilities)) {
+    validateVulnerabilityEntry(label, packageName, vulnerability, errors);
+  }
+
+  const counts = { info: 0, low: 0, moderate: 0, high: 0, critical: 0 };
+  for (const vulnerability of Object.values(audit.vulnerabilities)) {
+    if (isRecord(vulnerability) && SEVERITY_RANK.has(vulnerability.severity)) {
+      counts[vulnerability.severity] += 1;
+    }
+  }
+  const metadataCounts = audit.metadata.vulnerabilities;
+  const countsMatch =
+    Object.entries(counts).every(([severity, count]) => metadataCounts[severity] === count) &&
+    metadataCounts.total === Object.keys(audit.vulnerabilities).length;
+  if (!countsMatch) {
+    errors.push(`${label} audit metadata counts do not match the vulnerability graph.`);
+  }
+
+  const linked = findSharpLinkedPackages(audit.vulnerabilities);
+  const expectedPackages = Object.keys(EXPECTED_AUDIT_CHAIN);
+  if (!sameStringSet([...linked], expectedPackages)) {
+    errors.push(
+      `${label} audit Sharp-linked graph differs from the exact allowlist: ${[...linked].sort().join(', ')}.`,
+    );
+  }
+
+  const linkedSources = [];
+  for (const packageName of linked) {
+    const vulnerability = audit.vulnerabilities[packageName];
+    const expected = EXPECTED_AUDIT_CHAIN[packageName];
+    if (!isRecord(vulnerability) || !expected) continue;
 
     if (severityExceedsRecorded(vulnerability.severity)) {
       errors.push(`${label} audit severity for ${packageName} exceeds recorded high severity.`);
     }
-
     if (vulnerability.range !== expected.range) {
-      errors.push(
-        `${label} audit vulnerable range drifted for ${packageName}: expected ${expected.range}.`,
-      );
+      errors.push(`${label} audit vulnerable range drifted for ${packageName}.`);
     }
-
     if (!sameStringSet(vulnerability.nodes, expected.nodes)) {
-      errors.push(
-        `${label} audit node paths drifted for ${packageName}: expected ${expected.nodes.join(', ')}.`,
-      );
+      errors.push(`${label} audit node paths drifted for ${packageName}.`);
     }
-
-    if (!Array.isArray(vulnerability.via)) {
-      errors.push(`${label} audit via evidence is malformed for ${packageName}.`);
-      continue;
-    }
-
     const viaPackages = vulnerability.via.filter((entry) => typeof entry === 'string');
-    if (!sameStringSet(viaPackages, expected.via)) {
-      errors.push(
-        `${label} audit dependency path drifted for ${packageName}: expected via ${expected.via.join(', ') || 'the recorded advisory only'}.`,
-      );
+    const viaObjects = vulnerability.via.filter(isRecord);
+    if (viaPackages.length + viaObjects.length !== vulnerability.via.length) {
+      errors.push(`${label} audit via evidence is malformed for ${packageName}.`);
     }
-
-    for (const entry of vulnerability.via) {
-      if (isRecord(entry)) {
-        observedSourceIds.push(entry.source);
-        if (
-          entry.source !== EXPECTED_ADVISORY.source ||
-          entry.name !== EXPECTED_ADVISORY.name ||
-          entry.dependency !== EXPECTED_ADVISORY.dependency ||
-          entry.title !== EXPECTED_ADVISORY.title ||
-          entry.url !== EXPECTED_ADVISORY.url ||
-          entry.range !== EXPECTED_ADVISORY.range
-        ) {
-          errors.push(`${label} audit contains changed Sharp advisory metadata.`);
-        }
-        if (severityExceedsRecorded(entry.severity)) {
-          errors.push(`${label} audit Sharp advisory severity increased above high.`);
-        }
+    if (!sameStringSet(viaPackages, expected.via)) {
+      errors.push(`${label} audit dependency path drifted for ${packageName}.`);
+    }
+    for (const entry of viaObjects) {
+      linkedSources.push(entry.source);
+      if (
+        entry.source !== EXPECTED_ADVISORY.source ||
+        entry.name !== EXPECTED_ADVISORY.name ||
+        entry.dependency !== EXPECTED_ADVISORY.dependency ||
+        entry.title !== EXPECTED_ADVISORY.title ||
+        entry.url !== EXPECTED_ADVISORY.url ||
+        entry.range !== EXPECTED_ADVISORY.range
+      ) {
+        errors.push(`${label} audit contains changed Sharp advisory metadata.`);
+      }
+      if (severityExceedsRecorded(entry.severity)) {
+        errors.push(`${label} audit Sharp advisory severity increased above high.`);
       }
     }
   }
-
-  if (observedSourceIds.length !== 1 || observedSourceIds[0] !== EXPECTED_ADVISORY.source) {
+  if (linkedSources.length !== 1 || linkedSources[0] !== EXPECTED_ADVISORY.source) {
     errors.push(
-      `${label} audit Sharp advisory source IDs differ from the sole allowed source ${EXPECTED_ADVISORY.source}.`,
+      `${label} audit Sharp advisory source IDs differ from sole source ${EXPECTED_ADVISORY.source}.`,
     );
   }
+
+  const unrelatedAdvisorySources = [];
+  for (const [packageName, vulnerability] of Object.entries(audit.vulnerabilities)) {
+    if (linked.has(packageName) || !isRecord(vulnerability) || !Array.isArray(vulnerability.via)) {
+      continue;
+    }
+    for (const via of vulnerability.via) {
+      if (isRecord(via)) unrelatedAdvisorySources.push(via.source);
+    }
+  }
+  return { unrelatedAdvisorySources };
 }
 
 function validateDependencyPaths(lockfile, errors) {
-  if (!isRecord(lockfile) || !isRecord(lockfile.packages)) {
+  if (!isRecord(lockfile) || lockfile.lockfileVersion !== 3 || !isRecord(lockfile.packages)) {
     errors.push('package-lock evidence is missing or malformed.');
     return;
   }
-
   for (const expected of EXPECTED_DEPENDENCY_PATHS) {
     const packageRecord = lockfile.packages[expected.packagePath];
     const dependencyValue = packageRecord?.[expected.field]?.[expected.dependency];
@@ -216,6 +385,17 @@ function validateDependencyPaths(lockfile, errors) {
       (expected.field !== undefined && dependencyValue !== expected.value)
     ) {
       errors.push(`Sharp dependency path changed at ${expected.label}.`);
+    }
+  }
+  for (const expected of EXPECTED_PROVENANCE) {
+    const packageRecord = lockfile.packages[expected.packagePath];
+    if (
+      !isRecord(packageRecord) ||
+      packageRecord.version !== expected.version ||
+      packageRecord.resolved !== expected.resolved ||
+      packageRecord.integrity !== expected.integrity
+    ) {
+      errors.push(`Approved registry provenance or integrity changed for ${expected.label}.`);
     }
   }
 }
@@ -236,85 +416,99 @@ export function evaluateAuditException({
   now = new Date(),
 } = {}) {
   const errors = [];
-
   validateExpiry(now, errors);
-  validateAudit('Full', fullAudit, errors);
-  validateAudit('Production', productionAudit, errors);
+  const full = validateAudit('Full', fullAudit, errors);
+  const production = validateAudit('Production', productionAudit, errors);
   validateDependencyPaths(lockfile, errors);
-
-  return { ok: errors.length === 0, errors };
+  return {
+    ok: errors.length === 0,
+    errors,
+    unrelatedAdvisorySources: [
+      ...new Set([...full.unrelatedAdvisorySources, ...production.unrelatedAdvisorySources]),
+    ],
+  };
 }
 
-function validateReachabilityEvidence(reachability, errors) {
+function validateReachabilityEvidence(profile, reachability, errors) {
+  const expectedProfile = BUILD_PROFILES[profile];
   if (
+    !expectedProfile ||
     !isRecord(reachability) ||
     reachability.schemaVersion !== 1 ||
     typeof reachability.assessedAt !== 'string' ||
     !Number.isFinite(Date.parse(reachability.assessedAt)) ||
     reachability.runtime !== 'Node.js v22.23.1' ||
     !isRecord(reachability.build) ||
-    reachability.build.command !== 'npm run cf:build' ||
-    !Number.isInteger(reachability.build.exitCode) ||
+    reachability.build.profile !== profile ||
+    reachability.build.environment !== expectedProfile.environment ||
+    reachability.build.command !== expectedProfile.command ||
     !sameStringSet(reachability.searchedTerms, ['sharp', 'libvips', '@img']) ||
     !Array.isArray(reachability.matches)
   ) {
-    errors.push('Sharp Worker reachability evidence is missing or malformed.');
+    errors.push(`Sharp Worker reachability evidence is missing or malformed for ${profile}.`);
     return;
   }
 
   const status = reachability.sharpWorkerReachability;
-  if (status === 'unproven') {
-    if (
-      reachability.build.exitCode === 0 ||
-      typeof reachability.proofGap !== 'string' ||
-      reachability.proofGap.length === 0
-    ) {
-      errors.push('Unproven Sharp Worker reachability evidence is malformed.');
-      return;
-    }
-    errors.push('Sharp Worker reachability remains unproven; deployment is blocked.');
+  if (status !== 'proven-absent') {
+    errors.push(
+      `Sharp Worker reachability for ${profile} is ${(status ?? 'unknown').replaceAll('-', ' ')}; deployment is blocked.`,
+    );
     return;
   }
-
-  if (status !== 'proven-reachable' && status !== 'proven-absent') {
-    errors.push('Sharp Worker reachability evidence has an unknown status.');
-    return;
-  }
-
   if (
     reachability.build.exitCode !== 0 ||
-    typeof reachability.build.outputDirectory !== 'string' ||
+    reachability.build.outputDirectory !== '.open-next' ||
     typeof reachability.build.metafile !== 'string' ||
     !/^[a-f0-9]{64}$/.test(reachability.build.outputSha256) ||
     !/^[a-f0-9]{64}$/.test(reachability.build.metafileSha256)
   ) {
-    errors.push('Completed-build Sharp Worker reachability evidence is malformed.');
-    return;
-  }
-
-  if (status === 'proven-reachable') {
-    if (reachability.matches.length === 0) {
-      errors.push('Proven reachable Sharp Worker evidence must identify a match.');
-      return;
-    }
-    errors.push('Sharp Worker reachability is proven reachable; deployment is blocked.');
-  } else if (reachability.matches.length !== 0) {
-    errors.push('Proven-absent Sharp Worker evidence cannot contain Sharp matches.');
+    errors.push(`Completed-build Sharp reachability evidence is malformed for ${profile}.`);
   }
 }
 
+export function evaluateDeploymentGate({ profile, reachability, ...auditInputs } = {}) {
+  const auditResult = evaluateAuditException(auditInputs);
+  const errors = [...auditResult.errors];
+  validateReachabilityEvidence(profile, reachability, errors);
+  return {
+    ok: errors.length === 0,
+    errors,
+    unrelatedAdvisorySources: auditResult.unrelatedAdvisorySources,
+  };
+}
+
 function resolveContainedPath(repositoryRoot, relativePath, label) {
-  if (path.isAbsolute(relativePath)) {
+  if (typeof relativePath !== 'string' || path.isAbsolute(relativePath)) {
     throw new Error(`${label} must be repository-relative.`);
   }
-
   const resolvedRoot = path.resolve(repositoryRoot);
   const resolvedPath = path.resolve(resolvedRoot, relativePath);
   if (resolvedPath !== resolvedRoot && !resolvedPath.startsWith(`${resolvedRoot}${path.sep}`)) {
     throw new Error(`${label} escapes the repository root.`);
   }
-
   return resolvedPath;
+}
+
+async function collectFiles(directoryPath) {
+  const files = [];
+  async function visit(currentPath, relativePath) {
+    const entries = await fs.readdir(currentPath, { withFileTypes: true });
+    entries.sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
+    for (const entry of entries) {
+      const entryPath = path.join(currentPath, entry.name);
+      const entryRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+      if (entry.isDirectory()) {
+        await visit(entryPath, entryRelativePath);
+      } else if (entry.isFile()) {
+        files.push({ absolutePath: entryPath, relativePath: entryRelativePath });
+      } else {
+        throw new Error(`Unsupported bundle entry type: ${entryRelativePath}`);
+      }
+    }
+  }
+  await visit(directoryPath, '');
+  return files;
 }
 
 async function digestFile(filePath) {
@@ -325,33 +519,11 @@ async function digestFile(filePath) {
 
 async function digestDirectory(directoryPath) {
   const hash = createHash('sha256');
-
-  async function visit(currentPath, relativePath) {
-    const entries = await fs.readdir(currentPath, { withFileTypes: true });
-    entries.sort((left, right) =>
-      left.name < right.name ? -1 : left.name > right.name ? 1 : 0,
-    );
-
-    for (const entry of entries) {
-      const entryPath = path.join(currentPath, entry.name);
-      const entryRelativePath = relativePath
-        ? `${relativePath}/${entry.name}`
-        : entry.name;
-      hash.update(`${entry.isDirectory() ? 'directory' : entry.isFile() ? 'file' : 'other'}\0`);
-      hash.update(`${entryRelativePath}\0`);
-
-      if (entry.isDirectory()) {
-        await visit(entryPath, entryRelativePath);
-      } else if (entry.isFile()) {
-        hash.update(await fs.readFile(entryPath));
-        hash.update('\0');
-      } else {
-        throw new Error(`Unsupported bundle entry type: ${entryRelativePath}`);
-      }
-    }
+  for (const file of await collectFiles(directoryPath)) {
+    hash.update(`file\0${file.relativePath}\0`);
+    hash.update(await fs.readFile(file.absolutePath));
+    hash.update('\0');
   }
-
-  await visit(directoryPath, '');
   return hash.digest('hex');
 }
 
@@ -369,7 +541,6 @@ export async function calculateBuildArtifactDigests(
   if (relativeMetafile.startsWith('..') || path.isAbsolute(relativeMetafile)) {
     throw new Error('Build metafile must be contained in the build output directory.');
   }
-
   const [outputSha256, metafileSha256] = await Promise.all([
     digestDirectory(outputPath),
     digestFile(metafilePath),
@@ -382,10 +553,10 @@ export async function verifyRecordedBuildArtifacts(reachability, repositoryRoot 
     const actual = await calculateBuildArtifactDigests(reachability.build, repositoryRoot);
     const errors = [];
     if (actual.outputSha256 !== reachability.build.outputSha256) {
-      errors.push('Current OpenNext output does not match the reviewed reachability evidence.');
+      errors.push('Current OpenNext output does not match reviewed reachability evidence.');
     }
     if (actual.metafileSha256 !== reachability.build.metafileSha256) {
-      errors.push('Current OpenNext metafile does not match the reviewed reachability evidence.');
+      errors.push('Current OpenNext metafile does not match reviewed reachability evidence.');
     }
     return { ok: errors.length === 0, errors };
   } catch (error) {
@@ -396,13 +567,170 @@ export async function verifyRecordedBuildArtifacts(reachability, repositoryRoot 
   }
 }
 
-export function evaluateDeploymentGate({ reachability, ...auditInputs } = {}) {
-  const auditResult = evaluateAuditException(auditInputs);
-  const errors = [...auditResult.errors];
+function collectMatchingStrings(value, location, matches) {
+  if (typeof value === 'string') {
+    if (SHARP_PATTERN.test(value)) matches.push(`${location}: ${value}`);
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) =>
+      collectMatchingStrings(entry, `${location}[${index}]`, matches),
+    );
+    return;
+  }
+  if (isRecord(value)) {
+    for (const [key, entry] of Object.entries(value)) {
+      if (SHARP_PATTERN.test(key)) matches.push(`${location}.${key}`);
+      collectMatchingStrings(entry, `${location}.${key}`, matches);
+    }
+  }
+}
 
-  validateReachabilityEvidence(reachability, errors);
+function inspectMetafile(parsed, relativePath) {
+  const runtimeMatches = [];
+  const uncertainty = [];
+  if (!isRecord(parsed) || !isRecord(parsed.inputs) || !isRecord(parsed.outputs)) {
+    return {
+      runtimeMatches,
+      uncertainty: [`${relativePath}: not an esbuild metafile with inputs and outputs`],
+    };
+  }
+  const structuredMatches = [];
+  for (const [inputPath, input] of Object.entries(parsed.inputs)) {
+    if (SHARP_PATTERN.test(inputPath)) structuredMatches.push(`input ${inputPath}`);
+    if (!isRecord(input) || !Array.isArray(input.imports ?? [])) {
+      uncertainty.push(`${relativePath}: malformed input ${inputPath}`);
+      continue;
+    }
+    for (const imported of input.imports ?? []) {
+      if (!isRecord(imported) || typeof imported.path !== 'string') {
+        uncertainty.push(`${relativePath}: malformed input import for ${inputPath}`);
+      } else if (SHARP_PATTERN.test(imported.path)) {
+        structuredMatches.push(`input import ${imported.path}`);
+      }
+    }
+  }
+  for (const [outputPath, output] of Object.entries(parsed.outputs)) {
+    if (SHARP_PATTERN.test(outputPath)) structuredMatches.push(`output ${outputPath}`);
+    if (
+      !isRecord(output) ||
+      !Array.isArray(output.imports ?? []) ||
+      !isRecord(output.inputs ?? {})
+    ) {
+      uncertainty.push(`${relativePath}: malformed output ${outputPath}`);
+      continue;
+    }
+    for (const imported of output.imports ?? []) {
+      if (!isRecord(imported) || typeof imported.path !== 'string') {
+        uncertainty.push(`${relativePath}: malformed output import for ${outputPath}`);
+      } else if (SHARP_PATTERN.test(imported.path)) {
+        structuredMatches.push(`output import ${imported.path}`);
+      }
+    }
+    for (const inputPath of Object.keys(output.inputs ?? {})) {
+      if (SHARP_PATTERN.test(inputPath)) structuredMatches.push(`output input ${inputPath}`);
+    }
+  }
+  runtimeMatches.push(...structuredMatches.map((match) => `${relativePath}: ${match}`));
+  const allMatches = [];
+  collectMatchingStrings(parsed, relativePath, allMatches);
+  if (allMatches.length > 0 && structuredMatches.length === 0) {
+    uncertainty.push(
+      `${relativePath}: Sharp-like metadata exists outside recognized esbuild reachability fields`,
+    );
+  }
+  return { runtimeMatches, uncertainty };
+}
 
-  return { ok: errors.length === 0, errors };
+export async function scanCurrentBuildReachability(build, repositoryRoot = process.cwd()) {
+  const runtimeMatches = [];
+  const toolingOnlyMatches = [];
+  const uncertainty = [];
+  try {
+    const outputPath = resolveContainedPath(
+      repositoryRoot,
+      build.outputDirectory,
+      'Build output directory',
+    );
+    const files = await collectFiles(outputPath);
+    const metafileCandidates = files.filter((file) =>
+      METAFILE_NAME_PATTERN.test(path.basename(file.relativePath)),
+    );
+    if (metafileCandidates.length === 0) {
+      uncertainty.push('No actual OpenNext/esbuild metafile was found in the build output.');
+    }
+
+    const recognizedMetafiles = new Set();
+    for (const file of metafileCandidates) {
+      try {
+        const parsed = JSON.parse(await fs.readFile(file.absolutePath, 'utf8'));
+        const inspected = inspectMetafile(parsed, file.relativePath);
+        recognizedMetafiles.add(file.relativePath);
+        runtimeMatches.push(...inspected.runtimeMatches);
+        uncertainty.push(...inspected.uncertainty);
+      } catch (error) {
+        uncertainty.push(`${file.relativePath}: metafile parse failed: ${error.message}`);
+      }
+    }
+
+    const recordedMetafile = path
+      .relative(outputPath, resolveContainedPath(repositoryRoot, build.metafile, 'Build metafile'))
+      .split(path.sep)
+      .join('/');
+    if (!recognizedMetafiles.has(recordedMetafile)) {
+      uncertainty.push('Recorded metafile is not an actual discovered esbuild metafile.');
+    }
+
+    for (const file of files) {
+      if (recognizedMetafiles.has(file.relativePath)) continue;
+      const buffer = await fs.readFile(file.absolutePath);
+      const pathMatches = SHARP_PATTERN.test(file.relativePath);
+      const contentMatches = SHARP_PATTERN.test(buffer.toString('latin1'));
+      if (!pathMatches && !contentMatches) continue;
+
+      const extension = path.extname(file.relativePath).toLowerCase();
+      const description = `${file.relativePath}${pathMatches ? ' [path]' : ''}${contentMatches ? ' [content]' : ''}`;
+      if (TOOLING_METADATA_EXTENSIONS.has(extension)) {
+        toolingOnlyMatches.push(description);
+      } else if (['.js', '.mjs', '.cjs', '.json', '.wasm', '.node'].includes(extension)) {
+        runtimeMatches.push(description);
+      } else {
+        uncertainty.push(`${description}: unclassified bundle artifact`);
+      }
+    }
+  } catch (error) {
+    uncertainty.push(`Build scan failed: ${error.message}`);
+  }
+
+  const status =
+    runtimeMatches.length > 0
+      ? 'proven-reachable'
+      : uncertainty.length > 0
+        ? 'unproven'
+        : 'proven-absent';
+  return { status, runtimeMatches, toolingOnlyMatches, uncertainty };
+}
+
+export async function authorizeDeployment({ repositoryRoot = process.cwd(), ...inputs } = {}) {
+  const gate = evaluateDeploymentGate(inputs);
+  const errors = [...gate.errors];
+  if (gate.ok) {
+    const freshness = await verifyRecordedBuildArtifacts(inputs.reachability, repositoryRoot);
+    errors.push(...freshness.errors);
+    const scan = await scanCurrentBuildReachability(inputs.reachability.build, repositoryRoot);
+    if (scan.status !== 'proven-absent') {
+      errors.push(
+        scan.status === 'proven-reachable'
+          ? `Current Worker output contains Sharp runtime reachability: ${scan.runtimeMatches.join('; ')}`
+          : `Current Worker Sharp reachability is uncertain: ${scan.uncertainty.join('; ')}`,
+      );
+    }
+  }
+  return {
+    ok: errors.length === 0,
+    errors,
+    unrelatedAdvisorySources: gate.unrelatedAdvisorySources,
+  };
 }
 
 async function readJson(filePath, label, errors) {
@@ -416,8 +744,14 @@ async function readJson(filePath, label, errors) {
 
 async function main() {
   const mode = process.argv[2];
-  if (mode !== 'audit-exception' && mode !== 'deployment') {
-    console.error('Usage: node tools/security/check-sharp-risk.mjs <audit-exception|deployment>');
+  const profile = process.argv[3];
+  if (
+    (mode !== 'audit-exception' && mode !== 'deployment') ||
+    (mode === 'deployment' && !BUILD_PROFILES[profile])
+  ) {
+    console.error(
+      'Usage: node tools/security/check-sharp-risk.mjs audit-exception | deployment <preview|production>',
+    );
     process.exitCode = 2;
     return;
   }
@@ -431,43 +765,29 @@ async function main() {
   const reachability =
     mode === 'deployment'
       ? await readJson(
-          EVIDENCE_PATHS.reachability,
-          'Sharp Worker reachability evidence',
+          EVIDENCE_PATHS.reachability[profile],
+          `${profile} Sharp Worker reachability evidence`,
           readErrors,
         )
       : undefined;
-
+  const inputs = { fullAudit, productionAudit, lockfile, profile, reachability };
   const result =
-    mode === 'deployment'
-      ? evaluateDeploymentGate({
-          fullAudit,
-          productionAudit,
-          lockfile,
-          reachability,
-        })
-      : evaluateAuditException({ fullAudit, productionAudit, lockfile });
+    mode === 'deployment' ? await authorizeDeployment(inputs) : evaluateAuditException(inputs);
   const errors = [...readErrors, ...result.errors];
-  if (mode === 'deployment' && result.ok) {
-    const artifactResult = await verifyRecordedBuildArtifacts(reachability);
-    errors.push(...artifactResult.errors);
-  }
 
   if (errors.length > 0) {
     console.error(`Sharp ${mode} gate failed:`);
-    for (const error of errors) {
-      console.error(`- ${error}`);
-    }
+    for (const error of errors) console.error(`- ${error}`);
     process.exitCode = 1;
     return;
   }
-
   if (mode === 'audit-exception') {
     console.log(
-      'Sharp audit exception accepted for local migration work only; deployment remains separately gated.',
+      `Sharp audit exception accepted for local migration only; ${result.unrelatedAdvisorySources.length} unrelated advisory sources remain visible and non-exempt.`,
     );
   } else {
     console.log(
-      'Sharp deployment gate passed: current audit is unchanged and Worker reachability is proven absent.',
+      `Sharp deployment gate passed for ${profile}: current Worker output and metafile prove absence.`,
     );
   }
 }

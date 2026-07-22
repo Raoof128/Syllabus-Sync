@@ -93,15 +93,16 @@ Cloudflare preview, upload, deployment, and production cutover are blocked by th
 
 ```bash
 npm run security:sharp:audit-exception
-npm run security:sharp:deployment-gate
+npm run security:sharp:deployment-gate -- preview
+npm run security:sharp:deployment-gate -- production
 ```
 
 - [ ] The local audit-exception gate accepts only the recorded `GHSA-f88m-g3jw-g9cj` / source `1124066` evidence and has not expired.
-- [ ] A Node 22 OpenNext build completed, and its `.open-next` output plus esbuild metafile were inspected for `sharp`, `libvips`, and `@img`.
+- [ ] The matching Node 22 preview or production OpenNext build completed, and the gate independently scanned its current `.open-next` output plus every discovered esbuild metafile for `sharp`, `libvips`, and `@img`.
 - [ ] Worker reachability is recorded as `proven-absent`; `unproven` and `proven-reachable` are both deployment failures.
 - [ ] No forced Sharp override, `npm audit fix --force`, or Next.js downgrade was used.
 
-The current evidence is `unproven` because the OpenNext build is blocked before output by the not-yet-implemented `open-next.config.ts` migration task. Local migration source work may continue after the audit-exception gate passes, but **do not run or bypass any `cf:preview`, `cf:upload*`, or `cf:deploy*` command** until all four items above are satisfied.
+The current preview evidence is `unproven` because the OpenNext build is blocked before output by the not-yet-implemented `open-next.config.ts` migration task; the production build was not attempted and is separately `unproven`. Local migration source work may continue after the audit-exception gate passes, but **do not run or bypass any `cf:preview`, `cf:upload*`, `cf:deploy*`, `cf:dev:scheduled`, or `cf:dry-run*` command** until all four items above are satisfied.
 
 ---
 

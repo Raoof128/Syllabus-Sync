@@ -245,3 +245,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** `artifacts/security/*`, `tools/security/check-sharp-risk.mjs`, `tools/security/check-sharp-risk.test.mjs`, `docs/security/sharp-cloudflare-risk-gate.md`, `docs/operations/deployment-checklist.md`, `.gitignore`, `package.json`, `AGENT.md`, `CHANGELOG.md`.
 - **Verification:** Node 22 focused gate tests, formatting, typecheck, secret scan, and local audit-exception gate passed. The deployment gate intentionally failed because Worker reachability remains `unproven` after OpenNext stopped before output on missing `open-next.config.ts`.
 - **Follow-ups:** Complete the remaining OpenNext migration, regenerate bundle/metafile reachability evidence, and re-evaluate compatible upstream releases no later than 2026-08-22 Australia/Sydney. Preview/public deployment and production cutover remain prohibited.
+
+### 2026-07-22 (Australia/Sydney) — Sharp Risk-Gate Review Closure
+
+**Raouf:**
+
+- **Scope:** Closed the security review findings against the Cloudflare Sharp advisory gate without relaxing the deployment block.
+- **Summary:** Replaced declared reachability trust with an independent scan of the current `.open-next` runtime files and all discovered esbuild metafiles; retained hashes only as freshness evidence; gated exact Next/OpenNext/Wrangler registry provenance and integrity; made the entire audit graph fail closed while leaving unrelated advisory sources visible; bound separate preview/production evidence to exact build commands; and enforced build→gate→action for scheduled development and both dry-run paths as well as preview/upload/deploy.
+- **Files Changed:** `tools/security/check-sharp-risk.mjs`, `tools/security/check-sharp-risk.test.mjs`, `package.json`, `.gitignore`, `artifacts/security/sharp-worker-reachability*.json`, `docs/security/sharp-cloudflare-risk-gate.md`, `docs/operations/deployment-checklist.md`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** 16 deterministic Node 22 tests cover forged absent evidence with Sharp in runtime/metafile data, provenance drift, malformed/expanded audit graphs, build-profile identity, freshness, and every Worker execution script. Formatting, typecheck, secrets, and the local audit exception passed; preview and production deployment gates remain blocked on `unproven`.
+- **Follow-ups:** Complete and independently scan both build profiles after the missing OpenNext migration configuration is implemented. Do not preview, dry-run, schedule, upload, deploy, or cut over before the matching gate derives `proven-absent`.
