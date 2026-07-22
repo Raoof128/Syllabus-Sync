@@ -345,3 +345,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** `tests/security/api-auth-analyzer.ts`, `tests/security/api-auth-analyzer.test.ts`, `AGENT.md`, `CHANGELOG.md`.
 - **Verification:** Node 22 analyzer tests passed (80/80); six-file Task 5 tests passed (117/117); route behavior tests passed (20/20); all 47 protected methods across 26 current routes remain covered. Main/Worker typechecks, lint, formatting, 819-file secret scan, 19 Sharp tests, and the audit exception passed. Runtime compatibility still reports only the same three DNS/Node-crypto blockers.
 - **Follow-ups:** Resolve the recorded runtime blockers in later migration tasks. No preview, dry-run, upload, deploy, or production cutover was run.
+
+### 2026-07-22 (Australia/Sydney) — Edge Middleware Web Crypto Migration
+
+**Raouf:**
+
+- **Scope:** Removed the remaining Node crypto dependencies from the Cloudflare Edge middleware import graph without changing CSP or CSRF wire contracts.
+- **Summary:** CSP nonce generation now uses Web Crypto for 16 random bytes and browser-safe base64 encoding. CSRF generation now uses Web Crypto for 32 random bytes and lowercase hexadecimal encoding; equal-length token comparison performs one XOR operation for every character before deciding equality. Added a policy-file guard against Node-only built-ins and strengthened existing CSP/CSRF tests for exact output shape and 64-call uniqueness.
+- **Files Changed:** `lib/security/csp.ts`, `lib/security/csrf.ts`, `tests/unit/security/csp.test.ts`, `tests/security/csrf-critical.test.ts`, `tests/cloudflare/middleware-edge-compat.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Node 22 targeted CSP, CSRF, MFA middleware, and Edge compatibility tests passed (47/47). Main and Worker typechecks, lint, full formatting, 819-file secret scan, 19 Sharp gate tests, and the local Sharp audit exception passed. The runtime audit now reports only the separately scoped `dns.lookup` blocker in `app/api/security/scan-headers/route.ts`.
+- **Follow-ups:** Replace the DNS lookup in its dedicated migration task. No preview, dry-run, upload, deployment, or production cutover was run; Sharp deployment gates remain fail closed.

@@ -11,7 +11,6 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { createHash, randomBytes } from "crypto";
 
 // ============================================================================
 // CONSTANTS
@@ -32,35 +31,32 @@ const EXEMPT_PATHS = ["/api/webhooks/", "/api/cron/"];
 // TOKEN GENERATION
 // ============================================================================
 
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
 /**
  * Generate a cryptographically secure CSRF token
  */
 export function generateCSRFToken(): string {
-  return randomBytes(CSRF_TOKEN_LENGTH).toString("hex");
+  const bytes = new Uint8Array(CSRF_TOKEN_LENGTH);
+  globalThis.crypto.getRandomValues(bytes);
+  return bytesToHex(bytes);
 }
 
 /**
- * Hash a CSRF token for comparison (prevents timing attacks)
- */
-function hashToken(token: string): string {
-  return createHash("sha256").update(token).digest("hex");
-}
-
-/**
- * Securely compare two tokens (constant-time comparison)
+ * Compare equal-length tokens with constant work and no data-dependent early exit.
+ * Length mismatches can safely fail before comparison because tokens have a fixed shape.
  */
 function secureCompare(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
 
-  const aHash = hashToken(a);
-  const bHash = hashToken(b);
-
-  let result = 0;
-  for (let i = 0; i < aHash.length; i++) {
-    result |= aHash.charCodeAt(i) ^ bHash.charCodeAt(i);
+  let difference = 0;
+  for (let index = 0; index < a.length; index += 1) {
+    difference |= a.charCodeAt(index) ^ b.charCodeAt(index);
   }
 
-  return result === 0;
+  return difference === 0;
 }
 
 // ============================================================================

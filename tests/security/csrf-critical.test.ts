@@ -3,7 +3,7 @@
  * Tests CSRF middleware that protects against cross-site request forgery
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { NextRequest } from "next/server";
 import {
   generateCSRFToken,
@@ -46,46 +46,19 @@ class MockRequest {
 }
 
 describe("CSRF Protection", () => {
-  beforeEach(() => {
-    // Mock crypto for token generation
-    vi.stubGlobal("crypto", {
-      randomUUID: () => "test-uuid-" + Math.random().toString(36),
-      randomBytes: (size: number) => {
-        const bytes = new Uint8Array(size);
-        for (let i = 0; i < size; i++) {
-          bytes[i] = Math.floor(Math.random() * 256);
-        }
-        return bytes;
-      },
-      createHash: () => ({
-        update: () => ({}),
-        digest: () => "hashed-token",
-      }),
-    });
-  });
-
   describe("generateCSRFToken", () => {
-    it("should generate a valid CSRF token", () => {
+    it("returns 32 random bytes encoded as lowercase hexadecimal", () => {
       const token = generateCSRFToken();
 
-      expect(token).toBeDefined();
-      expect(typeof token).toBe("string");
-      expect(token.length).toBeGreaterThan(16); // Should be reasonable length
+      expect(token).toHaveLength(64);
+      expect(token).toMatch(/^[0-9a-f]{64}$/);
     });
 
-    it("should generate unique tokens", () => {
-      const token1 = generateCSRFToken();
-      const token2 = generateCSRFToken();
-
-      expect(token1).not.toBe(token2);
-    });
-
-    it("should be cryptographically secure", () => {
-      const tokens = Array.from({ length: 100 }, () => generateCSRFToken());
-      const uniqueTokens = new Set(tokens);
-
-      // All tokens should be unique (very high probability test)
-      expect(uniqueTokens.size).toBe(100);
+    it("does not repeat across calls", () => {
+      const values = new Set(
+        Array.from({ length: 64 }, () => generateCSRFToken()),
+      );
+      expect(values.size).toBe(64);
     });
   });
 

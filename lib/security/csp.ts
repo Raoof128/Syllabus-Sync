@@ -11,18 +11,26 @@
  * unique cryptographic nonce, eliminating the need for 'unsafe-inline' entirely.
  */
 
-import crypto from 'crypto';
-
 // ============================================================================
 // NONCE GENERATION
 // ============================================================================
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = '';
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary);
+}
 
 /**
  * Generate a cryptographically random nonce for CSP.
  * Used by middleware.ts to create a per-request nonce.
  */
 export function generateNonce(): string {
-  return crypto.randomBytes(16).toString('base64');
+  const bytes = new Uint8Array(16);
+  globalThis.crypto.getRandomValues(bytes);
+  return bytesToBase64(bytes);
 }
 
 // ============================================================================

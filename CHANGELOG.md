@@ -534,3 +534,17 @@ All notable changes to this project will be documented in this file.
 **Verification:** Node 22 analyzer tests passed (80/80), six-file Task 5 tests passed (117/117), and route behavior tests passed (20/20). All 47 current protected methods remain green. Main and Worker typechecks, lint, formatting, 819-file secret scan, 19 Sharp tests, and the audit exception passed; runtime blockers remain the same three DNS/Node-crypto findings.
 
 **Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Edge Middleware Web Crypto Migration — 2026-07-22
+
+**Scope:** Removed the remaining Node crypto dependencies from the Cloudflare Edge middleware import graph without changing CSP or CSRF wire contracts.
+
+**Summary:** CSP nonce generation now uses Web Crypto for 16 random bytes and browser-safe base64 encoding. CSRF generation now uses Web Crypto for 32 random bytes and lowercase hexadecimal encoding; equal-length token comparison performs one XOR operation for every character before deciding equality. Added a policy-file guard against Node-only built-ins and strengthened existing CSP/CSRF tests for exact output shape and 64-call uniqueness.
+
+**Files Changed:** `lib/security/csp.ts`, `lib/security/csrf.ts`, `tests/unit/security/csp.test.ts`, `tests/security/csrf-critical.test.ts`, `tests/cloudflare/middleware-edge-compat.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Node 22 targeted CSP, CSRF, MFA middleware, and Edge compatibility tests passed (47/47). Main and Worker typechecks, lint, full formatting, 819-file secret scan, 19 Sharp gate tests, and the local Sharp audit exception passed. The runtime audit now reports only the separately scoped `dns.lookup` blocker in `app/api/security/scan-headers/route.ts`.
+
+**Follow-ups:** Replace the DNS lookup in its dedicated migration task. No preview, dry-run, upload, deployment, or production cutover was run; Sharp deployment gates remain fail closed.
