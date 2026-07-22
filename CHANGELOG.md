@@ -464,3 +464,17 @@ All notable changes to this project will be documented in this file.
 **Verification:** On Node 22, 16 focused middleware, route-auth, inventory, and Worker-contract tests passed; 19 Sharp gate tests passed; main and isolated Worker typechecks, formatting, secret scan, and local Sharp audit-exception gate passed. The runtime audit records only the expected remaining DNS blocker in the security-header scanner and Node crypto blockers in CSP/CSRF. No Cloudflare execution or deployment command was run.
 
 **Follow-ups:** Resolve the recorded runtime blockers in their separately scoped migration tasks. Existing Sharp reachability and deployment gates remain unchanged and fail closed.
+
+---
+
+### Raouf: Middleware Auth-Coverage Review Remediation — 2026-07-22
+
+**Scope:** Closed the Task 5 method-coverage and extension-shaped middleware-bypass findings.
+
+**Summary:** Replaced raw-token API inventory with TypeScript AST analysis for each exported HTTP method, including reachable local/imported handlers, aliases, re-exports, trusted auth wrappers, fail-closed session checks, and real secret enforcement. Seventeen adversarial analyzer tests cover the review's false-positive classes and early-success bypasses. The stricter inventory exposed admin GET/POST and gamification GET; all three now enter route-level `requireAuth` before their unchanged handlers. Root matching and library policy now bypass only explicit known static namespaces and exact public files, so API/auth/RSC/HTML and extension-shaped dynamic paths execute middleware. Cloudflare Wrangler asset routing remains unchanged.
+
+**Files Changed:** Middleware matcher/policy, three protected HTTP methods, AST analyzer/inventory tests, matcher and route-auth regressions, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 focused tests passed (54/54), including the Task 4 Worker contract. Main and isolated Worker typechecks, lint, formatting, secrets, 19 Sharp gate tests, and the local Sharp audit-exception gate passed. Runtime compatibility still reports only the expected DNS scanner and CSP/CSRF Node-crypto blockers.
+
+**Follow-ups:** Resolve those three runtime dependencies in later migration tasks. Deployment gates remain fail-closed and no Cloudflare execution or deployment command was run.

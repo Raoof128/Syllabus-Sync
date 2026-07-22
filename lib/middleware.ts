@@ -51,33 +51,33 @@ function isPublicApiPath(path: string): boolean {
   );
 }
 
+const STATIC_PATH_PREFIXES = ['/_next/static/', '/icons/', '/images/', '/tiles/'] as const;
+const STATIC_EXACT_PATHS = new Set([
+  '/_next/static',
+  '/icons',
+  '/images',
+  '/tiles',
+  '/favicon.ico',
+  '/apple-touch-icon.png',
+  '/manifest.webmanifest',
+  '/security.txt',
+  '/sw.js',
+  '/syllabus-sync-logo.png',
+]);
+
+export function isKnownStaticPath(path: string): boolean {
+  return (
+    STATIC_EXACT_PATHS.has(path) || STATIC_PATH_PREFIXES.some((prefix) => path.startsWith(prefix))
+  );
+}
+
 /**
  * Next.js 16 Proxy — security headers, session refresh, and route protection.
  */
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  const staticFileExtensions = [
-    '.webmanifest',
-    '.json',
-    '.ico',
-    '.png',
-    '.jpg',
-    '.jpeg',
-    '.svg',
-    '.css',
-    '.js',
-    '.woff',
-    '.woff2',
-    '.ttf',
-    '.eot',
-    '.map',
-    '.txt',
-    '.xml',
-  ];
-  const isStaticFile = staticFileExtensions.some((ext) => path.endsWith(ext));
-
-  if (isStaticFile) {
+  if (isKnownStaticPath(path)) {
     return NextResponse.next();
   }
 

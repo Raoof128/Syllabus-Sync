@@ -4,6 +4,6 @@ export const middleware = middlewareHandler;
 
 export const config = {
   matcher: [
-    '/((?!_next/|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webmanifest|woff2?|ttf|eot|ico|json|txt)$).*)',
+    '/((?!_next/static(?:/|$)|icons(?:/|$)|images(?:/|$)|tiles(?:/|$)|favicon\\.ico$|apple-touch-icon\\.png$|manifest\\.webmanifest$|security\\.txt$|sw\\.js$|syllabus-sync-logo\\.png$).*)',
   ],
 };

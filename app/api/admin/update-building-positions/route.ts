@@ -19,7 +19,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
-import { parseJsonBody } from '@/app/api/_lib/middleware';
+import { parseJsonBody, requireAuth } from '@/app/api/_lib/middleware';
 import { logger } from '@/lib/logger';
 
 // ============================================================================
@@ -228,7 +228,7 @@ interface RequestBody {
 // API HANDLERS
 // ============================================================================
 
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest) {
   // CRITICAL: Hard block in production - cannot be bypassed by any env var
   if (IS_PRODUCTION) {
     return new NextResponse(null, { status: 404 });
@@ -409,7 +409,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint to check if the service is available
-export async function GET() {
+async function handleGet() {
   // CRITICAL: Hard block in production - cannot be bypassed by any env var
   if (IS_PRODUCTION) {
     return new NextResponse(null, { status: 404 });
@@ -430,4 +430,12 @@ export async function GET() {
     allowedBuildings: ALLOWED_BUILDING_IDS,
     positionBounds: POSITION_BOUNDS,
   });
+}
+
+export async function POST(request: NextRequest) {
+  return requireAuth(request, async () => handlePost(request));
+}
+
+export async function GET(request: NextRequest) {
+  return requireAuth(request, async () => handleGet());
 }

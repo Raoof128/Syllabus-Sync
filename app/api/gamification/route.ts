@@ -143,7 +143,7 @@ function generateDemoEvents(): XPEvent[] {
  * GET /api/gamification - Get user's gamification profile
  * Returns demo data if not authenticated
  */
-export async function GET(request: NextRequest) {
+async function handleGet(request: NextRequest) {
   // SECURITY: Apply rate limiting
   const clientIP = getClientIP(request);
   const { allowed, resetIn } = await apiLimiter(`gamification:${clientIP}`);
@@ -276,6 +276,10 @@ export async function GET(request: NextRequest) {
 
     return jsonSuccess(response);
   });
+}
+
+export async function GET(request: NextRequest) {
+  return requireAuth(request, async () => handleGet(request));
 }
 
 /**
