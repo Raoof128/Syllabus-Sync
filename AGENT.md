@@ -275,3 +275,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** `wrangler.jsonc`, `open-next.config.ts`, `custom-worker.ts`, `cloudflare-env.d.ts`, `.dev.vars.example`, `public/_headers`, `.gitignore`, `config/ts/tsconfig.json`, `config/ts/tsconfig.cloudflare.json`, `package.json`, `tests/cloudflare/*`, `AGENT.md`, `CHANGELOG.md`.
 - **Verification:** Node 22 type generation, focused configuration tests, main and Cloudflare typechecks, formatting, and secret scan passed. Existing build→Sharp-gate→action scripts were preserved. No preview, dry-run, upload, deploy, or production cutover was run.
 - **Follow-ups:** Before any deployment, confirm Cloudflare Images is enabled for the target account and the owner accepts transformation billing; then independently derive the matching Sharp reachability evidence. Task 8 must replace the temporary 503 worker stub.
+
+### 2026-07-22 (Australia/Sydney) — Cloudflare Worker Configuration Review Remediation
+
+**Raouf:**
+
+- **Scope:** Closed the Task 4 quality-gate and route-regression review findings without changing deployment behaviour or static cache policy.
+- **Summary:** Added the isolated Worker typecheck to the global `npm run check` sequence immediately after the main Next typecheck, protected by an exact script contract test. Tightened the Worker route test to require the exact approved static bypass list and explicitly reject dynamic HTML/RSC, API, auth, and `/_next/image` bypass patterns. The plan-mandated immutable caching for stable-name icon/image paths was left unchanged for final branch review.
+- **Files Changed:** `package.json`, `tests/cloudflare/worker-config.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Node 22 focused Cloudflare tests, global check-contract assertion, main and Worker typechecks, formatting, and secret scan passed. The Sharp audit scripts and build→gate→action ordering were not changed.
+- **Follow-ups:** The Cloudflare Images enablement/billing and Sharp deployment-evidence blockers remain. Keep the immutable icon/image-cache policy as specified unless a separately reviewed production policy changes it.

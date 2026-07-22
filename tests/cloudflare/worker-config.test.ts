@@ -30,9 +30,39 @@ describe('Cloudflare Worker configuration', () => {
     );
     expect(config.assets.directory).toBe('.open-next/assets');
     expect(config.assets.binding).toBe('ASSETS');
-    expect(config.assets.run_worker_first).toEqual(
-      expect.arrayContaining(['/*', '!/_next/static/*', '!/icons/*', '!/images/*']),
-    );
+
+    if (!Array.isArray(config.assets.run_worker_first)) {
+      throw new Error('assets.run_worker_first must be an explicit route list');
+    }
+
+    expect(config.assets.run_worker_first).toEqual([
+      '/*',
+      '!/_next/static/*',
+      '!/icons/*',
+      '!/images/*',
+      '!/favicon.ico',
+      '!/manifest.webmanifest',
+      '!/*.webmanifest',
+      '!/*.woff2',
+      '!/sw.js',
+    ]);
+
+    for (const unsafeBypass of [
+      '!/*',
+      '!/*.html',
+      '!/*.rsc',
+      '!/*?_rsc=*',
+      '!/api/*',
+      '!/auth/*',
+      '!/login',
+      '!/signup',
+      '!/reset-password',
+      '!/_next/image',
+      '!/_next/image*',
+    ]) {
+      expect(config.assets.run_worker_first).not.toContain(unsafeBypass);
+    }
+
     expect(config.images.binding).toBe('IMAGES');
     expect(config.keep_vars).toBe(true);
     expect(config.triggers.crons).toEqual([]);
@@ -55,5 +85,15 @@ describe('Cloudflare Worker configuration', () => {
       service: 'syllabus-sync-production',
     });
     expect(production.triggers.crons).toEqual([]);
+  });
+
+  it('enforces the isolated Worker typecheck in the global quality gate', async () => {
+    const packageJson = JSON.parse(await readFile('package.json', 'utf8')) as {
+      scripts: Record<string, string>;
+    };
+
+    expect(packageJson.scripts.check).toBe(
+      'npm run check:secrets && npm run format:check && npm run typecheck && npm run typecheck:cloudflare && npm run lint && npm run test && npm run build',
+    );
   });
 });

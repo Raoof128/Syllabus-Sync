@@ -436,3 +436,17 @@ All notable changes to this project will be documented in this file.
 **Verification:** Node 22 `npm run cf:typegen`, focused Vitest configuration tests, `npm run typecheck`, `npm run typecheck:cloudflare`, focused Prettier check, and `npm run check:secrets` passed. Existing build→Sharp deployment-gate→action ordering remains unchanged.
 
 **Follow-ups:** Cloudflare Images enablement and transformation-billing acceptance are externally unverified, so `IMAGES` is planned configuration only and deployment remains blocked. Keep both cron lists empty until the separately reviewed Vercel-Cron cutover. Task 8 replaces the temporary 503 worker stub.
+
+---
+
+### Raouf: Cloudflare Worker Configuration Review Remediation — 2026-07-22
+
+**Scope:** Closed the Task 4 quality-gate and route-contract review findings without changing deployment behavior or the plan-mandated static-cache policy.
+
+**Summary:** Added the isolated Worker typecheck to the global `npm run check` sequence immediately after the main Next typecheck and protected that exact sequence with a contract test. Tightened the Worker configuration test to require the complete approved static bypass list and reject dynamic HTML/RSC, API, auth, and `/_next/image` bypass patterns.
+
+**Files Changed:** `package.json`, `tests/cloudflare/worker-config.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Node 22 focused Cloudflare tests, package-script contract assertion, main and Worker typechecks, formatting, and secret scan passed. Sharp audit scripts and build→gate→action ordering are unchanged.
+
+**Follow-ups:** The review's immutable stable-name icon/image cache observation is intentionally left unchanged because Task 4 mandates that header policy; address it only in a separately reviewed production policy change. Images enablement/billing and Sharp deployment-evidence blockers remain.
