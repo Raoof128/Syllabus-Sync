@@ -335,3 +335,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** API-auth analyzer/tests, sync and WebAuthn routes/tests, `AGENT.md`, `CHANGELOG.md`.
 - **Verification:** Node 22 analyzer tests passed (75/75); six-file Task 5 tests passed (112/112); route behavior tests passed (20/20); all 47 protected methods across 26 routes remain covered. Main/Worker typechecks, lint, formatting, 818-file secret scan, 19 Sharp tests, and the audit exception passed. Runtime compatibility still reports only the same three DNS/Node-crypto blockers.
 - **Follow-ups:** Resolve the recorded runtime blockers in later migration tasks. No preview, dry-run, upload, deploy, or production cutover was run.
+
+### 2026-07-22 (Australia/Sydney) — Complete HTTP Export Inventory Closure
+
+**Raouf:**
+
+- **Scope:** Closed the final narrow Task 5 omission for unresolved named HTTP exports in mixed-method route files.
+- **Summary:** Syntax-level HTTP method presence is now recorded independently from callable resolution. Unresolved external named re-exports, unresolved imported/local exports, uninitialized or destructured exported method bindings, and namespace exports named as HTTP methods remain in coverage as explicit uncovered targets. A guarded local GET can no longer hide an unresolved external POST. Type-only exports remain excluded because they create no runtime handler. All prior exact binding, immutable callable, no-generic-helper, session-dominance, matcher, and route-ordering rules remain unchanged.
+- **Files Changed:** `tests/security/api-auth-analyzer.ts`, `tests/security/api-auth-analyzer.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Node 22 analyzer tests passed (80/80); six-file Task 5 tests passed (117/117); route behavior tests passed (20/20); all 47 protected methods across 26 current routes remain covered. Main/Worker typechecks, lint, formatting, 819-file secret scan, 19 Sharp tests, and the audit exception passed. Runtime compatibility still reports only the same three DNS/Node-crypto blockers.
+- **Follow-ups:** Resolve the recorded runtime blockers in later migration tasks. No preview, dry-run, upload, deploy, or production cutover was run.

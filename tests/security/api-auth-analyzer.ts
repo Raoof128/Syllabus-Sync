@@ -20,6 +20,7 @@ interface CallableTarget {
   filePath: string;
   symbolName: string;
   mustBeExported?: boolean;
+  unresolved?: boolean;
 }
 
 interface ImportTarget {
@@ -275,42 +276,52 @@ export class ApiAuthAnalyzer {
         const isExported = hasModifier(statement, ts.SyntaxKind.ExportKeyword);
         const isConst = (statement.declarationList.flags & ts.NodeFlags.Const) !== 0;
         for (const declaration of statement.declarationList.declarations) {
-          if (!ts.isIdentifier(declaration.name) || !declaration.initializer) continue;
-          if (isConst && isFunctionLikeExpression(declaration.initializer)) {
-            info.callables.set(declaration.name.text, declaration.initializer);
-          } else if (isConst && ts.isIdentifier(declaration.initializer)) {
-            info.aliases.set(declaration.name.text, declaration.initializer.text);
+          if (ts.isIdentifier(declaration.name) && declaration.initializer) {
+            if (isConst && isFunctionLikeExpression(declaration.initializer)) {
+              info.callables.set(declaration.name.text, declaration.initializer);
+            } else if (isConst && ts.isIdentifier(declaration.initializer)) {
+              info.aliases.set(declaration.name.text, declaration.initializer.text);
+            }
           }
           if (isExported) {
-            info.exports.set(declaration.name.text, {
-              filePath,
-              symbolName: declaration.name.text,
-            });
+            for (const exportedName of collectBindingNames(declaration.name)) {
+              info.exports.set(exportedName, {
+                filePath,
+                symbolName: exportedName,
+                unresolved: !ts.isIdentifier(declaration.name),
+              });
+            }
           }
         }
         continue;
       }
 
-      if (
-        ts.isExportDeclaration(statement) &&
-        statement.exportClause &&
-        ts.isNamedExports(statement.exportClause)
-      ) {
+      if (ts.isExportDeclaration(statement) && statement.exportClause) {
+        if (statement.isTypeOnly) continue;
+        if (ts.isNamespaceExport(statement.exportClause)) {
+          const exportedName = statement.exportClause.name.text;
+          info.exports.set(exportedName, {
+            filePath,
+            symbolName: exportedName,
+            unresolved: true,
+          });
+          continue;
+        }
+        if (!ts.isNamedExports(statement.exportClause)) continue;
         const hasModuleSpecifier = Boolean(statement.moduleSpecifier);
         const reexportFile =
           statement.moduleSpecifier && ts.isStringLiteral(statement.moduleSpecifier)
             ? this.loader.resolve(filePath, statement.moduleSpecifier.text)
             : null;
-        // An unresolved external re-export has no declaration we can prove. Do not silently
-        // fall back to a same-named callable in the current module.
-        if (hasModuleSpecifier && !reexportFile) continue;
         for (const element of statement.exportClause.elements) {
+          if (element.isTypeOnly) continue;
           const exportedName = element.name.text;
           const sourceName = element.propertyName?.text ?? element.name.text;
           info.exports.set(exportedName, {
             filePath: reexportFile ?? filePath,
             symbolName: sourceName,
             mustBeExported: hasModuleSpecifier,
+            unresolved: hasModuleSpecifier && !reexportFile,
           });
         }
       }
@@ -354,6 +365,7 @@ export class ApiAuthAnalyzer {
     target: CallableTarget,
     seen: Set<string>,
   ): { node: ts.FunctionLikeDeclaration; filePath: string } | null {
+    if (target.unresolved) return null;
     const key = `${target.mustBeExported ? 'export:' : 'local:'}${target.filePath}#${target.symbolName}`;
     if (seen.has(key)) return null;
     seen.add(key);

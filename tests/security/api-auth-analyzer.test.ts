@@ -294,7 +294,39 @@ describe('API auth AST analyzer adversarial coverage', () => {
         }
         export { guardedHandler as POST } from 'unresolved-auth-package';
       `),
-    ).toEqual([]);
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('keeps an unresolved external POST uncovered beside a guarded local GET', () => {
+    expect(
+      analyze(`
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        export async function GET(request: Request) {
+          return requireAuth(request, async () => Response.json({ protected: true }));
+        }
+        export { externalHandler as POST } from 'unresolved-auth-package';
+      `),
+    ).toEqual([
+      expect.objectContaining({ method: 'GET', covered: true }),
+      expect.objectContaining({ method: 'POST', covered: false }),
+    ]);
+  });
+
+  it.each([
+    ['an uninitialized exported method binding', `export let POST;`],
+    [
+      'an exported destructured method binding',
+      `const handlers = { POST: () => Response.json({ exposed: true }) }; export const { POST } = handlers;`,
+    ],
+    [
+      'an unresolved imported method exported locally',
+      `import { externalHandler as POST } from 'unresolved-auth-package'; export { POST };`,
+    ],
+    ['an exported namespace named as an HTTP method', `export * as POST from './shared';`],
+  ])('keeps %s present and uncovered', (_label, routeSource) => {
+    expect(analyze(routeSource)).toEqual([
+      expect.objectContaining({ method: 'POST', covered: false }),
+    ]);
   });
 
   it('rejects an imported handler whose source symbol is not exported', () => {

@@ -520,3 +520,17 @@ All notable changes to this project will be documented in this file.
 **Verification:** Node 22 analyzer tests passed (75/75), six-file Task 5 tests passed (112/112), and route behavior tests passed (20/20). All 47 protected methods remain green. Main and Worker typechecks, lint, formatting, secrets, 19 Sharp tests, and the audit exception passed; runtime blockers remain the same three DNS/Node-crypto findings.
 
 **Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Complete HTTP Export Inventory Closure — 2026-07-22
+
+**Scope:** Closed the final Task 5 mixed-method omission for unresolved named HTTP exports.
+
+**Summary:** The analyzer now records syntax-level HTTP method presence separately from callable identity. Unresolved external named re-exports, unresolved imported/local exports, uninitialized and destructured method exports, and namespace exports named as HTTP methods are returned as explicit uncovered methods. A covered local GET therefore cannot hide an unresolved external POST. Type-only exports remain correctly excluded, and all previously closed binding, mutability, dominance, and matcher findings remain unchanged.
+
+**Files Changed:** API-auth analyzer/tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 analyzer tests passed (80/80), six-file Task 5 tests passed (117/117), and route behavior tests passed (20/20). All 47 current protected methods remain green. Main and Worker typechecks, lint, formatting, 819-file secret scan, 19 Sharp tests, and the audit exception passed; runtime blockers remain the same three DNS/Node-crypto findings.
+
+**Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.
