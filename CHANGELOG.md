@@ -4,11 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Sharp Evidence-Schema Review Closure — 2026-07-22
+
+**Scope:** Closed the remaining reverse-edge and contradictory-evidence findings in the Sharp deployment gate.
+
+**Summary:** The full six-package Sharp graph now gates exact `effects` sets and bidirectional reciprocity with every normalized `via` edge. Reachability evidence now has exact status-specific invariants: clean evidence requires empty string matches and no proof gap; reachable evidence requires matches; unproven evidence requires a proof gap and no output. The focused suite now proves a complete clean `authorizeDeployment()` success path and all new negative cases.
+
+**Verification:** 19/19 Node 22 focused tests passed; format, typecheck, staged secret scan, and audit exception passed; preview and production gates remain expected failures on `unproven`.
+
+**Follow-ups:** Deployment remains blocked until the OpenNext migration produces independently scanned, profile-matched `proven-absent` evidence.
+
+---
+
 ### Raouf: Sharp Risk-Gate Review Closure — 2026-07-22
 
 **Scope:** Closed all security review findings in the Cloudflare Sharp advisory release gate.
 
-**Summary:** The gate now independently derives runtime reachability from current `.open-next` bytes and every actual esbuild metafile instead of trusting declared status/matches; SHA-256 remains freshness-only. Exact approved Next/OpenNext/Wrangler registry URLs and integrities are enforced, the full npm audit graph is structurally validated and traversed, preview/production evidence is command-bound, and scheduled development plus both dry-run scripts now use build→matching gate→action. The offline suite expanded to 16 adversarial cases.
+**Summary:** The gate now independently derives runtime reachability from current `.open-next` bytes and every actual esbuild metafile instead of trusting declared status/matches; SHA-256 remains freshness-only. Exact approved Next/OpenNext/Wrangler registry URLs and integrities are enforced, the full npm audit graph is structurally validated and traversed, preview/production evidence is command-bound, and scheduled development plus both dry-run scripts now use build→matching gate→action. The offline suite expanded to 17 adversarial cases.
 
 **Verification:** Node 22 focused tests, formatting, typecheck, staged secret scan, and local audit-exception gate passed. Both deployment profiles remain intentionally blocked because reachability is `unproven`.
 

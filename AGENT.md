@@ -253,5 +253,15 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Scope:** Closed the security review findings against the Cloudflare Sharp advisory gate without relaxing the deployment block.
 - **Summary:** Replaced declared reachability trust with an independent scan of the current `.open-next` runtime files and all discovered esbuild metafiles; retained hashes only as freshness evidence; gated exact Next/OpenNext/Wrangler registry provenance and integrity; made the entire audit graph fail closed while leaving unrelated advisory sources visible; bound separate preview/production evidence to exact build commands; and enforced build→gate→action for scheduled development and both dry-run paths as well as preview/upload/deploy.
 - **Files Changed:** `tools/security/check-sharp-risk.mjs`, `tools/security/check-sharp-risk.test.mjs`, `package.json`, `.gitignore`, `artifacts/security/sharp-worker-reachability*.json`, `docs/security/sharp-cloudflare-risk-gate.md`, `docs/operations/deployment-checklist.md`, `AGENT.md`, `CHANGELOG.md`.
-- **Verification:** 16 deterministic Node 22 tests cover forged absent evidence with Sharp in runtime/metafile data, provenance drift, malformed/expanded audit graphs, build-profile identity, freshness, and every Worker execution script. Formatting, typecheck, secrets, and the local audit exception passed; preview and production deployment gates remain blocked on `unproven`.
+- **Verification:** 17 deterministic Node 22 tests cover forged absent evidence with Sharp in runtime/metafile data, provenance drift, malformed/expanded audit graphs, build-profile identity, freshness, and every Worker execution script. Formatting, typecheck, secrets, and the local audit exception passed; preview and production deployment gates remain blocked on `unproven`.
 - **Follow-ups:** Complete and independently scan both build profiles after the missing OpenNext migration configuration is implemented. Do not preview, dry-run, schedule, upload, deploy, or cut over before the matching gate derives `proven-absent`.
+
+### 2026-07-22 (Australia/Sydney) — Sharp Evidence-Schema Review Closure
+
+**Raouf:**
+
+- **Scope:** Closed the remaining exact-graph and reachability-schema findings from the second Sharp gate review.
+- **Summary:** Added exact `effects` reverse-edge allowlists and bidirectional reciprocity checks for every Sharp-linked `via` edge; enforced status-specific `matches`, `proofGap`, build-result, output, and hash invariants; and added a complete clean-bundle `authorizeDeployment()` positive test so authorization—not only component checks—is proven.
+- **Files Changed:** `tools/security/check-sharp-risk.mjs`, `tools/security/check-sharp-risk.test.mjs`, `docs/security/sharp-cloudflare-risk-gate.md`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** 19/19 focused Node 22 tests passed, including effects removal/addition/malformed/non-reciprocal cases, contradictory reachability metadata, and integrated clean authorization. Formatting, typecheck, secrets, and audit exception passed; preview and production remain blocked as `unproven`.
+- **Follow-ups:** No review finding remains open. Deployment still requires the missing OpenNext migration tasks and independently derived `proven-absent` evidence for the matching build profile.

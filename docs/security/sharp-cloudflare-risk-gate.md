@@ -59,7 +59,7 @@ Forcing `sharp@0.35.3` would violate Miniflare's exact `0.34.5` constraint and N
 
 ## Gates
 
-`npm run security:sharp:audit-exception` is the local-work gate. It validates the structure of every vulnerability entry, traverses the complete `via` graph from the Sharp advisory, and compares the resulting six-package subgraph to the exact allowlist. It also checks the exact registry tarballs/integrities above. Malformed entries, an added Sharp-linked consumer, changed edges/nodes/ranges/sources, severity increase, provenance drift, or expiry fail closed. Direct advisory sources outside the Sharp-linked graph remain counted and visible; this exception does not exempt them or replace the normal audit policy.
+`npm run security:sharp:audit-exception` is the local-work gate. It validates the structure of every vulnerability entry, traverses the complete `via` graph from the Sharp advisory, and compares the resulting six-package subgraph to the exact allowlist. Every exact `effects` reverse-edge set is also checked, and each `A via B` edge must have exactly one reciprocal `B effects A` edge (and vice versa). It also checks the exact registry tarballs/integrities above. Malformed, missing, duplicate, added, non-reciprocal, or wrong-target graph edges; an added Sharp-linked consumer; changed nodes/ranges/sources; severity increase; provenance drift; or expiry fail closed. Direct advisory sources outside the Sharp-linked graph remain counted and visible; this exception does not exempt them or replace the normal audit policy.
 
 `npm run security:sharp:deployment-gate -- preview` and `-- production` bind authorization to `npm run cf:build` and `npm run cf:build:production`, respectively. The gate does not trust declared status or `matches`. It independently walks the current `.open-next` tree, discovers and parses every actual `metafile*.json` / `*.meta.json` esbuild metafile, and checks input paths/imports plus output paths/imports/inputs. It separately scans runtime filenames and bytes for `sharp`, `libvips`, and `@img`.
 
@@ -69,6 +69,14 @@ The reachability classification is conservative:
 - Matches confined to recognized tooling-only `.map`, `.txt`, `.md`, or `.log` files are reported but are not runtime evidence when all metafiles are structurally clean.
 - A missing/malformed metafile, an unclassified artifact match, unsupported filesystem entry, unrecognized metafile string, or scan error is `unproven` and fails.
 - Only a complete scan with no runtime match or uncertainty derives `proven-absent`.
+
+Tracked reachability metadata has an exact status-specific schema before scanning:
+
+- All statuses require an exact profile/command/environment, Node 22 runtime, the three search terms, and `matches` containing strings only.
+- `proven-absent` requires a completed build with fresh output/metafile hashes, an empty `matches` array, and no non-empty `proofGap`.
+- `proven-reachable` requires a completed build, at least one string match, and no non-empty `proofGap`; it always blocks.
+- `unproven` requires a non-empty `proofGap`, a failed or explicitly unattempted build, and null output/metafile paths; it always blocks.
+- Unknown statuses or any contradiction between these fields fail as malformed evidence. A clean independent scan cannot override contradictory tracked metadata.
 
 SHA-256 output/metafile checks remain an additional freshness binding; hashes never substitute for the independent scan. Contradictory caller-supplied `proven-absent` evidence fails whenever current bytes show a match. Preview, upload, deploy, scheduled Worker development, and both dry-run paths all execute matching build, gate, then action; a failed build or gate cannot reach Cloudflare execution.
 

@@ -54,31 +54,37 @@ const EXPECTED_AUDIT_CHAIN = {
     range: '>=3.9.13',
     nodes: ['node_modules/@opennextjs/aws'],
     via: ['next'],
+    effects: ['@opennextjs/cloudflare'],
   },
   '@opennextjs/cloudflare': {
     range: '0.3.0 - 0.6.6 || >=1.2.0',
     nodes: ['node_modules/@opennextjs/cloudflare'],
     via: ['@opennextjs/aws', 'next', 'wrangler'],
+    effects: [],
   },
   miniflare: {
     range: '<=0.0.0-fec45ed61 || >=4.20250508.3',
     nodes: ['node_modules/miniflare'],
     via: ['sharp'],
+    effects: ['wrangler'],
   },
   next: {
     range: '9.5.6-canary.0 - 10.0.7 || >=14.3.0-canary.0',
     nodes: ['node_modules/next'],
     via: ['sharp'],
+    effects: ['@opennextjs/aws', '@opennextjs/cloudflare'],
   },
   sharp: {
     range: '<0.35.0',
     nodes: ['node_modules/sharp'],
     via: [],
+    effects: ['miniflare', 'next'],
   },
   wrangler: {
     range: '<=0.0.0-7ae5dd357 || >=4.16.0',
     nodes: ['node_modules/wrangler'],
     via: ['miniflare'],
+    effects: ['@opennextjs/cloudflare'],
   },
 };
 
@@ -336,6 +342,9 @@ function validateAudit(label, audit, errors) {
     if (!sameStringSet(viaPackages, expected.via)) {
       errors.push(`${label} audit dependency path drifted for ${packageName}.`);
     }
+    if (!sameStringSet(vulnerability.effects, expected.effects)) {
+      errors.push(`${label} audit effects edges drifted for ${packageName}.`);
+    }
     for (const entry of viaObjects) {
       linkedSources.push(entry.source);
       if (
@@ -357,6 +366,37 @@ function validateAudit(label, audit, errors) {
     errors.push(
       `${label} audit Sharp advisory source IDs differ from sole source ${EXPECTED_ADVISORY.source}.`,
     );
+  }
+
+  for (const packageName of linked) {
+    const vulnerability = audit.vulnerabilities[packageName];
+    if (!isRecord(vulnerability) || !Array.isArray(vulnerability.via)) continue;
+    for (const dependencyName of vulnerability.via.filter((entry) => typeof entry === 'string')) {
+      const dependency = audit.vulnerabilities[dependencyName];
+      if (
+        !linked.has(dependencyName) ||
+        !isRecord(dependency) ||
+        !Array.isArray(dependency.effects) ||
+        dependency.effects.filter((effect) => effect === packageName).length !== 1
+      ) {
+        errors.push(
+          `${label} audit via edge ${packageName} -> ${dependencyName} lacks one reciprocal effects edge.`,
+        );
+      }
+    }
+    for (const effectedName of Array.isArray(vulnerability.effects) ? vulnerability.effects : []) {
+      const effected = audit.vulnerabilities[effectedName];
+      if (
+        !linked.has(effectedName) ||
+        !isRecord(effected) ||
+        !Array.isArray(effected.via) ||
+        effected.via.filter((via) => via === packageName).length !== 1
+      ) {
+        errors.push(
+          `${label} audit effects edge ${packageName} -> ${effectedName} lacks one reciprocal via edge.`,
+        );
+      }
+    }
   }
 
   const unrelatedAdvisorySources = [];
@@ -443,27 +483,59 @@ function validateReachabilityEvidence(profile, reachability, errors) {
     reachability.build.environment !== expectedProfile.environment ||
     reachability.build.command !== expectedProfile.command ||
     !sameStringSet(reachability.searchedTerms, ['sharp', 'libvips', '@img']) ||
-    !Array.isArray(reachability.matches)
+    !Array.isArray(reachability.matches) ||
+    reachability.matches.some((match) => typeof match !== 'string') ||
+    !['unproven', 'proven-reachable', 'proven-absent'].includes(
+      reachability.sharpWorkerReachability,
+    )
   ) {
     errors.push(`Sharp Worker reachability evidence is missing or malformed for ${profile}.`);
     return;
   }
 
   const status = reachability.sharpWorkerReachability;
-  if (status !== 'proven-absent') {
+  const proofGapIsEmpty =
+    reachability.proofGap === undefined ||
+    reachability.proofGap === null ||
+    reachability.proofGap === '';
+  const hasCompletedBuild =
+    reachability.build.exitCode === 0 &&
+    reachability.build.outputDirectory === '.open-next' &&
+    typeof reachability.build.metafile === 'string' &&
+    /^[a-f0-9]{64}$/.test(reachability.build.outputSha256) &&
+    /^[a-f0-9]{64}$/.test(reachability.build.metafileSha256);
+
+  if (status === 'unproven') {
+    if (
+      typeof reachability.proofGap !== 'string' ||
+      reachability.proofGap.length === 0 ||
+      !(
+        reachability.build.exitCode === null ||
+        (Number.isInteger(reachability.build.exitCode) && reachability.build.exitCode !== 0)
+      ) ||
+      reachability.build.outputDirectory !== null ||
+      reachability.build.metafile !== null
+    ) {
+      errors.push(`Unproven Sharp reachability metadata is malformed for ${profile}.`);
+    }
+    errors.push(`Sharp Worker reachability for ${profile} is unproven; deployment is blocked.`);
+    return;
+  }
+
+  if (!hasCompletedBuild || !proofGapIsEmpty) {
+    errors.push(`Completed-build Sharp reachability evidence is malformed for ${profile}.`);
+  }
+  if (status === 'proven-reachable') {
+    if (reachability.matches.length === 0) {
+      errors.push(`Proven-reachable Sharp evidence requires non-empty matches for ${profile}.`);
+    }
     errors.push(
-      `Sharp Worker reachability for ${profile} is ${(status ?? 'unknown').replaceAll('-', ' ')}; deployment is blocked.`,
+      `Sharp Worker reachability for ${profile} is proven reachable; deployment is blocked.`,
     );
     return;
   }
-  if (
-    reachability.build.exitCode !== 0 ||
-    reachability.build.outputDirectory !== '.open-next' ||
-    typeof reachability.build.metafile !== 'string' ||
-    !/^[a-f0-9]{64}$/.test(reachability.build.outputSha256) ||
-    !/^[a-f0-9]{64}$/.test(reachability.build.metafileSha256)
-  ) {
-    errors.push(`Completed-build Sharp reachability evidence is malformed for ${profile}.`);
+  if (reachability.matches.length !== 0) {
+    errors.push(`Proven-absent Sharp evidence requires empty matches for ${profile}.`);
   }
 }
 

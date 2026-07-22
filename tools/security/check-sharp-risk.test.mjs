@@ -293,7 +293,7 @@ test('deployment accepts only current proven-absent bundle evidence', async () =
     const outputDirectory = path.join(temporaryRoot, '.open-next');
     await fs.mkdir(outputDirectory);
     await fs.writeFile(path.join(outputDirectory, 'worker.js'), 'export default {};\n');
-    await fs.writeFile(path.join(outputDirectory, 'metafile.json'), '{"inputs":{}}\n');
+    await fs.writeFile(path.join(outputDirectory, 'metafile.json'), '{"inputs":{},"outputs":{}}\n');
 
     const evidence = reachability('proven-absent');
     Object.assign(
@@ -306,9 +306,16 @@ test('deployment accepts only current proven-absent bundle evidence', async () =
       reachability: evidence,
     });
     const currentArtifacts = await verifyRecordedBuildArtifacts(evidence, temporaryRoot);
+    const authorization = await authorizeDeployment({
+      ...inputs(),
+      profile: 'preview',
+      reachability: evidence,
+      repositoryRoot: temporaryRoot,
+    });
 
     assert.equal(result.ok, true, result.errors.join('\n'));
     assert.equal(currentArtifacts.ok, true, currentArtifacts.errors.join('\n'));
+    assert.equal(authorization.ok, true, authorization.errors.join('\n'));
 
     await fs.writeFile(path.join(outputDirectory, 'worker.js'), 'changed bundle\n');
     const staleArtifacts = await verifyRecordedBuildArtifacts(evidence, temporaryRoot);
@@ -401,6 +408,52 @@ test('rejects malformed and additional Sharp-linked audit paths', () => {
   assert.match(malformed.errors.join('\n'), /malformed|via/i);
   assert.equal(additional.ok, false);
   assert.match(additional.errors.join('\n'), /sharp-linked|unexpected|graph/i);
+});
+
+test('rejects missing, added, malformed, and non-reciprocal effects edges', () => {
+  const missing = audit();
+  missing.vulnerabilities.sharp.effects = ['miniflare'];
+  const added = audit();
+  added.vulnerabilities.sharp.effects.push('new-sharp-consumer');
+  const malformed = audit();
+  malformed.vulnerabilities.next.effects.push(null);
+  const nonReciprocal = audit();
+  nonReciprocal.vulnerabilities.wrangler.effects = ['next'];
+
+  for (const changedAudit of [missing, added, malformed, nonReciprocal]) {
+    const result = evaluateAuditException({ ...inputs(), fullAudit: changedAudit });
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join('\n'), /effects|reciprocal|graph|malformed/i);
+  }
+});
+
+test('rejects contradictory and malformed status-specific reachability metadata', () => {
+  const nonEmptyAbsent = reachability('proven-absent');
+  nonEmptyAbsent.matches = ['worker.mjs: sharp'];
+  const malformedAbsent = reachability('proven-absent');
+  malformedAbsent.matches = [null];
+  const proofGapAbsent = reachability('proven-absent');
+  proofGapAbsent.proofGap = 'Sharp might be reachable';
+  const malformedUnproven = reachability('unproven');
+  malformedUnproven.proofGap = null;
+  const malformedReachable = reachability('proven-reachable');
+  malformedReachable.matches = [];
+
+  for (const evidence of [
+    nonEmptyAbsent,
+    malformedAbsent,
+    proofGapAbsent,
+    malformedUnproven,
+    malformedReachable,
+  ]) {
+    const result = evaluateDeploymentGate({
+      ...inputs(),
+      profile: 'preview',
+      reachability: evidence,
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join('\n'), /matches|proof gap|malformed|contradict/i);
+  }
 });
 
 test('keeps well-formed unrelated advisory sources visible and non-exempt', () => {
