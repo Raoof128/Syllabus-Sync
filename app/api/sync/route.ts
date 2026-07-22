@@ -82,17 +82,17 @@ function sanitizePayload(
 // ============================================================================
 
 export async function POST(request: Request) {
+  const supabase = await createServerClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return jsonUnauthorized('Not authenticated');
+  }
+
   try {
-    const supabase = await createServerClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return jsonUnauthorized('Not authenticated');
-    }
-
     // SECURITY: Rate limit sync mutations
     const rateLimitResult = await mutationLimiter(`user:${user.id}:sync`);
     if (!rateLimitResult.allowed) {

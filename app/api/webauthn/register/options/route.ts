@@ -31,17 +31,17 @@ const optionsSchema = z.object({
  * Requires authentication.
  */
 export async function POST(request: NextRequest) {
+  const supabase = await createServerClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return jsonUnauthorized('Authentication required');
+  }
+
   try {
-    const supabase = await createServerClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return jsonUnauthorized('Authentication required');
-    }
-
     const clientIP = getClientIP(request);
     const { allowed, resetIn } = await webauthnRegisterLimiter(clientIP);
 

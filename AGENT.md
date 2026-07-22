@@ -325,3 +325,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** API-auth analyzer/tests, notification PATCH alias/test, WebAuthn credentials and registration routes/tests, `AGENT.md`, `CHANGELOG.md`.
 - **Verification:** Node 22 analyzer tests passed (61/61); six-file Task 5 tests passed (98/98); route regressions passed (19/19); all 47 protected methods across 26 routes remain covered. Main/Worker typechecks, lint, formatting, 818-file secret scan, 19 Sharp tests, and the audit exception passed. Runtime compatibility still reports only the same three DNS/Node-crypto blockers.
 - **Follow-ups:** Resolve the recorded runtime blockers in later migration tasks. No preview, dry-run, upload, deploy, or production cutover was run.
+
+### 2026-07-22 (Australia/Sydney) — Mutable Callable and Exception-Path Closure
+
+**Raouf:**
+
+- **Scope:** Closed the remaining Task 5 mutable-callable and try/catch/finally analyzer findings with strict rejection rules.
+- **Summary:** Function/arrow variables are analyzable only when declared `const`; function declarations, const callables, and immutable aliases are discarded from trust if a complete module scan finds assignment, compound assignment, update, destructuring/property write, loop write, or rebinding to the symbol. Direct session evidence inside `try` is rejected entirely. The sync POST plus four protected WebAuthn credential/registration methods now perform their unchanged server-client/getUser/denial sequence before entering `try`; limiter and protected work remain inside existing error handling. New sync and WebAuthn regressions prove unauthenticated requests stop before limiter work.
+- **Files Changed:** API-auth analyzer/tests, sync and WebAuthn routes/tests, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Node 22 analyzer tests passed (75/75); six-file Task 5 tests passed (112/112); route behavior tests passed (20/20); all 47 protected methods across 26 routes remain covered. Main/Worker typechecks, lint, formatting, 818-file secret scan, 19 Sharp tests, and the audit exception passed. Runtime compatibility still reports only the same three DNS/Node-crypto blockers.
+- **Follow-ups:** Resolve the recorded runtime blockers in later migration tasks. No preview, dry-run, upload, deploy, or production cutover was run.

@@ -110,6 +110,39 @@ function collectBindingNames(name: ts.BindingName): string[] {
   );
 }
 
+function writtenBindingIdentifiers(target: ts.Node): ts.Identifier[] {
+  if (ts.isIdentifier(target)) return [target];
+  if (
+    ts.isParenthesizedExpression(target) ||
+    ts.isAsExpression(target) ||
+    ts.isTypeAssertionExpression(target) ||
+    ts.isNonNullExpression(target)
+  ) {
+    return writtenBindingIdentifiers(target.expression);
+  }
+  if (ts.isPropertyAccessExpression(target) || ts.isElementAccessExpression(target)) {
+    return writtenBindingIdentifiers(target.expression);
+  }
+  if (ts.isArrayLiteralExpression(target)) {
+    return target.elements.flatMap((element) =>
+      ts.isOmittedExpression(element) ? [] : writtenBindingIdentifiers(element),
+    );
+  }
+  if (ts.isObjectLiteralExpression(target)) {
+    return target.properties.flatMap((property) => {
+      if (ts.isShorthandPropertyAssignment(property)) return [property.name];
+      if (ts.isPropertyAssignment(property)) return writtenBindingIdentifiers(property.initializer);
+      if (ts.isSpreadAssignment(property)) return writtenBindingIdentifiers(property.expression);
+      return [];
+    });
+  }
+  return [];
+}
+
+function isAssignmentOperator(kind: ts.SyntaxKind): boolean {
+  return kind >= ts.SyntaxKind.FirstAssignment && kind <= ts.SyntaxKind.LastAssignment;
+}
+
 function returnExpressions(node: ts.FunctionLikeDeclaration): ts.Expression[] {
   if (!node.body) return [];
   if (!ts.isBlock(node.body)) return [node.body];
@@ -243,7 +276,7 @@ export class ApiAuthAnalyzer {
         const isConst = (statement.declarationList.flags & ts.NodeFlags.Const) !== 0;
         for (const declaration of statement.declarationList.declarations) {
           if (!ts.isIdentifier(declaration.name) || !declaration.initializer) continue;
-          if (isFunctionLikeExpression(declaration.initializer)) {
+          if (isConst && isFunctionLikeExpression(declaration.initializer)) {
             info.callables.set(declaration.name.text, declaration.initializer);
           } else if (isConst && ts.isIdentifier(declaration.initializer)) {
             info.aliases.set(declaration.name.text, declaration.initializer.text);
@@ -281,6 +314,37 @@ export class ApiAuthAnalyzer {
           });
         }
       }
+    }
+
+    const writtenBindings = new Set<string>();
+    const recordWrites = (target: ts.Node) => {
+      for (const identifier of writtenBindingIdentifiers(target)) {
+        if (!this.identifierHasLocalShadow(identifier, identifier.text)) {
+          writtenBindings.add(identifier.text);
+        }
+      }
+    };
+    const visitWrites = (node: ts.Node) => {
+      if (ts.isBinaryExpression(node) && isAssignmentOperator(node.operatorToken.kind)) {
+        recordWrites(node.left);
+      } else if (
+        (ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) &&
+        (node.operator === ts.SyntaxKind.PlusPlusToken ||
+          node.operator === ts.SyntaxKind.MinusMinusToken)
+      ) {
+        recordWrites(node.operand);
+      } else if (
+        (ts.isForInStatement(node) || ts.isForOfStatement(node)) &&
+        !ts.isVariableDeclarationList(node.initializer)
+      ) {
+        recordWrites(node.initializer);
+      }
+      ts.forEachChild(node, visitWrites);
+    };
+    visitWrites(sourceFile);
+    for (const name of writtenBindings) {
+      info.callables.delete(name);
+      info.aliases.delete(name);
     }
 
     return info;
@@ -600,15 +664,9 @@ export class ApiAuthAnalyzer {
     return deniesError && deniesMissingUser;
   }
 
-  private blockHasTrustedSessionGuard(
-    block: ts.Block,
-    filePath: string,
-    callable: ts.FunctionLikeDeclaration,
-  ): boolean {
+  private blockHasTrustedSessionGuard(block: ts.Block, filePath: string): boolean {
     const statements = [...block.statements];
-    if (statements[0] && ts.isTryStatement(statements[0])) {
-      return this.blockHasTrustedSessionGuard(statements[0].tryBlock, filePath, callable);
-    }
+    if (statements[0] && ts.isTryStatement(statements[0])) return false;
     if (statements.length < 3) return false;
 
     const clientName = this.trustedServerClientDeclaration(statements[0], filePath);
@@ -633,7 +691,7 @@ export class ApiAuthAnalyzer {
     const nextStack = new Set(stack).add(key);
     const body = resolved.node.body;
     if (body && ts.isBlock(body)) {
-      if (this.blockHasTrustedSessionGuard(body, resolved.filePath, resolved.node)) {
+      if (this.blockHasTrustedSessionGuard(body, resolved.filePath)) {
         return `${resolved.filePath}: trusted auth.getUser fail-closed guard`;
       }
       if (this.blockHasTrustedInlineSecretGuard(body, resolved.filePath, resolved.node)) {
@@ -687,7 +745,7 @@ export class ApiAuthAnalyzer {
         const body = callback.body;
         if (
           ts.isBlock(body) &&
-          (this.blockHasTrustedSessionGuard(body, filePath, callback) ||
+          (this.blockHasTrustedSessionGuard(body, filePath) ||
             this.blockHasTrustedInlineSecretGuard(body, filePath, callback))
         ) {
           return 'guarded';

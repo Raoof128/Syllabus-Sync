@@ -506,3 +506,17 @@ All notable changes to this project will be documented in this file.
 **Verification:** Node 22 analyzer tests passed (61/61), six-file Task 5 tests passed (98/98), and route regressions passed (19/19). All 47 protected methods remain green. Main and Worker typechecks, lint, formatting, secrets, 19 Sharp tests, and the audit exception passed; runtime blockers remain the same three DNS/Node-crypto findings.
 
 **Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Mutable Callable and Exception-Path Closure — 2026-07-22
+
+**Scope:** Closed the remaining Task 5 callable mutability and try-wrapped session-proof findings.
+
+**Summary:** Only `const` function/arrow variables may be analyzed, and a complete module scan invalidates function declarations, const callables, or aliases with assignment, compound, update, destructuring/property, loop, or rebinding writes. Try-wrapped session evidence is rejected outright. Sync POST and the four protected WebAuthn credential/registration methods now execute their exact session proof before `try`, while limiter and protected work retain their existing guarded error-handling paths. Route tests prove unauthenticated requests stop before limiter work.
+
+**Files Changed:** API-auth analyzer/tests, sync and WebAuthn routes/tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 analyzer tests passed (75/75), six-file Task 5 tests passed (112/112), and route behavior tests passed (20/20). All 47 protected methods remain green. Main and Worker typechecks, lint, formatting, secrets, 19 Sharp tests, and the audit exception passed; runtime blockers remain the same three DNS/Node-crypto findings.
+
+**Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.

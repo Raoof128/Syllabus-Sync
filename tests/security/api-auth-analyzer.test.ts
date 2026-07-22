@@ -318,6 +318,100 @@ describe('API auth AST analyzer adversarial coverage', () => {
 
   it.each([
     [
+      'a let handler reassigned after guarded initialization',
+      `
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        export let POST = (request: Request) =>
+          requireAuth(request, async () => Response.json({ protected: true }));
+        POST = async () => Response.json({ exposed: true });
+      `,
+    ],
+    [
+      'a var handler reassigned after guarded initialization',
+      `
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        export var POST = (request: Request) =>
+          requireAuth(request, async () => Response.json({ protected: true }));
+        POST = async () => Response.json({ exposed: true });
+      `,
+    ],
+    [
+      'a reassigned function declaration',
+      `
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        export function POST(request: Request) {
+          return requireAuth(request, async () => Response.json({ protected: true }));
+        }
+        POST = async () => Response.json({ exposed: true });
+      `,
+    ],
+    [
+      'a destructuring write to a function declaration',
+      `
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        export function POST(request: Request) {
+          return requireAuth(request, async () => Response.json({ protected: true }));
+        }
+        ({ POST } = unguardedHandlers);
+      `,
+    ],
+    [
+      'a compound write to a function declaration',
+      `
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        export function POST(request: Request) {
+          return requireAuth(request, async () => Response.json({ protected: true }));
+        }
+        POST ||= async () => Response.json({ exposed: true });
+      `,
+    ],
+    [
+      'mutation of a function behind an immutable export alias',
+      `
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        function guardedHandler(request: Request) {
+          return requireAuth(request, async () => Response.json({ protected: true }));
+        }
+        export const POST = guardedHandler;
+        guardedHandler = async () => Response.json({ exposed: true });
+      `,
+    ],
+  ])('rejects mutable callable identity from %s', (_label, routeSource) => {
+    expect(analyze(routeSource)).toEqual([
+      expect.objectContaining({ method: 'POST', covered: false }),
+    ]);
+  });
+
+  it.each(['let', 'var'])('rejects a reassigned %s secret predicate', (declarationKind) => {
+    expect(
+      analyze(`
+        import { jsonError } from '@/app/api/_lib/response';
+        ${declarationKind} isAuthorized = (request: Request): boolean => {
+          const secret = process.env.CRON_SECRET;
+          const authorization = request.headers.get('authorization');
+          return Boolean(secret && authorization === \`Bearer \${secret}\`);
+        };
+        isAuthorized = () => true;
+        export async function POST(request: Request) {
+          if (!isAuthorized(request)) return jsonError('Unauthorized', 401);
+          return Response.json({ protected: true });
+        }
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('accepts an immutable const HTTP handler', () => {
+    expect(
+      analyze(`
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        export const POST = (request: Request) =>
+          requireAuth(request, async () => Response.json({ protected: true }));
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: true })]);
+  });
+
+  it.each([
+    [
       'an untrusted server client',
       `
         import { jsonUnauthorized } from '@/app/api/_lib/response';
@@ -567,6 +661,53 @@ describe('API auth AST analyzer adversarial coverage', () => {
         }
       `),
     ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it.each([
+    ['a successful catch response', `catch { return Response.json({ exposed: true }); }`],
+    ['a fallthrough catch', `catch { const ignored = true; }`],
+    [
+      'a conditional catch',
+      `catch (error) {
+        if (error instanceof Error) return jsonUnauthorized('Failed');
+        return Response.json({ exposed: true });
+      }`,
+    ],
+    ['a side-effecting finally block', `finally { performProtectedWork(); }`],
+  ])('rejects try-wrapped direct-session evidence with %s', (_label, completion) => {
+    expect(
+      analyze(`
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST() {
+          try {
+            const supabase = await createServerClient();
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error || !user) return jsonUnauthorized('Authentication required');
+            return Response.json({ userId: user.id });
+          } ${completion}
+        }
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('accepts exact direct-session proof outside protected try work', () => {
+    expect(
+      analyze(`
+        import { jsonError, jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST() {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error || !user) return jsonUnauthorized('Authentication required');
+          try {
+            return Response.json({ userId: user.id });
+          } catch {
+            return jsonError('Protected work failed', 500);
+          }
+        }
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: true })]);
   });
 
   it.each([
