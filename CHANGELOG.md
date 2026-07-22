@@ -492,3 +492,17 @@ All notable changes to this project will be documented in this file.
 **Verification:** Node 22 Task 5 focused tests passed (80/80); all 47 protected exported methods across 26 protected routes remain green. Main and isolated Worker typechecks, lint, formatting, secrets, 19 Sharp tests, and the local audit exception passed. The runtime audit still reports only the three previously recorded DNS/Node-crypto blockers.
 
 **Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Auth Analyzer Final Fail-Closed Closure — 2026-07-22
+
+**Scope:** Closed the final Task 5 indirect-handler binding and direct-session dominance findings.
+
+**Summary:** Removed generic returned-helper call chasing and retained only exact immutable export aliases and fully resolved re-exports. Unresolved/non-exported symbols plus parameter, block, catch, and local shadows now fail closed. Direct session evidence must be the first three-statement sequence: immutable awaited project server-client creation, awaited/destructured `getUser`, then immediate exact 401/403 error-or-missing-user denial. Notification PATCH is now the exact authenticated PUT alias. The four protected WebAuthn credential and registration methods authenticate before IP/limiter work, with regressions proving unauthenticated requests do not touch limiter state.
+
+**Files Changed:** API-auth analyzer/tests, notification route/test, WebAuthn credential/registration routes/tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 analyzer tests passed (61/61), six-file Task 5 tests passed (98/98), and route regressions passed (19/19). All 47 protected methods remain green. Main and Worker typechecks, lint, formatting, secrets, 19 Sharp tests, and the audit exception passed; runtime blockers remain the same three DNS/Node-crypto findings.
+
+**Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.

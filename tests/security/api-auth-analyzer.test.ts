@@ -223,6 +223,101 @@ describe('API auth AST analyzer adversarial coverage', () => {
 
   it.each([
     [
+      'an imported guarded helper shadowed by a parameter',
+      `
+        import { guardedHandler } from './shared';
+        export async function POST(
+          request: Request,
+          guardedHandler = (_request: Request) => Response.json({ exposed: true }),
+        ) {
+          return guardedHandler(request);
+        }
+      `,
+    ],
+    [
+      'an imported guarded helper shadowed by a block binding',
+      `
+        import { guardedHandler } from './shared';
+        export async function POST(request: Request) {
+          const guardedHandler = (_request: Request) => Response.json({ exposed: true });
+          return guardedHandler(request);
+        }
+      `,
+    ],
+    [
+      'an imported guarded helper shadowed by a catch binding',
+      `
+        import { guardedHandler } from './shared';
+        export async function POST(request: Request) {
+          try {
+            throw new Error('fixture');
+          } catch (guardedHandler) {
+            return guardedHandler(request);
+          }
+        }
+      `,
+    ],
+    [
+      'a local guarded helper shadowed by a parameter',
+      `
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        function guardedHandler(request: Request) {
+          return requireAuth(request, async () => Response.json({ protected: true }));
+        }
+        export async function POST(
+          request: Request,
+          guardedHandler = (_request: Request) => Response.json({ exposed: true }),
+        ) {
+          return guardedHandler(request);
+        }
+      `,
+    ],
+  ])('rejects returned-helper evidence from %s', (_label, routeSource) => {
+    expect(
+      analyze(routeSource, {
+        [`${ROOT}/app/api/example/shared.ts`]: `
+          import { requireAuth } from '@/app/api/_lib/middleware';
+          export function guardedHandler(request: Request) {
+            return requireAuth(request, async () => Response.json({ protected: true }));
+          }
+        `,
+      }),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('rejects an unresolved external re-export despite a same-named local callable', () => {
+    expect(
+      analyze(`
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        function guardedHandler(request: Request) {
+          return requireAuth(request, async () => Response.json({ protected: true }));
+        }
+        export { guardedHandler as POST } from 'unresolved-auth-package';
+      `),
+    ).toEqual([]);
+  });
+
+  it('rejects an imported handler whose source symbol is not exported', () => {
+    expect(
+      analyze(
+        `
+          import { guardedHandler } from './not-exported';
+          export { guardedHandler as POST };
+        `,
+        {
+          [`${ROOT}/app/api/example/not-exported.ts`]: `
+            import { requireAuth } from '@/app/api/_lib/middleware';
+            function guardedHandler(request: Request) {
+              return requireAuth(request, async () => Response.json({ protected: true }));
+            }
+          `,
+        },
+      ),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it.each([
+    [
       'an untrusted server client',
       `
         import { jsonUnauthorized } from '@/app/api/_lib/response';
@@ -369,6 +464,108 @@ describe('API auth AST analyzer adversarial coverage', () => {
           export async function createServerClient() { return {} as never; }
         `,
       }),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it.each([
+    [
+      'a call before client creation',
+      `
+        performProtectedWork();
+        const supabase = await createServerClient();
+      `,
+    ],
+    [
+      'an awaited call before client creation',
+      `
+        await performProtectedWork();
+        const supabase = await createServerClient();
+      `,
+    ],
+    [
+      'an assignment before client creation',
+      `
+        let protectedState = false;
+        protectedState = true;
+        const supabase = await createServerClient();
+      `,
+    ],
+    [
+      'a constructor call before client creation',
+      `
+        new ProtectedOperation();
+        const supabase = await createServerClient();
+      `,
+    ],
+    [
+      'a tagged template before client creation',
+      `
+        audit\`protected operation\`;
+        const supabase = await createServerClient();
+      `,
+    ],
+    [
+      'an update before client creation',
+      `
+        let protectedCounter = 0;
+        protectedCounter++;
+        const supabase = await createServerClient();
+      `,
+    ],
+    [
+      'a return before client creation',
+      `
+        return Response.json({ exposed: true });
+        const supabase = await createServerClient();
+      `,
+    ],
+    [
+      'a throw before client creation',
+      `
+        throw new Error('before authentication');
+        const supabase = await createServerClient();
+      `,
+    ],
+    [
+      'a mutable client binding',
+      `
+        let supabase = await createServerClient();
+      `,
+    ],
+    [
+      'a reassigned client',
+      `
+        let supabase = await createServerClient();
+        supabase = await getAttackerClient();
+      `,
+    ],
+    [
+      'an aliased client receiver',
+      `
+        const supabase = await createServerClient();
+        const authClient = supabase;
+      `,
+    ],
+    [
+      'a mutated auth receiver',
+      `
+        const supabase = await createServerClient();
+        supabase.auth = attackerAuth;
+      `,
+    ],
+  ])('rejects direct-session evidence with %s', (_label, prelude) => {
+    const receiver = prelude.includes('authClient') ? 'authClient' : 'supabase';
+    expect(
+      analyze(`
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST() {
+          ${prelude}
+          const { data: { user }, error } = await ${receiver}.auth.getUser();
+          if (error || !user) return jsonUnauthorized('Authentication required');
+          return Response.json({ userId: user.id });
+        }
+      `),
     ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
   });
 

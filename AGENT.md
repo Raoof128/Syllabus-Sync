@@ -315,3 +315,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** `tests/security/api-auth-analyzer.ts`, `tests/security/api-auth-analyzer.test.ts`, `AGENT.md`, `CHANGELOG.md`.
 - **Verification:** Node 22 focused Task 5 tests passed (80/80), including all 47 methods across 26 protected routes. Main and Worker typechecks, lint, formatting, secret scan, 19 Sharp gate tests, and the audit exception passed. Runtime compatibility remains non-zero only for the same three DNS/Node-crypto blockers.
 - **Follow-ups:** Resolve the recorded runtime blockers in later migration tasks. No preview, dry-run, upload, deploy, or production cutover was run.
+
+### 2026-07-22 (Australia/Sydney) — Auth Analyzer Final Fail-Closed Closure
+
+**Raouf:**
+
+- **Scope:** Closed the final Task 5 indirect-handler and direct-session dominance findings with a smaller fail-closed analyzer model.
+- **Summary:** Removed arbitrary returned-helper traversal; exact immutable export aliases and resolvable re-exports are the only indirect handler forms. Unresolved/non-exported symbols and parameter, block, catch, or local shadows fail closed. Direct session proof is now limited to a first-operation sequence of immutable awaited project-client creation, awaited/destructured `getUser`, and an immediate exact 401/403 error-or-missing-user denial. Notification PATCH is an exact alias of its authenticated PUT handler. The four protected WebAuthn credential/registration methods now authenticate before deriving client IP or invoking limiters, so unauthenticated requests cannot touch limiter state; authenticated rate-limit behavior remains unchanged.
+- **Files Changed:** API-auth analyzer/tests, notification PATCH alias/test, WebAuthn credentials and registration routes/tests, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Node 22 analyzer tests passed (61/61); six-file Task 5 tests passed (98/98); route regressions passed (19/19); all 47 protected methods across 26 routes remain covered. Main/Worker typechecks, lint, formatting, 818-file secret scan, 19 Sharp tests, and the audit exception passed. Runtime compatibility still reports only the same three DNS/Node-crypto blockers.
+- **Follow-ups:** Resolve the recorded runtime blockers in later migration tasks. No preview, dry-run, upload, deploy, or production cutover was run.

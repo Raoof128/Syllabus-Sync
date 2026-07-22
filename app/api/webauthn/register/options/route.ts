@@ -31,17 +31,6 @@ const optionsSchema = z.object({
  * Requires authentication.
  */
 export async function POST(request: NextRequest) {
-  const clientIP = getClientIP(request);
-  const { allowed, resetIn } = await webauthnRegisterLimiter(clientIP);
-
-  if (!allowed) {
-    return jsonError(
-      `Too many registration attempts. Try again in ${Math.ceil(resetIn / 60)} minutes.`,
-      429,
-      ERROR_CODES.RATE_LIMITED,
-    );
-  }
-
   try {
     const supabase = await createServerClient();
     const {
@@ -51,6 +40,17 @@ export async function POST(request: NextRequest) {
 
     if (authError || !user) {
       return jsonUnauthorized('Authentication required');
+    }
+
+    const clientIP = getClientIP(request);
+    const { allowed, resetIn } = await webauthnRegisterLimiter(clientIP);
+
+    if (!allowed) {
+      return jsonError(
+        `Too many registration attempts. Try again in ${Math.ceil(resetIn / 60)} minutes.`,
+        429,
+        ERROR_CODES.RATE_LIMITED,
+      );
     }
 
     const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);

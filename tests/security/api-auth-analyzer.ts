@@ -19,6 +19,7 @@ export interface MethodCoverage {
 interface CallableTarget {
   filePath: string;
   symbolName: string;
+  mustBeExported?: boolean;
 }
 
 interface ImportTarget {
@@ -83,12 +84,6 @@ function unwrapExpression(expression: ts.Expression): ts.Expression {
     current = current.expression;
   }
   return current;
-}
-
-function calledIdentifier(expression: ts.Expression): string | null {
-  const unwrapped = unwrapExpression(expression);
-  if (ts.isIdentifier(unwrapped)) return unwrapped.text;
-  return null;
 }
 
 function containsNode(root: ts.Node, predicate: (node: ts.Node) => boolean): boolean {
@@ -245,11 +240,12 @@ export class ApiAuthAnalyzer {
 
       if (ts.isVariableStatement(statement)) {
         const isExported = hasModifier(statement, ts.SyntaxKind.ExportKeyword);
+        const isConst = (statement.declarationList.flags & ts.NodeFlags.Const) !== 0;
         for (const declaration of statement.declarationList.declarations) {
           if (!ts.isIdentifier(declaration.name) || !declaration.initializer) continue;
           if (isFunctionLikeExpression(declaration.initializer)) {
             info.callables.set(declaration.name.text, declaration.initializer);
-          } else if (ts.isIdentifier(declaration.initializer)) {
+          } else if (isConst && ts.isIdentifier(declaration.initializer)) {
             info.aliases.set(declaration.name.text, declaration.initializer.text);
           }
           if (isExported) {
@@ -267,16 +263,21 @@ export class ApiAuthAnalyzer {
         statement.exportClause &&
         ts.isNamedExports(statement.exportClause)
       ) {
+        const hasModuleSpecifier = Boolean(statement.moduleSpecifier);
         const reexportFile =
           statement.moduleSpecifier && ts.isStringLiteral(statement.moduleSpecifier)
             ? this.loader.resolve(filePath, statement.moduleSpecifier.text)
             : null;
+        // An unresolved external re-export has no declaration we can prove. Do not silently
+        // fall back to a same-named callable in the current module.
+        if (hasModuleSpecifier && !reexportFile) continue;
         for (const element of statement.exportClause.elements) {
           const exportedName = element.name.text;
           const sourceName = element.propertyName?.text ?? element.name.text;
           info.exports.set(exportedName, {
             filePath: reexportFile ?? filePath,
             symbolName: sourceName,
+            mustBeExported: hasModuleSpecifier,
           });
         }
       }
@@ -289,11 +290,16 @@ export class ApiAuthAnalyzer {
     target: CallableTarget,
     seen: Set<string>,
   ): { node: ts.FunctionLikeDeclaration; filePath: string } | null {
-    const key = `${target.filePath}#${target.symbolName}`;
+    const key = `${target.mustBeExported ? 'export:' : 'local:'}${target.filePath}#${target.symbolName}`;
     if (seen.has(key)) return null;
     seen.add(key);
 
     const module = this.moduleInfo(target.filePath);
+    if (target.mustBeExported) {
+      const exported = module.exports.get(target.symbolName);
+      if (!exported) return null;
+      return this.resolveTarget(exported, seen);
+    }
     const callable = module.callables.get(target.symbolName);
     if (callable) return { node: callable, filePath: target.filePath };
 
@@ -303,7 +309,11 @@ export class ApiAuthAnalyzer {
     const imported = module.imports.get(target.symbolName);
     if (imported?.filePath) {
       return this.resolveTarget(
-        { filePath: imported.filePath, symbolName: imported.symbolName },
+        {
+          filePath: imported.filePath,
+          symbolName: imported.symbolName,
+          mustBeExported: true,
+        },
         seen,
       );
     }
@@ -328,7 +338,9 @@ export class ApiAuthAnalyzer {
         ts.isArrowFunction(parent) ||
         ts.isMethodDeclaration(parent)
       ) {
-        if (parent.parameters.some((parameter) => collectBindingNames(parameter.name).includes(name))) {
+        if (
+          parent.parameters.some((parameter) => collectBindingNames(parameter.name).includes(name))
+        ) {
           return true;
         }
       }
@@ -365,18 +377,26 @@ export class ApiAuthAnalyzer {
 
   private resolveImportBinding(identifier: ts.Identifier, filePath: string): ImportTarget | null {
     if (this.identifierHasLocalShadow(identifier, identifier.text)) return null;
+    return this.moduleInfo(filePath).imports.get(identifier.text) ?? null;
+  }
+
+  private resolveCallableBinding(
+    identifier: ts.Identifier,
+    filePath: string,
+  ): CallableTarget | null {
+    if (this.identifierHasLocalShadow(identifier, identifier.text)) return null;
     const module = this.moduleInfo(filePath);
-    let name = identifier.text;
-    const seen = new Set<string>();
-    while (!seen.has(name)) {
-      seen.add(name);
-      const imported = module.imports.get(name);
-      if (imported) return imported;
-      const alias = module.aliases.get(name);
-      if (!alias) return null;
-      name = alias;
-    }
-    return null;
+    const callable = module.callables.has(identifier.text);
+    const imported = module.imports.get(identifier.text);
+    if (Number(callable) + Number(Boolean(imported)) !== 1) return null;
+    if (callable) return { filePath, symbolName: identifier.text };
+    return imported?.filePath
+      ? {
+          filePath: imported.filePath,
+          symbolName: imported.symbolName,
+          mustBeExported: true,
+        }
+      : null;
   }
 
   private identifierIsTrustedImport(
@@ -439,18 +459,14 @@ export class ApiAuthAnalyzer {
             unwrapped.arguments[1] &&
             ts.isNumericLiteral(unwrapExpression(unwrapped.arguments[1]))
           ) {
-            status = Number(
-              (unwrapExpression(unwrapped.arguments[1]) as ts.NumericLiteral).text,
-            );
+            status = Number((unwrapExpression(unwrapped.arguments[1]) as ts.NumericLiteral).text);
           }
         }
       } else if (
         ts.isPropertyAccessExpression(callee) &&
         callee.name.text === 'json' &&
         ts.isIdentifier(callee.expression) &&
-        this.identifierIsTrustedImport(callee.expression, filePath, 'next/server', [
-          'NextResponse',
-        ])
+        this.identifierIsTrustedImport(callee.expression, filePath, 'next/server', ['NextResponse'])
       ) {
         status = numericStatusFromOptions(unwrapped.arguments[1]);
       }
@@ -475,7 +491,7 @@ export class ApiAuthAnalyzer {
     if (ts.isReturnStatement(statement)) {
       return Boolean(
         statement.expression &&
-          this.isTrustedDenialExpression(statement.expression, filePath, authOnly),
+        this.isTrustedDenialExpression(statement.expression, filePath, authOnly),
       );
     }
     if (ts.isBlock(statement)) {
@@ -489,47 +505,42 @@ export class ApiAuthAnalyzer {
     return false;
   }
 
-  private statementHasUncoveredReturn(statement: ts.Statement, filePath: string): boolean {
-    return containsNode(statement, (node) =>
-      ts.isReturnStatement(node)
-        ? !node.expression || !this.isTrustedDenialExpression(node.expression, filePath, false)
-        : false,
-    );
-  }
-
-  private hasTrustedServerClientDeclaration(
-    authStatement: ts.Statement,
-    clientName: string,
-    filePath: string,
-  ): boolean {
-    if (!ts.isBlock(authStatement.parent)) return false;
-    const statements = [...authStatement.parent.statements];
-    const statementIndex = statements.indexOf(authStatement);
-    if (statementIndex < 0) return false;
-
-    for (let index = statementIndex - 1; index >= 0; index -= 1) {
-      const statement = statements[index];
-      if (!ts.isVariableStatement(statement)) continue;
-      for (const declaration of statement.declarationList.declarations) {
-        if (!ts.isIdentifier(declaration.name) || declaration.name.text !== clientName) continue;
-        if (!declaration.initializer) return false;
-        const initializer = unwrapExpression(declaration.initializer);
-        return (
-          ts.isCallExpression(initializer) &&
-          this.callIsTrustedImport(initializer, filePath, '@/lib/supabase/server', [
-            'createServerClient',
-          ])
-        );
-      }
+  private trustedServerClientDeclaration(statement: ts.Statement, filePath: string): string | null {
+    if (
+      !ts.isVariableStatement(statement) ||
+      (statement.declarationList.flags & ts.NodeFlags.Const) === 0 ||
+      statement.declarationList.declarations.length !== 1
+    ) {
+      return null;
     }
-    return false;
+    const declaration = statement.declarationList.declarations[0];
+    if (!ts.isIdentifier(declaration.name) || !declaration.initializer) return null;
+
+    let initializer = declaration.initializer;
+    while (ts.isParenthesizedExpression(initializer)) initializer = initializer.expression;
+    if (!ts.isAwaitExpression(initializer)) return null;
+    const call = unwrapExpression(initializer.expression);
+    if (
+      !ts.isCallExpression(call) ||
+      call.arguments.length !== 0 ||
+      !this.callIsTrustedImport(call, filePath, '@/lib/supabase/server', ['createServerClient'])
+    ) {
+      return null;
+    }
+    return declaration.name.text;
   }
 
   private authResultDeclaration(
     statement: ts.Statement,
-    filePath: string,
+    clientName: string,
   ): { userName: string; errorName: string } | null {
-    if (!ts.isVariableStatement(statement)) return null;
+    if (
+      !ts.isVariableStatement(statement) ||
+      (statement.declarationList.flags & ts.NodeFlags.Const) === 0 ||
+      statement.declarationList.declarations.length !== 1
+    ) {
+      return null;
+    }
     for (const declaration of statement.declarationList.declarations) {
       if (!ts.isObjectBindingPattern(declaration.name) || !declaration.initializer) continue;
       let initializer = declaration.initializer;
@@ -543,16 +554,9 @@ export class ApiAuthAnalyzer {
         callee.name.text !== 'getUser' ||
         !ts.isPropertyAccessExpression(callee.expression) ||
         callee.expression.name.text !== 'auth' ||
-        !ts.isIdentifier(callee.expression.expression)
-      ) {
-        continue;
-      }
-      if (
-        !this.hasTrustedServerClientDeclaration(
-          statement,
-          callee.expression.expression.text,
-          filePath,
-        )
+        !ts.isIdentifier(callee.expression.expression) ||
+        callee.expression.expression.text !== clientName ||
+        awaited.arguments.length !== 0
       ) {
         continue;
       }
@@ -572,7 +576,14 @@ export class ApiAuthAnalyzer {
     userName: string,
     errorName: string,
   ): boolean {
-    const terms = flattenOrExpression(expression);
+    const unwrapped = unwrapExpression(expression);
+    if (
+      !ts.isBinaryExpression(unwrapped) ||
+      unwrapped.operatorToken.kind !== ts.SyntaxKind.BarBarToken
+    ) {
+      return false;
+    }
+    const terms = [unwrapExpression(unwrapped.left), unwrapExpression(unwrapped.right)];
     const deniesError = terms.some((term) => {
       const unwrapped = unwrapExpression(term);
       return ts.isIdentifier(unwrapped) && unwrapped.text === errorName;
@@ -595,37 +606,22 @@ export class ApiAuthAnalyzer {
     callable: ts.FunctionLikeDeclaration,
   ): boolean {
     const statements = [...block.statements];
-    for (let index = 0; index < statements.length; index += 1) {
-      const statement = statements[index];
-      if (
-        ts.isTryStatement(statement) &&
-        !statements
-          .slice(0, index)
-          .some((prior) => this.statementHasUncoveredReturn(prior, filePath)) &&
-        this.blockHasTrustedSessionGuard(statement.tryBlock, filePath, callable)
-      ) {
-        return true;
-      }
-      const result = this.authResultDeclaration(statement, filePath);
-      if (!result) continue;
-      if (
-        statements
-          .slice(0, index)
-          .some((prior) => this.statementHasUncoveredReturn(prior, filePath))
-      ) {
-        continue;
-      }
-      const guard = statements[index + 1];
-      if (
-        guard &&
-        ts.isIfStatement(guard) &&
-        this.conditionDeniesAuthFailure(guard.expression, result.userName, result.errorName) &&
-        this.statementReturnsTrustedDenial(guard.thenStatement, filePath, true)
-      ) {
-        return true;
-      }
+    if (statements[0] && ts.isTryStatement(statements[0])) {
+      return this.blockHasTrustedSessionGuard(statements[0].tryBlock, filePath, callable);
     }
-    return false;
+    if (statements.length < 3) return false;
+
+    const clientName = this.trustedServerClientDeclaration(statements[0], filePath);
+    if (!clientName) return false;
+    const result = this.authResultDeclaration(statements[1], clientName);
+    if (!result) return false;
+    const guard = statements[2];
+    return Boolean(
+      ts.isIfStatement(guard) &&
+      !guard.elseStatement &&
+      this.conditionDeniesAuthFailure(guard.expression, result.userName, result.errorName) &&
+      this.statementReturnsTrustedDenial(guard.thenStatement, filePath, true),
+    );
   }
 
   private analyzeTarget(target: CallableTarget, stack: Set<string>): string | null {
@@ -709,14 +705,10 @@ export class ApiAuthAnalyzer {
       }
     }
 
-    const name = calledIdentifier(unwrapped.expression);
-    if (!name) return 'uncovered';
-    const module = this.moduleInfo(filePath);
-    const imported = module.imports.get(name);
-    const target = imported?.filePath
-      ? { filePath: imported.filePath, symbolName: imported.symbolName }
-      : { filePath, symbolName: name };
-    return this.analyzeTarget(target, stack) ? 'guarded' : 'uncovered';
+    // Do not infer authentication by chasing arbitrary returned helper names. Export aliases and
+    // re-exports are resolved from their exact declarations before this point; all other returned
+    // calls must carry trusted evidence directly.
+    return 'uncovered';
   }
 
   private secretBindingFromDeclaration(
@@ -727,16 +719,11 @@ export class ApiAuthAnalyzer {
     const initializer = unwrapExpression(declaration.initializer);
     if (
       !ts.isPropertyAccessExpression(initializer) ||
-      (initializer.name.text !== 'CRON_SECRET' &&
-        initializer.name.text !== 'ADMIN_SECRET_TOKEN') ||
+      (initializer.name.text !== 'CRON_SECRET' && initializer.name.text !== 'ADMIN_SECRET_TOKEN') ||
       !ts.isPropertyAccessExpression(initializer.expression) ||
       initializer.expression.name.text !== 'env' ||
       !ts.isIdentifier(initializer.expression.expression) ||
-      !this.identifierIsUnshadowedGlobal(
-        initializer.expression.expression,
-        filePath,
-        'process',
-      )
+      !this.identifierIsUnshadowedGlobal(initializer.expression.expression, filePath, 'process')
     ) {
       return null;
     }
@@ -869,10 +856,10 @@ export class ApiAuthAnalyzer {
       }
       return Boolean(
         secretName &&
-          credentialName &&
-          ts.isIfStatement(statement) &&
-          this.conditionDeniesInvalidSecret(statement.expression, secretName, credentialName) &&
-          this.statementReturnsTrustedDenial(statement.thenStatement, filePath, true),
+        credentialName &&
+        ts.isIfStatement(statement) &&
+        this.conditionDeniesInvalidSecret(statement.expression, secretName, credentialName) &&
+        this.statementReturnsTrustedDenial(statement.thenStatement, filePath, true),
       );
     }
     return false;
@@ -910,13 +897,8 @@ export class ApiAuthAnalyzer {
       ) {
         return false;
       }
-      const name = expression.text;
-      if (this.identifierHasLocalShadow(expression, name)) return false;
-      const module = this.moduleInfo(filePath);
-      const imported = module.imports.get(name);
-      const target = imported?.filePath
-        ? { filePath: imported.filePath, symbolName: imported.symbolName }
-        : { filePath, symbolName: name };
+      const target = this.resolveCallableBinding(expression, filePath);
+      if (!target) return false;
       if (this.isFailClosedSecretPredicate(target)) return true;
       return false;
     }
@@ -945,13 +927,13 @@ export class ApiAuthAnalyzer {
       if (!ts.isReturnStatement(statement) || !statement.expression) return false;
       return Boolean(
         secretName &&
-          credentialName &&
-          this.expressionAuthorizesSecret(
-            statement.expression,
-            secretName,
-            credentialName,
-            resolved.filePath,
-          ),
+        credentialName &&
+        this.expressionAuthorizesSecret(
+          statement.expression,
+          secretName,
+          credentialName,
+          resolved.filePath,
+        ),
       );
     }
     return false;

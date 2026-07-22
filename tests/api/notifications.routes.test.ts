@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DELETE as DELETE_COLLECTION, GET, POST } from '@/app/api/notifications/route';
-import { DELETE as DELETE_BY_ID, GET as GET_BY_ID } from '@/app/api/notifications/[id]/route';
+import {
+  DELETE as DELETE_BY_ID,
+  GET as GET_BY_ID,
+  PATCH as PATCH_BY_ID,
+  PUT as PUT_BY_ID,
+} from '@/app/api/notifications/[id]/route';
 import { PUT as MARK_ALL_READ } from '@/app/api/notifications/mark-all-read/route';
 
 const createServerClientMock = vi.fn();
@@ -91,6 +96,10 @@ function createSingleSelectChain(result: { data: unknown; error: { code?: string
 describe('notifications API routes', () => {
   beforeEach(() => {
     createServerClientMock.mockReset();
+  });
+
+  it('keeps PATCH as the exact authenticated PUT handler alias', () => {
+    expect(PATCH_BY_ID).toBe(PUT_BY_ID);
   });
 
   it('soft-deletes all notifications in collection DELETE', async () => {

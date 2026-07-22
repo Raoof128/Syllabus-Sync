@@ -137,9 +137,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 /**
  * PATCH /api/notifications/[id] - Partially update a notification (same as PUT)
  */
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  return PUT(request, { params });
-}
+export const PATCH = PUT;
 
 /**
  * DELETE /api/notifications/[id] - Delete a notification
