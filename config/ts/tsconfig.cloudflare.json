@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "lib": ["es2023"],
+    "strict": true,
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "types": []
+  },
+  "files": ["../../cloudflare-env.d.ts", "../../custom-worker.ts"]
+}

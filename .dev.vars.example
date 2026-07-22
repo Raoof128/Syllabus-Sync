@@ -1,0 +1,3 @@
+NEXTJS_ENV=development
+DEPLOYMENT_PLATFORM=cloudflare
+DEPLOYMENT_ENV=preview

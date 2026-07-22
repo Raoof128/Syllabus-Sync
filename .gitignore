@@ -73,6 +73,13 @@ artifacts/security/*
 
 # typescript
 *.tsbuildinfo
+
+# OpenNext / Cloudflare local and generated files
+.open-next/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/
 next-env.d.ts
 
 # IDE

@@ -34,6 +34,7 @@
     "analyze": "ANALYZE=true npm run build",
     "test:ci": "npm run test",
     "typecheck": "tsc -p config/ts/tsconfig.json --noEmit",
+    "typecheck:cloudflare": "tsc -p config/ts/tsconfig.cloudflare.json --noEmit",
     "check:secrets": "node tools/security/check-secrets.mjs",
     "security:sharp:audit-exception": "node tools/security/check-sharp-risk.mjs audit-exception",
     "security:sharp:deployment-gate": "node tools/security/check-sharp-risk.mjs deployment",

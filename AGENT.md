@@ -265,3 +265,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** `tools/security/check-sharp-risk.mjs`, `tools/security/check-sharp-risk.test.mjs`, `docs/security/sharp-cloudflare-risk-gate.md`, `AGENT.md`, `CHANGELOG.md`.
 - **Verification:** 19/19 focused Node 22 tests passed, including effects removal/addition/malformed/non-reciprocal cases, contradictory reachability metadata, and integrated clean authorization. Formatting, typecheck, secrets, and audit exception passed; preview and production remain blocked as `unproven`.
 - **Follow-ups:** No review finding remains open. Deployment still requires the missing OpenNext migration tasks and independently derived `proven-absent` evidence for the matching build profile.
+
+### 2026-07-22 (Australia/Sydney) — Cloudflare Worker Configuration Scaffolding
+
+**Raouf:**
+
+- **Scope:** Added the local configuration contracts required for the OpenNext/Cloudflare migration without activating a Worker or production schedules.
+- **Summary:** Added the Wrangler preview/production configuration, OpenNext default configuration, static asset cache headers, local environment template, generated binding declarations, and configuration tests. Isolated generated Workerd runtime declarations in a strict dedicated Cloudflare TypeScript project so they cannot alter the DOM/Next application type program. Preview and production crons remain empty; the planned `IMAGES` binding is configuration-only because Cloudflare Images enablement and billing acceptance have not been verified.
+- **Files Changed:** `wrangler.jsonc`, `open-next.config.ts`, `custom-worker.ts`, `cloudflare-env.d.ts`, `.dev.vars.example`, `public/_headers`, `.gitignore`, `config/ts/tsconfig.json`, `config/ts/tsconfig.cloudflare.json`, `package.json`, `tests/cloudflare/*`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Node 22 type generation, focused configuration tests, main and Cloudflare typechecks, formatting, and secret scan passed. Existing build→Sharp-gate→action scripts were preserved. No preview, dry-run, upload, deploy, or production cutover was run.
+- **Follow-ups:** Before any deployment, confirm Cloudflare Images is enabled for the target account and the owner accepts transformation billing; then independently derive the matching Sharp reachability evidence. Task 8 must replace the temporary 503 worker stub.

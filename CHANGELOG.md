@@ -422,3 +422,17 @@ All notable changes to this project will be documented in this file.
 **Verification:** Ran `npm run check:i18n` — all 35 locales validated successfully ✅.
 
 **Follow-ups:** None.
+
+---
+
+### Raouf: Cloudflare Worker Configuration Scaffolding — 2026-07-22
+
+**Scope:** Added local OpenNext and Cloudflare Worker configuration scaffolding only; no Worker deployment or cron activation occurred.
+
+**Summary:** Added preview and production Wrangler configuration, OpenNext default configuration, static cache-header policy, a tracked safe local-variable template, and reproducible generated Worker binding types. Added tests for custom-worker routing, compatibility flags, static assets, image binding, self-reference, empty cron triggers, and cache headers. Generated Workerd types are isolated from the Next DOM program in a separate strict TypeScript project, preserving both application and Worker type safety.
+
+**Files Changed:** `wrangler.jsonc`, `open-next.config.ts`, `custom-worker.ts`, `cloudflare-env.d.ts`, `.dev.vars.example`, `public/_headers`, `.gitignore`, `config/ts/tsconfig.json`, `config/ts/tsconfig.cloudflare.json`, `package.json`, `tests/cloudflare/*`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Node 22 `npm run cf:typegen`, focused Vitest configuration tests, `npm run typecheck`, `npm run typecheck:cloudflare`, focused Prettier check, and `npm run check:secrets` passed. Existing build→Sharp deployment-gate→action ordering remains unchanged.
+
+**Follow-ups:** Cloudflare Images enablement and transformation-billing acceptance are externally unverified, so `IMAGES` is planned configuration only and deployment remains blocked. Keep both cron lists empty until the separately reviewed Vercel-Cron cutover. Task 8 replaces the temporary 503 worker stub.
