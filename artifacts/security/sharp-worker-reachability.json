@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "assessedAt": "2026-07-22T16:15:37+10:00",
+  "runtime": "Node.js v22.23.1",
+  "build": {
+    "command": "npm run cf:build",
+    "exitCode": 1,
+    "outputDirectory": null,
+    "metafile": null,
+    "failure": "No `open-next.config.ts` file was found in the project root.",
+    "logSha256": "8495b8a209097ddd0aa5cead9d4d2365325097e5b831345b173cadd200ffe219"
+  },
+  "sharpWorkerReachability": "unproven",
+  "searchedTerms": ["sharp", "libvips", "@img"],
+  "matches": [],
+  "proofGap": "OpenNext build stopped before output because open-next.config.ts is absent; .open-next and an esbuild metafile were not generated."
+}

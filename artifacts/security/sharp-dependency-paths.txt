@@ -1,0 +1,32 @@
+sharp@0.34.5
+node_modules/sharp
+  sharp@"0.34.5" from miniflare@4.20260721.0
+  node_modules/miniflare
+    miniflare@"4.20260721.0" from wrangler@4.113.0
+    node_modules/wrangler
+      dev wrangler@"^4.113.0" from the root project
+      peer wrangler@"^4.86.0" from @opennextjs/cloudflare@1.20.2
+      node_modules/@opennextjs/cloudflare
+        @opennextjs/cloudflare@"^1.20.2" from the root project
+  optional sharp@"^0.34.5" from next@16.2.11
+  node_modules/next
+    next@"^16.2.11" from the root project
+    peer next@">=15.5.21 <16 || >=16.2.11" from @opennextjs/aws@4.1.0
+    node_modules/@opennextjs/aws
+      @opennextjs/aws@"4.1.0" from @opennextjs/cloudflare@1.20.2
+      node_modules/@opennextjs/cloudflare
+        @opennextjs/cloudflare@"^1.20.2" from the root project
+    peer next@">=15.5.21 <16 || >=16.2.11" from @opennextjs/cloudflare@1.20.2
+    node_modules/@opennextjs/cloudflare
+      @opennextjs/cloudflare@"^1.20.2" from the root project
+    peer next@"^13.2.0 || ^14.0 || ^15.0.0-rc.0 || ^16.0.0-0" from @sentry/nextjs@10.50.0
+    node_modules/@sentry/nextjs
+      @sentry/nextjs@"^10.40.0" from the root project
+
+--- npm ls sharp --all ---
+syllabus-sync@1.0.0 /Users/raoof.r12/Desktop/Raouf/MQ_Research/Syllabus-Sync-cloudflare-workers
+├─┬ next@16.2.11
+│ └── sharp@0.34.5
+└─┬ wrangler@4.113.0
+  └─┬ miniflare@4.20260721.0
+    └── sharp@0.34.5 deduped

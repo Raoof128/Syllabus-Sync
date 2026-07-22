@@ -235,3 +235,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Summary:** Applied the repository Prettier configuration mechanically to the 47 files reported by the baseline `format:check`; no application logic or Cloudflare migration code was changed.
 - **Verification:** `npm run check` passed.
 - **Follow-ups:** None.
+
+### 2026-07-22 (Australia/Sydney) — Cloudflare Sharp Advisory Risk Gate
+
+**Raouf:**
+
+- **Scope:** Added a deterministic, time-limited security exception for the exact upstream Sharp advisory observed during the Cloudflare Workers migration, while preserving a hard deployment block.
+- **Summary:** Tracked full and production npm audit evidence plus exact Sharp dependency paths; added a fail-closed Node gate and 11 deterministic negative/positive tests; separated the local migration audit exception from Worker reachability; and required valid `proven-absent` OpenNext bundle/metafile evidence before every Cloudflare preview, upload, or deploy command. No Sharp override, forced audit fix, or Next downgrade was introduced.
+- **Files Changed:** `artifacts/security/*`, `tools/security/check-sharp-risk.mjs`, `tools/security/check-sharp-risk.test.mjs`, `docs/security/sharp-cloudflare-risk-gate.md`, `docs/operations/deployment-checklist.md`, `.gitignore`, `package.json`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Node 22 focused gate tests, formatting, typecheck, secret scan, and local audit-exception gate passed. The deployment gate intentionally failed because Worker reachability remains `unproven` after OpenNext stopped before output on missing `open-next.config.ts`.
+- **Follow-ups:** Complete the remaining OpenNext migration, regenerate bundle/metafile reachability evidence, and re-evaluate compatible upstream releases no later than 2026-08-22 Australia/Sydney. Preview/public deployment and production cutover remain prohibited.

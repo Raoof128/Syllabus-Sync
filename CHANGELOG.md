@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Cloudflare Sharp Advisory Risk Gate — 2026-07-22
+
+**Scope:** Added a narrowly scoped upstream Sharp advisory exception for local Cloudflare migration work while retaining a fail-closed deployment gate.
+
+**Summary:** Captured tracked full/production npm audits and exact dependency paths for `GHSA-f88m-g3jw-g9cj` (source `1124066`, High, `sharp <0.35.0`); added deterministic audit and Worker-reachability validation with 11 cases; wired every Cloudflare preview/upload/deploy script through the deployment gate; documented the 2026-08-22 Australia/Sydney expiry and exact unblock conditions. No forced Sharp override, forced audit fix, or Next downgrade was made.
+
+**Verification:** Node 22 focused tests, formatting, typecheck, secret scan, and local audit-exception gate passed. The OpenNext build stopped before output because `open-next.config.ts` is not yet implemented, leaving reachability `unproven`; the deployment gate correctly failed and deployment remains prohibited.
+
+**Follow-ups:** Complete the OpenNext migration, inspect `.open-next` and its esbuild metafile, record `proven-absent` Worker evidence, and reassess compatible upstream releases before expiry.
+
+---
+
 ### Raouf: App-Icon Logo Rebrand — 2026-07-07
 
 **Scope:** Replaced the Macquarie University crest logo with the new Syllabus Sync app-icon image across the entire app.

@@ -87,6 +87,22 @@ npm run check
 
 If any check fails, fix the issue and re-run `npm run check` before continuing.
 
+### 3.1 Cloudflare Sharp hard stop
+
+Cloudflare preview, upload, deployment, and production cutover are blocked by the time-limited [Sharp advisory risk gate](../security/sharp-cloudflare-risk-gate.md). This is separate from the normal quality gate.
+
+```bash
+npm run security:sharp:audit-exception
+npm run security:sharp:deployment-gate
+```
+
+- [ ] The local audit-exception gate accepts only the recorded `GHSA-f88m-g3jw-g9cj` / source `1124066` evidence and has not expired.
+- [ ] A Node 22 OpenNext build completed, and its `.open-next` output plus esbuild metafile were inspected for `sharp`, `libvips`, and `@img`.
+- [ ] Worker reachability is recorded as `proven-absent`; `unproven` and `proven-reachable` are both deployment failures.
+- [ ] No forced Sharp override, `npm audit fix --force`, or Next.js downgrade was used.
+
+The current evidence is `unproven` because the OpenNext build is blocked before output by the not-yet-implemented `open-next.config.ts` migration task. Local migration source work may continue after the audit-exception gate passes, but **do not run or bypass any `cf:preview`, `cf:upload*`, or `cf:deploy*` command** until all four items above are satisfied.
+
 ---
 
 ## 4. Deploy to Production
