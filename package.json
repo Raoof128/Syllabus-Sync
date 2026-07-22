@@ -23,6 +23,7 @@
     "test:ci": "npm run test",
     "typecheck": "tsc -p config/ts/tsconfig.json --noEmit",
     "check:secrets": "node tools/security/check-secrets.mjs",
+    "check:cloudflare-runtime": "node tools/cloudflare/check-runtime-compat.mjs",
     "check": "npm run check:secrets && npm run format:check && npm run typecheck && npm run lint && npm run test && npm run build",
     "check:i18n": "node tools/i18n/check-translations.mjs",
     "export:flutter-map-assets": "node --experimental-strip-types tools/export_buildings.mjs",
