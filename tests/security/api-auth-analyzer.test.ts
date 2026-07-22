@@ -10,6 +10,8 @@ import {
 const ROOT = '/repo';
 const ROUTE = `${ROOT}/app/api/example/route.ts`;
 const AUTH_MIDDLEWARE = `${ROOT}/app/api/_lib/middleware.ts`;
+const RESPONSE_HELPERS = `${ROOT}/app/api/_lib/response.ts`;
+const SUPABASE_SERVER = `${ROOT}/lib/supabase/server.ts`;
 
 function loaderFor(files: Record<string, string>): SourceLoader {
   const sources = new Map(Object.entries(files));
@@ -40,6 +42,19 @@ function analyze(routeSource: string, extras: Record<string, string> = {}) {
         return handler('fixture-user');
       }
       export const requireAuthWithRateLimit = requireAuth;
+    `,
+    [RESPONSE_HELPERS]: `
+      export function jsonUnauthorized(message: string) {
+        return Response.json({ message }, { status: 401 });
+      }
+      export function jsonError(message: string, status: number) {
+        return Response.json({ message }, { status });
+      }
+    `,
+    [SUPABASE_SERVER]: `
+      export async function createServerClient() {
+        return {} as never;
+      }
     `,
     ...extras,
   });
@@ -162,6 +177,379 @@ describe('API auth AST analyzer adversarial coverage', () => {
     ]);
   });
 
+  it.each([
+    [
+      'a property call with an unused trusted auth import',
+      `
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        const fake = { requireAuth: (_request: Request, handler: () => Response) => handler() };
+        export async function POST(request: Request) {
+          return fake.requireAuth(request, () => Response.json({ exposed: true }));
+        }
+      `,
+    ],
+    [
+      'a similarly named import from the wrong module',
+      `
+        import { requireAuth } from './lookalike';
+        export async function POST(request: Request) {
+          return requireAuth(request, () => Response.json({ exposed: true }));
+        }
+      `,
+    ],
+    [
+      'a parameter shadowing a trusted auth import',
+      `
+        import { requireAuth } from '@/app/api/_lib/middleware';
+        export async function POST(
+          request: Request,
+          requireAuth = (_request: Request, handler: () => Response) => handler(),
+        ) {
+          return requireAuth(request, () => Response.json({ exposed: true }));
+        }
+      `,
+    ],
+  ])('rejects %s', (_label, routeSource) => {
+    expect(
+      analyze(routeSource, {
+        [`${ROOT}/app/api/example/lookalike.ts`]: `
+          export function requireAuth(_request: Request, handler: () => Response) {
+            return handler();
+          }
+        `,
+      }),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it.each([
+    [
+      'an untrusted server client',
+      `
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from './fake-supabase';
+        export async function POST() {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error || !user) return jsonUnauthorized('Authentication required');
+          return Response.json({ userId: user.id });
+        }
+      `,
+    ],
+    [
+      'a non-awaited auth result',
+      `
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST() {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = supabase.auth.getUser();
+          if (error || !user) return jsonUnauthorized('Authentication required');
+          return Response.json({ userId: user.id });
+        }
+      `,
+    ],
+    [
+      'only the auth error',
+      `
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST() {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error) return jsonUnauthorized('Authentication required');
+          return Response.json({ userId: user?.id });
+        }
+      `,
+    ],
+    [
+      'only an absent user',
+      `
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST() {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (!user) return jsonUnauthorized('Authentication required');
+          return Response.json({ userId: user.id, error });
+        }
+      `,
+    ],
+    [
+      'wrong error polarity',
+      `
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST() {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (!error || !user) return jsonUnauthorized('Authentication required');
+          return Response.json({ userId: user.id });
+        }
+      `,
+    ],
+    [
+      'a partial missing-user condition',
+      `
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST(request: Request) {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error || (!user && request.headers.has('x-flag'))) {
+            return jsonUnauthorized('Authentication required');
+          }
+          return Response.json({ userId: user?.id });
+        }
+      `,
+    ],
+    [
+      'side effects between auth and denial',
+      `
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST() {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          await recordProtectedActivity();
+          if (error || !user) return jsonUnauthorized('Authentication required');
+          return Response.json({ userId: user.id });
+        }
+      `,
+    ],
+    [
+      'success between auth and denial',
+      `
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST(request: Request) {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (request.headers.has('x-bypass')) return Response.json({ exposed: true });
+          if (error || !user) return jsonUnauthorized('Authentication required');
+          return Response.json({ userId: user.id });
+        }
+      `,
+    ],
+    [
+      'a locally shadowed denial helper',
+      `
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST(
+          _request: Request,
+          jsonUnauthorized = (_message: string) => Response.json({ exposed: true }),
+        ) {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error || !user) return jsonUnauthorized('Authentication required');
+          return Response.json({ userId: user.id });
+        }
+      `,
+    ],
+    [
+      'a locally shadowed NextResponse denial',
+      `
+        import { NextResponse } from 'next/server';
+        import { createServerClient } from '@/lib/supabase/server';
+        export async function POST(
+          _request: Request,
+          NextResponse = { json: (body: unknown) => Response.json(body) },
+        ) {
+          const supabase = await createServerClient();
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error || !user) return NextResponse.json({}, { status: 401 });
+          return Response.json({ userId: user.id });
+        }
+      `,
+    ],
+  ])('rejects session evidence from %s', (_label, routeSource) => {
+    expect(
+      analyze(routeSource, {
+        [`${ROOT}/app/api/example/fake-supabase.ts`]: `
+          export async function createServerClient() { return {} as never; }
+        `,
+      }),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it.each([
+    [
+      'a self-comparison',
+      `
+        const secret = process.env.CRON_SECRET;
+        const authorization = request.headers.get('authorization');
+        if (!secret || authorization !== authorization) return jsonError('Unauthorized', 401);
+      `,
+    ],
+    [
+      'a reversed deny-on-equality comparison',
+      `
+        const secret = process.env.CRON_SECRET;
+        const authorization = request.headers.get('authorization');
+        if (!secret || authorization === \`Bearer \${secret}\`) return jsonError('Unauthorized', 401);
+      `,
+    ],
+    [
+      'an unrelated request header',
+      `
+        const secret = process.env.CRON_SECRET;
+        const authorization = request.headers.get('x-api-key');
+        if (!secret || authorization !== \`Bearer \${secret}\`) return jsonError('Unauthorized', 401);
+      `,
+    ],
+    [
+      'two configured secret bindings',
+      `
+        const firstSecret = process.env.CRON_SECRET;
+        const secret = process.env.ADMIN_SECRET_TOKEN;
+        const authorization = request.headers.get('authorization');
+        if (!secret || authorization !== \`Bearer \${secret}\`) return jsonError('Unauthorized', 401);
+      `,
+    ],
+    [
+      'a credential-to-secret equality in the denial branch',
+      `
+        const secret = process.env.CRON_SECRET;
+        const authorization = request.headers.get('authorization');
+        if (!secret || authorization === \`Bearer \${secret}\`) return jsonError('Unauthorized', 403);
+      `,
+    ],
+    [
+      'reversed credential operands',
+      `
+        const secret = process.env.CRON_SECRET;
+        const authorization = request.headers.get('authorization');
+        if (!secret || \`Bearer \${secret}\` !== authorization) return jsonError('Unauthorized', 401);
+      `,
+    ],
+  ])('rejects secret evidence from %s', (_label, guardBody) => {
+    expect(
+      analyze(`
+        import { jsonError } from '@/app/api/_lib/response';
+        export async function POST(request: Request) {
+          ${guardBody}
+          return Response.json({ protected: true });
+        }
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('rejects a locally shadowed secret denial helper', () => {
+    expect(
+      analyze(`
+        import { jsonError } from '@/app/api/_lib/response';
+        export async function POST(
+          request: Request,
+          jsonError = (_message: string, _status: number) => Response.json({ exposed: true }),
+        ) {
+          const secret = process.env.CRON_SECRET;
+          const authorization = request.headers.get('authorization');
+          if (!secret || authorization !== \`Bearer \${secret}\`) {
+            return jsonError('Unauthorized', 401);
+          }
+          return Response.json({ protected: true });
+        }
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('rejects a locally shadowed process binding as a configured secret', () => {
+    expect(
+      analyze(`
+        import { jsonError } from '@/app/api/_lib/response';
+        export async function POST(
+          request: Request,
+          process = { env: { CRON_SECRET: 'attacker-controlled' } },
+        ) {
+          const secret = process.env.CRON_SECRET;
+          const authorization = request.headers.get('authorization');
+          if (!secret || authorization !== \`Bearer \${secret}\`) {
+            return jsonError('Unauthorized', 401);
+          }
+          return Response.json({ protected: true });
+        }
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('rejects protected work before an invoked secret predicate', () => {
+    expect(
+      analyze(`
+        import { jsonError } from '@/app/api/_lib/response';
+        function isAuthorized(request: Request): boolean {
+          const secret = process.env.CRON_SECRET;
+          const authorization = request.headers.get('authorization');
+          return Boolean(secret && authorization === \`Bearer \${secret}\`);
+        }
+        export async function POST(request: Request) {
+          const result = performProtectedWork();
+          if (!isAuthorized(request)) return jsonError('Unauthorized', 401);
+          return Response.json({ result });
+        }
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('rejects a shadowed Boolean in a secret predicate', () => {
+    expect(
+      analyze(`
+        import { jsonError } from '@/app/api/_lib/response';
+        function isAuthorized(
+          request: Request,
+          Boolean = (_value: unknown) => true,
+        ): boolean {
+          const secret = process.env.CRON_SECRET;
+          const authorization = request.headers.get('authorization');
+          return Boolean(secret && authorization === \`Bearer \${secret}\`);
+        }
+        export async function POST(request: Request) {
+          if (!isAuthorized(request)) return jsonError('Unauthorized', 401);
+          return Response.json({ protected: true });
+        }
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('rejects a locally shadowed non-auth wrapper', () => {
+    expect(
+      analyze(
+        `
+          import { withCSRFProtection } from '@/lib/security/csrf';
+          export async function POST(request: Request) {
+            const withCSRFProtection = (callback: () => Response) => () => callback();
+            return withCSRFProtection(() => Response.json({ exposed: true }))(request);
+          }
+        `,
+        {
+          [`${ROOT}/lib/security/csrf.ts`]: `
+            export function withCSRFProtection(callback: () => Response) { return callback; }
+          `,
+        },
+      ),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
+  it('rejects a similarly named non-auth wrapper from the wrong module', () => {
+    expect(
+      analyze(
+        `
+          import { requireAuth } from '@/app/api/_lib/middleware';
+          import { withCSRFProtection } from './csrf-lookalike';
+          export async function POST(request: Request) {
+            return withCSRFProtection(
+              () => requireAuth(request, async () => Response.json({ protected: true })),
+            )(request);
+          }
+        `,
+        {
+          [`${ROOT}/app/api/example/csrf-lookalike.ts`]: `
+            export function withCSRFProtection(callback: () => Response) { return callback; }
+          `,
+        },
+      ),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: false })]);
+  });
+
   it('follows only invoked aliased imports and direct re-exports', () => {
     const shared = `${ROOT}/app/api/example/shared.ts`;
     const extras = {
@@ -189,8 +577,10 @@ describe('API auth AST analyzer adversarial coverage', () => {
   it('accepts a reachable fail-closed session check', () => {
     expect(
       analyze(`
+        import { jsonUnauthorized } from '@/app/api/_lib/response';
+        import { createServerClient } from '@/lib/supabase/server';
         export async function POST() {
-          const supabase = await getClient();
+          const supabase = await createServerClient();
           const { data: { user }, error } = await supabase.auth.getUser();
           if (error || !user) return jsonUnauthorized('Authentication required');
           return Response.json({ userId: user.id });
@@ -202,6 +592,7 @@ describe('API auth AST analyzer adversarial coverage', () => {
   it('accepts an actual reachable fail-closed secret comparison', () => {
     expect(
       analyze(`
+        import { jsonError } from '@/app/api/_lib/response';
         export async function POST(request: Request) {
           const secret = process.env.CRON_SECRET;
           const authorization = request.headers.get('authorization');
@@ -217,6 +608,7 @@ describe('API auth AST analyzer adversarial coverage', () => {
   it('follows a directly invoked fail-closed secret predicate helper', () => {
     expect(
       analyze(`
+        import { jsonError } from '@/app/api/_lib/response';
         function isAuthorized(request: Request): boolean {
           const secret = process.env.CRON_SECRET;
           const authorization = request.headers.get('authorization');
@@ -225,6 +617,17 @@ describe('API auth AST analyzer adversarial coverage', () => {
         export async function POST(request: Request) {
           if (!isAuthorized(request)) return jsonError('Unauthorized', 401);
           return Response.json({ protected: true });
+        }
+      `),
+    ).toEqual([expect.objectContaining({ method: 'POST', covered: true })]);
+  });
+
+  it('accepts a symbol-resolved alias of the trusted auth import', () => {
+    expect(
+      analyze(`
+        import { requireAuth as enforceSession } from '@/app/api/_lib/middleware';
+        export async function POST(request: Request) {
+          return enforceSession(request, async () => Response.json({ protected: true }));
         }
       `),
     ).toEqual([expect.objectContaining({ method: 'POST', covered: true })]);

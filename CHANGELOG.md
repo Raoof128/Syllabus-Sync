@@ -478,3 +478,17 @@ All notable changes to this project will be documented in this file.
 **Verification:** Node 22 focused tests passed (54/54), including the Task 4 Worker contract. Main and isolated Worker typechecks, lint, formatting, secrets, 19 Sharp gate tests, and the local Sharp audit-exception gate passed. Runtime compatibility still reports only the expected DNS scanner and CSP/CSRF Node-crypto blockers.
 
 **Follow-ups:** Resolve those three runtime dependencies in later migration tasks. Deployment gates remain fail-closed and no Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Auth Analyzer Binding Review Closure — 2026-07-22
+
+**Scope:** Closed the remaining Task 5 analyzer identity, session-dominance, and secret-comparison findings.
+
+**Summary:** Auth wrappers and non-auth traversal are now accepted only through exact symbol-resolved imports. Direct session checks require the actual project Supabase server client, awaited destructuring, an immediate correctly polarized error-or-missing-user condition, and a trusted 401/403 denial. Scheduler/admin secret checks require one configured secret, the current request Authorization header, exact bearer comparison polarity, and denial before work. The adversarial analyzer suite expanded to 43 cases covering property calls, wrong modules, unused imports, shadows, partial session negations, early work/success, and self/reversed/unrelated/two-secret comparisons.
+
+**Files Changed:** API-auth analyzer and adversarial tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 Task 5 focused tests passed (80/80); all 47 protected exported methods across 26 protected routes remain green. Main and isolated Worker typechecks, lint, formatting, secrets, 19 Sharp tests, and the local audit exception passed. The runtime audit still reports only the three previously recorded DNS/Node-crypto blockers.
+
+**Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.

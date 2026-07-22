@@ -305,3 +305,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** `middleware.ts`, `lib/middleware.ts`, `app/api/admin/update-building-positions/route.ts`, `app/api/gamification/route.ts`, `tests/security/api-auth-analyzer.ts`, `tests/security/api-auth-analyzer.test.ts`, `tests/security/api-auth-coverage.test.ts`, `tests/api/middleware.matcher.test.ts`, `tests/api/protected-route-auth.test.ts`, `AGENT.md`, `CHANGELOG.md`.
 - **Verification:** Node 22 focused middleware, matcher, protected-route, per-method inventory, adversarial analyzer, and Worker-contract tests passed (54/54). Main and isolated Worker typechecks, lint, formatting, secret scan, 19 Sharp gate tests, and the local Sharp audit-exception gate passed. The runtime audit remains non-zero only for the same expected DNS lookup in `app/api/security/scan-headers/route.ts` and Node crypto imports in `lib/security/csp.ts` and `lib/security/csrf.ts`.
 - **Follow-ups:** Resolve the three recorded runtime dependencies in later migration tasks. No preview, upload, dry-run, deploy, production cutover, or Wrangler static bypass change occurred.
+
+### 2026-07-22 (Australia/Sydney) — Auth Analyzer Binding Review Closure
+
+**Raouf:**
+
+- **Scope:** Closed the remaining Task 5 analyzer false-positive findings without changing route, middleware, Worker, or deployment behavior.
+- **Summary:** Replaced name-based trust with exact import and lexical-binding resolution for auth wrappers, Supabase server clients, denial helpers, NextResponse, CSRF traversal, and global process/Boolean use. Session evidence now requires an awaited, destructured result from the project server client followed immediately by a correctly polarized error-or-missing-user 401/403 denial. Secret evidence now requires one configured CRON/ADMIN secret, the current request Authorization header, an exact bearer mismatch denial before work, and trusted 401/403 output. Forty-three analyzer tests cover property calls, unused and wrong-module imports, local shadows, malformed session checks, intervening work/success, and self/reversed/unrelated/two-secret comparisons.
+- **Files Changed:** `tests/security/api-auth-analyzer.ts`, `tests/security/api-auth-analyzer.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Node 22 focused Task 5 tests passed (80/80), including all 47 methods across 26 protected routes. Main and Worker typechecks, lint, formatting, secret scan, 19 Sharp gate tests, and the audit exception passed. Runtime compatibility remains non-zero only for the same three DNS/Node-crypto blockers.
+- **Follow-ups:** Resolve the recorded runtime blockers in later migration tasks. No preview, dry-run, upload, deploy, or production cutover was run.
