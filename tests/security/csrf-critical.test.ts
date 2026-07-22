@@ -7,6 +7,7 @@ import { describe, it, expect } from "vitest";
 import { NextRequest } from "next/server";
 import {
   generateCSRFToken,
+  validateCSRF,
   validateCSRFToken,
   validateOrigin,
 } from "@/lib/security/csrf";
@@ -157,6 +158,28 @@ describe("CSRF Protection", () => {
 
       const result = validateOrigin(mockRequest);
       expect(result.valid).toBe(true); // Same-host requests are allowed
+    });
+
+    it("trusts the normalized Cloudflare application origin in both validators", () => {
+      const previousAppUrl = process.env.NEXT_PUBLIC_APP_URL;
+      process.env.NEXT_PUBLIC_APP_URL = "https://www.syllabus-sync.app/account";
+
+      try {
+        const mockRequest = new MockRequest("POST", [
+          ["Origin", "https://www.syllabus-sync.app"],
+          ["Host", "worker-preview.example.workers.dev"],
+        ]) as any;
+
+        expect(validateOrigin(mockRequest).valid).toBe(true);
+        expect(validateCSRF(mockRequest).valid).toBe(true);
+      } finally {
+        if (previousAppUrl === undefined) {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete process.env.NEXT_PUBLIC_APP_URL;
+        } else {
+          process.env.NEXT_PUBLIC_APP_URL = previousAppUrl;
+        }
+      }
     });
   });
 

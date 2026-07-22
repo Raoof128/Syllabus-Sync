@@ -12,6 +12,7 @@ import { signupLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { createSignupSchema } from '@/lib/schemas/auth';
 import { logger } from '@/lib/logger';
+import { getConfiguredAppOrigin, isProductionDeployment } from '@/lib/platform/runtime';
 
 // ============================================================================
 // AUDIT LOGGING HELPER
@@ -48,10 +49,7 @@ const DEV_EMAILS = process.env.DEV_BYPASS_EMAILS
   ? process.env.DEV_BYPASS_EMAILS.split(',').map((e) => e.trim().toLowerCase())
   : [];
 
-// SECURITY: Stricter production detection
-const isRealProduction =
-  process.env.VERCEL_ENV === 'production' ||
-  (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+const isRealProduction = isProductionDeployment();
 const isDevelopment = process.env.NODE_ENV === 'development' && !isRealProduction;
 
 function isDevEmail(email: string): boolean {
@@ -192,7 +190,18 @@ export async function POST(request: NextRequest) {
     let createdUser: { id: string } | null = null;
     let createdSession: unknown | null = null;
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl =
+      getConfiguredAppOrigin() ??
+      (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+        ? 'http://localhost:3000'
+        : null);
+    if (!appUrl) {
+      return jsonError(
+        'Service temporarily unavailable. Please try again later.',
+        503,
+        ERROR_CODES.EXTERNAL_SERVICE_ERROR,
+      );
+    }
     const devAutoConfirm = isDevelopment && isDevEmail(email);
 
     if (devAutoConfirm && adminClient) {

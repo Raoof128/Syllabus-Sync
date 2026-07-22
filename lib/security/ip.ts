@@ -12,6 +12,11 @@
  */
 
 import { NextRequest } from "next/server";
+import {
+  getConfiguredAppOrigin,
+  getDeploymentPlatform,
+  isProductionDeployment,
+} from "@/lib/platform/runtime";
 
 // ============================================================================
 // IP VALIDATION
@@ -98,33 +103,26 @@ export function getClientIPFromHeaders(
   headers: HeaderAccessor,
   options: GetClientIPOptions = {},
 ): string {
-  // Prefer Vercel's env signal when available; NODE_ENV is "production" on Vercel previews too.
-  const isRealProduction =
-    process.env.VERCEL_ENV === "production" ||
-    (process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV);
-  const isVercelRuntime =
-    Boolean(process.env.VERCEL) || Boolean(process.env.VERCEL_ENV);
+  const production = isProductionDeployment();
+  const platform = getDeploymentPlatform();
   const { trustForwardedFor = false } = options;
 
   // In production, prefer verified proxy headers that cannot be spoofed
-  if (isRealProduction) {
-    // 1. Vercel's verified header (highest trust)
-    // This header is set by Vercel's edge network and cannot be spoofed
-    const vercelIp = extractFirstIP(headers.get("x-vercel-forwarded-for"));
-    if (vercelIp) return vercelIp;
+  if (production) {
+    if (platform === "cloudflare") {
+      const cloudflareIp = headers.get("cf-connecting-ip");
+      if (cloudflareIp && isValidIP(cloudflareIp)) return cloudflareIp;
+    }
 
-    // 2. Cloudflare's verified header
-    // Set by Cloudflare when used as a CDN/proxy
-    const cfIp = headers.get("cf-connecting-ip");
-    if (cfIp && isValidIP(cfIp)) return cfIp;
+    if (platform === "vercel") {
+      const vercelIp = extractFirstIP(headers.get("x-vercel-forwarded-for"));
+      if (vercelIp) return vercelIp;
+    }
 
-    // 3. Vercel commonly provides `x-real-ip` / `x-forwarded-for` on Node requests.
-    // Prefer `x-real-ip` (single value), then allow `x-forwarded-for` when we are on Vercel
-    // (Vercel sets/overwrites it at the edge) or when explicitly trusted.
     const realIp = headers.get("x-real-ip");
     if (realIp && isValidIP(realIp)) return realIp;
 
-    if (isVercelRuntime || trustForwardedFor) {
+    if (platform === "vercel" || trustForwardedFor) {
       const forwardedIp = extractFirstIP(headers.get("x-forwarded-for"));
       if (forwardedIp) return forwardedIp;
     }
@@ -205,12 +203,11 @@ export function isTrustedOrigin(request: NextRequest): boolean {
  * Check if a host matches our allowed hosts
  */
 function isSameHost(host: string): boolean {
+  const configuredOrigin = getConfiguredAppOrigin();
   const allowedHosts = [
     "localhost",
     "127.0.0.1",
-    process.env.NEXT_PUBLIC_APP_URL
-      ? new URL(process.env.NEXT_PUBLIC_APP_URL).host
-      : "syllabus-sync.vercel.app",
+    configuredOrigin ? new URL(configuredOrigin).host : "syllabus-sync.vercel.app",
   ];
 
   return allowedHosts.some(

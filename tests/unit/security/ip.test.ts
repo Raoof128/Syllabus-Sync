@@ -25,6 +25,34 @@ describe("getClientIPFromHeaders", () => {
     process.env = { ...originalEnv };
   });
 
+  it("prefers Cloudflare's verified IP and rejects caller forwarded headers", () => {
+    setEnv({
+      DEPLOYMENT_PLATFORM: "cloudflare",
+      DEPLOYMENT_ENV: "production",
+      VERCEL: "",
+      VERCEL_ENV: "",
+      NODE_ENV: "production",
+    });
+
+    const ip = getClientIPFromHeaders(
+      headersOf({
+        "cf-connecting-ip": "203.0.113.20",
+        "x-forwarded-for": "198.51.100.99",
+        "x-real-ip": "198.51.100.100",
+        "x-vercel-forwarded-for": "198.51.100.101",
+      }),
+    );
+    expect(ip).toBe("203.0.113.20");
+
+    expect(
+      getClientIPFromHeaders(
+        headersOf({
+          "x-forwarded-for": "198.51.100.99",
+        }),
+      ),
+    ).toBe("unknown");
+  });
+
   it("uses x-forwarded-for on vercel production runtime", () => {
     setEnv({ VERCEL: "1", VERCEL_ENV: "production", NODE_ENV: "production" });
 
@@ -34,6 +62,19 @@ describe("getClientIPFromHeaders", () => {
       }),
     );
     expect(ip).toBe("1.2.3.4");
+  });
+
+  it("prefers Vercel's verified header on the rollback runtime", () => {
+    setEnv({ VERCEL: "1", VERCEL_ENV: "production", NODE_ENV: "production" });
+
+    const ip = getClientIPFromHeaders(
+      headersOf({
+        "x-vercel-forwarded-for": "203.0.113.30, 203.0.113.31",
+        "x-real-ip": "198.51.100.100",
+        "x-forwarded-for": "198.51.100.99",
+      }),
+    );
+    expect(ip).toBe("203.0.113.30");
   });
 
   it("prefers x-real-ip when present in production", () => {

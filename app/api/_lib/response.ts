@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import { logger } from '@/lib/logger';
+import { isProductionDeployment } from '@/lib/platform/runtime';
 
 // ============================================================================
 // API RESPONSE HELPERS
@@ -147,11 +148,7 @@ export const handleDatabaseError = (error: unknown): NextResponse<ApiResponse<ne
   });
 
   // Don't expose internal database errors to clients
-  // SECURITY: Use VERCEL_ENV for reliable production detection
-  // This prevents error detail exposure even if NODE_ENV is misconfigured
-  const isRealProduction =
-    process.env.VERCEL_ENV === 'production' ||
-    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+  const isRealProduction = isProductionDeployment();
 
   return jsonError(
     'A database error occurred',

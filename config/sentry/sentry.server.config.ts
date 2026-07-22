@@ -2,12 +2,12 @@
 // The config you add here will be used whenever the server handles a request.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-export {};
+import { getDeploymentEnvironment, isProductionDeployment } from '@/lib/platform/runtime';
 
 // Only initialize Sentry if DSN is configured
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 const sentryEnabled =
-  Boolean(dsn) && (process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true');
+  Boolean(dsn) && (isProductionDeployment() || process.env.SENTRY_ENABLED === 'true');
 
 if (sentryEnabled) {
   void import('@sentry/nextjs')
@@ -16,7 +16,7 @@ if (sentryEnabled) {
         dsn,
 
         // Performance Monitoring
-        tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+        tracesSampleRate: isProductionDeployment() ? 0.1 : 1.0,
 
         // Set sampling rate for profiling - this is relative to tracesSampleRate
         profilesSampleRate: 0.1,
@@ -25,10 +25,10 @@ if (sentryEnabled) {
         debug: false,
 
         // Environment tagging
-        environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'development',
+        environment: getDeploymentEnvironment(),
 
         // Only send errors in production (unless explicitly enabled)
-        enabled: process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true',
+        enabled: isProductionDeployment() || process.env.SENTRY_ENABLED === 'true',
 
         // Filter out sensitive data
         beforeSend(event) {

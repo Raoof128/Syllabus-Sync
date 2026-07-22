@@ -11,6 +11,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import {
+  getConfiguredAppOrigin,
+  isProductionDeployment,
+} from "@/lib/platform/runtime";
 
 // ============================================================================
 // CONSTANTS
@@ -168,20 +172,9 @@ function getAllowedOrigins(): string[] {
     "http://127.0.0.1:3002",
   ];
 
-  const addUrl = (raw: string | undefined) => {
-    if (!raw) return;
-    try {
-      origins.push(new URL(raw).origin);
-    } catch { /* ignore invalid URL */ }
-  };
-
-  addUrl(process.env.NEXT_PUBLIC_APP_URL);
-
-  // Vercel injects three URL vars per deployment; all must be trusted
-  if (process.env.VERCEL_URL) origins.push(`https://${process.env.VERCEL_URL}`);
-  if (process.env.VERCEL_BRANCH_URL) origins.push(`https://${process.env.VERCEL_BRANCH_URL}`);
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    origins.push(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
+  const configuredOrigin = getConfiguredAppOrigin();
+  if (configuredOrigin && !origins.includes(configuredOrigin)) {
+    origins.push(configuredOrigin);
   }
 
   return origins;
@@ -213,9 +206,7 @@ export function withCSRFProtection<T>(
     // This provides defense-in-depth on top of Supabase's SameSite=Lax cookies
     // SECURITY FIX: CSRF can ONLY be disabled in development, never in production
     // This prevents attackers from disabling CSRF protection via environment variables
-    const isRealProduction =
-      process.env.VERCEL_ENV === "production" ||
-      (process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV);
+    const isRealProduction = isProductionDeployment();
 
     // NOTE: For Vitest integration tests, we allow disabling CSRF validation
     // in the test environment specifically.
@@ -268,13 +259,9 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 function getTrustedOrigins(): Set<string> {
   const origins = new Set<string>();
 
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    origins.add(process.env.NEXT_PUBLIC_SITE_URL);
-  }
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    try {
-      origins.add(new URL(process.env.NEXT_PUBLIC_APP_URL).origin);
-    } catch { /* ignore invalid URL */ }
+  const configuredOrigin = getConfiguredAppOrigin();
+  if (configuredOrigin) {
+    origins.add(configuredOrigin);
   }
 
   origins.add('https://maps.googleapis.com');
@@ -287,12 +274,6 @@ function getTrustedOrigins(): Set<string> {
       origins.add(new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin);
     } catch { /* ignore invalid URL */ }
   }
-  if (process.env.VERCEL_URL) origins.add(`https://${process.env.VERCEL_URL}`);
-  if (process.env.VERCEL_BRANCH_URL) origins.add(`https://${process.env.VERCEL_BRANCH_URL}`);
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    origins.add(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
-  }
-
   return origins;
 }
 

@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { isProductionDeployment } from '@/lib/platform/runtime';
 /**
  * Distributed Rate Limiting Service
  *
@@ -257,12 +258,9 @@ function getStore(): RateLimitStore {
     // fall through
   }
 
-  // SECURITY: In production, require Redis - don't fall back to memory store
+  // SECURITY: In production, require a distributed store - don't silently rely on memory.
   // Memory store is useless in serverless environments (each instance has its own memory)
-  // Use VERCEL_ENV for more reliable production detection
-  const isRealProduction =
-    process.env.VERCEL_ENV === 'production' ||
-    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+  const isRealProduction = isProductionDeployment();
 
   // SECURITY: Check for explicit override to allow memory store in production
   // This should only be used for testing/demo deployments
@@ -319,10 +317,7 @@ export async function checkRateLimit(
     ? `ratelimit:${config.prefix}:${identifier}`
     : `ratelimit:${identifier}`;
   const now = Date.now();
-  // SECURITY: Use VERCEL_ENV for reliable production detection
-  const isProduction =
-    process.env.VERCEL_ENV === 'production' ||
-    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+  const isProduction = isProductionDeployment();
   const isMemoryStore = store instanceof MemoryStore;
   const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
 

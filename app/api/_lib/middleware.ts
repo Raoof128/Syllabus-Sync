@@ -8,6 +8,7 @@ import {
 } from '@/lib/services/rateLimitService';
 import { validateOrigin, shouldSkipCSRF, validateCSRF } from '@/lib/security/csrf';
 import { logger } from '@/lib/logger';
+import { getClientIP } from '@/lib/security/ip';
 
 const MUTATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
 let lastTransientAuthLogAt = 0;
@@ -235,56 +236,6 @@ export const requireAuthWithRateLimit = async (
 // ============================================================================
 // RATE LIMITING MIDDLEWARE
 // ============================================================================
-
-/**
- * Validates IP address format to prevent injection
- */
-function isValidIP(ip: string): boolean {
-  // IPv4 pattern
-  const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-  // IPv6 pattern (simplified)
-  const ipv6Pattern = /^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}$/;
-
-  return ipv4Pattern.test(ip) || ipv6Pattern.test(ip);
-}
-
-/**
- * Extract client IP from request headers securely
- * SECURITY: Only trust verified proxy headers in production
- */
-function getClientIP(request: NextRequest): string {
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  // In production, prefer verified proxy headers that cannot be spoofed
-  if (isProduction) {
-    // Vercel's verified header (highest trust)
-    const vercelIp = request.headers.get('x-vercel-forwarded-for');
-    if (vercelIp) {
-      const firstIp = vercelIp.split(',')[0].trim();
-      if (firstIp && isValidIP(firstIp)) return firstIp;
-    }
-
-    // Cloudflare's verified header
-    const cfIp = request.headers.get('cf-connecting-ip');
-    if (cfIp && isValidIP(cfIp)) return cfIp;
-  }
-
-  // In development or as fallback, use standard headers
-  // SECURITY: Be careful with x-forwarded-for in production if not behind a trusted proxy
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    const firstIp = forwarded.split(',')[0].trim();
-    if (firstIp && isValidIP(firstIp)) return firstIp;
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp && isValidIP(realIp)) return realIp;
-
-  const clientIp = request.headers.get('x-client-ip');
-  if (clientIp && isValidIP(clientIp)) return clientIp;
-
-  return 'unknown';
-}
 
 /**
  * Apply rate limiting to API routes

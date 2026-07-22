@@ -14,6 +14,7 @@ import { emailKeyPrefix } from '@/lib/security/identifiers';
 import { checkSignInProvider, buildMismatchMessage } from '@/lib/auth/providerGuard';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { isProductionDeployment } from '@/lib/platform/runtime';
 
 const signinSchema = z.object({
   email: z.string().email(),
@@ -26,13 +27,7 @@ const DEV_EMAILS = process.env.DEV_BYPASS_EMAILS
   ? process.env.DEV_BYPASS_EMAILS.split(',').map((e) => e.trim().toLowerCase())
   : [];
 
-// SECURITY: Stricter production detection
-// - VERCEL_ENV is set by Vercel and cannot be spoofed
-// - NODE_ENV alone can be manipulated in local environments
-// This ensures dev features are NEVER enabled on Vercel production
-const isRealProduction =
-  process.env.VERCEL_ENV === 'production' ||
-  (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+const isRealProduction = isProductionDeployment();
 const isDevelopment = process.env.NODE_ENV === 'development' && !isRealProduction;
 
 function isDevEmail(email: string): boolean {

@@ -10,6 +10,7 @@
 
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
+import { getConfiguredAppOrigin } from '@/lib/platform/runtime';
 
 // ============================================================================
 // CONFIG
@@ -34,14 +35,15 @@ function isPlaceholder(value: string): boolean {
 }
 
 function getAppUrl(): string {
-  const explicit = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  if (explicit && !isPlaceholder(explicit)) return explicit.replace(/\/+$/, '');
+  const appOrigin =
+    getConfiguredAppOrigin() ??
+    (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : null);
 
-  // Vercel provides deployment URLs without protocol.
-  const vercelUrl = process.env.VERCEL_URL?.trim();
-  if (vercelUrl && !isPlaceholder(vercelUrl)) return `https://${vercelUrl.replace(/\/+$/, '')}`;
+  if (!appOrigin) {
+    throw new Error('Application origin is not configured');
+  }
 
-  return 'http://localhost:3000';
+  return appOrigin;
 }
 
 function getEmailConfig(): EmailServiceConfig {

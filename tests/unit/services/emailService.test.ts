@@ -88,6 +88,53 @@ describe('emailService (resend)', () => {
     expect(args.text).toContain('https://syllabus-sync.vercel.app/verify?token=');
   });
 
+  it('uses the configured Cloudflare application origin', async () => {
+    setEnv({
+      RESEND_API_KEY: 're_test_key_123',
+      VERIFICATION_EMAIL_FROM: 'onboarding@resend.dev',
+      VERIFICATION_EMAIL_NAME: 'Syllabus Sync',
+      DEPLOYMENT_PLATFORM: 'cloudflare',
+      DEPLOYMENT_ENV: 'production',
+      NEXT_PUBLIC_APP_URL: 'https://www.syllabus-sync.app/account',
+      VERCEL_URL: undefined,
+    });
+
+    const mod = await import('@/lib/services/emailService');
+    const res = await mod.sendVerificationEmail({
+      to: 'user@example.com',
+      token: 'c'.repeat(64),
+    });
+    expect(res.success).toBe(true);
+    const args = sendMock.mock.calls[0]?.[0] as { text: string };
+    expect(args.text).toContain('https://www.syllabus-sync.app/verify?token=');
+    expect(args.text).not.toContain('/account/verify');
+  });
+
+  it('fails closed when a production application origin is not configured', async () => {
+    setEnv({
+      RESEND_API_KEY: 're_test_key_123',
+      VERIFICATION_EMAIL_FROM: 'onboarding@resend.dev',
+      VERIFICATION_EMAIL_NAME: 'Syllabus Sync',
+      DEPLOYMENT_PLATFORM: 'cloudflare',
+      DEPLOYMENT_ENV: 'production',
+      NODE_ENV: 'production',
+      NEXT_PUBLIC_APP_URL: undefined,
+      NEXT_PUBLIC_SITE_URL: undefined,
+      VERCEL_PROJECT_PRODUCTION_URL: undefined,
+      VERCEL_BRANCH_URL: undefined,
+      VERCEL_URL: undefined,
+    });
+
+    const mod = await import('@/lib/services/emailService');
+    await expect(
+      mod.sendVerificationEmail({
+        to: 'user@example.com',
+        token: 'd'.repeat(64),
+      }),
+    ).rejects.toThrow('Application origin is not configured');
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
   it('rejects invalid recipient email and does not call resend', async () => {
     setEnv({
       RESEND_API_KEY: 're_test_key_123',
