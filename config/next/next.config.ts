@@ -143,7 +143,7 @@ const sentryOptions = {
     enabled: sentryEnabled,
   },
   // Route handlers and server components are automatically instrumented
-  automaticVercelMonitors: true,
+  automaticVercelMonitors: false,
   // Source map configuration
   sourcemaps: {
     // Disable source map upload if no auth token — separate from error capture
@@ -156,3 +156,7 @@ const configWithPlugins = bundleAnalyzer(nextConfig);
 export default sentryEnabled
   ? withSentryConfig(configWithPlugins, sentryOptions)
   : configWithPlugins;
+
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
+
+initOpenNextCloudflareForDev();
