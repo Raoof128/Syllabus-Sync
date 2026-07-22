@@ -20,7 +20,7 @@ type EmailServiceConfig = {
   resendApiKey: string;
   fromAddress: string;
   fromName: string;
-  appUrl: string;
+  appUrl: string | null;
 };
 
 function isPlaceholder(value: string): boolean {
@@ -34,16 +34,32 @@ function isPlaceholder(value: string): boolean {
   );
 }
 
-function getAppUrl(): string {
-  const appOrigin =
-    getConfiguredAppOrigin() ??
-    (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : null);
+function getEmailAppOrigin(): string | null {
+  // Validate the raw direct value before origin normalization can discard a
+  // placeholder marker embedded in its path, query, or fragment.
+  for (const candidate of [process.env.NEXT_PUBLIC_APP_URL, process.env.NEXT_PUBLIC_SITE_URL]) {
+    if (!candidate) continue;
+    if (isPlaceholder(candidate)) return null;
 
-  if (!appOrigin) {
-    throw new Error('Application origin is not configured');
+    const origin = getConfiguredAppOrigin({ NEXT_PUBLIC_APP_URL: candidate });
+    if (origin) return isPlaceholder(origin) ? null : origin;
   }
 
-  return appOrigin;
+  const vercelHost =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
+    process.env.VERCEL_BRANCH_URL ??
+    process.env.VERCEL_URL;
+
+  if (vercelHost !== undefined) {
+    // Vercel aliases are host-only, but deployment templates can still leave
+    // recognizable placeholder hostnames that must never receive raw tokens.
+    if (isPlaceholder(vercelHost)) return null;
+
+    const origin = getConfiguredAppOrigin({ VERCEL_URL: vercelHost });
+    return origin && !isPlaceholder(origin) ? origin : null;
+  }
+
+  return process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : null;
 }
 
 function getEmailConfig(): EmailServiceConfig {
@@ -55,8 +71,18 @@ function getEmailConfig(): EmailServiceConfig {
     resendApiKey,
     fromAddress,
     fromName,
-    appUrl: getAppUrl(),
+    appUrl: getEmailAppOrigin(),
   };
+}
+
+function isEmailConfigValid(
+  cfg: EmailServiceConfig,
+): cfg is EmailServiceConfig & { appUrl: string } {
+  if (cfg.resendApiKey.length === 0 || isPlaceholder(cfg.resendApiKey)) return false;
+  if (!isValidEmailAddress(cfg.fromAddress) || isPlaceholder(cfg.fromAddress)) return false;
+  if (cfg.fromName.trim().length === 0) return false;
+  if (!cfg.appUrl) return false;
+  return true;
 }
 
 function isValidEmailAddress(value: string): boolean {
@@ -87,12 +113,7 @@ function getResendClient(apiKey: string): Resend {
  * Check if Resend is configured well enough to send email.
  */
 export function isEmailServiceConfigured(): boolean {
-  const cfg = getEmailConfig();
-  if (cfg.resendApiKey.length === 0 || isPlaceholder(cfg.resendApiKey)) return false;
-  if (!isValidEmailAddress(cfg.fromAddress) || isPlaceholder(cfg.fromAddress)) return false;
-  if (cfg.fromName.trim().length === 0) return false;
-  if (cfg.appUrl.trim().length === 0) return false;
-  return true;
+  return isEmailConfigValid(getEmailConfig());
 }
 
 // ============================================================================
@@ -238,7 +259,7 @@ export async function sendEmail({
 }: SendEmailParams): Promise<{ success: boolean; error?: string }> {
   const cfg = getEmailConfig();
 
-  if (!isEmailServiceConfigured()) {
+  if (!isEmailConfigValid(cfg)) {
     logger.warn('Email service not configured — skipping email');
     return { success: false, error: 'Email service not configured' };
   }
@@ -288,7 +309,7 @@ export async function sendVerificationEmail({
 }: SendVerificationEmailParams): Promise<{ success: boolean; error?: string }> {
   const cfg = getEmailConfig();
 
-  if (!isEmailServiceConfigured()) {
+  if (!isEmailConfigValid(cfg)) {
     logger.warn('Email service not configured — skipping verification email');
     return { success: false, error: 'Email service not configured' };
   }
@@ -341,7 +362,7 @@ export async function sendPasswordResetEmail({ to, token }: SendPasswordResetEma
 }> {
   const cfg = getEmailConfig();
 
-  if (!isEmailServiceConfigured()) {
+  if (!isEmailConfigValid(cfg)) {
     logger.warn('Email service not configured — skipping password reset email');
     return { success: false, error: 'Email service not configured' };
   }

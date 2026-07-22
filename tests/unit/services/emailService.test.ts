@@ -126,14 +126,78 @@ describe('emailService (resend)', () => {
     });
 
     const mod = await import('@/lib/services/emailService');
+    expect(mod.isEmailServiceConfigured()).toBe(false);
     await expect(
       mod.sendVerificationEmail({
         to: 'user@example.com',
         token: 'd'.repeat(64),
       }),
-    ).rejects.toThrow('Application origin is not configured');
+    ).resolves.toEqual({
+      success: false,
+      error: 'Email service not configured',
+    });
     expect(sendMock).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ['direct example domain', { NEXT_PUBLIC_APP_URL: 'https://example.com/app' }],
+    ['direct paste marker', { NEXT_PUBLIC_SITE_URL: 'https://paste-real-domain.test' }],
+    ['Vercel your marker', { VERCEL_URL: 'your-app.vercel.app' }],
+  ])('never sends token links to a %s placeholder origin', async (_label, placeholderEnv) => {
+    setEnv({
+      RESEND_API_KEY: 're_test_key_123',
+      VERIFICATION_EMAIL_FROM: 'onboarding@resend.dev',
+      VERIFICATION_EMAIL_NAME: 'Syllabus Sync',
+      DEPLOYMENT_PLATFORM: 'cloudflare',
+      DEPLOYMENT_ENV: 'production',
+      NODE_ENV: 'production',
+      NEXT_PUBLIC_APP_URL: undefined,
+      NEXT_PUBLIC_SITE_URL: undefined,
+      VERCEL_PROJECT_PRODUCTION_URL: undefined,
+      VERCEL_BRANCH_URL: undefined,
+      VERCEL_URL: undefined,
+      ...placeholderEnv,
+    });
+
+    const mod = await import('@/lib/services/emailService');
+    expect(mod.isEmailServiceConfigured()).toBe(false);
+    await expect(
+      mod.sendVerificationEmail({ to: 'user@example.com', token: 'e'.repeat(64) }),
+    ).resolves.toMatchObject({ success: false });
+    await expect(
+      mod.sendPasswordResetEmail({ to: 'user@example.com', token: 'f'.repeat(64) }),
+    ).resolves.toMatchObject({ success: false });
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it.each(['not a URL', 'https://user:secret@real-domain.test/path'])(
+    'returns the failure contract for invalid application origin %s',
+    async (invalidOrigin) => {
+      setEnv({
+        RESEND_API_KEY: 're_test_key_123',
+        VERIFICATION_EMAIL_FROM: 'onboarding@resend.dev',
+        VERIFICATION_EMAIL_NAME: 'Syllabus Sync',
+        DEPLOYMENT_PLATFORM: 'cloudflare',
+        DEPLOYMENT_ENV: 'production',
+        NODE_ENV: 'production',
+        NEXT_PUBLIC_APP_URL: invalidOrigin,
+        NEXT_PUBLIC_SITE_URL: undefined,
+        VERCEL_PROJECT_PRODUCTION_URL: undefined,
+        VERCEL_BRANCH_URL: undefined,
+        VERCEL_URL: undefined,
+      });
+
+      const mod = await import('@/lib/services/emailService');
+      expect(mod.isEmailServiceConfigured()).toBe(false);
+      await expect(
+        mod.sendVerificationEmail({ to: 'user@example.com', token: '1'.repeat(64) }),
+      ).resolves.toMatchObject({ success: false });
+      await expect(
+        mod.sendPasswordResetEmail({ to: 'user@example.com', token: '2'.repeat(64) }),
+      ).resolves.toMatchObject({ success: false });
+      expect(sendMock).not.toHaveBeenCalled();
+    },
+  );
 
   it('rejects invalid recipient email and does not call resend', async () => {
     setEnv({

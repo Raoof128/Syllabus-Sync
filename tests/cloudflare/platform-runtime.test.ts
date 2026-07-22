@@ -51,6 +51,7 @@ describe('deployment runtime detection', () => {
     const env = {
       DEPLOYMENT_PLATFORM: 'cloudflare',
       DEPLOYMENT_ENV: 'preview',
+      NODE_ENV: 'production',
     };
 
     expect(isProductionDeployment(env)).toBe(false);
@@ -83,6 +84,12 @@ describe('deployment runtime detection', () => {
     ).toBe('https://www.syllabus-sync.app');
     expect(getConfiguredAppOrigin({ NEXT_PUBLIC_APP_URL: 'ftp://files.example.com' })).toBeNull();
     expect(getConfiguredAppOrigin({ NEXT_PUBLIC_APP_URL: 'javascript:alert(1)' })).toBeNull();
+  });
+
+  it('rejects credential-bearing configured origins', () => {
+    expect(
+      getConfiguredAppOrigin({ NEXT_PUBLIC_APP_URL: 'https://user:secret@example.org/path' }),
+    ).toBeNull();
   });
 
   it('does not treat a scheme or path as a Vercel hostname', () => {
@@ -133,7 +140,6 @@ describe('platform-neutral runtime consumers', () => {
       'lib/security/ip.ts',
       'lib/security/csrf.ts',
       'app/api/auth/signup/route.ts',
-      'lib/services/emailService.ts',
     ];
 
     for (const file of originConsumers) {
