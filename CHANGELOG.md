@@ -450,3 +450,17 @@ All notable changes to this project will be documented in this file.
 **Verification:** Node 22 focused Cloudflare tests, package-script contract assertion, main and Worker typechecks, formatting, and secret scan passed. Sharp audit scripts and build→gate→action ordering are unchanged.
 
 **Follow-ups:** The review's immutable stable-name icon/image cache observation is intentionally left unchanged because Task 4 mandates that header policy; address it only in a separately reviewed production policy change. Images enablement/billing and Sharp deployment-evidence blockers remain.
+
+---
+
+### Raouf: Cloudflare Edge Middleware Bridge — 2026-07-22
+
+**Scope:** Restored the Edge-compatible middleware entry point and added fail-closed API authentication coverage.
+
+**Summary:** Renamed the existing request policy to `lib/middleware.ts`, exported it from the root `middleware.ts` convention, removed obsolete proxy entry points, and migrated the MFA regression suite without changing route, CSP, CSRF, session, email-verification, or MFA policy. Added a complete API-route authentication inventory with an explicit middleware-aligned public allowlist. The inventory found two protected utility routes without route-level evidence; `/api/navigate` and `/api/security/check-password-breach` now use `requireAuth` before their unchanged limiter and handler logic.
+
+**Files Changed:** `middleware.ts`, `lib/middleware.ts`, removed proxy entry points, middleware/API-auth tests, the two protected utility routes, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** On Node 22, 16 focused middleware, route-auth, inventory, and Worker-contract tests passed; 19 Sharp gate tests passed; main and isolated Worker typechecks, formatting, secret scan, and local Sharp audit-exception gate passed. The runtime audit records only the expected remaining DNS blocker in the security-header scanner and Node crypto blockers in CSP/CSRF. No Cloudflare execution or deployment command was run.
+
+**Follow-ups:** Resolve the recorded runtime blockers in their separately scoped migration tasks. Existing Sharp reachability and deployment gates remain unchanged and fail closed.

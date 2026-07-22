@@ -19,7 +19,7 @@ vi.mock('@supabase/ssr', () => ({
   })),
 }));
 
-describe('proxy mfa enforcement', () => {
+describe('middleware mfa enforcement', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -38,10 +38,10 @@ describe('proxy mfa enforcement', () => {
   });
 
   it('redirects protected routes to /login?mfa=1 when aal2 upgrade is required', async () => {
-    const { proxy } = await import('@/lib/proxy');
+    const { middleware } = await import('@/lib/middleware');
 
     const req = new NextRequest('http://localhost/calendar');
-    const res = await proxy(req);
+    const res = await middleware(req);
 
     expect(res.status).toBeGreaterThanOrEqual(300);
     const location = res.headers.get('location');
@@ -51,10 +51,10 @@ describe('proxy mfa enforcement', () => {
   });
 
   it('allows /login to render when aal2 upgrade is required (no redirect to /home)', async () => {
-    const { proxy } = await import('@/lib/proxy');
+    const { middleware } = await import('@/lib/middleware');
 
     const req = new NextRequest('http://localhost/login?mfa=1');
-    const res = await proxy(req);
+    const res = await middleware(req);
 
     expect(res.headers.get('location')).toBeNull();
   });
@@ -65,19 +65,19 @@ describe('proxy mfa enforcement', () => {
       error: null,
     });
 
-    const { proxy } = await import('@/lib/proxy');
+    const { middleware } = await import('@/lib/middleware');
 
     const req = new NextRequest('http://localhost/login');
-    const res = await proxy(req);
+    const res = await middleware(req);
 
     expect(res.headers.get('location')).toContain('/home');
   });
 
   it('returns 403 for non-public API routes when aal2 upgrade is required', async () => {
-    const { proxy } = await import('@/lib/proxy');
+    const { middleware } = await import('@/lib/middleware');
 
     const req = new NextRequest('http://localhost/api/user/export');
-    const res = await proxy(req);
+    const res = await middleware(req);
     const json = await res.json();
 
     expect(res.status).toBe(403);
@@ -88,10 +88,10 @@ describe('proxy mfa enforcement', () => {
     vi.useFakeTimers();
     supabaseMocks.getUserMock.mockImplementationOnce(() => new Promise(() => {}) as any);
 
-    const { proxy } = await import('@/lib/proxy');
+    const { middleware } = await import('@/lib/middleware');
 
     const req = new NextRequest('http://localhost/api/user/export');
-    const pending = proxy(req);
+    const pending = middleware(req);
     await vi.advanceTimersByTimeAsync(6000);
     const res = await pending;
     const json = await res.json();
@@ -108,12 +108,12 @@ describe('proxy mfa enforcement', () => {
       error: null,
     });
 
-    const { proxy } = await import('@/lib/proxy');
+    const { middleware } = await import('@/lib/middleware');
 
     const optionsReq = new NextRequest('http://localhost/api/webauthn/authenticate/options', {
       method: 'POST',
     });
-    const optionsRes = await proxy(optionsReq);
+    const optionsRes = await middleware(optionsReq);
     // Should NOT be 401/403 — the route is public
     expect(optionsRes.status).not.toBe(401);
     expect(optionsRes.status).not.toBe(403);
@@ -121,7 +121,7 @@ describe('proxy mfa enforcement', () => {
     const verifyReq = new NextRequest('http://localhost/api/webauthn/authenticate/verify', {
       method: 'POST',
     });
-    const verifyRes = await proxy(verifyReq);
+    const verifyRes = await middleware(verifyReq);
     expect(verifyRes.status).not.toBe(401);
     expect(verifyRes.status).not.toBe(403);
   });
@@ -132,12 +132,12 @@ describe('proxy mfa enforcement', () => {
       error: null,
     });
 
-    const { proxy } = await import('@/lib/proxy');
+    const { middleware } = await import('@/lib/middleware');
 
     const req = new NextRequest('http://localhost/api/webauthn/register/options', {
       method: 'POST',
     });
-    const res = await proxy(req);
+    const res = await middleware(req);
     expect(res.status).toBe(401);
   });
 
@@ -151,10 +151,10 @@ describe('proxy mfa enforcement', () => {
       },
     });
 
-    const { proxy } = await import('@/lib/proxy');
+    const { middleware } = await import('@/lib/middleware');
 
     const req = new NextRequest('http://localhost/calendar');
-    const res = await proxy(req);
+    const res = await middleware(req);
 
     expect(supabaseMocks.signOutMock).not.toHaveBeenCalled();
     expect(res.headers.get('location')).toContain('/login');

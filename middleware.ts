@@ -1,6 +1,6 @@
-import { proxy as proxyHandler } from './tools/proxy/proxy';
+import { middleware as middlewareHandler } from '@/lib/middleware';
 
-export const proxy = proxyHandler;
+export const middleware = middlewareHandler;
 
 export const config = {
   matcher: [

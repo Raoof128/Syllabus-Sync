@@ -54,7 +54,7 @@ function isPublicApiPath(path: string): boolean {
 /**
  * Next.js 16 Proxy — security headers, session refresh, and route protection.
  */
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   const staticFileExtensions = [
