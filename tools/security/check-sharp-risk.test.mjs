@@ -6,6 +6,8 @@ import test from 'node:test';
 
 import {
   authorizeDeployment,
+  classifyBuildArtifact,
+  collectBundledInputPaths,
   calculateBuildArtifactDigests,
   evaluateAuditException,
   evaluateDeploymentGate,
@@ -542,4 +544,79 @@ test('every Cloudflare Worker execution script enforces build then matching gate
     assert.ok(script.indexOf(build) < script.indexOf(gate), `${name} must build before gate`);
     assert.ok(script.indexOf(gate) < actionIndex, `${name} must gate before action`);
   }
+});
+
+test('classifyBuildArtifact blocks on a real Sharp package directory', () => {
+  const result = classifyBuildArtifact('server-functions/default/node_modules/sharp/lib/index.js', '');
+
+  assert.equal(result.kind, 'runtime');
+  assert.match(result.description, /package-path/);
+});
+
+test('classifyBuildArtifact blocks on an @img native platform package', () => {
+  const result = classifyBuildArtifact(
+    'server-functions/default/node_modules/@img/sharp-linux-x64/lib/sharp.js',
+    '',
+  );
+
+  assert.equal(result.kind, 'runtime');
+});
+
+test('classifyBuildArtifact blocks on a compiled libvips native binary', () => {
+  for (const candidate of ['assets/sharp-linux-x64.node', 'vendor/libvips.wasm', 'vendor/libvips.so.42']) {
+    assert.equal(classifyBuildArtifact(candidate, '').kind, 'runtime', candidate);
+  }
+});
+
+test('classifyBuildArtifact blocks on a bundled Sharp module specifier', () => {
+  const bundled = new Set(['node_modules/next/dist/server/image-optimizer.js']);
+  const result = classifyBuildArtifact(
+    'node_modules/next/dist/server/image-optimizer.js',
+    "const sharp = require('sharp');",
+    bundled,
+  );
+
+  assert.equal(result.kind, 'runtime');
+  assert.match(result.description, /bundled/);
+});
+
+test('classifyBuildArtifact records an unbundled Sharp specifier without blocking', () => {
+  const result = classifyBuildArtifact(
+    'server-functions/default/node_modules/next/dist/server/image-optimizer.js',
+    "const sharp = require('sharp');",
+    new Set(['node_modules/next/dist/server/app-render.js']),
+  );
+
+  assert.equal(result.kind, 'tooling');
+  assert.match(result.description, /unbundled-scaffolding/);
+});
+
+test('classifyBuildArtifact does not block on incidental uses of the word sharp', () => {
+  const incidental = [
+    ['middleware/handler.mjs', 'var L = "Sharp", M = "Sony", N = "Xiaomi";'],
+    ['server-functions/default/handler.mjs', '"&sharp;":"\\u266F","&shchcy;":"\\u0449"'],
+    ['assets/_next/static/css/app.css', '.leaflet-routing-icon-sharp-right{background-position:-20px 0}'],
+    [
+      'server-functions/default/node_modules/next/dist/server/capsize-font-metrics.json',
+      '{"MaterialIconsSharp":{"familyName":"Material Icons Sharp"}}',
+    ],
+  ];
+
+  for (const [relativePath, content] of incidental) {
+    const result = classifyBuildArtifact(relativePath, content);
+    assert.equal(result.kind, 'tooling', relativePath);
+    assert.match(result.description, /incidental-name/, relativePath);
+  }
+});
+
+test('classifyBuildArtifact ignores files with no Sharp signal at all', () => {
+  assert.equal(classifyBuildArtifact('assets/app.js', 'export const answer = 42;'), null);
+});
+
+test('collectBundledInputPaths normalises esbuild input keys', () => {
+  const bundled = collectBundledInputPaths(['./node_modules/sharp/lib/index.js', 42, 'app/page.tsx']);
+
+  assert.ok(bundled.has('node_modules/sharp/lib/index.js'));
+  assert.ok(bundled.has('app/page.tsx'));
+  assert.equal(bundled.size, 2);
 });

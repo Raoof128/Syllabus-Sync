@@ -15,7 +15,7 @@ const COMPLETE_PREVIEW: Record<string, string> = {
   NEXT_PUBLIC_SUPABASE_URL: 'https://abcdefghijkl.supabase.co',
   NEXT_PUBLIC_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.preview',
   NEXT_PUBLIC_APP_URL: 'https://syllabus-sync-preview.workers.dev',
-  SUPABASE_SERVICE_ROLE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.service',
+  SUPABASE_SERVICE_ROLE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.test-service-role',
   RESEND_API_KEY: 're_preview_key',
   CRON_SECRET: 'a'.repeat(64),
   UPSTASH_REDIS_REST_URL: 'https://redis.upstash.io',

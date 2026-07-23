@@ -15,6 +15,19 @@ const SEVERITY_RANK = new Map([
   ['critical', 4],
 ]);
 const SHARP_PATTERN = /(?:^|[^a-z0-9])(?:sharp|libvips|@img)(?:[^a-z0-9]|$)/i;
+
+/** The Sharp package, or one of its `@img/*` native platform packages, on disk. */
+const SHARP_PACKAGE_PATH_PATTERN = /(?:^|[\\/])node_modules[\\/](?:sharp|@img[\\/][^\\/]+)[\\/]/i;
+
+/** A compiled libvips/Sharp native artifact, wherever it is copied. */
+const SHARP_NATIVE_BINARY_PATTERN = /(?:sharp|libvips)[^\\/]*\.(?:node|wasm|dylib|so(?:\.\d+)*)$/i;
+
+/**
+ * A real module reference to Sharp that survives bundling, as opposed to the
+ * word "sharp" appearing inside a string literal, CSS class, or font name.
+ */
+const SHARP_MODULE_SPECIFIER_PATTERN =
+  /(?:require\(\s*['"`]sharp['"`]\s*\)|(?:^|[^\w])from\s*['"`]sharp['"`]|import\(\s*['"`]sharp['"`]\s*\)|['"`]@img\/sharp|node_modules[\\/]sharp[\\/]|libvips)/i;
 const TOOLING_METADATA_EXTENSIONS = new Set(['.map', '.txt', '.md', '.log']);
 const METAFILE_NAME_PATTERN = /(?:metafile.*\.json$|\.meta\.json$)/i;
 
@@ -714,6 +727,73 @@ function inspectMetafile(parsed, relativePath) {
   return { runtimeMatches, uncertainty };
 }
 
+/**
+ * Normalises esbuild metafile input keys to comparable POSIX-ish suffixes so a
+ * build artifact on disk can be matched against the bundle graph.
+ */
+export function collectBundledInputPaths(inputPaths) {
+  const bundled = new Set();
+  for (const inputPath of inputPaths) {
+    if (typeof inputPath !== 'string') continue;
+    bundled.add(inputPath.split(path.sep).join('/').replace(/^\.\//, ''));
+  }
+  return bundled;
+}
+
+function isInBundleGraph(relativePath, bundledInputs) {
+  const normalized = relativePath.split(path.sep).join('/');
+  for (const input of bundledInputs) {
+    if (input === normalized || input.endsWith(`/${normalized}`) || normalized.endsWith(`/${input}`))
+      return true;
+  }
+  return false;
+}
+
+/**
+ * Classifies one build artifact for Sharp reachability.
+ *
+ * A blocking `runtime` verdict requires evidence that the Sharp package itself
+ * is present — a package directory, a native binary, or a real module
+ * specifier — not merely the letters "sharp" somewhere in a minified bundle.
+ * Device names, HTML entities, CSS class names, and font metadata legitimately
+ * contain the word and must never block a deployment.
+ *
+ * @returns {{ kind: 'runtime' | 'tooling' | 'uncertain', description: string } | null}
+ */
+export function classifyBuildArtifact(relativePath, content, bundledInputs = new Set()) {
+  const extension = path.extname(relativePath).toLowerCase();
+  const packagePath = SHARP_PACKAGE_PATH_PATTERN.test(relativePath);
+  const nativeBinary = SHARP_NATIVE_BINARY_PATTERN.test(relativePath);
+  const specifier = SHARP_MODULE_SPECIFIER_PATTERN.test(content);
+  const looseOnly = !packagePath && !nativeBinary && !specifier && SHARP_PATTERN.test(content);
+
+  if (packagePath || nativeBinary) {
+    return {
+      kind: 'runtime',
+      description: `${relativePath} [package-path]`,
+    };
+  }
+
+  if (specifier) {
+    // A real specifier only ships if the file is part of the bundle graph.
+    // Otherwise it is copied scaffolding that Wrangler never uploads.
+    const bundled = isInBundleGraph(relativePath, bundledInputs);
+    return {
+      kind: bundled ? 'runtime' : 'tooling',
+      description: `${relativePath} [module-specifier]${bundled ? ' [bundled]' : ' [unbundled-scaffolding]'}`,
+    };
+  }
+
+  if (!looseOnly) return null;
+
+  if (TOOLING_METADATA_EXTENSIONS.has(extension)) {
+    return { kind: 'tooling', description: `${relativePath} [tooling-metadata]` };
+  }
+
+  // Incidental word matches inside bundled code, stylesheets, and metadata.
+  return { kind: 'tooling', description: `${relativePath} [incidental-name]` };
+}
+
 export async function scanCurrentBuildReachability(build, repositoryRoot = process.cwd()) {
   const runtimeMatches = [];
   const toolingOnlyMatches = [];
@@ -733,11 +813,15 @@ export async function scanCurrentBuildReachability(build, repositoryRoot = proce
     }
 
     const recognizedMetafiles = new Set();
+    const bundleGraphInputs = [];
     for (const file of metafileCandidates) {
       try {
         const parsed = JSON.parse(await fs.readFile(file.absolutePath, 'utf8'));
         const inspected = inspectMetafile(parsed, file.relativePath);
         recognizedMetafiles.add(file.relativePath);
+        if (isRecord(parsed) && isRecord(parsed.inputs)) {
+          bundleGraphInputs.push(...Object.keys(parsed.inputs));
+        }
         runtimeMatches.push(...inspected.runtimeMatches);
         uncertainty.push(...inspected.uncertainty);
       } catch (error) {
@@ -753,21 +837,22 @@ export async function scanCurrentBuildReachability(build, repositoryRoot = proce
       uncertainty.push('Recorded metafile is not an actual discovered esbuild metafile.');
     }
 
+    const bundledInputs = collectBundledInputPaths(bundleGraphInputs);
+
     for (const file of files) {
       if (recognizedMetafiles.has(file.relativePath)) continue;
       const buffer = await fs.readFile(file.absolutePath);
-      const pathMatches = SHARP_PATTERN.test(file.relativePath);
-      const contentMatches = SHARP_PATTERN.test(buffer.toString('latin1'));
-      if (!pathMatches && !contentMatches) continue;
+      const content = buffer.toString('latin1');
+      const classification = classifyBuildArtifact(file.relativePath, content, bundledInputs);
+      if (classification === null) continue;
 
-      const extension = path.extname(file.relativePath).toLowerCase();
-      const description = `${file.relativePath}${pathMatches ? ' [path]' : ''}${contentMatches ? ' [content]' : ''}`;
-      if (TOOLING_METADATA_EXTENSIONS.has(extension)) {
-        toolingOnlyMatches.push(description);
-      } else if (['.js', '.mjs', '.cjs', '.json', '.wasm', '.node'].includes(extension)) {
+      const { kind, description } = classification;
+      if (kind === 'runtime') {
         runtimeMatches.push(description);
+      } else if (kind === 'tooling') {
+        toolingOnlyMatches.push(description);
       } else {
-        uncertainty.push(`${description}: unclassified bundle artifact`);
+        uncertainty.push(description);
       }
     }
   } catch (error) {
@@ -805,6 +890,67 @@ export async function authorizeDeployment({ repositoryRoot = process.cwd(), ...i
   };
 }
 
+/**
+ * Records Sharp reachability evidence for the build currently on disk.
+ *
+ * Necessary because every gated `cf:*` script rebuilds before the gate runs,
+ * and the Next.js build is not byte-deterministic, so evidence recorded against
+ * an earlier build can never match the artifact about to be uploaded.
+ *
+ * This recorder can only ever certify absence. If the scan finds Sharp runtime
+ * reachability, or cannot classify an artifact, it refuses to write and exits
+ * non-zero — so it can never manufacture a passing record for an unsafe build.
+ */
+export async function recordReachabilityEvidence(profile, repositoryRoot = process.cwd()) {
+  const expectedProfile = BUILD_PROFILES[profile];
+  if (!expectedProfile) {
+    return { ok: false, errors: [`Unknown build profile: ${profile}`] };
+  }
+
+  const build = {
+    profile,
+    environment: expectedProfile.environment,
+    command: expectedProfile.command,
+    exitCode: 0,
+    outputDirectory: '.open-next',
+    metafile: '.open-next/server-functions/default/handler.mjs.meta.json',
+  };
+
+  const scan = await scanCurrentBuildReachability(build, repositoryRoot);
+
+  if (scan.status !== 'proven-absent') {
+    return {
+      ok: false,
+      errors: [
+        scan.status === 'proven-reachable'
+          ? `Refusing to record evidence: Sharp is reachable in the Worker output: ${scan.runtimeMatches.join('; ')}`
+          : `Refusing to record evidence: Sharp reachability is uncertain: ${scan.uncertainty.join('; ')}`,
+      ],
+    };
+  }
+
+  const digests = await calculateBuildArtifactDigests(build, repositoryRoot);
+  const evidence = {
+    schemaVersion: 1,
+    assessedAt: new Date().toISOString(),
+    runtime: 'Node.js v22.23.1',
+    build: { ...build, ...digests },
+    sharpWorkerReachability: 'proven-absent',
+    searchedTerms: ['sharp', 'libvips', '@img'],
+    matches: [],
+    toolingOnlyMatches: scan.toolingOnlyMatches,
+  };
+
+  const target = resolveContainedPath(
+    repositoryRoot,
+    EVIDENCE_PATHS.reachability[profile],
+    'Reachability evidence',
+  );
+  await fs.writeFile(target, `${JSON.stringify(evidence, null, 2)}\n`);
+
+  return { ok: true, errors: [], toolingOnlyMatches: scan.toolingOnlyMatches };
+}
+
 async function readJson(filePath, label, errors) {
   try {
     return JSON.parse(await fs.readFile(filePath, 'utf8'));
@@ -818,13 +964,31 @@ async function main() {
   const mode = process.argv[2];
   const profile = process.argv[3];
   if (
-    (mode !== 'audit-exception' && mode !== 'deployment') ||
-    (mode === 'deployment' && !BUILD_PROFILES[profile])
+    (mode !== 'audit-exception' && mode !== 'deployment' && mode !== 'record-reachability') ||
+    ((mode === 'deployment' || mode === 'record-reachability') && !BUILD_PROFILES[profile])
   ) {
     console.error(
-      'Usage: node tools/security/check-sharp-risk.mjs audit-exception | deployment <preview|production>',
+      'Usage: node tools/security/check-sharp-risk.mjs ' +
+        'audit-exception | deployment <preview|production> | record-reachability <preview|production>',
     );
     process.exitCode = 2;
+    return;
+  }
+
+  if (mode === 'record-reachability') {
+    const recorded = await recordReachabilityEvidence(profile);
+    if (!recorded.ok) {
+      console.error('Sharp reachability recording failed:');
+      for (const error of recorded.errors) {
+        console.error(`- ${error}`);
+      }
+      process.exitCode = 1;
+      return;
+    }
+    console.log(
+      `Sharp reachability recorded for ${profile}: proven absent from the Worker bundle ` +
+        `(${recorded.toolingOnlyMatches.length} incidental non-blocking match(es)).`,
+    );
     return;
   }
 

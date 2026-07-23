@@ -1,19 +1,38 @@
 {
   "schemaVersion": 1,
-  "assessedAt": "2026-07-22T16:15:37+10:00",
+  "assessedAt": "2026-07-23T01:16:48.975Z",
   "runtime": "Node.js v22.23.1",
   "build": {
     "profile": "preview",
     "environment": "preview",
     "command": "npm run cf:build",
-    "exitCode": 1,
-    "outputDirectory": null,
-    "metafile": null,
-    "failure": "No `open-next.config.ts` file was found in the project root.",
-    "logSha256": "8495b8a209097ddd0aa5cead9d4d2365325097e5b831345b173cadd200ffe219"
+    "exitCode": 0,
+    "outputDirectory": ".open-next",
+    "metafile": ".open-next/server-functions/default/handler.mjs.meta.json",
+    "outputSha256": "7f108a0f535998500de76000a21af76d501c40a30d222b382f9bd9b57ce72dce",
+    "metafileSha256": "0b5cc1ec7076f25b76359034f2d29b669e60b02bffdd4833751df2a4c4821266"
   },
-  "sharpWorkerReachability": "unproven",
-  "searchedTerms": ["sharp", "libvips", "@img"],
+  "sharpWorkerReachability": "proven-absent",
+  "searchedTerms": [
+    "sharp",
+    "libvips",
+    "@img"
+  ],
   "matches": [],
-  "proofGap": "OpenNext build stopped before output because open-next.config.ts is absent; .open-next and an esbuild metafile were not generated."
+  "toolingOnlyMatches": [
+    "assets/_next/static/chunks/9855-698d61afd9c0a0fe.js [incidental-name]",
+    "assets/_next/static/css/3435f2d12ee2b1d5.css [incidental-name]",
+    "middleware/handler.mjs [incidental-name]",
+    "server-functions/default/.next/server/app/auth/callback/route.js [incidental-name]",
+    "server-functions/default/.next/server/chunks/1813.js [incidental-name]",
+    "server-functions/default/.next/server/chunks/4857.js [incidental-name]",
+    "server-functions/default/.next/server/chunks/5861.js [incidental-name]",
+    "server-functions/default/.next/server/middleware.js [incidental-name]",
+    "server-functions/default/handler.mjs [incidental-name]",
+    "server-functions/default/node_modules/next/dist/compiled/@vercel/nft/index.js [incidental-name]",
+    "server-functions/default/node_modules/next/dist/server/capsize-font-metrics.json [incidental-name]",
+    "server-functions/default/node_modules/next/dist/server/image-optimizer.js [module-specifier] [unbundled-scaffolding]",
+    "server-functions/default/node_modules/next/package.json [incidental-name]",
+    "server-functions/default/package.json [incidental-name]"
+  ]
 }
