@@ -92,6 +92,9 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // OpenNext re-parses this raw source with its own path-to-regexp copy,
+        // which must stay on the same v6 dialect Next.js uses. See the scoped
+        // `@opennextjs/aws` override in package.json.
         source: '/(.*)',
         headers: [
           // Prevent MIME type sniffing

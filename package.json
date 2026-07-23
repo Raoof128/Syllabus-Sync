@@ -175,6 +175,12 @@
     "undici": "^7.28.0",
     "serialize-javascript": "^7.0.3",
     "path-to-regexp": "^8.3.0",
+    "@opennextjs/aws": {
+      "path-to-regexp": "^6.3.0",
+      "express": {
+        "path-to-regexp": "^8.3.0"
+      }
+    },
     "tar": "^7.5.11",
     "@tootallnate/once": "^3.0.1",
     "next": {

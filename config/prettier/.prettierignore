@@ -1,5 +1,7 @@
 .next
 .vercel
+.open-next
+.wrangler
 node_modules
 out
 dist
