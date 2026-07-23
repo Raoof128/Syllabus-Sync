@@ -118,6 +118,58 @@ jobs:
             .next/
             !.next/cache/
 
+  cloudflare-build:
+    name: Cloudflare Worker Build
+    runs-on: ubuntu-latest
+    needs: [test, security]
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder
+      NEXT_PUBLIC_APP_URL: https://preview.example.net
+      NEXT_PUBLIC_SITE_URL: https://preview.example.net
+      NEXT_PUBLIC_VAPID_PUBLIC_KEY: BPlaceholder
+      DEPLOYMENT_PLATFORM: cloudflare
+      DEPLOYMENT_ENV: preview
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Cloudflare runtime compatibility
+        run: npm run check:cloudflare-runtime
+
+      - name: Verify Sharp risk gate logic
+        run: npm run test:sharp-risk-gate
+
+      # cf:dry-run builds the Worker, records Sharp reachability for the exact
+      # build, enforces the reachability gate, and tees the upload measurement.
+      - name: Build and dry-run the Worker
+        run: npm run cf:dry-run
+
+      - name: Enforce Worker size gate
+        run: npm run check:worker-size -- .open-next/wrangler-dry-run.log
+
+      - name: Upload Worker diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-worker-diagnostics
+          path: |
+            .open-next/wrangler-dry-run.log
+            .open-next/server-functions/default/handler.mjs.meta.json
+            artifacts/security/sharp-worker-reachability.json
+          if-no-files-found: ignore
+
   lighthouse:
     name: Lighthouse Performance
     runs-on: ubuntu-latest
@@ -158,7 +210,7 @@ jobs:
   notify:
     name: Notification
     runs-on: ubuntu-latest
-    needs: [test, security, build, lighthouse]
+    needs: [test, security, build, cloudflare-build, lighthouse]
     if: always()
 
     steps:

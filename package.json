@@ -21,6 +21,7 @@
     "cf:upload:production": "npm run cf:build:production && npm run security:sharp:record-reachability -- production && npm run security:sharp:deployment-gate -- production && opennextjs-cloudflare upload --env=production",
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "cf:typegen:production": "wrangler types --env=production --env-interface CloudflareEnv cloudflare-env.production.d.ts",
+    "cf:smoke": "node tools/cloudflare/smoke.mjs",
     "cf:dev:scheduled": "npm run cf:build && npm run security:sharp:record-reachability -- preview && npm run security:sharp:deployment-gate -- preview && wrangler dev --test-scheduled",
     "cf:dry-run": "bash -o pipefail -c 'npm run cf:build && npm run security:sharp:record-reachability -- preview && npm run security:sharp:deployment-gate -- preview && wrangler deploy --dry-run 2>&1 | tee .open-next/wrangler-dry-run.log'",
     "cf:dry-run:production": "bash -o pipefail -c 'npm run cf:build:production && npm run security:sharp:record-reachability -- production && npm run security:sharp:deployment-gate -- production && wrangler deploy --env=production --dry-run 2>&1 | tee .open-next/wrangler-production-dry-run.log'",
