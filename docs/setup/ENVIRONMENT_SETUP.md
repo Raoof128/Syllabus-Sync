@@ -60,7 +60,7 @@ Syllabus Sync depends on several external services. You will need active account
    - `UPSTASH_REDIS_REST_URL`
    - `UPSTASH_REDIS_REST_TOKEN`
 
-Rate limiting falls back to in-memory storage during local development if these are not set. For production configuration, see the [Resend and Vercel Setup](../operations/resend-vercel-setup.md) guide.
+Rate limiting falls back to in-memory storage during local development if these are not set. For production configuration, see the [Resend Deployment Setup](../operations/resend-deployment-setup.md) guide.
 
 ### Google Maps Platform (Optional for Local)
 
@@ -161,5 +161,5 @@ For Docker-based deployments, see the [Docker README](../../infra/docker/README.
 | :---------------------- | :--------------------------------------------------------------------------------------------- |
 | Google Maps Platform    | [`docs/operations/google-maps-platform-setup.md`](../operations/google-maps-platform-setup.md) |
 | Supabase OAuth (Google) | [`docs/operations/supabase-oauth-setup.md`](../operations/supabase-oauth-setup.md)             |
-| Resend and Vercel       | [`docs/operations/resend-vercel-setup.md`](../operations/resend-vercel-setup.md)               |
+| Resend deployment       | [`docs/operations/resend-deployment-setup.md`](../operations/resend-deployment-setup.md)       |
 | Deployment Checklist    | [`docs/operations/deployment-checklist.md`](../operations/deployment-checklist.md)             |

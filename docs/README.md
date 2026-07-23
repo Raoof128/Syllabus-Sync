@@ -40,13 +40,16 @@ Documentation for developers interacting with or extending the backend.
 
 Runbooks and checklists for managing the application lifecycle.
 
-| Document                                                                 | Description                                                           |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| [Environment Setup](./operations/ENVIRONMENT_SETUP.md)                   | Prerequisites, local configuration, and required third-party services |
-| [Deployment Checklist](./operations/deployment-checklist.md)             | Pre-production quality gates and release verification steps           |
-| [Google Maps Platform Setup](./operations/google-maps-platform-setup.md) | Configuration for Google Maps Embed API, Routes API, and Places API   |
-| [Resend and Vercel Setup](./operations/resend-vercel-setup.md)           | Transactional email and scheduled cron job configuration              |
-| [Supabase OAuth Setup](./operations/supabase-oauth-setup.md)             | OAuth provider configuration for Supabase Auth                        |
+| Document                                                                       | Description                                                           |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| [Environment Setup](./operations/ENVIRONMENT_SETUP.md)                         | Prerequisites, local configuration, and required third-party services |
+| [Deployment Checklist](./operations/deployment-checklist.md)                   | Pre-production quality gates and release verification steps           |
+| [Google Maps Platform Setup](./operations/google-maps-platform-setup.md)       | Configuration for Google Maps Embed API, Routes API, and Places API   |
+| [Resend Deployment Setup](./operations/resend-deployment-setup.md)             | Transactional email and scheduled cron job configuration              |
+| [Cloudflare Workers Deployment](./operations/cloudflare-workers-deployment.md) | Building, verifying, and deploying the Cloudflare Worker              |
+| [Cloudflare Cutover Runbook](./operations/cloudflare-cutover-runbook.md)       | Owner-approved production cutover procedure                           |
+| [Cloudflare Rollback Runbook](./operations/cloudflare-rollback-runbook.md)     | Stop conditions and the two rollback paths                            |
+| [Supabase OAuth Setup](./operations/supabase-oauth-setup.md)                   | OAuth provider configuration for Supabase Auth                        |
 
 ## Project Planning
 

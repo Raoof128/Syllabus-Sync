@@ -97,7 +97,7 @@ Student tools often lag behind modern web standards — outdated UIs, poor mobil
 ║  🌍  19 languages · Full RTL · WCAG 2.1 AA · 360px–2560px            ║
 ║  🎮  Gamification: XP, leaderboards, streaks, achievement system     ║
 ║  🔔  Context-aware notifications with multi-channel delivery         ║
-║  ⚡  CI/CD via GitHub Actions · Comprehensive Vitest test suite · Vercel Edge deployment    ║
+║  ⚡  CI/CD via GitHub Actions · Comprehensive Vitest test suite · Cloudflare Workers        ║
 ╚══════════════════════════════════════════════════════════════════════╝
 ```
 
@@ -113,19 +113,19 @@ Syllabus Sync is built on a modern, edge-ready tech stack designed for scalabili
 
 ### Runtime Stack
 
-| Layer               | Technology                                                 |
-| ------------------- | ---------------------------------------------------------- |
-| **Framework**       | Next.js 16 (App Router)                                    |
-| **UI**              | React 19, Tailwind CSS 4, Radix UI, Framer Motion          |
-| **State**           | Zustand (persistent storage, SWR-like caching)             |
-| **Database & Auth** | Supabase PostgreSQL with enforced Row-Level Security (RLS) |
-| **Infrastructure**  | Vercel (Edge Middleware, Serverless Functions)             |
-| **Rate Limiting**   | Upstash Redis (distributed)                                |
-| **Error Tracking**  | Sentry (client, server, edge)                              |
+| Layer               | Technology                                                     |
+| ------------------- | -------------------------------------------------------------- |
+| **Framework**       | Next.js 16 (App Router)                                        |
+| **UI**              | React 19, Tailwind CSS 4, Radix UI, Framer Motion              |
+| **State**           | Zustand (persistent storage, SWR-like caching)                 |
+| **Database & Auth** | Supabase PostgreSQL with enforced Row-Level Security (RLS)     |
+| **Infrastructure**  | Cloudflare Workers via OpenNext (Vercel retained for rollback) |
+| **Rate Limiting**   | Upstash Redis (distributed)                                    |
+| **Error Tracking**  | Sentry (client, server, edge)                                  |
 
 ### Key Architectural Decisions
 
-- **Edge-First Security Middleware:** All routing passes through Vercel Edge Middleware. Auth state, email verification gates, CSRF protection, and rate limiting are enforced at the edge.
+- **Edge-First Security Middleware:** All routing passes through the Edge-compatible Next.js middleware running in the Worker. Auth state, email verification gates, CSRF protection, and rate limiting are enforced at the edge.
 - **Distributed Rate Limiting:** Uses Upstash Redis and explicitly fails closed in production if Redis is unconfigured, preventing bypass attacks during autoscaling events.
 - **Database-Level Atomicity:** Critical operations (e.g., profile creation) are handled via PostgreSQL triggers to guarantee integrity.
 - **Optimistic UI with Additive Server Sync:** Complex state uses optimistic updates backed by an additive merge strategy to eliminate race conditions.
@@ -271,7 +271,8 @@ npm run check
 Built with the support of the open-source community. This project benefits from:
 
 - [Supabase](https://supabase.com/) — Open-source backend with RLS.
-- [Vercel](https://vercel.com/) — Edge deployment infrastructure.
+- [Cloudflare Workers](https://workers.cloudflare.com/) — Edge deployment infrastructure.
+- [Vercel](https://vercel.com/) — Retained rollback hosting during the migration window.
 
 <br/>
 

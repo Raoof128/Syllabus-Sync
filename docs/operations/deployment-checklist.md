@@ -226,3 +226,26 @@ Rollback:     Vercel Dashboard > Promote previous deployment
 Migrations:   npx supabase db push        # Apply pending SQL
 Env check:    VERCEL_ENVIRONMENT=production npm run vercel:env:check
 ```
+
+---
+
+## Cloudflare Workers (migration in progress)
+
+The production host is migrating from Vercel to Cloudflare Workers. Until the seven-day stability
+window closes, **Vercel remains the rollback target and must not be deleted**.
+
+For Worker builds, environment separation, the Sharp reachability gate, scheduled jobs, and
+deployment, follow [Cloudflare Workers Deployment](./cloudflare-workers-deployment.md).
+
+For the production cutover and rollback procedures, follow the
+[cutover runbook](./cloudflare-cutover-runbook.md) and the
+[rollback runbook](./cloudflare-rollback-runbook.md). Preview evidence is recorded in the
+[preview test record](./cloudflare-preview-test-record.md).
+
+Cloudflare-specific facts that differ from the Vercel procedure above:
+
+- Cron is owned by the Worker's `scheduled()` handler, not `vercel.json`. Never enable both.
+- The client IP comes from `cf-connecting-ip`; caller-supplied `x-forwarded-for` is not trusted.
+- Cron Triggers run in UTC.
+- The Worker compressed upload must stay below 9.5 MiB. Last measured 6799.23 KiB, which is above
+  the 2.8 MiB free-plan threshold, so **Workers Paid is required**.

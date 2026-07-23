@@ -8,16 +8,16 @@
 
 ## 1. Technology Stack
 
-| Layer              | Technology                                          | Rationale                                                                                    |
-| :----------------- | :-------------------------------------------------- | :------------------------------------------------------------------------------------------- |
-| **Runtime**        | Next.js 16 (App Router), React 19                   | Server Components reduce client JS payload; edge middleware enables pre-application security |
-| **State**          | Zustand 5 (persistent stores)                       | Lightweight, framework-agnostic, supports optimistic UI patterns without boilerplate         |
-| **Database**       | Supabase (PostgreSQL 15, GoTrue Auth, PostgREST)    | RLS-native, integrated auth, real-time subscriptions, eliminates custom backend              |
-| **Infrastructure** | Vercel (Edge Middleware, Serverless Functions)      | Zero-config scaling, edge network for middleware, instant rollback deployments               |
-| **Rate Limiting**  | Upstash Redis (REST) / Supabase PostgreSQL fallback | Stateless REST API works in serverless; no persistent connections required                   |
-| **Mapping**        | Leaflet (OpenStreetMap) + Google Maps API (proxied) | Leaflet for custom campus rendering; Google for routing and place search                     |
-| **Styling**        | Tailwind CSS, Shadcn UI                             | Utility-first for consistency; Shadcn for accessible, composable components                  |
-| **Observability**  | Sentry (Edge + Server + Client)                     | Unified error tracking across all three Next.js runtimes                                     |
+| Layer              | Technology                                                                                                                                   | Rationale                                                                                                               |
+| :----------------- | :------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------- |
+| **Runtime**        | Next.js 16 (App Router), React 19                                                                                                            | Server Components reduce client JS payload; edge middleware enables pre-application security                            |
+| **State**          | Zustand 5 (persistent stores)                                                                                                                | Lightweight, framework-agnostic, supports optimistic UI patterns without boilerplate                                    |
+| **Database**       | Supabase (PostgreSQL 15, GoTrue Auth, PostgREST)                                                                                             | RLS-native, integrated auth, real-time subscriptions, eliminates custom backend                                         |
+| **Infrastructure** | Cloudflare Workers via OpenNext, with a temporary Edge-compatible Next.js middleware bridge and Supabase as the external data/auth authority | Single-Worker deployment on Cloudflare's edge network; Vercel retained as rollback hosting during the transition window |
+| **Rate Limiting**  | Upstash Redis (REST) / Supabase PostgreSQL fallback                                                                                          | Stateless REST API works in serverless; no persistent connections required                                              |
+| **Mapping**        | Leaflet (OpenStreetMap) + Google Maps API (proxied)                                                                                          | Leaflet for custom campus rendering; Google for routing and place search                                                |
+| **Styling**        | Tailwind CSS, Shadcn UI                                                                                                                      | Utility-first for consistency; Shadcn for accessible, composable components                                             |
+| **Observability**  | Sentry (Edge + Server + Client)                                                                                                              | Unified error tracking across all three Next.js runtimes                                                                |
 
 ---
 
@@ -30,7 +30,7 @@ Client Request
       |
       v
 +---------------------+
-| Vercel Edge Network  |
+| Cloudflare Edge      |
 +---------------------+
       |
       v
