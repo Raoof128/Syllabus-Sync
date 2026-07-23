@@ -6,7 +6,15 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "ES2022",
-    "types": []
+    "types": [],
+    "baseUrl": "../..",
+    "paths": {
+      "@/lib/*": ["./lib/*"]
+    }
   },
-  "files": ["../../cloudflare-env.d.ts", "../../custom-worker.ts"]
+  "files": [
+    "../../cloudflare-env.d.ts",
+    "../../cloudflare-env.secrets.d.ts",
+    "../../custom-worker.ts"
+  ]
 }
