@@ -375,3 +375,13 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** `lib/services/emailService.ts`, focused platform/email/token-cleanup/API behavior tests, `AGENT.md`, and `CHANGELOG.md`.
 - **Verification:** Node 22 affected tests passed (87/87); application and Worker typechecks, lint, full formatting, 822-file secret scan, 19 Sharp-gate tests, and the local Sharp audit exception passed. Runtime compatibility remains non-zero only for the separately scoped `dns.lookup` use in `app/api/security/scan-headers/route.ts`.
 - **Follow-ups:** Replace the DNS lookup in its dedicated task. No preview, dry-run, upload, deployment, production cutover, or push was performed; Sharp reachability deployment gates remain fail closed.
+
+### 2026-07-22 (Australia/Sydney) — Worker-Compatible DNS Header Scanning
+
+**Raouf:**
+
+- **Scope:** Replaced the security-header scanner's unsupported `dns.lookup()` dependency and made runtime compatibility a permanent global quality gate.
+- **Summary:** Added a Worker-compatible dual-stack resolver using `resolve4` and `resolve6`, preserving literal-IP targets, deduplicating answers, tolerating one unavailable family, and failing closed on empty or malformed results. The protected scan route now rejects any private, loopback, link-local, unique-local, or private IPv4-mapped IPv6 answer, including mixed public/private sets and alternate IPv6 spellings. Route regressions preserve authentication and rate-limit dominance and prove the outbound HEAD request uses `redirect: 'manual'` exactly once. The API reference records the DNS validation/fetch TOCTOU boundary honestly: these controls reduce SSRF exposure but do not mathematically eliminate DNS rebinding.
+- **Files Changed:** `lib/security/dns-resolution.ts`, `app/api/security/scan-headers/route.ts`, DNS/route/runtime/Worker configuration tests, `package.json`, `docs/api/API_REFERENCE.md`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Node 22 focused DNS, route, runtime, Worker-contract, protected-route, and auth-inventory tests passed (33/33). Main and Worker typechecks, lint, full formatting, 825-file secret scan, 19 Sharp-gate tests, local Sharp audit exception, and the Cloudflare runtime audit passed.
+- **Follow-ups:** Cloudflare public-fetch restrictions remain part of the production SSRF boundary. No preview, dry-run, upload, deployment, production cutover, or push was performed; Sharp reachability deployment gates remain fail closed.

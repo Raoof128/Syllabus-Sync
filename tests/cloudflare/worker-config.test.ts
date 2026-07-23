@@ -87,13 +87,13 @@ describe('Cloudflare Worker configuration', () => {
     expect(production.triggers.crons).toEqual([]);
   });
 
-  it('enforces the isolated Worker typecheck in the global quality gate', async () => {
+  it('enforces runtime compatibility and the isolated Worker typecheck in the global gate', async () => {
     const packageJson = JSON.parse(await readFile('package.json', 'utf8')) as {
       scripts: Record<string, string>;
     };
 
     expect(packageJson.scripts.check).toBe(
-      'npm run check:secrets && npm run format:check && npm run typecheck && npm run typecheck:cloudflare && npm run lint && npm run test && npm run build',
+      'npm run check:secrets && npm run check:cloudflare-runtime && npm run format:check && npm run typecheck && npm run typecheck:cloudflare && npm run lint && npm run test && npm run build',
     );
   });
 });

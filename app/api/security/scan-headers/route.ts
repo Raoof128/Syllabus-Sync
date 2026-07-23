@@ -6,7 +6,6 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import dns from "node:dns/promises";
 import net from "node:net";
 import {
   scanURLHeaders,
@@ -22,6 +21,7 @@ import {
 import { securityScanLimiter } from "@/lib/services/rateLimitService";
 import { getClientIP } from "@/lib/security/ip";
 import { logger } from "@/lib/logger";
+import { resolveHostAddresses } from "@/lib/security/dns-resolution";
 
 export const runtime = "nodejs";
 
@@ -61,12 +61,17 @@ function isPrivateIPv4(ip: string): boolean {
   );
 }
 
+function mappedIPv4FromIPv6(address: string): string | null {
+  const match = /^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/.exec(address);
+  if (!match) return null;
+
+  const high = Number.parseInt(match[1], 16);
+  const low = Number.parseInt(match[2], 16);
+  return `${high >>> 8}.${high & 0xff}.${low >>> 8}.${low & 0xff}`;
+}
+
 function isPrivateOrLoopbackAddress(address: string): boolean {
   const normalized = address.toLowerCase();
-
-  if (normalized.startsWith("::ffff:")) {
-    return isPrivateIPv4(normalized.replace("::ffff:", ""));
-  }
 
   if (net.isIP(normalized) === 4) {
     return isPrivateIPv4(normalized);
@@ -76,13 +81,19 @@ function isPrivateOrLoopbackAddress(address: string): boolean {
     return false;
   }
 
-  if (normalized === "::1" || normalized === "::") return true;
-  if (normalized.startsWith("fc") || normalized.startsWith("fd")) return true; // ULA
+  // The URL parser gives a stable compressed IPv6 form, closing alternate
+  // textual representations such as expanded loopback addresses.
+  const canonical = new URL(`http://[${normalized}]/`).hostname.slice(1, -1);
+  const mappedIPv4 = mappedIPv4FromIPv6(canonical);
+  if (mappedIPv4) return isPrivateIPv4(mappedIPv4);
+
+  if (canonical === "::1" || canonical === "::") return true;
+  if (canonical.startsWith("fc") || canonical.startsWith("fd")) return true; // ULA
   if (
-    normalized.startsWith("fe8") ||
-    normalized.startsWith("fe9") ||
-    normalized.startsWith("fea") ||
-    normalized.startsWith("feb")
+    canonical.startsWith("fe8") ||
+    canonical.startsWith("fe9") ||
+    canonical.startsWith("fea") ||
+    canonical.startsWith("feb")
   )
     return true; // Link-local
 
@@ -115,7 +126,9 @@ async function validateScanTarget(
     }
   }
 
-  const hostname = parsed.hostname.toLowerCase();
+  // URL.hostname retains brackets around IPv6 literals. DNS and net.isIP use
+  // the unbracketed representation, so normalize before applying SSRF policy.
+  const hostname = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (
     BLOCKED_HOSTS.has(hostname) ||
     hostname.endsWith(".local") ||
@@ -130,15 +143,8 @@ async function validateScanTarget(
   }
 
   try {
-    const resolvedAddresses = await dns.lookup(hostname, {
-      all: true,
-      verbatim: true,
-    });
-    if (
-      resolvedAddresses.some((entry) =>
-        isPrivateOrLoopbackAddress(entry.address),
-      )
-    ) {
+    const resolvedAddresses = await resolveHostAddresses(hostname);
+    if (resolvedAddresses.some(isPrivateOrLoopbackAddress)) {
       return {
         valid: false,
         message: "Target resolves to a private network address",
@@ -199,6 +205,9 @@ export async function POST(request: NextRequest) {
     }
 
     const targetUrl = validation.url.toString();
+    // SECURITY BOUNDARY: validation and fetch perform separate DNS operations.
+    // Rejecting every private validation answer plus manual redirect handling
+    // reduces SSRF exposure, but cannot mathematically prevent DNS rebinding.
     const result = await scanURLHeaders(targetUrl);
 
     const response = NextResponse.json({

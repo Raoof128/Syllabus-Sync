@@ -626,7 +626,7 @@ Supported actions: `CREATE`, `READ`, `UPDATE`, `DELETE`, `LOGIN`, `LOGOUT`, `PAS
 | :----- | :--------------------------- | :------------ | :-------------------- | :------------------------------------------------------------------------------ |
 | `POST` | `/api/security/scan-headers` | Authenticated | `securityScanLimiter` | Analyze security headers of an external URL and return a graded posture report. |
 
-Blocks requests to internal hosts (`localhost`, `127.0.0.1`, `169.254.169.254`, etc.) and sensitive ports (22, 3306, 5432, 6379, etc.) to prevent SSRF.
+Blocks requests to internal hosts (`localhost`, `127.0.0.1`, `169.254.169.254`, etc.) and sensitive ports (22, 3306, 5432, 6379, etc.) to reduce SSRF exposure. The scanner resolves both IPv4 and IPv6 records with Worker-compatible DNS APIs, rejects the target if any returned address is loopback, private, or link-local, and does not follow redirects. DNS validation and the outbound fetch remain separate resolution events, so these controls do not mathematically eliminate DNS-rebinding time-of-check/time-of-use risk; Cloudflare's public-fetch restrictions remain part of the runtime boundary.
 
 ---
 
