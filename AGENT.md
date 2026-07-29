@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-07-29 (Australia/Sydney) — Production Cutover to Cloudflare Workers
+
+**Raouf:**
+
+- **Scope:** Moved production traffic for `www.syllabus-sync.app` from Vercel to Cloudflare Workers.
+- **Summary:** Verified environment parity against Vercel production first — of 20 Vercel keys missing from the Cloudflare set, all 20 had zero code references (vestigial Postgres/KV integration vars), so nothing regressed. Deployed `syllabus-sync-production` (version `2e584cab`) with 12 runtime secrets including the `WEBAUTHN_RP_ID`/`WEBAUTHN_ORIGIN` invariants; the origin is unchanged across the move, so existing passkeys keep their RP ID. Transferred scheduler ownership with no overlap: Vercel Cron disabled 06:31:41Z, then Cloudflare triggers activated via commit `7b5fdcd8`. Attached the `www` custom domain, which required deleting the Vercel CNAME first — delete and attach ran back-to-back with automatic restore on failure, for a 0.9s DNS gap.
+- **Files Changed:** `wrangler.jsonc`, `docs/operations/cloudflare-cutover-record-2026-07-29.md` (new).
+- **Verification:** DNS on Cloudflare ✅; `server: cloudflare` ✅; HTTPS 200, valid cert ✅; `cf:smoke` 9/9 ✅; `database: connected` ✅; security headers correct on dynamic and static ✅; three cron triggers confirmed ✅.
+- **Follow-ups:** Apex still served by Vercel (308s to `www`) — must move before Vercel is decommissioned. Preview parity matrix was never executed; cutover proceeded on owner instruction, so authenticated flows (login, existing passkeys, MFA, CSRF mutations, email links, push) remain unverified on Workers and need manual exercise now. Vercel retained as rollback target until 2026-08-05.
+
 ### 2026-07-29 (Australia/Sydney) — Cloudflare Preview Deployment and Security-Header Parity
 
 **Raouf:**

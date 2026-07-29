@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Production Cutover to Cloudflare Workers — 2026-07-29
+
+**Scope:** Moved production traffic for `www.syllabus-sync.app` from Vercel to Cloudflare Workers.
+
+**Summary:** Deployed `syllabus-sync-production` (version `2e584cab`) with 12 runtime secrets including the `WEBAUTHN_RP_ID` / `WEBAUTHN_ORIGIN` invariants. Confirmed environment parity against Vercel production first: of 20 Vercel keys absent from the Cloudflare set, all 20 proved to have zero code references (vestigial Vercel Postgres/KV integration variables), so no feature regression. Transferred scheduler ownership without overlap — Vercel Cron disabled at 06:31:41Z, then the three Cloudflare cron triggers activated by commit `7b5fdcd8` and confirmed on the Worker. Attached the `www.syllabus-sync.app` custom domain, which required deleting the existing Vercel CNAME first; delete and attach ran back-to-back with automatic CNAME restore on failure, leaving a 0.9 second DNS gap.
+
+**Files Changed:** `wrangler.jsonc`, `docs/operations/cloudflare-cutover-record-2026-07-29.md` (new).
+
+**Verification:** DNS resolves to Cloudflare ✅; `server: cloudflare`, `cf-ray: …-SYD` ✅; HTTPS 200 with a valid certificate ✅; `cf:smoke` **9/9** ✅; `/api/health` reports `database: connected` ✅; security headers present exactly once on dynamic routes and present on static assets ✅; all three cron triggers confirmed on the production Worker ✅; no scheduler overlap at any point ✅.
+
+**Follow-ups:** The apex `syllabus-sync.app` is still served by Vercel and 308-redirects to `www`; user-facing behaviour is correct, but it must move to Cloudflare before Vercel is decommissioned. The preview parity matrix was never executed — cutover proceeded on owner instruction with that gate unmet, so authenticated flows (login, existing passkeys, MFA, CSRF mutations, email links, push) remain unverified on Workers and need manual exercise now that traffic is live. Vercel is retained as the rollback target until 2026-08-05.
+
+---
+
 ### Raouf: Cloudflare Preview Deployment and Security-Header Parity — 2026-07-29
 
 **Scope:** First Cloudflare Workers preview deployment, plus two security-header regressions it exposed.

@@ -1,18 +1,38 @@
 {
   "schemaVersion": 1,
-  "assessedAt": "2026-07-22T16:15:37+10:00",
+  "assessedAt": "2026-07-29T06:33:01.640Z",
   "runtime": "Node.js v22.23.1",
   "build": {
     "profile": "production",
     "environment": "production",
     "command": "npm run cf:build:production",
-    "exitCode": null,
-    "outputDirectory": null,
-    "metafile": null,
-    "failure": "Production OpenNext build was not attempted because the required open-next.config.ts migration task is absent."
+    "exitCode": 0,
+    "outputDirectory": ".open-next",
+    "metafile": ".open-next/server-functions/default/handler.mjs.meta.json",
+    "outputSha256": "8f54c9104f3eaf53adb6328459a3fed6f65e25e547a5ef6e3840479fa1ed5477",
+    "metafileSha256": "379166b2d99b06475813d742aca13316ff200c028bd79fc9999bda5e96a46435"
   },
-  "sharpWorkerReachability": "unproven",
-  "searchedTerms": ["sharp", "libvips", "@img"],
+  "sharpWorkerReachability": "proven-absent",
+  "searchedTerms": [
+    "sharp",
+    "libvips",
+    "@img"
+  ],
   "matches": [],
-  "proofGap": "No production OpenNext output or esbuild metafile exists; production Worker reachability is unproven."
+  "toolingOnlyMatches": [
+    "assets/_next/static/chunks/9855-698d61afd9c0a0fe.js [incidental-name]",
+    "assets/_next/static/css/3435f2d12ee2b1d5.css [incidental-name]",
+    "middleware/handler.mjs [incidental-name]",
+    "server-functions/default/.next/server/app/auth/callback/route.js [incidental-name]",
+    "server-functions/default/.next/server/chunks/1813.js [incidental-name]",
+    "server-functions/default/.next/server/chunks/4857.js [incidental-name]",
+    "server-functions/default/.next/server/chunks/5861.js [incidental-name]",
+    "server-functions/default/.next/server/middleware.js [incidental-name]",
+    "server-functions/default/handler.mjs [incidental-name]",
+    "server-functions/default/node_modules/next/dist/compiled/@vercel/nft/index.js [incidental-name]",
+    "server-functions/default/node_modules/next/dist/server/capsize-font-metrics.json [incidental-name]",
+    "server-functions/default/node_modules/next/dist/server/image-optimizer.js [module-specifier] [unbundled-scaffolding]",
+    "server-functions/default/node_modules/next/package.json [incidental-name]",
+    "server-functions/default/package.json [incidental-name]"
+  ]
 }
