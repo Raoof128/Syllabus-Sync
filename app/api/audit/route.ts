@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonError, parseJsonBody, BODY_SIZE_LIMITS, ERROR_CODES } from '@/app/api/_lib/response';
-import { requireAuth } from '@/app/api/_lib/middleware';
+import { requireAuth, requireAuthWithRateLimit } from '@/app/api/_lib/middleware';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
 
@@ -145,92 +145,99 @@ export async function GET(request: NextRequest) {
 // ============================================================================
 
 export async function POST(request: NextRequest) {
-  return requireAuth(request, async (userId: string) => {
-    try {
-      // SECURITY: Use parseJsonBody with size limit instead of raw request.json()
-      const { data: body, error: bodyError } = await parseJsonBody(
-        request,
-        BODY_SIZE_LIMITS.DEFAULT,
-      );
-      if (bodyError) return bodyError;
-      const { action, tableName, recordId, oldData, newData, severity, metadata } = body as Record<
-        string,
-        unknown
-      >;
+  // SECURITY (BA-0007): unlike every other mutation route in this codebase,
+  // this endpoint had no rate limiter, letting an authenticated user flood
+  // their own audit log with self-attributed rows (log_audit() pins
+  // user_id = auth.uid(), so cross-user forgery is already blocked — this
+  // closes the remaining self-flood/log-noise gap).
+  return requireAuthWithRateLimit(
+    request,
+    async (userId: string) => {
+      try {
+        // SECURITY: Use parseJsonBody with size limit instead of raw request.json()
+        const { data: body, error: bodyError } = await parseJsonBody(
+          request,
+          BODY_SIZE_LIMITS.DEFAULT,
+        );
+        if (bodyError) return bodyError;
+        const { action, tableName, recordId, oldData, newData, severity, metadata } =
+          body as Record<string, unknown>;
 
-      // Validate required fields
-      if (!action) {
-        return jsonError('Action is required', 400, ERROR_CODES.BAD_REQUEST);
+        // Validate required fields
+        if (!action) {
+          return jsonError('Action is required', 400, ERROR_CODES.BAD_REQUEST);
+        }
+
+        // Validate action
+        const validActions = [
+          'CREATE',
+          'READ',
+          'UPDATE',
+          'DELETE',
+          'LOGIN',
+          'LOGOUT',
+          'PASSWORD_CHANGE',
+          'PASSWORD_RESET',
+          'EMAIL_CHANGE',
+          'MFA_ENABLE',
+          'MFA_DISABLE',
+          'MFA_BACKUP_CODE_USED',
+          'API_KEY_CREATE',
+          'API_KEY_REVOKE',
+          'SETTINGS_CHANGE',
+          'EXPORT',
+          'IMPORT',
+          'SESSION_TERMINATED',
+          'SECURITY_EVENT',
+          'RATE_LIMIT_EXCEEDED',
+          'IP_ANOMALY_DETECTED',
+          'DEVICE_FINGERPRINT_CHANGED',
+          'SUSPICIOUS_ACTIVITY',
+        ];
+
+        if (!validActions.includes(action as string)) {
+          return jsonError('Invalid action', 400, ERROR_CODES.BAD_REQUEST);
+        }
+
+        // Validate severity
+        const validSeverities = ['info', 'warning', 'critical'];
+        const finalSeverity = (severity as string) || 'info';
+        if (!validSeverities.includes(finalSeverity)) {
+          return jsonError('Invalid severity', 400, ERROR_CODES.BAD_REQUEST);
+        }
+
+        const supabase = await createServerClient();
+        const ip = getClientIP(request);
+        const userAgent = request.headers.get('user-agent') || undefined;
+
+        // Log audit event
+        const { data: logId, error } = await supabase.rpc('log_audit', {
+          p_user_id: userId,
+          p_action: action,
+          p_table_name: tableName || null,
+          p_record_id: recordId || null,
+          p_old_data: oldData ? JSON.stringify(oldData) : null,
+          p_new_data: newData ? JSON.stringify(newData) : null,
+          p_severity: finalSeverity,
+          p_ip_address: ip,
+          p_user_agent: userAgent,
+          p_metadata: metadata ? JSON.stringify(metadata) : '{}',
+        });
+
+        if (error) {
+          logger.error('Failed to log audit event:', error);
+          return jsonError('Failed to log audit event', 500, ERROR_CODES.INTERNAL_ERROR);
+        }
+
+        return NextResponse.json({
+          success: true,
+          logId,
+        });
+      } catch (error) {
+        logger.error('Audit log API error:', error);
+        return jsonError('Failed to process request', 500, ERROR_CODES.INTERNAL_ERROR);
       }
-
-      // Validate action
-      const validActions = [
-        'CREATE',
-        'READ',
-        'UPDATE',
-        'DELETE',
-        'LOGIN',
-        'LOGOUT',
-        'PASSWORD_CHANGE',
-        'PASSWORD_RESET',
-        'EMAIL_CHANGE',
-        'MFA_ENABLE',
-        'MFA_DISABLE',
-        'MFA_BACKUP_CODE_USED',
-        'API_KEY_CREATE',
-        'API_KEY_REVOKE',
-        'SETTINGS_CHANGE',
-        'EXPORT',
-        'IMPORT',
-        'SESSION_TERMINATED',
-        'SECURITY_EVENT',
-        'RATE_LIMIT_EXCEEDED',
-        'IP_ANOMALY_DETECTED',
-        'DEVICE_FINGERPRINT_CHANGED',
-        'SUSPICIOUS_ACTIVITY',
-      ];
-
-      if (!validActions.includes(action as string)) {
-        return jsonError('Invalid action', 400, ERROR_CODES.BAD_REQUEST);
-      }
-
-      // Validate severity
-      const validSeverities = ['info', 'warning', 'critical'];
-      const finalSeverity = (severity as string) || 'info';
-      if (!validSeverities.includes(finalSeverity)) {
-        return jsonError('Invalid severity', 400, ERROR_CODES.BAD_REQUEST);
-      }
-
-      const supabase = await createServerClient();
-      const ip = getClientIP(request);
-      const userAgent = request.headers.get('user-agent') || undefined;
-
-      // Log audit event
-      const { data: logId, error } = await supabase.rpc('log_audit', {
-        p_user_id: userId,
-        p_action: action,
-        p_table_name: tableName || null,
-        p_record_id: recordId || null,
-        p_old_data: oldData ? JSON.stringify(oldData) : null,
-        p_new_data: newData ? JSON.stringify(newData) : null,
-        p_severity: finalSeverity,
-        p_ip_address: ip,
-        p_user_agent: userAgent,
-        p_metadata: metadata ? JSON.stringify(metadata) : '{}',
-      });
-
-      if (error) {
-        logger.error('Failed to log audit event:', error);
-        return jsonError('Failed to log audit event', 500, ERROR_CODES.INTERNAL_ERROR);
-      }
-
-      return NextResponse.json({
-        success: true,
-        logId,
-      });
-    } catch (error) {
-      logger.error('Audit log API error:', error);
-      return jsonError('Failed to process request', 500, ERROR_CODES.INTERNAL_ERROR);
-    }
-  });
+    },
+    'audit',
+  );
 }
