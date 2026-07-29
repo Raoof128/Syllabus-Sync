@@ -212,13 +212,35 @@ async function handlePushReminderCron() {
     reminderCount += reminders.length;
 
     for (const reminder of reminders) {
-      const { data: existingDelivery } = await admin
+      // SECURITY/CORRECTNESS (BA-0015): dedup used to be check-then-insert
+      // (SELECT for an existing row, then INSERT if none was found), which
+      // is a classic TOCTOU race — two overlapping cron invocations (or two
+      // runs within the same lookahead window) could both pass the SELECT
+      // before either INSERT committed, and both would go on to send the
+      // push notification, double-sending the reminder. `reminder_key` has
+      // a UNIQUE constraint (supabase/migrations/20260313093000), so we
+      // instead INSERT the delivery row FIRST as an atomic claim — only one
+      // concurrent invocation can ever win it — and only send the push
+      // after the claim succeeds. A unique-violation (23505) means another
+      // invocation already claimed and is handling this exact reminder, so
+      // we skip it here rather than sending a duplicate.
+      const { data: claimedDelivery, error: claimError } = await admin
         .from('push_reminder_deliveries')
+        .insert({
+          user_id: preference.user_id,
+          reminder_key: reminder.reminderKey,
+          reminder_type: reminder.reminderType,
+          related_id: reminder.relatedId,
+          scheduled_for: reminder.scheduledFor,
+          metadata: reminder.payload.data,
+        })
         .select('id')
-        .eq('reminder_key', reminder.reminderKey)
-        .maybeSingle();
+        .single();
 
-      if (existingDelivery) {
+      if (claimError) {
+        if (claimError.code !== '23505') {
+          logger.error('Failed to claim push reminder delivery', claimError);
+        }
         continue;
       }
 
@@ -227,20 +249,11 @@ async function handlePushReminderCron() {
       removedInvalidSubscriptionCount += result.invalidSubscriptionsRemoved;
 
       if (result.sentCount === 0) {
-        continue;
-      }
-
-      const { error: deliveryError } = await admin.from('push_reminder_deliveries').insert({
-        user_id: preference.user_id,
-        reminder_key: reminder.reminderKey,
-        reminder_type: reminder.reminderType,
-        related_id: reminder.relatedId,
-        scheduled_for: reminder.scheduledFor,
-        metadata: reminder.payload.data,
-      });
-
-      if (deliveryError) {
-        logger.error('Failed to record push reminder delivery', deliveryError);
+        // Nothing was actually delivered (e.g. no valid subscriptions right
+        // now) — release the claim so a later run can retry this reminder
+        // instead of being permanently blocked by a row that recorded a
+        // delivery that never happened.
+        await admin.from('push_reminder_deliveries').delete().eq('id', claimedDelivery.id);
         continue;
       }
 
