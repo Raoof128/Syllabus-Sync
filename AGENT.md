@@ -497,3 +497,14 @@ Follow-ups: Once a GitHub repository URL is confirmed, update the badge URLs and
 - **Files Changed:** `tools/cloudflare/check-public-env.mjs`, `tests/cloudflare/public-env-gate.test.ts`, `package.json`, the finding ledger, `AGENT.md`, `CHANGELOG.md`.
 - **Verification:** Production version `e9e93429`; `npm run check` exit 0 with 1239 tests; **signup HTTP 200** (was 503 for every user since cutover); health healthy/connected; weather 200; all hostile origins 403; login 429s from attempt 11; `cf:smoke` 9/9. Test user deleted, `auth.users` back to 29.
 - **Follow-ups:** Split the Maps key into a referrer-restricted browser key and a separate server key (it is currently both public and server-side, so the public value can drive billable usage). Narrow or revoke `CLOUDFLARE_API_KEY` — `API Tokens Write` is effectively root for token minting. The leaked Supabase PAT in `~/.zshrc`/`~/.bashrc` is still unrotated.
+
+### 2026-07-30 (Australia/Sydney) — BA-0048: Cross-User Profile Read (a P0 this audit had reported as absent)
+
+**Raouf:**
+
+- **Scope:** Fixed a live cross-user PII exposure on `public.profiles` and corrected two earlier incorrect conclusions.
+- **Summary:** `profiles_select` was PERMISSIVE / `FOR SELECT` / role `public` / `USING (true)`, beside the correct owner-scoped policy. Postgres ORs permissive policies, so every authenticated user could read every profile. Proven: a throwaway account read **30 rows** — 30 emails, 30 names, 16 student IDs. Live since the initial schema in Jan 2026.
+- **THE LESSON — I made the same mistake twice:** BA-0021 declared "no live PII exposure" from the `user_details` **view** (which is genuinely secure) without checking the base table's policies. BA-0030 then dropped always-true policies only from the four tables **the advisor named** instead of sweeping `pg_policies`. Both are the same error: trusting a derived object, or someone else's list, over the catalog. Verification now sweeps every table in `public`, with `xp_config` the one justified exception. **When a control is table-scoped, enumerate from the catalog — never from a report.**
+- **Files Changed:** `supabase/migrations/20260730120000_fix_profiles_cross_user_read.sql`, `tests/security/profiles-cross-user-read.test.ts`, the finding ledger, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** Same session token: 30 rows → 1 row, own profile still readable. `npm run check` exit 0, 1242 tests. Throwaway account deleted; users/profiles back to 29/29.
+- **Follow-ups:** `audit_logs` has 0 rows, so exploitation over the ~6-month window can be neither confirmed nor ruled out. Finding all 48 is now recorded in the security questionnaire on the Desktop.

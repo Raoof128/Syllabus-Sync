@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Cross-User Profile Read (BA-0048) — a P0 This Audit Reported as Absent — 2026-07-30
+
+**Scope:** Fixed a live cross-user PII exposure on `public.profiles` that two earlier passes of this audit failed to find, and corrected the record.
+
+**Summary:** `public.profiles` carried `profiles_select` — PERMISSIVE, `FOR SELECT`, role `public` (which includes `authenticated`), `USING (true)` — sitting beside the correct `"Users can view their own profile"` with `USING (auth.uid() = id)`. Postgres ORs permissive policies, so the unconditional one won and the ownership check was inert. `authenticated` holds the table-level SELECT grant, so **any account could read every profile row**. Proven against production: a throwaway account created seconds earlier read **30 profile rows** — 30 emails, 30 full names, 16 student IDs. The defect dates to `20260104000000_initial_schema.sql`, so it was live for roughly six months.
+
+**This audit reported the opposite, twice, and both misses share one cause — trusting a derived object or a supplied list over the catalog:**
+
+1. **BA-0021** concluded there was no live PII exposure. That was based on `public.user_details`, the _view_, which genuinely does carry `security_invoker = true` and genuinely does deny anon. The base table's own policies were never examined, so a live exposure was recorded as absent.
+2. **BA-0030** dropped unconditional policies from `events`, `deadlines`, `units` and `class_times` — the four tables Supabase's advisor happened to name — instead of sweeping `pg_policies`. `profiles` has the identical defect and was not on that list.
+
+The new migration's verification therefore sweeps **every** table in `public` rather than an enumerated set, with `xp_config` the single allow-listed exception (a non-personal lookup table clients are meant to read). That way the next table with this defect fails the migration without anyone having to think of it.
+
+**Files Changed:** `supabase/migrations/20260730120000_fix_profiles_cross_user_read.sql` (new), `tests/security/profiles-cross-user-read.test.ts` (new), `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Applied to production. The same session token that read 30 rows now reads exactly **1**, and its own profile is still readable, so no lockout. Catalog sweep confirms no unconditional client-reachable policy remains on any table in `public` except `xp_config`. `npm run check` exit 0 with **1242 tests**. The throwaway account was deleted — `auth.users` and `profiles` both back to 29.
+
+**Follow-ups:** `audit_logs` is empty (0 rows against 29 users and six months of activity), so whether this was ever exploited can be neither confirmed nor ruled out — that gap is now the highest-value thing left to fix. This finding is disclosed in the security questionnaire as an incident rather than a backlog item.
+
+---
+
 ### Raouf: Deployed the Red-Team Fixes, Restored Missing API Keys — and Caused/Recovered a Production Outage — 2026-07-30
 
 **Scope:** Minted a scoped Cloudflare deploy token, set the three missing Google API keys, and shipped every outstanding red-team fix to production. Includes an outage this work caused and rolled back.
