@@ -111,7 +111,10 @@ describe('BA-0015: push-reminders delivery dedup is atomic under overlapping inv
                 if (claimedKeys.has(row.reminder_key)) {
                   return {
                     data: null,
-                    error: { code: '23505', message: 'duplicate key value violates unique constraint' },
+                    error: {
+                      code: '23505',
+                      message: 'duplicate key value violates unique constraint',
+                    },
                   };
                 }
 

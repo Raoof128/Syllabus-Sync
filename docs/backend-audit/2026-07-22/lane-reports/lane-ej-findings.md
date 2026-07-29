@@ -14,23 +14,24 @@ reported below as BA-0004.
 
 ## Summary table
 
-| ID | Title | Severity | Lane |
-|----|-------|----------|------|
-| BA-0002 | Unverified "biometric" credential planting → persistent auth backdoor | **P1** | E |
-| BA-0003 | New WebAuthn/passkey enrollment does not require AAL2 step-up | P2 | E |
-| BA-0004 | Password-reset / email-verify token consumption discards UPDATE result (sibling of BA-0001) | P2 | E |
-| BA-0005 | Password change/reset does not revoke other sessions (dead session-termination module) | P2 | E |
-| BA-0006 | Duplicate, inconsistent passkey implementations (architectural root cause of BA-0002/0003) | P3 | E |
-| BA-0007 | Audit log self-forgery, no rate limit on `POST /api/audit` | P2 | J |
-| BA-0008 | No account-deletion / erasure flow exists (scope gap, not a defect) | Info | J |
-| BA-0009 | Client-side JSON "export" — no CSV/formula-injection surface, blocklist sanitization | Info | J |
-| BA-0010 | Signup account-enumeration is a documented, deliberate UX trade-off | Info/P3 | E |
+| ID      | Title                                                                                       | Severity | Lane |
+| ------- | ------------------------------------------------------------------------------------------- | -------- | ---- |
+| BA-0002 | Unverified "biometric" credential planting → persistent auth backdoor                       | **P1**   | E    |
+| BA-0003 | New WebAuthn/passkey enrollment does not require AAL2 step-up                               | P2       | E    |
+| BA-0004 | Password-reset / email-verify token consumption discards UPDATE result (sibling of BA-0001) | P2       | E    |
+| BA-0005 | Password change/reset does not revoke other sessions (dead session-termination module)      | P2       | E    |
+| BA-0006 | Duplicate, inconsistent passkey implementations (architectural root cause of BA-0002/0003)  | P3       | E    |
+| BA-0007 | Audit log self-forgery, no rate limit on `POST /api/audit`                                  | P2       | J    |
+| BA-0008 | No account-deletion / erasure flow exists (scope gap, not a defect)                         | Info     | J    |
+| BA-0009 | Client-side JSON "export" — no CSV/formula-injection surface, blocklist sanitization        | Info     | J    |
+| BA-0010 | Signup account-enumeration is a documented, deliberate UX trade-off                         | Info/P3  | E    |
 
 ---
 
 ## BA-0002 — Unverified "biometric" credential planting → persistent auth backdoor (P1)
 
 **Files:**
+
 - `app/api/auth/biometric/route.ts:70-140` (vulnerable write path)
 - `app/api/auth/passkey/verify/route.ts:59-136` (consumes the planted metadata to mint a session)
 - `app/api/webauthn/authenticate/verify/route.ts:85-157` (also has a "legacy user_metadata"
@@ -38,7 +39,7 @@ reported below as BA-0004.
 
 **Root cause:**
 
-`POST /api/auth/biometric` is a *second, parallel* passkey-enable endpoint (independent of the
+`POST /api/auth/biometric` is a _second, parallel_ passkey-enable endpoint (independent of the
 correctly-implemented `/api/webauthn/register/*` and `/api/auth/passkey/register*` ceremony
 flows). It requires only a valid session (`supabase.auth.getUser()`), then writes
 client-supplied values straight into `user_metadata` with **zero WebAuthn verification** —
@@ -101,7 +102,7 @@ authenticator involved, and complete login.
    `POST /api/auth/biometric {"enabled":true,"credentialId":"<self-chosen>","publicKey":"<own pubkey>","counter":0}`
    using the victim's session. No CSRF token is needed if the request has no `Origin`/`Referer`
    header (curl-style — `lib/security/csrf.ts` `validateOrigin()` explicitly allows this:
-   *"No origin + no referer = non-browser (curl, Postman, service worker) → allow"*).
+   _"No origin + no referer = non-browser (curl, Postman, service worker) → allow"_).
 3. The victim's `user_metadata.biometric_credential_id/biometric_public_key` now points at a
    key the attacker controls, with `biometric_enabled: true`.
 4. At any later time — including **after the victim changes their password** — the attacker
@@ -117,6 +118,7 @@ theft, shared device, or similar) at any point in time. No cross-user primitive 
 beyond that — this is what elevates a temporary foothold into permanent account takeover.
 
 **Fix:**
+
 - Delete/disable the `enabled:true` branch of `POST /api/auth/biometric` (or require it to go
   through `verifyRegistrationResponse` with a server-stored, single-use challenge exactly like
   `/api/webauthn/register/verify`).
@@ -132,6 +134,7 @@ beyond that — this is what elevates a temporary foothold into permanent accoun
 ## BA-0003 — New WebAuthn/passkey enrollment does not require AAL2 step-up (P2)
 
 **Files:**
+
 - `app/api/webauthn/register/options/route.ts:33-105`
 - `app/api/webauthn/register/verify/route.ts:33-148`
 - `app/api/auth/passkey/register-options/route.ts:9-52`
@@ -146,7 +149,7 @@ public for the purposes of `shouldResolveUser`/`requiresMfaUpgrade`, so the
 `if (isApiRoute && !isPublicApi && user && requiresMfaUpgrade)` 403 gate at
 `lib/middleware.ts:340-347` never fires for these routes. Only
 `app/api/auth/mfa/unenroll/route.ts:58-99` opts in to its own explicit AAL2 check — enrollment
-of a *new* factor has no equivalent guard anywhere.
+of a _new_ factor has no equivalent guard anywhere.
 
 **Concrete failure scenario:** an attacker who has hijacked a session that is only at `aal1`
 (e.g. a stolen cookie captured before the legitimate user completed their TOTP/SMS challenge,
@@ -163,6 +166,7 @@ factors — mirroring the existing pattern in `mfa/unenroll`.
 ## BA-0004 — Password-reset / email-verify token consumption discards UPDATE result (P2, sibling of BA-0001)
 
 **Files:**
+
 - `app/api/auth/password/reset/route.ts:63-90`
 - `app/api/auth/email/verify/route.ts:68-96`
 - (dead-code sibling, not currently reachable: `lib/security/two-factor-backup-codes.ts:217-253` `consumeBackupCode()`)
@@ -183,7 +187,7 @@ if (updateError) { ...500... }
 // falls through to change the password regardless of how many rows the UPDATE touched
 ```
 
-The `.eq('used', false)` guard on the UPDATE is a correct compare-and-swap *at the SQL level*,
+The `.eq('used', false)` guard on the UPDATE is a correct compare-and-swap _at the SQL level_,
 but the Supabase JS client only returns an `error`, not the affected row count, unless
 `.select()` is chained (default `Prefer: return=minimal` → PostgREST returns 204 with no error
 even when 0 rows matched). The code never checks this, so it cannot tell "I consumed the
@@ -192,7 +196,7 @@ prevents double-use race condition") is therefore inaccurate: the guard exists i
 result is never observed by the application, exactly mirroring the discarded `DELETE` result in
 `consumeChallenge()` (BA-0001).
 
-**Concrete failure scenario:** two near-simultaneous `POST` requests carrying the *same* valid
+**Concrete failure scenario:** two near-simultaneous `POST` requests carrying the _same_ valid
 reset/verification token (e.g. an email-security scanner prefetching the link at the same
 moment the user clicks it, or a duplicate form submission/replay by anyone who has seen the
 token) can both pass the initial SELECT, both issue the guarded UPDATE, and — because neither
@@ -212,6 +216,7 @@ lookup-miss case).
 ## BA-0005 — Password change/reset does not revoke other sessions (P2)
 
 **Files:**
+
 - `app/api/auth/password/route.ts:71-84` (authenticated in-app password change)
 - `app/api/auth/password/reset/route.ts:92-99` (forgot-password token flow)
 - `lib/security/session-termination.ts` (implements the missing behavior, but is dead code)
@@ -274,6 +279,7 @@ this codebase (signin, signup, MFA, passkey, password reset, etc., all of which 
 `createRateLimiter`) — **this route has no rate limiter at all**.
 
 **Concrete failure scenario:**
+
 1. A user under scrutiny (e.g. an abuse/policy investigation, or someone who wants to obscure
    what they actually did) can inject fabricated, benign-looking entries into their own
    official audit trail, or fabricate entries that contradict what really happened — directly
@@ -314,12 +320,12 @@ The only "export" feature is entirely client-side: it reads already-loaded Zusta
 JSON. There is no server round-trip, no CSV/XLSX generation, and therefore no spreadsheet
 formula-injection surface (`=`, `+`, `-`, `@` leading characters are irrelevant to a `.json`
 download opened as text/JSON, not imported into Excel/Sheets as tabular data). `sanitizeData()`
-recursively drops any object key whose name *contains* `token`, `password`, `secret`,
+recursively drops any object key whose name _contains_ `token`, `password`, `secret`,
 `sessionid`, `auth`, or `key` — a coarse denylist rather than an allowlist. It does not
 strip PII fields (email, student ID, etc.) because those are presumably intended to be
 exportable user data; this is a reasonable design choice, not a defect, but is noted since the
 denylist approach means any future field added to these stores whose name doesn't match one of
-those substrings will be exported by default (fail-open-by-omission for *future* sensitive
+those substrings will be exported by default (fail-open-by-omission for _future_ sensitive
 fields, not a currently exploitable issue).
 
 ---

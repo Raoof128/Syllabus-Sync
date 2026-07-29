@@ -13,15 +13,25 @@
 -- user: per-user deadline/completion counts, activity telemetry, and the full
 -- (not top-100) XP roster.
 --
+-- CORRECTION (verified against production 2026-07-29): `anon` holds the same
+-- privileges, so the exposure is unauthenticated, not merely cross-user. A
+-- plain `GET /rest/v1/mv_xp_leaderboard` carrying only the publishable anon
+-- key shipped in the web bundle returned HTTP 200. It returned zero rows only
+-- because these matviews have never been REFRESHed — the first refresh would
+-- serve all 29 users' analytics to the open internet. Both roles additionally
+-- hold INSERT/UPDATE/DELETE/TRUNCATE/TRIGGER/REFERENCES/MAINTAIN, which are
+-- inert against a read-only matview but are noise that hides the real grant.
+-- Revoke ALL from both client roles rather than SELECT from one.
+--
 -- The only correct remedy is to revoke the direct grant and serve the data
 -- through SECURITY DEFINER functions that filter by auth.uid() (or, for the
 -- leaderboard, reinstate an explicit bound instead of returning everyone).
 --
 -- Idempotent: REVOKE/GRANT and CREATE OR REPLACE are safe to re-run.
 
-REVOKE SELECT ON public.mv_deadline_analytics FROM authenticated;
-REVOKE SELECT ON public.mv_user_activity_summary FROM authenticated;
-REVOKE SELECT ON public.mv_xp_leaderboard FROM authenticated;
+REVOKE ALL ON public.mv_deadline_analytics FROM anon, authenticated;
+REVOKE ALL ON public.mv_user_activity_summary FROM anon, authenticated;
+REVOKE ALL ON public.mv_xp_leaderboard FROM anon, authenticated;
 
 GRANT SELECT ON public.mv_deadline_analytics TO service_role;
 GRANT SELECT ON public.mv_user_activity_summary TO service_role;
@@ -78,7 +88,7 @@ DO $$
 DECLARE
   offending text;
 BEGIN
-  SELECT string_agg(DISTINCT c.relname, ', ')
+  SELECT string_agg(DISTINCT c.relname || ' (' || r.rolname || ')', ', ')
   INTO offending
   FROM pg_class c
   JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -87,11 +97,10 @@ BEGIN
   WHERE n.nspname = 'public'
     AND c.relkind = 'm'
     AND c.relname IN ('mv_deadline_analytics', 'mv_user_activity_summary', 'mv_xp_leaderboard')
-    AND r.rolname = 'authenticated'
-    AND acl.privilege_type = 'SELECT';
+    AND r.rolname IN ('anon', 'authenticated');
 
   IF offending IS NOT NULL THEN
-    RAISE EXCEPTION 'BA-0023 verification failed: authenticated still has direct SELECT on: %', offending;
+    RAISE EXCEPTION 'BA-0023 verification failed: client roles still hold privileges on: %', offending;
   END IF;
 END
 $$;

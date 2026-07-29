@@ -1112,6 +1112,10 @@ export type Database = {
         Returns: Json;
       };
       calculate_level: { Args: { p_xp: number }; Returns: number };
+      ensure_my_gamification_profile: {
+        Args: never;
+        Returns: Database['public']['Tables']['gamification_profiles']['Row'][];
+      };
       cleanup_expired_email_verifications: { Args: never; Returns: number };
       cleanup_expired_password_resets: { Args: never; Returns: number };
       cleanup_expired_rate_limits: { Args: never; Returns: number };

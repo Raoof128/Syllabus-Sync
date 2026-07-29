@@ -26,6 +26,41 @@ REVOKE INSERT, UPDATE ON public.gamification_profiles FROM authenticated;
 DROP POLICY IF EXISTS "Users can insert their own gamification profile" ON public.gamification_profiles;
 DROP POLICY IF EXISTS "Users can update their own gamification profile" ON public.gamification_profiles;
 
+-- The revoke above breaks one legitimate caller: app/api/gamification/route.ts
+-- lazily creates a missing profile with a direct
+-- `.from('gamification_profiles').insert({ user_id })` on a user-scoped client,
+-- which runs as `authenticated`. Without a replacement, a first-time profile
+-- fetch would 500 for any user lacking a row (BA-0028).
+--
+-- This is the narrowest possible replacement: it takes no arguments, so the
+-- caller cannot name a victim, and it creates a row only for auth.uid() —
+-- closing the write path without reopening the BA-0022 IDOR. It cannot be used
+-- to set xp/streak values; those remain the exclusive province of award_xp()
+-- and update_streak().
+CREATE OR REPLACE FUNCTION public.ensure_my_gamification_profile()
+RETURNS SETOF public.gamification_profiles
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated' USING ERRCODE = '42501';
+  END IF;
+
+  INSERT INTO public.gamification_profiles (user_id)
+  VALUES (auth.uid())
+  ON CONFLICT (user_id) DO NOTHING;
+
+  RETURN QUERY
+    SELECT * FROM public.gamification_profiles WHERE user_id = auth.uid();
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.ensure_my_gamification_profile() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.ensure_my_gamification_profile() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.ensure_my_gamification_profile() TO service_role;
+
 -- ============================================================================
 -- Part B: on_deadline_completed() permits double/duplicate XP awards.
 --
@@ -41,9 +76,21 @@ DROP POLICY IF EXISTS "Users can update their own gamification profile" ON publi
 -- violation for legitimate double-submits, e.g. a retried request).
 -- ============================================================================
 
+-- Production already holds 6 rows that violate this constraint: three pairs,
+-- all written at 2026-01-30 06:14:12 within a 2.6-second window — one
+-- double-submitted request, not XP farming. An unconditional unique index
+-- would abort this migration.
+--
+-- The index is therefore bounded to events written from this migration
+-- onwards. Deleting the historical rows was considered and rejected: it would
+-- leave that user's xp_events ledger summing to 60 XP less than their
+-- gamification_profiles.xp balance, and correcting the balance instead would
+-- visibly remove XP (and possibly a level) from a real user to tidy up a
+-- four-month-old bug that has already been paid out.
 CREATE UNIQUE INDEX IF NOT EXISTS uq_xp_events_user_event_ref
   ON public.xp_events (user_id, event_type, reference_id)
-  WHERE reference_id IS NOT NULL;
+  WHERE reference_id IS NOT NULL
+    AND created_at > TIMESTAMPTZ '2026-07-29 11:40:00+00';
 
 CREATE OR REPLACE FUNCTION public.award_xp(
   p_user_id uuid,

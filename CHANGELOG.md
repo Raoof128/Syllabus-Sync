@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Backend Audit Database Remediation Applied to Production — 2026-07-29
+
+**Scope:** Applied every outstanding audit migration to the production Supabase project via the CLI, and fixed five further findings surfaced while doing so — four of them live, unauthenticated, and missed by the audit itself.
+
+**Summary:** Pushed nine migrations to `cxsqlgvbwtevkkljzolg`. Three corrections matter more than the push:
+
+1. **BA-0021 was never live.** The audit's migration-chain reading concluded `user_details` had lost `security_invoker`, and that conclusion was reported repeatedly as an active PII exposure. The production catalog says otherwise: the flag is set, `user_details` is the only view in `public`, anon reads return 401, and the advisors report no `security_definer_view` finding. Migration `20260729080000` applied as a no-op and stands as a forward guard. No user PII was ever exposed by this defect.
+2. **BA-0023 was worse than documented, and real.** `anon` — the publishable key in the web bundle — held full privileges on all three materialized views, so the exposure was unauthenticated rather than cross-user. `GET /rest/v1/mv_xp_leaderboard` with only the anon key returned HTTP 200. It returned zero rows solely because the matviews have never been REFRESHed; the first refresh would have served all 29 users' analytics to the open internet. The migration as written revoked `SELECT` from `authenticated` only and would not have closed it.
+3. **Running `supabase db advisors` found two live P0s the audit never looked for.** `auth.role() = 'authenticated'` ownership gates are skipped entirely for `anon`, and `REVOKE ALL ... FROM PUBLIC` does not stop it because Supabase grants `anon` EXECUTE directly. Proven against production with the anon key alone. Separately, sixteen duplicate `USING (true)` RLS policies let any authenticated user update or delete any other user's events, deadlines, units and class times.
+
+**Files Changed:** `supabase/migrations/20260729090100`, `20260729090300` (amended pre-apply), `20260729110000`, `20260729110001`, `20260729120000`, `20260729130000` (new), `app/api/gamification/route.ts`, `lib/supabase/database.types.ts`, `tests/security/materialized-view-grants.test.ts`, `tests/security/gamification-profile-write-path.test.ts` (new), `tests/security/definer-guards-and-permissive-policies.test.ts` (new), `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`.
+
+**Verification:** Every fix confirmed against the live database, not inferred. The anon attack that previously reached `award_xp`'s body now returns `42501 permission denied`; all three matviews, `user_details`, `profiles` and `events` return 401 to the anon key. Advisor findings 119 → 99 with `rls_policy_always_true` 12 → 0 and zero ERROR-level findings throughout. `npm run check` exits 0: 132 files, **1207 tests**, secrets scan 890 files, build compiles. No production row was deleted or modified — `xp_events` still holds 125 rows.
+
+**Follow-ups:** The XP unique index is bounded to events created after this migration, because six pre-existing rows (one double-submitted request on 2026-01-30, 60 XP) violate it; deleting them was rejected on the owner's instruction as it would desynchronise the ledger from users' balances. 25 SECURITY DEFINER functions remain executable by `anon` — none uses the bypassable gate, but each needs individual review. Anonymous sign-ins are enabled (26 advisor findings), which makes `TO authenticated` weaker than it reads. 13 functions still have a mutable `search_path`. The Supabase personal access token in the shell profile was exposed and must be rotated.
+
+---
+
 ### Raouf: Production Cutover to Cloudflare Workers — 2026-07-29
 
 **Scope:** Moved production traffic for `www.syllabus-sync.app` from Vercel to Cloudflare Workers.
