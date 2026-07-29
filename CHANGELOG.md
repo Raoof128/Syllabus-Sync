@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: CI Deploy Credentials Recovered, CRON_SECRET Rotated — 2026-07-30
+
+**Scope:** Completed the CI deploy configuration by recovering the secret values Cloudflare will not return.
+
+**Summary:** Cloudflare's Workers secrets API is write-only, confirmed against three endpoints — `/secrets`, `/secrets/{name}` and `/settings` all return `name` and `type` only, never a value. The values were still recoverable, though, because they were originally copied from Vercel during the cutover and Vercel's per-variable endpoint decrypts: that recovered `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `KV_REST_API_URL` and `KV_REST_API_TOKEN`. `CRON_SECRET` is Vercel type `sensitive` and is never returned, so it was rotated instead — safe because it is self-contained (`lib/cloudflare/scheduled.ts` reads it from env and calls the app's own protected route with the same value) and Vercel Cron was disabled at cutover. Verified live: 401 without it, 401 with a wrong value, 200 with the new one.
+
+Two incidental findings. The rate limiter runs on `KV_REST_API_*` — the Vercel-KV branch of `getStore()` — not on Upstash-named variables and not on the Postgres store, which is exactly why `public.rate_limits` is empty while rate limiting works. And the `WEBAUTHN_RP_ID` CI variable had been set to `www.syllabus-sync.app`; the canonical value is the apex `syllabus-sync.app`, because an RP ID must be a registrable suffix of the origin. The deployment env gate rejected it, which is the gate doing its job.
+
+**Files Changed:** `AGENT.md`, `CHANGELOG.md`. Credentials live in CI secrets and Worker secrets, not in the repository.
+
+**Verification:** `node tools/deployment/check-required-env.mjs` with exactly the configured set exits **0**, with three warnings for optional values (`VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `SENTRY_AUTH_TOKEN`). Existing Worker secrets are untouched by `wrangler deploy`, so Web Push keeps working. All recovered values were shredded from disk; `.env.local` holds only `NEXT_PUBLIC_*` build values.
+
+**Follow-ups:** `VAPID_PRIVATE_KEY` is unrecoverable — absent from Vercel and from disk — and must not be rotated casually, because one live push subscription would break. The Worker's actual `WEBAUTHN_RP_ID` value could **not** be verified: secrets are unreadable, the cutover record does not record it, and reading it back needs a properly-formed SSR session cookie. A `www`-scoped RP ID would work today but would break a future move to the apex domain, so it is worth checking directly.
+
+---
+
 ### Raouf: Closed the Remaining Questionnaire Gaps — Orphaned AI Surface, Audit-Log Diagnosis, CI Secrets — 2026-07-30
 
 **Scope:** Worked through every item listed as fragile or incomplete in the security questionnaire and fixed what could be fixed, rather than restating them.
