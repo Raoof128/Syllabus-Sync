@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { createServerClient } from '@/lib/supabase/server';
 import { requireAuthWithRateLimit } from '@/app/api/_lib/middleware';
 import { jsonSuccess, jsonError, handleDatabaseError, ERROR_CODES } from '@/app/api/_lib/response';
@@ -19,8 +18,21 @@ const DeleteSubscriptionSchema = z.object({
   endpoint: z.string().url(),
 });
 
+// SECURITY (BA-0012): this used to be `createAdminClient() ?? (await
+// createServerClient())`. push_subscriptions.endpoint is globally unique and
+// the upsert below resolves conflicts with `onConflict: 'endpoint'`. The
+// table's RLS policies (supabase/migrations/20260313093000_...) intentionally
+// scope INSERT/UPDATE to `auth.uid() = user_id`, so a legitimate
+// re-subscription can update your own row but an upsert that collides with
+// someone else's endpoint should be rejected by RLS. Routing the mutation
+// through the service-role admin client silently bypassed that RLS check -
+// any authenticated user could upsert an endpoint they observed or guessed
+// and reassign (hijack) another user's existing push subscription, since the
+// admin client has no ownership concept at all. Always use the RLS-scoped,
+// user-session client so Postgres enforces the ownership check the schema
+// already declares.
 async function getWritableClient() {
-  return createAdminClient() ?? (await createServerClient());
+  return createServerClient();
 }
 
 export async function POST(request: Request) {

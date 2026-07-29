@@ -54,13 +54,13 @@ describe('push subscription route', () => {
     createServerClientMock.mockReset();
   });
 
-  it('stores a push subscription via POST', async () => {
+  it('stores a push subscription via POST using the RLS-scoped server client', async () => {
     const table = createUpsertChain({
       data: { id: 'sub-1', endpoint: 'https://push.example/sub' },
       error: null,
     });
 
-    createAdminClientMock.mockReturnValue({
+    createServerClientMock.mockResolvedValue({
       from: vi.fn(() => table),
     });
 
@@ -89,11 +89,20 @@ describe('push subscription route', () => {
         auth_key: 'auth-key',
       }),
     );
+    // SECURITY (BA-0012) REGRESSION: the RLS-bypassing admin client must
+    // never be used for this mutation. push_subscriptions.endpoint is
+    // globally unique and the RLS policies scope INSERT/UPDATE to
+    // `auth.uid() = user_id`; routing through the admin/service-role client
+    // silently defeated that check, letting any authenticated user upsert a
+    // known/guessed endpoint and reassign (hijack) another user's existing
+    // subscription. The mutation must go through the RLS-scoped
+    // createServerClient() so Postgres enforces ownership.
+    expect(createAdminClientMock).not.toHaveBeenCalled();
   });
 
-  it('deletes a push subscription via DELETE', async () => {
+  it('deletes a push subscription via DELETE using the RLS-scoped server client', async () => {
     const table = createDeleteChain({ error: null });
-    createAdminClientMock.mockReturnValue({
+    createServerClientMock.mockResolvedValue({
       from: vi.fn(() => table),
     });
 
@@ -107,5 +116,6 @@ describe('push subscription route', () => {
     );
 
     expect(response.status).toBe(200);
+    expect(createAdminClientMock).not.toHaveBeenCalled();
   });
 });
