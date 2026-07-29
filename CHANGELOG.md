@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Closed the Remaining Questionnaire Gaps — Orphaned AI Surface, Audit-Log Diagnosis, CI Secrets — 2026-07-30
+
+**Scope:** Worked through every item listed as fragile or incomplete in the security questionnaire and fixed what could be fixed, rather than restating them.
+
+**Summary:** **BA-0049 (P2)** — `sylla_ai_requests`, `sylla_active_generations` and four `sylla_*` functions existed in production with no migration file and no calling code, built for an AI chat/upload feature that never shipped. The tables were inert (RLS enabled, zero policies), but all four functions were `SECURITY DEFINER` — which bypasses RLS — and granted EXECUTE to `anon` and `authenticated`. Three took a caller-supplied identifier with no ownership check, the same defect class as BA-0029/BA-0031: burn another user's AI quota, consume their upload quota, or set another user's request status and token counts. Client reach is revoked on all six objects, `service_role` keeps access so the feature stays developable, and they are recorded in migration history for the first time. Deliberately not dropped — the work they belong to isn't visible from this repository.
+
+**A correction:** I had reported `audit_logs` as a broken mechanism. It isn't. Calling `log_audit` with a real user session wrote a correctly-attributed row (resolved user id and email). The table was empty because its only callers are MFA backup-code, session-termination and an explicit audit endpoint — and with 1 WebAuthn credential across 29 users, essentially nobody has triggered them. It is a coverage gap, not a breakage, and that distinction matters because it is the reason exploitation of BA-0048 can be neither confirmed nor ruled out.
+
+**Files Changed:** `supabase/migrations/20260730130000_lock_down_orphaned_sylla_surface.sql` (new), `tests/security/orphaned-sylla-surface.test.ts` (new), `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Catalog sweep confirms zero `sylla_*` functions remain client-executable and zero `sylla_*` tables remain granted to client roles, with `service_role` access intact. `npm run check` exit 0 with **1250 tests**. Every test account created for proof was deleted; `auth.users` and `profiles` both back to 29.
+
+**Follow-ups:** Set 9 GitHub secrets and 4 variables that could be independently verified; 9 secrets and 3 vars remain and only the owner can supply them, because Cloudflare does not return secret values once set. **Do not trigger the deploy workflow until they are in** — a half-configured run would leave the service-role client unset, reproducing the outage caused by hand earlier today. Still open and not closeable from here: no backup restore has ever been tested, and platform-level leaked-password protection requires a Supabase Pro plan.
+
+---
+
 ### Raouf: Cross-User Profile Read (BA-0048) — a P0 This Audit Reported as Absent — 2026-07-30
 
 **Scope:** Fixed a live cross-user PII exposure on `public.profiles` that two earlier passes of this audit failed to find, and corrected the record.
