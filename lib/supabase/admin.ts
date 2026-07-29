@@ -1,13 +1,29 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+// SECURITY/RELIABILITY (BA-0017): these used to be module-scope `const`s
+// read once at import time. That's fragile under OpenNext on Cloudflare
+// Workers, which populates `process.env` for a request/isolate at its own
+// point in the startup sequence — if this module were evaluated before that
+// happened, the captured values would stay empty strings for the rest of
+// the isolate's lifetime, even after the real env became available.
+// Reading `process.env` fresh inside each function call instead means
+// `createAdminClient()` always reflects the environment's current state.
+function getSupabaseUrl(): string {
+  return process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+}
+
+function getSupabaseServiceRoleKey(): string {
+  return process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+}
 
 // One-time warning flag to prevent console spam
 let adminWarningShown = false;
 
 // Check if admin client is properly configured
 function isAdminConfigured(): boolean {
+  const supabaseUrl = getSupabaseUrl();
+  const supabaseServiceRoleKey = getSupabaseServiceRoleKey();
+
   // Check URL is valid
   const hasValidUrl = !!(
     supabaseUrl &&
@@ -50,7 +66,7 @@ export function createAdminClient() {
     return null;
   }
 
-  return createClient(supabaseUrl, supabaseServiceRoleKey, {
+  return createClient(getSupabaseUrl(), getSupabaseServiceRoleKey(), {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
