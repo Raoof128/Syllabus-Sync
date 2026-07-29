@@ -13,10 +13,6 @@ import { logger } from '@/lib/logger';
 
 const biometricSchema = z.object({
   enabled: z.boolean(),
-  credentialId: z.string().optional(),
-  publicKey: z.string().optional(),
-  counter: z.number().optional(),
-  transports: z.array(z.string()).optional(),
 });
 
 type BiometricMetadata = {
@@ -87,35 +83,46 @@ export async function POST(request: NextRequest) {
       return jsonError('Invalid biometric payload', 400, ERROR_CODES.VALIDATION_ERROR);
     }
 
-    const { enabled, credentialId, publicKey, counter, transports } = parsed.data;
+    const { enabled } = parsed.data;
 
-    if (enabled && (!credentialId || !publicKey)) {
+    // SECURITY (BA-0002): This endpoint must never accept client-supplied
+    // credential material (credentialId/publicKey). Doing so previously let
+    // an attacker with a briefly-hijacked session plant their own public key
+    // in user_metadata with zero WebAuthn ceremony - no challenge, no
+    // attestation, no proof of possession - which
+    // app/api/webauthn/authenticate/verify and app/api/auth/passkey/verify
+    // then trusted to mint a session, creating a permanent
+    // password-independent backdoor. Enabling biometric/passkey login must
+    // go through a real registration ceremony
+    // (POST /api/auth/passkey/register-options + /api/auth/passkey/register,
+    // which calls verifyRegistrationResponse against a server-issued
+    // challenge) or the DB-backed /api/webauthn/register flow. This endpoint
+    // only supports disabling and reporting status.
+    if (enabled) {
       return jsonError(
-        'Credential details are required to enable biometric login',
+        'Enabling biometric login requires completing passkey registration',
         400,
         ERROR_CODES.VALIDATION_ERROR,
       );
     }
 
-    if (!enabled) {
-      const { error: deleteCredentialsError } = await supabase
-        .from('webauthn_credentials')
-        .delete()
-        .eq('user_id', user.id);
+    const { error: deleteCredentialsError } = await supabase
+      .from('webauthn_credentials')
+      .delete()
+      .eq('user_id', user.id);
 
-      if (deleteCredentialsError) {
-        logger.error('Biometric disable credential cleanup failed:', deleteCredentialsError);
-        return jsonError('Failed to update biometric settings', 400, ERROR_CODES.BAD_REQUEST);
-      }
+    if (deleteCredentialsError) {
+      logger.error('Biometric disable credential cleanup failed:', deleteCredentialsError);
+      return jsonError('Failed to update biometric settings', 400, ERROR_CODES.BAD_REQUEST);
     }
 
     const { error: updateError } = await supabase.auth.updateUser({
       data: {
-        biometric_enabled: enabled,
-        biometric_credential_id: enabled ? (credentialId ?? null) : null,
-        biometric_public_key: enabled ? (publicKey ?? null) : null,
-        biometric_counter: enabled ? (counter ?? 0) : null,
-        biometric_transports: enabled ? (transports ?? null) : null,
+        biometric_enabled: false,
+        biometric_credential_id: null,
+        biometric_public_key: null,
+        biometric_counter: null,
+        biometric_transports: null,
         biometric_updated_at: new Date().toISOString(),
       },
     });
@@ -126,12 +133,12 @@ export async function POST(request: NextRequest) {
     }
 
     return jsonSuccess({
-      enabled,
-      credentialId: enabled ? (credentialId ?? null) : null,
-      publicKey: enabled ? (publicKey ?? null) : null,
-      counter: enabled ? (counter ?? 0) : null,
-      transports: enabled ? (transports ?? null) : null,
-      credentialCount: enabled ? undefined : 0,
+      enabled: false,
+      credentialId: null,
+      publicKey: null,
+      counter: null,
+      transports: null,
+      credentialCount: 0,
     });
   } catch (error) {
     logger.error('Biometric POST error:', error);
