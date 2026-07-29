@@ -2,6 +2,7 @@ import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { sendPushNotificationToUser, isWebPushConfigured } from '@/lib/server/push';
+import { constantTimeCompare } from '@/lib/security/constant-time-compare';
 
 const DEFAULT_LOOKAHEAD_MINUTES = 10;
 
@@ -14,6 +15,28 @@ function getLookaheadMinutes(): number {
   }
 
   return DEFAULT_LOOKAHEAD_MINUTES;
+}
+
+// SECURITY/RELIABILITY (BA-0014): this job previously loaded every matching
+// `user_preferences` row with no LIMIT and processed users one at a time in a
+// single unbounded sequential loop. As the user base grows, per-invocation
+// work grows linearly with (active users) x (matching reminders), and
+// Cloudflare Workers enforce a CPU-time ceiling per invocation — a large
+// enough table could get the invocation killed mid-run. Capping the batch
+// bounds worst-case work per run; any users left over are picked up on the
+// next invocation (this job runs every 10 minutes), so truncation only
+// delays delivery rather than dropping it.
+const DEFAULT_MAX_USERS_PER_RUN = 200;
+
+function getMaxUsersPerRun(): number {
+  const rawValue = process.env.PUSH_REMINDER_MAX_USERS_PER_RUN;
+  const parsed = rawValue ? Number.parseInt(rawValue, 10) : Number.NaN;
+
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+
+  return DEFAULT_MAX_USERS_PER_RUN;
 }
 
 type ReminderCandidate = {
@@ -136,6 +159,7 @@ async function collectEventReminders(
 async function handlePushReminderCron() {
   const admin = createAdminClient();
   const lookaheadMinutes = getLookaheadMinutes();
+  const maxUsersPerRun = getMaxUsersPerRun();
 
   if (!admin) {
     return jsonError(
@@ -158,11 +182,20 @@ async function handlePushReminderCron() {
       'user_id, notifications_enabled, push_notifications, deadline_notifications_enabled, event_notifications_enabled, deadline_reminder_timing_minutes, event_reminder_timing_minutes',
     )
     .eq('notifications_enabled', true)
-    .eq('push_notifications', true);
+    .eq('push_notifications', true)
+    .limit(maxUsersPerRun);
 
   if (error) {
     logger.error('Failed to load push reminder preferences', error);
     return jsonError('Failed to load reminder preferences', 500, ERROR_CODES.DATABASE_ERROR);
+  }
+
+  const truncated = (preferences ?? []).length === maxUsersPerRun;
+  if (truncated) {
+    logger.warn(
+      'push-reminders cron hit the per-run user cap; remaining users will be processed on the next invocation',
+      { maxUsersPerRun },
+    );
   }
 
   let reminderCount = 0;
@@ -217,7 +250,9 @@ async function handlePushReminderCron() {
 
   return jsonSuccess({
     lookaheadMinutes,
+    maxUsersPerRun,
     scannedUsers: preferences?.length ?? 0,
+    truncated,
     matchedReminders: reminderCount,
     deliveredReminders: deliveredReminderCount,
     sentPushCount,
@@ -229,7 +264,9 @@ function isAuthorized(request: Request): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
-  return Boolean(cronSecret && authHeader === `Bearer ${cronSecret}`);
+  return Boolean(
+    cronSecret && authHeader && constantTimeCompare(authHeader, `Bearer ${cronSecret}`),
+  );
 }
 
 export async function GET(request: Request) {

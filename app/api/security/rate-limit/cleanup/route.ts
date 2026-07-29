@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { jsonSuccess, jsonError, ERROR_CODES } from "@/app/api/_lib/response";
 import { logger } from "@/lib/logger";
+import { constantTimeCompare } from "@/lib/security/constant-time-compare";
 
 /**
  * Cron endpoint: deletes stale/expired rate limit rows.
@@ -12,7 +13,7 @@ async function handleCleanup(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
   const authHeader = request.headers.get("authorization");
 
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || !authHeader || !constantTimeCompare(authHeader, `Bearer ${cronSecret}`)) {
     return jsonError("Unauthorized", 401, ERROR_CODES.UNAUTHORIZED);
   }
 
