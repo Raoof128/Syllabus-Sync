@@ -17,11 +17,10 @@
 /images/*
   Cache-Control: public,max-age=31536000,immutable
 
-# Content-Type is intentionally omitted: the assets server already infers
-# `application/manifest+json` from the extension, and declaring it here made it
-# appear twice in the response.
 /manifest.webmanifest
+  Content-Type: application/manifest+json
   Cache-Control: public,max-age=86400
 
 /*.webmanifest
+  Content-Type: application/manifest+json
   Cache-Control: public,max-age=86400

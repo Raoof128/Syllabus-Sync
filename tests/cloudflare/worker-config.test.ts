@@ -84,7 +84,15 @@ describe('Cloudflare Worker configuration', () => {
       binding: 'WORKER_SELF_REFERENCE',
       service: 'syllabus-sync-production',
     });
-    expect(production.triggers.crons).toEqual([]);
+
+    // Production scheduling was handed over from Vercel Cron to Cloudflare Cron
+    // Triggers at the 2026-07-29 cutover, so these three expressions are now the
+    // intended state. They must stay exactly in sync with the routes mapped in
+    // `lib/cloudflare/scheduled.ts`; an extra or renamed expression throws there
+    // at runtime rather than silently skipping a cleanup job. The preview
+    // environment above is still asserted empty, because only one environment may
+    // ever own a schedule against the shared Supabase backend.
+    expect(production.triggers.crons).toEqual(['0 3 * * *', '10 3 * * *', '20 3 * * *']);
   });
 
   it('enforces runtime compatibility and the isolated Worker typecheck in the global gate', async () => {
