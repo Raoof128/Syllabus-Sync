@@ -129,17 +129,15 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  // Only nonce-dependent headers belong here. The constant security headers
+  // (X-Frame-Options, X-Content-Type-Options, Referrer-Policy, HSTS,
+  // Permissions-Policy) are declared once in `config/next/next.config.ts`.
+  // Vercel collapsed a duplicate set silently; OpenNext appends instead, which
+  // produced invalid values such as `X-Frame-Options: SAMEORIGIN, SAMEORIGIN`
+  // that browsers may discard entirely.
   const setSecurityHeaders = (headers: Headers) => {
     headers.set('Content-Security-Policy', cspHeader);
     headers.set('x-nonce', nonce);
-    headers.set('X-Frame-Options', 'SAMEORIGIN');
-    headers.set('X-Content-Type-Options', 'nosniff');
-    headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-    headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-    headers.set(
-      'Permissions-Policy',
-      'camera=(), microphone=(), geolocation=(self), payment=(), usb=()',
-    );
   };
 
   setSecurityHeaders(response.headers);

@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-07-29 (Australia/Sydney) — Cloudflare Preview Deployment and Security-Header Parity
+
+**Raouf:**
+
+- **Scope:** First Cloudflare Workers preview deployment, and the two security-header regressions it exposed.
+- **Summary:** Deployed the preview Worker to `syllabus-sync-preview.pouyaalavi1378.workers.dev` (Workers Paid confirmed active on the account holding the `syllabus-sync.app` zone). Runtime secrets sourced from the Vercel project via its API, with `CRON_SECRET` and a VAPID keypair generated fresh. Smoke suite 9/9. Diffing response headers against live Vercel exposed two Cloudflare-only regressions. (1) Five constant security headers were declared in both `config/next/next.config.ts` and `lib/middleware.ts`; Vercel collapsed the duplicate, OpenNext appends, producing invalid values like `X-Frame-Options: SAMEORIGIN, SAMEORIGIN` that browsers may ignore outright. Removed them from middleware, which now sets only the nonce-dependent CSP and `x-nonce`. (2) Static assets bypass the Worker via the `run_worker_first` exclusions, so no security headers reached them at all — Vercel sent four, Cloudflare sent zero. Added a `/*` block to `public/_headers`.
+- **Files Changed:** `lib/middleware.ts`, `public/_headers`.
+- **Verification:** typecheck ✅; lint ✅; 1107/1107 tests ✅; Sharp gates ✅; 6776.58 KiB gzip under the 9.5 MiB limit ✅; `cf:smoke` 9/9 ✅; exact header parity with Vercel on dynamic routes and static assets ✅.
+- **Follow-ups:** `/manifest.webmanifest` still returns a doubled (identical-value) `Content-Type`; cosmetic, root cause unidentified. Preview lacks `GOOGLE_ROUTES_API_KEY`, `GOOGLE_WEATHER_API_KEY`, and the Sentry pair.
+
 ### 2026-07-07 (Australia/Sydney) — App-Icon Logo Rebrand
 
 **Raouf:**

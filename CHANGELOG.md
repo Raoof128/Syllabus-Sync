@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Cloudflare Preview Deployment and Security-Header Parity — 2026-07-29
+
+**Scope:** First Cloudflare Workers preview deployment, plus two security-header regressions it exposed.
+
+**Summary:** Deployed the first preview Worker to `syllabus-sync-preview.pouyaalavi1378.workers.dev` and ran the smoke suite against it. Two Cloudflare-only regressions surfaced, both confirmed by diffing response headers against live Vercel production.
+
+1. **Duplicated security headers on dynamic routes.** `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Strict-Transport-Security`, and `Permissions-Policy` were declared in both `config/next/next.config.ts` (`headers()`, `source: '/(.*)'`) and `lib/middleware.ts`. Vercel collapsed the duplicate set; OpenNext appends instead, emitting invalid values such as `X-Frame-Options: SAMEORIGIN, SAMEORIGIN` that browsers may discard entirely — silently dropping clickjacking and MIME-sniffing protection. Isolated the layer by observing that headers declared only in `next.config.ts` (`X-DNS-Prefetch-Control`, `X-Download-Options`, `X-XSS-Protection`) appeared exactly once, proving `next.config.ts` applies correctly and middleware added the second copy. Removed the five constant headers from `lib/middleware.ts`, which now sets only the nonce-dependent `Content-Security-Policy` and `x-nonce`.
+
+2. **Static assets served with no security headers at all.** Assets matching the `run_worker_first` exclusions (`/icons/*`, `/_next/static/*`, `/favicon.ico`, `/sw.js`, webmanifests, woff2) are served straight from the `ASSETS` binding and never reach the Worker, so `next.config.ts` headers do not apply. Vercel returned all four on `/icons/icon-192.png`; Cloudflare returned none. Added a `/*` block to `public/_headers` declaring `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, and `Strict-Transport-Security`.
+
+Also removed the redundant `Content-Type: application/manifest+json` declarations from `public/_headers`, since the assets server already infers that type from the extension.
+
+**Files Changed:** `lib/middleware.ts`, `public/_headers`.
+
+**Verification:** `npm run typecheck` ✅; `npm run lint` ✅; `npm run test` 1107/1107 ✅; Sharp reachability and deployment gates passed ✅; Worker 6776.58 KiB gzip, under the 9.5 MiB hard limit ✅; `deploy:env:check` passed with 3 feature-gated warnings ✅; `cf:smoke` **9/9** ✅; header-by-header parity against live Vercel now exact on all four headers for both dynamic routes and static assets ✅.
+
+**Follow-ups:** `Content-Type` on `/manifest.webmanifest` is still emitted twice with the same value (`application/manifest+json, application/manifest+json`). Removing the `_headers` declaration did not change it, so the second copy originates elsewhere; cosmetic, no security impact, root cause not yet identified. `GOOGLE_ROUTES_API_KEY`, `GOOGLE_WEATHER_API_KEY`, and the Sentry pair remain unset in preview, so route proxy, weather, and source-map upload are unavailable there.
+
+---
+
 ### Raouf: Sharp Evidence-Schema Review Closure — 2026-07-22
 
 **Scope:** Closed the remaining reverse-edge and contradictory-evidence findings in the Sharp deployment gate.
