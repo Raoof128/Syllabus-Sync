@@ -169,6 +169,20 @@ export async function middleware(request: NextRequest) {
       redirectUrl.searchParams.set('redirectTo', path);
       return NextResponse.redirect(redirectUrl);
     }
+    // SECURITY (BA-0010): protectedRoutes only lists page paths, so this
+    // branch previously fell through to `return response` for EVERY other
+    // route once Supabase env config was invalid - including non-public API
+    // routes, which never got a 401/403/503 and were simply forwarded to
+    // their handlers with no auth check performed by the proxy at all. Fail
+    // closed here the same way an unresolved auth check does below.
+    if (isApiRoute && !isPublicApi) {
+      const unavailableResponse = NextResponse.json(
+        { error: 'Auth temporarily unavailable', code: 'AUTH_UNAVAILABLE' },
+        { status: 503 },
+      );
+      setSecurityHeaders(unavailableResponse.headers);
+      return unavailableResponse;
+    }
     return response;
   }
 
@@ -301,7 +315,15 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    if (requiresMfaUpgrade) {
+    // SECURITY (BA-0009): requiresMfaUpgrade defaults to false and only
+    // becomes true when the AAL check actually resolved. When it times out
+    // or errors (mfaResolution === 'unknown'), that default silently reads
+    // as "no upgrade needed" and this used to send an already-authenticated
+    // visitor straight to /home without ever confirming their AAL - a
+    // fail-open bypass of step-up MFA. The API-route equivalent below
+    // correctly fails closed with a 503 in the same situation; treat an
+    // unresolved AAL check the same way requiresMfaUpgrade is treated here.
+    if (requiresMfaUpgrade || mfaResolution === 'unknown') {
       if (!path.startsWith('/login')) {
         const redirectUrl = new URL('/login', request.url);
         redirectUrl.searchParams.set('mfa', '1');
@@ -313,15 +335,21 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isProtectedRoute && !user && !publicRoutes.some((route) => path.startsWith(route))) {
-    if (authResolution === 'unknown') {
-      return response;
-    }
+    // SECURITY (BA-0008): when auth.getUser() times out or errors we don't
+    // know whether the visitor is authenticated. Serving the protected page
+    // anyway (the old `return response` here) fails open. The equivalent
+    // API-route check below correctly fails closed with a 503; page routes
+    // must fail closed too, by redirecting to login exactly as we would for
+    // a confirmed unauthenticated visitor.
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirectTo', path);
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (isProtectedRoute && user && requiresMfaUpgrade) {
+  // SECURITY (BA-0009): same fail-closed treatment as the auth-route branch
+  // above - an unresolved AAL check must not be treated as "no MFA upgrade
+  // needed" for protected pages, mirroring the API branch's 503 below.
+  if (isProtectedRoute && user && (requiresMfaUpgrade || mfaResolution === 'unknown')) {
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('mfa', '1');
     redirectUrl.searchParams.set('redirectTo', path);

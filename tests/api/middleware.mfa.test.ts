@@ -101,6 +101,45 @@ describe('middleware mfa enforcement', () => {
     vi.useRealTimers();
   });
 
+  it('BA-0009: redirects a protected page to /login?mfa=1 instead of serving it when the AAL check times out', async () => {
+    // SECURITY REGRESSION: requiresMfaUpgrade defaults to false, so when the
+    // AAL check itself times out (mfaResolution stays 'unknown'), the
+    // protected-page branch used to silently read that as "no MFA upgrade
+    // needed" and serve the page - a fail-open bypass of step-up MFA. The
+    // API-route branch already fails closed with 503 in the same situation.
+    vi.useFakeTimers();
+    supabaseMocks.getAalMock.mockImplementationOnce(() => new Promise(() => {}) as any);
+
+    const { middleware } = await import('@/lib/middleware');
+
+    const req = new NextRequest('http://localhost/calendar');
+    const pending = middleware(req);
+    await vi.advanceTimersByTimeAsync(2500);
+    const res = await pending;
+
+    expect(res.status).toBeGreaterThanOrEqual(300);
+    const location = res.headers.get('location');
+    expect(location).toContain('/login');
+    expect(location).toContain('mfa=1');
+    vi.useRealTimers();
+  });
+
+  it('BA-0009: does not send an already-authenticated visitor from /login to /home when the AAL check times out', async () => {
+    vi.useFakeTimers();
+    supabaseMocks.getAalMock.mockImplementationOnce(() => new Promise(() => {}) as any);
+
+    const { middleware } = await import('@/lib/middleware');
+
+    const req = new NextRequest('http://localhost/login');
+    const pending = middleware(req);
+    await vi.advanceTimersByTimeAsync(2500);
+    const res = await pending;
+
+    const location = res.headers.get('location');
+    expect(location === null || !location.includes('/home')).toBe(true);
+    vi.useRealTimers();
+  });
+
   it('allows /api/webauthn/authenticate/* through without auth (pre-login passkey flow)', async () => {
     // Simulate unauthenticated user (no session)
     supabaseMocks.getUserMock.mockResolvedValueOnce({
