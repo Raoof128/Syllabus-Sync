@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Deployed the Red-Team Fixes, Restored Missing API Keys — and Caused/Recovered a Production Outage — 2026-07-30
+
+**Scope:** Minted a scoped Cloudflare deploy token, set the three missing Google API keys, and shipped every outstanding red-team fix to production. Includes an outage this work caused and rolled back.
+
+**Summary:** The previous session's fixes were blocked on Cloudflare access. The `CLOUDFLARE_API_KEY` in `.env` turned out to be a valid user-scoped token carrying **API Tokens Write**, so it could mint a new token — one scoped to the account that owns the Worker with only `Workers Scripts Write` + `Account Settings Read`. That unblocked both deployment and secret management.
+
+Three keys were missing, not two. `/api/weather` was also broken; it had hidden behind a 400-for-missing-coordinates that fires before the key check. The local `GOOGLE_ROUTES_API_KEY` turned out to be **empty (length 0)**, so it was never going to work — but `GOOGLE_MAPS_API_KEY` was validated directly against the Places, Routes and Weather APIs and works for all three. And `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` was absent from the shipped bundle entirely, so the map SDK could never load.
+
+**An outage was caused in the process, and must be recorded plainly.** `NEXT_PUBLIC_*` values are inlined by Next at **build** time; Worker secrets and `wrangler.jsonc` vars are runtime-only. The 22:47 rebuild exported only two of the required NEXT_PUBLIC variables, so `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` were inlined as empty strings. Every existing gate passed — build exit 0, 1231 tests green, `wrangler deploy --dry-run` clean, Worker booted — yet `/api/health` reported `database: not_configured`, `createAdminClient()` returned null, and the browser had no Supabase credentials at all. Detected via the admin-client oracle (`/api/auth/password/reset` 503s only when that client is null) and resolved by rolling back to version `2e584cab`, which restored `healthy`/`connected` immediately. Fixed forward by extracting the authoritative values from the known-good serving bundle, rebuilding, and **gating on build output** before redeploying.
+
+**Files Changed:** `tools/cloudflare/check-public-env.mjs` (new), `tests/cloudflare/public-env-gate.test.ts` (new), `package.json` (gate wired into all five `cf:deploy`/`upload`/`preview` scripts), `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Production on Worker version `e9e93429`. `npm run check` exit 0 with **1239 tests**. Verified live: **signup returns HTTP 200** (was 503 for every user); `/api/health` healthy/connected; client bundle carries the Supabase host and publishable key; `robots.txt` and `sitemap.xml` now point at `www.syllabus-sync.app`; `/api/weather` HTTP 200 with live data; `place-search` 403 (auth gate) rather than 503; `maps.googleapis.com`, `evil.example.com` and `localhost:3000` origins all 403; login rate limit 429s from the 11th attempt (new limit of 10, was 50); `cf:smoke` **9/9**. The single test user created during verification was deleted — `auth.users` is back to 29, unchanged from before the red team.
+
+**Follow-ups:** The Maps key now serves both the browser and the server-side Places/Routes/Weather calls — it should be split into a referrer-restricted browser key and a separate server key, and restricted by API in Google Cloud Console, or anyone can drive billable Google usage with the public value. `CLOUDFLARE_API_KEY` still carries `API Tokens Write`, which is effectively a root credential for the user's Cloudflare tokens and should be narrowed or revoked now that a scoped deploy token exists. The exposed Supabase personal access token in `~/.zshrc`/`~/.bashrc` is **still unrotated**. Signup account-enumeration is left as the documented deliberate tradeoff, and three npm advisories remain accepted as build-time-only.
+
+---
+
 ### Raouf: Red-Team Remediation — Signup Outage, Avatar Storage, CSRF Trust, Auth Config — 2026-07-30
 
 **Scope:** Fixed everything found by the full red team of the live deployment: one critical production outage, three avatar-storage findings, three CSRF/rate-limit findings, the canonical-URL cluster, server-side breached-password enforcement, and the Supabase Auth configuration.
