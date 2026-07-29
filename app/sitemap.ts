@@ -1,8 +1,13 @@
 import type { MetadataRoute } from 'next';
-import { UNIVERSITY_CONFIG } from '@/lib/config';
+import { APP_CONFIG } from '@/lib/config';
+import { getConfiguredAppOrigin } from '@/lib/platform/runtime';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = UNIVERSITY_CONFIG.website;
+  // BA-0040: this used to be UNIVERSITY_CONFIG.website, which made every entry
+  // below point at https://www.mq.edu.au/... — claiming pages on the
+  // university's domain and never listing this app's own URLs.
+  // Read at call time; see the note in app/robots.ts.
+  const baseUrl = getConfiguredAppOrigin() ?? APP_CONFIG.url;
   const now = new Date();
 
   return [

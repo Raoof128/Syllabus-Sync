@@ -8,6 +8,7 @@ import {
   ERROR_CODES,
 } from '@/app/api/_lib/response';
 import { hashResetToken } from '@/lib/security/passwordReset';
+import { isPasswordBreachBlocked } from '@/lib/security/password-breach';
 import { passwordResetTokenLimiter } from '@/lib/services/rateLimitService';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
@@ -58,6 +59,19 @@ export async function POST(request: NextRequest) {
     }
 
     const { token, newPassword } = parsed.data;
+
+    // BA-0041: refuse known-breached passwords here too. Reset is the other route
+    // by which a password enters the system, and it was equally unguarded.
+    // Fails open if HIBP is unreachable — see isPasswordBreachBlocked().
+    if (await isPasswordBreachBlocked(newPassword)) {
+      return jsonError(
+        'This password has appeared in a known data breach. Please choose a different one.',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+        { target: 'newPassword' },
+      );
+    }
+
     const tokenHash = hashResetToken(token);
 
     // 1) Find matching non-used, non-expired token

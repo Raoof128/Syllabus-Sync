@@ -4,6 +4,14 @@ import { POST } from '@/app/api/auth/password/reset/route';
 
 const createAdminClientMock = vi.fn();
 
+vi.mock('@/lib/security/password-breach', () => ({
+  // BA-0041 added a server-side HIBP lookup to these routes. Mocked here so the
+  // suite stays deterministic and offline-capable — the guard's own behaviour is
+  // covered by tests/security/breached-password-enforced.test.ts. Returning
+  // false keeps these cases exercising the paths they were written for.
+  isPasswordBreachBlocked: vi.fn(async () => false),
+}));
+
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => createAdminClientMock(),
 }));

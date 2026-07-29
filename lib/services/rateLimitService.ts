@@ -405,7 +405,9 @@ export function createRateLimiter(config: RateLimitConfig) {
 export const signupLimiter = createRateLimiter({
   prefix: 'signup',
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 20, // Max 20 signups per hour per IP (increased for testing)
+  // BA-0038: was 20, a testing-only value that was never restored before shipping to
+  // production. 5 new accounts per hour per IP is ample for genuine use.
+  maxRequests: 5,
   failClosed: true, // SECURITY: Deny on store failure
 });
 
@@ -413,7 +415,10 @@ export const signupLimiter = createRateLimiter({
 export const loginLimiter = createRateLimiter({
   prefix: 'login',
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 50, // Max 50 attempts per 15 min (increased for testing)
+  // BA-0038: was 50, a testing-only value that was never restored before shipping to
+  // production — roughly 4,800 password guesses per day per account from a
+  // single IP. 10 per 15 min still absorbs typos and password-manager retries.
+  maxRequests: 10,
   failClosed: true, // SECURITY: Deny on store failure
 });
 
@@ -477,7 +482,10 @@ export const passkeyStatusLimiter = createRateLimiter({
 export const passkeyAuthLimiter = createRateLimiter({
   prefix: 'passkey_auth',
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 50, // Max 50 passkey auth attempts per 15 min (increased for testing)
+  // BA-0038: was 50, a testing-only value that was never restored before shipping to
+  // production. Kept in step with loginLimiter — these are two routes to the
+  // same account, so a loose limit on one undoes the other.
+  maxRequests: 10,
   failClosed: true, // SECURITY: Deny on store failure
 });
 

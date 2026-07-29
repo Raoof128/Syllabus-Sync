@@ -163,14 +163,23 @@ export function validateOrigin(request: NextRequest): {
  * Get list of allowed origins
  */
 function getAllowedOrigins(): string[] {
-  const origins = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:3002",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001",
-    "http://127.0.0.1:3002",
-  ];
+  // BA-0039: these were returned unconditionally, including in production. That
+  // was latent rather than live — the global middleware applies the stricter
+  // validateCSRF()/getTrustedOrigins() check first and rejected all six — but
+  // validateOrigin() is still wired into app/api/_lib/middleware.ts,
+  // app/api/navigate/route.ts and withCSRFProtection(), so a single change to the
+  // middleware matcher would have made them reachable. Defence in depth must not
+  // rely on an outer layer that a routing change can remove.
+  const origins = isProductionDeployment()
+    ? []
+    : [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
+      ];
 
   const configuredOrigin = getConfiguredAppOrigin();
   if (configuredOrigin && !origins.includes(configuredOrigin)) {
@@ -264,7 +273,13 @@ function getTrustedOrigins(): Set<string> {
     origins.add(configuredOrigin);
   }
 
-  origins.add('https://maps.googleapis.com');
+  // BA-0037: `https://maps.googleapis.com` used to be trusted here. It was never
+  // needed — the Maps SDK is loaded *outbound* as a <script src> in
+  // lib/maps/google/loader.ts and nothing on that host ever posts to this app —
+  // and it widened CSRF trust to a third-party origin that also appears in
+  // `script-src`, i.e. one host trusted both for code and for request
+  // provenance. Verified live before removal: `Origin: https://maps.googleapis.com`
+  // reached the credential check (401) where an arbitrary origin was rejected (403).
 
   if (process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF) {
     origins.add(`https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.supabase.co`);

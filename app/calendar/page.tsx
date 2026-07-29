@@ -55,7 +55,11 @@ const translate = (key: TranslationKey, vars?: Record<string, string | number>) 
   return text;
 };
 
-const siteUrl = UNIVERSITY_CONFIG.website || 'https://syllabus-sync.vercel.app';
+// BA-0040: was `UNIVERSITY_CONFIG.website || 'https://syllabus-sync.vercel.app'`,
+// so the JSON-LD `url` advertised the university's domain, with a stale
+// pre-cutover Vercel host as the fallback. APP_CONFIG.url reads
+// NEXT_PUBLIC_APP_URL, which is now declared per environment in wrangler.jsonc.
+const siteUrl = APP_CONFIG.url;
 const metaTitle = translate('calendarMetaTitle', { appName: APP_CONFIG.name });
 const metaDescription = translate('calendarMetaDescription', {
   universityName: UNIVERSITY_CONFIG.name,

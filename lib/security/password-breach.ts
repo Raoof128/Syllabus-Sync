@@ -454,3 +454,52 @@ export async function handlePasswordBreachCheck(
     );
   }
 }
+
+// ============================================================================
+// SERVER-SIDE ENFORCEMENT (BA-0041)
+// ============================================================================
+
+/**
+ * Minimum number of appearances in breach corpora before a password is refused.
+ *
+ * 1 is deliberate: HIBP's corpus is of *already-leaked* credentials, so a single
+ * appearance means the plaintext is in a public wordlist and will be tried by
+ * any credential-stuffing run.
+ */
+const BREACH_BLOCK_THRESHOLD = 1;
+
+/**
+ * Server-side guard for password-setting flows.
+ *
+ * This module previously had no server-side caller at all. The breach check was
+ * exposed at `/api/security/check-password-breach` and consumed only by
+ * `components/security/PasswordStrengthIndicator.tsx`, which made it a UX hint
+ * rather than a control — posting directly to the signup or password-reset API
+ * bypassed it. Supabase's platform-level `password_hibp_enabled` would cover
+ * this, but it requires the Pro plan (the Management API returns HTTP 402 on
+ * Free), so enforcement belongs here.
+ *
+ * FAILS OPEN by design. `api.pwnedpasswords.com` is a third-party dependency and
+ * must not be able to take registration and password reset down with it. A
+ * breached password admitted during an outage is still constrained by the
+ * 12-character policy, rate limiting and MFA. The alternative — failing closed —
+ * trades a marginal credential-quality gain for a total availability loss on a
+ * dependency we do not control.
+ *
+ * @returns `true` only when the password is known-breached and must be refused.
+ */
+export async function isPasswordBreachBlocked(password: string): Promise<boolean> {
+  if (!password) return false;
+
+  try {
+    const result = await checkPasswordBreach(password);
+    return result.breachCount >= BREACH_BLOCK_THRESHOLD;
+  } catch (error) {
+    logger.warn(
+      "Password breach check unavailable; allowing the password (fail-open). " +
+        "The length/complexity policy, rate limiting and MFA still apply.",
+      { reason: error instanceof Error ? error.message : "unknown" },
+    );
+    return false;
+  }
+}

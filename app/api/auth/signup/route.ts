@@ -13,6 +13,7 @@ import { getClientIP } from '@/lib/security/ip';
 import { createSignupSchema } from '@/lib/schemas/auth';
 import { logger } from '@/lib/logger';
 import { getConfiguredAppOrigin, isProductionDeployment } from '@/lib/platform/runtime';
+import { isPasswordBreachBlocked } from '@/lib/security/password-breach';
 
 // ============================================================================
 // AUDIT LOGGING HELPER
@@ -181,6 +182,18 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password, fullName, studentId, faculty, course, year } = parsed.data;
+
+    // BA-0041: refuse known-breached passwords. This check existed only in the
+    // browser (PasswordStrengthIndicator), so posting here directly bypassed it.
+    // Fails open if HIBP is unreachable — see isPasswordBreachBlocked().
+    if (await isPasswordBreachBlocked(password)) {
+      return jsonError(
+        'This password has appeared in a known data breach. Please choose a different one.',
+        400,
+        ERROR_CODES.VALIDATION_ERROR,
+        { target: 'password' },
+      );
+    }
 
     const supabase = await createServerClient();
     // adminClient already initialized at top for kill switch check

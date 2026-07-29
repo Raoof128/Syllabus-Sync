@@ -38,6 +38,11 @@
   "vars": {
     "DEPLOYMENT_PLATFORM": "cloudflare",
     "DEPLOYMENT_ENV": "preview",
+    // BA-0033: getConfiguredAppOrigin() reads this first and otherwise falls
+    // back to VERCEL_* variables that do not exist on Workers. Without it,
+    // signup returns 503 for every user and email links have no base URL.
+    // Public value, so it is a var rather than a secret.
+    "NEXT_PUBLIC_APP_URL": "https://syllabus-sync-preview.pouyaalavi1378.workers.dev",
   },
   "triggers": {
     "crons": [],
@@ -59,6 +64,10 @@
       "vars": {
         "DEPLOYMENT_PLATFORM": "cloudflare",
         "DEPLOYMENT_ENV": "production",
+        // BA-0033: see the preview `vars` note. This must stay the real
+        // customer-facing origin — password-reset and email-verification links
+        // are built from it.
+        "NEXT_PUBLIC_APP_URL": "https://www.syllabus-sync.app",
       },
       // Cutover change: production scheduling moved from Vercel Cron to
       // Cloudflare Cron Triggers. Vercel Cron was disabled first, at

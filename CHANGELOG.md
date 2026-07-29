@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Red-Team Remediation — Signup Outage, Avatar Storage, CSRF Trust, Auth Config — 2026-07-30
+
+**Scope:** Fixed everything found by the full red team of the live deployment: one critical production outage, three avatar-storage findings, three CSRF/rate-limit findings, the canonical-URL cluster, server-side breached-password enforcement, and the Supabase Auth configuration.
+
+**Summary:** The headline finding is that **user registration had been completely broken since the Cloudflare cutover**. `app/api/auth/signup/route.ts` refuses to run without `getConfiguredAppOrigin()`, which falls back to `VERCEL_PROJECT_PRODUCTION_URL`/`VERCEL_URL` — variables that simply do not exist on Workers. Neither `NEXT_PUBLIC_APP_URL` nor `NEXT_PUBLIC_SITE_URL` was declared, so every signup returned 503. It was distinguished from the two lookalike causes before fixing: the kill switch returns a different message and `app_config.signup_enabled` is `true`, and the admin client demonstrably works because `/api/health` reports `database: connected`.
+
+Storage was the other substantive area. The `avatars` bucket could be **listed anonymously**, which was exploited end-to-end with nothing but the publishable anon key: list the bucket → a folder named with a user's `auth.uid()` → the exact filename → download the photo. Alongside it, `avatars_update_own` had `USING` but no `WITH CHECK`, so `storage.move()` could relocate an object into another user's folder, and the bucket accepted `image/svg+xml` — active content served with no `nosniff`, no `Content-Disposition` and no CSP. Those three chain into "plant a scripted SVG as another user's avatar".
+
+`https://maps.googleapis.com` was a trusted CSRF origin (confirmed live: it reached the credential check where an arbitrary origin was rejected) despite only ever being an outbound `<script src>`. Rate limits were still at values whose own comments said they had been raised for testing. And the breached-password check — a complete HIBP implementation already in the repo — was called only by the browser, so posting straight to the API bypassed it.
+
+**Files Changed:** `wrangler.jsonc`, `lib/security/csrf.ts`, `lib/services/rateLimitService.ts`, `lib/security/password-breach.ts`, `app/api/auth/signup/route.ts`, `app/api/auth/password/reset/route.ts`, `app/robots.ts`, `app/sitemap.ts`, `app/calendar/page.tsx`, `supabase/migrations/20260730090000_harden_avatar_storage.sql` (new), five new test files, `tests/cloudflare/worker-config.test.ts`, `tests/api/auth/signup.test.ts`, `tests/api/auth/passwordReset.test.ts`, `package-lock.json`, `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`.
+
+**Verification:** `npm run check` exits 0 — 136 files, **1231 tests**, secrets scan 896 files, build compiles. Storage fixes applied and verified against production: anonymous listing now returns zero objects while the legitimate public avatar URL still returns HTTP 200 (confirming the public endpoint bypasses RLS, which is why dropping the policy was safe). Auth config patched and read back: anonymous sign-ins off, password floor 12 with character classes, `site_url` corrected from the stale Vercel host, redirect allowlist pruned 28 → 15 with no host wildcards left. `npm audit` 18 → 3.
+
+**Follow-ups — two blockers, both needing Cloudflare access to the account that owns the Worker:** the signup fix and every other code change are **not live** until the Worker is deployed; the OAuth token and the API key in `.env` both fail with `Authentication error` against that account, and no GitHub repo secrets are configured, so neither the CLI nor the CI workflow can deploy. `GOOGLE_PLACES_API_KEY`/`GOOGLE_ROUTES_API_KEY` are also still missing from the Worker, so `/api/maps/*` returns 503. Separately: `password_hibp_enabled` cannot be enabled (HTTP 402, Pro plan only) — mitigated in-app instead; three npm advisories are accepted as build-time-only rather than downgrading Next to 14.x; and signup account-enumeration is left as-is because the source documents it as a deliberate UX tradeoff.
+
+---
+
 ### Raouf: Backend Audit Database Remediation Applied to Production — 2026-07-29
 
 **Scope:** Applied every outstanding audit migration to the production Supabase project via the CLI, and fixed five further findings surfaced while doing so — four of them live, unauthenticated, and missed by the audit itself.
