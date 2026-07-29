@@ -110,19 +110,23 @@ export async function consumeChallenge(
   const admin = createAdminClient();
   if (!admin) return null;
 
+  // Claim the challenge with a single atomic DELETE ... RETURNING. Reading and
+  // then deleting in two statements let two concurrent callers both observe the
+  // row before either delete committed, and discarding the delete result meant a
+  // failed delete silently left the challenge usable until it expired. Returning
+  // a row here is therefore proof that this caller — and only this caller —
+  // removed it.
   const { data, error } = await admin
     .from('webauthn_challenges')
-    .select('*')
+    .delete()
     .eq('challenge', challenge)
     .eq('type', type)
     .gt('expires_at', new Date().toISOString())
+    .select()
     .limit(1)
     .single();
 
   if (error || !data) return null;
-
-  // Delete the challenge (one-time use)
-  await admin.from('webauthn_challenges').delete().eq('id', data.id);
 
   return {
     id: data.id,
@@ -222,13 +226,22 @@ export async function updateCredentialCounter(
   const admin = createAdminClient();
   if (!admin) return;
 
-  const { error } = await admin
+  const update = admin
     .from('webauthn_credentials')
     .update({
       counter: newCounter,
       last_used_at: new Date().toISOString(),
     })
     .eq('credential_id', credentialId);
+
+  // Where the authenticator maintains a real counter, only ever move it
+  // forwards: an unguarded write would let a replayed assertion rewind it and
+  // erase the very signal that proves a replay happened. Synced platform
+  // passkeys (iCloud Keychain, Google Password Manager) always report 0, and
+  // @simplewebauthn skips its counter check in that case — guarding those would
+  // match no rows and silently stop `last_used_at` from advancing, so they take
+  // the unguarded path.
+  const { error } = newCounter > 0 ? await update.lt('counter', newCounter) : await update;
 
   if (error) {
     logger.error('Failed to update credential counter:', error);
