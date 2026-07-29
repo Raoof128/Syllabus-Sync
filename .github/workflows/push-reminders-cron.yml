@@ -1,8 +1,17 @@
 name: Push Reminders Cron
 
+# SECURITY/RELIABILITY (BA-0016): this workflow used to run on a `schedule`
+# trigger firing every 10 minutes, in addition to /api/cron/push-reminders
+# being invoked through Cloudflare. It was never folded into the
+# 2026-07-29 Vercel->Cloudflare cron cutover (wrangler.jsonc only
+# reconciled the three routes in lib/cloudflare/scheduled.ts's
+# CRON_ROUTE_BY_EXPRESSION). On this repo PUSH_REMINDERS_CRON_URL/SECRET
+# are unset, so the job's own guard below already refuses to curl anything
+# - but it still ran (and failed) every 10 minutes as CI noise, and the
+# moment those secrets are populated it becomes a real duplicate scheduler.
+# The schedule trigger is removed; workflow_dispatch is kept so this can
+# still be run by hand if ever needed.
 on:
-  schedule:
-    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 jobs:
