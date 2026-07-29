@@ -10,7 +10,18 @@ const sentryEnabled =
   Boolean(dsn) && (isProductionDeployment() || process.env.SENTRY_ENABLED === 'true');
 
 if (sentryEnabled) {
-  void import('@sentry/nextjs')
+  // SECURITY/RELIABILITY (BA-0018): this used to be `void import(...).then(...)`,
+  // a floating promise that is never awaited and never handed to
+  // `ctx.waitUntil()`. On Cloudflare Workers, async work outside the
+  // request/response lifecycle is not guaranteed to keep running once the
+  // first response has been sent — a cold isolate's first request could
+  // complete before this promise chain settles, leaving Sentry silently
+  // uninitialized for that isolate's lifetime. This file is loaded via
+  // Next's Sentry-instrumented `register()` hook as
+  // `await import('./sentry.server.config')`, so awaiting the chain here
+  // means that outer await transitively waits for Sentry.init() to finish
+  // before the isolate starts handling requests.
+  await import('@sentry/nextjs')
     .then((Sentry) => {
       Sentry.init({
         dsn,

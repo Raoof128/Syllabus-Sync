@@ -10,7 +10,13 @@ const sentryEnabled =
   Boolean(dsn) && (isProductionDeployment() || process.env.SENTRY_ENABLED === 'true');
 
 if (sentryEnabled) {
-  void import('@sentry/nextjs')
+  // SECURITY/RELIABILITY (BA-0018): see sentry.server.config.ts — this used
+  // to be `void import(...).then(...)`, a floating promise never awaited or
+  // handed to `ctx.waitUntil()`, so Sentry.init() could be cut off on
+  // Workers before it resolves. Awaiting it here lets the outer
+  // `await import('./sentry.edge.config')` in Next's instrumentation
+  // register() hook wait for initialization to actually finish.
+  await import('@sentry/nextjs')
     .then((Sentry) => {
       Sentry.init({
         dsn,
