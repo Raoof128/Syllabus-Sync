@@ -57,7 +57,7 @@ real users (R2).
 
 ## Findings
 
-30 ledger entries. Severity counts include the disproved rows, which are recorded
+34 ledger entries. Severity counts include the disproved rows, which are recorded
 deliberately so future auditors do not re-chase them.
 
 | Severity | Count | Fixed | Deferred / validated | Disproved |
@@ -70,19 +70,19 @@ deliberately so future auditors do not re-chase them.
 
 ### Fixed and fully verified
 
-| ID       | Sev | Title                                                                       | Commit     |
-| -------- | --- | --------------------------------------------------------------------------- | ---------- |
-| RTA-0026 | P0  | Cross-user WebAuthn credential confusion → account takeover                 | `1073e4da` |
-| RTA-0001 | P1  | Sharp gate blocked every `cf:*` deploy path                                 | `b0b8cd7a` |
-| RTA-0029 | P1  | `audit_settings` has no RLS; 5 unguarded definers (**migration unapplied**) | `f6ea500e` |
-| RTA-0004 | P2  | Reset/verify tokens double-spendable (BA-0006)                              | `59e1894b` |
-| RTA-0005 | P2  | WebAuthn origin check was circular (BA-0003)                                | `999a11c9` |
-| RTA-0006 | P2  | HIBP lookup unbounded — could hang signup                                   | `8b8c5f0e` |
-| RTA-0007 | P2  | PostCSS pinned to a vulnerable version                                      | `46c0d4ed` |
-| RTA-0027 | P2  | Open redirect + session fixation on `/auth/confirm`                         | `e8ce242c` |
-| RTA-0028 | P2  | Rate-limit store + weather fetches unbounded                                | `10a13cc5` |
-| RTA-0009 | P2  | Webmanifest served a doubled `Content-Type`                                 | `afe854ee` |
-| RTA-0003 | P1  | push-reminders has no scheduler (**gap pinned, not closed**)                | `d7036029` |
+| ID       | Sev | Title                                                              | Commit     |
+| -------- | --- | ------------------------------------------------------------------ | ---------- |
+| RTA-0026 | P0  | Cross-user WebAuthn credential confusion → account takeover        | `1073e4da` |
+| RTA-0001 | P1  | Sharp gate blocked every `cf:*` deploy path                        | `b0b8cd7a` |
+| RTA-0029 | P3  | `audit_settings` RLS gap — **downgraded, replay-only** (see below) | `f6ea500e` |
+| RTA-0004 | P2  | Reset/verify tokens double-spendable (BA-0006)                     | `59e1894b` |
+| RTA-0005 | P2  | WebAuthn origin check was circular (BA-0003)                       | `999a11c9` |
+| RTA-0006 | P2  | HIBP lookup unbounded — could hang signup                          | `8b8c5f0e` |
+| RTA-0007 | P2  | PostCSS pinned to a vulnerable version                             | `46c0d4ed` |
+| RTA-0027 | P2  | Open redirect + session fixation on `/auth/confirm`                | `e8ce242c` |
+| RTA-0028 | P2  | Rate-limit store + weather fetches unbounded                       | `10a13cc5` |
+| RTA-0009 | P2  | Webmanifest served a doubled `Content-Type`                        | `afe854ee` |
+| RTA-0003 | P1  | push-reminders has no scheduler (**gap pinned, not closed**)       | `d7036029` |
 
 ### Disproved — recorded so they are not re-derived
 
@@ -100,6 +100,55 @@ deliberately so future auditors do not re-chase them.
 - **"`recent_audit_activity` / `security_audit_events` lack `security_invoker`"** —
   applied by a later migration than the `CREATE`, so a naive static pass
   mis-flags them.
+
+## Live database verification — and a correction to my own P1
+
+The database findings were originally reconstructed from the migration chain
+alone. They have since been settled with **read-only catalogue queries against
+production** (`supabase db query --linked`; no write, no migration applied), and
+the chain turned out to disagree with production in both directions.
+
+**I had to downgrade my own P1.** `audit_settings`, `cleanup_old_audit_logs()`
+and `add_sample_class_times()` **do not exist in production**, and **no public
+table lacks RLS** (0 rows). The audit-trail-destruction chain I filed is real
+only for an environment built from the migration chain — a `supabase db reset`,
+staging, or a DR rebuild. RTA-0029 is now P3, replay-only.
+
+That same verification caught **a real bug in my own migration**: the
+`ALTER TABLE public.audit_settings ...` was unguarded and would have raised
+42P01 and aborted the push against production. It is now guarded.
+
+**What is genuinely live instead (RTA-0033, P2):**
+`purge_deleted_records(integer)` and `refresh_analytics_views()` are SECURITY
+DEFINER, have no ownership check, have an unpinned `search_path`, and hold
+`EXECUTE` for **both `anon` and `authenticated`** — verified through
+`information_schema.role_routine_grants`. Neither has any application caller
+(the only repository mentions are generated entries in `database.types.ts`).
+`purge_deleted_records` takes a caller-controlled window, so a negative
+`p_days_old` moves the cutoff into the future and hard-deletes every
+soft-deleted row for every user. `20260114013519` issued only
+`REVOKE ... FROM PUBLIC`, which BA-0032 had already established does not remove
+Supabase's direct grants.
+
+**Other things the queries settled:**
+
+| Question                                                          | Answer                                                                                                                                                                                            |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `log_audit` overload ambiguity (RTA-0034)                         | **Disproved.** Production holds only the 10-arg form; no ambiguity. Replay-only.                                                                                                                  |
+| pg_cron duplicating Cloudflare crons (RTA-0035)                   | **Confirmed live.** Installed, with two ACTIVE jobs at `0 3` and `10 3` — the exact Cloudflare expressions. The `*/15` webauthn-challenge job is absent, so that cleanup has **no owner at all**. |
+| Unpinned `search_path` exploitable?                               | **No.** `anon`/`authenticated` hold USAGE but **not CREATE** on `public` and `extensions`, so a client role cannot hijack resolution. Defence-in-depth, as filed.                                 |
+| BA-0030's "production still has all sixteen always-true policies" | **Resolved.** Only the documented `xp_config` exception remains.                                                                                                                                  |
+| Objects production has that the chain lacks (RTA-0036)            | `favorite_buildings` and `edge_response_cache` — both with RLS on. The chain cannot rebuild production.                                                                                           |
+
+**RTA-0031 is now proven, not argued.** Rather than rest on documentation, I ran
+an RLS probe on a session-local temp table. The first attempt was **vacuous** —
+`supabase db query` connects as `postgres`, which has `rolbypassrls`, so RLS
+never applied and the reassignment "succeeded". Re-run under `SET ROLE
+authenticated`, it was **BLOCKED**: `new row violates row-level security policy`,
+with the value unchanged. PostgreSQL does apply `USING` to the new row when
+`WITH CHECK` is omitted, so the reported reassignment vulnerability does not
+exist — and migration `20260730090000` (BA-0035) states the same incorrect
+rationale.
 
 ## Systemic pattern worth naming
 
@@ -131,6 +180,10 @@ account created, no mail sent, no data modified, no fuzzing.
    ships with the static assets, and the gate re-approval only matters at deploy.
 2. **Apply the migration** `20260730180000_close_audit_settings_rls_and_unguarded_definers.sql`.
    It ships unapplied by design and carries its own failing verification block.
+   Its live value is revoking `anon`/`authenticated` EXECUTE on
+   `purge_deleted_records` and `refresh_analytics_views` (RTA-0033) and pinning
+   `search_path` on the six unpinned definers; the `audit_settings` block is a
+   guarded no-op in production and corrects a chain-built environment.
 3. **Run `manual-production-smoke-checklist.md`** — the flows that need real
    accounts, real mail and real authenticators, including the live signup on
    Workers that has still never been exercised.

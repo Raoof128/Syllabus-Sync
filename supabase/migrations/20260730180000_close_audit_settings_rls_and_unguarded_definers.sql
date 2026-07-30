@@ -55,22 +55,69 @@
 -- Functions are NOT dropped even where they have zero callers — revoking is
 -- reversible and a drop is not. Removal is tracked separately.
 --
+-- ----------------------------------------------------------------------------
+-- VERIFIED AGAINST PRODUCTION, 2026-07-30 (read-only catalogue queries via
+-- `supabase db query --linked`; no write, no migration applied):
+--
+--   * audit_settings, cleanup_old_audit_logs(), add_sample_class_times(uuid) and
+--     cleanup_expired_webauthn_challenges() DO NOT EXIST in production. Points 1
+--     and part of 2 above are therefore REPLAY-ONLY — real for any environment
+--     built from this chain, not live today. Every block is guarded accordingly.
+--   * NO table in public lacks RLS in production (0 rows).
+--   * LIVE AND ANON-REACHABLE: purge_deleted_records(integer) and
+--     refresh_analytics_views(), both SECURITY DEFINER, both with an UNPINNED
+--     search_path, both holding EXECUTE for anon AND authenticated. Neither has
+--     any application caller — the only repository mentions are generated entries
+--     in lib/supabase/database.types.ts. These two are the real live findings.
+--   * Six SECURITY DEFINER functions in public have an unpinned search_path:
+--     the two above plus the trigger functions handle_new_user_profile(),
+--     on_deadline_completed(), on_unit_created() and protect_profile_fields().
+--     Confirmed safe to pin: none of them references auth., storage. or
+--     extensions., so `search_path = public` cannot change their resolution.
+--   * NOT exploitable today: anon and authenticated hold USAGE but NOT CREATE on
+--     both public and extensions (pg_namespace.nspacl), so the unpinned path
+--     cannot be hijacked by a client role. Point 4 is defence-in-depth, as stated.
+-- ----------------------------------------------------------------------------
+--
 -- Idempotent and safe to re-run.
 -- ============================================================================
 
 -- ---------------------------------------------------------------------------
 -- 1. audit_settings: enable RLS and remove client access entirely.
+--
+--    GUARDED, because live catalogue verification (2026-07-30, read-only via
+--    `supabase db query --linked`) showed this table DOES NOT EXIST in
+--    production, along with cleanup_old_audit_logs(). The audit-trail-destruction
+--    chain described above is therefore a REPLAY-ONLY defect: it is real for any
+--    environment built from this migration chain (`supabase db reset`, staging, a
+--    DR rebuild), and not a live production hole.
+--
+--    An unguarded ALTER TABLE here would raise 42P01 and abort the push against
+--    production. Keeping the block, guarded, so a chain-built environment is
+--    still corrected.
+--
 --    There is no user-scoped read here — this is operator configuration, so
---    service_role is the only legitimate consumer and no policy is needed.
---    With RLS on and no policy, the table is default-deny for anon/authenticated
---    even if a default grant remains.
+--    service_role is the only legitimate consumer and no policy is needed. With
+--    RLS on and no policy the table is default-deny for anon/authenticated even
+--    if a default grant remains.
 -- ---------------------------------------------------------------------------
-ALTER TABLE public.audit_settings ENABLE ROW LEVEL SECURITY;
-
-REVOKE ALL ON TABLE public.audit_settings FROM PUBLIC;
-REVOKE ALL ON TABLE public.audit_settings FROM anon;
-REVOKE ALL ON TABLE public.audit_settings FROM authenticated;
-GRANT ALL ON TABLE public.audit_settings TO service_role;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'audit_settings' AND c.relkind = 'r'
+  ) THEN
+    EXECUTE 'ALTER TABLE public.audit_settings ENABLE ROW LEVEL SECURITY';
+    EXECUTE 'REVOKE ALL ON TABLE public.audit_settings FROM PUBLIC';
+    EXECUTE 'REVOKE ALL ON TABLE public.audit_settings FROM anon';
+    EXECUTE 'REVOKE ALL ON TABLE public.audit_settings FROM authenticated';
+    EXECUTE 'GRANT ALL ON TABLE public.audit_settings TO service_role';
+  ELSE
+    RAISE NOTICE 'audit_settings absent (expected in production); skipping';
+  END IF;
+END
+$$;
 
 -- ---------------------------------------------------------------------------
 -- 2. Revoke client EXECUTE on the five unguarded / cost-bearing definers.
