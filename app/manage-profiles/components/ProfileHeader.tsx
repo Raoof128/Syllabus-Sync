@@ -140,15 +140,6 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
                   <Mail className="h-3.5 w-3.5 shrink-0 text-mq-content-tertiary" />
                   <span className="break-all">{profile.email}</span>
                 </p>
-                {profile.studentId && (
-                  <p className="text-mq-content-tertiary text-sm flex items-center justify-center sm:justify-start gap-1.5 min-w-0">
-                    <IdCard className="h-3.5 w-3.5 shrink-0" />
-                    <span className="break-all">
-                      {t('idPrefix')}
-                      {profile.studentId}
-                    </span>
-                  </p>
-                )}
               </div>
               {profile.avatar?.startsWith('data:') && (
                 <p className="mt-2 text-xs text-mq-warning">{t('avatarLocalOnlyWarning')}</p>

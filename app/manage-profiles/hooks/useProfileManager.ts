@@ -27,11 +27,6 @@ function normalizeYear(year: string | undefined | null): string {
   return YEAR_LEGACY_MAP[year] ?? year;
 }
 
-function normalizeStudentId(studentId: string | undefined | null): string {
-  if (!studentId) return '';
-  return studentId.trim();
-}
-
 export function useProfileManager() {
   const { t } = useTypedTranslation();
   const profileSchema = useMemo(() => createProfileSchema(t), [t]);
@@ -73,7 +68,6 @@ export function useProfileManager() {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: currentProfile?.name || '',
-      studentId: normalizeStudentId(currentProfile?.studentId),
       faculty: currentProfile?.faculty || '',
       course: currentProfile?.course || '',
       year: normalizeYear(currentProfile?.year),
@@ -95,7 +89,6 @@ export function useProfileManager() {
     if (currentProfile) {
       form.reset({
         name: currentProfile.name || '',
-        studentId: normalizeStudentId(currentProfile.studentId),
         faculty: currentProfile.faculty || '',
         course: currentProfile.course || '',
         year: normalizeYear(currentProfile.year),
@@ -120,7 +113,6 @@ export function useProfileManager() {
       toastUtils.error(t('error'), t('databaseConnectionFailed'));
       form.reset({
         name: currentProfile.name || '',
-        studentId: normalizeStudentId(currentProfile.studentId),
         faculty: currentProfile.faculty || '',
         course: currentProfile.course || '',
         year: normalizeYear(currentProfile.year),
@@ -135,7 +127,6 @@ export function useProfileManager() {
         // Store already shows the specific error toast — just reset the form
         form.reset({
           name: currentProfile.name || '',
-          studentId: normalizeStudentId(currentProfile.studentId),
           faculty: currentProfile.faculty || '',
           course: currentProfile.course || '',
           year: normalizeYear(currentProfile.year),

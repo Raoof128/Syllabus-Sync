@@ -571,7 +571,6 @@ export type Database = {
           faculty: string | null;
           full_name: string | null;
           id: string;
-          student_id: string | null;
           updated_at: string | null;
           year: string | null;
         };
@@ -583,7 +582,6 @@ export type Database = {
           faculty?: string | null;
           full_name?: string | null;
           id?: string;
-          student_id?: string | null;
           updated_at?: string | null;
           year?: string | null;
         };
@@ -595,7 +593,6 @@ export type Database = {
           faculty?: string | null;
           full_name?: string | null;
           id?: string;
-          student_id?: string | null;
           updated_at?: string | null;
           year?: string | null;
         };
@@ -1089,7 +1086,6 @@ export type Database = {
           level: number | null;
           longest_streak: number | null;
           streak_days: number | null;
-          student_id: string | null;
           updated_at: string | null;
           xp: number | null;
           year: string | null;

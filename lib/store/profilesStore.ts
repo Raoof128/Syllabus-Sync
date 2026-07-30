@@ -23,7 +23,6 @@ interface DbProfile {
   id: string;
   email: string;
   full_name: string | null;
-  student_id: string | null;
   faculty: string | null;
   course: string | null;
   year: string | null;
@@ -45,7 +44,6 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
-  studentId: string;
   avatar?: string;
   // Profile fields stored in Supabase
   faculty: string;
@@ -157,7 +155,6 @@ function mapDbToClient(db: DbProfile, existing?: Partial<UserProfile>): UserProf
     id: db.id,
     name: db.full_name || '',
     email: db.email,
-    studentId: db.student_id || '',
     avatar: db.avatar_url || undefined,
     // Profile fields from database
     faculty: db.faculty || '',
@@ -185,10 +182,6 @@ function mapClientToDb(updates: Partial<UserProfile>): Partial<DbProfile> {
     if (trimmed) {
       dbUpdates.full_name = trimmed;
     }
-  }
-  if (updates.studentId !== undefined) {
-    const trimmed = updates.studentId.trim();
-    dbUpdates.student_id = trimmed || null;
   }
   if (updates.faculty !== undefined) {
     dbUpdates.faculty = updates.faculty || null;
@@ -555,7 +548,6 @@ export const useProfilesStore = create<ProfilesState>()(
         profiles: state.profiles.map((p) => ({
           ...p,
           // SECURITY: Don't persist sensitive PII to localStorage
-          studentId: '',
           email: '',
         })),
         currentProfileId: state.currentProfileId,

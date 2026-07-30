@@ -95,9 +95,7 @@ describe('profiles API route', () => {
     const request = new Request('http://localhost/api/profiles', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        student_id: '12345678',
-      }),
+      body: JSON.stringify({}),
     });
 
     const response = await PUT(request);

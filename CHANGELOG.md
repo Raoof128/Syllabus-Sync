@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Student IDs Removed and User Notification Drafted — 2026-07-30
+
+**Scope:** The two open decisions from the BA-0048 remediation plan, both actioned on owner instruction.
+
+**Summary:** `profiles.student_id` held the most sensitive field that BA-0048 exposed, and the application read it for nothing: collected at signup, stored, displayed back to its owner. Removing it ran in the order that keeps production consistent. The 16 stored values were nulled first, collection was stripped from 56 code references and 140 translation keys across 35 locales, that was deployed and a live signup verified to succeed without the field, and only then was the column dropped. `public.user_details` selected the column and blocked the drop, so the migration recreates the view first **`WITH (security_invoker = true)`** and re-checks the flag afterwards. That matters: this is the same DROP/CREATE shape that silently lost `security_invoker` twice before, which is the BA-0021 defect.
+
+One correction. I had written that nothing in the app depended on the field. No logic read it, but it was a required signup field with UI in two components and keys in 35 locale files, so the change came to 56 references rather than one line.
+
+For the notification, a Gmail draft is prepared and deliberately **not sent**. It goes to 27 recipients in BCC, never To:, because putting the list in To: would leak every address to every recipient and create a second privacy incident. The app's own mail path was unusable: the Resend key held in Vercel is invalid and the Worker's copy cannot be read back. The text states what was exposed, the roughly six-month window, that no evidence of misuse was found, and plainly that no access log exists detailed enough to prove nobody read those records.
+
+**Files Changed:** `supabase/migrations/20260730140000_drop_student_id.sql` (new), `lib/schemas/auth.ts`, `app/api/auth/signup/route.ts`, `app/api/profiles/route.ts`, `app/api/types.ts`, `app/signup/SignupClient.tsx`, `app/manage-profiles/*`, `lib/store/profilesStore.ts`, `lib/config.ts`, `components/ProfileCard.tsx`, `lib/supabase/database.types.ts`, 35 locale files, five test files, the finding ledger.
+
+**Verification:** Column absent from table and view, `security_invoker` still true, `npm run check` exit 0 with 1250 tests, `cf:smoke` 9/9, live signup returns 200 without the field. Test accounts deleted; `auth.users` back to 29.
+
+**Follow-ups:** The recipient list wants pruning before anyone sends it. Roughly half the 29 accounts look like the two maintainers' own test accounts, so genuinely affected third parties number closer to 14. Deciding which are real belongs to the owners, so the draft over-includes rather than risk omitting someone.
+
+---
+
 ### Raouf: CI Deploy Credentials Recovered, CRON_SECRET Rotated — 2026-07-30
 
 **Scope:** Completed the CI deploy configuration by recovering the secret values Cloudflare will not return.

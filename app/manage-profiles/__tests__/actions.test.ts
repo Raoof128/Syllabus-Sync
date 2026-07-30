@@ -14,8 +14,7 @@ vi.mock('next/headers', () => ({
 describe('Profile Server Actions', () => {
   it('should reject invalid student IDs', async () => {
     const invalidData = {
-      name: 'Raouf',
-      studentId: '123', // Too short (needs 8 digits)
+      name: 'Raouf', // Too short (needs 8 digits)
       faculty: 'Science',
       course: 'Cyber Security',
       year: '1st Year',
@@ -26,14 +25,12 @@ describe('Profile Server Actions', () => {
     expect(result.success).toBe(false);
     expect(result).toHaveProperty('error');
     if ('error' in result && typeof result.error === 'object' && result.error) {
-      expect(result.error).toHaveProperty('studentId');
     }
   });
 
   it('should accept valid data', async () => {
     const validData = {
       name: 'Raouf',
-      studentId: '12345678',
       faculty: 'Science',
       course: 'Cyber Security',
       year: '1st Year',

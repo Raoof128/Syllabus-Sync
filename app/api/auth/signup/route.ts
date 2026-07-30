@@ -78,7 +78,6 @@ const serverT = (key: string): string => {
     'validation.passwordNumber': 'Password must contain at least one number',
     'validation.termsRequired': 'You must agree to the terms',
     'validation.fullNameRequired': 'Full name is required',
-    'validation.studentIdRequired': 'Student ID is required',
     'validation.passwordsMismatch': 'Passwords do not match',
   };
   return translations[key] || key;
@@ -181,7 +180,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const { email, password, fullName, studentId, faculty, course, year } = parsed.data;
+    const { email, password, fullName, faculty, course, year } = parsed.data;
 
     // BA-0041: refuse known-breached passwords. This check existed only in the
     // browser (PasswordStrengthIndicator), so posting here directly bypassed it.
@@ -322,7 +321,6 @@ export async function POST(request: NextRequest) {
           id: userId,
           email,
           full_name: fullName,
-          student_id: studentId,
           faculty: faculty || null,
           course: course || null,
           year: year || null,
@@ -366,7 +364,6 @@ export async function POST(request: NextRequest) {
           id: userId,
           email,
           full_name: fullName,
-          student_id: studentId,
           faculty: faculty || null,
           course: course || null,
           year: year || null,

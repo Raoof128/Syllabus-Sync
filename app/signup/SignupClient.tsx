@@ -122,7 +122,6 @@ export default function SignupClient() {
       confirmPassword: '',
       agreedToTerms: false,
       fullName: '',
-      studentId: '',
       faculty: '',
       course: '',
       year: '',
@@ -210,7 +209,6 @@ export default function SignupClient() {
           agreedToTerms: data.agreedToTerms,
           _gotcha: data._gotcha,
           fullName: data.fullName,
-          studentId: data.studentId,
           faculty: data.faculty,
           course: data.course,
           year: data.year,
@@ -249,7 +247,6 @@ export default function SignupClient() {
       addProfile({
         name: data.fullName,
         email: data.email,
-        studentId: data.studentId,
         faculty: data.faculty || '',
         course: data.course || '',
         year: data.year || '',
@@ -609,26 +606,6 @@ export default function SignupClient() {
                     {errors.fullName && (
                       <p id="fullName-error" className="text-xs text-mq-error">
                         {errors.fullName.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="studentId" className="font-bold text-mq-content">
-                      {t('studentId')} <span className="text-mq-error">*</span>
-                    </Label>
-                    <Input
-                      id="studentId"
-                      placeholder={t('studentIdPlaceholder')}
-                      disabled={isSubmitting}
-                      className="h-12 rounded-xl"
-                      {...register('studentId')}
-                      aria-invalid={!!errors.studentId}
-                      aria-describedby={errors.studentId ? 'studentId-error' : undefined}
-                    />
-                    {errors.studentId && (
-                      <p id="studentId-error" className="text-xs text-mq-error">
-                        {errors.studentId.message}
                       </p>
                     )}
                   </div>
