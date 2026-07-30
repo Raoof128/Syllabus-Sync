@@ -110,9 +110,9 @@ const EXPECTED_DEPENDENCY_PATHS = [
     value: '^16.2.11',
   },
   {
-    label: 'next@16.2.11 -> optional sharp',
+    label: 'next@16.2.12 -> optional sharp',
     packagePath: 'node_modules/next',
-    version: '16.2.11',
+    version: '16.2.12',
     field: 'optionalDependencies',
     dependency: 'sharp',
     value: '^0.34.5',
@@ -125,36 +125,48 @@ const EXPECTED_DEPENDENCY_PATHS = [
     value: '^4.113.0',
   },
   {
-    label: 'wrangler@4.113.0 -> miniflare',
+    label: 'wrangler@4.115.0 -> miniflare',
     packagePath: 'node_modules/wrangler',
-    version: '4.113.0',
+    version: '4.115.0',
     field: 'dependencies',
     dependency: 'miniflare',
-    value: '4.20260721.0',
+    value: '4.20260722.1',
   },
   {
-    label: 'miniflare@4.20260721.0 -> sharp',
+    label: 'miniflare@4.20260722.1 -> sharp',
     packagePath: 'node_modules/miniflare',
-    version: '4.20260721.0',
+    version: '4.20260722.1',
     field: 'dependencies',
     dependency: 'sharp',
-    value: '0.34.5',
+    value: '0.35.2',
   },
+  // The vulnerable copy. Next declares Sharp as an OPTIONAL dependency for
+  // build-time image optimisation, which is why the advisory follows the
+  // production tree at all; the reachability scan below is what proves it never
+  // reaches the Worker bundle.
   {
-    label: 'installed sharp',
+    label: 'installed sharp (next optional, advisory-affected)',
     packagePath: 'node_modules/sharp',
     version: '0.34.5',
+  },
+  // Miniflare's nested copy moved to 0.35.2, which is OUTSIDE the advisory
+  // range (<0.35.0), so it contributes no exposure. Pinned here so a downgrade
+  // back into the affected range has to be re-approved rather than sliding in.
+  {
+    label: 'installed sharp (miniflare nested, patched)',
+    packagePath: 'node_modules/miniflare/node_modules/sharp',
+    version: '0.35.2',
   },
 ];
 
 const EXPECTED_PROVENANCE = [
   {
-    label: 'Next 16.2.11',
+    label: 'Next 16.2.12',
     packagePath: 'node_modules/next',
-    version: '16.2.11',
-    resolved: 'https://registry.npmjs.org/next/-/next-16.2.11.tgz',
+    version: '16.2.12',
+    resolved: 'https://registry.npmjs.org/next/-/next-16.2.12.tgz',
     integrity:
-      'sha512-B339zaqbyK8cmxhoAvLrcwoabwCP1wz21zSzfqxqXAemTu2BXnH7tQnfcglKv1vnMUIDBc+Hth7XODQriTZiRQ==',
+      'sha512-iD59eYQWmbFcEbX7v/acG5DRym9iw1DdaPoD0WTA920naWsE25wShzJW4+UvAs8MK9EC2kBfIH6vtto1H1PHGw==',
   },
   {
     label: 'OpenNext Cloudflare 1.20.2',
@@ -165,12 +177,12 @@ const EXPECTED_PROVENANCE = [
       'sha512-iFBjABnaDk3be27F5EpxyMLMGPbVnnArFx5I3Y8Rf6BSx5nBV8h0UuJiMKrx3+whDU5ahIy4d8sfbvWvMiF1Kg==',
   },
   {
-    label: 'Wrangler 4.113.0',
+    label: 'Wrangler 4.115.0',
     packagePath: 'node_modules/wrangler',
-    version: '4.113.0',
-    resolved: 'https://registry.npmjs.org/wrangler/-/wrangler-4.113.0.tgz',
+    version: '4.115.0',
+    resolved: 'https://registry.npmjs.org/wrangler/-/wrangler-4.115.0.tgz',
     integrity:
-      'sha512-ROGzSloJv0y21It6Oc9LaruNcu1tdiQ/XzL3Jc3YkFjzXEMXzTqVhA8vQaGMTdZHTjFP0PVcwAHNgaw3gXu4wA==',
+      'sha512-+upG2VW66M1sjb43yzgUZ6Ss8iYpJ6+7F3U4GF8TY5EYd+08sYdS54d24AEwCnhuef3J9KlSPusqiqR9WYy1UA==',
   },
 ];
 

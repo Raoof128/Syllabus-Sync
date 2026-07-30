@@ -107,10 +107,10 @@ function lockfile() {
         devDependencies: { wrangler: '^4.113.0' },
       },
       'node_modules/next': {
-        version: '16.2.11',
-        resolved: 'https://registry.npmjs.org/next/-/next-16.2.11.tgz',
+        version: '16.2.12',
+        resolved: 'https://registry.npmjs.org/next/-/next-16.2.12.tgz',
         integrity:
-          'sha512-B339zaqbyK8cmxhoAvLrcwoabwCP1wz21zSzfqxqXAemTu2BXnH7tQnfcglKv1vnMUIDBc+Hth7XODQriTZiRQ==',
+          'sha512-iD59eYQWmbFcEbX7v/acG5DRym9iw1DdaPoD0WTA920naWsE25wShzJW4+UvAs8MK9EC2kBfIH6vtto1H1PHGw==',
         optionalDependencies: { sharp: '^0.34.5' },
       },
       'node_modules/@opennextjs/cloudflare': {
@@ -120,17 +120,18 @@ function lockfile() {
           'sha512-iFBjABnaDk3be27F5EpxyMLMGPbVnnArFx5I3Y8Rf6BSx5nBV8h0UuJiMKrx3+whDU5ahIy4d8sfbvWvMiF1Kg==',
       },
       'node_modules/wrangler': {
-        version: '4.113.0',
-        resolved: 'https://registry.npmjs.org/wrangler/-/wrangler-4.113.0.tgz',
+        version: '4.115.0',
+        resolved: 'https://registry.npmjs.org/wrangler/-/wrangler-4.115.0.tgz',
         integrity:
-          'sha512-ROGzSloJv0y21It6Oc9LaruNcu1tdiQ/XzL3Jc3YkFjzXEMXzTqVhA8vQaGMTdZHTjFP0PVcwAHNgaw3gXu4wA==',
-        dependencies: { miniflare: '4.20260721.0' },
+          'sha512-+upG2VW66M1sjb43yzgUZ6Ss8iYpJ6+7F3U4GF8TY5EYd+08sYdS54d24AEwCnhuef3J9KlSPusqiqR9WYy1UA==',
+        dependencies: { miniflare: '4.20260722.1' },
       },
       'node_modules/miniflare': {
-        version: '4.20260721.0',
-        dependencies: { sharp: '0.34.5' },
+        version: '4.20260722.1',
+        dependencies: { sharp: '0.35.2' },
       },
       'node_modules/sharp': { version: '0.34.5' },
+      'node_modules/miniflare/node_modules/sharp': { version: '0.35.2' },
     },
   };
 }
