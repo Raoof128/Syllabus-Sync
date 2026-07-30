@@ -88,12 +88,19 @@ export async function POST(request: NextRequest) {
       return jsonError('Invalid or expired reset link', 400, ERROR_CODES.BAD_REQUEST);
     }
 
-    // 2) Mark token as used (atomic guard)
-    const { error: updateError } = await adminClient
+    // 2) Claim the token. SECURITY (BA-0006): this UPDATE is the single-use
+    // gate, not the `.eq('used', false)` in the lookup above — between that
+    // SELECT and this write a concurrent request can already have spent the
+    // token. `.select('id')` is what makes the guard real: PostgREST reports a
+    // zero-row UPDATE as success (`error: null`), so without asking which rows
+    // changed, the loser of a race fell straight through to the password write
+    // and reset the account off an already-consumed token.
+    const { data: claimedRows, error: updateError } = await adminClient
       .from('password_resets')
       .update({ used: true })
       .eq('id', record.id)
-      .eq('used', false);
+      .eq('used', false)
+      .select('id');
 
     if (updateError) {
       logger.error('Failed to mark password reset token used', {
@@ -101,6 +108,12 @@ export async function POST(request: NextRequest) {
         error: updateError.message,
       });
       return jsonError('Password reset failed', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+
+    if (!claimedRows || claimedRows.length === 0) {
+      // Lost the race, or the token was consumed between lookup and claim.
+      // Same generic message as "not found"/"expired" so nothing is revealed.
+      return jsonError('Invalid or expired reset link', 400, ERROR_CODES.BAD_REQUEST);
     }
 
     // 3) Update password

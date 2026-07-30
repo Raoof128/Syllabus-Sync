@@ -38,11 +38,13 @@ function makePasswordResetsTable(record: { id: string; user_id: string } | null)
     error: record ? null : { message: 'not found' },
   }));
 
+  // BA-0006: the route now terminates the consuming UPDATE with `.select('id')`
+  // and treats a zero-row result as "token already spent", so this double has
+  // to report an affected row count instead of resolving on the second `.eq()`.
+  // Race behaviour itself is covered by tests/api/auth/token-single-use-rowcount.test.ts.
   const updateChain: any = {};
-  const updateEq = vi.fn();
-  updateEq.mockImplementationOnce(() => updateChain);
-  updateEq.mockImplementationOnce(async () => ({ error: null }));
-  updateChain.eq = updateEq;
+  updateChain.eq = vi.fn(() => updateChain);
+  updateChain.select = vi.fn(async () => ({ data: [{ id: 'claimed-row' }], error: null }));
 
   return {
     select: chain.select,

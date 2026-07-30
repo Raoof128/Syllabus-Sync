@@ -1,8 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-// @ts-expect-error -- plain .mjs gate tool, intentionally untyped
-import { evaluateAuditException } from '../../tools/security/check-sharp-risk.mjs';
+import { evaluateAuditException as untypedGate } from '../../tools/security/check-sharp-risk.mjs';
+
+// The gate is plain .mjs, so its inferred signature loses the evidence
+// parameters. Narrow it here rather than weakening the test with `any`.
+const evaluateAuditException = untypedGate as unknown as (input: {
+  fullAudit: unknown;
+  productionAudit: unknown;
+  lockfile: unknown;
+  now?: Date;
+}) => { ok: boolean; errors: string[] };
 
 const repoRoot = resolve(__dirname, '../..');
 const readJson = (relativePath: string) =>

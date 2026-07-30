@@ -80,12 +80,19 @@ export async function POST(request: NextRequest) {
       return jsonError('Invalid or expired verification link', 400, ERROR_CODES.BAD_REQUEST);
     }
 
-    // 3. Mark token as used (atomic — prevents double-use race condition)
-    const { error: updateError } = await adminClient
+    // 3. Claim the token. SECURITY (BA-0006): this UPDATE is the single-use
+    // gate, not the `.eq('used', false)` in the lookup above — between that
+    // SELECT and this write a concurrent request can already have spent the
+    // token. `.select('id')` is what makes the guard real: PostgREST reports a
+    // zero-row UPDATE as success (`error: null`), so without asking which rows
+    // changed, the loser of a race fell straight through and confirmed the
+    // address off an already-consumed token.
+    const { data: claimedRows, error: updateError } = await adminClient
       .from('email_verifications')
       .update({ used: true })
       .eq('id', record.id)
-      .eq('used', false); // Extra guard against race condition
+      .eq('used', false)
+      .select('id');
 
     if (updateError) {
       logger.error('Failed to mark verification token used', {
@@ -93,6 +100,11 @@ export async function POST(request: NextRequest) {
         error: updateError.message,
       });
       return jsonError('Verification failed', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+
+    if (!claimedRows || claimedRows.length === 0) {
+      // SECURITY: same generic message as "not found"/"expired"/"already used".
+      return jsonError('Invalid or expired verification link', 400, ERROR_CODES.BAD_REQUEST);
     }
 
     // 4. Mark user as email-verified via admin API
