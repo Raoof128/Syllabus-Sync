@@ -192,12 +192,24 @@ DECLARE
   unprotected int;
   unpinned int;
 BEGIN
-  -- audit_settings must now have RLS.
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_class
-    WHERE oid = 'public.audit_settings'::regclass AND relrowsecurity
+  -- audit_settings must have RLS *if it exists at all*.
+  --
+  -- The existence guard is load-bearing, not defensive padding: a bare
+  -- 'public.audit_settings'::regclass RAISES 42P01 when the table is absent, so
+  -- an unguarded assertion here aborts the whole migration in production, where
+  -- the table does not exist. That is exactly what happened on the first push
+  -- attempt — it failed at this statement and rolled back atomically, leaving
+  -- the two live function fixes unapplied.
+  IF EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'audit_settings' AND c.relkind = 'r'
+  ) AND NOT EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public' AND c.relname = 'audit_settings' AND c.relrowsecurity
   ) THEN
-    RAISE EXCEPTION 'audit_settings still does not have RLS enabled';
+    RAISE EXCEPTION 'audit_settings exists but still does not have RLS enabled';
   END IF;
 
   -- No public table may be left without RLS.

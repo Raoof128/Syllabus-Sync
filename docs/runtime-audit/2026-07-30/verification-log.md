@@ -191,3 +191,48 @@ b0b8cd7a fix(security): re-approve the Sharp supply-chain gate so production can
 
 Nothing was pushed. Nothing was deployed. No secret was printed, logged, or
 committed.
+
+## Migration applied to production — 2026-07-30
+
+The hardening migration was applied on the owner's explicit instruction, using
+the Supabase CLI. Recorded here in full, including the first attempt failing.
+
+**Pre-check.** `supabase migration list --linked` showed exactly one pending
+migration — `20260730180000`, with an empty `remote` column. Every other entry
+matched local↔remote, so `db push` could only apply this one file. That check
+mattered: a backlog would have dragged in the chain's known replay blockers.
+
+**First attempt: FAILED, and rolled back cleanly.**
+
+```
+Applying migration 20260730180000_...sql
+LegacyDbPushApplyError: Failed to execute statement. At statement: 3
+```
+
+My bug. I had guarded the DDL block against `audit_settings` being absent but
+left the verification block asserting `'public.audit_settings'::regclass`, which
+raises 42P01 when the table does not exist. Confirmed the rollback was atomic
+before retrying: both target functions still `UNPINNED` with
+`anon,authenticated` EXECUTE, and `schema_migrations` still topped out at
+`20260730160000` — the migration was not recorded. Failing closed rather than
+half-applying is the designed behaviour and it held.
+
+**Second attempt: applied.** The Docker errors in the output are a warning about
+caching a local migrations catalog, not the apply.
+
+**Post-apply verification (read-only):**
+
+| Check                                           | Result                                                            |
+| ----------------------------------------------- | ----------------------------------------------------------------- |
+| `schema_migrations` head                        | `20260730180000`                                                  |
+| `purge_deleted_records(integer)`                | `search_path=public`; client EXECUTE **NONE**                     |
+| `refresh_analytics_views()`                     | `search_path=public`; client EXECUTE **NONE**                     |
+| `service_role` EXECUTE on both                  | **retained** — not over-revoked                                   |
+| `definers_unpinned`                             | **6 → 0**                                                         |
+| `tables_without_rls`                            | 0                                                                 |
+| Live triggers on `profiles`/`units`/`deadlines` | all three still attached, `tgenabled = 'O'`, functions now pinned |
+| `cf:smoke`                                      | **9/9 passed**                                                    |
+| `/api/health`                                   | `status: healthy`, `database: connected`                          |
+
+The `audit_settings` block was a no-op in production, as expected — the table
+does not exist there. It remains correct for a chain-built environment.
