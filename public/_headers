@@ -17,10 +17,14 @@
 /images/*
   Cache-Control: public,max-age=31536000,immutable
 
-/manifest.webmanifest
-  Content-Type: application/manifest+json
-  Cache-Control: public,max-age=86400
-
+# One rule only. `/manifest.webmanifest` used to be declared here AND matched by
+# a `/*.webmanifest` glob below it; Cloudflare applies every matching rule and
+# appends, so production served
+#   content-type: application/manifest+json, application/manifest+json
+# which is an invalid single-value header a browser may reject outright. This was
+# the "doubled Content-Type, root cause unidentified" follow-up from the
+# 2026-07-29 preview deployment. The glob already covers the concrete filename,
+# so the exact-path duplicate is what had to go.
 /*.webmanifest
   Content-Type: application/manifest+json
   Cache-Control: public,max-age=86400
