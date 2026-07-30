@@ -22,6 +22,24 @@ const HIBP_API_URL = "https://api.pwnedpasswords.com/range/";
 const HIBP_USER_AGENT = "Syllabus-Sync-Security-Check";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+/**
+ * Wall-clock ceiling for the HIBP lookup.
+ *
+ * `isPasswordBreachBlocked` documents that this check FAILS OPEN so that
+ * api.pwnedpasswords.com cannot take signup and password reset down with it.
+ * That promise was not actually implemented: the fetch below had no timeout and
+ * no abort signal, so a connection that hung rather than failing never settled,
+ * `checkPasswordBreach` never returned, and the caller sat inside the signup /
+ * reset request until the platform killed it. Failing open only works if the
+ * failure is BOUNDED — an unreachable dependency has to become a fast local
+ * decision, not an inherited hang.
+ *
+ * 2.5s is chosen against the surrounding budget: the edge middleware allows 6s
+ * for auth resolution in production, so a password-setting request has to leave
+ * room for its own Supabase work as well.
+ */
+const HIBP_TIMEOUT_MS = 2_500;
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -167,12 +185,15 @@ export async function checkPasswordBreach(
   }
 
   try {
-    // Fetch breach data from HIBP API
+    // Fetch breach data from HIBP API. `AbortSignal.timeout` is available on
+    // both the Node and Workers runtimes; on abort, fetch rejects and the
+    // catch below returns the safe fail-open default.
     const response = await fetch(`${apiUrl}${prefix}`, {
       method: "GET",
       headers: {
         "User-Agent": HIBP_USER_AGENT,
       },
+      signal: AbortSignal.timeout(HIBP_TIMEOUT_MS),
     });
 
     if (!response.ok) {
