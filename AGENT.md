@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-07-30 (Australia/Sydney) — Signup → Email → Redirect Flow Audit
+
+**Raouf:**
+
+- **Scope:** Audited the signup, verification-email, and post-verification redirect chain end to end, and fixed the three defects found.
+- **Summary:** The flow completed (mail sends, addresses confirm, users can sign in) but the confirmation feedback was broken on the main path. Signup requested `emailRedirectTo=/auth/callback?redirectTo=/login%3Fverified%3D1`; `/login` is absent from `SAFE_REDIRECT_PATHS`, so `isValidRedirect()` rejected it and `redirectTo` silently degraded to `/home`. The callback signed out the session it had just minted and sent the user to `/home`, which the middleware bounced to `/login?redirectTo=/home`, losing `verified=1` — so the green banner never appeared and the callback's final two lines were dead code. Reproduced at route level first (the real link resolved to `/home`). The callback now lands email verification on `/login?verified=1` and forwards an explicit destination as `redirectTo`; the OAuth branch still follows `redirectTo` directly since it keeps its session. Signup's `emailRedirectTo` simplified to `${appUrl}/auth/callback`. Also fixed `/verify`, which rendered "Verification Failed / Invalid or expired verification link" for the middleware's own `?reason=unverified` redirect because it only handled `?token=<64 hex>` — it now has a check-your-inbox `pending` state built from existing translation keys (no 35-locale change). Corrected the stale `ACCOUNT_EXISTS_MESSAGE` comment, which described behaviour the production path deliberately does not have.
+- **Files Changed:** `app/auth/callback/route.ts`, `app/api/auth/signup/route.ts`, `app/verify/page.tsx`, `tests/api/auth/callback.signup-verification.test.ts` (new), `tests/unit/verify-page-gate-redirect.test.tsx` (new), `tests/api/auth/callback.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+- **Verification:** `npm run check` exit 0 — 1269 tests / 143 files (from 1260/141), Prettier clean, both typechecks clean, Lint OK, build compiled ✅. New cover: the exact signup link, legacy nested `/login` redirects, destination forwarding, attacker-supplied `redirectTo` rejection, both OAuth branches, and all three `/verify` states. Two assertions in `callback.test.ts` were intentionally updated — they locked the old email-path behaviour. Live config checked read-only via the Supabase Management API: `site_url` matches the Worker `NEXT_PUBLIC_APP_URL`, `uri_allow_list` permits the callback, `mailer_autoconfirm` false, anonymous auth off.
+- **Follow-ups:** Verification email still ships via Gmail SMTP from `perkycoders@gmail.com` — relay-capped and cannot DKIM-align with `syllabus-sync.app`, so spam risk plus off-brand sender on a new user's first impression. Resend is already wired for the resend path; switching Supabase SMTP needs an owner decision. The initial and resent emails also use two different mechanisms/lifetimes (native `/auth/callback?code=` at 3600s vs custom `/verify?token=` at 20 min), and `/api/auth/email/send-verification` has no callers — candidates for consolidation. A live signup on Workers remains unexercised.
+
 ### 2026-07-30 (Australia/Sydney) — Merged Both Feature Branches Into main
 
 **Raouf:**

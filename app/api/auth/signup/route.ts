@@ -61,11 +61,13 @@ function isDevEmail(email: string): boolean {
 const GENERIC_SIGNUP_SUCCESS =
   'If this email is not already registered, you will receive a confirmation email shortly.';
 
-// UX tradeoff: we surface "account already exists" directly instead of hiding
-// it behind GENERIC_SIGNUP_SUCCESS. This weakens account-enumeration resistance
-// (an attacker can now probe which emails are registered) but eliminates the
-// confusing "we sent you an email" message for users who already have an
-// account. Rate-limiting + honeypot above still throttle enumeration attempts.
+// Only the development auto-confirm branch surfaces "account already exists".
+// The production path deliberately answers GENERIC_SIGNUP_SUCCESS for an
+// existing address so signup cannot be used to enumerate accounts — see the
+// 2026-04-07 CI remediation entry in CHANGELOG.md and tests/api/auth/signup.test.ts,
+// which lock that 200-with-generic-message contract in. The accepted UX cost is
+// that someone who already has an account is told to check an inbox that will
+// not receive anything; the login page carries the resend-verification path.
 const ACCOUNT_EXISTS_MESSAGE = 'An account with this email already exists. Please sign in instead.';
 
 // Server-side translation stub (returns key or basic English)
@@ -259,7 +261,12 @@ export async function POST(request: NextRequest) {
           data: {
             full_name: fullName,
           },
-          emailRedirectTo: `${appUrl}/auth/callback?redirectTo=/login%3Fverified%3D1`,
+          // The callback owns the post-verification destination: it drops the
+          // session it mints and lands the user on /login?verified=1. Passing a
+          // nested `redirectTo=/login?...` here was silently discarded, because
+          // isValidRedirect() only allows SAFE_REDIRECT_PATHS and '/login' is
+          // not one of them — so it fell back to '/home' and lost the banner.
+          emailRedirectTo: `${appUrl}/auth/callback`,
         },
       });
 

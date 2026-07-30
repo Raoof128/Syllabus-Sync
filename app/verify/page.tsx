@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, MailCheck } from 'lucide-react';
 import { Button } from '@/components/ui/mq/button';
 import { API_ROUTES } from '@/lib/constants/config';
 import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 
-type VerifyState = 'loading' | 'success' | 'error';
+type VerifyState = 'loading' | 'success' | 'error' | 'pending';
 
 export default function VerifyPage() {
   const { t } = useTypedTranslation();
@@ -17,8 +17,15 @@ export default function VerifyPage() {
   const token = searchParams.get('token');
   const isValidFormat = useMemo(() => !!token && /^[0-9a-f]{64}$/.test(token), [token]);
 
-  // If token format is invalid, start in error state (no effect needed)
-  const [state, setState] = useState<VerifyState>(isValidFormat ? 'loading' : 'error');
+  // The middleware's email-verification gate sends signed-in-but-unconfirmed
+  // users here as /verify?reason=unverified — no token at all. That is not a
+  // broken link, so it must not render the "invalid link" error: show a
+  // check-your-inbox state and point at /login, where resend lives.
+  const isGateRedirect = !token;
+
+  const [state, setState] = useState<VerifyState>(
+    isValidFormat ? 'loading' : isGateRedirect ? 'pending' : 'error',
+  );
 
   useEffect(() => {
     if (!isValidFormat || !token) return;
@@ -57,6 +64,17 @@ export default function VerifyPage() {
             <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto" />
             <h1 className="text-xl font-bold text-mq-content">{t('emailVerified')}</h1>
             <p className="text-sm text-mq-content-secondary">{t('emailVerifiedSuccess')}</p>
+            <Button onClick={() => router.push('/login')} className="w-full">
+              {t('goToLogin')}
+            </Button>
+          </>
+        )}
+
+        {state === 'pending' && (
+          <>
+            <MailCheck className="h-12 w-12 text-mq-primary mx-auto" aria-hidden="true" />
+            <h1 className="text-xl font-bold text-mq-content">{t('verifyEmail')}</h1>
+            <p className="text-sm text-mq-content-secondary">{t('verificationEmailSent')}</p>
             <Button onClick={() => router.push('/login')} className="w-full">
               {t('goToLogin')}
             </Button>

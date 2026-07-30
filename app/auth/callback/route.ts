@@ -171,14 +171,22 @@ export async function GET(request: Request) {
     console.warn('Post-verification signOut failed (non-fatal):', signOutError);
   }
 
-  // If we have a validated redirectTo that isn't just bouncing back to login,
-  // honor it. This allows signup-confirmation emails to land the user on
-  // their intended destination (e.g., /map or /home) after they sign in.
-  if (redirectTo && redirectTo !== '/login') {
-    return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
-  }
-
+  // We just dropped the session, so the user is anonymous from here on. Sending
+  // them straight at `redirectTo` would only bounce off the middleware into
+  // /login?redirectTo=… and lose the `verified` flag on the way, which is why
+  // the green "email verified" banner never used to appear: signup asks for
+  // `redirectTo=/login?verified=1`, `/login` is not in SAFE_REDIRECT_PATHS, so
+  // isValidRedirect() rejected it and `redirectTo` silently became '/home'.
+  //
+  // Land on /login?verified=1 instead, and forward an explicitly requested
+  // destination as `redirectTo` so it survives the sign-in that follows.
   const verifiedLoginUrl = new URL('/login', requestUrl.origin);
   verifiedLoginUrl.searchParams.set('verified', '1');
+
+  const wantsLogin = !rawRedirect || rawRedirect.startsWith('/login');
+  if (!wantsLogin && isValidRedirect(rawRedirect)) {
+    verifiedLoginUrl.searchParams.set('redirectTo', redirectTo);
+  }
+
   return NextResponse.redirect(verifiedLoginUrl);
 }
