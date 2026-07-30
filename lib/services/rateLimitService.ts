@@ -1,6 +1,15 @@
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { isProductionDeployment } from '@/lib/platform/runtime';
+
+/**
+ * Wall-clock ceiling for a rate-limit store round trip.
+ *
+ * Deliberately tight: this call sits in front of every authentication request,
+ * and a slow limiter is worse than a briefly unavailable one — the failClosed
+ * policy is there to handle unavailability.
+ */
+const RATE_LIMIT_STORE_TIMEOUT_MS = 2_000;
 /**
  * Distributed Rate Limiting Service
  *
@@ -112,6 +121,14 @@ class UpstashRedisStore implements RateLimitStore {
   }
 
   private async command<T>(...args: (string | number)[]): Promise<T> {
+    // SECURITY/AVAILABILITY: bound the store call. `checkRateLimit` awaits this
+    // BEFORE the handler runs, so an endpoint that accepts the connection and
+    // then never responds (a partial Upstash/KV outage) hangs every login,
+    // signup, password reset, MFA verify and passkey auth in the isolate until
+    // the Worker wall-clock limit kills them — and `failClosed` never gets to
+    // decide, because no error is ever thrown. A timeout converts the hang into
+    // a rejection so the failClosed policy actually applies. Same class as the
+    // HIBP fix in lib/security/password-breach.ts, on a more critical path.
     const response = await fetch(`${this.baseUrl}`, {
       method: 'POST',
       headers: {
@@ -119,6 +136,7 @@ class UpstashRedisStore implements RateLimitStore {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(args),
+      signal: AbortSignal.timeout(RATE_LIMIT_STORE_TIMEOUT_MS),
     });
 
     if (!response.ok) {

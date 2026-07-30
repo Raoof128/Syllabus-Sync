@@ -21,11 +21,15 @@ export class OpenMeteoProvider implements WeatherProvider {
     url.searchParams.set('models', 'best_match');
     url.searchParams.set('forecast_days', '1');
 
+    // AVAILABILITY: see googleWeatherProvider — `next.revalidate` does not bound
+    // the request, so an upstream that stalls rather than failing would hang the
+    // weather route instead of degrading.
     const response = await fetch(url.toString(), {
       headers: {
         Accept: 'application/json',
       },
       next: { revalidate: 300 },
+      signal: AbortSignal.timeout(2_500),
     });
 
     if (!response.ok) {
