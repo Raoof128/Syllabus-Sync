@@ -110,6 +110,41 @@ export async function POST(request: NextRequest) {
       return jsonError('Passkey not recognized', 401, ERROR_CODES.UNAUTHORIZED);
     }
 
+    // SECURITY (P0): the credential must belong to the user this challenge was
+    // issued for.
+    //
+    // Identity and key material arrive from two different places and nothing
+    // used to reconcile them. `userId` comes from the challenge row, which
+    // /api/webauthn/authenticate/options creates for whatever email the CALLER
+    // supplied. `dbCredential` comes from getCredentialById(), a lookup on
+    // `credential_id` alone with no user_id filter. So an attacker could take a
+    // challenge minted for a victim, sign it with their OWN authenticator, and
+    // have the signature checked against their OWN public key — then have the
+    // block below mint a session for the VICTIM. Unauthenticated, no victim
+    // interaction, and `/api/webauthn/authenticate/` is on the middleware's
+    // public allowlist so the edge never saw it.
+    //
+    // @simplewebauthn cannot catch this: verifyAuthenticationResponse only
+    // asserts `id === rawId`; it never compares the response's credential id
+    // against the credential record it is handed. And `credential_id` is UNIQUE,
+    // so the lookup is deterministic — the attack was not probabilistic.
+    //
+    // This must stay AHEAD of verifyAuthenticationResponse and of the session
+    // mint, so a mismatched credential costs no crypto and no privileged call.
+    // The legacy branch above is already safe by construction: it reads
+    // `biometric_credential_id` off the challenge user's own record and requires
+    // it to equal the presented id, so identity and key share one source.
+    //
+    // The sibling /api/webauthn/register/verify has always had the equivalent
+    // check (`storedChallenge.userId !== user.id`); this route was missing it.
+    if (dbCredential && dbCredential.userId !== userId) {
+      logger.warn('WebAuthn credential does not belong to the challenge user', {
+        challengeUserId: userId,
+        credentialId,
+      });
+      return jsonError('Passkey not recognized', 401, ERROR_CODES.UNAUTHORIZED);
+    }
+
     const host = request.headers.get('host') ?? new URL(request.url).hostname;
     const rpId = getRelyingPartyId(host);
     const origin = request.headers.get('origin') ?? new URL(request.url).origin;
