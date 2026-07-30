@@ -287,22 +287,46 @@ function mapDbCredential(data: Record<string, unknown>): WebAuthnCredential {
 }
 
 /**
- * Get RP ID from environment or request host.
+ * SECURITY (BA-0003): see the matching note in app/api/auth/passkey/_lib.ts.
+ * `WEBAUTHN_RP_ID`/`WEBAUTHN_ORIGIN` are the anchors that bind an assertion to
+ * this site; falling back to the caller's own `Host`/`Origin` made the origin
+ * check compare an attacker-supplied value against itself. Fails closed on any
+ * deployed runtime, host-derived fallback kept for local development only.
+ *
+ * Read inside the function, never at module scope (BA-0017).
+ */
+const isDeployedRuntime = () => process.env.NODE_ENV === 'production';
+
+/**
+ * Get RP ID from environment, or from the request host in local development.
  */
 export function getRelyingPartyId(host: string): string {
   // Use env override if set (for production), trimming whitespace/newlines
   const envRpId = process.env.WEBAUTHN_RP_ID?.trim();
   if (envRpId) return envRpId;
 
+  if (isDeployedRuntime()) {
+    throw new Error(
+      'WEBAUTHN_RP_ID is not configured; refusing to derive the RP ID from request headers',
+    );
+  }
+
   // Extract hostname without port
   return host.split(':')[0];
 }
 
 /**
- * Get expected origin from environment or request.
+ * Get expected origin from environment, or from the request in local development.
  */
 export function getExpectedOrigin(requestOrigin: string): string {
   const envOrigin = process.env.WEBAUTHN_ORIGIN?.trim();
   if (envOrigin) return envOrigin;
+
+  if (isDeployedRuntime()) {
+    throw new Error(
+      'WEBAUTHN_ORIGIN is not configured; refusing to trust the caller-supplied Origin header',
+    );
+  }
+
   return requestOrigin;
 }
