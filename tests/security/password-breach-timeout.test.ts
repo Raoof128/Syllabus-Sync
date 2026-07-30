@@ -23,13 +23,15 @@ describe('HIBP breach lookup is bounded', () => {
   });
 
   it('passes an abort signal to fetch', async () => {
-    const fetchSpy = vi.fn(async () => new Response('ABCDEF:1\n', { status: 200 }));
+    const fetchSpy = vi.fn(
+      async (_url: string, _init?: RequestInit) => new Response('ABCDEF:1\n', { status: 200 }),
+    );
     vi.stubGlobal('fetch', fetchSpy);
 
     await checkPasswordBreach('some-password-value');
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-    const init = fetchSpy.mock.calls[0][1] as RequestInit | undefined;
+    const init = fetchSpy.mock.calls[0][1];
     expect(init?.signal, 'HIBP fetch must carry a timeout signal').toBeDefined();
     expect(init?.signal).toBeInstanceOf(AbortSignal);
   });
