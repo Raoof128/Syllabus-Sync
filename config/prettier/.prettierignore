@@ -11,6 +11,9 @@ test-results
 .idea
 .vscode
 .agent
+# local agent scratch state — self-ignored in git, not repo source
+.remember
+.superpowers
 next-env.d.ts
 public
 Team_Plan

@@ -58,6 +58,16 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-07-30 (Australia/Sydney) — Merged Both Feature Branches Into main
+
+**Raouf:**
+
+- **Scope:** Fast-forwarded `main` to the state already running in production, and unblocked the `format:check` step of `npm run check`.
+- **Summary:** `main` had been stuck at `ba88b2c3` (2026-07-07) while both feature branches advanced in separate worktrees. Verified the topology first: `main` was a strict ancestor of both, and `feat/cloudflare-workers-migration` (29 commits) was itself a strict ancestor of `audit/backend-hardening-cloudflare` (70 commits), so a single `--ff-only` merge to `f9393714` pulled in both branches losslessly — no merge commit, no conflict resolution, nothing on `main` that the branches lacked. Used `--ff-only` deliberately so anything non-trivial would fail loudly. Ran `npm ci` afterwards for the dependency move (Next 16.1.6 → 16.2.11 plus the OpenNext/Wrangler toolchain). Also fixed `format:check`, which previously could not pass anywhere: Prettier walked `.remember/` and `.superpowers/`, local agent scratch dirs that self-ignore in git through nested `.gitignore` files but were missing from `.prettierignore`.
+- **Files Changed:** `config/prettier/.prettierignore`, `.gitignore`, `AGENT.md`, `CHANGELOG.md`. The merge moved `main` `ba88b2c3` → `f9393714` (253 files, +47,227/−8,556) with no hand edits.
+- **Verification:** `npm run check` exit code 0 — secrets (911 files) ✅, Cloudflare runtime compat ✅, Prettier clean ✅, `typecheck` ✅, `typecheck:cloudflare` ✅, Lint OK ✅, 1260/1260 tests across 141 files ✅, production build compiled ✅. Ancestry re-confirmed post-merge (0 commits outstanding on either branch). Safety branch `backup/main-pre-merge-2026-07-30` retained at the old tip.
+- **Follow-ups:** Not pushed — `origin/main` remains at `ba88b2c3`. Keep both feature branches and their worktrees until the push lands. Prior cutover follow-ups still open (apex on Vercel; authenticated flows unverified on Workers).
+
 ### 2026-07-29 (Australia/Sydney) — Production Cutover to Cloudflare Workers
 
 **Raouf:**

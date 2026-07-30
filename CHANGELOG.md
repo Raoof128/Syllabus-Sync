@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Merged Both Feature Branches Into main — 2026-07-30
+
+**Scope:** Brought `main` up to the state that is actually in production, and unblocked `npm run check`.
+
+**Summary:** `main` had been sitting at `ba88b2c3` since 2026-07-07 while both feature branches ran ahead of it in separate worktrees. Checked the topology before merging: `main` was a strict ancestor of both branches (0 commits behind either), and `feat/cloudflare-workers-migration` (29 commits) was itself a strict ancestor of `audit/backend-hardening-cloudflare` (70 commits, 41 of them beyond the Cloudflare work). So one fast-forward of `main` to `f9393714` brought in both branches losslessly — no merge commit, no conflicts, nothing on `main` that the branches lacked. Merged with `--ff-only` so a non-trivial merge would have failed loudly rather than silently producing a resolution. Reinstalled dependencies with `npm ci` afterwards, since `package.json` moved Next 16.1.6 → 16.2.11 and added the OpenNext/Wrangler toolchain. Separately fixed the `format:check` step of `npm run check`, which could not pass on any machine: Prettier was walking `.remember/` and `.superpowers/`, local agent scratch directories that self-ignore in git via their own nested `.gitignore` files but were absent from `.prettierignore`. Adding them makes the full gate pass end to end for the first time.
+
+**Files Changed:** `config/prettier/.prettierignore`, `.gitignore`, `AGENT.md`, `CHANGELOG.md`. The merge itself moved `main` from `ba88b2c3` to `f9393714` (253 files, +47,227/−8,556) without modifying any file by hand.
+
+**Verification:** `npm run check` **exit code 0** — `check:secrets` (911 files) ✅, `check:cloudflare-runtime` ✅, `format:check` clean ✅, `typecheck` ✅, `typecheck:cloudflare` ✅, `lint` OK ✅, `npm test` 1260/1260 across 141 files ✅, production build compiled ✅. Post-merge ancestry re-confirmed: `main..audit/backend-hardening-cloudflare` = 0 commits, and `feat/cloudflare-workers-migration` is an ancestor of `main`. Safety branch `backup/main-pre-merge-2026-07-30` left at the old `ba88b2c3` tip. `check:i18n` still reports the known 8-key gap across 34 locales and still exits 0 — unchanged by this merge.
+
+**Follow-ups:** Nothing has been pushed — `origin/main` is still at `ba88b2c3`, so this merge is local until someone pushes it. The two feature branches and their worktrees are left in place; delete them only after the push lands. The cutover follow-ups from the 2026-07-29 entry still stand: the apex domain is still served by Vercel, and authenticated flows on Workers remain manually unverified.
+
+---
+
 ### Raouf: Repairing What the Student ID Removal Broke — 2026-07-30
 
 **Scope:** Clearing this morning's leftovers. They included a live defect I had introduced myself a few hours earlier.

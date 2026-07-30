@@ -91,6 +91,9 @@ next-env.d.ts
 *.swp
 *.swo
 
+# local AI agent instructions (not shared)
+CLAUDE.md
+
 # ignore exported zip artifacts
 syllabus-sync_*.zip
 
