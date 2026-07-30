@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Repairing What the Student ID Removal Broke — 2026-07-30
+
+**Scope:** Clearing this morning's leftovers. They included a live defect I had introduced myself a few hours earlier.
+
+**Summary:** Dropping `profiles.student_id` meant recreating `public.user_details`, which took the view from 15 columns to 14. Two `SECURITY DEFINER` functions still named the column, and both broke. `get_my_profile()` declared a 15-column result and selected `*` from the view, so PL/pgSQL raised `structure of query does not match function result type` for any authenticated caller that matched a row. `create_user_profile` still inserted into a column that no longer existed. I confirmed both against production before fixing them, by impersonating a real session inside a transaction that rolled back.
+
+The reason my earlier verification passed is worth stating. I checked that the column was gone from the table and the view, that `security_invoker` survived, and that a live signup returned 200. All three were true. I never asked the catalog which other objects named the column. Signup passed because it uses a different function that never referenced the field, and nothing in the app calls `get_my_profile`, so nothing failed loudly. A service-role probe cannot catch this either: with no session the function returns zero rows, and the structural mismatch only fires once a row is returned, so a broken function looks healthy to exactly the check I ran. Dropping a column changes the contract of every object that depends on it, and only the catalog knows that list.
+
+The rebuilt function lists its columns explicitly instead of using `SELECT *`, since that is what let the contract drift unnoticed. Both functions lost `EXECUTE` for `PUBLIC` and `anon`; `get_my_profile` had been PUBLIC-executable while running as `SECURITY DEFINER`. The `p_student_id` parameter was removed rather than accepted and ignored, so any remaining caller fails loudly instead of believing a value was stored.
+
+Three documents still said we collect student IDs. The privacy policy now records the deletion instead of quietly dropping the field, the reference schema snapshot and the API examples are corrected, and 70 orphaned translation keys across all 35 locales are gone.
+
+**Files Changed:** `supabase/migrations/20260730160000_fix_student_id_function_residue.sql` (new), `tests/security/student-id-function-residue.test.ts` (new), `tests/i18n/student-id-fully-removed.test.ts` (new), `lib/supabase/database.types.ts`, `tests/api/profiles.route.test.ts`, `docs/policies/privacy-policy.md`, `docs/database/database-schema.sql`, `docs/api/API_REFERENCE.md`, 35 locale files, the finding ledger.
+
+**Verification:** The migration's verification block, run alone against the pre-fix state, failed as designed, so it is not vacuous. After applying: no `student_id` reference remains in any function, view, index or constraint; `get_my_profile` returns exactly one row for a real session; its 14 declared columns match the view's 14; the old four-argument signature is gone; a cross-user `create_user_profile` call is still rejected. `npm run check` exit 0 with 1260 tests.
+
+---
+
 ### Raouf: Student IDs Removed and User Notification Drafted — 2026-07-30
 
 **Scope:** The two open decisions from the BA-0048 remediation plan, both actioned on owner instruction.

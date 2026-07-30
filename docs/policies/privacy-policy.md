@@ -2,7 +2,7 @@
 
 **Syllabus Sync -- Data Protection and Privacy Practices**
 
-Last Updated: 2026-03-21
+Last Updated: 2026-07-30
 
 ---
 
@@ -30,6 +30,14 @@ Syllabus Sync follows the principle of data minimization (GDPR Article 5(1)(c)).
 - We do not perform behavioral tracking beyond what is necessary for security (IP anomaly detection, device fingerprinting for account protection).
 - We do not retain data beyond its stated purpose.
 
+**Field removed 2026-07-30: student ID.**
+
+Until 2026-07-30 the signup form required a student ID and stored it in `public.profiles.student_id`. No application logic ever read it, no query filtered on it and no integration consumed it, so it failed the test in this section: we were holding an institutional identifier we did not use.
+
+On 2026-07-30 we deleted every stored value, removed the field from signup and profile editing, and dropped the column. The deletion is irreversible and no copy was kept. Signup no longer asks for a student ID and the application no longer has anywhere to store one.
+
+This mattered more than a tidy-up. For roughly six months a misconfigured row-level-security policy on `public.profiles` allowed any signed-in user to read every profile, including the stored student IDs. That defect was fixed the same day. Affected users are being notified directly. Removing the field ensures a future defect of the same kind cannot expose it again.
+
 ---
 
 ## 3. Data Inventory
@@ -39,7 +47,7 @@ The following table enumerates every category of personal data processed by the 
 | Data Category                | Specific Data Elements                                                                                                                     | Purpose and Legal Basis                                                                                             | Evidence (Code / Schema)                                                                                                                                                     |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Account identity**         | Email address, authentication identifier (Supabase Auth UID), password hash (managed by Supabase Auth, never stored in application tables) | Account creation, authentication, session management. Basis: contractual necessity.                                 | `app/api/auth/signup/route.ts`, `app/api/auth/signin/route.ts`, `supabase/migrations/20260104000000_initial_schema.sql`                                                      |
-| **Profile**                  | `full_name`, `student_id`, `course`, `year`, `avatar_url`, `email`                                                                         | Personalize academic dashboard and user profile. Basis: contractual necessity.                                      | `app/api/profiles/route.ts`, `docs/database/database-schema.sql` (`public.profiles`)                                                                                         |
+| **Profile**                  | `full_name`, `course`, `year`, `avatar_url`, `email`                                                                                       | Personalize academic dashboard and user profile. Basis: contractual necessity.                                      | `app/api/profiles/route.ts`, `docs/database/database-schema.sql` (`public.profiles`)                                                                                         |
 | **Academic planning**        | Units (subjects), class times, deadlines, events, todos                                                                                    | Core application functionality. Basis: contractual necessity.                                                       | `docs/database/database-schema.sql` (`public.units`, `public.class_times`, `public.deadlines`, `public.events`), `supabase/migrations/20260124001000_create_todos_table.sql` |
 | **Notification preferences** | In-app notifications, notification preference toggles (email/push, reminder timing)                                                        | Deliver user-configured reminders and alerts. Basis: consent (user-configured).                                     | `docs/database/database-schema.sql` (`public.notifications`, `public.user_preferences`), `lib/store/notificationPreferencesStore.ts`                                         |
 | **Security and audit**       | Audit event metadata: action type, severity, IP address (`inet`), user-agent, timestamp                                                    | Security monitoring, abuse detection, incident investigation. Basis: legitimate interest (security of the service). | `lib/security/audit.ts`, `supabase/migrations/20260214003000_restore_missing_core_security_tables.sql` (`public.audit_logs`, `public.auth_audit_logs`)                       |

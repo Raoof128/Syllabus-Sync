@@ -125,7 +125,6 @@ X-RateLimit-Reset: 842
   "email": "student@students.mq.edu.au",
   "password": "SecureP@ss123",
   "fullName": "Jane Smith",
-  "studentId": "46012345",
   "course": "Bachelor of IT",
   "year": "2"
 }
@@ -303,7 +302,6 @@ Passwordless authentication using the WebAuthn standard.
 ```json
 {
   "full_name": "Jane Smith",
-  "student_id": "46012345",
   "faculty": "Science and Engineering",
   "course": "Bachelor of IT",
   "year": "3",

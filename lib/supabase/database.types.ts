@@ -1133,7 +1133,6 @@ export type Database = {
         Args: {
           p_email: string;
           p_full_name?: string;
-          p_student_id?: string;
           p_user_id: string;
         };
         Returns: Json;
@@ -1176,7 +1175,6 @@ export type Database = {
           level: number;
           longest_streak: number;
           streak_days: number;
-          student_id: string;
           updated_at: string;
           xp: number;
           year: string;

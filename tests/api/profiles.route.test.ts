@@ -85,7 +85,11 @@ describe('profiles API route', () => {
   it('returns 403 when immutable fields are rejected by DB trigger', async () => {
     const profilesTable = createProfilesTable({
       data: null,
-      error: { message: 'Cannot modify student_id after it has been set' },
+      // The message the live `protect_profile_fields` trigger actually raises.
+      // This mock previously used a student_id message, which the trigger has no
+      // branch for now that BA-0050 dropped the column: the test passed on a
+      // fabricated string and documented behaviour the database cannot produce.
+      error: { message: 'Cannot modify email directly. Use the authentication flow.' },
     });
 
     createServerClientMock.mockResolvedValue({
