@@ -11,152 +11,152 @@ that this audit was authorised to make.
 
 ## R1 — CI runs no build or Worker verification at all
 
-| | |
-| --- | --- |
-| Finding | RTA-0002 (P1) |
-| Impact | **High.** Production Build, Cloudflare Worker Build and Lighthouse are all skipped on every push. A change that breaks the Worker build, blows the size ceiling, or breaks the deploy gate reaches `main` with a green-looking Test Suite and no signal. This is not hypothetical: it is precisely why RTA-0001 — production being undeployable — sat undetected. |
-| Likelihood | **Certain, and currently active.** Confirmed on runs 30513673331 and 30512740454. |
-| Current mitigation | None in CI. Only a developer running `npm run cf:dry-run` locally would notice, and `npm run check` does not include the deploy gates (RTA-0012). |
-| Root cause | `Run npm audit --omit=dev --audit-level high` fails on advisories the project has formally accepted (BA-0044), and `build` + `cloudflare-build` both declare `needs: [test, security]`. |
-| Decision needed | What advisory posture CI should enforce. The accepted sharp exception needs to be expressed in CI so **new** advisories still fail the build while accepted ones do not blind the pipeline — or the build jobs need to stop depending on the advisory gate. |
-| Owner | Repo owner |
-| Why not fixed here | Deciding which advisories CI may tolerate is a security-policy call. Making that change unilaterally would read as weakening a gate rather than fixing a topology bug. |
-| Review trigger | Immediately — this blinds every other control. Re-evaluate whenever the accepted advisory set changes. |
+|                    |                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | RTA-0002 (P1)                                                                                                                                                                                                                                                                                                                                                     |
+| Impact             | **High.** Production Build, Cloudflare Worker Build and Lighthouse are all skipped on every push. A change that breaks the Worker build, blows the size ceiling, or breaks the deploy gate reaches `main` with a green-looking Test Suite and no signal. This is not hypothetical: it is precisely why RTA-0001 — production being undeployable — sat undetected. |
+| Likelihood         | **Certain, and currently active.** Confirmed on runs 30513673331 and 30512740454.                                                                                                                                                                                                                                                                                 |
+| Current mitigation | None in CI. Only a developer running `npm run cf:dry-run` locally would notice, and `npm run check` does not include the deploy gates (RTA-0012).                                                                                                                                                                                                                 |
+| Root cause         | `Run npm audit --omit=dev --audit-level high` fails on advisories the project has formally accepted (BA-0044), and `build` + `cloudflare-build` both declare `needs: [test, security]`.                                                                                                                                                                           |
+| Decision needed    | What advisory posture CI should enforce. The accepted sharp exception needs to be expressed in CI so **new** advisories still fail the build while accepted ones do not blind the pipeline — or the build jobs need to stop depending on the advisory gate.                                                                                                       |
+| Owner              | Repo owner                                                                                                                                                                                                                                                                                                                                                        |
+| Why not fixed here | Deciding which advisories CI may tolerate is a security-policy call. Making that change unilaterally would read as weakening a gate rather than fixing a topology bug.                                                                                                                                                                                            |
+| Review trigger     | Immediately — this blinds every other control. Re-evaluate whenever the accepted advisory set changes.                                                                                                                                                                                                                                                            |
 
 ## R2 — Deadline reminders have no scheduler
 
-| | |
-| --- | --- |
-| Finding | RTA-0003 (P1) |
-| Impact | **High, user-facing and silent.** `/api/cron/push-reminders` is invoked by nothing. Users who enabled reminders receive none, and nothing errors — there is no failing job to notice. |
-| Likelihood | **Certain, and currently active.** Cloudflare's production triggers carry only the three cleanup expressions; the GitHub Actions schedule was removed by BA-0016. |
-| Current mitigation | None. The gap is now pinned by `tests/cloudflare/cron-ownership-coverage.test.ts` so it is at least visible in the suite. |
-| Decision needed | Whether to enable it. If yes: add `'*/10 * * * *' -> '/api/cron/push-reminders'` to `CRON_ROUTE_BY_EXPRESSION` **and** to `wrangler.jsonc` production `triggers.crons`, then remove the `KNOWN_UNSCHEDULED` entry (the test forces this). Verify no double-send, since dedup is insert-based (BA-0015). |
-| Owner | Repo owner |
-| Why not fixed here | Enabling it resumes real push delivery to real users, and scheduled-trigger changes were out of scope for this pass. |
-| Review trigger | Next release. Note the route's batch cap (`DEFAULT_MAX_USERS_PER_RUN` = 200) documents a 10-minute cadence for catch-up after truncation, so choosing a slower cadence changes its correctness argument. |
+|                    |                                                                                                                                                                                                                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | RTA-0003 (P1)                                                                                                                                                                                                                                                                                           |
+| Impact             | **High, user-facing and silent.** `/api/cron/push-reminders` is invoked by nothing. Users who enabled reminders receive none, and nothing errors — there is no failing job to notice.                                                                                                                   |
+| Likelihood         | **Certain, and currently active.** Cloudflare's production triggers carry only the three cleanup expressions; the GitHub Actions schedule was removed by BA-0016.                                                                                                                                       |
+| Current mitigation | None. The gap is now pinned by `tests/cloudflare/cron-ownership-coverage.test.ts` so it is at least visible in the suite.                                                                                                                                                                               |
+| Decision needed    | Whether to enable it. If yes: add `'*/10 * * * *' -> '/api/cron/push-reminders'` to `CRON_ROUTE_BY_EXPRESSION` **and** to `wrangler.jsonc` production `triggers.crons`, then remove the `KNOWN_UNSCHEDULED` entry (the test forces this). Verify no double-send, since dedup is insert-based (BA-0015). |
+| Owner              | Repo owner                                                                                                                                                                                                                                                                                              |
+| Why not fixed here | Enabling it resumes real push delivery to real users, and scheduled-trigger changes were out of scope for this pass.                                                                                                                                                                                    |
+| Review trigger     | Next release. Note the route's batch cap (`DEFAULT_MAX_USERS_PER_RUN` = 200) documents a 10-minute cadence for catch-up after truncation, so choosing a slower cadence changes its correctness argument.                                                                                                |
 
 ## R3 — Password reset does not evict an attacker's session
 
-| | |
-| --- | --- |
-| Finding | RTA-0008 (P2) |
-| Impact | **Moderate-to-high in the scenario that matters.** Password reset is the recovery mechanism used precisely when a user suspects compromise. An attacker holding a session keeps it after the victim resets. Password *change* does revoke (BA-0005); reset — the weaker-trust path — does not. |
-| Likelihood | Low per-account, but the consequence is a full account-takeover persisting through the user's own remediation. |
-| Current mitigation | Reset tokens are single-use (fixed, RTA-0004), rate limited, and 20-minute lived, so obtaining one is not trivial. Password change does revoke. |
-| Decision needed | Approve a migration. `admin.signOut` in `@supabase/auth-js` 2.104.1 requires the user's JWT, which the unauthenticated reset path never has, so this needs either a `SECURITY DEFINER` function that revokes refresh tokens by user id, or a GoTrue version exposing admin logout by id. |
-| Owner | Repo owner + whoever approves migrations |
-| Why not fixed here | Needs a DB migration; migrations must not be applied to production in this audit, and shipping an unapplied migration would leave code calling a function that does not exist. |
-| Review trigger | Next migration window. Treat as elevated if any account compromise is ever reported. |
+|                    |                                                                                                                                                                                                                                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | RTA-0008 (P2)                                                                                                                                                                                                                                                                                  |
+| Impact             | **Moderate-to-high in the scenario that matters.** Password reset is the recovery mechanism used precisely when a user suspects compromise. An attacker holding a session keeps it after the victim resets. Password _change_ does revoke (BA-0005); reset — the weaker-trust path — does not. |
+| Likelihood         | Low per-account, but the consequence is a full account-takeover persisting through the user's own remediation.                                                                                                                                                                                 |
+| Current mitigation | Reset tokens are single-use (fixed, RTA-0004), rate limited, and 20-minute lived, so obtaining one is not trivial. Password change does revoke.                                                                                                                                                |
+| Decision needed    | Approve a migration. `admin.signOut` in `@supabase/auth-js` 2.104.1 requires the user's JWT, which the unauthenticated reset path never has, so this needs either a `SECURITY DEFINER` function that revokes refresh tokens by user id, or a GoTrue version exposing admin logout by id.       |
+| Owner              | Repo owner + whoever approves migrations                                                                                                                                                                                                                                                       |
+| Why not fixed here | Needs a DB migration; migrations must not be applied to production in this audit, and shipping an unapplied migration would leave code calling a function that does not exist.                                                                                                                 |
+| Review trigger     | Next migration window. Treat as elevated if any account compromise is ever reported.                                                                                                                                                                                                           |
 
 ## R4 — Eleven SECURITY DEFINER functions do not pin `search_path`
 
-| | |
-| --- | --- |
-| Finding | RTA-0010 (P2, confidence *plausible*) |
-| Impact | Defence-in-depth. A definer function whose name resolution is attacker-influenceable can be made to execute attacker objects with elevated rights. Four are trigger functions (`handle_new_user_profile`, `audit_trigger`, `on_deadline_completed`, `protect_profile_fields`), which is the classic shape. |
-| Likelihood | **Low and unproven.** Exploitation requires `CREATE` on a schema earlier in the resolution path; Supabase revokes that from `PUBLIC` by default. Not demonstrated. |
-| Current mitigation | Default revocation of `CREATE` on `public`; the definer guards added by BA-0049/BA-0031 validate callers. |
-| Decision needed | Confirm against the live catalogue, then pin. |
-| Owner | Whoever approves migrations |
-| Why not fixed here | Needs a migration, the live catalogue was not queried in this pass, and a wrong pin on a trigger function changes behaviour. |
-| Review trigger | Next migration window. It also violates the repo's own stated rule, so it should not stay open indefinitely. |
+|                    |                                                                                                                                                                                                                                                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | RTA-0010 (P2, confidence _plausible_)                                                                                                                                                                                                                                                                      |
+| Impact             | Defence-in-depth. A definer function whose name resolution is attacker-influenceable can be made to execute attacker objects with elevated rights. Four are trigger functions (`handle_new_user_profile`, `audit_trigger`, `on_deadline_completed`, `protect_profile_fields`), which is the classic shape. |
+| Likelihood         | **Low and unproven.** Exploitation requires `CREATE` on a schema earlier in the resolution path; Supabase revokes that from `PUBLIC` by default. Not demonstrated.                                                                                                                                         |
+| Current mitigation | Default revocation of `CREATE` on `public`; the definer guards added by BA-0049/BA-0031 validate callers.                                                                                                                                                                                                  |
+| Decision needed    | Confirm against the live catalogue, then pin.                                                                                                                                                                                                                                                              |
+| Owner              | Whoever approves migrations                                                                                                                                                                                                                                                                                |
+| Why not fixed here | Needs a migration, the live catalogue was not queried in this pass, and a wrong pin on a trigger function changes behaviour.                                                                                                                                                                               |
+| Review trigger     | Next migration window. It also violates the repo's own stated rule, so it should not stay open indefinitely.                                                                                                                                                                                               |
 
 ## R5 — `pg_cron` may duplicate two Cloudflare cleanup crons
 
-| | |
-| --- | --- |
-| Finding | RTA-0011 (P3) |
-| Impact | Low. Both sides issue idempotent `DELETE`s of expired rows. The real cost is diagnostic: a green Cloudflare cron is not evidence the cleanup ran, and two writers contend at the same minute. |
-| Likelihood | Certain **if** `pg_cron` is installed; the migrations register jobs conditionally on the extension existing. |
-| Current mitigation | Idempotent deletes; different objects for the third job (`cleanup-webauthn-challenges` at `*/15` is not duplicated). |
-| Decision needed | Run `SELECT jobname, schedule FROM cron.job;` read-only. If present, unschedule the two duplicates or drop the corresponding Cloudflare triggers — pick one owner per job. |
-| Owner | Repo owner |
-| Why not fixed here | Needs live confirmation the extension is installed; if it is not, the finding is moot. |
-| Review trigger | Same window as R3/R4. |
+|                    |                                                                                                                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | RTA-0011 (P3)                                                                                                                                                                                 |
+| Impact             | Low. Both sides issue idempotent `DELETE`s of expired rows. The real cost is diagnostic: a green Cloudflare cron is not evidence the cleanup ran, and two writers contend at the same minute. |
+| Likelihood         | Certain **if** `pg_cron` is installed; the migrations register jobs conditionally on the extension existing.                                                                                  |
+| Current mitigation | Idempotent deletes; different objects for the third job (`cleanup-webauthn-challenges` at `*/15` is not duplicated).                                                                          |
+| Decision needed    | Run `SELECT jobname, schedule FROM cron.job;` read-only. If present, unschedule the two duplicates or drop the corresponding Cloudflare triggers — pick one owner per job.                    |
+| Owner              | Repo owner                                                                                                                                                                                    |
+| Why not fixed here | Needs live confirmation the extension is installed; if it is not, the finding is moot.                                                                                                        |
+| Review trigger     | Same window as R3/R4.                                                                                                                                                                         |
 
 ## R6 — Verification email is sent from a personal Gmail account
 
-| | |
-| --- | --- |
-| Finding | Carried from the 2026-07-30 signup audit |
-| Impact | Moderate and commercially relevant. Mail goes out via `smtp.gmail.com` as `Perkycoders <perkycoders@gmail.com>`: subject to a ~500/day relay cap, unable to DKIM-align with `syllabus-sync.app`, and off-brand at the exact moment a new user decides whether to trust the product. Spam-foldering here presents as "signup is broken". |
-| Likelihood | Ongoing. The cap becomes a hard blocker at scale. |
-| Current mitigation | Resend is already configured and used for the resend path. |
-| Decision needed | Point Supabase SMTP at Resend. |
-| Owner | Repo owner |
-| Why not fixed here | Outward-facing change to a live third-party project. |
-| Review trigger | Before any real user cohort onboards. |
+|                    |                                                                                                                                                                                                                                                                                                                                         |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | Carried from the 2026-07-30 signup audit                                                                                                                                                                                                                                                                                                |
+| Impact             | Moderate and commercially relevant. Mail goes out via `smtp.gmail.com` as `Perkycoders <perkycoders@gmail.com>`: subject to a ~500/day relay cap, unable to DKIM-align with `syllabus-sync.app`, and off-brand at the exact moment a new user decides whether to trust the product. Spam-foldering here presents as "signup is broken". |
+| Likelihood         | Ongoing. The cap becomes a hard blocker at scale.                                                                                                                                                                                                                                                                                       |
+| Current mitigation | Resend is already configured and used for the resend path.                                                                                                                                                                                                                                                                              |
+| Decision needed    | Point Supabase SMTP at Resend.                                                                                                                                                                                                                                                                                                          |
+| Owner              | Repo owner                                                                                                                                                                                                                                                                                                                              |
+| Why not fixed here | Outward-facing change to a live third-party project.                                                                                                                                                                                                                                                                                    |
+| Review trigger     | Before any real user cohort onboards.                                                                                                                                                                                                                                                                                                   |
 
 ## R7 — Two divergent verification mechanisms
 
-| | |
-| --- | --- |
-| Finding | Carried from the 2026-07-30 signup audit |
-| Impact | Low-moderate correctness/UX. The initial mail uses Supabase native `/auth/callback?code=` (`mailer_otp_exp` 3600s); the resend uses a custom token at `/verify?token=` (20 min). Two lifetimes and two code paths for one user-visible action, and `/api/auth/email/send-verification` has no callers. |
-| Likelihood | Certain; the confusion is structural. |
-| Current mitigation | Both paths work; both token types are now single-use with a checked row count (RTA-0004). |
-| Decision needed | Consolidate onto one mechanism and delete the dead endpoint (after confirming it is genuinely uncalled). |
-| Owner | Repo owner |
-| Review trigger | Next auth change. |
+|                    |                                                                                                                                                                                                                                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Finding            | Carried from the 2026-07-30 signup audit                                                                                                                                                                                                                                                               |
+| Impact             | Low-moderate correctness/UX. The initial mail uses Supabase native `/auth/callback?code=` (`mailer_otp_exp` 3600s); the resend uses a custom token at `/verify?token=` (20 min). Two lifetimes and two code paths for one user-visible action, and `/api/auth/email/send-verification` has no callers. |
+| Likelihood         | Certain; the confusion is structural.                                                                                                                                                                                                                                                                  |
+| Current mitigation | Both paths work; both token types are now single-use with a checked row count (RTA-0004).                                                                                                                                                                                                              |
+| Decision needed    | Consolidate onto one mechanism and delete the dead endpoint (after confirming it is genuinely uncalled).                                                                                                                                                                                               |
+| Owner              | Repo owner                                                                                                                                                                                                                                                                                             |
+| Review trigger     | Next auth change.                                                                                                                                                                                                                                                                                      |
 
 ## R8 — Four high advisories remain, all sharp/libvips
 
-| | |
-| --- | --- |
-| Finding | RTA-0007 residual / BA-0044 |
-| Impact | Low. One root cause: `sharp` 0.34.5 reached through Next's **optional** build-time image dependency (CVE-2026-33327/33328/35590/35591). `@opennextjs/aws`, `@opennextjs/cloudflare` and `next` appear only as dependents. |
-| Likelihood | Not reachable at runtime — the reachability gate scans the actual Worker output and metafile and records proven-absent for both profiles. |
-| Current mitigation | The Sharp risk gate, now re-approved and additionally bound to the real lockfile by a test. miniflare's nested copy is already on the patched 0.35.2. |
-| Decision needed | None until upstream ships a fix, or until the exception expires. |
-| Owner | Repo owner |
-| **Review expiry** | **2026-08-22.** The gate fails closed after that date by design — it will block deploys until re-reviewed. Do not extend it without re-checking reachability. |
+|                    |                                                                                                                                                                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | RTA-0007 residual / BA-0044                                                                                                                                                                                               |
+| Impact             | Low. One root cause: `sharp` 0.34.5 reached through Next's **optional** build-time image dependency (CVE-2026-33327/33328/35590/35591). `@opennextjs/aws`, `@opennextjs/cloudflare` and `next` appear only as dependents. |
+| Likelihood         | Not reachable at runtime — the reachability gate scans the actual Worker output and metafile and records proven-absent for both profiles.                                                                                 |
+| Current mitigation | The Sharp risk gate, now re-approved and additionally bound to the real lockfile by a test. miniflare's nested copy is already on the patched 0.35.2.                                                                     |
+| Decision needed    | None until upstream ships a fix, or until the exception expires.                                                                                                                                                          |
+| Owner              | Repo owner                                                                                                                                                                                                                |
+| **Review expiry**  | **2026-08-22.** The gate fails closed after that date by design — it will block deploys until re-reviewed. Do not extend it without re-checking reachability.                                                             |
 
 ## R9 — Apex domain still served by Vercel
 
-| | |
-| --- | --- |
-| Finding | RTA-0017 (P4 today) |
-| Impact | None today: `https://syllabus-sync.app/` returns 308 to `www` correctly. Becomes an **outage** the moment Vercel is decommissioned. |
-| Likelihood | Certain if Vercel is retired without moving the apex first. |
-| Current mitigation | The redirect works; Vercel is retained as rollback target. |
-| Decision needed | Move the apex to Cloudflare before retiring Vercel. |
-| Owner | Repo owner |
-| Review trigger | Vercel was retained until **2026-08-05** — that date has effectively arrived. |
+|                    |                                                                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | RTA-0017 (P4 today)                                                                                                                 |
+| Impact             | None today: `https://syllabus-sync.app/` returns 308 to `www` correctly. Becomes an **outage** the moment Vercel is decommissioned. |
+| Likelihood         | Certain if Vercel is retired without moving the apex first.                                                                         |
+| Current mitigation | The redirect works; Vercel is retained as rollback target.                                                                          |
+| Decision needed    | Move the apex to Cloudflare before retiring Vercel.                                                                                 |
+| Owner              | Repo owner                                                                                                                          |
+| Review trigger     | Vercel was retained until **2026-08-05** — that date has effectively arrived.                                                       |
 
 ## R10 — Authenticated production flows on Workers remain unverified
 
-| | |
-| --- | --- |
-| Finding | Carried from the 2026-07-29 cutover record |
-| Impact | Unknown, which is the problem. Login, existing passkeys, MFA, CSRF mutations, email links and push have never been exercised on Workers; the preview parity matrix was never run and the cutover proceeded on owner instruction. Several fixes in this audit (webmanifest `Content-Type`, WebAuthn anchors, token single-use) can only be confirmed live. |
-| Likelihood | n/a — this is absent evidence, not a defect. |
-| Current mitigation | 1289 automated tests, 9/9 `cf:smoke`, and the read-only live checks in the verification log (headers, health, deny-by-default, 401/405/400 behaviour all correct). |
-| Decision needed | Run `manual-production-smoke-checklist.md` after deploying. |
-| Owner | Repo owner |
-| Why not done here | Requires creating real accounts, sending real mail and registering real authenticators. |
-| Review trigger | Immediately after the next production deploy. |
+|                    |                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | Carried from the 2026-07-29 cutover record                                                                                                                                                                                                                                                                                                                |
+| Impact             | Unknown, which is the problem. Login, existing passkeys, MFA, CSRF mutations, email links and push have never been exercised on Workers; the preview parity matrix was never run and the cutover proceeded on owner instruction. Several fixes in this audit (webmanifest `Content-Type`, WebAuthn anchors, token single-use) can only be confirmed live. |
+| Likelihood         | n/a — this is absent evidence, not a defect.                                                                                                                                                                                                                                                                                                              |
+| Current mitigation | 1289 automated tests, 9/9 `cf:smoke`, and the read-only live checks in the verification log (headers, health, deny-by-default, 401/405/400 behaviour all correct).                                                                                                                                                                                        |
+| Decision needed    | Run `manual-production-smoke-checklist.md` after deploying.                                                                                                                                                                                                                                                                                               |
+| Owner              | Repo owner                                                                                                                                                                                                                                                                                                                                                |
+| Why not done here  | Requires creating real accounts, sending real mail and registering real authenticators.                                                                                                                                                                                                                                                                   |
+| Review trigger     | Immediately after the next production deploy.                                                                                                                                                                                                                                                                                                             |
 
 ## R11 — Security-critical source is exempt from the formatting gate
 
-| | |
-| --- | --- |
-| Finding | RTA-0013 (P3) |
-| Impact | Low, but poorly placed. A bare `security` pattern in `.prettierignore` matches any path segment of that name, so `lib/security/`, `tests/security/`, `app/api/security/` and `docs/security/` are all invisible to `format:check`. The most security-sensitive directory is the one the gate cannot see; style drift there goes unreviewed. It already shows — `lib/security/*.ts` uses double quotes where the rest of the repo uses single. |
-| Likelihood | Certain. |
-| Decision needed | Scope the pattern to what was actually intended. |
-| Owner | Repo owner |
-| Why not fixed here | Narrowing it would reformat many files in one commit — the mass-format the audit brief forbids. It should be its own deliberate commit. |
-| Review trigger | Whenever a formatting-only churn commit is acceptable. |
+|                    |                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding            | RTA-0013 (P3)                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Impact             | Low, but poorly placed. A bare `security` pattern in `.prettierignore` matches any path segment of that name, so `lib/security/`, `tests/security/`, `app/api/security/` and `docs/security/` are all invisible to `format:check`. The most security-sensitive directory is the one the gate cannot see; style drift there goes unreviewed. It already shows — `lib/security/*.ts` uses double quotes where the rest of the repo uses single. |
+| Likelihood         | Certain.                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Decision needed    | Scope the pattern to what was actually intended.                                                                                                                                                                                                                                                                                                                                                                                              |
+| Owner              | Repo owner                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Why not fixed here | Narrowing it would reformat many files in one commit — the mass-format the audit brief forbids. It should be its own deliberate commit.                                                                                                                                                                                                                                                                                                       |
+| Review trigger     | Whenever a formatting-only churn commit is acceptable.                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ---
 
 ## Also open, lower priority
 
-| Risk | Finding | Note |
-| --- | --- | --- |
-| 21 routes authenticate via inline `getUser()` instead of the mandated guard wrapper | RTA-0014 (P3) | Layer-2 CSRF/rate-limit wrapping skipped; edge middleware still validates CSRF origin, so defence-in-depth rather than an open hole. Most already call a named limiter. |
-| Two parallel passkey stacks with divergent middleware posture | RTA-0015 (P3) | `/api/auth/passkey/*` is on the public allowlist and therefore exempt from the AAL2 gate; `/api/webauthn/*` is not. Confirms the second half of BA-0004. Decide whether passkey enrolment must require AAL2, then consolidate. |
-| Dev-only pin editor ships `node:fs` into the Worker bundle | RTA-0016 (P3) | Fails closed on `NODE_ENV`, so unreachable — but it costs bundle size against a 6791 KiB budget near the ceiling. |
-| `npm run check` omits the deploy-blocking gates | RTA-0012 (P3) | Partially mitigated: the new provenance test now runs inside `npm run check`, so that specific drift fails there. `check:worker-size` needs a build log, so it fits `cf:dry-run` better. |
-| 34 locales missing the same 8 keys | — | Confirmed the keys ARE referenced in live source and ARE present in `en`. `useTranslation` falls back `locale -> en -> key`, so users see **English text, not raw keys** — a mixed-language UX gap (P4), not a visible bug. `check:i18n` reports it and exits 0 regardless. |
+| Risk                                                                                | Finding       | Note                                                                                                                                                                                                                                                                        |
+| ----------------------------------------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 21 routes authenticate via inline `getUser()` instead of the mandated guard wrapper | RTA-0014 (P3) | Layer-2 CSRF/rate-limit wrapping skipped; edge middleware still validates CSRF origin, so defence-in-depth rather than an open hole. Most already call a named limiter.                                                                                                     |
+| Two parallel passkey stacks with divergent middleware posture                       | RTA-0015 (P3) | `/api/auth/passkey/*` is on the public allowlist and therefore exempt from the AAL2 gate; `/api/webauthn/*` is not. Confirms the second half of BA-0004. Decide whether passkey enrolment must require AAL2, then consolidate.                                              |
+| Dev-only pin editor ships `node:fs` into the Worker bundle                          | RTA-0016 (P3) | Fails closed on `NODE_ENV`, so unreachable — but it costs bundle size against a 6791 KiB budget near the ceiling.                                                                                                                                                           |
+| `npm run check` omits the deploy-blocking gates                                     | RTA-0012 (P3) | Partially mitigated: the new provenance test now runs inside `npm run check`, so that specific drift fails there. `check:worker-size` needs a build log, so it fits `cf:dry-run` better.                                                                                    |
+| 34 locales missing the same 8 keys                                                  | —             | Confirmed the keys ARE referenced in live source and ARE present in `en`. `useTranslation` falls back `locale -> en -> key`, so users see **English text, not raw keys** — a mixed-language UX gap (P4), not a visible bug. `check:i18n` reports it and exits 0 regardless. |
