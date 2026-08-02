@@ -58,6 +58,39 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-08-02 (Australia/Sydney) — Reconciling Two Independent Audits Into One Trunk
+
+**Raouf:**
+
+- **Scope:** Collapsed five branches into `main` by rebase and removed them. The repository had
+  been carrying two concurrent audits of the same system, plus three branches already strict
+  ancestors of `main`.
+- **Summary:** The two audits converged, so the honest result is that
+  `audit/backend-hardening-cloudflare` contributed **no source-code changes**. Three of its
+  fifteen commits were dropped rather than duplicated: BA-0006 (`main`'s predicate is
+  semantically identical because `id` is the primary key, and its test covers both token types),
+  BA-0056 (`main`'s is the deployed check and its test is a superset), and BA-0054 (dropped by
+  git as already upstream — the file recovered from the production catalogue is **byte-identical**
+  to the one the other audit wrote independently, corroborating the recovery). Combining the
+  branches exposed two defects invisible on either alone: git **auto-merged both audits' P0
+  binding checks into one file**, leaving the check present twice with no conflict raised, and
+  `rls-policy-recursion.test.ts` carried five raw NUL bytes that made a security regression test
+  binary to git and its diffs unreviewable. Both fixed; the WebAuthn route is now byte-identical
+  to `main`, so this merge cannot change deployed behaviour.
+- **Files Changed:** 12 commits onto `17003fbe`. Net vs `main`:
+  `supabase/migrations/20260802010000_fix_schedules_rls_recursion.sql` (the only migration `main`
+  lacked, already applied to production), six migrations repaired for buildability,
+  `tests/security/rls-policy-recursion.test.ts`, `tools/database/verify-fresh-build.sh`,
+  `docs/backend-audit/2026-08-02/`, `CHANGELOG.md`, `AGENT.md`. Nothing under `app/`, `lib/`,
+  `components/`, `features/`.
+- **Verification:** `npm run check` exit 0 — 1323 tests across 153 files, which is `main`'s 1319
+  plus the recursion suite's 4, the arithmetic check that the union lost nothing. Migration chain
+  rebuilt from empty on throwaway PostgreSQL 15.18: applied=80 failed=0 total=80, matching
+  production. All branch tips tagged `prereconcile/2026-08-02/*` before the first rewrite.
+- **Follow-ups:** `isTrustedOrigin` fail-open on absent `Origin`+`Referer`; BA-0004's
+  `/api/auth/*` exemption; the `npm audit` waiver for accepted BA-0044 advisories. Delete the
+  `prereconcile/*` tags once the merge has proven itself.
+
 ### 2026-08-02 (Australia/Sydney) — RLS Recursion, and a Migration Set That Could Not Build
 
 **Raouf:**

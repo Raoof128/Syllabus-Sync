@@ -4,6 +4,67 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Reconciling Two Independent Audits Into One Trunk — 2026-08-02
+
+**Scope:** Collapsing five branches into `main` by rebase, then removing them. The repository
+had been carrying two concurrent audits of the same system — `audit/full-runtime-hardening`
+(which reached `main`) and `audit/backend-hardening-cloudflare` — plus three branches that were
+already strict ancestors of `main`.
+
+**Summary:** The two audits had converged, and the honest outcome of reconciling them is that
+**this branch contributed no source-code changes at all**. Every application-level fix it
+carried had an equivalent already on `main`, so three of its fifteen commits were dropped rather
+than duplicated:
+
+- **BA-0006** (single-use token claim) — `main`'s implementation is semantically identical
+  (`claimedRows.length === 0` vs `claimed.length !== 1`; `id` is the primary key, so at most one
+  row can ever match and the two predicates cannot disagree). `main`'s
+  `token-single-use-rowcount.test.ts` covers the race for password reset _and_ email
+  verification, a strict superset of the single case added here.
+- **BA-0056** (P0 passkey account takeover) — `main`'s check is the one deployed to production,
+  and its `webauthn-cross-user-credential.test.ts` adds the strongest assertion of the three
+  ("rejects before spending any privileged call"), which this branch's test lacked.
+- **BA-0054** (migration recovered from the production catalogue) — dropped by git itself as
+  "patch contents already upstream". The recovered file is **byte-identical** (blob `f6e42692`)
+  to the migration the other audit wrote independently, which is a stronger corroboration of the
+  recovery than anything asserted at the time.
+
+Two defects surfaced that only appear when branches are actually combined. First, git
+**auto-merged both audits' P0 checks into the same file** — the credential/challenge binding
+test ended up present twice, at lines 109 and 172, because the two audits placed it on either
+side of the legacy-credential fallback. Neither side conflicted, so nothing warned. The second
+copy was unreachable, but duplicated security logic is precisely the artifact a "clean" rebase
+hides; the route is now byte-identical to `main`, so deployed behaviour is unchanged by this
+merge. Second, `rls-policy-recursion.test.ts` held five **raw NUL bytes** used as a composite-key
+separator, which made git classify a security regression test as binary and its diffs
+unreviewable. Both fixed.
+
+What actually merges is therefore the database layer and its tooling: the production RLS
+recursion fix, the buildability repairs, the fresh-build verifier, and the audit record.
+
+**Files Changed:** 12 commits rebased onto `17003fbe`. Net contribution vs `main`:
+`supabase/migrations/20260802010000_fix_schedules_rls_recursion.sql` (the only migration `main`
+lacked, and the one already applied to production), six migration files repaired for
+buildability (BA-0053/BA-0057), `tests/security/rls-policy-recursion.test.ts`,
+`tools/database/verify-fresh-build.sh`, `docs/backend-audit/2026-08-02/`, `CHANGELOG.md`,
+`AGENT.md`. Zero changes under `app/`, `lib/`, `components/` or `features/`.
+
+**Verification:** `npm run check` exit 0 on the merged tree — secrets (933 files), Cloudflare
+runtime compat, Prettier, `typecheck`, `typecheck:cloudflare`, lint, **1323 tests across 153
+files**, production build compiled. The test count is exactly `main`'s 1319 plus the four cases
+in the recursion suite, which is the arithmetic check that the union dropped nothing. Migration
+chain rebuilt from empty against a throwaway PostgreSQL 15.18: **applied=80 failed=0 total=80**,
+matching production's migration count. Every branch tip was tagged `prereconcile/2026-08-02/*`
+before the first rewrite, so every pre-merge state remains addressable.
+
+**Follow-ups:** Unchanged and still open — `isTrustedOrigin` fails open when both `Origin` and
+`Referer` are absent (three unauthenticated `/api/maps/*` routes); BA-0004's `/api/auth/*`
+blanket exemption; the `npm audit` waiver for the accepted BA-0044 advisories, without which a
+red CI board carries no information. The `prereconcile/*` tags are local only and can be deleted
+once the merge has proven itself.
+
+---
+
 ### Raouf: The P0 Is Deployed — and Why It Had Sat Undeployed for Three Days — 2026-08-02
 
 **Scope:** Getting the BA-0056 WebAuthn account-takeover fix into production.
