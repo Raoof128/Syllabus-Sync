@@ -38,18 +38,32 @@ Both are cheap. Neither had been done.
 | BA-0053 | **P1** | 6 of 78 migrations fail on a clean database — a fresh environment cannot be built from the migration set at all                                     | Reported, fix scoped                  |
 | BA-0054 | P2     | Bidirectional schema drift: production holds objects no migration creates, and migrations define objects that exist nowhere                         | Reported                              |
 | BA-0055 | P2     | `anon` retains table-level SELECT/UPDATE/DELETE grants on 11 tables, including `password_resets`, `backup_codes` and `webauthn_credentials`         | Reported (RLS-contained — see caveat) |
+| BA-0056 | **P0** | WebAuthn verify never binds the presented credential to the challenge's user — any account with a passkey can be taken over                         | **Fixed & verified**                  |
+| BA-0057 | **P1** | Two regressions introduced by my own migration repair: `audit_settings` without RLS, and duplicate `log_audit` overloads breaking signup            | **Fixed & verified**                  |
 | BA-0027 | P2     | Confirmed with a reproduction. Was an unverified "candidate" in the predecessor ledger                                                              | Confirmed                             |
 
 ### Verdict
 
-**CONDITIONAL PASS.** No live cross-user data exposure was found — the BA-0048 fix holds
-under direct test, and every sensitive table proved RLS-contained when probed with real
-seeded rows rather than assumed to be. But the migration set cannot build a working
-database, which means there is currently **no reproducible path to a new environment and
-therefore no tested disaster-recovery path**. That is a launch-blocking operational gap
-even though it is not a confidentiality one.
+**FAIL at first assessment; CONDITIONAL PASS after remediation.**
 
----
+A parallel audit lane found, and I independently confirmed, a **P0 WebAuthn account
+takeover** (BA-0056): any user with a self-serve account could obtain a valid session for
+any account that has a passkey. That is now fixed and proven. Had this pass stopped at my
+own solo findings, it would have been missed.
+
+Beyond that: no other live cross-user data exposure was found. The BA-0048 fix holds under
+direct test, and every sensitive table proved RLS-contained when probed with real seeded
+rows rather than assumed to be. Four of the five P0/P1 findings reported by the RLS lane
+were **refuted** under testing (§11.3) — reporting them would have meant shipping false
+criticals.
+
+The migration set could not build a working database at all, which meant there was no
+reproducible path to a new environment and therefore no tested disaster-recovery path. That
+is now fixed and gated in CI.
+
+Remaining blocker to a clean pass: eight backend domains were never examined (storage,
+email runtime, job idempotency, privacy/retention, observability, performance,
+backup/restore, deployment pipeline), and BA-0004 remains open pending an owner decision.
 
 ## 2. Baseline (captured before any change)
 
@@ -540,3 +554,141 @@ Commit `bf21ad19`.
 Item 7 is the structural one. Every finding in this report was found by executing
 something — a query against production, or a migration against a real database — and none
 of them were visible to a suite that only reads migration text.
+
+---
+
+## 11. Parallel lane results, and what survived verification
+
+Six audit lanes ran in parallel and reported late. Their findings are recorded here **with
+my own verdict on each**, because several did not survive testing. Every claim below was
+re-checked against source or against a live database before being accepted or rejected.
+
+### 11.1 BA-0056 (P0) — CONFIRMED and FIXED: WebAuthn account takeover
+
+Reported by the API lane, independently confirmed, fixed in `00f80ab5`. This is the most
+serious finding of either audit pass.
+
+`POST /api/webauthn/authenticate/verify` brought two identities together and never
+compared them. `userId` came from the consumed challenge — the account being logged
+_into_, derived from a client-supplied email. `dbCredential` came from
+`getCredentialById()`, which queries `webauthn_credentials` by `credential_id` alone
+through the service-role client, bypassing RLS and every user scope. The public key handed
+to `verifyAuthenticationResponse` came from that row; the session was minted for `userId`.
+
+`grep` confirms `dbCredential.userId` was never read anywhere in the codebase, though
+`mapDbCredential()` populates it.
+
+**Attack:** an attacker with a self-serve account holding one passkey requests a challenge
+for the victim's email, discards the returned `allowCredentials`, signs the challenge with
+their _own_ authenticator on the real origin, and posts it. The signature is genuine, so
+verification passes — against the attacker's key — and a valid Supabase session for the
+victim is returned. No origin spoofing, no victim interaction, and both endpoints are in
+`isPublicApiPath`, so no session is needed to reach them.
+
+**Proven non-vacuous:** with the binding check removed the cross-user assertion returns
+**HTTP 200** and a session is minted for the victim; with it, 401, and neither
+`generateLink` nor `verifyOtp` is reached.
+
+### 11.2 BA-0057 (P1) — regressions my own repair introduced, caught and fixed
+
+Repairing the audit-logging migration (§4) made a file apply that had never applied
+anywhere. That is correct, but it materialised two defects that were dormant only because
+the file was unrunnable. **Neither was visible in the diff; both were found by building a
+database and exercising it.**
+
+1. **`audit_settings` had no RLS** — the only table in the schema never given it. Creating
+   it created an exposure: as `anon`, `SELECT` returned a real row and
+   `UPDATE ... SET value='0'` reported `UPDATE 1`. Now locked to `service_role`.
+2. **Duplicate `log_audit` overloads broke signup.** The migration declares a 7-argument
+   `log_audit` whose parameters are a strict prefix of the canonical 10-argument version.
+   Every call site passes 6–7 arguments, matching both. `handle_new_user_safe()` calls it,
+   so `INSERT INTO auth.users` raised _"function public.log_audit(...) is not unique"_ and
+   **no profile row was created** — signup would have broken for every new user.
+
+The lesson is the same one this audit keeps relearning: applying a migration is not
+evidence it is correct; only exercising the result is.
+
+### 11.3 Claims that did NOT survive verification
+
+The RLS lane reported five P0/P1 findings. **Four are refuted**, and I record that plainly
+because acting on them would have meant shipping false criticals.
+
+| Claim                                                                                                                                                          | Verdict              | Evidence                                                                                                                                                                                                                                                                                           |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0: `UPDATE` policies with `USING` and no `WITH CHECK` allow handing a `webauthn_credentials` row to a victim → account takeover ("13 policies, only 3 fixed") | **REFUTED**          | PostgreSQL uses the `USING` expression **as** the `WITH CHECK` expression when the latter is omitted. Tested live: as Alice, `UPDATE webauthn_credentials SET user_id='<bob>'` → `ERROR: new row violates row-level security policy`; final owner still Alice. The whole finding class evaporates. |
+| P1: `ratelimit_set/increment/get`, `cleanup_expired_rate_limits` client-callable                                                                               | **REFUTED**          | Catalog sweep of `pg_proc.proacl` on a built database: none is EXECUTE-able by `anon`/`authenticated`/PUBLIC.                                                                                                                                                                                      |
+| P1: `purge_deleted_records(-99999)` destroys every user's soft-deleted rows                                                                                    | **REFUTED**          | Same sweep — not client-executable.                                                                                                                                                                                                                                                                |
+| P1: `refresh_analytics_views()` → `get_xp_leaderboard()` leaks the whole user base                                                                             | **REFUTED**          | Same sweep — `refresh_analytics_views` is not client-executable, so the chain does not start.                                                                                                                                                                                                      |
+| P1: anon rewrites `audit_settings`, then `cleanup_old_audit_logs()` wipes the audit trail                                                                      | **PARTLY CONFIRMED** | The table half was real (§11.2) and is fixed. The chain half is refuted: `cleanup_old_audit_logs` is not client-executable (catalog count = 0).                                                                                                                                                    |
+
+The lane's reasoning was that `REVOKE ... FROM PUBLIC` never removes Supabase's direct
+`anon` grant. That is true **for tables** — it is exactly BA-0055 — but not for
+**functions**, which get their default `EXECUTE` via `PUBLIC` under plain PostgreSQL
+semantics, so revoking `FROM PUBLIC` is effective. Generalising a table-level fact to
+functions produced four false criticals.
+
+The lane was also wrong that `audit_settings` exists in production carrying real rows: I
+probed it directly and PostgREST returns `PGRST205` — it does not exist there, precisely
+because the migration that creates it has never applied.
+
+### 11.4 A fair challenge to my own reasoning, accepted
+
+The open-findings lane pointed out that my migration replay was **error-tolerant** — it
+continued past each failure — so "that migration has never applied anywhere" does not
+follow from the replay alone. That is correct, and the two claims should be separated:
+
+- _The migration cannot apply_ — established directly. It fails on its own with two
+  deterministic, version-independent SQL errors.
+- _It has never applied in production_ — carried by the independent observation that all
+  three of its durable objects are absent there.
+
+The conclusion holds; the inference chain as I first wrote it was sloppy. Recorded rather
+than quietly corrected.
+
+### 11.5 BA-0004 — re-scoped, and the lane's analysis is better than mine
+
+I rated this a P1 step-up-MFA bypass. The open-findings lane traced the redemption path
+and showed the impact is different: `/api/auth/passkey/verify` mints a session via
+`generateLink` + `verifyOtp`, which yields **AAL1**, and `nextLevel` stays `aal2` while the
+victim's TOTP factor exists — so the attacker is still gated at the AAL boundary.
+
+The real harm is **persistence**, and it is arguably worse than a momentary bypass: the
+password-reset route writes only `password_reset_at` / `password_reset_method` into
+`user_metadata`, and Supabase merges metadata shallowly, so an attacker-planted
+`biometric_credential_id` **survives a password reset** — it outlives standard incident
+response. The legacy route also overwrites the victim's own passkey slot, causing lockout.
+
+**Corrected: P2, recategorised from "step-up bypass" to "unauthorized authenticator binding
+and persistence."** Still unfixed for the reason given in §9.1 — the repair changes
+reachability for 28 auth routes and needs an owner decision.
+
+### 11.6 Other lane findings recorded, not yet fixed
+
+| Sev | Finding                                                                                                                                                                                                                                                                                                                                                                                                  | Location                                              |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| P2  | **Open redirect.** `next` is validated only with `startsWith('/')`, so `//evil.example` passes and `new URL()` resolves it to an external origin. The correct helper (`isValidRedirect`, which rejects `//`) already exists and is used by the sibling callback route.                                                                                                                                   | `app/auth/confirm/route.ts:19-22`                     |
+| P2  | **Unauthenticated abuse of a paid Google API key.** `/api/maps/*` is public and CSRF-exempt; the only gate is `isTrustedOrigin`, which **returns `true` when both Origin and Referer are absent** — so plain `curl` passes. Rotating IPs bills the project's Google account.                                                                                                                             | `lib/security/ip.ts:177-184`                          |
+| P2  | **BA-0003 under-scoped.** A _second_ copy of the fail-open WebAuthn RP-ID/origin helpers exists at `app/api/auth/passkey/_lib.ts:8-19`; fixing only `lib/security/webauthn.ts` leaves half the surface. The deploy gate also checks GitHub Actions **variables** while the Worker reads **secrets**, so a correctly-set variable with an unset secret passes CI and still falls back to request headers. | two files                                             |
+| P3  | **BA-0011 premise was wrong.** Only two of three pg_cron jobs overlap the Cloudflare schedule, and both are idempotent `DELETE ... WHERE expires_at < now()`. No migration schedules rate-limit cleanup at all. The finding worth keeping is the inverse: `webauthn_challenges` cleanup exists **only** as pg_cron, with no Cloudflare counterpart.                                                      | three migrations                                      |
+| P3  | Non-constant-time admin-token comparison; in dev with no token set it returns `true` for any authenticated user. Production-blocked at line 233.                                                                                                                                                                                                                                                         | `app/api/admin/update-building-positions/route.ts:50` |
+
+The API lane also verified there are **no IDOR findings** across the other 64 routes and
+**no mass assignment anywhere** — every update path enumerates columns or relies on Zod
+key-stripping, and `sync` adds a per-table field allowlist.
+
+### 11.7 BA-0027 — additions that change the fix
+
+Two refinements worth carrying into the reconciliation migration:
+
+- `CREATE UNIQUE INDEX **IF NOT EXISTS**` does not save the statement: PostgreSQL resolves
+  column references before the name-existence short-circuit, so it still raises. Exactly
+  one statement breaks the replay, not three.
+- The three matview access functions are `RETURNS SETOF <matview>`, so they **block the
+  drop** (`cannot drop ... because other objects depend on it`). The forward migration must
+  drop those functions first, then the matviews, then recreate and re-apply the revokes.
+  **Do not use `DROP ... CASCADE`** — it would silently take the access-control functions
+  with it.
+- **Trap:** the intended `mv_user_activity_summary` definition selects `p.email`, and
+  matviews support neither RLS nor `security_invoker`. Materialising it while any
+  `GRANT SELECT ... TO authenticated` is live would recreate BA-0023 as a full email
+  disclosure. The current no-op is accidentally suppressing that.
