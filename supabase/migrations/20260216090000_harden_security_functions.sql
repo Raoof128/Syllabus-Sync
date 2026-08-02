@@ -158,9 +158,30 @@ $$;
 -- --------------------------------------------------------------------------
 -- Public event seeding: service role only
 -- --------------------------------------------------------------------------
-REVOKE EXECUTE ON FUNCTION public.seed_demo_events() FROM PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.seed_demo_events() FROM authenticated;
-GRANT EXECUTE ON FUNCTION public.seed_demo_events() TO service_role;
+-- BA-0053: these three statements aborted the migration at line 161 of 365 when
+-- seed_demo_events() is absent -- which is the case on any clean replay, because
+-- the function is defined below the failure point of
+-- 20260114013519_add_soft_deletes_constraints_seeds.sql, which itself aborts.
+-- One broken migration was therefore disabling a second one's security
+-- hardening: every REVOKE below this line (seed_demo_units, seed_demo_deadlines,
+-- seed_demo_class_times, seed_demo_notifications, seed_demo_data_for_user, and
+-- the destructive clear_user_data) was silently skipped.
+--
+-- Guarded so an absent function is a no-op rather than an abort. The hardening
+-- below this point now always runs.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public' AND p.proname = 'seed_demo_events'
+  ) THEN
+    REVOKE EXECUTE ON FUNCTION public.seed_demo_events() FROM PUBLIC;
+    REVOKE EXECUTE ON FUNCTION public.seed_demo_events() FROM authenticated;
+    GRANT EXECUTE ON FUNCTION public.seed_demo_events() TO service_role;
+  END IF;
+END
+$$;
 
 -- --------------------------------------------------------------------------
 -- Master seed function: self-only and no global/public event insertion
