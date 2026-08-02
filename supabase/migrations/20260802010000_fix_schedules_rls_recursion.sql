@@ -92,16 +92,21 @@ COMMENT ON FUNCTION public.owns_schedule(uuid) IS
 -- is_schedule_member" for authenticated.)
 --
 -- Granting EXECUTE is safe here precisely because of the no-user-id design
--- above: the only question a caller can ask is about its own relationship to
--- a schedule id, which it may already determine from its own rows. anon is
--- deliberately excluded -- it can hold no membership, and the same-table
--- policies already yield it nothing.
+-- above: the only question a caller can ask is about its own relationship to a
+-- schedule id, which it may already determine from its own rows.
+--
+-- anon is granted too, and that is deliberate. Excluding it was tried first and
+-- was worse: anon holds the table-level SELECT grant (BA-0055), so its query
+-- still reaches policy evaluation, which then calls these functions and fails
+-- with `42501 permission denied for function is_schedule_member` -- verified
+-- against production. That trades a 500 for a 401 instead of the correct
+-- answer. With the grant, auth.uid() is NULL for anon, both functions return
+-- false, and anon gets what RLS is supposed to give it: zero rows, no error.
+-- Nothing is disclosed either way; this is the honest empty result.
 REVOKE EXECUTE ON FUNCTION public.is_schedule_member(uuid) FROM PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.is_schedule_member(uuid) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.owns_schedule(uuid) FROM PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.owns_schedule(uuid) FROM anon;
-GRANT EXECUTE ON FUNCTION public.is_schedule_member(uuid) TO authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.owns_schedule(uuid) TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.is_schedule_member(uuid) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.owns_schedule(uuid) TO anon, authenticated, service_role;
 
 -- ============================================================================
 -- 2. Rebuild the two policies that formed the cycle
