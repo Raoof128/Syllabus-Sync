@@ -65,9 +65,22 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON public.audit_logs(action);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_table_name ON public.audit_logs(table_name);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_severity ON public.audit_logs(severity);
 
--- Partial index for recent logs (faster queries)
-CREATE INDEX IF NOT EXISTS idx_audit_logs_recent ON public.audit_logs(created_at DESC) 
-WHERE created_at > now() - interval '7 days';
+-- Index for recent logs (faster queries).
+--
+-- BA-0053: this was a partial index with `WHERE created_at > now() - interval
+-- '7 days'`. now() is STABLE, not IMMUTABLE, and PostgreSQL rejects
+-- non-IMMUTABLE functions in an index predicate -- so the statement failed on
+-- every PostgreSQL version and aborted this entire migration at line 70 of 340.
+-- Everything below it (audit_settings, log_audit, cleanup_old_audit_logs,
+-- audit_trigger, the four audit_logs policies including the append-only pair,
+-- and the recent_audit_activity / security_audit_events views) therefore never
+-- ran. Confirmed absent from production and from a clean replay of all
+-- migrations alike.
+--
+-- A time-relative predicate cannot be expressed as a partial index at all; the
+-- planner already serves "recent rows" efficiently from the plain DESC index
+-- below, so the predicate is dropped rather than reformulated.
+CREATE INDEX IF NOT EXISTS idx_audit_logs_recent ON public.audit_logs(created_at DESC);
 
 -- ============================================================================
 -- AUDIT LOG RETENTION CONFIGURATION
@@ -253,10 +266,29 @@ CREATE TRIGGER audit_deadlines_trigger
     FOR EACH ROW EXECUTE FUNCTION public.audit_trigger();
 
 -- Events table audit (only user-created events)
+--
+-- BA-0053: this was a single trigger covering INSERT OR UPDATE OR DELETE with
+-- `WHEN (NEW.user_id IS NOT NULL OR OLD.user_id IS NOT NULL)`. PostgreSQL
+-- rejects that outright -- "DELETE trigger's WHEN condition cannot reference NEW
+-- values" -- because NEW does not exist for DELETE (nor OLD for INSERT). This
+-- was the SECOND independent fatal error in this migration, after the
+-- non-IMMUTABLE index predicate at line 70; together they are conclusive that
+-- the file was never executed against a database before being committed.
+--
+-- Split so each trigger references only the row-variable that exists for its
+-- events, preserving the original intent exactly.
+DROP TRIGGER IF EXISTS audit_events_trigger ON public.events;
 CREATE TRIGGER audit_events_trigger
-    AFTER INSERT OR UPDATE OR DELETE ON public.events
-    FOR EACH ROW 
-    WHEN (NEW.user_id IS NOT NULL OR OLD.user_id IS NOT NULL)
+    AFTER INSERT OR UPDATE ON public.events
+    FOR EACH ROW
+    WHEN (NEW.user_id IS NOT NULL)
+    EXECUTE FUNCTION public.audit_trigger();
+
+DROP TRIGGER IF EXISTS audit_events_delete_trigger ON public.events;
+CREATE TRIGGER audit_events_delete_trigger
+    AFTER DELETE ON public.events
+    FOR EACH ROW
+    WHEN (OLD.user_id IS NOT NULL)
     EXECUTE FUNCTION public.audit_trigger();
 
 -- Profiles table audit

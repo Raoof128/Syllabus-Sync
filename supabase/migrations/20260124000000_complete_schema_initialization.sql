@@ -282,59 +282,92 @@ GRANT SELECT ON public.xp_config TO authenticated;
 -- ============================================================================
 
 -- Profiles policies (user can only access their own profile)
+-- BA-0053: bare CREATE POLICY aborts with "policy ... already exists" when an
+-- earlier migration already created these, which is exactly what happens on a
+-- clean replay. AGENT.md §3.3 requires migrations to be idempotent.
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.profiles;
 CREATE POLICY "Users can view their own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
 -- User preferences policies
+DROP POLICY IF EXISTS "Users can view their own preferences" ON public.user_preferences;
 CREATE POLICY "Users can view their own preferences" ON public.user_preferences FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert their own preferences" ON public.user_preferences;
 CREATE POLICY "Users can insert their own preferences" ON public.user_preferences FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update their own preferences" ON public.user_preferences;
 CREATE POLICY "Users can update their own preferences" ON public.user_preferences FOR UPDATE USING (auth.uid() = user_id);
 
 -- Units policies
+DROP POLICY IF EXISTS "Users can view their own units" ON public.units;
 CREATE POLICY "Users can view their own units" ON public.units FOR SELECT USING (auth.uid() = user_id AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Users can insert their own units" ON public.units;
 CREATE POLICY "Users can insert their own units" ON public.units FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update their own units" ON public.units;
 CREATE POLICY "Users can update their own units" ON public.units FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete their own units" ON public.units;
 CREATE POLICY "Users can delete their own units" ON public.units FOR DELETE USING (auth.uid() = user_id);
 
 -- Class times policies (inherited from units ownership)
+DROP POLICY IF EXISTS "Users can view class times for their units" ON public.class_times;
 CREATE POLICY "Users can view class times for their units" ON public.class_times FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.units WHERE units.id = class_times.unit_id AND units.user_id = auth.uid() AND units.deleted_at IS NULL)
 );
+DROP POLICY IF EXISTS "Users can insert class times for their units" ON public.class_times;
 CREATE POLICY "Users can insert class times for their units" ON public.class_times FOR INSERT WITH CHECK (
   EXISTS (SELECT 1 FROM public.units WHERE units.id = class_times.unit_id AND units.user_id = auth.uid() AND units.deleted_at IS NULL)
 );
+DROP POLICY IF EXISTS "Users can update class times for their units" ON public.class_times;
 CREATE POLICY "Users can update class times for their units" ON public.class_times FOR UPDATE USING (
   EXISTS (SELECT 1 FROM public.units WHERE units.id = class_times.unit_id AND units.user_id = auth.uid() AND units.deleted_at IS NULL)
 );
+DROP POLICY IF EXISTS "Users can delete class times for their units" ON public.class_times;
 CREATE POLICY "Users can delete class times for their units" ON public.class_times FOR DELETE USING (
   EXISTS (SELECT 1 FROM public.units WHERE units.id = class_times.unit_id AND units.user_id = auth.uid() AND units.deleted_at IS NULL)
 );
 
 -- Deadlines policies
+DROP POLICY IF EXISTS "Users can view their own deadlines" ON public.deadlines;
 CREATE POLICY "Users can view their own deadlines" ON public.deadlines FOR SELECT USING (auth.uid() = user_id AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Users can insert their own deadlines" ON public.deadlines;
 CREATE POLICY "Users can insert their own deadlines" ON public.deadlines FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update their own deadlines" ON public.deadlines;
 CREATE POLICY "Users can update their own deadlines" ON public.deadlines FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete their own deadlines" ON public.deadlines;
 CREATE POLICY "Users can delete their own deadlines" ON public.deadlines FOR DELETE USING (auth.uid() = user_id);
 
 -- Events policies (public + private events)
+DROP POLICY IF EXISTS "Users can view public or their own events" ON public.events;
 CREATE POLICY "Users can view public or their own events" ON public.events FOR SELECT USING ((user_id IS NULL OR auth.uid() = user_id) AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Users can insert their own events" ON public.events;
 CREATE POLICY "Users can insert their own events" ON public.events FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update their own events" ON public.events;
 CREATE POLICY "Users can update their own events" ON public.events FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete their own events" ON public.events;
 CREATE POLICY "Users can delete their own events" ON public.events FOR DELETE USING (auth.uid() = user_id);
 
 -- Notifications policies
+DROP POLICY IF EXISTS "Users can view their own notifications" ON public.notifications;
 CREATE POLICY "Users can view their own notifications" ON public.notifications FOR SELECT USING (auth.uid() = user_id AND deleted_at IS NULL);
+DROP POLICY IF EXISTS "Users can insert their own notifications" ON public.notifications;
 CREATE POLICY "Users can insert their own notifications" ON public.notifications FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update their own notifications" ON public.notifications;
 CREATE POLICY "Users can update their own notifications" ON public.notifications FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete their own notifications" ON public.notifications;
 CREATE POLICY "Users can delete their own notifications" ON public.notifications FOR DELETE USING (auth.uid() = user_id);
 
 -- Gamification profiles policies
+DROP POLICY IF EXISTS "Users can view their own gamification profile" ON public.gamification_profiles;
 CREATE POLICY "Users can view their own gamification profile" ON public.gamification_profiles FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert their own gamification profile" ON public.gamification_profiles;
 CREATE POLICY "Users can insert their own gamification profile" ON public.gamification_profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update their own gamification profile" ON public.gamification_profiles;
 CREATE POLICY "Users can update their own gamification profile" ON public.gamification_profiles FOR UPDATE USING (auth.uid() = user_id);
 
 -- XP events policies
+DROP POLICY IF EXISTS "Users can view their own XP events" ON public.xp_events;
 CREATE POLICY "Users can view their own XP events" ON public.xp_events FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert their own XP events" ON public.xp_events;
 CREATE POLICY "Users can insert their own XP events" ON public.xp_events FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- ============================================================================

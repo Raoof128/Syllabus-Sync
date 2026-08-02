@@ -35,15 +35,42 @@
 --
 -- Idempotent: REVOKE only.
 
-REVOKE ALL ON TABLE public.sylla_ai_requests FROM anon, authenticated;
-REVOKE ALL ON TABLE public.sylla_active_generations FROM anon, authenticated;
+-- BA-0053: these objects exist only in production as unmanaged schema -- no
+-- migration creates them -- so a bare REVOKE aborts every clean replay with
+-- `relation "public.sylla_ai_requests" does not exist`. Guarded per object so
+-- the lockdown still applies wherever the objects are present.
+DO $$
+BEGIN
+  IF to_regclass('public.sylla_ai_requests') IS NOT NULL THEN
+    REVOKE ALL ON TABLE public.sylla_ai_requests FROM anon, authenticated;
+  END IF;
+  IF to_regclass('public.sylla_active_generations') IS NOT NULL THEN
+    REVOKE ALL ON TABLE public.sylla_active_generations FROM anon, authenticated;
+  END IF;
+END
+$$;
 
-REVOKE EXECUTE ON FUNCTION public.sylla_reserve_chat_request(uuid, text, text, text, integer)
-  FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.sylla_reserve_upload_request(uuid)
-  FROM anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.sylla_cleanup_old_ai_requests()
-  FROM anon, authenticated;
+-- BA-0053: these were bare REVOKEs naming exact signatures, which abort on any
+-- database where the functions are absent -- every clean replay, since nothing
+-- creates them. Resolved from the catalog instead, which is both runnable
+-- everywhere and immune to the signature-mismatch no-op the block below already
+-- guards against for sylla_finalize_request.
+DO $$
+DECLARE
+  v_sig text;
+BEGIN
+  FOR v_sig IN
+    SELECT 'public.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')'
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname LIKE 'sylla%'
+  LOOP
+    EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM anon, authenticated', v_sig);
+    RAISE NOTICE 'BA-0049: revoked client EXECUTE on %', v_sig;
+  END LOOP;
+END
+$$;
 
 -- sylla_finalize_request's exact signature is resolved from the catalog: it takes
 -- five arguments whose types were not asserted when this was written, and naming
@@ -106,7 +133,16 @@ BEGIN
   END IF;
 
   -- And service_role must retain access, or the feature becomes undevelopable.
-  IF NOT EXISTS (
+  -- BA-0053: this assertion is only meaningful where the function exists. On a
+  -- database without the unmanaged sylla_* surface -- every clean replay -- the
+  -- NOT EXISTS is trivially true and the migration aborts claiming service_role
+  -- "lost" a privilege it never held. Scoped to the present case so absence is
+  -- a no-op while a genuine regression still fails loudly.
+  IF EXISTS (
+    SELECT 1 FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public' AND p.proname = 'sylla_reserve_chat_request'
+  ) AND NOT EXISTS (
     SELECT 1 FROM pg_proc p
     JOIN pg_namespace n ON n.oid = p.pronamespace
     CROSS JOIN LATERAL aclexplode(p.proacl) AS acl
