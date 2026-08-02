@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "assessedAt": "2026-07-29T06:33:01.640Z",
+  "assessedAt": "2026-07-30T00:44:12.988Z",
   "runtime": "Node.js v22.23.1",
   "build": {
     "profile": "production",
@@ -9,8 +9,8 @@
     "exitCode": 0,
     "outputDirectory": ".open-next",
     "metafile": ".open-next/server-functions/default/handler.mjs.meta.json",
-    "outputSha256": "8f54c9104f3eaf53adb6328459a3fed6f65e25e547a5ef6e3840479fa1ed5477",
-    "metafileSha256": "379166b2d99b06475813d742aca13316ff200c028bd79fc9999bda5e96a46435"
+    "outputSha256": "10b2183b0d1975c5656593e7a2ff43d30446c2c39efeda217b771c0bc4f0f502",
+    "metafileSha256": "f0668e4def3e145860bd08f68dcfa8dd4715e061fd029a0f7c19ff8782c18a5f"
   },
   "sharpWorkerReachability": "proven-absent",
   "searchedTerms": [
@@ -29,10 +29,13 @@
     "server-functions/default/.next/server/chunks/5861.js [incidental-name]",
     "server-functions/default/.next/server/middleware.js [incidental-name]",
     "server-functions/default/handler.mjs [incidental-name]",
+    "server-functions/default/node_modules/lightningcss/package.json [incidental-name]",
     "server-functions/default/node_modules/next/dist/compiled/@vercel/nft/index.js [incidental-name]",
     "server-functions/default/node_modules/next/dist/server/capsize-font-metrics.json [incidental-name]",
     "server-functions/default/node_modules/next/dist/server/image-optimizer.js [module-specifier] [unbundled-scaffolding]",
     "server-functions/default/node_modules/next/package.json [incidental-name]",
+    "server-functions/default/node_modules/webpack/lib/html/HtmlGenerator.js [incidental-name]",
+    "server-functions/default/node_modules/webpack/lib/html/syntax.js [incidental-name]",
     "server-functions/default/package.json [incidental-name]"
   ]
 }
