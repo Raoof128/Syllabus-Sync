@@ -4,6 +4,98 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: A Dead Feature, and a Migration Set That Could Not Build — 2026-08-02
+
+**Scope:** A re-audit of the backend, scoped deliberately as "check the real system rather
+than a description of it" — because this audit's own record shows it reported a live P0 as
+absent twice, each time by trusting a derived object or a supplied list. Two cheap things
+had never been done: probe live production read-only with the public anon key, and replay
+the migrations against an empty database. Both were done here, and both found defects.
+
+**Summary:** **BA-0052 (P1)** — `public.schedules` and `public.schedule_members` carry
+mutually recursive RLS policies. The schedules SELECT policy subqueries schedule_members
+while the schedule_members SELECT policy subqueries schedules, so reading either re-enters
+the other and Postgres aborts with 42P17. Production returns HTTP 500 on both tables, and
+the same error reproduces locally for the `authenticated` role — so this is not an
+anon-only artefact. **The sharing feature has been dead for every signed-in user since
+2026-02-20.** `app/api/sync/route.ts:139` destructures only `data` and discards `error`,
+so the failure is swallowed and a genuine collaborator is refused with 403. It fails
+closed, so it is an availability defect rather than an escalation — but it is silent, and
+1260 passing tests never saw it, because no test in this repository executes SQL. I checked
+the other seven sites that discard a Supabase error the same way; all are ownership-scoped,
+so none fails open.
+
+**BA-0053 (P1)** — replaying all 78 migrations against a clean PostgreSQL 15.18 found
+**6 fatally broken**. Since each runs in a transaction, everything after a failure point is
+lost. `20260129000000_add_audit_logging.sql` has _two_ independent fatal errors — a
+non-IMMUTABLE `now()` in an index predicate and a DELETE trigger whose WHEN clause
+references NEW — so it can never have applied anywhere. Production confirms it: three of
+its objects are absent there, and a fresh build produces exactly the same object set. That
+also explains the two later `restore_*` migrations, which patched back `audit_logs` and
+`log_audit` by hand and never covered the rest. Worse, `20260216090000_harden_security_functions.sql`
+aborted at line 161 of 365 because it depends on a function defined below _another_ broken
+migration's failure point — one broken file was silently disabling a second file's security
+hardening, including the revoke on the destructive `clear_user_data()`.
+
+**A correction to the project record.** The changelog states audit logs are protected. The
+append-only _control_ the design intended (`"No updates to audit logs"`, `"No deletes to
+audit logs"`) does not exist in production, because it sits below that migration's failure
+point. The property still holds, but only by RLS default-deny. I verified that
+behaviourally — as an authenticated user, UPDATE and DELETE against another user's
+`audit_logs` row both affected 0 rows and the row survived — rather than trusting either
+the code or the changelog.
+
+**BA-0055 (P2)** — `anon` retains table-level SELECT/UPDATE/DELETE grants on eleven tables
+including `password_resets`, `backup_codes` and `webauthn_credentials`, while fourteen
+less-sensitive tables have the grant revoked. The discriminator is exactly whether a
+migration ever issued `REVOKE ... FROM anon`; `rate_limits` shows why intent is not enough,
+having revoked `FROM public`, which does not remove a privilege held directly by `anon`.
+**I did not assume RLS contains this — I tested it.** With real rows seeded into those
+tables, anon read 0 rows and a delete attempt left the token intact, and a second
+authenticated user read 0 of the first user's rows. So there is no live exposure; the
+finding is that RLS is the _only_ layer on the most sensitive tables in the system, which
+matters here because this codebase's history is a record of that single layer failing
+silently.
+
+**BA-0027** is confirmed with a reproduction, having been an unverified candidate:
+`mv_deadline_analytics` is created twice with different shapes, the second with
+`IF NOT EXISTS` so it silently no-ops, after which its index aborts the migration on a
+column that does not exist.
+
+**Files Changed:** `supabase/migrations/20260802010000_fix_schedules_rls_recursion.sql`
+(new), `tests/security/rls-policy-recursion.test.ts` (new),
+`tools/database/verify-fresh-build.sh` (new),
+`docs/backend-audit/2026-08-02/backend-runtime-audit-2026.md` (new), and repairs to
+`20260129000000_add_audit_logging.sql`, `20260124000000_complete_schema_initialization.sql`,
+`20260216090000_harden_security_functions.sql`, `20260114013519_add_soft_deletes_constraints_seeds.sql`,
+`20260326000000_enable_rls_edge_response_cache.sql`,
+`20260730130000_lock_down_orphaned_sylla_surface.sql`.
+
+**Verification:** Fresh build from migrations alone: **applied=79 failed=0**. `npm run check`
+exit 0 with **1264 tests** (up from 1260). The BA-0052 migration's verification block was run
+against the pre-fix state first and failed as designed, so it is not vacuous; the new
+regression test likewise fails all 4 assertions when the fix migration is removed, naming
+both offending tables. After the fix, an owner and a member both see the shared schedule, an
+unrelated user sees nothing, and the BA-0026 guard still refuses promotion to `owner`.
+Testing also corrected me once: granting EXECUTE only to `service_role` traded 42P17 for
+42501, because Postgres enforces EXECUTE against the calling role for functions referenced
+in a policy. **No production data was created, modified or deleted** — write reachability
+was established with zero-row filters, and every destructive test ran against the local
+replica.
+
+**Follow-ups:** The `mv_deadline_analytics` reconciliation is deliberately not done here;
+dropping and recreating the matview changes the contract of `get_my_deadline_analytics()`
+and `refresh_analytics_views()` and wants its own reviewed migration. The blanket
+`REVOKE ... FROM anon` sweep for BA-0055 is scoped but unwritten. Three things could not be
+settled without service-role access and remain open: whether production is missing the
+REVOKEs lost to the hardening cascade, whether `pg_cron` is actually scheduled (BA-0011),
+and production's true policy/grant state; §8 of the audit report gives the exact queries.
+Most importantly, **not one test in this repository runs SQL against a real database** —
+every finding above was found by executing something, and none were visible to 1260 green
+tests. `tools/database/verify-fresh-build.sh` is a first step; it should be wired into CI.
+
+---
+
 ### Raouf: Live Database Verification of the Runtime Audit — 2026-07-30
 
 **Scope:** Settled the database half of the runtime audit against the real project using read-only `supabase db query --linked` catalogue queries. No write, no DDL executed, no migration applied, no secret printed.

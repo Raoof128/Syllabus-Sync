@@ -58,6 +58,45 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-08-02 (Australia/Sydney) — RLS Recursion, and a Migration Set That Could Not Build
+
+**Raouf:**
+
+- **Scope:** Re-audit of the backend, scoped as "check the real system, not a description of
+  it", after this audit's own record showed it reporting a live P0 as absent twice. Two cheap
+  checks had never been run: read-only probing of live production with the public anon key,
+  and replaying the migrations against an empty database. Both found defects.
+- **Summary:** **BA-0052 (P1)** — mutually recursive RLS policies on `schedules` and
+  `schedule_members` (each one's SELECT policy subqueries the other) make both tables
+  permanently unqueryable with 42P17. Verified live in production (HTTP 500) and reproduced
+  locally for the `authenticated` role, so the sharing feature has been dead for every
+  signed-in user since 2026-02-20. `app/api/sync/route.ts:139` discards the query `error`, so
+  it fails closed and silently. Fixed with two SECURITY DEFINER helpers that take no user id —
+  each answers only whether the _current_ caller relates to a schedule — keeping the fix clear
+  of the IDOR class of BA-0029/BA-0031/BA-0049. **BA-0053 (P1)** — 6 of 78 migrations fail on a
+  clean database, so no reproducible environment and no tested recovery path existed.
+  `20260129000000_add_audit_logging.sql` has two independent fatal errors and can never have
+  applied anywhere, which production confirms; that also explains the later `restore_*`
+  migrations. One broken migration was silently disabling a second one's security hardening.
+  **BA-0055 (P2)** — `anon` retains table grants on eleven tables including `password_resets`
+  and `backup_codes`, because `REVOKE ... FROM public` does not remove a direct `anon` grant.
+  Tested with real seeded rows: RLS contains all of it, so no live exposure — the finding is
+  single-layer defence on the most sensitive tables. **BA-0027** confirmed with a reproduction.
+- **Files Changed:** `supabase/migrations/20260802010000_fix_schedules_rls_recursion.sql` (new),
+  `tests/security/rls-policy-recursion.test.ts` (new), `tools/database/verify-fresh-build.sh`
+  (new), `docs/backend-audit/2026-08-02/backend-runtime-audit-2026.md` (new), plus repairs to
+  six historical migrations.
+- **Verification:** Fresh build applied=79 failed=0 ✅; `npm run check` exit 0 with 1264 tests ✅;
+  the BA-0052 verification block fails against the pre-fix state and the new regression test
+  fails all 4 assertions with the fix removed, so neither is vacuous ✅; owner and member both
+  see a shared schedule while an unrelated user sees nothing, and promotion to `owner` is still
+  refused ✅. No production data was created, modified or deleted.
+- **Follow-ups:** `mv_deadline_analytics` reconciliation and the blanket `REVOKE ... FROM anon`
+  sweep are scoped but unwritten. Three items need service-role access to settle (lost REVOKEs
+  in production, `pg_cron` scheduling for BA-0011, true policy/grant state) — exact queries in
+  §8 of the audit report. **No test in this repository executes SQL against a real database**;
+  every finding above was found by executing something. Wire `verify-fresh-build.sh` into CI.
+
 ### 2026-07-30 (Australia/Sydney) — Live Database Verification of the Runtime Audit
 
 **Raouf:**
