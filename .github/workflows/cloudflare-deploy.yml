@@ -60,7 +60,39 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # BA-0058: the job-level `env:` block above is in scope for EVERY step,
+      # including this one, so the unit tests ran with deployment configuration
+      # visible. Six assertions across four files then failed in CI while passing
+      # locally, and because this gate runs before the deploy steps, the P0
+      # WebAuthn fix in 1073e4da could not ship for three days:
+      #
+      #   emailService  - asserts the VERCEL_URL fallback "when NEXT_PUBLIC_APP_URL
+      #                   is not set"; the job env sets it, so the premise is void
+      #   rateLimitService / protected-route-auth
+      #                 - DEPLOYMENT_ENV=production makes the limiter fail closed
+      #                   ("no distributed rate limiting in production"), turning
+      #                   an expected 200 into a 403
+      #   security/ip   - DEPLOYMENT_PLATFORM=cloudflare changes which forwarded
+      #                   header getClientIP trusts
+      #
+      # The tests are right; the environment was wrong. Unit tests must not see
+      # deployment configuration.
+      #
+      # These four are blanked here rather than moving the whole job-level block
+      # onto the build and deploy steps. That alternative is the tidier shape but
+      # a far riskier edit: `NEXT_PUBLIC_*` values are inlined at BUILD time, and
+      # omitting one while relocating the block is precisely what caused the
+      # 2026-07-30 production outage (see tools/cloudflare/check-public-env.mjs).
+      # Nothing the build or deploy consumes is touched by this change.
+      #
+      # Verified locally: with these four set, 6 tests across 4 files fail —
+      # exactly the CI failures. With them blank, 1267/1267 pass.
       - name: Run quality gate
+        env:
+          DEPLOYMENT_PLATFORM: ''
+          DEPLOYMENT_ENV: ''
+          NEXT_PUBLIC_APP_URL: ''
+          NEXT_PUBLIC_SITE_URL: ''
         run: npm run check
 
       - name: Validate deployment environment
