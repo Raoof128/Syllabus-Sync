@@ -4,6 +4,56 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: The P0 Is Deployed — and Why It Had Sat Undeployed for Three Days — 2026-08-02
+
+**Scope:** Getting the BA-0056 WebAuthn account-takeover fix into production.
+
+**Summary:** The fix was already on `main` — commit `1073e4da`, 2026-07-30, from a parallel
+audit that found the same defect independently. It had never shipped. `gh run list
+--workflow=cloudflare-deploy.yml` returned **nothing**: the deployment workflow had never run,
+not once. So a P0 sat committed and live-in-production for three days.
+
+The first deploy attempt failed at the quality gate, which is the gate doing its job — nothing
+was deployed. The cause was a **CI configuration defect, not a code defect**: the deploy job's
+job-level `env:` block is in scope for _every_ step including `npm run check`, so unit tests
+ran with deployment configuration visible. Six assertions across four files failed in CI while
+passing locally — `emailService` asserts a fallback "when `NEXT_PUBLIC_APP_URL` is not set" and
+the job env sets it; `DEPLOYMENT_ENV=production` makes the rate limiter fail closed, turning an
+expected 200 into a 403; `DEPLOYMENT_PLATFORM=cloudflare` changes which forwarded header
+`getClientIP` trusts. Reproduced locally before fixing: with those four variables set, exactly
+those 6 tests fail; blanked, 1267/1267 pass.
+
+I blanked the four on the quality-gate step rather than relocating the whole job-level block
+onto the build and deploy steps. Relocating is the tidier shape but the riskier edit —
+`NEXT_PUBLIC_*` values are inlined at **build** time, and omitting one while moving the block
+is exactly what caused the 2026-07-30 production outage. Nothing the build or deploy consumes
+was touched.
+
+**Also worth naming:** every recent `ci-cd.yml` run fails at `npm audit` on the four high
+advisories that BA-0044 already assessed and accepted as build-time-only. CI therefore fails on
+a known-accepted condition, so a red signal carries no information — which is very likely why
+nobody noticed the deploy had never run. When the board is always red, nothing stands out.
+
+**Files Changed:** `.github/workflows/cloudflare-deploy.yml` (on `main`, via
+`fix/ci-quality-gate-env-leak`, fast-forwarded to `main` as `17003fbe`).
+
+**Verification:** Deploy run `30727951670` — quality gate ✅, env validation ✅, dry-run and
+size gate ✅, **production Worker deployed** ✅. Production after: `/api/health` healthy /
+database connected; `cf:smoke` **9/9**; signup returns 400 for an empty body rather than 503,
+so the route is live. `1073e4da` confirmed an ancestor of the deployed commit, so the P0 binding
+check is in the shipped Worker. The BA-0052 database fix is unaffected — an authenticated read
+of `schedules` and `schedule_members` still succeeds.
+
+**Follow-ups:** `main` and `audit/backend-hardening-cloudflare` remain divergent (two concurrent
+audits of the same system); reconciling them is an owner decision, and whoever does it **must
+carry `20260802010000` onto `main`** rather than accepting the CLI's
+`migration repair --status reverted` prompt. `isTrustedOrigin` still fails open when Origin and
+Referer are both absent, leaving three unauthenticated `/api/maps/*` routes open to billing
+abuse of the Google key — not fixed here because it needs testing against real non-browser
+clients. The npm-audit waiver should be made explicit so CI red means something again.
+
+---
+
 ### Raouf: Shipped the Recursion Fix to Production, and Recovered a Lost Migration — 2026-08-02
 
 **Scope:** Pushing the audit's database fix to production, and the migration-history drift that
