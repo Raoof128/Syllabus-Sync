@@ -80,12 +80,19 @@ export async function POST(request: NextRequest) {
       return jsonError('Invalid or expired verification link', 400, ERROR_CODES.BAD_REQUEST);
     }
 
-    // 3. Mark token as used (atomic — prevents double-use race condition)
-    const { error: updateError } = await adminClient
+    // 3. Claim the token: conditional update whose ROW COUNT decides the winner.
+    //
+    // BA-0006: the `.eq('used', false)` guard was already here and the comment
+    // claimed atomicity, but the result was discarded and only `updateError`
+    // was checked. A conditional UPDATE matching zero rows is not an error, so
+    // the loser of a concurrent race saw `updateError === null` and proceeded to
+    // confirm the email with an already-spent token.
+    const { data: claimed, error: updateError } = await adminClient
       .from('email_verifications')
       .update({ used: true })
       .eq('id', record.id)
-      .eq('used', false); // Extra guard against race condition
+      .eq('used', false)
+      .select('id');
 
     if (updateError) {
       logger.error('Failed to mark verification token used', {
@@ -93,6 +100,12 @@ export async function POST(request: NextRequest) {
         error: updateError.message,
       });
       return jsonError('Verification failed', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+
+    if (!claimed || claimed.length !== 1) {
+      // Another request claimed it first. SECURITY: same message as "not found",
+      // "expired" and "already used".
+      return jsonError('Invalid or expired verification link', 400, ERROR_CODES.BAD_REQUEST);
     }
 
     // 4. Mark user as email-verified via admin API

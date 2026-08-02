@@ -88,12 +88,24 @@ export async function POST(request: NextRequest) {
       return jsonError('Invalid or expired reset link', 400, ERROR_CODES.BAD_REQUEST);
     }
 
-    // 2) Mark token as used (atomic guard)
-    const { error: updateError } = await adminClient
+    // 2) Claim the token: conditional update whose ROW COUNT decides the winner.
+    //
+    // BA-0006: `.eq('used', false)` was already here, but the result was
+    // discarded and only `updateError` was checked. A conditional UPDATE that
+    // matches zero rows is not an error — it succeeds having changed nothing.
+    // So two concurrent requests could both pass the step-1 lookup, both reach
+    // here, and the loser would see `updateError === null` and go on to reset
+    // the password with an already-spent token. The guard was present; its
+    // verdict was thrown away.
+    //
+    // `.select('id')` makes PostgREST return the affected rows, so the claim is
+    // decided by how many rows this statement actually took.
+    const { data: claimed, error: updateError } = await adminClient
       .from('password_resets')
       .update({ used: true })
       .eq('id', record.id)
-      .eq('used', false);
+      .eq('used', false)
+      .select('id');
 
     if (updateError) {
       logger.error('Failed to mark password reset token used', {
@@ -101,6 +113,12 @@ export async function POST(request: NextRequest) {
         error: updateError.message,
       });
       return jsonError('Password reset failed', 500, ERROR_CODES.INTERNAL_ERROR);
+    }
+
+    if (!claimed || claimed.length !== 1) {
+      // Another request claimed this token first. Same generic message as an
+      // invalid or expired token, so nothing is disclosed about which case hit.
+      return jsonError('Invalid or expired reset link', 400, ERROR_CODES.BAD_REQUEST);
     }
 
     // 3) Update password

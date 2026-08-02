@@ -26,7 +26,17 @@ vi.mock(import('@/lib/services/rateLimitService'), async (importOriginal) => {
   };
 });
 
-function makePasswordResetsTable(record: { id: string; user_id: string } | null) {
+/**
+ * @param record        the row the step-1 lookup finds, or null for "no such token"
+ * @param claimedRows   rows the step-2 conditional UPDATE reports as affected.
+ *                      1 = this request won the claim. 0 = a concurrent request
+ *                      already spent the token (BA-0006), which must NOT be
+ *                      treated as success.
+ */
+function makePasswordResetsTable(
+  record: { id: string; user_id: string } | null,
+  claimedRows: number = 1,
+) {
   const chain: any = {};
 
   chain.select = vi.fn(() => chain);
@@ -38,11 +48,13 @@ function makePasswordResetsTable(record: { id: string; user_id: string } | null)
     error: record ? null : { message: 'not found' },
   }));
 
+  // update(...).eq(...).eq(...).select('id') → { data: rows, error }
   const updateChain: any = {};
-  const updateEq = vi.fn();
-  updateEq.mockImplementationOnce(() => updateChain);
-  updateEq.mockImplementationOnce(async () => ({ error: null }));
-  updateChain.eq = updateEq;
+  updateChain.eq = vi.fn(() => updateChain);
+  updateChain.select = vi.fn(async () => ({
+    data: Array.from({ length: claimedRows }, () => ({ id: record?.id ?? 'row' })),
+    error: null,
+  }));
 
   return {
     select: chain.select,
@@ -128,5 +140,43 @@ describe('password reset consume API', () => {
       'user-1',
       expect.objectContaining({ password: 'A'.repeat(12) }),
     );
+  });
+
+  /**
+   * BA-0006. The route already filtered the claiming UPDATE with
+   * `.eq('used', false)` and the comment called it an atomic guard, but only
+   * `updateError` was inspected. A conditional UPDATE that matches zero rows is
+   * not an error — it succeeds having changed nothing — so the loser of a race
+   * saw `error === null` and reset the password with an already-spent token.
+   *
+   * This models the loser: the step-1 lookup still sees the token as unused
+   * (both requests read before either wrote), but the claim takes 0 rows.
+   */
+  it('refuses to reset when a concurrent request already claimed the token', async () => {
+    const passwordResets = makePasswordResetsTable({ id: 'token-1', user_id: 'user-1' }, 0);
+    const updateUserById = vi.fn().mockResolvedValue({ error: null });
+
+    createAdminClientMock.mockReturnValue({
+      from: vi.fn(() => passwordResets),
+      auth: { admin: { updateUserById } },
+    });
+
+    const req = new NextRequest('http://localhost/api/auth/password/reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: 'c'.repeat(64),
+        newPassword: 'B'.repeat(12),
+      }),
+    });
+
+    const res = await POST(req);
+
+    expect(res.status).toBe(400);
+    // The whole point: the password must not be changed by the losing request.
+    expect(updateUserById).not.toHaveBeenCalled();
+    // And the refusal must not disclose that the token existed but was taken.
+    const json = await res.json();
+    expect(JSON.stringify(json)).toMatch(/Invalid or expired reset link/i);
   });
 });
