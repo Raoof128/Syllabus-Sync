@@ -4,6 +4,70 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: A P0 Account Takeover, and Two Regressions I Caused Myself — 2026-08-02
+
+**Scope:** Second half of the re-audit. Six parallel lanes reported late; their findings are
+recorded with a verdict on each, because most of the criticals did not survive testing.
+
+**Summary:** **BA-0056 (P0)** — `POST /api/webauthn/authenticate/verify` brought two
+identities together and never compared them. `userId` came from the consumed challenge (the
+account being logged _into_, derived from a client-supplied email); `dbCredential` came from
+`getCredentialById()`, which queries by `credential_id` alone through the service-role client
+and so returns **any** user's row. The public key used for verification came from that row;
+the session was minted for the challenge's user. An attacker with a self-serve account
+holding one passkey could request a challenge for a victim's email, sign it with their own
+authenticator on the real origin, and receive a valid session for the victim — no origin
+spoofing, no victim interaction, no session required to reach either endpoint. Proven
+non-vacuous: without the fix the cross-user assertion returns **HTTP 200**; with it, 401.
+
+**BA-0057 (P1) — two regressions my own migration repair introduced.** Making the
+audit-logging migration apply was correct, but it materialised two defects that were dormant
+only because the file was unrunnable. `audit_settings` is the only table in the schema never
+given RLS, so creating it created an exposure: as `anon`, `SELECT` returned a real row and
+`UPDATE ... SET value='0'` reported `UPDATE 1`. And a 7-argument `log_audit` overload whose
+parameters are a strict prefix of the canonical 10-argument version made every 6–7 argument
+call ambiguous — `handle_new_user_safe()` calls it, so **inserting a new user created no
+profile row**; signup would have broken for every new user. Neither was visible in the diff.
+Both were found by building a database and exercising it.
+
+**Four reported criticals were refuted.** The largest: "UPDATE policies with `USING` and no
+`WITH CHECK` let a user hand their credential row to a victim — account takeover, 13 policies
+affected". PostgreSQL uses the `USING` expression **as** the `WITH CHECK` expression when the
+latter is omitted. Tested live: the hand-off raises `new row violates row-level security
+policy` and the row does not move. Three more (`ratelimit_*`, `purge_deleted_records`,
+`refresh_analytics_views` → leaderboard leak) rest on the premise that `REVOKE ... FROM
+PUBLIC` leaves a direct `anon` grant. True for **tables** — that is BA-0055 — but not for
+**functions**, whose default `EXECUTE` comes via `PUBLIC`. A catalog sweep confirms none is
+client-executable.
+
+**A correction to my own earlier entry.** My migration replay was error-tolerant, so "that
+migration has never applied anywhere" does not follow from the replay alone. Two claims were
+conflated: _it cannot apply_ (established directly — two deterministic SQL errors) and _it
+never applied in production_ (carried by the independent absence of all three of its objects
+there). The conclusion holds; the reasoning as first written did not.
+
+**Files Changed:** `app/api/webauthn/authenticate/verify/route.ts`,
+`tests/security/webauthn-credential-user-binding.test.ts` (new),
+`supabase/migrations/20260129000000_add_audit_logging.sql`,
+`supabase/migrations/20260214002000_restore_log_audit_function.sql`,
+`docs/backend-audit/2026-08-02/backend-runtime-audit-2026.md`.
+
+**Verification:** `npm run check` exit 0 with **1267 tests**; fresh build applied=79 failed=0;
+anon denied on `audit_settings` for both SELECT and UPDATE; exactly one `log_audit` overload;
+a new `auth.users` row now creates its profile row. Every fix proven non-vacuous by removing
+it and watching the test fail.
+
+**Follow-ups:** BA-0004 re-scoped to authenticator binding and persistence (an
+attacker-planted passkey survives a password reset, because Supabase merges `user_metadata`
+shallowly) — still unfixed, needs an owner decision on which of the two duplicate passkey
+implementations is canonical. Open redirect in `app/auth/confirm/route.ts` (`//evil.example`
+passes a `startsWith('/')` check; the correct helper already exists and is used by the sibling
+route). `isTrustedOrigin` returns **true** when Origin and Referer are both absent, leaving
+`/api/maps/*` open to unauthenticated billing abuse of the Google key. Eight backend domains
+remain unexamined.
+
+---
+
 ### Raouf: A Dead Feature, and a Migration Set That Could Not Build — 2026-08-02
 
 **Scope:** A re-audit of the backend, scoped deliberately as "check the real system rather
