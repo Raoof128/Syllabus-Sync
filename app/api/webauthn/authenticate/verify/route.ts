@@ -82,6 +82,38 @@ export async function POST(request: NextRequest) {
     const credentialId = authResponse.id;
     const dbCredential = await getCredentialById(credentialId);
 
+    // BA-0056 (P0): bind the presented credential to the challenge's user.
+    //
+    // Two identities meet here and they were never compared. `userId` comes
+    // from the challenge, which /api/webauthn/authenticate/options creates from
+    // a client-supplied email — so it is the account being logged INTO.
+    // `dbCredential` is resolved by getCredentialById(), which queries
+    // webauthn_credentials by credential_id alone through the service-role
+    // client, bypassing RLS and every user scope. It therefore returns ANY
+    // user's credential.
+    //
+    // The public key handed to verifyAuthenticationResponse below came from
+    // that row. Without this check an attacker requested a challenge for a
+    // victim's email, ignored the returned allowCredentials, signed the
+    // challenge with their OWN registered authenticator on the real origin,
+    // and the route verified the signature against the attacker's own public
+    // key — then minted a Supabase session for the victim at line ~176. A
+    // genuine signature over a genuine challenge, attributed to the wrong
+    // account: full account takeover from a self-serve account, no victim
+    // interaction and no origin spoofing.
+    //
+    // mapDbCredential() already populates userId; the route simply never read
+    // it. Rejecting rather than falling through to the legacy branch is
+    // deliberate — treating a mismatch as "not found" would let the same
+    // assertion be retried against user_metadata.
+    if (dbCredential && dbCredential.userId !== userId) {
+      logger.warn('WebAuthn credential/challenge user mismatch rejected', {
+        challengeUserId: userId,
+        credentialUserId: dbCredential.userId,
+      });
+      return jsonError('Passkey not recognized', 401, ERROR_CODES.UNAUTHORIZED);
+    }
+
     // Fallback: check legacy user_metadata
     let isLegacyCredential = false;
     let legacyPublicKey: string | undefined;
