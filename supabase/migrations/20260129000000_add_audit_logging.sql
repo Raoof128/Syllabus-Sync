@@ -94,6 +94,37 @@ CREATE TABLE IF NOT EXISTS public.audit_settings (
     updated_at timestamp with time zone DEFAULT now()
 );
 
+-- BA-0057 (P1): audit_settings was the only table in the entire schema that was
+-- never given RLS -- no policies, no grants, no revokes. While this migration
+-- was unappliable that was harmless, because the table did not exist anywhere.
+-- Repairing the migration would have CREATED the exposure, which is exactly
+-- what a fresh build demonstrated: as `anon`, `SELECT` returned a real row and
+-- `UPDATE public.audit_settings SET value = '0'` reported `UPDATE 1`.
+--
+-- The table governs audit-log retention, so an anonymous caller could set the
+-- window to zero or negative. cleanup_old_audit_logs() reads that window and is
+-- SECURITY DEFINER; it is not currently client-executable (verified against the
+-- catalog), so the full "wipe the audit trail" chain does not close today --
+-- but a config table that anyone can rewrite is a control failure regardless,
+-- and the only thing standing between it and that chain is one GRANT.
+--
+-- Locked to service_role, matching app_config (20260214003000).
+ALTER TABLE public.audit_settings ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE public.audit_settings FROM PUBLIC;
+-- Supabase grants tables to anon/authenticated directly, so revoking from
+-- PUBLIC alone leaves those grants in place (BA-0055). Both are named.
+REVOKE ALL ON TABLE public.audit_settings FROM anon, authenticated;
+GRANT ALL ON TABLE public.audit_settings TO service_role;
+
+DROP POLICY IF EXISTS "Service role can manage audit settings" ON public.audit_settings;
+CREATE POLICY "Service role can manage audit settings"
+    ON public.audit_settings
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
+
 -- Insert default retention period (90 days)
 INSERT INTO public.audit_settings (key, value, description)
 VALUES (

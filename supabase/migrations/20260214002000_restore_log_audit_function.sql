@@ -7,6 +7,23 @@
 
 BEGIN;
 
+-- BA-0053: 20260129000000 declares a 7-argument log_audit whose parameters are a
+-- strict prefix of the 10-argument one below, with identical defaults. While
+-- that migration was unappliable the overload never existed, so the ambiguity
+-- was invisible. Repairing that migration made both signatures real, and every
+-- existing call site passes 6 or 7 arguments -- which then matches BOTH and
+-- fails with "function public.log_audit(...) is not unique".
+--
+-- That is not cosmetic: handle_new_user_safe() calls log_audit, so the
+-- ambiguity breaks profile creation for every new signup. Caught by building a
+-- database from the repaired migrations and creating a user, which surfaced
+-- `WARNING: handle_new_user_safe failed for user ...: function
+-- public.log_audit(text, name, uuid, jsonb, jsonb, unknown) is not unique`.
+--
+-- The 7-argument form carries no capability this one lacks, so it is dropped
+-- rather than kept and disambiguated at each call site.
+DROP FUNCTION IF EXISTS public.log_audit(text, text, uuid, jsonb, jsonb, text, jsonb);
+
 CREATE OR REPLACE FUNCTION public.log_audit(
   p_action text,
   p_table_name text DEFAULT NULL,
