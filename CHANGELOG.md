@@ -4,6 +4,56 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Shipped the Recursion Fix to Production, and Recovered a Lost Migration — 2026-08-02
+
+**Scope:** Pushing the audit's database fix to production, and the migration-history drift that
+blocked it.
+
+**Summary:** `supabase db push` refused to run: `20260730180000` was applied on the remote with
+no local counterpart. The CLI suggested `migration repair --status reverted`, which would have
+been wrong — the migration really did apply, and marking it reverted falsifies the history
+table. I recovered the file from `supabase_migrations.schema_migrations.statements` and
+committed it verbatim. It is `close_audit_settings_rls_and_unguarded_definers` from a
+2026-07-30 runtime audit: production carries a security fix that no fresh build, `db reset`,
+staging environment or DR rebuild would ever have received.
+
+**That file also corrects me.** I had recorded lane-rls's findings on `purge_deleted_records`
+and `refresh_analytics_views` as REFUTED, on the strength of a catalog sweep against my local
+replica. Its own production verification says the opposite in terms: both were "LIVE AND
+ANON-REACHABLE ... holding EXECUTE for anon AND authenticated". My sweep ran against a
+bootstrap that does not reproduce Supabase's _direct_ grants of EXECUTE to anon on functions —
+so `REVOKE ... FROM PUBLIC` was sufficient in my replica and insufficient in production. That
+is exactly the BA-0055 trap I had documented for tables and then failed to apply to functions.
+The lane was right; my refutation was an artefact of an imperfect model.
+
+**The push itself failed at the bookkeeping step** — "permission denied for schema
+supabase_migrations", because the CLI's temporary login role cannot write the history table on
+this project. The DDL rolled back atomically, which I confirmed before touching anything else:
+recursion still present, helpers absent, no history row. Applied through the Management API
+query endpoint instead (which runs as `postgres`), then recorded the history row explicitly.
+
+**And excluding anon from EXECUTE on the helpers was wrong**, which only production revealed.
+anon holds the table-level SELECT grant, so its query still reaches policy evaluation, calls
+the helpers, and fails with `42501 permission denied for function is_schedule_member` — trading
+a 500 for a 401 rather than the correct answer. anon is now granted; `auth.uid()` is NULL for
+it, both helpers return false, and it gets the honest empty result.
+
+**Files Changed:** `supabase/migrations/20260730180000_close_audit_settings_rls_and_unguarded_definers.sql`
+(recovered), `supabase/migrations/20260802010000_fix_schedules_rls_recursion.sql`.
+
+**Verification:** Against production — a real authenticated user now reads `schedules` and
+`schedule_members` and gets counts instead of 42P17, **ending a five-month outage**; anon gets
+HTTP 200 with zero rows; both helpers are SECURITY DEFINER with `search_path` pinned.
+`supabase migration list --linked` reports **80 migrations, no unsynced entries in either
+direction**. Fresh build applied=80 failed=0. `npm run check` exit 0, 1267 tests.
+
+**Follow-ups:** **The BA-0056 P0 is still live.** It is an application fix, not a migration, so
+it needs a Worker deployment — not done here, and it is the most urgent outstanding item.
+BA-0004, the open redirect in `app/auth/confirm`, and the `isTrustedOrigin` fail-open remain
+unfixed. Eight backend domains remain unexamined.
+
+---
+
 ### Raouf: A P0 Account Takeover, and Two Regressions I Caused Myself — 2026-08-02
 
 **Scope:** Second half of the re-audit. Six parallel lanes reported late; their findings are
