@@ -433,9 +433,95 @@ without touching a row; every destructive test was run against the local replica
 | ------- | ---------------------- | ------------------------------------------------------------- |
 | BA-0027 | candidate (unverified) | **CONFIRMED** with reproduction (§5)                          |
 | BA-0003 | validated (P3)         | Unchanged — latent fail-open, contained by env vars being set |
-| BA-0004 | candidate              | Delegated; verdict pending at time of writing                 |
-| BA-0006 | candidate              | Delegated; verdict pending at time of writing                 |
+| BA-0004 | candidate              | **CONFIRMED, raised to P1** — see §9.1                        |
+| BA-0006 | candidate              | **CONFIRMED and FIXED** — see §9.2                            |
 | BA-0011 | validated (P2)         | Cannot be closed without `cron.job` — see §8                  |
+
+### 9.1 BA-0004 — CONFIRMED (P1): a second passkey-registration surface bypasses the AAL2 gate
+
+The middleware does enforce MFA on API routes, and fails closed:
+
+```ts
+// lib/middleware.ts
+if (isApiRoute && !isPublicApi && user && requiresMfaUpgrade) {
+  return NextResponse.json({ error: 'MFA required', code: 'MFA_REQUIRED' }, { status: 403 });
+}
+```
+
+But `isPublicApiPath()` exempts an entire prefix:
+
+```ts
+// lib/middleware.ts:43
+path.startsWith('/api/auth/') ||
+```
+
+**There are two passkey-registration surfaces, and only one is behind the gate:**
+
+| Surface                                           | Behind the MFA gate?   | Own AAL check? |
+| ------------------------------------------------- | ---------------------- | -------------- |
+| `/api/webauthn/register/options\|verify`          | yes                    | none           |
+| `/api/auth/passkey/register`, `/register-options` | **no** (exempt prefix) | **none**       |
+
+Neither performs its own assurance check — I grepped all three route files for
+`getAuthenticatorAssuranceLevel`, `listFactors` and `aal` and found none. The gated pair is
+protected only by the middleware, and the `/api/auth/passkey/*` pair is protected by nothing.
+
+**Attack.** An attacker holding an AAL1-only session for a victim who has MFA enrolled — the
+exact situation MFA exists to defend, i.e. a stolen password or session cookie — calls
+`POST /api/auth/passkey/register-options` then `/register`, and enrols their own passkey. The
+`/api/webauthn/register/*` path would have returned 403 `MFA_REQUIRED`. The result is durable
+attacker-controlled authentication on an MFA-protected account.
+
+Raised from P2 because the control it defeats is the one guarding compromised credentials, and
+the bypass is a plain prefix mismatch rather than a subtle race.
+
+**Why the exemption exists, and why the fix needs a decision.** `/api/auth/*` must be reachable
+before authentication for `signin`, `signup`, `request-reset`, `reset`, `email/verify` and the
+passkey _login_ ceremony. The blanket prefix was the quick way to achieve that. The repair is to
+replace the prefix with an explicit allow-list of genuinely pre-auth endpoints, leaving
+`passkey/register*`, `mfa/enroll`, `mfa/sms/enroll`, `sessions` and `password` (change) gated.
+
+I have **not** shipped that change. It alters the reachability of 28 auth routes, and getting it
+wrong locks every user out of login — a worse outcome than the finding. It needs the owner's
+decision on which surface is canonical (the duplicate `/api/auth/passkey/*` and
+`/api/webauthn/*` implementations are themselves a finding) and a full auth-flow exercise.
+
+For contrast, `POST /api/auth/mfa/unenroll` is exempt from the same gate but is **correctly**
+protected: it rate-limits, authenticates, and explicitly requires AAL2 when verified factors
+exist, failing closed if AAL cannot be determined. That is the pattern the passkey registration
+routes should follow, and it shows the exemption is survivable where routes self-enforce.
+
+### 9.2 BA-0006 — CONFIRMED and FIXED (P2): token claims decided by error, not row count
+
+Both `app/api/auth/password/reset/route.ts` and `app/api/auth/email/verify/route.ts` filtered
+the claiming UPDATE with `.eq('used', false)` and both carried a comment asserting atomicity:
+
+```ts
+// "Mark token as used (atomic guard)"
+const { error: updateError } = await adminClient
+  .from('password_resets')
+  .update({ used: true })
+  .eq('id', record.id)
+  .eq('used', false);
+
+if (updateError) {
+  /* ... */
+}
+```
+
+The guard was real; its verdict was discarded. A conditional UPDATE matching **zero** rows is
+not an error — it succeeds having changed nothing. So two concurrent requests could both pass
+the step-1 lookup while the token still read unused, both reach the claim, and the loser would
+see `updateError === null` and go on to reset the password (or confirm the email) with an
+already-spent token.
+
+Fixed by appending `.select('id')` so PostgREST returns the affected rows, and requiring exactly
+one. A loser receives the same generic "invalid or expired" response as any other failure, so
+nothing is disclosed about which case was hit.
+
+Verified non-vacuous: with the row-count check removed the losing request returns **HTTP 200**
+and the password is reset from a spent token; with it, 400 and `updateUserById` is never called.
+Commit `bf21ad19`.
 
 ---
 
