@@ -692,3 +692,49 @@ Two refinements worth carrying into the reconciliation migration:
   matviews support neither RLS nor `security_invoker`. Materialising it while any
   `GRANT SELECT ... TO authenticated` is live would recreate BA-0023 as a full email
   disclosure. The current no-op is accidentally suppressing that.
+
+---
+
+## 12. Deployment findings (BA-0058)
+
+Attempting to ship the P0 fix surfaced three problems that are findings in their own right.
+
+### 12.1 The P0 was fixed on `main` three days ago and never shipped
+
+`origin/main` already contains the BA-0056 binding check — commit `1073e4da`,
+2026-07-30 15:20, _"fix(security): P0 — reject a passkey assertion whose credential belongs
+to another user"_. A parallel audit found the same defect independently, which is strong
+corroboration that it is real.
+
+But **`gh run list --workflow=cloudflare-deploy.yml` returns nothing: the deployment
+workflow has never run, not once.** The fix sat committed and undeployed for three days
+while the vulnerability stayed live. A fix in `main` is not a fix in production, and nothing
+in this project's process closes that gap — there is no deploy-on-merge, and the manual
+workflow had never been invoked.
+
+### 12.2 CI has been red for days, on an accepted risk
+
+Every recent `ci-cd.yml` run fails, all at the same step: `npm audit` reporting 4 high
+severity advisories. Those are BA-0044 — **already assessed and accepted as build-time
+only**. So the pipeline fails on a known-accepted condition, which means a red CI signal
+carries no information here. That is very likely why nobody noticed the deploy had never
+run: when the board is always red, nothing stands out.
+
+The advisories should be waived explicitly (`npm audit --audit-level=critical`, or an
+allowlist keyed to the specific advisory IDs) so that red once again means "something
+broke."
+
+### 12.3 Two divergent audit lines, and a migration-history trap
+
+`main` and `audit/backend-hardening-cloudflare` have diverged: 21 commits on `main` that the
+audit branch lacks, 13 the other way. They are two independent audits of the same system
+running concurrently, and they have already duplicated work (both found BA-0056).
+
+There is a concrete trap in this. `20260802010000_fix_schedules_rls_recursion.sql` exists
+only on the audit branch, but it is **applied and recorded in production**. Anyone running
+`supabase db push` from `main` will therefore see a remote-only migration and be prompted by
+the CLI to `migration repair --status reverted` — which would falsify the history exactly as
+described in §11 for `20260730180000`. **Whoever reconciles these branches must carry that
+migration file onto `main`,** not repair it away.
+
+Reconciliation is an owner decision and was not attempted here.
