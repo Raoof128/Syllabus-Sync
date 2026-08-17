@@ -5,7 +5,22 @@ export const UNIVERSITY_CONFIG = {
   name: 'Macquarie University',
   shortName: 'Macquarie University',
   website: 'https://www.mq.edu.au',
-  supportEmail: 'support@mq.edu.au',
+  /**
+   * Support contact for this application.
+   *
+   * This was `support@mq.edu.au` until 2026-08-17. That is a real Macquarie
+   * University service desk which has never agreed to receive mail about
+   * Syllabus Sync, so every user who hit "Feedback" or looked for help was
+   * being pointed at a team that knows nothing about the product. Raised by
+   * the external security and privacy review (Q15).
+   *
+   * Until the university makes a decision on branding and support ownership,
+   * this must resolve to a mailbox the maintainers actually read. Set
+   * NEXT_PUBLIC_SUPPORT_EMAIL to move it (e.g. to support@syllabus-sync.app
+   * once that mailbox exists) without a code change; the literal below is the
+   * fallback and must stay a working address.
+   */
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'raoof.r12@gmail.com',
 } as const;
 
 /**

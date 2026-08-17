@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import { getDeploymentEnvironment, isProductionDeployment } from '@/lib/platform/runtime';
+import { scrubSentryEvent } from '@/lib/observability/sentry-scrub';
 
 // Only initialize Sentry if DSN is configured
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
@@ -32,6 +33,17 @@ if (sentryEnabled) {
 
         // Only send errors in production (unless explicitly enabled)
         enabled: isProductionDeployment() || process.env.SENTRY_ENABLED === 'true',
+
+        // Filter out sensitive data.
+        //
+        // This config had no beforeSend hook at all until 2026-08-17, so edge
+        // events (middleware, edge routes) were the one path with nothing
+        // stripped — not even the `authorization` and `cookie` headers the
+        // client and server configs had always removed. Found while closing
+        // the review's Q6.
+        beforeSend(event) {
+          return scrubSentryEvent(event);
+        },
       });
     })
     .catch((error) => {

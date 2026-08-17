@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import { getDeploymentEnvironment, isProductionDeployment } from '@/lib/platform/runtime';
+import { scrubSentryEvent } from '@/lib/observability/sentry-scrub';
 
 // Only initialize Sentry if DSN is configured
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
@@ -43,11 +44,10 @@ if (sentryEnabled) {
 
         // Filter out sensitive data
         beforeSend(event) {
-          // Remove potentially sensitive data
-          if (event.request?.headers) {
-            delete event.request.headers['authorization'];
-            delete event.request.headers['cookie'];
-          }
+          // Headers, request body, cookies and query string. The body is the
+          // one that matters here: /api/security/check-password-breach takes a
+          // plaintext password. See lib/observability/sentry-scrub.ts.
+          scrubSentryEvent(event);
 
           // Remove sensitive data from breadcrumbs
           if (event.breadcrumbs) {

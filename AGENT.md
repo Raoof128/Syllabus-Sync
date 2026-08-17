@@ -58,6 +58,40 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-08-17 (Australia/Sydney) — Closing the External Review's Code-Side Findings
+
+**Raouf:**
+
+- **Scope:** The five findings from an external security and privacy questionnaire that
+  could only be answered by changing code: account deletion, Sentry request-body
+  scrubbing, login auditing, the fresh-database CI gate, and the support contact address.
+- **Summary:** Account deletion had no implementation at all — `DELETE /api/profiles`
+  removed two rows and cascaded to nothing, because every user table foreign-keys to
+  `auth.users` rather than `profiles`, while the privacy policy and 34 locales' worth of
+  unused i18n strings both promised the feature. `DELETE /api/account` fires the
+  cascades that were always there; **no migration was needed**. Sentry's `beforeSend`
+  stripped headers but never bodies, one `sendDefaultPii: true` away from shipping the
+  plaintext password that `/api/security/check-password-breach` receives; the edge config
+  had no `beforeSend` at all. `logAuthEvent` had been exported since January with no
+  caller, so no sign-in has ever been audited. And `tools/database/verify-fresh-build.sh`,
+  whose header promises CI enforcement, was never wired to a workflow even though the
+  audit report claimed BA-0053 was "gated in CI".
+- **Files Changed:** four new source files (`app/api/account/route.ts`,
+  `lib/observability/sentry-scrub.ts`, `lib/security/auth-audit.ts`,
+  `features/settings/components/privacy/DeleteAccountDialog.tsx`), two new test suites,
+  the three Sentry configs, signin/signout, `DataManagement.tsx`, `lib/config.ts`,
+  `.github/workflows/ci-cd.yml`. Nothing under `supabase/`.
+- **Verification:** `npm run check` exit 0; 9/9 and 11/11 on the new suites; the CI gate
+  rehearsed locally at `applied=80 failed=0 total=80` before being committed; production
+  migration list 80/80 in sync. Both new suites caught real defects in the first draft (a
+  `parseJsonBody` contract mix-up that 413'd every request, and a header-casing miss that
+  let `Cookie` survive scrubbing).
+- **Follow-ups:** Not deployed — on `review/2026-08-17-questionnaire-remediation`. Signup
+  still holds a duplicate local audit helper. Two incompatible `parseJsonBody` functions
+  remain in `app/api/_lib/`, which is a trap for the next route author. Owner actions
+  outstanding: Supabase Owner MFA, Cloudflare 2FA enforcement, backup restore drill,
+  Maps key restrictions, Resend/Upstash region confirmation.
+
 ### 2026-08-02 (Australia/Sydney) — Reconciling Two Independent Audits Into One Trunk
 
 **Raouf:**

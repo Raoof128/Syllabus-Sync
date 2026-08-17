@@ -4,6 +4,88 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Closing the External Review's Code-Side Findings — 2026-08-17
+
+**Scope:** Five findings from the second round of an external security and privacy
+questionnaire, all of which were answerable only by changing code rather than by
+explaining it. Account deletion (Q3/Q4), Sentry request-body scrubbing (Q6), login
+auditing (Q3), the fresh-database CI gate (Q2), and the support contact address (Q15).
+
+**Summary:**
+
+- **Account deletion existed nowhere.** `DELETE /api/profiles` removed the `profiles`
+  and `user_preferences` rows, but every user table foreign-keys to `auth.users` rather
+  than to `profiles` (20260124000000), so that cascaded to **nothing**: the auth user,
+  password hash, MFA secrets, passkeys and all academic data survived. The i18n strings
+  `deleteAccount` / `deleteAccountDesc` ("Permanently delete your account and all data")
+  had existed in all 34 locales since the settings screen was translated, with no
+  component rendering them, while the privacy policy told users deletion was available
+  from settings. `DELETE /api/account` closes it, and needs **no migration** — the
+  `ON DELETE CASCADE` constraints were always there, which is why manual deletion from
+  the Supabase dashboard already worked. What was missing was the route that fires them.
+  Re-authenticates (password, or typed email for OAuth-only accounts), writes the audit
+  row **before** deleting so `log_audit()` can still attribute it, and fails closed if
+  either the audit write or the service-role client is unavailable.
+- **Sentry `beforeSend` stripped headers only.** The reviewer noticed that
+  `/api/security/check-password-breach` takes a plaintext password in its body while
+  `beforeSend` removed only `authorization` and `cookie`. Nothing was leaking, because
+  `sendDefaultPii` is unset and defaults to `false` — but that is a library default, not
+  a control, and one flag would have shipped a password to a third party. Extracted a
+  shared `scrubSentryEvent()` that drops body, cookies and query string, and drops the
+  whole `request` object for credential-bearing paths. Found while wiring it that
+  `sentry.edge.config.ts` had **no `beforeSend` at all**, so edge events were the one
+  path with nothing stripped, not even the two headers.
+- **Login was never audited.** `logAuthEvent` has been exported from
+  `lib/security/audit.ts` with a `LOGIN` action since January and re-exported from
+  `lib/security/index.ts`, with **no caller anywhere**. Signup-side events were logged,
+  which is what made the hole easy to miss — `auth_audit_logs` was never empty, it just
+  never contained a sign-in. New `lib/security/auth-audit.ts` writes signin success,
+  failure, provider mismatch and signout. It writes through the **service-role** client
+  deliberately: a failed sign-in has no session, so the cookie-bound client is `anon`,
+  and BA-0029 revoked `log_audit` EXECUTE from `anon` — the failed-login row is the one
+  you most want and the one the RLS-scoped path cannot write. Attempted addresses are
+  stored as the same hashed prefix the login limiter keys on, never in plaintext.
+- **The fresh-build gate was never wired to CI.** `tools/database/verify-fresh-build.sh`
+  was written on 2026-08-02 and its own header says "This script exists so that can never
+  again be true without CI saying so." Nothing called it, yet the audit report stated
+  BA-0053 was "now fixed and gated in CI" — a sentence the external reviewer would have
+  taken at face value. Added a `migrations` job with a `postgres:15` service that runs it.
+- **`support@mq.edu.au` was the app's support address.** A real university service desk
+  that never agreed to receive mail about this product, so every user seeking help was
+  misdirected. Now `NEXT_PUBLIC_SUPPORT_EMAIL` with a maintainer address as the fallback.
+
+**Files Changed:** `app/api/account/route.ts` (new), `lib/observability/sentry-scrub.ts`
+(new), `lib/security/auth-audit.ts` (new),
+`features/settings/components/privacy/DeleteAccountDialog.tsx` (new),
+`tests/api/account-delete.route.test.ts` (new),
+`tests/security/sentry-request-body-scrub.test.ts` (new),
+`config/sentry/sentry.{client,server,edge}.config.ts`, `app/api/auth/signin/route.ts`,
+`app/api/auth/signout/route.ts`, `features/settings/components/privacy/DataManagement.tsx`,
+`lib/config.ts`, `.github/workflows/ci-cd.yml`, `AGENT.md`, `CHANGELOG.md`.
+No migration, and nothing under `supabase/`.
+
+**Verification:** `npm run check` exit 0. New suites green: 9/9 account deletion, 11/11
+Sentry scrub. The fresh-build gate rehearsed locally against PostgreSQL 15 before being
+committed to CI: `applied=80 failed=0 total=80`, matching production. `supabase migration
+list` against production shows 80/80 local and remote in sync, zero drift.
+
+Two defects were caught by the new tests rather than by review, which is the argument for
+having written them first. The account route mixed the two different `parseJsonBody`
+helpers in this codebase (`response.ts` returns `{ data, error }`, `middleware.ts` returns
+`{ success, ... }`), so every request 413'd — all 9 tests failed identically. And the
+Sentry scrubber deleted `cookie` and `COOKIE` by name while leaving `Cookie`, since header
+casing is not normalised across runtimes; it now matches on the normalised key.
+
+**Follow-ups:** The delete route is **not deployed** — it sits on
+`review/2026-08-17-questionnaire-remediation` pending review. `app/api/auth/signup/route.ts`
+still carries its own local copy of the audit helper and should move to
+`lib/security/auth-audit.ts`. The duplicate `parseJsonBody` pair is a live trap for the
+next route author and one of them should go. Still owner actions, not code: MFA enrolment
+on both Supabase Owners, Cloudflare account-level 2FA enforcement, a backup restore drill,
+Google Maps key restrictions, and Resend/Upstash region confirmation.
+
+---
+
 ### Raouf: Reconciling Two Independent Audits Into One Trunk — 2026-08-02
 
 **Scope:** Collapsing five branches into `main` by rebase, then removing them. The repository

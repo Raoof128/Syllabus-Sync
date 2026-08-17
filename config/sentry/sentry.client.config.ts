@@ -2,6 +2,8 @@
 // The config you add here will be used whenever a users loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
+import { scrubSentryEvent } from '@/lib/observability/sentry-scrub';
+
 export {};
 
 // Only initialize Sentry if DSN is configured
@@ -47,15 +49,11 @@ if (sentryEnabled) {
           }),
         ],
 
-        // Filter out sensitive data
+        // Filter out sensitive data.
+        // Headers, request body, cookies and query string — see
+        // lib/observability/sentry-scrub.ts for why the body matters here.
         beforeSend(event) {
-          // Remove potentially sensitive data
-          if (event.request?.headers) {
-            delete event.request.headers['authorization'];
-            delete event.request.headers['cookie'];
-          }
-
-          return event;
+          return scrubSentryEvent(event);
         },
 
         // Ignore common non-actionable errors
