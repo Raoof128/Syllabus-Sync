@@ -18,7 +18,11 @@ import { requireAuth } from '@/app/api/_lib/middleware';
 // Cache weather data for 5 minutes (current) to 15 minutes (hourly)
 const weatherCache = new Map<string, { data: WeatherResult; timestamp: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes standard ttl
-const EDGE_CACHE_CONTROL = 'public, max-age=0, s-maxage=300, stale-while-revalidate=60';
+// BA-0076: private. This route now requires a session (BA-0065); a `public`
+// s-maxage would let any shared cache that honours it serve the response to
+// callers who never passed the auth gate. The in-isolate cache below still
+// absorbs repeat lookups.
+const EDGE_CACHE_CONTROL = 'private, max-age=300';
 
 // Lazy-init provider at runtime (not build time) to avoid breaking page collection
 let _provider: GoogleWeatherProvider | null = null;

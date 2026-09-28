@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { evaluateAuditException as untypedGate } from '../../tools/security/check-sharp-risk.mjs';
+import {
+  evaluateAuditException as untypedGate,
+  evaluateSharpRemediation as untypedRemediation,
+} from '../../tools/security/check-sharp-risk.mjs';
 
 // The gate is plain .mjs, so its inferred signature loses the evidence
 // parameters. Narrow it here rather than weakening the test with `any`.
@@ -11,6 +14,11 @@ const evaluateAuditException = untypedGate as unknown as (input: {
   lockfile: unknown;
   now?: Date;
 }) => { ok: boolean; errors: string[] };
+const evaluateSharpRemediation = untypedRemediation as unknown as (input: {
+  fullAudit: unknown;
+  productionAudit: unknown;
+  lockfile: unknown;
+}) => { remediated: boolean; reason?: string; installed?: string[] };
 
 const repoRoot = resolve(__dirname, '../..');
 const readJson = (relativePath: string) =>
@@ -48,6 +56,20 @@ describe('Sharp risk gate — approved provenance tracks the committed lockfile'
     lockfile: readJson('package-lock.json'),
   });
   const errors: string[] = result.errors;
+
+  // 2026-09-28: Next 16.3.6 and Wrangler 4.142 carry Sharp 0.35.5 / 0.35.4,
+  // outside every tracked advisory, so the exception is no longer needed. If a
+  // future bump reintroduces a vulnerable copy, this fails here rather than at
+  // the deploy gate.
+  it('the committed lockfile and audit evidence show Sharp remediated', () => {
+    const remediation = evaluateSharpRemediation({
+      fullAudit: readJson('artifacts/security/npm-audit-full.json'),
+      productionAudit: readJson('artifacts/security/npm-audit-production.json'),
+      lockfile: readJson('package-lock.json'),
+    });
+    expect(remediation.reason).toBeUndefined();
+    expect(remediation.remediated).toBe(true);
+  });
 
   it('records no dependency-ancestry drift against the real lockfile', () => {
     expect(errors.filter((e) => /dependency path changed/i.test(e))).toEqual([]);

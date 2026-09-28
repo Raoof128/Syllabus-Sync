@@ -49,6 +49,21 @@ export const emailVerifyResendLimiter = createRateLimiter({
   failClosed: true,
 });
 
+/**
+ * BA-0074: the resend limiter above is keyed on IP + email, so rotating IPs
+ * reset it. Anyone could register a victim's address and then flood that inbox,
+ * and because each send invalidates the previous token, the owner could never
+ * use a link. This caps sends per address regardless of source. It is looser
+ * than the per-IP limit so a hostile caller exhausting it locks the owner out
+ * of resending for at most one window, not indefinitely.
+ */
+export const emailVerifyResendPerAddressLimiter = createRateLimiter({
+  prefix: "email-verify-resend-address",
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: EMAIL_VERIFY_MAX_SENDS_PER_HOUR * 3,
+  failClosed: true,
+});
+
 // ============================================================================
 // TOKEN FUNCTIONS
 // ============================================================================

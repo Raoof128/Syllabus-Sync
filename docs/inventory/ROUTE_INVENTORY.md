@@ -119,8 +119,8 @@ Desktop and mobile sidebar variants render identical route targets.
 | User Preferences | `/api/user-preferences` | 2         | Authenticated                                       |
 | Gamification     | `/api/gamification/*`   | 3         | Optional / Authenticated                            |
 | Navigation       | `/api/navigate`         | 1         | Public (IP rate-limited)                            |
-| Maps             | `/api/maps/*`           | 4         | Public (IP rate-limited, origin-validated)          |
-| Weather          | `/api/weather`          | 1         | Public (IP rate-limited)                            |
+| Maps             | `/api/maps/*`           | 4         | Authenticated (IP rate-limited)                     |
+| Weather          | `/api/weather`          | 1         | Authenticated (IP rate-limited)                     |
 | Audit            | `/api/audit`            | 2         | Authenticated                                       |
 | Sync             | `/api/sync`             | 1         | Authenticated                                       |
 | Security         | `/api/security/*`       | 3         | Authenticated                                       |

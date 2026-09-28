@@ -9,6 +9,7 @@ import {
 } from '@/app/api/_lib/response';
 import {
   emailVerifyResendLimiter,
+  emailVerifyResendPerAddressLimiter,
   createAndSendVerification,
 } from '@/lib/security/emailVerification';
 import { getClientIP } from '@/lib/security/ip';
@@ -44,7 +45,8 @@ export async function POST(request: NextRequest) {
     }
 
     const email = parsed.data.email;
-    const rateKey = `ip:${clientIP}:em:${emailKeyPrefix(email)}`;
+    const emailKey = emailKeyPrefix(email);
+    const rateKey = `ip:${clientIP}:em:${emailKey}`;
     const { allowed, remaining, resetIn } = await emailVerifyResendLimiter(rateKey);
 
     if (!allowed) {
@@ -53,6 +55,17 @@ export async function POST(request: NextRequest) {
         429,
         ERROR_CODES.RATE_LIMITED,
         { retryAfter: resetIn, remaining },
+      );
+    }
+
+    // BA-0074: a per-address cap that IP rotation cannot reset.
+    const perAddress = await emailVerifyResendPerAddressLimiter(`em:${emailKey}`);
+    if (!perAddress.allowed) {
+      return jsonError(
+        'Too many requests. Please try again later.',
+        429,
+        ERROR_CODES.RATE_LIMITED,
+        { retryAfter: perAddress.resetIn, remaining: perAddress.remaining },
       );
     }
 

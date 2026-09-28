@@ -5,12 +5,24 @@
 import { getDeploymentEnvironment, isProductionDeployment } from '@/lib/platform/runtime';
 import { scrubSentryEvent } from '@/lib/observability/sentry-scrub';
 
-// Only initialize Sentry if DSN is configured
-const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
-const sentryEnabled =
-  Boolean(dsn) && (isProductionDeployment() || process.env.SENTRY_ENABLED === 'true');
+/**
+ * Initialise edge Sentry. Called and awaited from `register()` in the root
+ * `instrumentation.ts` (BA-0061).
+ *
+ * This used to run as top-level code with a top-level `await`. Once the file
+ * was actually bundled, webpack warned that top-level await in the Edge target
+ * "may not run as expected". Wrapping it keeps the BA-0018 guarantee — the
+ * caller awaits the whole import-then-init chain — without top-level await.
+ * Env is read inside the function, never at module scope (BA-0017).
+ */
+export async function initSentryEdge(): Promise<void> {
+  // Only initialize Sentry if DSN is configured
+  const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+  const sentryEnabled =
+    Boolean(dsn) && (isProductionDeployment() || process.env.SENTRY_ENABLED === 'true');
 
-if (sentryEnabled) {
+  if (!sentryEnabled) return;
+
   // SECURITY/RELIABILITY (BA-0018): see sentry.server.config.ts — this used
   // to be `void import(...).then(...)`, a floating promise never awaited or
   // handed to `ctx.waitUntil()`, so Sentry.init() could be cut off on

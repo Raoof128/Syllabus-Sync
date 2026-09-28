@@ -32,6 +32,23 @@ describe('instrumentation.ts wires server and edge Sentry (BA-0061)', () => {
     );
   });
 
+  it('awaits the exported init functions, so no config relies on top-level await', () => {
+    const src = readFileSync(FILE, 'utf-8');
+    expect(src).toMatch(/await initSentryServer\(\)/);
+    expect(src).toMatch(/await initSentryEdge\(\)/);
+    for (const [rel, fn] of [
+      ['config/sentry/sentry.server.config.ts', 'initSentryServer'],
+      ['config/sentry/sentry.edge.config.ts', 'initSentryEdge'],
+    ]) {
+      const config = readFileSync(path.join(ROOT, rel), 'utf-8');
+      expect(config).toMatch(new RegExp(`export async function ${fn}\\(`));
+      // Top-level await in the edge bundle drew a webpack "may not run as
+      // expected" warning; every await must now sit inside the init function.
+      const beforeInit = config.slice(0, config.indexOf(`export async function ${fn}`));
+      expect(beforeInit).not.toMatch(/^\s*await\s/m);
+    }
+  });
+
   it('exports onRequestError backed by Sentry.captureRequestError', () => {
     const src = readFileSync(FILE, 'utf-8');
     expect(src).toMatch(/export const onRequestError/);

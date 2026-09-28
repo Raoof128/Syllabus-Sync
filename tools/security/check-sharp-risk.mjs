@@ -474,12 +474,87 @@ function validateExpiry(now, errors) {
   }
 }
 
+// Lowest Sharp outside every advisory this gate has tracked:
+// GHSA-f88m-g3jw-g9cj (<0.35.0) and GHSA-rgj7-g3m4-5g8c (<0.35.4).
+const PATCHED_SHARP = [0, 35, 4];
+
+function parseVersion(version) {
+  const match = typeof version === 'string' && /^(\d+)\.(\d+)\.(\d+)$/.exec(version);
+  return match ? match.slice(1).map(Number) : null;
+}
+
+function isPatchedSharp(version) {
+  const parsed = parseVersion(version);
+  if (!parsed) return false; // pre-releases and anything unparseable fail closed
+  for (let i = 0; i < 3; i += 1) {
+    if (parsed[i] !== PATCHED_SHARP[i]) return parsed[i] > PATCHED_SHARP[i];
+  }
+  return true;
+}
+
+/**
+ * The exception above exists only while a vulnerable Sharp is installed. Once
+ * every copy in the lockfile is at or above the patched release and neither
+ * audit report links any advisory to Sharp, there is nothing left to except,
+ * and the (expired) exception must not keep blocking deployment of the fix.
+ *
+ * Fails closed: any unparseable or vulnerable Sharp version, any malformed
+ * evidence, or any Sharp-linked advisory returns `remediated: false`, which
+ * routes back through the full exception checks. This path never relaxes the
+ * Worker reachability scan — authorizeDeployment still requires proven absence.
+ */
+export function evaluateSharpRemediation({ fullAudit, productionAudit, lockfile } = {}) {
+  if (!isRecord(lockfile) || !isRecord(lockfile.packages)) {
+    return { remediated: false, reason: 'Package lock evidence is missing or malformed.' };
+  }
+  const installed = Object.entries(lockfile.packages).filter(([packagePath]) =>
+    /(?:^|\/)node_modules\/sharp$/.test(packagePath),
+  );
+  const vulnerable = installed.filter(
+    ([, record]) => !isRecord(record) || !isPatchedSharp(record.version),
+  );
+  if (vulnerable.length > 0) {
+    return {
+      remediated: false,
+      reason: `Sharp below 0.35.4 is installed at: ${vulnerable.map(([p]) => p).join(', ')}.`,
+    };
+  }
+  for (const [label, audit] of [
+    ['Full', fullAudit],
+    ['Production', productionAudit],
+  ]) {
+    if (!isRecord(audit) || audit.auditReportVersion !== 2 || !isRecord(audit.vulnerabilities)) {
+      return { remediated: false, reason: `${label} audit evidence is missing or malformed.` };
+    }
+    // findSharpLinkedPackages seeds its result with 'sharp'; count only names
+    // the report actually lists as vulnerable.
+    const linked = [...findSharpLinkedPackages(audit.vulnerabilities)].filter(
+      (name) => name in audit.vulnerabilities,
+    );
+    if (linked.length > 0) {
+      return {
+        remediated: false,
+        reason: `${label} audit still links advisories to Sharp: ${linked.join(', ')}.`,
+      };
+    }
+  }
+  return {
+    remediated: true,
+    installed: installed.map(([packagePath, record]) => `${packagePath}@${record.version}`),
+  };
+}
+
 export function evaluateAuditException({
   fullAudit,
   productionAudit,
   lockfile,
   now = new Date(),
 } = {}) {
+  const remediation = evaluateSharpRemediation({ fullAudit, productionAudit, lockfile });
+  if (remediation.remediated) {
+    return { ok: true, errors: [], unrelatedAdvisorySources: [], remediated: true };
+  }
+
   const errors = [];
   validateExpiry(now, errors);
   const full = validateAudit('Full', fullAudit, errors);
@@ -1029,7 +1104,11 @@ async function main() {
     process.exitCode = 1;
     return;
   }
-  if (mode === 'audit-exception') {
+  if (mode === 'audit-exception' && result.remediated) {
+    console.log(
+      'Sharp is remediated: every installed copy is >= 0.35.4 and no audit advisory links to it. No exception is required.',
+    );
+  } else if (mode === 'audit-exception') {
     console.log(
       `Sharp audit exception accepted for local migration only; ${result.unrelatedAdvisorySources.length} unrelated advisory sources remain visible and non-exempt.`,
     );

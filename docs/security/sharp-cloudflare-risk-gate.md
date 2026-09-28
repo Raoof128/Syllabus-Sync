@@ -1,5 +1,16 @@
 # Sharp Advisory Risk Gate for Cloudflare Migration
 
+> **Status update — 2026-09-28 (BA-0068).** The exception below expired on 2026-08-22,
+> and because `evaluateDeploymentGate()` depends on it, every gated `cf:*` script failed
+> closed from then on. Next 16.3.6 and Wrangler 4.142 now carry Sharp `0.35.5` and
+> `0.35.4`, outside both tracked advisories (GHSA-f88m-g3jw-g9cj `<0.35.0`,
+> GHSA-rgj7-g3m4-5g8c `<0.35.4`). `evaluateSharpRemediation()` recognises that state: when
+> **every** installed Sharp is `>=0.35.4` and neither audit report links an advisory to
+> Sharp, no exception is required. Any lower, pre-release or unparseable version, malformed
+> evidence, or Sharp-linked advisory routes back through the (expired) exception and fails.
+> **The Worker reachability scan is unchanged and still mandatory.** The historical record
+> below is kept as written. Owner review of this change is requested.
+
 **Status:** Local migration work may continue. Cloudflare preview, upload, public deployment, and production cutover are prohibited.
 
 **Owner decision (2026-07-22, Australia/Sydney):** Do not force Sharp 0.35.3, run `npm audit fix --force`, or downgrade Next.js. Reassess upstream compatibility and Worker bundle reachability before any deployment.

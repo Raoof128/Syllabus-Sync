@@ -4,8 +4,17 @@ import { requireAuthWithRateLimit } from '@/app/api/_lib/middleware';
 import { jsonSuccess, jsonError, handleDatabaseError, ERROR_CODES } from '@/app/api/_lib/response';
 import { logger } from '@/lib/logger';
 
+// BA-0075: the reminder cron POSTs to this URL server-side, so it must be an
+// https push-service endpoint, never an arbitrary http:// target.
+const pushEndpoint = z
+  .string()
+  .url()
+  .refine((value) => new URL(value).protocol === 'https:', {
+    message: 'Push endpoint must use https',
+  });
+
 const PushSubscriptionSchema = z.object({
-  endpoint: z.string().url(),
+  endpoint: pushEndpoint,
   expirationTime: z.number().nullable().optional(),
   keys: z.object({
     p256dh: z.string().min(1),

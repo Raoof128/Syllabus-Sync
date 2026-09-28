@@ -56,6 +56,23 @@ export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
 /**
  * Create a success response
  */
+/**
+ * BA-0076: API responses are private unless a route opts into caching.
+ * Route handlers set no Cache-Control of their own, so a signed-in response
+ * such as GET /api/auth/user (the full user object and profile) left caching
+ * to whatever sat in between. Cloudflare does not cache Worker responses by
+ * default, so no cross-user leak was demonstrated — this makes the rule
+ * explicit rather than a property of today's deployment. A route that sets
+ * its own Cache-Control (for example /api/health) keeps it.
+ */
+const PRIVATE_NO_STORE = 'private, no-store';
+
+function withPrivateDefault(init?: ResponseInit): ResponseInit {
+  const headers = new Headers(init?.headers);
+  if (!headers.has('cache-control')) headers.set('Cache-Control', PRIVATE_NO_STORE);
+  return { ...init, headers };
+}
+
 export const jsonSuccess = <T = unknown>(
   data: T,
   status: number = 200,
@@ -72,7 +89,7 @@ export const jsonSuccess = <T = unknown>(
           ...meta,
         },
       },
-      { status, ...init },
+      withPrivateDefault({ status, ...init }),
     );
   } catch (error) {
     // SECURITY: If data contains circular references, JSON.stringify (used by NextResponse.json) will fail.
@@ -105,7 +122,7 @@ export const jsonError = (
         timestamp: new Date().toISOString(),
       },
     },
-    { status },
+    withPrivateDefault({ status }),
   );
 };
 

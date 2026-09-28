@@ -17,11 +17,13 @@ import type { Instrumentation } from 'next';
  */
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
-    await import('./config/sentry/sentry.server.config');
+    const { initSentryServer } = await import('./config/sentry/sentry.server.config');
+    await initSentryServer();
   }
 
   if (process.env.NEXT_RUNTIME === 'edge') {
-    await import('./config/sentry/sentry.edge.config');
+    const { initSentryEdge } = await import('./config/sentry/sentry.edge.config');
+    await initSentryEdge();
   }
 }
 

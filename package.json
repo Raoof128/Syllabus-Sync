@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@opennextjs/cloudflare": "^1.20.2",
+    "@opennextjs/cloudflare": "^1.20.6",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-label": "^2.1.8",
@@ -75,7 +75,7 @@
     "@radix-ui/react-toast": "^1.2.15",
     "@sentry/nextjs": "^10.40.0",
     "@simplewebauthn/browser": "^13.2.2",
-    "@simplewebauthn/server": "^13.2.2",
+    "@simplewebauthn/server": "^13.3.3",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.93.3",
     "@tanstack/react-query": "^5.90.20",
@@ -88,7 +88,7 @@
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
     "lucide-react": "^0.575.0",
-    "next": "^16.2.11",
+    "next": "^16.3.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.71.1",
@@ -105,8 +105,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.2.0",
-    "@next/bundle-analyzer": "^16.2.11",
-    "@next/eslint-plugin-next": "^16.2.11",
+    "@next/bundle-analyzer": "^16.3.6",
+    "@next/eslint-plugin-next": "^16.3.6",
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
@@ -125,11 +125,11 @@
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.17",
     "autoprefixer": "^10.4.23",
-    "browserslist": "^4.28.1",
+    "browserslist": "^4.29.1",
     "caniuse-lite": "^1.0.30001767",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^16.2.11",
+    "eslint-config-next": "^16.3.6",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -143,7 +143,7 @@
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.0.5",
     "vitest": "^4.0.16",
-    "wrangler": "^4.113.0"
+    "wrangler": "^4.142.0"
   },
   "keywords": [
     "react",
@@ -173,11 +173,11 @@
   "license": "MIT",
   "overrides": {
     "minimatch": "^10.2.3",
-    "brace-expansion": "^5.0.7",
+    "brace-expansion": "^5.0.9",
     "flatted": "^3.4.0",
-    "fast-uri": "^3.1.4",
+    "fast-uri": "^3.1.6",
     "yauzl": "^3.2.1",
-    "undici": "^7.28.0",
+    "undici": "^7.29.0",
     "serialize-javascript": "^7.0.3",
     "path-to-regexp": "^8.3.0",
     "@opennextjs/aws": {
@@ -191,7 +191,8 @@
     "next": {
       "postcss": "^8.5.25"
     },
-    "svix": "1.92.2"
+    "svix": "1.92.2",
+    "nanoid": "^3.3.18"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

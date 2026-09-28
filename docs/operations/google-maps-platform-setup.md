@@ -139,12 +139,12 @@ After configuration, verify the full map pipeline:
 
 ## Troubleshooting
 
-| Symptom                                | Likely Cause                                                          | Resolution                                                                                                             |
-| :------------------------------------- | :-------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
-| Map does not render                    | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` missing or invalid                  | Verify the key exists in `.env.local` and the Maps JavaScript API is enabled.                                          |
-| `RefererNotAllowedMapError` in console | Browser key referrer restriction does not match the current domain    | Add the current domain to the key's HTTP referrer allowlist in the Cloud Console.                                      |
-| Map renders but routes fail            | `GOOGLE_ROUTES_API_KEY` missing server-side or Routes API not enabled | Confirm the server key is set and the Routes API is enabled on the project.                                            |
-| Place search returns no results        | Places API (New) not enabled or server key not authorized             | Enable the Places API and add it to the server key's API restrictions.                                                 |
-| Advanced Markers not appearing         | `NEXT_PUBLIC_GOOGLE_MAP_ID` missing or not a JavaScript-type Map ID   | Create a JavaScript Map ID in Map Management.                                                                          |
-| Map script blocked by CSP              | Content Security Policy does not allow Google Maps domains            | Confirm that `lib/security/csp.ts` includes the Google Maps script and connect-src allowlists. Redeploy after changes. |
-| 401 errors on `/api/maps/*` routes     | API routes not listed in `isPublicApiPath()`                          | Verify that `lib/proxy.ts` includes `/api/maps/` in its public path list.                                              |
+| Symptom                                | Likely Cause                                                           | Resolution                                                                                                                |
+| :------------------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| Map does not render                    | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` missing or invalid                   | Verify the key exists in `.env.local` and the Maps JavaScript API is enabled.                                             |
+| `RefererNotAllowedMapError` in console | Browser key referrer restriction does not match the current domain     | Add the current domain to the key's HTTP referrer allowlist in the Cloud Console.                                         |
+| Map renders but routes fail            | `GOOGLE_ROUTES_API_KEY` missing server-side or Routes API not enabled  | Confirm the server key is set and the Routes API is enabled on the project.                                               |
+| Place search returns no results        | Places API (New) not enabled or server key not authorized              | Enable the Places API and add it to the server key's API restrictions.                                                    |
+| Advanced Markers not appearing         | `NEXT_PUBLIC_GOOGLE_MAP_ID` missing or not a JavaScript-type Map ID    | Create a JavaScript Map ID in Map Management.                                                                             |
+| Map script blocked by CSP              | Content Security Policy does not allow Google Maps domains             | Confirm that `lib/security/csp.ts` includes the Google Maps script and connect-src allowlists. Redeploy after changes.    |
+| 401 errors on `/api/maps/*` routes     | The caller has no session (these routes require sign-in since BA-0065) | Expected for signed-out requests. Do **not** add `/api/maps/` back to `isPublicApiPath()` — that re-opens paid-API abuse. |

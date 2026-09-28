@@ -10,6 +10,7 @@ import {
   collectBundledInputPaths,
   calculateBuildArtifactDigests,
   evaluateAuditException,
+  evaluateSharpRemediation,
   evaluateDeploymentGate,
   scanCurrentBuildReachability,
   verifyRecordedBuildArtifacts,
@@ -620,4 +621,127 @@ test('collectBundledInputPaths normalises esbuild input keys', () => {
   assert.ok(bundled.has('node_modules/sharp/lib/index.js'));
   assert.ok(bundled.has('app/page.tsx'));
   assert.equal(bundled.size, 2);
+});
+
+// ---------------------------------------------------------------------------
+// Remediated state (2026-09-28): every installed Sharp >= 0.35.4.
+// ---------------------------------------------------------------------------
+
+function remediatedLockfile(sharpVersions = { 'node_modules/sharp': '0.35.5' }) {
+  const packages = {
+    '': { dependencies: { next: '^16.3.6' }, devDependencies: { wrangler: '^4.142.0' } },
+    'node_modules/next': { version: '16.3.6', optionalDependencies: { sharp: '^0.35.5' } },
+  };
+  for (const [packagePath, version] of Object.entries(sharpVersions)) {
+    packages[packagePath] = { version };
+  }
+  return { lockfileVersion: 3, packages };
+}
+
+function cleanAudit() {
+  return {
+    auditReportVersion: 2,
+    vulnerabilities: {
+      vitest: {
+        name: 'vitest',
+        severity: 'moderate',
+        isDirect: true,
+        via: [{ source: 1193683, name: 'vitest', severity: 'moderate' }],
+        effects: [],
+        range: '>=2.1.0 <4.1.11',
+        nodes: ['node_modules/vitest'],
+        fixAvailable: true,
+      },
+    },
+    metadata: { vulnerabilities: { info: 0, low: 0, moderate: 1, high: 0, critical: 0 } },
+  };
+}
+
+test('remediated Sharp needs no exception, even after the exception expired', () => {
+  const result = evaluateAuditException({
+    fullAudit: cleanAudit(),
+    productionAudit: cleanAudit(),
+    lockfile: remediatedLockfile({
+      'node_modules/sharp': '0.35.5',
+      'node_modules/miniflare/node_modules/sharp': '0.35.4',
+    }),
+    now: new Date('2026-09-28T00:00:00+10:00'),
+  });
+  assert.equal(result.ok, true, result.errors.join('\n'));
+  assert.equal(result.remediated, true);
+});
+
+test('any vulnerable Sharp copy routes back through the expired exception and fails', () => {
+  const result = evaluateAuditException({
+    fullAudit: cleanAudit(),
+    productionAudit: cleanAudit(),
+    lockfile: remediatedLockfile({
+      'node_modules/sharp': '0.35.5',
+      'node_modules/miniflare/node_modules/sharp': '0.35.2',
+    }),
+    now: new Date('2026-09-28T00:00:00+10:00'),
+  });
+  assert.equal(result.ok, false);
+  assert.equal(
+    evaluateSharpRemediation({
+      fullAudit: cleanAudit(),
+      productionAudit: cleanAudit(),
+      lockfile: remediatedLockfile({ 'node_modules/sharp': '0.35.3' }),
+    }).remediated,
+    false,
+  );
+});
+
+test('an unparseable or pre-release Sharp version fails closed', () => {
+  for (const version of ['0.36.0-rc.1', 'latest', undefined]) {
+    const remediation = evaluateSharpRemediation({
+      fullAudit: cleanAudit(),
+      productionAudit: cleanAudit(),
+      lockfile: remediatedLockfile({ 'node_modules/sharp': version }),
+    });
+    assert.equal(remediation.remediated, false, String(version));
+  }
+});
+
+test('a Sharp-linked advisory in either audit report blocks the remediated path', () => {
+  const withSharp = cleanAudit();
+  withSharp.vulnerabilities.sharp = {
+    name: 'sharp',
+    severity: 'high',
+    isDirect: false,
+    via: [{ source: 1193725, name: 'sharp', severity: 'high' }],
+    effects: [],
+    range: '<0.35.6',
+    nodes: ['node_modules/sharp'],
+    fixAvailable: true,
+  };
+  const remediation = evaluateSharpRemediation({
+    fullAudit: cleanAudit(),
+    productionAudit: withSharp,
+    lockfile: remediatedLockfile(),
+  });
+  assert.equal(remediation.remediated, false);
+});
+
+test('malformed evidence never counts as remediated', () => {
+  assert.equal(evaluateSharpRemediation({}).remediated, false);
+  assert.equal(
+    evaluateSharpRemediation({
+      fullAudit: { auditReportVersion: 1, vulnerabilities: {} },
+      productionAudit: cleanAudit(),
+      lockfile: remediatedLockfile(),
+    }).remediated,
+    false,
+  );
+});
+
+test('remediation does not bypass the Worker reachability requirement', () => {
+  const gate = evaluateDeploymentGate({
+    fullAudit: cleanAudit(),
+    productionAudit: cleanAudit(),
+    lockfile: remediatedLockfile(),
+    profile: 'production',
+    reachability: undefined,
+  });
+  assert.equal(gate.ok, false);
 });

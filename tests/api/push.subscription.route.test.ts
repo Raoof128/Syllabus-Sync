@@ -100,6 +100,24 @@ describe('push subscription route', () => {
     expect(createAdminClientMock).not.toHaveBeenCalled();
   });
 
+  it('BA-0075: rejects a non-https endpoint, which the reminder cron would POST to', async () => {
+    const from = vi.fn();
+    createServerClientMock.mockResolvedValue({ from });
+
+    const response = await POST(
+      new Request('http://localhost/api/push/subscription', {
+        method: 'POST',
+        body: JSON.stringify({
+          endpoint: 'http://internal.example/hook',
+          keys: { p256dh: 'p', auth: 'a' },
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(from).not.toHaveBeenCalled();
+  });
+
   it('deletes a push subscription via DELETE using the RLS-scoped server client', async () => {
     const table = createDeleteChain({ error: null });
     createServerClientMock.mockResolvedValue({

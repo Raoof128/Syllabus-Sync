@@ -58,6 +58,42 @@ Whether you are a human or an AI, you must follow this protocol for every code c
 
 ## Change Log (Raouf Template)
 
+### 2026-09-28 (Australia/Sydney) — Backend Audit: Passkey Storage, Definer Grants, and a Blocked Deploy Gate
+
+**Raouf:**
+
+- **Scope:** Full backend, security and runtime audit against current (September 2026)
+  upstream documentation, continuing the ledger at BA-0059. Report:
+  `docs/backend-audit/2026-09-28/backend-audit-2026-09-28.md`.
+- **Summary:** BA-0002's fix closed one route, not the door: `webauthn_credentials` kept
+  owner INSERT/UPDATE policies and login still trusted user-writable `user_metadata`, so a
+  stolen session could plant a permanent software passkey (**BA-0059, P1**, proven by SQL
+  and re-found independently). Under Supabase's default function grant `anon` could call
+  `ratelimit_set()` (**BA-0060**); the previous audit marked this refuted because its
+  replay — and the CI fresh-build gate — omitted that grant. The Sharp exception expired on
+  2026-08-22, so **every gated deploy has failed since (BA-0068)**; Next 16.3.6 fixes two
+  critical Next advisories and brings patched Sharp, and the gate now recognises that while
+  still requiring Worker reachability to be proven absent. No `instrumentation.ts` existed,
+  so server/edge Sentry never ran (BA-0061). Also fixed: XFF-keyed limiters (BA-0062), a
+  racy and fail-open Upstash limiter (BA-0063), missing step-up on password change, device
+  revocation and factor enrolment under `/api/auth/*` (BA-0064), open paid Google proxies
+  (BA-0065), and `sb_secret_`/`sb_publishable_` key support plus a bundle secret scan
+  (BA-0066).
+- **Files Changed:** two migrations (`20260928000000`, `20260928000100`); `instrumentation.ts`
+  and `app/api/_lib/aal.ts` (new); the WebAuthn, passkey, password, sessions, MFA-enrol,
+  maps, weather, token-verify routes; `lib/security/{webauthn,ip,csrf}.ts`,
+  `lib/services/rateLimitService.ts`, `lib/supabase/admin.ts`, `lib/middleware.ts`,
+  `lib/hooks/useBiometrics.ts`; `tools/database/verify-fresh-build.sh`,
+  `tools/security/check-sharp-risk.mjs`, `tools/cloudflare/check-public-env.mjs`;
+  `package.json`/lockfile; refreshed `artifacts/security/*`. Removed
+  `app/api/auth/passkey/{_lib.ts,options,verify,register,register-options}`.
+- **Verification:** see the CHANGELOG entry of the same date.
+- **Follow-ups:** **BA-0069 (P1, open): MFA is enforced only in Next.js** — an AAL1 JWT from
+  Supabase Auth reads and writes every table through PostgREST. Needs RESTRICTIVE AAL
+  policies validated on a staging project; do not ship blind. Owner actions: apply both
+  migrations, deploy, tell legacy-only biometric users to re-enable once, add explicit
+  GRANTs to any new `public` table from 2026-10-30, plan the move off legacy Supabase keys.
+
 ### 2026-08-17 (Australia/Sydney) — Closing the External Review's Code-Side Findings
 
 **Raouf:**

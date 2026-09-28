@@ -232,22 +232,23 @@ Passwordless authentication using the WebAuthn standard.
 
 ### Registration
 
-| Method | Endpoint                             | Auth          | Rate Limit |
-| :----- | :----------------------------------- | :------------ | :--------- |
-| `POST` | `/api/auth/passkey/register-options` | Public        | None       |
-| `POST` | `/api/auth/passkey/register`         | Public        | None       |
-| `POST` | `/api/auth/passkey/status`           | Public        | None       |
-| `POST` | `/api/webauthn/register/options`     | Authenticated | None       |
-| `POST` | `/api/webauthn/register/verify`      | Authenticated | None       |
+| Method | Endpoint                         | Auth          | Rate Limit |
+| :----- | :------------------------------- | :------------ | :--------- |
+| `POST` | `/api/auth/passkey/status`       | Public        | None       |
+| `POST` | `/api/webauthn/register/options` | Authenticated | None       |
+| `POST` | `/api/webauthn/register/verify`  | Authenticated | None       |
 
 ### Authentication
 
 | Method | Endpoint                             | Auth   | Rate Limit |
 | :----- | :----------------------------------- | :----- | :--------- |
-| `POST` | `/api/auth/passkey/options`          | Public | None       |
-| `POST` | `/api/auth/passkey/verify`           | Public | None       |
 | `POST` | `/api/webauthn/authenticate/options` | Public | None       |
 | `POST` | `/api/webauthn/authenticate/verify`  | Public | None       |
+
+The legacy `/api/auth/passkey/{options,verify,register,register-options}` routes were
+removed on 2026-09-28 (BA-0059): they kept the challenge in an unsigned client cookie and
+stored key material in user-writable `user_metadata`. Only `webauthn_credentials`, written by
+the server after a verified ceremony, is a credential source.
 
 ### Credential Management
 
@@ -533,20 +534,20 @@ Response headers include `X-Cache: HIT | MISS | DEMO`.
 
 Server-side proxies that keep the `GOOGLE_ROUTES_API_KEY` off the client.
 
-| Method | Endpoint                  | Auth   | Rate Limit   | Description                                   |
-| :----- | :------------------------ | :----- | :----------- | :-------------------------------------------- |
-| `POST` | `/api/maps/routes`        | Public | `apiLimiter` | Compute routes via Google Routes API.         |
-| `POST` | `/api/maps/place-search`  | Public | `apiLimiter` | Search for places via Google Places API.      |
-| `POST` | `/api/maps/place-details` | Public | `apiLimiter` | Fetch place details via Google Places API.    |
-| `POST` | `/api/maps/dev-pin`       | Public | `apiLimiter` | Development tool for pinning map coordinates. |
+| Method | Endpoint                  | Auth    | Rate Limit   | Description                                   |
+| :----- | :------------------------ | :------ | :----------- | :-------------------------------------------- |
+| `POST` | `/api/maps/routes`        | Session | `apiLimiter` | Compute routes via Google Routes API.         |
+| `POST` | `/api/maps/place-search`  | Session | `apiLimiter` | Search for places via Google Places API.      |
+| `POST` | `/api/maps/place-details` | Session | `apiLimiter` | Fetch place details via Google Places API.    |
+| `POST` | `/api/maps/dev-pin`       | Session | `apiLimiter` | Development tool for pinning map coordinates. |
 
-All maps endpoints validate the request origin via `isTrustedOrigin` and enforce IP-based rate limiting.
+All maps endpoints require a signed-in session (middleware session + AAL2 gate, and `requireAuth` in the handler), are CSRF-checked, and enforce IP-based rate limiting. They were public until 2026-09-28 (BA-0065).
 
 ### Weather
 
-| Method | Endpoint       | Auth   | Rate Limit            | Description                                              |
-| :----- | :------------- | :----- | :-------------------- | :------------------------------------------------------- |
-| `GET`  | `/api/weather` | Public | `apiLimiter` (per-IP) | Fetch current and hourly weather via Google Weather API. |
+| Method | Endpoint       | Auth    | Rate Limit            | Description                                              |
+| :----- | :------------- | :------ | :-------------------- | :------------------------------------------------------- |
+| `GET`  | `/api/weather` | Session | `apiLimiter` (per-IP) | Fetch current and hourly weather via Google Weather API. |
 
 **Query parameters:**
 

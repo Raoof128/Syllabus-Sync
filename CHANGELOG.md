@@ -4,6 +4,81 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Backend Audit — Passkey Storage, Definer Grants, and a Blocked Deploy Gate — 2026-09-28
+
+**Scope:** Full backend, security and runtime audit against current upstream documentation
+(Next.js 16.3, OpenNext 1.20, Workers, Supabase, SimpleWebAuthn 13, Sentry 10), continuing
+the finding ledger at BA-0059. Full report with proofs:
+`docs/backend-audit/2026-09-28/backend-audit-2026-09-28.md`.
+
+**Summary:**
+
+- **BA-0059 (P1) — a stolen session could plant a permanent passkey.** BA-0002 blocked one
+  route that accepted client key material; the storage it guarded was still writable.
+  `webauthn_credentials` kept owner INSERT/UPDATE policies from 20260207000000, and login
+  still fell back to `user_metadata.biometric_*`, which Supabase lets the account holder
+  rewrite through its own `PUT /auth/v1/user`. Reproduced in SQL (planted key → 1 row;
+  rewritten key → 2 rows) and re-found independently by a second audit lane. Client writes
+  revoked; `storeCredential` writes via service role after verification; metadata fallback
+  removed; the unused cookie-challenge `/api/auth/passkey/{options,verify,register*}`
+  routes deleted (their "expected" challenge was a client cookie, so one captured assertion
+  replayed indefinitely). `useBiometrics` now uses the DB-backed ceremony. Legacy-only
+  metadata passkeys stop working and must be re-enabled once — a planted key is
+  indistinguishable from a real one, so none can be migrated.
+- **BA-0060 — `anon` could reset any rate-limit key.** Supabase grants EXECUTE on new
+  functions directly to `anon`; migrations that revoked only `FROM PUBLIC` left it. Under a
+  replay that reproduces that default, `SELECT ratelimit_set('login:…',0,0,0)` succeeds as
+  `anon`. The 2026-08-02 audit recorded this as REFUTED because its replay — like the CI
+  fresh-build gate — omitted the default. Revoked generically from every definer function;
+  the gate now reproduces the platform and asserts both invariants.
+- **BA-0068 — nothing could be deployed since 2026-08-22.** The Sharp exception expired and
+  every gated `cf:*` script depends on it. Next 16.3.6 (which also fixes two critical Next
+  advisories) brings patched Sharp in both copies; the gate recognises the remediated state,
+  fails closed on anything below 0.35.4, and still requires Worker reachability proven
+  absent.
+- **BA-0061** No `instrumentation.ts`, so server and edge Sentry never initialised.
+- **BA-0062** Two token limiters keyed on client-controlled X-Forwarded-For.
+- **BA-0063** Upstash limiter was GET-then-SET (a parallel burst all passed) and turned read
+  errors into a fresh window; now one atomic Lua script that fails closed.
+- **BA-0064** Password change, "sign out other devices" and adding an MFA factor under
+  `/api/auth/*` now require AAL2 when a factor exists; password re-verification no longer
+  replaces the caller's AAL2 session with an AAL1 one.
+- **BA-0065** Paid Google Maps/Weather proxies required no session and accepted curl.
+- **BA-0066** `sb_secret_`/`sb_publishable_` keys accepted; bundle check fails on any server
+  secret in client assets.
+- **BA-0074/0075/0076** Per-address resend cap; https-only push endpoints; API responses
+  `private, no-store` unless a route opts in.
+
+**Files Changed:** migrations `20260928000000_lock_webauthn_credential_writes.sql` and
+`20260928000100_revoke_anon_execute_on_definer_functions.sql`; new `instrumentation.ts`,
+`app/api/_lib/aal.ts`; WebAuthn, passkey-status, biometric, password, sessions, MFA-enrol,
+token-verify, resend, push, maps and weather routes; `app/api/_lib/response.ts`;
+`lib/security/{webauthn,ip,csrf,emailVerification}.ts`, `lib/services/rateLimitService.ts`,
+`lib/supabase/admin.ts`, `lib/middleware.ts`, `lib/hooks/useBiometrics.ts`,
+`lib/constants/config.ts`; Sentry server/edge configs; `tools/database/verify-fresh-build.sh`,
+`tools/security/check-sharp-risk.mjs` (+ tests), `tools/cloudflare/check-public-env.mjs`;
+`package.json`, `package-lock.json`, `artifacts/security/*`. Removed
+`app/api/auth/passkey/{_lib.ts,options,verify,register,register-options}` and the root
+`sentry.{server,edge}.config.ts` shims. 11 new or extended test suites.
+
+**Verification:** `npm run check` exit 0 — secrets (941 files), runtime compat, Prettier,
+both typechecks, lint (0 errors), **1387 tests across 161 files** (baseline 1343/155),
+production build. `test:sharp-risk-gate` 33/33. Fresh database from migrations
+**82/82**, post-build invariants hold, and shown to fail with either new migration
+removed. Every new security test was run against the original code and failed there.
+`npm audit` 16 → 5 (all dev/build-only); CI's `--omit=dev --audit-level high` gate now
+passes. `cf:dry-run` and `cf:dry-run:production` both exit 0 with Sharp proven absent
+(6.67 MiB gzip); at the starting commit the same gate failed on the expired exception.
+
+**Follow-ups:** **BA-0069 (P1, open): MFA is enforced only in Next.js**; an AAL1 JWT from
+Supabase Auth reads and writes every table through PostgREST. Needs RESTRICTIVE AAL
+policies validated on a staging project. Open P3s: `/auth/confirm` login CSRF, passkey
+status discloses `mfaEnabled`. Vitest stays at 4.1.5 (dev-only advisory; npm arborist bug).
+Owner: apply both migrations, deploy, smoke one sign-in on preview (first use of Upstash
+`EVAL`), notify legacy biometric users, add explicit GRANTs to new tables from 2026-10-30.
+
+---
+
 ### Raouf: Closing the External Review's Code-Side Findings — 2026-08-17
 
 **Scope:** Five findings from the second round of an external security and privacy

@@ -58,12 +58,7 @@
 | `app/api/webauthn/authenticate/options/route.ts`                              | Authentication challenge generation                                                                            |
 | `app/api/webauthn/authenticate/verify/route.ts`                               | Assertion verification, counter increment                                                                      |
 | `app/api/webauthn/credentials/route.ts`                                       | Credential listing (RLS-scoped) and deletion                                                                   |
-| `app/api/auth/passkey/options/route.ts`                                       | Alternative passkey options endpoint                                                                           |
-| `app/api/auth/passkey/verify/route.ts`                                        | Alternative passkey verification endpoint                                                                      |
-| `app/api/auth/passkey/register-options/route.ts`                              | Alternative registration options                                                                               |
-| `app/api/auth/passkey/register/route.ts`                                      | Alternative registration verification                                                                          |
 | `app/api/auth/passkey/status/route.ts`                                        | Passkey enrollment status                                                                                      |
-| `app/api/auth/passkey/_lib.ts`                                                | Shared passkey utilities                                                                                       |
 | `supabase/migrations/20260207000000_add_webauthn_tables.sql`                  | `webauthn_credentials` and `webauthn_challenges` table schemas, RLS policies                                   |
 | `supabase/migrations/20260214003000_restore_missing_core_security_tables.sql` | Ensures security table integrity                                                                               |
 

@@ -13,6 +13,11 @@ const mocks = vi.hoisted(() => ({
     success: true,
   })),
   getClientIpMock: vi.fn(() => '127.0.0.1'),
+  perAddressLimiterMock: vi.fn(async (_id: string) => ({
+    allowed: true,
+    remaining: 8,
+    resetIn: 3600,
+  })),
 }));
 
 vi.mock('@/lib/supabase/admin', () => ({
@@ -25,6 +30,7 @@ vi.mock('@/lib/security/ip', () => ({
 
 vi.mock('@/lib/security/emailVerification', () => ({
   emailVerifyResendLimiter: (id: string) => mocks.limiterMock(id),
+  emailVerifyResendPerAddressLimiter: (id: string) => mocks.perAddressLimiterMock(id),
   createAndSendVerification: (admin: any, userId: string, email: string) =>
     mocks.createAndSendVerificationMock(admin, userId, email),
 }));
@@ -137,5 +143,40 @@ describe('email resend verification API', () => {
 
     const res = await POST(req);
     expect(res.status).toBe(429);
+  });
+
+  it('BA-0074: caps sends per address even when every request comes from a new IP', async () => {
+    const createAndSend = mocks.createAndSendVerificationMock;
+    createAdminClientMock.mockReturnValue({
+      rpc: vi.fn().mockResolvedValue({ data: [{ user_id: 'u1' }], error: null }),
+      auth: {
+        admin: {
+          getUserById: vi
+            .fn()
+            .mockResolvedValue({ data: { user: { email_confirmed_at: null } }, error: null }),
+        },
+      },
+    });
+    // Per-IP limiter always allows (fresh IP each time); per-address says no.
+    mocks.perAddressLimiterMock.mockResolvedValueOnce({
+      allowed: false,
+      remaining: 0,
+      resetIn: 900,
+    });
+
+    const { POST } = await import('@/app/api/auth/email/resend-verification/route');
+    const res = await POST(
+      new NextRequest('http://localhost/api/auth/email/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'Victim@Example.com' }),
+      }),
+    );
+
+    expect(res.status).toBe(429);
+    expect(createAndSend).not.toHaveBeenCalled();
+    // Keyed on the normalised address alone, never on the IP.
+    const key = mocks.perAddressLimiterMock.mock.calls[0][0];
+    expect(key).toMatch(/^em:[0-9a-f]{16}$/);
   });
 });
