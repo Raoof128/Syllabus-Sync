@@ -57,6 +57,10 @@ describe('auth sessions API', () => {
           error: null,
         }),
         signOut,
+        mfa: {
+          listFactors: vi.fn().mockResolvedValue({ data: { all: [] }, error: null }),
+          getAuthenticatorAssuranceLevel: vi.fn(),
+        },
       },
     });
 
@@ -72,5 +76,53 @@ describe('auth sessions API', () => {
     expect(response.status).toBe(200);
     expect(json.data.scope).toBe('global');
     expect(signOut).toHaveBeenCalledWith({ scope: 'global' });
+  });
+
+  describe('BA-0064: revoking other devices needs step-up when MFA is enrolled', () => {
+    const client = (aal: 'aal1' | 'aal2', signOut: ReturnType<typeof vi.fn>) => ({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }),
+        signOut,
+        mfa: {
+          listFactors: vi
+            .fn()
+            .mockResolvedValue({ data: { all: [{ status: 'verified' }] }, error: null }),
+          getAuthenticatorAssuranceLevel: vi
+            .fn()
+            .mockResolvedValue({ data: { currentLevel: aal, nextLevel: 'aal2' }, error: null }),
+        },
+      },
+    });
+    const post = (scope: string) =>
+      POST(
+        new NextRequest('http://localhost/api/auth/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scope }),
+        }),
+      );
+
+    it.each(['others', 'global'])('refuses scope=%s at AAL1', async (scope) => {
+      const signOut = vi.fn();
+      createServerClientMock.mockResolvedValue(client('aal1', signOut));
+      const res = await post(scope);
+      expect(res.status).toBe(403);
+      expect(signOut).not.toHaveBeenCalled();
+    });
+
+    it('still lets an AAL1 session sign itself out (scope=local)', async () => {
+      const signOut = vi.fn().mockResolvedValue({ error: null });
+      createServerClientMock.mockResolvedValue(client('aal1', signOut));
+      const res = await post('local');
+      expect(res.status).toBe(200);
+      expect(signOut).toHaveBeenCalledWith({ scope: 'local' });
+    });
+
+    it('allows scope=global at AAL2', async () => {
+      const signOut = vi.fn().mockResolvedValue({ error: null });
+      createServerClientMock.mockResolvedValue(client('aal2', signOut));
+      const res = await post('global');
+      expect(res.status).toBe(200);
+    });
   });
 });

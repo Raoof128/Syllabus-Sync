@@ -8,6 +8,7 @@ import {
   BODY_SIZE_LIMITS,
   ERROR_CODES,
 } from '@/app/api/_lib/response';
+import { requireAal2IfEnrolled } from '@/app/api/_lib/aal';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -76,6 +77,15 @@ export async function POST(request: NextRequest) {
     }
 
     const { scope } = parsed.data;
+
+    // BA-0064: signing yourself out ('local') is always allowed. Revoking every
+    // OTHER device is a takeover primitive — it evicts the real owner — so it
+    // needs the same step-up the middleware would demand outside /api/auth/.
+    if (scope !== 'local') {
+      const stepUp = await requireAal2IfEnrolled(supabase, user.id, 'Sessions revoke');
+      if (stepUp) return stepUp;
+    }
+
     const { error: signOutError } = await supabase.auth.signOut({ scope });
 
     if (signOutError) {

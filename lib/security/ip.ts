@@ -112,6 +112,11 @@ export function getClientIPFromHeaders(
     if (platform === "cloudflare") {
       const cloudflareIp = headers.get("cf-connecting-ip");
       if (cloudflareIp && isValidIP(cloudflareIp)) return cloudflareIp;
+      // BA-0062: on Workers the edge always sets CF-Connecting-IP for internet
+      // traffic. Anything reaching here without it is not a normal client
+      // request, and X-Real-IP / X-Forwarded-For are client-settable, so
+      // falling through to them would hand the limiter key to the caller.
+      return "unknown";
     }
 
     if (platform === "vercel") {

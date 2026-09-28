@@ -13,10 +13,6 @@ export const API_ROUTES = {
     PASSWORD_RESET: '/api/auth/password/reset',
     PASSWORD_CLEANUP: '/api/auth/password/cleanup',
     SESSIONS: '/api/auth/sessions',
-    PASSKEY_REGISTER_OPTIONS: '/api/auth/passkey/register-options',
-    PASSKEY_REGISTER: '/api/auth/passkey/register',
-    PASSKEY_OPTIONS: '/api/auth/passkey/options',
-    PASSKEY_VERIFY: '/api/auth/passkey/verify',
     // MFA routes
     MFA_STATUS: '/api/auth/mfa/status',
     MFA_ENROLL: '/api/auth/mfa/enroll',

@@ -15,8 +15,8 @@ import {
   getRelyingPartyId,
   getExpectedOrigin,
   webauthnRegisterLimiter,
+  bufferToBase64Url,
 } from '@/lib/security/webauthn';
-import { bufferToBase64Url } from '@/app/api/auth/passkey/_lib';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';

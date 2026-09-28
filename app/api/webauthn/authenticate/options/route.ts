@@ -78,22 +78,19 @@ export async function POST(request: NextRequest) {
     }
 
     const userId: string = userRow.user_id;
-    const userMeta = (userRow.user_meta ?? {}) as Record<string, unknown>;
 
-    // Get credentials from DB table
+    // SECURITY (BA-0059): only the DB table is a credential source. The legacy
+    // `user_metadata.biometric_*` slot is writable by the account holder through
+    // Supabase's own `PUT /auth/v1/user`, so it cannot vouch for a public key.
     const credentials = await getCredentialsForUser(userId);
 
-    // Also check legacy user_metadata for backwards compatibility
-    const legacyCredentialId = userMeta.biometric_credential_id as string | undefined;
-
-    if (credentials.length === 0 && !legacyCredentialId) {
+    if (credentials.length === 0) {
       return jsonError('Passkey not available for this account', 404, ERROR_CODES.NOT_FOUND);
     }
 
     const host = request.headers.get('host') ?? new URL(request.url).hostname;
     const rpId = getRelyingPartyId(host);
 
-    // Build allowCredentials from DB + legacy
     const allowCredentials: Array<{
       id: string;
       transports?: AuthenticatorTransportFuture[];
@@ -101,15 +98,6 @@ export async function POST(request: NextRequest) {
       id: c.credentialId,
       transports: c.transports as AuthenticatorTransportFuture[],
     }));
-
-    if (legacyCredentialId && !allowCredentials.some((c) => c.id === legacyCredentialId)) {
-      const legacyTransports =
-        (userMeta.biometric_transports as AuthenticatorTransportFuture[]) ?? undefined;
-      allowCredentials.push({
-        id: legacyCredentialId,
-        transports: legacyTransports,
-      });
-    }
 
     const options = await generateAuthenticationOptions({
       rpID: rpId,

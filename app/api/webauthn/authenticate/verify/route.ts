@@ -20,8 +20,8 @@ import {
   getRelyingPartyId,
   getExpectedOrigin,
   webauthnAuthLimiter,
+  base64UrlToBuffer,
 } from '@/lib/security/webauthn';
-import { base64UrlToBuffer } from '@/app/api/auth/passkey/_lib';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
@@ -29,6 +29,19 @@ import { z } from 'zod';
 const verifySchema = z.object({
   credential: z.record(z.string(), z.unknown()),
 });
+
+function extractClientChallenge(authResponse: AuthenticationResponseJSON): string | null {
+  const encoded = authResponse.response?.clientDataJSON;
+  if (typeof encoded !== 'string') return null;
+  try {
+    const clientData: unknown = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf-8'));
+    if (typeof clientData !== 'object' || clientData === null) return null;
+    const challenge = (clientData as { challenge?: unknown }).challenge;
+    return typeof challenge === 'string' && challenge.length > 0 ? challenge : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * POST /api/webauthn/authenticate/verify
@@ -62,12 +75,12 @@ export async function POST(request: NextRequest) {
 
     const authResponse = parsed.data.credential as unknown as AuthenticationResponseJSON;
 
-    // Decode clientDataJSON to extract challenge
-    const clientDataStr = Buffer.from(authResponse.response.clientDataJSON, 'base64url').toString(
-      'utf-8',
-    );
-    const clientData = JSON.parse(clientDataStr) as { challenge: string };
-    const challengeFromClient = clientData.challenge;
+    // Decode clientDataJSON to extract challenge. A malformed assertion is the
+    // caller's error (400), not ours (500).
+    const challengeFromClient = extractClientChallenge(authResponse);
+    if (!challengeFromClient) {
+      return jsonError('Invalid authentication payload', 400, ERROR_CODES.VALIDATION_ERROR);
+    }
 
     // Consume challenge from DB
     const storedChallenge = await consumeChallenge(challengeFromClient, 'authentication');
@@ -78,40 +91,19 @@ export async function POST(request: NextRequest) {
 
     const userId = storedChallenge.userId;
 
-    // Look up credential from DB
+    // Look up credential from DB. SECURITY (BA-0059): the table is the only
+    // credential source. The legacy `user_metadata.biometric_*` fallback that
+    // used to live here trusted a public key the account holder can rewrite
+    // at will through Supabase's own `PUT /auth/v1/user`, with no ceremony.
     const credentialId = authResponse.id;
     const dbCredential = await getCredentialById(credentialId);
 
-    // Fallback: check legacy user_metadata
-    let isLegacyCredential = false;
-    let legacyPublicKey: string | undefined;
-    let legacyCounter = 0;
-    let legacyTransports: AuthenticatorTransportFuture[] | undefined;
-
     if (!dbCredential) {
-      const { data: userRecord } = await adminClient.auth.admin.getUserById(userId);
-
-      if (userRecord?.user) {
-        const metadata = (userRecord.user.user_metadata || {}) as Record<string, unknown>;
-        const metaCredId = metadata.biometric_credential_id as string | undefined;
-
-        if (metaCredId === credentialId) {
-          isLegacyCredential = true;
-          legacyPublicKey = metadata.biometric_public_key as string;
-          legacyCounter = (metadata.biometric_counter as number) ?? 0;
-          legacyTransports = metadata.biometric_transports as
-            | AuthenticatorTransportFuture[]
-            | undefined;
-        }
-      }
-    }
-
-    if (!dbCredential && !isLegacyCredential) {
       return jsonError('Passkey not recognized', 401, ERROR_CODES.UNAUTHORIZED);
     }
 
-    // SECURITY (P0): the credential must belong to the user this challenge was
-    // issued for.
+    // SECURITY (P0, BA-0056): the credential must belong to the user this
+    // challenge was issued for.
     //
     // Identity and key material arrive from two different places and nothing
     // used to reconcile them. `userId` comes from the challenge row, which
@@ -131,13 +123,10 @@ export async function POST(request: NextRequest) {
     //
     // This must stay AHEAD of verifyAuthenticationResponse and of the session
     // mint, so a mismatched credential costs no crypto and no privileged call.
-    // The legacy branch above is already safe by construction: it reads
-    // `biometric_credential_id` off the challenge user's own record and requires
-    // it to equal the presented id, so identity and key share one source.
     //
     // The sibling /api/webauthn/register/verify has always had the equivalent
     // check (`storedChallenge.userId !== user.id`); this route was missing it.
-    if (dbCredential && dbCredential.userId !== userId) {
+    if (dbCredential.userId !== userId) {
       logger.warn('WebAuthn credential does not belong to the challenge user', {
         challengeUserId: userId,
         credentialId,
@@ -150,14 +139,6 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get('origin') ?? new URL(request.url).origin;
     const expectedOrigin = getExpectedOrigin(origin);
 
-    const credentialPublicKey = dbCredential
-      ? base64UrlToBuffer(dbCredential.publicKey)
-      : base64UrlToBuffer(legacyPublicKey!);
-    const credentialCounter = dbCredential ? dbCredential.counter : legacyCounter;
-    const credentialTransports = dbCredential
-      ? (dbCredential.transports as AuthenticatorTransportFuture[])
-      : legacyTransports;
-
     const verification = await verifyAuthenticationResponse({
       response: authResponse,
       expectedChallenge: storedChallenge.challenge,
@@ -165,9 +146,9 @@ export async function POST(request: NextRequest) {
       expectedRPID: rpId,
       credential: {
         id: credentialId,
-        publicKey: credentialPublicKey,
-        counter: credentialCounter,
-        transports: credentialTransports,
+        publicKey: base64UrlToBuffer(dbCredential.publicKey),
+        counter: dbCredential.counter,
+        transports: dbCredential.transports as AuthenticatorTransportFuture[],
       },
       requireUserVerification: true,
     });
@@ -176,20 +157,7 @@ export async function POST(request: NextRequest) {
       return jsonError('Passkey verification failed', 401, ERROR_CODES.UNAUTHORIZED);
     }
 
-    const newCounter = verification.authenticationInfo.newCounter;
-
-    // Update counter
-    if (dbCredential) {
-      await updateCredentialCounter(credentialId, newCounter);
-    } else if (isLegacyCredential) {
-      // Update legacy counter in user_metadata
-      await adminClient.auth.admin.updateUserById(userId, {
-        user_metadata: {
-          biometric_counter: newCounter,
-          biometric_updated_at: new Date().toISOString(),
-        },
-      });
-    }
+    await updateCredentialCounter(credentialId, verification.authenticationInfo.newCounter);
 
     // Establish session via magic link (same pattern as existing passkey verify)
     const { data: userRecord } = await adminClient.auth.admin.getUserById(userId);
@@ -221,7 +189,6 @@ export async function POST(request: NextRequest) {
     logger.info('WebAuthn authentication success', {
       userId,
       credentialId,
-      isLegacy: isLegacyCredential,
     });
 
     return jsonSuccess({ signedIn: true });

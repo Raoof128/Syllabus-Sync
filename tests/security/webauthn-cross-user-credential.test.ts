@@ -49,6 +49,7 @@ vi.mock('@/lib/security/webauthn', () => ({
   getRelyingPartyId: () => 'syllabus-sync.app',
   getExpectedOrigin: () => 'https://www.syllabus-sync.app',
   webauthnAuthLimiter: vi.fn(async () => ({ allowed: true, remaining: 9, resetIn: 0 })),
+  base64UrlToBuffer: (value: string) => Buffer.from(value, 'base64url'),
 }));
 
 vi.mock('@simplewebauthn/server', () => ({
@@ -170,5 +171,48 @@ describe('/api/webauthn/authenticate/verify — credential must belong to the ch
     await POST(assertionRequest(ATTACKER_CREDENTIAL_ID));
 
     expect(verifyAuthenticationResponse).not.toHaveBeenCalled();
+  });
+
+  it('rejects a key planted in user_metadata, with no ceremony (BA-0059)', async () => {
+    // The account holder can write user_metadata directly through Supabase's
+    // own PUT /auth/v1/user, so a stolen session could plant a software key
+    // there. The old legacy fallback then verified assertions against it and
+    // minted a session. The DB table is now the only credential source.
+    getCredentialById.mockResolvedValue(null);
+    getUserById.mockResolvedValue({
+      data: {
+        user: {
+          id: VICTIM,
+          email: 'victim@example.com',
+          user_metadata: {
+            biometric_credential_id: 'planted-credential-id',
+            biometric_public_key: Buffer.from('attacker-software-key').toString('base64url'),
+            biometric_counter: 0,
+          },
+        },
+      },
+    });
+
+    const res = await POST(assertionRequest('planted-credential-id'));
+
+    expect(res.status).toBe(401);
+    expect(verifyAuthenticationResponse).not.toHaveBeenCalled();
+    expect(generateLink).not.toHaveBeenCalled();
+    expect(verifyOtp).not.toHaveBeenCalled();
+  });
+
+  it('answers a malformed clientDataJSON with 400, not 500', async () => {
+    const req = new NextRequest('https://www.syllabus-sync.app/api/webauthn/authenticate/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        credential: { id: 'x', rawId: 'x', type: 'public-key', response: { clientDataJSON: '%%%' } },
+      }),
+    });
+
+    const res = await POST(req);
+
+    expect(res.status).toBe(400);
+    expect(consumeChallenge).not.toHaveBeenCalled();
   });
 });

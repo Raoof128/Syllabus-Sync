@@ -64,9 +64,6 @@ export async function POST(request: NextRequest) {
       return jsonSuccess({ available: false, mfaEnabled: false });
     }
 
-    const metadata = (userRow.user_meta ?? {}) as Record<string, unknown>;
-    const hasLegacyCredential = Boolean(metadata.biometric_credential_id);
-
     const { count: dbCredentialCount, error: credentialsError } = await adminClient
       .from('webauthn_credentials')
       .select('credential_id', { head: true, count: 'exact' })
@@ -76,7 +73,10 @@ export async function POST(request: NextRequest) {
       logger.warn('Passkey status credential lookup failed:', credentialsError);
     }
 
-    const biometricAvailable = hasLegacyCredential || (dbCredentialCount ?? 0) > 0;
+    // BA-0059: only DB-backed credentials can authenticate, so only they count.
+    // A `user_metadata.biometric_credential_id` is user-writable and no longer
+    // accepted by /api/webauthn/authenticate/*.
+    const biometricAvailable = (dbCredentialCount ?? 0) > 0;
 
     // Check MFA factors via admin API
     let mfaEnabled = false;

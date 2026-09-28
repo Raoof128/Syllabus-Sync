@@ -47,7 +47,10 @@ const REQUIRED = [
   {
     env: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     description: 'Supabase publishable key',
-    pattern: /eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]{20,}/,
+    // Legacy anon JWT, or the `sb_publishable_` key Supabase is moving every
+    // project to (legacy keys are deprecated by the end of 2026).
+    pattern:
+      /eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]{20,}|sb_publishable_[A-Za-z0-9_-]{20,}/,
     consequence: 'every client-side query and the whole auth flow fail',
   },
   {
@@ -73,6 +76,31 @@ const OPTIONAL = [
     consequence: 'push notification subscription fails in the browser',
   },
 ];
+
+/**
+ * Values that must NEVER reach the browser. Any hit fails the check outright.
+ * A server secret in the client bundle is readable by every visitor and
+ * bypasses RLS entirely, so this is checked on the built output itself rather
+ * than trusted to variable naming.
+ */
+function findForbidden(blob) {
+  const hits = [];
+  if (/sb_secret_[A-Za-z0-9_-]{10,}/.test(blob)) {
+    hits.push('a Supabase secret key (sb_secret_…)');
+  }
+  for (const [token] of blob.matchAll(/eyJ[A-Za-z0-9_-]+\.(eyJ[A-Za-z0-9_-]+)\.[A-Za-z0-9_-]+/g)) {
+    try {
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString('utf8'));
+      if (payload && payload.role === 'service_role') {
+        hits.push('a Supabase service_role JWT');
+        break;
+      }
+    } catch {
+      // Not a decodable JWT; ignore.
+    }
+  }
+  return hits;
+}
 
 async function collectChunks(dir) {
   const out = [];
@@ -107,6 +135,17 @@ async function main() {
 
   let blob = '';
   for (const file of files) blob += await readFile(file, 'utf8');
+
+  const forbidden = findForbidden(blob);
+  if (forbidden.length > 0) {
+    console.error('\nPublic env check FAILED: server secrets found in the client bundle.\n');
+    for (const hit of forbidden) console.error(`  Found ${hit} under ${chunkDir}.`);
+    console.error(
+      '\nNever put a secret in a NEXT_PUBLIC_* variable. Rotate the exposed key in\n' +
+        'Supabase immediately, fix the variable, and rebuild.\n',
+    );
+    process.exit(1);
+  }
 
   const missingRequired = [];
   const missingOptional = [];

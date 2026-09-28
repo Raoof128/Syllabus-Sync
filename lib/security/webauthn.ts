@@ -152,19 +152,30 @@ export async function storeCredential(params: {
   transports: string[];
   deviceName: string;
 }): Promise<void> {
-  const supabase = await createServerClient();
+  // SECURITY (BA-0059): client roles hold no INSERT on webauthn_credentials, so
+  // key material can only enter the table through this function — and every
+  // caller reaches it only after verifyRegistrationResponse has succeeded
+  // against a consumed, user-bound challenge. `params.userId` must therefore be
+  // the verified session user, never a request value.
+  const admin = createAdminClient();
+  if (!admin) throw new Error('Admin client not configured');
 
-  // Check max passkeys limit
-  const { count } = await supabase
+  // Check max passkeys limit. A failed count must not read as "under the limit".
+  const { count, error: countError } = await admin
     .from('webauthn_credentials')
-    .select('*', { count: 'exact', head: true })
+    .select('id', { count: 'exact', head: true })
     .eq('user_id', params.userId);
+
+  if (countError) {
+    logger.error('Failed to count WebAuthn credentials:', countError);
+    throw new Error('Failed to save passkey');
+  }
 
   if (count !== null && count >= MAX_PASSKEYS_PER_USER) {
     throw new Error(`Maximum of ${MAX_PASSKEYS_PER_USER} passkeys reached`);
   }
 
-  const { error } = await supabase.from('webauthn_credentials').insert({
+  const { error } = await admin.from('webauthn_credentials').insert({
     user_id: params.userId,
     credential_id: params.credentialId,
     public_key: params.publicKey,
@@ -287,8 +298,7 @@ function mapDbCredential(data: Record<string, unknown>): WebAuthnCredential {
 }
 
 /**
- * SECURITY (BA-0003): see the matching note in app/api/auth/passkey/_lib.ts.
- * `WEBAUTHN_RP_ID`/`WEBAUTHN_ORIGIN` are the anchors that bind an assertion to
+ * SECURITY (BA-0003): `WEBAUTHN_RP_ID`/`WEBAUTHN_ORIGIN` are the anchors that bind an assertion to
  * this site; falling back to the caller's own `Host`/`Origin` made the origin
  * check compare an attacker-supplied value against itself. Fails closed on any
  * deployed runtime, host-derived fallback kept for local development only.
@@ -330,3 +340,12 @@ export function getExpectedOrigin(requestOrigin: string): string {
 
   return requestOrigin;
 }
+
+export const bufferToBase64Url = (buffer: ArrayBuffer | Uint8Array) => {
+  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+  return Buffer.from(bytes).toString('base64url');
+};
+
+export const base64UrlToBuffer = (value: string) => {
+  return Buffer.from(value, 'base64url');
+};

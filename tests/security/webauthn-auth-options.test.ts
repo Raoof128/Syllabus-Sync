@@ -118,7 +118,9 @@ describe("WebAuthn Authenticate Options (Security Audit)", () => {
     expect(json.error.message).toBe("Passkey not available for this account");
   });
 
-  it("includes legacy credentials from user_metadata", async () => {
+  it("does not treat a user_metadata credential as a passkey (BA-0059)", async () => {
+    // user_metadata is writable by the account holder via PUT /auth/v1/user,
+    // so a credential id found there must never produce a login challenge.
     mockAdminClient.rpc.mockResolvedValue({
       data: [
         {
@@ -136,12 +138,8 @@ describe("WebAuthn Authenticate Options (Security Audit)", () => {
 
     const response = await POST(makeRequest({ email: "test@mq.edu.au" }));
 
-    expect(response.status).toBe(200);
-    expect(mockStoreChallenge).toHaveBeenCalledWith(
-      "test-challenge-abc",
-      "authentication",
-      "user-1",
-    );
+    expect(response.status).toBe(404);
+    expect(mockStoreChallenge).not.toHaveBeenCalled();
   });
 
   it("handles RPC errors gracefully", async () => {

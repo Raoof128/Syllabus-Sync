@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { jsonSuccess, jsonError, jsonUnauthorized, ERROR_CODES } from '@/app/api/_lib/response';
+import { requireAal2IfEnrolled } from '@/app/api/_lib/aal';
 import { mfaEnrollLimiter } from '@/lib/security/mfa';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
@@ -31,6 +32,13 @@ export async function POST(request: NextRequest) {
       });
       return jsonUnauthorized('Authentication required');
     }
+
+    // BA-0064: /api/auth/* is outside the middleware AAL2 gate. Adding a
+    // second factor to an account that already has one must require that
+    // factor, or a password alone lets an attacker enrol their own
+    // authenticator. First-time enrolment (no verified factor) is unaffected.
+    const stepUp = await requireAal2IfEnrolled(supabase, user.id, 'MFA enroll');
+    if (stepUp) return stepUp;
 
     // First, list existing factors to clean up any unverified ones
     let factorsData;

@@ -38,12 +38,16 @@ function isRefreshTokenMissingError(error: { message?: string; code?: string | n
   );
 }
 
+// BA-0065: `/api/maps/` and `/api/weather` used to be listed here. They proxy
+// paid Google Maps Platform APIs, and their only other gate (isTrustedOrigin)
+// accepts a request with no Origin/Referer — plain curl — so anyone could
+// spend the project's quota. Every caller is rendered only inside the
+// authenticated app shell (app/client-layout.tsx), so they now sit behind the
+// same session + AAL2 gate as every other data route.
 function isPublicApiPath(path: string): boolean {
   return (
     path.startsWith('/api/auth/') ||
     path.startsWith('/api/health') ||
-    path.startsWith('/api/maps/') ||
-    path.startsWith('/api/weather') ||
     path.startsWith('/api/cron/') ||
     path.startsWith('/api/security/rate-limit/cleanup') ||
     path.startsWith('/api/csp-report') ||

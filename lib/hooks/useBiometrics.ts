@@ -5,6 +5,8 @@ import { toastUtils } from '@/lib/utils/toast';
 import { errorHandler } from '@/lib/utils/errorHandling';
 import type { TranslationKey } from '@/lib/i18n/translations';
 
+const BIOMETRIC_DEVICE_NAME = 'This device (biometric)';
+
 // Check if WebAuthn/biometric authentication is available
 function isBiometricAvailable(): boolean {
   if (typeof window === 'undefined') return false;
@@ -106,8 +108,12 @@ export function useBiometrics({ t }: UseBiometricsProps) {
         return false;
       }
 
-      const optionsResponse = await fetch(API_ROUTES.AUTH.PASSKEY_REGISTER_OPTIONS, {
+      // BA-0059: register through the DB-backed ceremony (server-stored,
+      // single-use challenge; credential written only after verification).
+      const optionsResponse = await fetch(API_ROUTES.AUTH.WEBAUTHN_REGISTER_OPTIONS, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deviceName: BIOMETRIC_DEVICE_NAME }),
       });
       const optionsResult = await optionsResponse.json();
       const options = optionsResult?.data?.options;
@@ -156,11 +162,12 @@ export function useBiometrics({ t }: UseBiometricsProps) {
         clientExtensionResults: credential.getClientExtensionResults(),
       };
 
-      const saveResponse = await fetch(API_ROUTES.AUTH.PASSKEY_REGISTER, {
+      const saveResponse = await fetch(API_ROUTES.AUTH.WEBAUTHN_REGISTER_VERIFY, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           credential: credentialPayload,
+          deviceName: BIOMETRIC_DEVICE_NAME,
         }),
       });
 

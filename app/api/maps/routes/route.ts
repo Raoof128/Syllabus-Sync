@@ -6,6 +6,7 @@ import { getClientIP, isTrustedOrigin } from '@/lib/security/ip';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { logger } from '@/lib/logger';
 import { GOOGLE_ROUTES_FIELD_MASK } from '@/lib/maps/google/fieldMasks';
+import { requireAuth } from '@/app/api/_lib/middleware';
 import type {
   GoogleComputedRoute,
   GoogleRouteStep,
@@ -208,7 +209,7 @@ function buildComputeRoutesBody(
   return body;
 }
 
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest) {
   if (!isTrustedOrigin(request)) {
     return jsonError('Forbidden.', 403, ERROR_CODES.FORBIDDEN);
   }
@@ -333,4 +334,12 @@ export async function POST(request: NextRequest) {
 
     return jsonError('Unable to compute a route right now.', 500, ERROR_CODES.INTERNAL_ERROR);
   }
+}
+
+// BA-0065: this route proxies a paid Google Maps Platform API. It used to be on
+// the middleware's public list, gated only by an origin check that accepts a
+// request with no Origin/Referer, so anyone could spend the project's quota.
+// It is now behind the middleware session gate and enforces auth itself too.
+export async function POST(request: NextRequest) {
+  return requireAuth(request, () => handlePost(request));
 }

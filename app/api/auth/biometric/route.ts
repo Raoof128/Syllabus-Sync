@@ -48,8 +48,11 @@ export async function GET() {
 
     const hasDbCredentials = (dbCredentialCount ?? 0) > 0;
 
+    // BA-0059: `enabled` reflects only credentials that can actually sign in.
+    // The legacy metadata flag is user-writable and no longer honoured by the
+    // login ceremony, so reporting it would show a passkey that cannot work.
     return jsonSuccess({
-      enabled: Boolean(metadata.biometric_enabled) || hasDbCredentials,
+      enabled: hasDbCredentials,
       credentialId: metadata.biometric_credential_id ?? null,
       publicKey: metadata.biometric_public_key ?? null,
       counter: metadata.biometric_counter ?? null,
@@ -94,10 +97,9 @@ export async function POST(request: NextRequest) {
     // then trusted to mint a session, creating a permanent
     // password-independent backdoor. Enabling biometric/passkey login must
     // go through a real registration ceremony
-    // (POST /api/auth/passkey/register-options + /api/auth/passkey/register,
-    // which calls verifyRegistrationResponse against a server-issued
-    // challenge) or the DB-backed /api/webauthn/register flow. This endpoint
-    // only supports disabling and reporting status.
+    // (the DB-backed /api/webauthn/register flow, which calls
+    // verifyRegistrationResponse against a server-issued, single-use
+    // challenge). This endpoint only supports disabling and reporting status.
     if (enabled) {
       return jsonError(
         'Enabling biometric login requires completing passkey registration',

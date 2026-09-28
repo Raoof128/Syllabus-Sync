@@ -110,4 +110,17 @@ describe('middleware fail-closed on unresolved auth checks', () => {
     expect(res.status).not.toBe(503);
     expect(res.status).not.toBe(401);
   });
+
+  it.each(['/api/maps/place-search', '/api/maps/routes', '/api/weather?lat=-33.77&lon=151.11'])(
+    'BA-0065: %s requires a session (paid Google proxy, no longer public)',
+    async (path) => {
+      supabaseMocks.getUserMock.mockResolvedValue({ data: { user: null }, error: null });
+      const { middleware } = await import('@/lib/middleware');
+
+      // No Origin/Referer: exactly the curl request isTrustedOrigin let through.
+      const res = await middleware(new NextRequest(`http://localhost${path}`));
+
+      expect(res.status).toBe(401);
+    },
+  );
 });

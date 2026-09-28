@@ -31,10 +31,14 @@ function isAdminConfigured(): boolean {
     !supabaseUrl.includes("your-project-id")
   );
 
-  // Service role keys are JWT tokens starting with "eyJ"
+  // Legacy service_role keys are JWTs ("eyJ…"). Supabase's replacement secret
+  // keys start "sb_secret_" and the legacy keys are deprecated by the end of
+  // 2026; rejecting them would silently disable every admin-backed route on
+  // key rotation (BA-0066). A publishable key must never pass as a secret.
   const hasValidKey = !!(
     supabaseServiceRoleKey &&
-    supabaseServiceRoleKey.startsWith("eyJ") &&
+    (supabaseServiceRoleKey.startsWith("eyJ") ||
+      supabaseServiceRoleKey.startsWith("sb_secret_")) &&
     supabaseServiceRoleKey !== "your-service-role-key-here" &&
     !supabaseServiceRoleKey.includes("PASTE")
   );

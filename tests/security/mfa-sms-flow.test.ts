@@ -40,6 +40,8 @@ describe("MFA SMS flow", () => {
 
   it("enroll returns factorId + challengeId", async () => {
     const mfa = {
+      // No verified factor yet: first enrolment needs no step-up (BA-0064).
+      listFactors: vi.fn().mockResolvedValue({ data: { all: [] }, error: null }),
       enroll: vi.fn().mockResolvedValue({
         data: { id: "550e8400-e29b-41d4-a716-446655440000" },
         error: null,

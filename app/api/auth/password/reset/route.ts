@@ -13,6 +13,7 @@ import { passwordResetTokenLimiter } from '@/lib/services/rateLimitService';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { SECURITY_CONFIG } from '@/lib/constants/config';
+import { getClientIP } from '@/lib/security/ip';
 
 const resetSchema = z.object({
   token: z
@@ -40,7 +41,10 @@ export async function POST(request: NextRequest) {
     }
 
     // SECURITY: Rate limit token verification to prevent brute-force
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    // BA-0062: never key a limiter on the raw X-Forwarded-For. Cloudflare
+    // appends to whatever the client sent, so its first entry is
+    // attacker-chosen and rotating it bypassed this limit entirely.
+    const ip = getClientIP(request);
     const rateLimitResult = await passwordResetTokenLimiter(`ip:${ip}:password-reset`);
     if (!rateLimitResult.allowed) {
       return jsonError(

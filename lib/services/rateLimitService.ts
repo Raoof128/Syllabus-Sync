@@ -147,34 +147,71 @@ class UpstashRedisStore implements RateLimitStore {
     return data.result as T;
   }
 
+  // BA-0063: the counter used to be a JSON blob updated with GET then SET.
+  // Concurrent requests all read the same count and all wrote count+1, so a
+  // parallel burst passed a 10-per-window login limit in full, and could do so
+  // again as soon as it finished. And `get()` swallowed store errors as "no
+  // entry", which started a fresh window and let a failClosed limiter through
+  // on exactly the failure it exists to refuse. One Lua script now increments
+  // and sets the expiry atomically, and every error propagates to
+  // checkRateLimit, which applies the limiter's failClosed policy.
+  //
+  // The counter lives under `<key>:n` so it can never collide with a JSON value
+  // still held under `<key>` by the old implementation: INCR on that value
+  // would error, and failClosed would lock those users out for a whole window.
+  private static readonly INCREMENT_SCRIPT = [
+    "local count = redis.call('INCR', KEYS[1])",
+    "local ttl = redis.call('PTTL', KEYS[1])",
+    'if ttl < 0 then',
+    "  redis.call('PEXPIRE', KEYS[1], ARGV[1])",
+    '  ttl = tonumber(ARGV[1])',
+    'end',
+    'return {count, ttl}',
+  ].join('\n');
+
+  private static counterKey(key: string) {
+    return `${key}:n`;
+  }
+
   async get(key: string) {
-    try {
-      const data = await this.command<string | null>('GET', key);
-      if (!data) return null;
-      return JSON.parse(data) as { count: number; resetTime: number };
-    } catch {
-      return null;
-    }
+    const counterKey = UpstashRedisStore.counterKey(key);
+    const [count, ttl] = await Promise.all([
+      this.command<string | null>('GET', counterKey),
+      this.command<number>('PTTL', counterKey),
+    ]);
+    if (count === null || ttl < 0) return null;
+    return { count: Number(count), resetTime: Date.now() + ttl };
   }
 
   async set(key: string, data: { count: number; resetTime: number }, ttlMs: number) {
-    const ttlSeconds = Math.ceil(ttlMs / 1000);
-    await this.command('SET', key, JSON.stringify(data), 'EX', ttlSeconds);
+    await this.command(
+      'SET',
+      UpstashRedisStore.counterKey(key),
+      data.count,
+      'PX',
+      Math.max(1, Math.ceil(ttlMs)),
+    );
   }
 
   async increment(key: string, windowMs: number) {
-    const now = Date.now();
-    const existing = await this.get(key);
+    const result = await this.command<unknown>(
+      'EVAL',
+      UpstashRedisStore.INCREMENT_SCRIPT,
+      1,
+      UpstashRedisStore.counterKey(key),
+      windowMs,
+    );
 
-    if (!existing || existing.resetTime < now) {
-      const data = { count: 1, resetTime: now + windowMs };
-      await this.set(key, data, windowMs);
-      return data;
+    if (
+      !Array.isArray(result) ||
+      result.length !== 2 ||
+      !Number.isFinite(Number(result[0])) ||
+      !Number.isFinite(Number(result[1]))
+    ) {
+      throw new Error('Upstash rate-limit script returned an unexpected result');
     }
 
-    existing.count++;
-    await this.set(key, existing, existing.resetTime - now);
-    return existing;
+    return { count: Number(result[0]), resetTime: Date.now() + Number(result[1]) };
   }
 }
 

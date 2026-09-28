@@ -253,9 +253,11 @@ const CSRF_EXEMPT_PREFIXES = [
   '/api/auth/callback',   // Supabase OAuth callback
   '/api/auth/confirm',    // Supabase email confirm
   '/api/webhooks',        // Inbound webhooks (Stripe, etc.)
-  '/api/maps',            // Google Maps proxy
   '/api/health',          // Health checks
   '/api/cron/',           // Cron jobs
+  // BA-0065: '/api/maps' was exempt here. Its callers are same-origin fetches
+  // from the authenticated app (which always send Origin), and now that the
+  // routes require a session cookie they need CSRF protection like any other.
 ];
 
 /** HTTP methods that cannot carry state-changing intent */

@@ -46,7 +46,9 @@ describe('passkey status route', () => {
     listFactorsMock.mockResolvedValue({ data: { factors: [] } });
   });
 
-  it('returns available for legacy metadata-backed passkeys', async () => {
+  it('does not report a user_metadata credential as available (BA-0059)', async () => {
+    // Legacy metadata credentials are user-writable and can no longer sign in,
+    // so advertising one would offer a passkey prompt that cannot succeed.
     rpcMock.mockResolvedValue({
       data: [{ user_id: 'user-1', user_meta: { biometric_credential_id: 'legacy-cred' } }],
       error: null,
@@ -61,7 +63,7 @@ describe('passkey status route', () => {
     const json = await response.json();
 
     expect(response.status).toBe(200);
-    expect(json.data.available).toBe(true);
+    expect(json.data.available).toBe(false);
   });
 
   it('returns available for DB-backed WebAuthn credentials', async () => {

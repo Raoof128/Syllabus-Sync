@@ -53,6 +53,20 @@ describe("getClientIPFromHeaders", () => {
     ).toBe("unknown");
   });
 
+  it("does not fall back to client-settable X-Real-IP on Cloudflare (BA-0062)", () => {
+    setEnv({
+      DEPLOYMENT_PLATFORM: "cloudflare",
+      DEPLOYMENT_ENV: "production",
+      VERCEL: "",
+      VERCEL_ENV: "",
+      NODE_ENV: "production",
+    });
+
+    expect(
+      getClientIPFromHeaders(headersOf({ "x-real-ip": "198.51.100.100" })),
+    ).toBe("unknown");
+  });
+
   it("uses x-forwarded-for on vercel production runtime", () => {
     setEnv({ VERCEL: "1", VERCEL_ENV: "production", NODE_ENV: "production" });
 

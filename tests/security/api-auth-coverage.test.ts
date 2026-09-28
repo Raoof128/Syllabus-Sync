@@ -15,8 +15,8 @@ const MIDDLEWARE_POLICY = resolve(REPOSITORY_ROOT, 'lib/middleware.ts');
 const PUBLIC_API_PREFIXES = [
   '/api/auth/',
   '/api/health',
-  '/api/maps/',
-  '/api/weather',
+  // BA-0065: '/api/maps/' and '/api/weather' were public; they proxy paid
+  // Google APIs and now require a session.
   '/api/cron/',
   '/api/security/rate-limit/cleanup',
   '/api/csp-report',

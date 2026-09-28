@@ -12,6 +12,7 @@ import { smsSendLimiter, isValidE164Phone } from '@/lib/security/mfa';
 import { getClientIP } from '@/lib/security/ip';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { requireAal2IfEnrolled } from '@/app/api/_lib/aal';
 
 const smsEnrollSchema = z.object({
   phone: z.string().regex(/^\+[1-9]\d{6,14}$/, 'Invalid phone number (E.164 format required)'),
@@ -44,6 +45,13 @@ export async function POST(request: NextRequest) {
     if (authError || !user) {
       return jsonUnauthorized('Authentication required');
     }
+
+    // BA-0064: /api/auth/* is outside the middleware AAL2 gate. Adding a
+    // second factor to an account that already has one must require that
+    // factor, or a password alone lets an attacker enrol their own
+    // authenticator. First-time enrolment (no verified factor) is unaffected.
+    const stepUp = await requireAal2IfEnrolled(supabase, user.id, 'SMS MFA enroll');
+    if (stepUp) return stepUp;
 
     const { data: body, error: parseError } = await parseJsonBody(request, BODY_SIZE_LIMITS.AUTH);
     if (parseError) return parseError;

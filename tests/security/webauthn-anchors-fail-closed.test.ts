@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { NextRequest } from 'next/server';
 import { getRelyingPartyId, getExpectedOrigin } from '@/lib/security/webauthn';
-import { getRpId, getOrigin } from '@/app/api/auth/passkey/_lib';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 
 /**
  * BA-0003 regression cover.
@@ -47,11 +47,6 @@ describe('WebAuthn origin/RP anchors fail closed on deployed runtimes', () => {
     (process.env as Record<string, string>).NODE_ENV = deployed ? 'production' : 'development';
   };
 
-  const attackerRequest = () =>
-    new NextRequest('https://evil.example/api/auth/passkey/verify', {
-      headers: { host: 'evil.example', origin: 'https://evil.example' },
-    });
-
   describe('lib/security/webauthn.ts (used by /api/webauthn/*)', () => {
     it('refuses a header-derived RP ID when WEBAUTHN_RP_ID is missing', () => {
       delete process.env.WEBAUTHN_RP_ID;
@@ -82,37 +77,15 @@ describe('WebAuthn origin/RP anchors fail closed on deployed runtimes', () => {
     });
   });
 
-  describe('app/api/auth/passkey/_lib.ts (used by /api/auth/passkey/*)', () => {
-    it('refuses a header-derived RP ID when WEBAUTHN_RP_ID is missing', () => {
-      delete process.env.WEBAUTHN_RP_ID;
-      setDeployed(true);
-      expect(() => getRpId(attackerRequest())).toThrow(/WEBAUTHN_RP_ID/);
-    });
-
-    it('refuses the caller-supplied Origin header when WEBAUTHN_ORIGIN is missing', () => {
-      delete process.env.WEBAUTHN_ORIGIN;
-      setDeployed(true);
-      expect(() => getOrigin(attackerRequest())).toThrow(/WEBAUTHN_ORIGIN/);
-    });
-
-    it('uses the configured anchors and ignores the request entirely', () => {
-      process.env.WEBAUTHN_RP_ID = 'syllabus-sync.app';
-      process.env.WEBAUTHN_ORIGIN = 'https://www.syllabus-sync.app';
-      setDeployed(true);
-      expect(getRpId(attackerRequest())).toBe('syllabus-sync.app');
-      expect(getOrigin(attackerRequest())).toBe('https://www.syllabus-sync.app');
-    });
-
-    it('still derives from the request in local development', () => {
-      delete process.env.WEBAUTHN_RP_ID;
-      delete process.env.WEBAUTHN_ORIGIN;
-      setDeployed(false);
-      const local = new NextRequest('http://localhost:3000/api/auth/passkey/verify', {
-        headers: { host: 'localhost:3000', origin: 'http://localhost:3000' },
-      });
-      expect(getRpId(local)).toBe('localhost');
-      expect(getOrigin(local)).toBe('http://localhost:3000');
-    });
+  it('has exactly one anchor resolver — the legacy passkey stack is gone (BA-0059)', () => {
+    // The second copy of these resolvers lived in app/api/auth/passkey/_lib.ts
+    // and served a cookie-challenge ceremony that BA-0059 removed. Two copies of
+    // a security check drift; this keeps it from quietly coming back.
+    const root = process.cwd();
+    expect(existsSync(join(root, 'app/api/auth/passkey/_lib.ts'))).toBe(false);
+    for (const route of ['options', 'verify', 'register', 'register-options']) {
+      expect(existsSync(join(root, 'app/api/auth/passkey', route, 'route.ts'))).toBe(false);
+    }
   });
 
   it('treats an empty or whitespace-only anchor as missing, not as a value', () => {

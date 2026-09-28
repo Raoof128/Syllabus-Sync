@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { jsonSuccess, jsonError, ERROR_CODES } from '@/app/api/_lib/response';
 import { passwordResetLimiter } from '@/lib/services/rateLimitService';
 import { parseJsonBody } from '@/app/api/_lib/middleware';
+import { requireAal2IfEnrolled, verifyPasswordWithoutSession } from '@/app/api/_lib/aal';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -55,14 +56,27 @@ export async function POST(request: NextRequest) {
 
     const { currentPassword, newPassword } = parsed.data;
 
-    // Verify current password by attempting to sign in
-    // This is done server-side to avoid session side effects on the client
-    const { error: verifyError } = await supabase.auth.signInWithPassword({
-      email: user.email!,
-      password: currentPassword,
-    });
+    // BA-0064: /api/auth/* is outside the middleware's AAL2 gate, so a
+    // password alone must not be enough to replace the password of an account
+    // that has a second factor.
+    const stepUp = await requireAal2IfEnrolled(supabase, user.id, 'Password change');
+    if (stepUp) return stepUp;
 
-    if (verifyError) {
+    if (!user.email) {
+      return jsonError(
+        'Password change is not available for this account',
+        400,
+        ERROR_CODES.BAD_REQUEST,
+      );
+    }
+
+    // Verify the current password WITHOUT touching the caller's session. This
+    // used to call signInWithPassword on the cookie-bound client, which
+    // replaced the caller's (possibly AAL2) session with a new AAL1 one before
+    // updateUser ran.
+    const passwordOk = await verifyPasswordWithoutSession(user.email, currentPassword);
+
+    if (!passwordOk) {
       return jsonError('Current password is incorrect', 400, ERROR_CODES.BAD_REQUEST, {
         remainingAttempts: remaining,
       });

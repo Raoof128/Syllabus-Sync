@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { GoogleWeatherProvider } from '@/lib/weather/providers/googleWeatherProvider';
 import { z } from 'zod';
 import { WeatherResult } from '@/lib/weather/types';
+import { requireAuth } from '@/app/api/_lib/middleware';
 
 /**
  * Weather API Proxy Endpoint
@@ -56,7 +57,7 @@ const WeatherResultSchema = z.object({
   modelUsed: z.string().optional(),
 });
 
-export async function GET(request: NextRequest) {
+async function handleGet(request: NextRequest) {
   // SECURITY: Rate limit weather API requests
   const clientIP = getClientIP(request);
   const { allowed, resetIn } = await apiLimiter(`weather:${clientIP}`);
@@ -164,4 +165,12 @@ export async function GET(request: NextRequest) {
 
     return jsonError('Failed to fetch weather data', 503, ERROR_CODES.EXTERNAL_SERVICE_ERROR);
   }
+}
+
+// BA-0065: this route proxies the paid Google Weather API. It used to be on
+// the middleware's public list, gated only by an origin check that accepts a
+// request with no Origin/Referer, so anyone could spend the project's quota.
+// It is now behind the middleware session gate and enforces auth itself too.
+export async function GET(request: NextRequest) {
+  return requireAuth(request, () => handleGet(request));
 }

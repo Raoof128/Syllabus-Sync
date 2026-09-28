@@ -9,6 +9,16 @@ const loggerMock = {
   debug: vi.fn(),
 };
 
+// BA-0065: the route now requires a session. `authenticated` toggles the
+// requireAuth stand-in so the unauthenticated path can be asserted too.
+let authenticated = true;
+vi.mock('@/app/api/_lib/middleware', () => ({
+  requireAuth: async (_request: Request, handler: (userId: string) => Promise<Response>) =>
+    authenticated
+      ? handler('user-1')
+      : new Response(JSON.stringify({ error: { code: 'UNAUTHORIZED' } }), { status: 401 }),
+}));
+
 vi.mock('@/lib/services/rateLimitService', () => ({
   apiLimiter: (...args: Parameters<typeof apiLimiterMock>) => apiLimiterMock(...args),
 }));
@@ -35,6 +45,26 @@ describe('POST /api/maps/routes', () => {
     getClientIPMock.mockReturnValue('127.0.0.1');
     isTrustedOriginMock.mockReturnValue(true);
     global.fetch = vi.fn();
+    authenticated = true;
+  });
+
+  it('refuses an unauthenticated caller before spending any Google quota (BA-0065)', async () => {
+    process.env.GOOGLE_ROUTES_API_KEY = 'test-routes-key';
+    authenticated = false;
+
+    const { POST } = await import('@/app/api/maps/routes/route');
+    const response = await POST(
+      new Request('http://localhost/api/maps/routes', {
+        method: 'POST',
+        body: JSON.stringify({
+          origin: { lat: -33.774, lng: 151.112 },
+          destination: { lat: -33.775, lng: 151.114 },
+        }),
+      }) as never,
+    );
+
+    expect(response.status).toBe(401);
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   afterEach(() => {

@@ -7,11 +7,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { requireAuth } from '@/app/api/_lib/middleware';
 
 // Force Node.js runtime so fs is available
 export const runtime = 'nodejs';
 
-export async function POST(req: NextRequest) {
+async function handlePost(req: NextRequest) {
   if (process.env.NODE_ENV !== 'development') {
     return NextResponse.json({ error: 'Dev-only endpoint' }, { status: 403 });
   }
@@ -80,4 +81,12 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ success: true, buildingId, position: [x, y] });
+}
+
+// BA-0065: this dev-only route rewrites a source file on disk. It sat under the
+// public /api/maps/ prefix with no auth and no CSRF check, so any website a
+// developer visited could POST to their local server.
+// It is now behind the middleware session gate and enforces auth itself too.
+export async function POST(req: NextRequest) {
+  return requireAuth(req, () => handlePost(req));
 }

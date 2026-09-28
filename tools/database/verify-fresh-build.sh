@@ -43,10 +43,16 @@ fi
 
 psql_ -d postgres -q -c "CREATE DATABASE $DB;"
 
-# Minimal Supabase-equivalent surface. Deliberately does NOT grant blanket
-# EXECUTE on functions to anon: two migrations revoke only FROM PUBLIC, which
-# would not remove a direct anon grant (the same defect class as BA-0055), and
-# their own verification blocks correctly fail if that grant is present.
+# Minimal Supabase-equivalent surface, including Supabase's default privileges
+# on tables, sequences AND functions.
+#
+# BA-0060: this bootstrap used to omit the default EXECUTE grant on functions,
+# on the stated grounds that two migrations' verification blocks would fail
+# with it. That was not true, and the omission hid a real defect: migrations
+# that revoke only FROM PUBLIC leave Supabase's direct anon grant in place, so
+# the rate-limit store was anon-callable in any real Supabase project while
+# this replay reported it locked. A replay that is more locked-down than the
+# platform proves nothing about the platform.
 psql_ -d "$DB" -v ON_ERROR_STOP=1 -q <<'SQL'
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -91,6 +97,7 @@ CREATE OR REPLACE FUNCTION storage.extension(name text) RETURNS text LANGUAGE sq
 GRANT USAGE ON SCHEMA public, auth, storage, extensions TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;
 CREATE PUBLICATION supabase_realtime;
 SQL
 
@@ -115,4 +122,38 @@ if [ "$failed" -ne 0 ]; then
   exit 1
 fi
 
+# Post-build invariants. These run against the built catalogue, not migration
+# text, so a later migration cannot quietly re-open what an earlier one closed.
+invariants=$(psql_ -d "$DB" -tA -v ON_ERROR_STOP=1 <<'SQL'
+-- BA-0060: no SECURITY DEFINER function in public may be executable by anon.
+SELECT 'anon can execute definer function ' || p.oid::regprocedure
+FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'public' AND p.prosecdef
+  AND has_function_privilege('anon', p.oid, 'EXECUTE')
+UNION ALL
+-- BA-0059: passkey key material may only be written by the server.
+SELECT 'client role can ' || lower(priv) || ' webauthn_credentials: ' || r
+FROM unnest(ARRAY['anon', 'authenticated']) AS r,
+     unnest(ARRAY['INSERT', 'UPDATE']) AS priv
+WHERE has_table_privilege(r, 'public.webauthn_credentials', priv)
+  AND EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public' AND tablename = 'webauthn_credentials'
+      AND cmd IN (priv, 'ALL') AND NOT (roles = ARRAY['service_role']::name[])
+  )
+UNION ALL
+SELECT 'table grant ' || lower(priv) || ' on webauthn_credentials held by ' || r
+FROM unnest(ARRAY['anon', 'authenticated']) AS r,
+     unnest(ARRAY['INSERT', 'UPDATE']) AS priv
+WHERE has_table_privilege(r, 'public.webauthn_credentials', priv);
+SQL
+)
+
+if [ -n "$invariants" ]; then
+  echo "FAIL: post-build security invariants violated:" >&2
+  echo "$invariants" | sed 's/^/  /' >&2
+  exit 1
+fi
+
 echo "OK: a working database can be built from supabase/migrations/ alone."
+echo "OK: post-build security invariants hold (BA-0059, BA-0060)."
