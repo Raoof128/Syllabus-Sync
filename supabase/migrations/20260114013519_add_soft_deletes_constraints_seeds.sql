@@ -282,8 +282,35 @@ FROM public.deadlines d
 WHERE d.deleted_at IS NULL
 GROUP BY date_trunc('week', d.due_date), d.user_id, d.priority, d.type;
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_deadline_analytics_key 
-ON public.mv_deadline_analytics(week_start, user_id, priority, type);
+-- BA-0027 / BA-0053: the CREATE MATERIALIZED VIEW IF NOT EXISTS above is a
+-- silent no-op, because 20260114000000_add_missing_materialized_views.sql
+-- already created mv_deadline_analytics with a different, narrower shape keyed
+-- on user_id alone. The richer week_start/priority/type definition above
+-- therefore never materialises, and this index then aborted the migration with
+-- `column "week_start" does not exist` -- taking the rest of this file
+-- (soft-delete constraints and seeds) with it.
+--
+-- Guarded so the index is created only against a matview that actually has the
+-- column. Reconciling the two competing definitions requires dropping and
+-- recreating the matview, which changes the contract of
+-- get_my_deadline_analytics() and refresh_analytics_views(); that belongs in its
+-- own reviewed forward migration, not in a repair to an historical file.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_attribute a
+    JOIN pg_class c ON c.oid = a.attrelid
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relname = 'mv_deadline_analytics'
+      AND a.attname = 'week_start'
+      AND a.attnum > 0 AND NOT a.attisdropped
+  ) THEN
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_deadline_analytics_key
+      ON public.mv_deadline_analytics(week_start, user_id, priority, type);
+  END IF;
+END
+$$;
 
 -- XP leaderboard (top users by XP)
 CREATE MATERIALIZED VIEW IF NOT EXISTS public.mv_xp_leaderboard AS

@@ -40,7 +40,6 @@ describe('profilesStore', () => {
     useProfilesStore.getState().addProfile({
       name: 'Test User',
       email: 'test@example.com',
-      studentId: '12345',
       faculty: 'Science',
       course: 'CS',
       year: '2026',
@@ -57,7 +56,6 @@ describe('profilesStore', () => {
     useProfilesStore.getState().addProfile({
       name: 'A',
       email: '',
-      studentId: '',
       faculty: '',
       course: '',
       year: '',
@@ -66,7 +64,6 @@ describe('profilesStore', () => {
     useProfilesStore.getState().addProfile({
       name: 'B',
       email: '',
-      studentId: '',
       faculty: '',
       course: '',
       year: '',
@@ -86,7 +83,6 @@ describe('profilesStore', () => {
     useProfilesStore.getState().addProfile({
       name: 'C',
       email: '',
-      studentId: '',
       faculty: '',
       course: '',
       year: '',
@@ -111,7 +107,6 @@ describe('profilesStore', () => {
     useProfilesStore.getState().addProfile({
       name: 'X',
       email: 'x@x.com',
-      studentId: '',
       faculty: '',
       course: '',
       year: '',
@@ -136,7 +131,6 @@ describe('profilesStore', () => {
     useProfilesStore.getState().addProfile({
       name: 'Y',
       email: '',
-      studentId: '',
       faculty: '',
       course: '',
       year: '',

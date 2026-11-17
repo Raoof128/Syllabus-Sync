@@ -32,35 +32,42 @@ afterEach(() => {
 });
 
 describe('rateLimitService production memory override', () => {
-  it('blocks fail-closed limiters in production when no distributed store is configured', async () => {
-    process.env.VERCEL_ENV = 'production';
-    unsetDistributedStoreEnv();
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete process.env.ALLOW_MEMORY_RATE_LIMIT;
+  it.each([
+    ['Cloudflare', { DEPLOYMENT_PLATFORM: 'cloudflare', DEPLOYMENT_ENV: 'production' }],
+    ['Vercel rollback', { VERCEL: '1', VERCEL_ENV: 'production' }],
+  ])(
+    'blocks fail-closed limiters in %s production when no distributed store is configured',
+    async (_platform, productionEnv) => {
+      Object.assign(process.env, productionEnv);
+      unsetDistributedStoreEnv();
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete process.env.ALLOW_MEMORY_RATE_LIMIT;
 
-    vi.doMock('@/lib/logger', () => ({
-      logger: {
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-      },
-    }));
+      vi.doMock('@/lib/logger', () => ({
+        logger: {
+          info: vi.fn(),
+          warn: vi.fn(),
+          error: vi.fn(),
+        },
+      }));
 
-    const { checkRateLimit } = await import('@/lib/services/rateLimitService');
-    const result = await checkRateLimit('127.0.0.1', {
-      prefix: 'login',
-      windowMs: 60_000,
-      maxRequests: 10,
-      failClosed: true,
-    });
+      const { checkRateLimit } = await import('@/lib/services/rateLimitService');
+      const result = await checkRateLimit('127.0.0.1', {
+        prefix: 'login',
+        windowMs: 60_000,
+        maxRequests: 10,
+        failClosed: true,
+      });
 
-    expect(result.allowed).toBe(false);
-    expect(result.remaining).toBe(0);
-    expect(result.resetIn).toBe(60);
-  });
+      expect(result.allowed).toBe(false);
+      expect(result.remaining).toBe(0);
+      expect(result.resetIn).toBe(60);
+    },
+  );
 
   it('allows fail-closed limiters in production when ALLOW_MEMORY_RATE_LIMIT=true (demo override)', async () => {
-    process.env.VERCEL_ENV = 'production';
+    process.env.DEPLOYMENT_PLATFORM = 'cloudflare';
+    process.env.DEPLOYMENT_ENV = 'production';
     process.env.ALLOW_MEMORY_RATE_LIMIT = 'true';
     unsetDistributedStoreEnv();
 

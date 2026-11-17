@@ -2,21 +2,33 @@
 // The config you add here will be used whenever the server handles a request.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-export {};
+import { getDeploymentEnvironment, isProductionDeployment } from '@/lib/platform/runtime';
+import { scrubSentryEvent } from '@/lib/observability/sentry-scrub';
 
 // Only initialize Sentry if DSN is configured
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 const sentryEnabled =
-  Boolean(dsn) && (process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true');
+  Boolean(dsn) && (isProductionDeployment() || process.env.SENTRY_ENABLED === 'true');
 
 if (sentryEnabled) {
-  void import('@sentry/nextjs')
+  // SECURITY/RELIABILITY (BA-0018): this used to be `void import(...).then(...)`,
+  // a floating promise that is never awaited and never handed to
+  // `ctx.waitUntil()`. On Cloudflare Workers, async work outside the
+  // request/response lifecycle is not guaranteed to keep running once the
+  // first response has been sent — a cold isolate's first request could
+  // complete before this promise chain settles, leaving Sentry silently
+  // uninitialized for that isolate's lifetime. This file is loaded via
+  // Next's Sentry-instrumented `register()` hook as
+  // `await import('./sentry.server.config')`, so awaiting the chain here
+  // means that outer await transitively waits for Sentry.init() to finish
+  // before the isolate starts handling requests.
+  await import('@sentry/nextjs')
     .then((Sentry) => {
       Sentry.init({
         dsn,
 
         // Performance Monitoring
-        tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+        tracesSampleRate: isProductionDeployment() ? 0.1 : 1.0,
 
         // Set sampling rate for profiling - this is relative to tracesSampleRate
         profilesSampleRate: 0.1,
@@ -25,18 +37,17 @@ if (sentryEnabled) {
         debug: false,
 
         // Environment tagging
-        environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'development',
+        environment: getDeploymentEnvironment(),
 
         // Only send errors in production (unless explicitly enabled)
-        enabled: process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true',
+        enabled: isProductionDeployment() || process.env.SENTRY_ENABLED === 'true',
 
         // Filter out sensitive data
         beforeSend(event) {
-          // Remove potentially sensitive data
-          if (event.request?.headers) {
-            delete event.request.headers['authorization'];
-            delete event.request.headers['cookie'];
-          }
+          // Headers, request body, cookies and query string. The body is the
+          // one that matters here: /api/security/check-password-breach takes a
+          // plaintext password. See lib/observability/sentry-scrub.ts.
+          scrubSentryEvent(event);
 
           // Remove sensitive data from breadcrumbs
           if (event.breadcrumbs) {

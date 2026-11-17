@@ -4,7 +4,7 @@ import { useTypedTranslation } from '@/lib/hooks/useTypedTranslation';
 import type { TranslationKey } from '@/lib/i18n/translations';
 import { UserProfile, useProfilesStore } from '@/lib/store/profilesStore';
 import { MagicCard } from '@/components/ui/MagicCard';
-import { Camera, Mail, IdCard, Loader2 } from 'lucide-react';
+import { Camera, Mail, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { BRAND_COLORS } from '@/lib/config';
 import { toastUtils } from '@/lib/utils/toast';
@@ -140,15 +140,6 @@ export function ProfileHeader({ profile, isSaving: isFormSaving }: ProfileHeader
                   <Mail className="h-3.5 w-3.5 shrink-0 text-mq-content-tertiary" />
                   <span className="break-all">{profile.email}</span>
                 </p>
-                {profile.studentId && (
-                  <p className="text-mq-content-tertiary text-sm flex items-center justify-center sm:justify-start gap-1.5 min-w-0">
-                    <IdCard className="h-3.5 w-3.5 shrink-0" />
-                    <span className="break-all">
-                      {t('idPrefix')}
-                      {profile.studentId}
-                    </span>
-                  </p>
-                )}
               </div>
               {profile.avatar?.startsWith('data:') && (
                 <p className="mt-2 text-xs text-mq-warning">{t('avatarLocalOnlyWarning')}</p>

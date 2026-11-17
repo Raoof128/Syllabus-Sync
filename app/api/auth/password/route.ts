@@ -83,6 +83,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // SECURITY (BA-0005): revoke every other session so a stolen/leaked
+    // session (or the very compromise that motivated this password change)
+    // cannot outlive it. Uses Supabase's native session revocation - the
+    // same `auth.signOut({ scope })` mechanism already used by the manual
+    // "sign out other devices" action in POST /api/auth/sessions - rather
+    // than lib/security/session-termination.ts, which is dead code: it
+    // reads/writes a `user_sessions` table that nothing in the app ever
+    // inserts into, so it would always operate on zero rows. `scope:
+    // 'others'` keeps the current session (the one that just proved
+    // knowledge of the current password) signed in.
+    const { error: signOutOthersError } = await supabase.auth.signOut({ scope: 'others' });
+    if (signOutOthersError) {
+      logger.error(
+        'Failed to revoke other sessions after password change:',
+        signOutOthersError.message,
+      );
+    }
+
     return jsonSuccess({
       message: 'Password changed successfully',
     });

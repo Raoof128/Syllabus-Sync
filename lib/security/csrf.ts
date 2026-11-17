@@ -10,58 +10,58 @@
  * - Custom header requirement for API calls
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { randomHex, sha256Hex } from './edge-crypto';
-import { getTrustedExternalOrigins } from './trusted-origins';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  getConfiguredAppOrigin,
+  isProductionDeployment,
+} from "@/lib/platform/runtime";
+import { getTrustedExternalOrigins } from "./trusted-origins";
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-const CSRF_COOKIE_NAME = '__Host-csrf';
-const CSRF_HEADER_NAME = 'x-csrf-token';
+const CSRF_COOKIE_NAME = "__Host-csrf";
+const CSRF_HEADER_NAME = "x-csrf-token";
 const CSRF_TOKEN_LENGTH = 32;
 const CSRF_TOKEN_MAX_AGE = 60 * 60 * 24; // 24 hours
 
 // Methods that require CSRF protection
-const PROTECTED_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
+const PROTECTED_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
 
 // Paths that are exempt from CSRF (webhooks, etc.)
-const EXEMPT_PATHS = ['/api/webhooks/', '/api/cron/'];
+const EXEMPT_PATHS = ["/api/webhooks/", "/api/cron/"];
 
 // ============================================================================
 // TOKEN GENERATION
 // ============================================================================
 
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
 /**
  * Generate a cryptographically secure CSRF token
  */
 export function generateCSRFToken(): string {
-  return randomHex(CSRF_TOKEN_LENGTH);
+  const bytes = new Uint8Array(CSRF_TOKEN_LENGTH);
+  globalThis.crypto.getRandomValues(bytes);
+  return bytesToHex(bytes);
 }
 
 /**
- * Hash a CSRF token for comparison (prevents timing attacks)
- */
-function hashToken(token: string): string {
-  return sha256Hex(token);
-}
-
-/**
- * Securely compare two tokens (constant-time comparison)
+ * Compare equal-length tokens with constant work and no data-dependent early exit.
+ * Length mismatches can safely fail before comparison because tokens have a fixed shape.
  */
 function secureCompare(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
 
-  const aHash = hashToken(a);
-  const bHash = hashToken(b);
-
-  let result = 0;
-  for (let i = 0; i < aHash.length; i++) {
-    result |= aHash.charCodeAt(i) ^ bHash.charCodeAt(i);
+  let difference = 0;
+  for (let index = 0; index < a.length; index += 1) {
+    difference |= a.charCodeAt(index) ^ b.charCodeAt(index);
   }
 
-  return result === 0;
+  return difference === 0;
 }
 
 // ============================================================================
@@ -89,18 +89,18 @@ export function validateCSRFToken(request: NextRequest): {
   // Get token from cookie
   const cookieToken = request.cookies.get(CSRF_COOKIE_NAME)?.value;
   if (!cookieToken) {
-    return { valid: false, reason: 'Missing CSRF cookie' };
+    return { valid: false, reason: "Missing CSRF cookie" };
   }
 
   // Get token from header
   const headerToken = request.headers.get(CSRF_HEADER_NAME);
   if (!headerToken) {
-    return { valid: false, reason: 'Missing CSRF header' };
+    return { valid: false, reason: "Missing CSRF header" };
   }
 
   // Compare tokens
   if (!secureCompare(cookieToken, headerToken)) {
-    return { valid: false, reason: 'CSRF token mismatch' };
+    return { valid: false, reason: "CSRF token mismatch" };
   }
 
   return { valid: true };
@@ -113,8 +113,8 @@ export function validateOrigin(request: NextRequest): {
   valid: boolean;
   reason?: string;
 } {
-  const origin = request.headers.get('origin');
-  const referer = request.headers.get('referer');
+  const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
 
   // For non-mutation requests, skip validation
   if (!PROTECTED_METHODS.includes(request.method)) {
@@ -123,14 +123,14 @@ export function validateOrigin(request: NextRequest): {
 
   // No origin + no referer = non-browser (curl, Postman, service worker) → allow
   if (!origin && !referer) {
-    console.warn('CSRF: Request without origin/referer headers', {
+    console.warn("CSRF: Request without origin/referer headers", {
       method: request.method,
       path: request.nextUrl.pathname,
     });
     return { valid: true };
   }
 
-  const host = request.headers.get('host');
+  const host = request.headers.get("host");
   const allowedOrigins = getAllowedOrigins();
 
   // Check origin header — same-host check first (handles all deploy aliases)
@@ -141,7 +141,7 @@ export function validateOrigin(request: NextRequest): {
       if (allowedOrigins.includes(originUrl.origin)) return { valid: true };
       return { valid: false, reason: `Invalid origin: ${origin}` };
     } catch {
-      return { valid: false, reason: 'Malformed origin header' };
+      return { valid: false, reason: "Malformed origin header" };
     }
   }
 
@@ -153,7 +153,7 @@ export function validateOrigin(request: NextRequest): {
       if (allowedOrigins.includes(refererUrl.origin)) return { valid: true };
       return { valid: false, reason: `Invalid referer: ${referer}` };
     } catch {
-      return { valid: false, reason: 'Malformed referer header' };
+      return { valid: false, reason: "Malformed referer header" };
     }
   }
 
@@ -164,35 +164,28 @@ export function validateOrigin(request: NextRequest): {
  * Get list of allowed origins
  */
 function getAllowedOrigins(): string[] {
-  const origins = [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:3002',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:3001',
-    'http://127.0.0.1:3002',
-  ];
+  // BA-0039: these were returned unconditionally, including in production. That
+  // was latent rather than live — the global middleware applies the stricter
+  // validateCSRF()/getTrustedOrigins() check first and rejected all six — but
+  // validateOrigin() is still wired into app/api/_lib/middleware.ts,
+  // app/api/navigate/route.ts and withCSRFProtection(), so a single change to the
+  // middleware matcher would have made them reachable. Defence in depth must not
+  // rely on an outer layer that a routing change can remove.
+  const origins = isProductionDeployment()
+    ? []
+    : [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
+      ];
 
-  const addUrl = (raw: string | undefined) => {
-    if (!raw) return;
-    try {
-      origins.push(new URL(raw).origin);
-    } catch {
-      /* ignore invalid URL */
-    }
-  };
-
-  addUrl(process.env.NEXT_PUBLIC_APP_URL);
-
-  // Vercel injects three URL vars per deployment; all must be trusted
-  if (process.env.VERCEL_URL) origins.push(`https://${process.env.VERCEL_URL}`);
-  if (process.env.VERCEL_BRANCH_URL) origins.push(`https://${process.env.VERCEL_BRANCH_URL}`);
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    origins.push(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
+  const configuredOrigin = getConfiguredAppOrigin();
+  if (configuredOrigin && !origins.includes(configuredOrigin)) {
+    origins.push(configuredOrigin);
   }
-
-  // Explicitly-configured sibling apps (e.g. Sylla). No wildcards.
-  origins.push(...getTrustedExternalOrigins());
 
   return origins;
 }
@@ -212,9 +205,9 @@ export function withCSRFProtection<T>(
     // Validate origin
     const originResult = validateOrigin(request);
     if (!originResult.valid) {
-      console.warn('CSRF origin validation failed:', originResult.reason);
+      console.warn("CSRF origin validation failed:", originResult.reason);
       return NextResponse.json(
-        { error: { code: 'CSRF_ERROR', message: 'Invalid request origin' } },
+        { error: { code: "CSRF_ERROR", message: "Invalid request origin" } },
         { status: 403 },
       );
     }
@@ -223,23 +216,23 @@ export function withCSRFProtection<T>(
     // This provides defense-in-depth on top of Supabase's SameSite=Lax cookies
     // SECURITY FIX: CSRF can ONLY be disabled in development, never in production
     // This prevents attackers from disabling CSRF protection via environment variables
-    const isRealProduction =
-      process.env.VERCEL_ENV === 'production' ||
-      (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+    const isRealProduction = isProductionDeployment();
 
     // NOTE: For Vitest integration tests, we allow disabling CSRF validation
     // in the test environment specifically.
-    const isTest = process.env.VITEST === 'true' || process.env.NODE_ENV === 'test';
+    const isTest =
+      process.env.VITEST === "true" || process.env.NODE_ENV === "test";
 
     const csrfEnabled =
-      isRealProduction || (process.env.CSRF_VALIDATION_ENABLED !== 'false' && !isTest);
+      isRealProduction ||
+      (process.env.CSRF_VALIDATION_ENABLED !== "false" && !isTest);
 
     if (csrfEnabled) {
       const csrfResult = validateCSRFToken(request);
       if (!csrfResult.valid) {
-        console.warn('CSRF token validation failed:', csrfResult.reason);
+        console.warn("CSRF token validation failed:", csrfResult.reason);
         return NextResponse.json(
-          { error: { code: 'CSRF_ERROR', message: 'Invalid CSRF token' } },
+          { error: { code: "CSRF_ERROR", message: "Invalid CSRF token" } },
           { status: 403 },
         );
       }
@@ -258,12 +251,12 @@ export function withCSRFProtection<T>(
  * These receive legitimate cross-origin or server-to-server traffic.
  */
 const CSRF_EXEMPT_PREFIXES = [
-  '/api/auth/callback', // Supabase OAuth callback
-  '/api/auth/confirm', // Supabase email confirm
-  '/api/webhooks', // Inbound webhooks (Stripe, etc.)
-  '/api/maps', // Google Maps proxy
-  '/api/health', // Health checks
-  '/api/cron/', // Cron jobs
+  '/api/auth/callback',   // Supabase OAuth callback
+  '/api/auth/confirm',    // Supabase email confirm
+  '/api/webhooks',        // Inbound webhooks (Stripe, etc.)
+  '/api/maps',            // Google Maps proxy
+  '/api/health',          // Health checks
+  '/api/cron/',           // Cron jobs
 ];
 
 /** HTTP methods that cannot carry state-changing intent */
@@ -276,18 +269,18 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 function getTrustedOrigins(): Set<string> {
   const origins = new Set<string>();
 
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    origins.add(process.env.NEXT_PUBLIC_SITE_URL);
-  }
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    try {
-      origins.add(new URL(process.env.NEXT_PUBLIC_APP_URL).origin);
-    } catch {
-      /* ignore invalid URL */
-    }
+  const configuredOrigin = getConfiguredAppOrigin();
+  if (configuredOrigin) {
+    origins.add(configuredOrigin);
   }
 
-  origins.add('https://maps.googleapis.com');
+  // BA-0037: `https://maps.googleapis.com` used to be trusted here. It was never
+  // needed — the Maps SDK is loaded *outbound* as a <script src> in
+  // lib/maps/google/loader.ts and nothing on that host ever posts to this app —
+  // and it widened CSRF trust to a third-party origin that also appears in
+  // `script-src`, i.e. one host trusted both for code and for request
+  // provenance. Verified live before removal: `Origin: https://maps.googleapis.com`
+  // reached the credential check (401) where an arbitrary origin was rejected (403).
 
   if (process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF) {
     origins.add(`https://${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF}.supabase.co`);
@@ -295,16 +288,8 @@ function getTrustedOrigins(): Set<string> {
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     try {
       origins.add(new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin);
-    } catch {
-      /* ignore invalid URL */
-    }
+    } catch { /* ignore invalid URL */ }
   }
-  if (process.env.VERCEL_URL) origins.add(`https://${process.env.VERCEL_URL}`);
-  if (process.env.VERCEL_BRANCH_URL) origins.add(`https://${process.env.VERCEL_BRANCH_URL}`);
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    origins.add(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
-  }
-
   // Explicitly-configured sibling apps (e.g. Sylla). No wildcards.
   for (const origin of getTrustedExternalOrigins()) {
     origins.add(origin);
@@ -380,9 +365,9 @@ export function setCSRFCookie(response: NextResponse, token?: string): void {
 
   response.cookies.set(CSRF_COOKIE_NAME, csrfToken, {
     httpOnly: false, // Must be readable by JS for double-submit
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
     maxAge: CSRF_TOKEN_MAX_AGE,
-    path: '/',
+    path: "/",
   });
 }

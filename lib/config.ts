@@ -24,7 +24,6 @@ export const APP_CONFIG = {
  */
 export const DEMO_USER = {
   name: 'Student',
-  studentId: '',
   email: '',
 } as const;
 

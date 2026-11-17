@@ -186,5 +186,5 @@ For Docker-based deployments, see the [Docker README](../../infra/docker/README.
 | :---------------------- | :--------------------------------------------------------------------------------------------- |
 | Google Maps Platform    | [`docs/operations/google-maps-platform-setup.md`](../operations/google-maps-platform-setup.md) |
 | Supabase OAuth (Google) | [`docs/operations/supabase-oauth-setup.md`](../operations/supabase-oauth-setup.md)             |
-| Legacy Vercel setup     | [`docs/operations/resend-vercel-setup.md`](../operations/resend-vercel-setup.md)               |
+| Legacy Vercel setup     | [`docs/operations/resend-deployment-setup.md`](../operations/resend-deployment-setup.md)       |
 | Deployment Checklist    | [`docs/operations/deployment-checklist.md`](../operations/deployment-checklist.md)             |

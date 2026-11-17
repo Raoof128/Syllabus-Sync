@@ -1,5 +1,15 @@
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { isProductionDeployment } from '@/lib/platform/runtime';
+
+/**
+ * Wall-clock ceiling for a rate-limit store round trip.
+ *
+ * Deliberately tight: this call sits in front of every authentication request,
+ * and a slow limiter is worse than a briefly unavailable one — the failClosed
+ * policy is there to handle unavailability.
+ */
+const RATE_LIMIT_STORE_TIMEOUT_MS = 2_000;
 /**
  * Distributed Rate Limiting Service
  *
@@ -111,6 +121,14 @@ class UpstashRedisStore implements RateLimitStore {
   }
 
   private async command<T>(...args: (string | number)[]): Promise<T> {
+    // SECURITY/AVAILABILITY: bound the store call. `checkRateLimit` awaits this
+    // BEFORE the handler runs, so an endpoint that accepts the connection and
+    // then never responds (a partial Upstash/KV outage) hangs every login,
+    // signup, password reset, MFA verify and passkey auth in the isolate until
+    // the Worker wall-clock limit kills them — and `failClosed` never gets to
+    // decide, because no error is ever thrown. A timeout converts the hang into
+    // a rejection so the failClosed policy actually applies. Same class as the
+    // HIBP fix in lib/security/password-breach.ts, on a more critical path.
     const response = await fetch(`${this.baseUrl}`, {
       method: 'POST',
       headers: {
@@ -118,6 +136,7 @@ class UpstashRedisStore implements RateLimitStore {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(args),
+      signal: AbortSignal.timeout(RATE_LIMIT_STORE_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -257,12 +276,9 @@ function getStore(): RateLimitStore {
     // fall through
   }
 
-  // SECURITY: In production, require Redis - don't fall back to memory store
+  // SECURITY: In production, require a distributed store - don't silently rely on memory.
   // Memory store is useless in serverless environments (each instance has its own memory)
-  // Use VERCEL_ENV for more reliable production detection
-  const isRealProduction =
-    process.env.VERCEL_ENV === 'production' ||
-    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+  const isRealProduction = isProductionDeployment();
 
   // SECURITY: Check for explicit override to allow memory store in production
   // This should only be used for testing/demo deployments
@@ -319,10 +335,7 @@ export async function checkRateLimit(
     ? `ratelimit:${config.prefix}:${identifier}`
     : `ratelimit:${identifier}`;
   const now = Date.now();
-  // SECURITY: Use VERCEL_ENV for reliable production detection
-  const isProduction =
-    process.env.VERCEL_ENV === 'production' ||
-    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+  const isProduction = isProductionDeployment();
   const isMemoryStore = store instanceof MemoryStore;
   const allowMemoryStore = process.env.ALLOW_MEMORY_RATE_LIMIT === 'true';
 
@@ -410,7 +423,9 @@ export function createRateLimiter(config: RateLimitConfig) {
 export const signupLimiter = createRateLimiter({
   prefix: 'signup',
   windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 20, // Max 20 signups per hour per IP (increased for testing)
+  // BA-0038: was 20, a testing-only value that was never restored before shipping to
+  // production. 5 new accounts per hour per IP is ample for genuine use.
+  maxRequests: 5,
   failClosed: true, // SECURITY: Deny on store failure
 });
 
@@ -418,7 +433,10 @@ export const signupLimiter = createRateLimiter({
 export const loginLimiter = createRateLimiter({
   prefix: 'login',
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 50, // Max 50 attempts per 15 min (increased for testing)
+  // BA-0038: was 50, a testing-only value that was never restored before shipping to
+  // production — roughly 4,800 password guesses per day per account from a
+  // single IP. 10 per 15 min still absorbs typos and password-manager retries.
+  maxRequests: 10,
   failClosed: true, // SECURITY: Deny on store failure
 });
 
@@ -482,7 +500,10 @@ export const passkeyStatusLimiter = createRateLimiter({
 export const passkeyAuthLimiter = createRateLimiter({
   prefix: 'passkey_auth',
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 50, // Max 50 passkey auth attempts per 15 min (increased for testing)
+  // BA-0038: was 50, a testing-only value that was never restored before shipping to
+  // production. Kept in step with loginLimiter — these are two routes to the
+  // same account, so a loose limit on one undoes the other.
+  maxRequests: 10,
   failClosed: true, // SECURITY: Deny on store failure
 });
 

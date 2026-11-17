@@ -2,7 +2,7 @@ import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { sendPushNotificationToUser, isWebPushConfigured } from '@/lib/server/push';
-import { matchesBearerToken } from '@/lib/security/constant-time';
+import { constantTimeCompare } from '@/lib/security/constant-time-compare';
 
 const DEFAULT_LOOKAHEAD_MINUTES = 10;
 
@@ -15,6 +15,28 @@ function getLookaheadMinutes(): number {
   }
 
   return DEFAULT_LOOKAHEAD_MINUTES;
+}
+
+// SECURITY/RELIABILITY (BA-0014): this job previously loaded every matching
+// `user_preferences` row with no LIMIT and processed users one at a time in a
+// single unbounded sequential loop. As the user base grows, per-invocation
+// work grows linearly with (active users) x (matching reminders), and
+// Cloudflare Workers enforce a CPU-time ceiling per invocation — a large
+// enough table could get the invocation killed mid-run. Capping the batch
+// bounds worst-case work per run; any users left over are picked up on the
+// next invocation (this job runs every 10 minutes), so truncation only
+// delays delivery rather than dropping it.
+const DEFAULT_MAX_USERS_PER_RUN = 200;
+
+function getMaxUsersPerRun(): number {
+  const rawValue = process.env.PUSH_REMINDER_MAX_USERS_PER_RUN;
+  const parsed = rawValue ? Number.parseInt(rawValue, 10) : Number.NaN;
+
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed;
+  }
+
+  return DEFAULT_MAX_USERS_PER_RUN;
 }
 
 type ReminderCandidate = {
@@ -137,6 +159,7 @@ async function collectEventReminders(
 async function handlePushReminderCron() {
   const admin = createAdminClient();
   const lookaheadMinutes = getLookaheadMinutes();
+  const maxUsersPerRun = getMaxUsersPerRun();
 
   if (!admin) {
     return jsonError(
@@ -159,11 +182,20 @@ async function handlePushReminderCron() {
       'user_id, notifications_enabled, push_notifications, deadline_notifications_enabled, event_notifications_enabled, deadline_reminder_timing_minutes, event_reminder_timing_minutes',
     )
     .eq('notifications_enabled', true)
-    .eq('push_notifications', true);
+    .eq('push_notifications', true)
+    .limit(maxUsersPerRun);
 
   if (error) {
     logger.error('Failed to load push reminder preferences', error);
     return jsonError('Failed to load reminder preferences', 500, ERROR_CODES.DATABASE_ERROR);
+  }
+
+  const truncated = (preferences ?? []).length === maxUsersPerRun;
+  if (truncated) {
+    logger.warn(
+      'push-reminders cron hit the per-run user cap; remaining users will be processed on the next invocation',
+      { maxUsersPerRun },
+    );
   }
 
   let reminderCount = 0;
@@ -180,13 +212,35 @@ async function handlePushReminderCron() {
     reminderCount += reminders.length;
 
     for (const reminder of reminders) {
-      const { data: existingDelivery } = await admin
+      // SECURITY/CORRECTNESS (BA-0015): dedup used to be check-then-insert
+      // (SELECT for an existing row, then INSERT if none was found), which
+      // is a classic TOCTOU race — two overlapping cron invocations (or two
+      // runs within the same lookahead window) could both pass the SELECT
+      // before either INSERT committed, and both would go on to send the
+      // push notification, double-sending the reminder. `reminder_key` has
+      // a UNIQUE constraint (supabase/migrations/20260313093000), so we
+      // instead INSERT the delivery row FIRST as an atomic claim — only one
+      // concurrent invocation can ever win it — and only send the push
+      // after the claim succeeds. A unique-violation (23505) means another
+      // invocation already claimed and is handling this exact reminder, so
+      // we skip it here rather than sending a duplicate.
+      const { data: claimedDelivery, error: claimError } = await admin
         .from('push_reminder_deliveries')
+        .insert({
+          user_id: preference.user_id,
+          reminder_key: reminder.reminderKey,
+          reminder_type: reminder.reminderType,
+          related_id: reminder.relatedId,
+          scheduled_for: reminder.scheduledFor,
+          metadata: reminder.payload.data,
+        })
         .select('id')
-        .eq('reminder_key', reminder.reminderKey)
-        .maybeSingle();
+        .single();
 
-      if (existingDelivery) {
+      if (claimError) {
+        if (claimError.code !== '23505') {
+          logger.error('Failed to claim push reminder delivery', claimError);
+        }
         continue;
       }
 
@@ -195,20 +249,11 @@ async function handlePushReminderCron() {
       removedInvalidSubscriptionCount += result.invalidSubscriptionsRemoved;
 
       if (result.sentCount === 0) {
-        continue;
-      }
-
-      const { error: deliveryError } = await admin.from('push_reminder_deliveries').insert({
-        user_id: preference.user_id,
-        reminder_key: reminder.reminderKey,
-        reminder_type: reminder.reminderType,
-        related_id: reminder.relatedId,
-        scheduled_for: reminder.scheduledFor,
-        metadata: reminder.payload.data,
-      });
-
-      if (deliveryError) {
-        logger.error('Failed to record push reminder delivery', deliveryError);
+        // Nothing was actually delivered (e.g. no valid subscriptions right
+        // now) — release the claim so a later run can retry this reminder
+        // instead of being permanently blocked by a row that recorded a
+        // delivery that never happened.
+        await admin.from('push_reminder_deliveries').delete().eq('id', claimedDelivery.id);
         continue;
       }
 
@@ -218,7 +263,9 @@ async function handlePushReminderCron() {
 
   return jsonSuccess({
     lookaheadMinutes,
+    maxUsersPerRun,
     scannedUsers: preferences?.length ?? 0,
+    truncated,
     matchedReminders: reminderCount,
     deliveredReminders: deliveredReminderCount,
     sentPushCount,
@@ -230,7 +277,9 @@ function isAuthorized(request: Request): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
-  return matchesBearerToken(authHeader, cronSecret);
+  return Boolean(
+    cronSecret && authHeader && constantTimeCompare(authHeader, `Bearer ${cronSecret}`),
+  );
 }
 
 export async function GET(request: Request) {

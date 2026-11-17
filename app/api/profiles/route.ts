@@ -21,7 +21,6 @@ import { logger } from '@/lib/logger';
 
 const UpdateProfileSchema = z.object({
   full_name: z.string().min(1).max(100).optional(),
-  student_id: z.string().min(1).max(20).nullable().optional(),
   faculty: z.string().max(100).nullable().optional(),
   course: z.string().max(100).nullable().optional(),
   year: z.string().max(20).nullable().optional(),
@@ -60,7 +59,6 @@ export async function GET(request: Request) {
               id: userId,
               email: user?.email,
               full_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User',
-              student_id: user?.user_metadata?.student_id || null,
             })
             .select()
             .single();
@@ -125,7 +123,6 @@ export async function PUT(request: Request) {
           updated_at: new Date().toISOString(),
         };
         if ('full_name' in updates) updatePayload.full_name = updates.full_name ?? null;
-        if ('student_id' in updates) updatePayload.student_id = updates.student_id ?? null;
         if ('faculty' in updates) updatePayload.faculty = updates.faculty ?? null;
         if ('course' in updates) updatePayload.course = updates.course ?? null;
         if ('year' in updates) updatePayload.year = updates.year ?? null;

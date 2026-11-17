@@ -31,7 +31,6 @@ export interface UserProfile {
   id: string;
   email: string;
   full_name?: string;
-  student_id?: string;
   course?: string;
   year?: string;
   avatar_url?: string;

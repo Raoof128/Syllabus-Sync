@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Merging the Backend Security Work Into the October Trunk — 2026-11-17
+
+**Scope:** One merge of the October 2026 trunk (product, branding, build and deploy setup, CI) with the July–August 2026 backend security work, which had diverged since April.
+
+**Summary:** The October trunk is the base. Added on top: the security test suites, 16 migrations and 6 migration repairs, the backend and runtime audit records, account deletion, auth audit logging, Sentry request scrubbing and the fresh-database CI job. Where both lines had fixed the same defect the trunk's version stays. Fixes the trunk lacked were restored: BA-0002 (the biometric endpoint no longer accepts client-supplied credential material), BA-0041 (breached-password check on password reset), BA-0039 and the proxy-header rules in the CSRF and client-IP helpers, constant-time cron secret comparison, and the sign-out audit row. The alternative Cloudflare deploy pipeline from the security line and the tests tied to it were not carried over. Dependencies were updated so the production audit passes.
+
+**Verification:** Typecheck, lint (0 warnings), format check, 1,399 tests in 167 files, secrets scan, translation check, local link check and the production dependency audit passed. The Next.js and Cloudflare builds, Playwright and the fresh-database build run in CI. Nothing was deployed.
+
+**Follow-ups:** Decide whether the public-env deploy gate (BA-0047) should be re-attached to the trunk's deploy scripts.
+
+---
+
 ### Leo: Open-Source Readiness Follow-Through — 2026-10-03
 
 **Scope:** Finished a local open-source readiness pass without publishing changes.
@@ -30,6 +42,668 @@ All notable changes to this project will be documented in this file.
 
 ### Leo: App-Icon Logo Rebrand — 2026-07-07
 
+### Raouf: Closing the External Review's Code-Side Findings — 2026-08-17
+
+**Scope:** Five findings from the second round of an external security and privacy
+questionnaire, all of which were answerable only by changing code rather than by
+explaining it. Account deletion (Q3/Q4), Sentry request-body scrubbing (Q6), login
+auditing (Q3), the fresh-database CI gate (Q2), and the support contact address (Q15).
+
+**Summary:**
+
+- **Account deletion existed nowhere.** `DELETE /api/profiles` removed the `profiles`
+  and `user_preferences` rows, but every user table foreign-keys to `auth.users` rather
+  than to `profiles` (20260124000000), so that cascaded to **nothing**: the auth user,
+  password hash, MFA secrets, passkeys and all academic data survived. The i18n strings
+  `deleteAccount` / `deleteAccountDesc` ("Permanently delete your account and all data")
+  had existed in all 34 locales since the settings screen was translated, with no
+  component rendering them, while the privacy policy told users deletion was available
+  from settings. `DELETE /api/account` closes it, and needs **no migration** — the
+  `ON DELETE CASCADE` constraints were always there, which is why manual deletion from
+  the Supabase dashboard already worked. What was missing was the route that fires them.
+  Re-authenticates (password, or typed email for OAuth-only accounts), writes the audit
+  row **before** deleting so `log_audit()` can still attribute it, and fails closed if
+  either the audit write or the service-role client is unavailable.
+- **Sentry `beforeSend` stripped headers only.** The reviewer noticed that
+  `/api/security/check-password-breach` takes a plaintext password in its body while
+  `beforeSend` removed only `authorization` and `cookie`. Nothing was leaking, because
+  `sendDefaultPii` is unset and defaults to `false` — but that is a library default, not
+  a control, and one flag would have shipped a password to a third party. Extracted a
+  shared `scrubSentryEvent()` that drops body, cookies and query string, and drops the
+  whole `request` object for credential-bearing paths. Found while wiring it that
+  `sentry.edge.config.ts` had **no `beforeSend` at all**, so edge events were the one
+  path with nothing stripped, not even the two headers.
+- **Login was never audited.** `logAuthEvent` has been exported from
+  `lib/security/audit.ts` with a `LOGIN` action since January and re-exported from
+  `lib/security/index.ts`, with **no caller anywhere**. Signup-side events were logged,
+  which is what made the hole easy to miss — `auth_audit_logs` was never empty, it just
+  never contained a sign-in. New `lib/security/auth-audit.ts` writes signin success,
+  failure, provider mismatch and signout. It writes through the **service-role** client
+  deliberately: a failed sign-in has no session, so the cookie-bound client is `anon`,
+  and BA-0029 revoked `log_audit` EXECUTE from `anon` — the failed-login row is the one
+  you most want and the one the RLS-scoped path cannot write. Attempted addresses are
+  stored as the same hashed prefix the login limiter keys on, never in plaintext.
+- **The fresh-build gate was never wired to CI.** `tools/database/verify-fresh-build.sh`
+  was written on 2026-08-02 and its own header says "This script exists so that can never
+  again be true without CI saying so." Nothing called it, yet the audit report stated
+  BA-0053 was "now fixed and gated in CI" — a sentence the external reviewer would have
+  taken at face value. Added a `migrations` job with a `postgres:15` service that runs it.
+- **`support@mq.edu.au` was the app's support address.** A real university service desk
+  that never agreed to receive mail about this product, so every user seeking help was
+  misdirected. Now `NEXT_PUBLIC_SUPPORT_EMAIL` with a maintainer address as the fallback.
+
+**Files Changed:** `app/api/account/route.ts` (new), `lib/observability/sentry-scrub.ts`
+(new), `lib/security/auth-audit.ts` (new),
+`features/settings/components/privacy/DeleteAccountDialog.tsx` (new),
+`tests/api/account-delete.route.test.ts` (new),
+`tests/security/sentry-request-body-scrub.test.ts` (new),
+`config/sentry/sentry.{client,server,edge}.config.ts`, `app/api/auth/signin/route.ts`,
+`app/api/auth/signout/route.ts`, `features/settings/components/privacy/DataManagement.tsx`,
+`lib/config.ts`, `.github/workflows/ci-cd.yml`, `AGENT.md`, `CHANGELOG.md`.
+No migration, and nothing under `supabase/`.
+
+**Verification:** `npm run check` exit 0. New suites green: 9/9 account deletion, 11/11
+Sentry scrub. The fresh-build gate rehearsed locally against PostgreSQL 15 before being
+committed to CI: `applied=80 failed=0 total=80`, matching production. `supabase migration
+list` against production shows 80/80 local and remote in sync, zero drift.
+
+Two defects were caught by the new tests rather than by review, which is the argument for
+having written them first. The account route mixed the two different `parseJsonBody`
+helpers in this codebase (`response.ts` returns `{ data, error }`, `middleware.ts` returns
+`{ success, ... }`), so every request 413'd — all 9 tests failed identically. And the
+Sentry scrubber deleted `cookie` and `COOKIE` by name while leaving `Cookie`, since header
+casing is not normalised across runtimes; it now matches on the normalised key.
+
+**Follow-ups:** The delete route is **not deployed** — it sits on
+`review/2026-08-17-questionnaire-remediation` pending review. `app/api/auth/signup/route.ts`
+still carries its own local copy of the audit helper and should move to
+`lib/security/auth-audit.ts`. The duplicate `parseJsonBody` pair is a live trap for the
+next route author and one of them should go. Still owner actions, not code: MFA enrolment
+on both Supabase Owners, Cloudflare account-level 2FA enforcement, a backup restore drill,
+Google Maps key restrictions, and Resend/Upstash region confirmation.
+
+---
+
+### Raouf: Reconciling Two Independent Audits Into One Trunk — 2026-08-02
+
+**Scope:** Collapsing five branches into `main` by rebase, then removing them. The repository
+had been carrying two concurrent audits of the same system — `audit/full-runtime-hardening`
+(which reached `main`) and `audit/backend-hardening-cloudflare` — plus three branches that were
+already strict ancestors of `main`.
+
+**Summary:** The two audits had converged, and the honest outcome of reconciling them is that
+**this branch contributed no source-code changes at all**. Every application-level fix it
+carried had an equivalent already on `main`, so three of its fifteen commits were dropped rather
+than duplicated:
+
+- **BA-0006** (single-use token claim) — `main`'s implementation is semantically identical
+  (`claimedRows.length === 0` vs `claimed.length !== 1`; `id` is the primary key, so at most one
+  row can ever match and the two predicates cannot disagree). `main`'s
+  `token-single-use-rowcount.test.ts` covers the race for password reset _and_ email
+  verification, a strict superset of the single case added here.
+- **BA-0056** (P0 passkey account takeover) — `main`'s check is the one deployed to production,
+  and its `webauthn-cross-user-credential.test.ts` adds the strongest assertion of the three
+  ("rejects before spending any privileged call"), which this branch's test lacked.
+- **BA-0054** (migration recovered from the production catalogue) — dropped by git itself as
+  "patch contents already upstream". The recovered file is **byte-identical** (blob `f6e42692`)
+  to the migration the other audit wrote independently, which is a stronger corroboration of the
+  recovery than anything asserted at the time.
+
+Two defects surfaced that only appear when branches are actually combined. First, git
+**auto-merged both audits' P0 checks into the same file** — the credential/challenge binding
+test ended up present twice, at lines 109 and 172, because the two audits placed it on either
+side of the legacy-credential fallback. Neither side conflicted, so nothing warned. The second
+copy was unreachable, but duplicated security logic is precisely the artifact a "clean" rebase
+hides; the route is now byte-identical to `main`, so deployed behaviour is unchanged by this
+merge. Second, `rls-policy-recursion.test.ts` held five **raw NUL bytes** used as a composite-key
+separator, which made git classify a security regression test as binary and its diffs
+unreviewable. Both fixed.
+
+What actually merges is therefore the database layer and its tooling: the production RLS
+recursion fix, the buildability repairs, the fresh-build verifier, and the audit record.
+
+**Files Changed:** 12 commits rebased onto `17003fbe`. Net contribution vs `main`:
+`supabase/migrations/20260802010000_fix_schedules_rls_recursion.sql` (the only migration `main`
+lacked, and the one already applied to production), six migration files repaired for
+buildability (BA-0053/BA-0057), `tests/security/rls-policy-recursion.test.ts`,
+`tools/database/verify-fresh-build.sh`, `docs/backend-audit/2026-08-02/`, `CHANGELOG.md`,
+`AGENT.md`. Zero changes under `app/`, `lib/`, `components/` or `features/`.
+
+**Verification:** `npm run check` exit 0 on the merged tree — secrets (933 files), Cloudflare
+runtime compat, Prettier, `typecheck`, `typecheck:cloudflare`, lint, **1323 tests across 153
+files**, production build compiled. The test count is exactly `main`'s 1319 plus the four cases
+in the recursion suite, which is the arithmetic check that the union dropped nothing. Migration
+chain rebuilt from empty against a throwaway PostgreSQL 15.18: **applied=80 failed=0 total=80**,
+matching production's migration count. Every branch tip was tagged `prereconcile/2026-08-02/*`
+before the first rewrite, so every pre-merge state remains addressable.
+
+**Follow-ups:** Unchanged and still open — `isTrustedOrigin` fails open when both `Origin` and
+`Referer` are absent (three unauthenticated `/api/maps/*` routes); BA-0004's `/api/auth/*`
+blanket exemption; the `npm audit` waiver for the accepted BA-0044 advisories, without which a
+red CI board carries no information. The `prereconcile/*` tags are local only and can be deleted
+once the merge has proven itself.
+
+---
+
+### Raouf: The P0 Is Deployed — and Why It Had Sat Undeployed for Three Days — 2026-08-02
+
+**Scope:** Getting the BA-0056 WebAuthn account-takeover fix into production.
+
+**Summary:** The fix was already on `main` — commit `1073e4da`, 2026-07-30, from a parallel
+audit that found the same defect independently. It had never shipped. `gh run list
+--workflow=cloudflare-deploy.yml` returned **nothing**: the deployment workflow had never run,
+not once. So a P0 sat committed and live-in-production for three days.
+
+The first deploy attempt failed at the quality gate, which is the gate doing its job — nothing
+was deployed. The cause was a **CI configuration defect, not a code defect**: the deploy job's
+job-level `env:` block is in scope for _every_ step including `npm run check`, so unit tests
+ran with deployment configuration visible. Six assertions across four files failed in CI while
+passing locally — `emailService` asserts a fallback "when `NEXT_PUBLIC_APP_URL` is not set" and
+the job env sets it; `DEPLOYMENT_ENV=production` makes the rate limiter fail closed, turning an
+expected 200 into a 403; `DEPLOYMENT_PLATFORM=cloudflare` changes which forwarded header
+`getClientIP` trusts. Reproduced locally before fixing: with those four variables set, exactly
+those 6 tests fail; blanked, 1267/1267 pass.
+
+I blanked the four on the quality-gate step rather than relocating the whole job-level block
+onto the build and deploy steps. Relocating is the tidier shape but the riskier edit —
+`NEXT_PUBLIC_*` values are inlined at **build** time, and omitting one while moving the block
+is exactly what caused the 2026-07-30 production outage. Nothing the build or deploy consumes
+was touched.
+
+**Also worth naming:** every recent `ci-cd.yml` run fails at `npm audit` on the four high
+advisories that BA-0044 already assessed and accepted as build-time-only. CI therefore fails on
+a known-accepted condition, so a red signal carries no information — which is very likely why
+nobody noticed the deploy had never run. When the board is always red, nothing stands out.
+
+**Files Changed:** `.github/workflows/cloudflare-deploy.yml` (on `main`, via
+`fix/ci-quality-gate-env-leak`, fast-forwarded to `main` as `17003fbe`).
+
+**Verification:** Deploy run `30727951670` — quality gate ✅, env validation ✅, dry-run and
+size gate ✅, **production Worker deployed** ✅. Production after: `/api/health` healthy /
+database connected; `cf:smoke` **9/9**; signup returns 400 for an empty body rather than 503,
+so the route is live. `1073e4da` confirmed an ancestor of the deployed commit, so the P0 binding
+check is in the shipped Worker. The BA-0052 database fix is unaffected — an authenticated read
+of `schedules` and `schedule_members` still succeeds.
+
+**Follow-ups:** `main` and `audit/backend-hardening-cloudflare` remain divergent (two concurrent
+audits of the same system); reconciling them is an owner decision, and whoever does it **must
+carry `20260802010000` onto `main`** rather than accepting the CLI's
+`migration repair --status reverted` prompt. `isTrustedOrigin` still fails open when Origin and
+Referer are both absent, leaving three unauthenticated `/api/maps/*` routes open to billing
+abuse of the Google key — not fixed here because it needs testing against real non-browser
+clients. The npm-audit waiver should be made explicit so CI red means something again.
+
+---
+
+### Raouf: Shipped the Recursion Fix to Production, and Recovered a Lost Migration — 2026-08-02
+
+**Scope:** Pushing the audit's database fix to production, and the migration-history drift that
+blocked it.
+
+**Summary:** `supabase db push` refused to run: `20260730180000` was applied on the remote with
+no local counterpart. The CLI suggested `migration repair --status reverted`, which would have
+been wrong — the migration really did apply, and marking it reverted falsifies the history
+table. I recovered the file from `supabase_migrations.schema_migrations.statements` and
+committed it verbatim. It is `close_audit_settings_rls_and_unguarded_definers` from a
+2026-07-30 runtime audit: production carries a security fix that no fresh build, `db reset`,
+staging environment or DR rebuild would ever have received.
+
+**That file also corrects me.** I had recorded lane-rls's findings on `purge_deleted_records`
+and `refresh_analytics_views` as REFUTED, on the strength of a catalog sweep against my local
+replica. Its own production verification says the opposite in terms: both were "LIVE AND
+ANON-REACHABLE ... holding EXECUTE for anon AND authenticated". My sweep ran against a
+bootstrap that does not reproduce Supabase's _direct_ grants of EXECUTE to anon on functions —
+so `REVOKE ... FROM PUBLIC` was sufficient in my replica and insufficient in production. That
+is exactly the BA-0055 trap I had documented for tables and then failed to apply to functions.
+The lane was right; my refutation was an artefact of an imperfect model.
+
+**The push itself failed at the bookkeeping step** — "permission denied for schema
+supabase_migrations", because the CLI's temporary login role cannot write the history table on
+this project. The DDL rolled back atomically, which I confirmed before touching anything else:
+recursion still present, helpers absent, no history row. Applied through the Management API
+query endpoint instead (which runs as `postgres`), then recorded the history row explicitly.
+
+**And excluding anon from EXECUTE on the helpers was wrong**, which only production revealed.
+anon holds the table-level SELECT grant, so its query still reaches policy evaluation, calls
+the helpers, and fails with `42501 permission denied for function is_schedule_member` — trading
+a 500 for a 401 rather than the correct answer. anon is now granted; `auth.uid()` is NULL for
+it, both helpers return false, and it gets the honest empty result.
+
+**Files Changed:** `supabase/migrations/20260730180000_close_audit_settings_rls_and_unguarded_definers.sql`
+(recovered), `supabase/migrations/20260802010000_fix_schedules_rls_recursion.sql`.
+
+**Verification:** Against production — a real authenticated user now reads `schedules` and
+`schedule_members` and gets counts instead of 42P17, **ending a five-month outage**; anon gets
+HTTP 200 with zero rows; both helpers are SECURITY DEFINER with `search_path` pinned.
+`supabase migration list --linked` reports **80 migrations, no unsynced entries in either
+direction**. Fresh build applied=80 failed=0. `npm run check` exit 0, 1267 tests.
+
+**Follow-ups:** **The BA-0056 P0 is still live.** It is an application fix, not a migration, so
+it needs a Worker deployment — not done here, and it is the most urgent outstanding item.
+BA-0004, the open redirect in `app/auth/confirm`, and the `isTrustedOrigin` fail-open remain
+unfixed. Eight backend domains remain unexamined.
+
+---
+
+### Raouf: A P0 Account Takeover, and Two Regressions I Caused Myself — 2026-08-02
+
+**Scope:** Second half of the re-audit. Six parallel lanes reported late; their findings are
+recorded with a verdict on each, because most of the criticals did not survive testing.
+
+**Summary:** **BA-0056 (P0)** — `POST /api/webauthn/authenticate/verify` brought two
+identities together and never compared them. `userId` came from the consumed challenge (the
+account being logged _into_, derived from a client-supplied email); `dbCredential` came from
+`getCredentialById()`, which queries by `credential_id` alone through the service-role client
+and so returns **any** user's row. The public key used for verification came from that row;
+the session was minted for the challenge's user. An attacker with a self-serve account
+holding one passkey could request a challenge for a victim's email, sign it with their own
+authenticator on the real origin, and receive a valid session for the victim — no origin
+spoofing, no victim interaction, no session required to reach either endpoint. Proven
+non-vacuous: without the fix the cross-user assertion returns **HTTP 200**; with it, 401.
+
+**BA-0057 (P1) — two regressions my own migration repair introduced.** Making the
+audit-logging migration apply was correct, but it materialised two defects that were dormant
+only because the file was unrunnable. `audit_settings` is the only table in the schema never
+given RLS, so creating it created an exposure: as `anon`, `SELECT` returned a real row and
+`UPDATE ... SET value='0'` reported `UPDATE 1`. And a 7-argument `log_audit` overload whose
+parameters are a strict prefix of the canonical 10-argument version made every 6–7 argument
+call ambiguous — `handle_new_user_safe()` calls it, so **inserting a new user created no
+profile row**; signup would have broken for every new user. Neither was visible in the diff.
+Both were found by building a database and exercising it.
+
+**Four reported criticals were refuted.** The largest: "UPDATE policies with `USING` and no
+`WITH CHECK` let a user hand their credential row to a victim — account takeover, 13 policies
+affected". PostgreSQL uses the `USING` expression **as** the `WITH CHECK` expression when the
+latter is omitted. Tested live: the hand-off raises `new row violates row-level security
+policy` and the row does not move. Three more (`ratelimit_*`, `purge_deleted_records`,
+`refresh_analytics_views` → leaderboard leak) rest on the premise that `REVOKE ... FROM
+PUBLIC` leaves a direct `anon` grant. True for **tables** — that is BA-0055 — but not for
+**functions**, whose default `EXECUTE` comes via `PUBLIC`. A catalog sweep confirms none is
+client-executable.
+
+**A correction to my own earlier entry.** My migration replay was error-tolerant, so "that
+migration has never applied anywhere" does not follow from the replay alone. Two claims were
+conflated: _it cannot apply_ (established directly — two deterministic SQL errors) and _it
+never applied in production_ (carried by the independent absence of all three of its objects
+there). The conclusion holds; the reasoning as first written did not.
+
+**Files Changed:** `app/api/webauthn/authenticate/verify/route.ts`,
+`tests/security/webauthn-credential-user-binding.test.ts` (new),
+`supabase/migrations/20260129000000_add_audit_logging.sql`,
+`supabase/migrations/20260214002000_restore_log_audit_function.sql`,
+`docs/backend-audit/2026-08-02/backend-runtime-audit-2026.md`.
+
+**Verification:** `npm run check` exit 0 with **1267 tests**; fresh build applied=79 failed=0;
+anon denied on `audit_settings` for both SELECT and UPDATE; exactly one `log_audit` overload;
+a new `auth.users` row now creates its profile row. Every fix proven non-vacuous by removing
+it and watching the test fail.
+
+**Follow-ups:** BA-0004 re-scoped to authenticator binding and persistence (an
+attacker-planted passkey survives a password reset, because Supabase merges `user_metadata`
+shallowly) — still unfixed, needs an owner decision on which of the two duplicate passkey
+implementations is canonical. Open redirect in `app/auth/confirm/route.ts` (`//evil.example`
+passes a `startsWith('/')` check; the correct helper already exists and is used by the sibling
+route). `isTrustedOrigin` returns **true** when Origin and Referer are both absent, leaving
+`/api/maps/*` open to unauthenticated billing abuse of the Google key. Eight backend domains
+remain unexamined.
+
+---
+
+### Raouf: A Dead Feature, and a Migration Set That Could Not Build — 2026-08-02
+
+**Scope:** A re-audit of the backend, scoped deliberately as "check the real system rather
+than a description of it" — because this audit's own record shows it reported a live P0 as
+absent twice, each time by trusting a derived object or a supplied list. Two cheap things
+had never been done: probe live production read-only with the public anon key, and replay
+the migrations against an empty database. Both were done here, and both found defects.
+
+**Summary:** **BA-0052 (P1)** — `public.schedules` and `public.schedule_members` carry
+mutually recursive RLS policies. The schedules SELECT policy subqueries schedule_members
+while the schedule_members SELECT policy subqueries schedules, so reading either re-enters
+the other and Postgres aborts with 42P17. Production returns HTTP 500 on both tables, and
+the same error reproduces locally for the `authenticated` role — so this is not an
+anon-only artefact. **The sharing feature has been dead for every signed-in user since
+2026-02-20.** `app/api/sync/route.ts:139` destructures only `data` and discards `error`,
+so the failure is swallowed and a genuine collaborator is refused with 403. It fails
+closed, so it is an availability defect rather than an escalation — but it is silent, and
+1260 passing tests never saw it, because no test in this repository executes SQL. I checked
+the other seven sites that discard a Supabase error the same way; all are ownership-scoped,
+so none fails open.
+
+**BA-0053 (P1)** — replaying all 78 migrations against a clean PostgreSQL 15.18 found
+**6 fatally broken**. Since each runs in a transaction, everything after a failure point is
+lost. `20260129000000_add_audit_logging.sql` has _two_ independent fatal errors — a
+non-IMMUTABLE `now()` in an index predicate and a DELETE trigger whose WHEN clause
+references NEW — so it can never have applied anywhere. Production confirms it: three of
+its objects are absent there, and a fresh build produces exactly the same object set. That
+also explains the two later `restore_*` migrations, which patched back `audit_logs` and
+`log_audit` by hand and never covered the rest. Worse, `20260216090000_harden_security_functions.sql`
+aborted at line 161 of 365 because it depends on a function defined below _another_ broken
+migration's failure point — one broken file was silently disabling a second file's security
+hardening, including the revoke on the destructive `clear_user_data()`.
+
+**A correction to the project record.** The changelog states audit logs are protected. The
+append-only _control_ the design intended (`"No updates to audit logs"`, `"No deletes to
+audit logs"`) does not exist in production, because it sits below that migration's failure
+point. The property still holds, but only by RLS default-deny. I verified that
+behaviourally — as an authenticated user, UPDATE and DELETE against another user's
+`audit_logs` row both affected 0 rows and the row survived — rather than trusting either
+the code or the changelog.
+
+**BA-0055 (P2)** — `anon` retains table-level SELECT/UPDATE/DELETE grants on eleven tables
+including `password_resets`, `backup_codes` and `webauthn_credentials`, while fourteen
+less-sensitive tables have the grant revoked. The discriminator is exactly whether a
+migration ever issued `REVOKE ... FROM anon`; `rate_limits` shows why intent is not enough,
+having revoked `FROM public`, which does not remove a privilege held directly by `anon`.
+**I did not assume RLS contains this — I tested it.** With real rows seeded into those
+tables, anon read 0 rows and a delete attempt left the token intact, and a second
+authenticated user read 0 of the first user's rows. So there is no live exposure; the
+finding is that RLS is the _only_ layer on the most sensitive tables in the system, which
+matters here because this codebase's history is a record of that single layer failing
+silently.
+
+**BA-0027** is confirmed with a reproduction, having been an unverified candidate:
+`mv_deadline_analytics` is created twice with different shapes, the second with
+`IF NOT EXISTS` so it silently no-ops, after which its index aborts the migration on a
+column that does not exist.
+
+**Files Changed:** `supabase/migrations/20260802010000_fix_schedules_rls_recursion.sql`
+(new), `tests/security/rls-policy-recursion.test.ts` (new),
+`tools/database/verify-fresh-build.sh` (new),
+`docs/backend-audit/2026-08-02/backend-runtime-audit-2026.md` (new), and repairs to
+`20260129000000_add_audit_logging.sql`, `20260124000000_complete_schema_initialization.sql`,
+`20260216090000_harden_security_functions.sql`, `20260114013519_add_soft_deletes_constraints_seeds.sql`,
+`20260326000000_enable_rls_edge_response_cache.sql`,
+`20260730130000_lock_down_orphaned_sylla_surface.sql`.
+
+**Verification:** Fresh build from migrations alone: **applied=79 failed=0**. `npm run check`
+exit 0 with **1264 tests** (up from 1260). The BA-0052 migration's verification block was run
+against the pre-fix state first and failed as designed, so it is not vacuous; the new
+regression test likewise fails all 4 assertions when the fix migration is removed, naming
+both offending tables. After the fix, an owner and a member both see the shared schedule, an
+unrelated user sees nothing, and the BA-0026 guard still refuses promotion to `owner`.
+Testing also corrected me once: granting EXECUTE only to `service_role` traded 42P17 for
+42501, because Postgres enforces EXECUTE against the calling role for functions referenced
+in a policy. **No production data was created, modified or deleted** — write reachability
+was established with zero-row filters, and every destructive test ran against the local
+replica.
+
+**Follow-ups:** The `mv_deadline_analytics` reconciliation is deliberately not done here;
+dropping and recreating the matview changes the contract of `get_my_deadline_analytics()`
+and `refresh_analytics_views()` and wants its own reviewed migration. The blanket
+`REVOKE ... FROM anon` sweep for BA-0055 is scoped but unwritten. Three things could not be
+settled without service-role access and remain open: whether production is missing the
+REVOKEs lost to the hardening cascade, whether `pg_cron` is actually scheduled (BA-0011),
+and production's true policy/grant state; §8 of the audit report gives the exact queries.
+Most importantly, **not one test in this repository runs SQL against a real database** —
+every finding above was found by executing something, and none were visible to 1260 green
+tests. `tools/database/verify-fresh-build.sh` is a first step; it should be wired into CI.
+
+---
+
+### Raouf: Live Database Verification of the Runtime Audit — 2026-07-30
+
+**Scope:** Settled the database half of the runtime audit against the real project using read-only `supabase db query --linked` catalogue queries. No write, no DDL executed, no migration applied, no secret printed.
+**Summary:** The chain-derived findings disagreed with production in both directions, and the most important outcome is a **correction to my own P1**. `audit_settings`, `cleanup_old_audit_logs()` and `add_sample_class_times()` **do not exist in production**, and **no table in `public` lacks RLS** — so the audit-trail-destruction chain I filed is replay-only (real for `supabase db reset`, staging or a DR rebuild), and RTA-0029 drops from P1 to P3. The same check caught a genuine bug in my own migration: its `ALTER TABLE public.audit_settings` was unguarded and would have raised 42P01 and **aborted the push against production**; every block is now guarded. What is genuinely live instead is narrower and worse in kind: `purge_deleted_records(integer)` and `refresh_analytics_views()` are SECURITY DEFINER with no ownership check, unpinned `search_path`, and hold `EXECUTE` for **both `anon` and `authenticated`** — verified via `information_schema.role_routine_grants` — with zero application callers (the only repo mentions are generated `database.types.ts` entries). `purge_deleted_records` takes a caller-controlled window, so a negative `p_days_old` moves the cutoff into the future and hard-deletes every soft-deleted row for every user. `20260114013519` issued only `REVOKE ... FROM PUBLIC`, which BA-0032 had already shown does not remove Supabase's direct grants. Also settled: the reported `log_audit` overload ambiguity is **disproved** (production holds only the 10-arg form); **pg_cron duplication is confirmed live** — installed, two ACTIVE jobs at `0 3` and `10 3`, exactly the Cloudflare expressions, while the `*/15` webauthn-challenge job is absent so that cleanup has **no owner at all**; the unpinned `search_path` is **not exploitable**, because `anon`/`authenticated` hold USAGE but not CREATE on `public` and `extensions`; BA-0030's recorded "production still has all sixteen always-true policies" is **resolved**, only the documented `xp_config` exception remains; and `favorite_buildings` + `edge_response_cache` exist in production while the chain never creates them, so the chain cannot rebuild the database. Finally, the `WITH CHECK` correction is now **proven rather than argued**: an RLS probe on a session-local temp table. The first attempt was **vacuous** — `supabase db query` connects as `postgres`, which has `rolbypassrls`, so RLS never applied and the reassignment appeared to succeed. Re-run under `SET ROLE authenticated` it was **BLOCKED** with `new row violates row-level security policy`, value unchanged. PostgreSQL does apply `USING` to the new row when `WITH CHECK` is omitted, so the reported reassignment vulnerability does not exist — and migration `20260730090000` (BA-0035) states the same incorrect rationale.
+**Files Changed:** `supabase/migrations/20260730180000_close_audit_settings_rls_and_unguarded_definers.sql` (guarded; header now records verified production state), `docs/runtime-audit/2026-07-30/finding-ledger.csv` (34 entries; RTA-0029 downgraded, RTA-0033/0034/0035/0036 added), `docs/runtime-audit/2026-07-30/executive-summary.md`, `AGENT.md`, `CHANGELOG.md`.
+**Verification:** Migration test 8/8 after the rewrite, and still confirmed to fail without the migration. Both of the migration's catalogue loops validated read-only against production — the revoke loop resolves to `public.purge_deleted_records(p_days_old integer)` and `public.refresh_analytics_views()`, the sweep resolves to those two plus the four trigger functions. Its verification predicates return `tables_without_rls = 0` and `definers_unpinned = 6` (0 after the sweep). Confirmed safe to pin: none of `protect_profile_fields`, `on_deadline_completed`, `on_unit_created` references `auth.`, `storage.` or `extensions.`, so `search_path = public` cannot change their resolution. Full gate re-run exit 0 — 152 files / 1319 tests, both typechecks, Lint OK, Prettier clean, build, `cf:dry-run` and `cf:dry-run:production`.
+**Follow-ups:** The migration still ships **unapplied** and now has real live value: revoking client `EXECUTE` on the two anon-reachable definers and pinning the six unpinned ones. Decide one owner per duplicated cron (`cron.unschedule` the two, or drop the Cloudflare triggers) and give the `webauthn_challenges` cleanup an owner. The chain's inability to rebuild production (missing `favorite_buildings` and `edge_response_cache`, plus the `20260124000000` duplicate-policy replay blocker) is worth a squashed baseline, since it is the condition under which BA-0027/0030/0048/0049 accumulated unnoticed.
+
+---
+
+### Raouf: Full Runtime, Security and Reliability Audit — 2026-07-30
+
+**Scope:** Whole-repository runtime audit on `audit/full-runtime-hardening-2026-07-30` (from `main` `1301734f`): every API route, `lib/**`, the full 78-migration chain, `app/**` pages and server actions, `features/**`/`components/**`/the service worker, `config/**`/`tools/**`/CI/deploy config, and all 151 test files. Eight read-only agents read every file in the runtime-relevant tree; every finding acted on was independently re-verified before any code changed. Nothing pushed, nothing deployed, no migration applied, no secret printed.
+**Summary:** Ten fixes, each with a regression test confirmed to fail against the pre-fix code first. **The headline is a P0: `/api/webauthn/authenticate/verify` took identity from the challenge row but the verifying public key from an unfiltered global `credential_id` lookup, and never reconciled them** — so an attacker could request a challenge for a victim's email, sign it with their own authenticator, and be issued a session cookie for the victim. Unauthenticated, no victim interaction, only precondition being that the victim has a passkey; `/api/webauthn/authenticate/` is on the public allowlist so the edge never saw it. `@simplewebauthn` cannot catch it (it only asserts `id === rawId`), `credential_id` is UNIQUE so it was deterministic, the sibling `register/verify` has always had the missing check, and **no test covered that route at all**. Second: production was **undeployable** — the Sharp gate's approved provenance still pinned Next 16.2.11/Wrangler 4.113.0 while the lockfile installs 16.2.12/4.115.0, and because `evaluateDeploymentGate` delegates to `evaluateAuditException`, every gated `cf:*` script failed closed on both profiles. Its root cause was that the gate's own suite validates a _synthetic_ lockfile fixture, so it stayed green while the real one drifted; a test now binds the constants to the committed lockfile inside `npm run check`. Also fixed: password-reset and email-verify tokens were double-spendable because the "atomic guard" never checked the affected row count (BA-0006, carried as `candidate`); the WebAuthn origin check was circular, falling back to the caller's own `Origin` header (BA-0003, carried as `validated`); an open redirect plus session fixation on `/auth/confirm` where `next.startsWith('/')` accepts `//evil.example`; four unbounded outbound fetches, including the rate-limit store in front of every auth request, where a hang made the `failClosed` policy unreachable; both PostCSS advisories, cleared by unpinning an override rather than npm's proposed Next 16→14 downgrade; the doubled webmanifest `Content-Type`, whose root cause was two overlapping `_headers` rules; and a migration enabling RLS on `audit_settings` — the only one of 27 tables without it — plus revoking five client-reachable definers, one of which lets the anon key destroy the audit trail.
+**Files Changed:** `app/api/webauthn/authenticate/verify/route.ts`, `app/auth/confirm/route.ts`, `app/api/auth/password/reset/route.ts`, `app/api/auth/email/verify/route.ts`, `app/api/auth/passkey/_lib.ts`, `lib/security/webauthn.ts`, `lib/security/password-breach.ts`, `lib/services/rateLimitService.ts`, `lib/weather/providers/{googleWeatherProvider,openMeteoProvider}.ts`, `public/_headers`, `tools/security/check-sharp-risk.{mjs,test.mjs}`, `package.json`, `package-lock.json`, `supabase/migrations/20260730180000_close_audit_settings_rls_and_unguarded_definers.sql` (new, **unapplied**), 8 new test files, `tests/api/auth/passwordReset.test.ts`, `artifacts/security/sharp-worker-reachability*.json`, `docs/runtime-audit/2026-07-30/**` (12 artefacts), `AGENT.md`, `CHANGELOG.md`.
+**Verification:** Full gate exit 0 — **158 files / 1350 tests** (from 143/1269), both typechecks, Lint OK, Prettier clean, build compiled, coverage 53.3/43.5/56.0/53.8 above thresholds, `check:secrets` over 900+ files, and — the point of the exercise — `security:sharp:audit-exception`, `cf:dry-run` **and** `cf:dry-run:production` all exit 0 where they previously failed. Worker 6791 KiB gzip under the ceiling. Live production checked read-only (headers, health, deny-by-default, 401/405/400 behaviour all correct; the doubled manifest `Content-Type` and the apex still on Vercel both confirmed). Baseline captured before any change, with its one pre-existing failure preserved verbatim.
+**Follow-ups:** Three need an owner decision and are in `docs/runtime-audit/2026-07-30/remaining-risk-register.md`. (1) **CI runs no build verification at all** — `npm audit` fails on the accepted Sharp advisories and `build`/`cloudflare-build` both `needs: [test, security]`, so Production Build, Worker Build and Lighthouse are all skipped; that is why the undeployable state was invisible. (2) **Deadline reminders have no scheduler** — BA-0016 removed the GitHub schedule and the route was never adopted into the Cloudflare triggers, so they fail silently with no failing job; pinned as a test invariant rather than enabled, because enabling resumes real push delivery. (3) **The new migration must be applied.** Also open: password reset does not revoke other sessions (needs a DB function; `admin.signOut` requires a JWT the unauthenticated path lacks), server/edge Sentry never initialises because there is no root `instrumentation.ts` (so BA-0018's fix is moot and no server error reaches Sentry), pg_cron duplicates two Cloudflare crons at the same minute, and the Sharp exception expires 2026-08-22. **Correction worth recording: the reported "11 UPDATE policies lack WITH CHECK → ownership reassignment" is NOT a vulnerability** — PostgreSQL applies `USING` to the new row when `WITH CHECK` is omitted, so reassignment is already blocked. Migration `20260730090000` (BA-0035) states the same incorrect rationale, so the misconception is embedded in the repo and will be re-derived unless corrected. The genuine residual there is that a user can reset their own spent backup codes' `used` flag, which changes no `user_id`; that module is currently unmounted.
+
+---
+
+### Raouf: Signup → Email → Redirect Flow Audit — 2026-07-30
+
+**Scope:** Full audit of the signup, verification-email, and post-verification redirect chain, plus fixes for the three defects it turned up.
+
+**Summary:** Traced the whole path — `SignupClient` → `/api/auth/signup` → Supabase `signUp` → verification email → `/auth/callback` → `/login` — against the live Supabase auth config and the production Worker vars. The flow did complete (emails send, addresses get confirmed, users can sign in), but the confirmation feedback was broken on the one path that matters. Signup asked for `emailRedirectTo=/auth/callback?redirectTo=/login%3Fverified%3D1`, and `/login` is not in `SAFE_REDIRECT_PATHS`, so `isValidRedirect()` rejected it and `redirectTo` silently became `/home`. The callback then signed out the session it had just minted and redirected to `/home`, which the middleware bounced to `/login?redirectTo=/home` — dropping `verified=1`, so the green "email verified" banner never rendered, and the two `verified=1` lines at the end of the callback were unreachable. Reproduced it at the route level before changing anything: the real signup link resolved to `http://localhost/home`. The callback now always lands email verification on `/login?verified=1` and forwards an explicitly requested destination as `redirectTo` so it survives the sign-in that follows; the OAuth branch, which keeps its session, still follows `redirectTo` directly. Signup's `emailRedirectTo` is reduced to `${appUrl}/auth/callback` since the callback owns the destination. Second defect: the middleware's email gate sends unconfirmed users to `/verify?reason=unverified`, but `/verify` only ever handled `?token=<64 hex>` and fell into its "Verification Failed / Invalid or expired verification link" state — telling users a link was broken when they had clicked nothing. Added a `pending` state (check-your-inbox plus a route to `/login`, where resend lives) using existing translation keys, so no 35-locale change. Third: corrected the stale comment above `ACCOUNT_EXISTS_MESSAGE`, which claimed signup surfaces "account already exists" directly when the production path deliberately returns the generic anti-enumeration message and only the dev auto-confirm branch 409s.
+
+**Files Changed:** `app/auth/callback/route.ts`, `app/api/auth/signup/route.ts`, `app/verify/page.tsx`, `tests/api/auth/callback.signup-verification.test.ts` (new), `tests/unit/verify-page-gate-redirect.test.tsx` (new), `tests/api/auth/callback.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** `npm run check` exit code 0 — 1269 tests across 143 files (up from 1260/141), Prettier clean, both typechecks clean, Lint OK, production build compiled ✅. Nine new assertions cover the exact signup link, a legacy nested `/login` redirect still in someone's inbox, destination forwarding, rejection of an attacker-supplied `redirectTo`, both OAuth branches (direct follow, and onboarding for an incomplete profile), and the three `/verify` states. Two pre-existing assertions in `callback.test.ts` were deliberately updated: they locked the old behaviour of following `redirectTo` on the email-verification path, which is now one hop shorter and keeps the banner. Live config verified read-only against the Supabase Management API: `site_url` = `https://www.syllabus-sync.app` matching the Worker's `NEXT_PUBLIC_APP_URL`, `uri_allow_list` covers `https://www.syllabus-sync.app/**` so the callback redirect is permitted, `mailer_autoconfirm` = false so confirmation is genuinely enforced, anonymous auth off, signups enabled.
+
+**Follow-ups:** Production verification emails are sent through **Gmail SMTP** (`smtp.gmail.com`) from `Perkycoders <perkycoders@gmail.com>` — a personal address, subject to Gmail's ~500/day relay cap and unable to DKIM-align with `syllabus-sync.app`, so these emails risk spam-foldering and look off-brand at exactly the moment a new user is deciding to trust the product. Resend is already configured and used for the resend path; moving Supabase SMTP onto it is the obvious fix but needs the owner's decision, so it is untouched here. Related: the initial email and the resent email use two different mechanisms with different links and lifetimes (Supabase native `/auth/callback?code=`, `mailer_otp_exp` 3600s, versus the custom Resend token at `/verify?token=`, 20 minutes), and `/api/auth/email/send-verification` has no callers at all. Worth consolidating. Not verified here: a live end-to-end signup on Workers, which would create a real account and send real mail — the cutover follow-up asking for manual exercise of authenticated flows still stands.
+
+---
+
+### Raouf: Merged Both Feature Branches Into main — 2026-07-30
+
+**Scope:** Brought `main` up to the state that is actually in production, and unblocked `npm run check`.
+
+**Summary:** `main` had been sitting at `ba88b2c3` since 2026-07-07 while both feature branches ran ahead of it in separate worktrees. Checked the topology before merging: `main` was a strict ancestor of both branches (0 commits behind either), and `feat/cloudflare-workers-migration` (29 commits) was itself a strict ancestor of `audit/backend-hardening-cloudflare` (70 commits, 41 of them beyond the Cloudflare work). So one fast-forward of `main` to `f9393714` brought in both branches losslessly — no merge commit, no conflicts, nothing on `main` that the branches lacked. Merged with `--ff-only` so a non-trivial merge would have failed loudly rather than silently producing a resolution. Reinstalled dependencies with `npm ci` afterwards, since `package.json` moved Next 16.1.6 → 16.2.11 and added the OpenNext/Wrangler toolchain. Separately fixed the `format:check` step of `npm run check`, which could not pass on any machine: Prettier was walking `.remember/` and `.superpowers/`, local agent scratch directories that self-ignore in git via their own nested `.gitignore` files but were absent from `.prettierignore`. Adding them makes the full gate pass end to end for the first time.
+
+**Files Changed:** `config/prettier/.prettierignore`, `.gitignore`, `AGENT.md`, `CHANGELOG.md`. The merge itself moved `main` from `ba88b2c3` to `f9393714` (253 files, +47,227/−8,556) without modifying any file by hand.
+
+**Verification:** `npm run check` **exit code 0** — `check:secrets` (911 files) ✅, `check:cloudflare-runtime` ✅, `format:check` clean ✅, `typecheck` ✅, `typecheck:cloudflare` ✅, `lint` OK ✅, `npm test` 1260/1260 across 141 files ✅, production build compiled ✅. Post-merge ancestry re-confirmed: `main..audit/backend-hardening-cloudflare` = 0 commits, and `feat/cloudflare-workers-migration` is an ancestor of `main`. Safety branch `backup/main-pre-merge-2026-07-30` left at the old `ba88b2c3` tip. `check:i18n` still reports the known 8-key gap across 34 locales and still exits 0 — unchanged by this merge.
+
+**Follow-ups:** Nothing has been pushed — `origin/main` is still at `ba88b2c3`, so this merge is local until someone pushes it. The two feature branches and their worktrees are left in place; delete them only after the push lands. The cutover follow-ups from the 2026-07-29 entry still stand: the apex domain is still served by Vercel, and authenticated flows on Workers remain manually unverified.
+
+---
+
+### Raouf: Repairing What the Student ID Removal Broke — 2026-07-30
+
+**Scope:** Clearing this morning's leftovers. They included a live defect I had introduced myself a few hours earlier.
+
+**Summary:** Dropping `profiles.student_id` meant recreating `public.user_details`, which took the view from 15 columns to 14. Two `SECURITY DEFINER` functions still named the column, and both broke. `get_my_profile()` declared a 15-column result and selected `*` from the view, so PL/pgSQL raised `structure of query does not match function result type` for any authenticated caller that matched a row. `create_user_profile` still inserted into a column that no longer existed. I confirmed both against production before fixing them, by impersonating a real session inside a transaction that rolled back.
+
+The reason my earlier verification passed is worth stating. I checked that the column was gone from the table and the view, that `security_invoker` survived, and that a live signup returned 200. All three were true. I never asked the catalog which other objects named the column. Signup passed because it uses a different function that never referenced the field, and nothing in the app calls `get_my_profile`, so nothing failed loudly. A service-role probe cannot catch this either: with no session the function returns zero rows, and the structural mismatch only fires once a row is returned, so a broken function looks healthy to exactly the check I ran. Dropping a column changes the contract of every object that depends on it, and only the catalog knows that list.
+
+The rebuilt function lists its columns explicitly instead of using `SELECT *`, since that is what let the contract drift unnoticed. Both functions lost `EXECUTE` for `PUBLIC` and `anon`; `get_my_profile` had been PUBLIC-executable while running as `SECURITY DEFINER`. The `p_student_id` parameter was removed rather than accepted and ignored, so any remaining caller fails loudly instead of believing a value was stored.
+
+Three documents still said we collect student IDs. The privacy policy now records the deletion instead of quietly dropping the field, the reference schema snapshot and the API examples are corrected, and 70 orphaned translation keys across all 35 locales are gone.
+
+**Files Changed:** `supabase/migrations/20260730160000_fix_student_id_function_residue.sql` (new), `tests/security/student-id-function-residue.test.ts` (new), `tests/i18n/student-id-fully-removed.test.ts` (new), `lib/supabase/database.types.ts`, `tests/api/profiles.route.test.ts`, `docs/policies/privacy-policy.md`, `docs/database/database-schema.sql`, `docs/api/API_REFERENCE.md`, 35 locale files, the finding ledger.
+
+**Verification:** The migration's verification block, run alone against the pre-fix state, failed as designed, so it is not vacuous. After applying: no `student_id` reference remains in any function, view, index or constraint; `get_my_profile` returns exactly one row for a real session; its 14 declared columns match the view's 14; the old four-argument signature is gone; a cross-user `create_user_profile` call is still rejected. `npm run check` exit 0 with 1260 tests.
+
+---
+
+### Raouf: Student IDs Removed and User Notification Drafted — 2026-07-30
+
+**Scope:** The two open decisions from the BA-0048 remediation plan, both actioned on owner instruction.
+
+**Summary:** `profiles.student_id` held the most sensitive field that BA-0048 exposed, and the application read it for nothing: collected at signup, stored, displayed back to its owner. Removing it ran in the order that keeps production consistent. The 16 stored values were nulled first, collection was stripped from 56 code references and 140 translation keys across 35 locales, that was deployed and a live signup verified to succeed without the field, and only then was the column dropped. `public.user_details` selected the column and blocked the drop, so the migration recreates the view first **`WITH (security_invoker = true)`** and re-checks the flag afterwards. That matters: this is the same DROP/CREATE shape that silently lost `security_invoker` twice before, which is the BA-0021 defect.
+
+One correction. I had written that nothing in the app depended on the field. No logic read it, but it was a required signup field with UI in two components and keys in 35 locale files, so the change came to 56 references rather than one line.
+
+For the notification, a Gmail draft is prepared and deliberately **not sent**. It goes to 27 recipients in BCC, never To:, because putting the list in To: would leak every address to every recipient and create a second privacy incident. The app's own mail path was unusable: the Resend key held in Vercel is invalid and the Worker's copy cannot be read back. The text states what was exposed, the roughly six-month window, that no evidence of misuse was found, and plainly that no access log exists detailed enough to prove nobody read those records.
+
+**Files Changed:** `supabase/migrations/20260730140000_drop_student_id.sql` (new), `lib/schemas/auth.ts`, `app/api/auth/signup/route.ts`, `app/api/profiles/route.ts`, `app/api/types.ts`, `app/signup/SignupClient.tsx`, `app/manage-profiles/*`, `lib/store/profilesStore.ts`, `lib/config.ts`, `components/ProfileCard.tsx`, `lib/supabase/database.types.ts`, 35 locale files, five test files, the finding ledger.
+
+**Verification:** Column absent from table and view, `security_invoker` still true, `npm run check` exit 0 with 1250 tests, `cf:smoke` 9/9, live signup returns 200 without the field. Test accounts deleted; `auth.users` back to 29.
+
+**Follow-ups:** The recipient list wants pruning before anyone sends it. Roughly half the 29 accounts look like the two maintainers' own test accounts, so genuinely affected third parties number closer to 14. Deciding which are real belongs to the owners, so the draft over-includes rather than risk omitting someone.
+
+---
+
+### Raouf: CI Deploy Credentials Recovered, CRON_SECRET Rotated — 2026-07-30
+
+**Scope:** Completed the CI deploy configuration by recovering the secret values Cloudflare will not return.
+
+**Summary:** Cloudflare's Workers secrets API is write-only, confirmed against three endpoints — `/secrets`, `/secrets/{name}` and `/settings` all return `name` and `type` only, never a value. The values were still recoverable, though, because they were originally copied from Vercel during the cutover and Vercel's per-variable endpoint decrypts: that recovered `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `KV_REST_API_URL` and `KV_REST_API_TOKEN`. `CRON_SECRET` is Vercel type `sensitive` and is never returned, so it was rotated instead — safe because it is self-contained (`lib/cloudflare/scheduled.ts` reads it from env and calls the app's own protected route with the same value) and Vercel Cron was disabled at cutover. Verified live: 401 without it, 401 with a wrong value, 200 with the new one.
+
+Two incidental findings. The rate limiter runs on `KV_REST_API_*` — the Vercel-KV branch of `getStore()` — not on Upstash-named variables and not on the Postgres store, which is exactly why `public.rate_limits` is empty while rate limiting works. And the `WEBAUTHN_RP_ID` CI variable had been set to `www.syllabus-sync.app`; the canonical value is the apex `syllabus-sync.app`, because an RP ID must be a registrable suffix of the origin. The deployment env gate rejected it, which is the gate doing its job.
+
+**Files Changed:** `AGENT.md`, `CHANGELOG.md`. Credentials live in CI secrets and Worker secrets, not in the repository.
+
+**Verification:** `node tools/deployment/check-required-env.mjs` with exactly the configured set exits **0**, with three warnings for optional values (`VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `SENTRY_AUTH_TOKEN`). Existing Worker secrets are untouched by `wrangler deploy`, so Web Push keeps working. All recovered values were shredded from disk; `.env.local` holds only `NEXT_PUBLIC_*` build values.
+
+**Follow-ups:** `VAPID_PRIVATE_KEY` is unrecoverable — absent from Vercel and from disk — and must not be rotated casually, because one live push subscription would break. The Worker's actual `WEBAUTHN_RP_ID` value could **not** be verified: secrets are unreadable, the cutover record does not record it, and reading it back needs a properly-formed SSR session cookie. A `www`-scoped RP ID would work today but would break a future move to the apex domain, so it is worth checking directly.
+
+---
+
+### Raouf: Closed the Remaining Questionnaire Gaps — Orphaned AI Surface, Audit-Log Diagnosis, CI Secrets — 2026-07-30
+
+**Scope:** Worked through every item listed as fragile or incomplete in the security questionnaire and fixed what could be fixed, rather than restating them.
+
+**Summary:** **BA-0049 (P2)** — `sylla_ai_requests`, `sylla_active_generations` and four `sylla_*` functions existed in production with no migration file and no calling code, built for an AI chat/upload feature that never shipped. The tables were inert (RLS enabled, zero policies), but all four functions were `SECURITY DEFINER` — which bypasses RLS — and granted EXECUTE to `anon` and `authenticated`. Three took a caller-supplied identifier with no ownership check, the same defect class as BA-0029/BA-0031: burn another user's AI quota, consume their upload quota, or set another user's request status and token counts. Client reach is revoked on all six objects, `service_role` keeps access so the feature stays developable, and they are recorded in migration history for the first time. Deliberately not dropped — the work they belong to isn't visible from this repository.
+
+**A correction:** I had reported `audit_logs` as a broken mechanism. It isn't. Calling `log_audit` with a real user session wrote a correctly-attributed row (resolved user id and email). The table was empty because its only callers are MFA backup-code, session-termination and an explicit audit endpoint — and with 1 WebAuthn credential across 29 users, essentially nobody has triggered them. It is a coverage gap, not a breakage, and that distinction matters because it is the reason exploitation of BA-0048 can be neither confirmed nor ruled out.
+
+**Files Changed:** `supabase/migrations/20260730130000_lock_down_orphaned_sylla_surface.sql` (new), `tests/security/orphaned-sylla-surface.test.ts` (new), `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Catalog sweep confirms zero `sylla_*` functions remain client-executable and zero `sylla_*` tables remain granted to client roles, with `service_role` access intact. `npm run check` exit 0 with **1250 tests**. Every test account created for proof was deleted; `auth.users` and `profiles` both back to 29.
+
+**Follow-ups:** Set 9 GitHub secrets and 4 variables that could be independently verified; 9 secrets and 3 vars remain and only the owner can supply them, because Cloudflare does not return secret values once set. **Do not trigger the deploy workflow until they are in** — a half-configured run would leave the service-role client unset, reproducing the outage caused by hand earlier today. Still open and not closeable from here: no backup restore has ever been tested, and platform-level leaked-password protection requires a Supabase Pro plan.
+
+---
+
+### Raouf: Cross-User Profile Read (BA-0048) — a P0 This Audit Reported as Absent — 2026-07-30
+
+**Scope:** Fixed a live cross-user PII exposure on `public.profiles` that two earlier passes of this audit failed to find, and corrected the record.
+
+**Summary:** `public.profiles` carried `profiles_select` — PERMISSIVE, `FOR SELECT`, role `public` (which includes `authenticated`), `USING (true)` — sitting beside the correct `"Users can view their own profile"` with `USING (auth.uid() = id)`. Postgres ORs permissive policies, so the unconditional one won and the ownership check was inert. `authenticated` holds the table-level SELECT grant, so **any account could read every profile row**. Proven against production: a throwaway account created seconds earlier read **30 profile rows** — 30 emails, 30 full names, 16 student IDs. The defect dates to `20260104000000_initial_schema.sql`, so it was live for roughly six months.
+
+**This audit reported the opposite, twice, and both misses share one cause — trusting a derived object or a supplied list over the catalog:**
+
+1. **BA-0021** concluded there was no live PII exposure. That was based on `public.user_details`, the _view_, which genuinely does carry `security_invoker = true` and genuinely does deny anon. The base table's own policies were never examined, so a live exposure was recorded as absent.
+2. **BA-0030** dropped unconditional policies from `events`, `deadlines`, `units` and `class_times` — the four tables Supabase's advisor happened to name — instead of sweeping `pg_policies`. `profiles` has the identical defect and was not on that list.
+
+The new migration's verification therefore sweeps **every** table in `public` rather than an enumerated set, with `xp_config` the single allow-listed exception (a non-personal lookup table clients are meant to read). That way the next table with this defect fails the migration without anyone having to think of it.
+
+**Files Changed:** `supabase/migrations/20260730120000_fix_profiles_cross_user_read.sql` (new), `tests/security/profiles-cross-user-read.test.ts` (new), `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Applied to production. The same session token that read 30 rows now reads exactly **1**, and its own profile is still readable, so no lockout. Catalog sweep confirms no unconditional client-reachable policy remains on any table in `public` except `xp_config`. `npm run check` exit 0 with **1242 tests**. The throwaway account was deleted — `auth.users` and `profiles` both back to 29.
+
+**Follow-ups:** `audit_logs` is empty (0 rows against 29 users and six months of activity), so whether this was ever exploited can be neither confirmed nor ruled out — that gap is now the highest-value thing left to fix. This finding is disclosed in the security questionnaire as an incident rather than a backlog item.
+
+---
+
+### Raouf: Deployed the Red-Team Fixes, Restored Missing API Keys — and Caused/Recovered a Production Outage — 2026-07-30
+
+**Scope:** Minted a scoped Cloudflare deploy token, set the three missing Google API keys, and shipped every outstanding red-team fix to production. Includes an outage this work caused and rolled back.
+
+**Summary:** The previous session's fixes were blocked on Cloudflare access. The `CLOUDFLARE_API_KEY` in `.env` turned out to be a valid user-scoped token carrying **API Tokens Write**, so it could mint a new token — one scoped to the account that owns the Worker with only `Workers Scripts Write` + `Account Settings Read`. That unblocked both deployment and secret management.
+
+Three keys were missing, not two. `/api/weather` was also broken; it had hidden behind a 400-for-missing-coordinates that fires before the key check. The local `GOOGLE_ROUTES_API_KEY` turned out to be **empty (length 0)**, so it was never going to work — but `GOOGLE_MAPS_API_KEY` was validated directly against the Places, Routes and Weather APIs and works for all three. And `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` was absent from the shipped bundle entirely, so the map SDK could never load.
+
+**An outage was caused in the process, and must be recorded plainly.** `NEXT_PUBLIC_*` values are inlined by Next at **build** time; Worker secrets and `wrangler.jsonc` vars are runtime-only. The 22:47 rebuild exported only two of the required NEXT_PUBLIC variables, so `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` were inlined as empty strings. Every existing gate passed — build exit 0, 1231 tests green, `wrangler deploy --dry-run` clean, Worker booted — yet `/api/health` reported `database: not_configured`, `createAdminClient()` returned null, and the browser had no Supabase credentials at all. Detected via the admin-client oracle (`/api/auth/password/reset` 503s only when that client is null) and resolved by rolling back to version `2e584cab`, which restored `healthy`/`connected` immediately. Fixed forward by extracting the authoritative values from the known-good serving bundle, rebuilding, and **gating on build output** before redeploying.
+
+**Files Changed:** `tools/cloudflare/check-public-env.mjs` (new), `tests/cloudflare/public-env-gate.test.ts` (new), `package.json` (gate wired into all five `cf:deploy`/`upload`/`preview` scripts), `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Production on Worker version `e9e93429`. `npm run check` exit 0 with **1239 tests**. Verified live: **signup returns HTTP 200** (was 503 for every user); `/api/health` healthy/connected; client bundle carries the Supabase host and publishable key; `robots.txt` and `sitemap.xml` now point at `www.syllabus-sync.app`; `/api/weather` HTTP 200 with live data; `place-search` 403 (auth gate) rather than 503; `maps.googleapis.com`, `evil.example.com` and `localhost:3000` origins all 403; login rate limit 429s from the 11th attempt (new limit of 10, was 50); `cf:smoke` **9/9**. The single test user created during verification was deleted — `auth.users` is back to 29, unchanged from before the red team.
+
+**Follow-ups:** The Maps key now serves both the browser and the server-side Places/Routes/Weather calls — it should be split into a referrer-restricted browser key and a separate server key, and restricted by API in Google Cloud Console, or anyone can drive billable Google usage with the public value. `CLOUDFLARE_API_KEY` still carries `API Tokens Write`, which is effectively a root credential for the user's Cloudflare tokens and should be narrowed or revoked now that a scoped deploy token exists. The exposed Supabase personal access token in `~/.zshrc`/`~/.bashrc` is **still unrotated**. Signup account-enumeration is left as the documented deliberate tradeoff, and three npm advisories remain accepted as build-time-only.
+
+---
+
+### Raouf: Red-Team Remediation — Signup Outage, Avatar Storage, CSRF Trust, Auth Config — 2026-07-30
+
+**Scope:** Fixed everything found by the full red team of the live deployment: one critical production outage, three avatar-storage findings, three CSRF/rate-limit findings, the canonical-URL cluster, server-side breached-password enforcement, and the Supabase Auth configuration.
+
+**Summary:** The headline finding is that **user registration had been completely broken since the Cloudflare cutover**. `app/api/auth/signup/route.ts` refuses to run without `getConfiguredAppOrigin()`, which falls back to `VERCEL_PROJECT_PRODUCTION_URL`/`VERCEL_URL` — variables that simply do not exist on Workers. Neither `NEXT_PUBLIC_APP_URL` nor `NEXT_PUBLIC_SITE_URL` was declared, so every signup returned 503. It was distinguished from the two lookalike causes before fixing: the kill switch returns a different message and `app_config.signup_enabled` is `true`, and the admin client demonstrably works because `/api/health` reports `database: connected`.
+
+Storage was the other substantive area. The `avatars` bucket could be **listed anonymously**, which was exploited end-to-end with nothing but the publishable anon key: list the bucket → a folder named with a user's `auth.uid()` → the exact filename → download the photo. Alongside it, `avatars_update_own` had `USING` but no `WITH CHECK`, so `storage.move()` could relocate an object into another user's folder, and the bucket accepted `image/svg+xml` — active content served with no `nosniff`, no `Content-Disposition` and no CSP. Those three chain into "plant a scripted SVG as another user's avatar".
+
+`https://maps.googleapis.com` was a trusted CSRF origin (confirmed live: it reached the credential check where an arbitrary origin was rejected) despite only ever being an outbound `<script src>`. Rate limits were still at values whose own comments said they had been raised for testing. And the breached-password check — a complete HIBP implementation already in the repo — was called only by the browser, so posting straight to the API bypassed it.
+
+**Files Changed:** `wrangler.jsonc`, `lib/security/csrf.ts`, `lib/services/rateLimitService.ts`, `lib/security/password-breach.ts`, `app/api/auth/signup/route.ts`, `app/api/auth/password/reset/route.ts`, `app/robots.ts`, `app/sitemap.ts`, `app/calendar/page.tsx`, `supabase/migrations/20260730090000_harden_avatar_storage.sql` (new), five new test files, `tests/cloudflare/worker-config.test.ts`, `tests/api/auth/signup.test.ts`, `tests/api/auth/passwordReset.test.ts`, `package-lock.json`, `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`.
+
+**Verification:** `npm run check` exits 0 — 136 files, **1231 tests**, secrets scan 896 files, build compiles. Storage fixes applied and verified against production: anonymous listing now returns zero objects while the legitimate public avatar URL still returns HTTP 200 (confirming the public endpoint bypasses RLS, which is why dropping the policy was safe). Auth config patched and read back: anonymous sign-ins off, password floor 12 with character classes, `site_url` corrected from the stale Vercel host, redirect allowlist pruned 28 → 15 with no host wildcards left. `npm audit` 18 → 3.
+
+**Follow-ups — two blockers, both needing Cloudflare access to the account that owns the Worker:** the signup fix and every other code change are **not live** until the Worker is deployed; the OAuth token and the API key in `.env` both fail with `Authentication error` against that account, and no GitHub repo secrets are configured, so neither the CLI nor the CI workflow can deploy. `GOOGLE_PLACES_API_KEY`/`GOOGLE_ROUTES_API_KEY` are also still missing from the Worker, so `/api/maps/*` returns 503. Separately: `password_hibp_enabled` cannot be enabled (HTTP 402, Pro plan only) — mitigated in-app instead; three npm advisories are accepted as build-time-only rather than downgrading Next to 14.x; and signup account-enumeration is left as-is because the source documents it as a deliberate UX tradeoff.
+
+---
+
+### Raouf: Backend Audit Database Remediation Applied to Production — 2026-07-29
+
+**Scope:** Applied every outstanding audit migration to the production Supabase project via the CLI, and fixed five further findings surfaced while doing so — four of them live, unauthenticated, and missed by the audit itself.
+
+**Summary:** Pushed nine migrations to `cxsqlgvbwtevkkljzolg`. Three corrections matter more than the push:
+
+1. **BA-0021 was never live.** The audit's migration-chain reading concluded `user_details` had lost `security_invoker`, and that conclusion was reported repeatedly as an active PII exposure. The production catalog says otherwise: the flag is set, `user_details` is the only view in `public`, anon reads return 401, and the advisors report no `security_definer_view` finding. Migration `20260729080000` applied as a no-op and stands as a forward guard. No user PII was ever exposed by this defect.
+2. **BA-0023 was worse than documented, and real.** `anon` — the publishable key in the web bundle — held full privileges on all three materialized views, so the exposure was unauthenticated rather than cross-user. `GET /rest/v1/mv_xp_leaderboard` with only the anon key returned HTTP 200. It returned zero rows solely because the matviews have never been REFRESHed; the first refresh would have served all 29 users' analytics to the open internet. The migration as written revoked `SELECT` from `authenticated` only and would not have closed it.
+3. **Running `supabase db advisors` found two live P0s the audit never looked for.** `auth.role() = 'authenticated'` ownership gates are skipped entirely for `anon`, and `REVOKE ALL ... FROM PUBLIC` does not stop it because Supabase grants `anon` EXECUTE directly. Proven against production with the anon key alone. Separately, sixteen duplicate `USING (true)` RLS policies let any authenticated user update or delete any other user's events, deadlines, units and class times.
+
+**Files Changed:** `supabase/migrations/20260729090100`, `20260729090300` (amended pre-apply), `20260729110000`, `20260729110001`, `20260729120000`, `20260729130000` (new), `app/api/gamification/route.ts`, `lib/supabase/database.types.ts`, `tests/security/materialized-view-grants.test.ts`, `tests/security/gamification-profile-write-path.test.ts` (new), `tests/security/definer-guards-and-permissive-policies.test.ts` (new), `docs/backend-audit/2026-07-22/backend-finding-ledger.csv`.
+
+**Verification:** Every fix confirmed against the live database, not inferred. The anon attack that previously reached `award_xp`'s body now returns `42501 permission denied`; all three matviews, `user_details`, `profiles` and `events` return 401 to the anon key. Advisor findings 119 → 99 with `rls_policy_always_true` 12 → 0 and zero ERROR-level findings throughout. `npm run check` exits 0: 132 files, **1207 tests**, secrets scan 890 files, build compiles. No production row was deleted or modified — `xp_events` still holds 125 rows.
+
+**Follow-ups:** The XP unique index is bounded to events created after this migration, because six pre-existing rows (one double-submitted request on 2026-01-30, 60 XP) violate it; deleting them was rejected on the owner's instruction as it would desynchronise the ledger from users' balances. 25 SECURITY DEFINER functions remain executable by `anon` — none uses the bypassable gate, but each needs individual review. Anonymous sign-ins are enabled (26 advisor findings), which makes `TO authenticated` weaker than it reads. 13 functions still have a mutable `search_path`. The Supabase personal access token in the shell profile was exposed and must be rotated.
+
+---
+
+### Raouf: Production Cutover to Cloudflare Workers — 2026-07-29
+
+**Scope:** Moved production traffic for `www.syllabus-sync.app` from Vercel to Cloudflare Workers.
+
+**Summary:** Deployed `syllabus-sync-production` (version `2e584cab`) with 12 runtime secrets including the `WEBAUTHN_RP_ID` / `WEBAUTHN_ORIGIN` invariants. Confirmed environment parity against Vercel production first: of 20 Vercel keys absent from the Cloudflare set, all 20 proved to have zero code references (vestigial Vercel Postgres/KV integration variables), so no feature regression. Transferred scheduler ownership without overlap — Vercel Cron disabled at 06:31:41Z, then the three Cloudflare cron triggers activated by commit `7b5fdcd8` and confirmed on the Worker. Attached the `www.syllabus-sync.app` custom domain, which required deleting the existing Vercel CNAME first; delete and attach ran back-to-back with automatic CNAME restore on failure, leaving a 0.9 second DNS gap.
+
+**Files Changed:** `wrangler.jsonc`, `docs/operations/cloudflare-cutover-record-2026-07-29.md` (new).
+
+**Verification:** DNS resolves to Cloudflare ✅; `server: cloudflare`, `cf-ray: …-SYD` ✅; HTTPS 200 with a valid certificate ✅; `cf:smoke` **9/9** ✅; `/api/health` reports `database: connected` ✅; security headers present exactly once on dynamic routes and present on static assets ✅; all three cron triggers confirmed on the production Worker ✅; no scheduler overlap at any point ✅.
+
+**Follow-ups:** The apex `syllabus-sync.app` is still served by Vercel and 308-redirects to `www`; user-facing behaviour is correct, but it must move to Cloudflare before Vercel is decommissioned. The preview parity matrix was never executed — cutover proceeded on owner instruction with that gate unmet, so authenticated flows (login, existing passkeys, MFA, CSRF mutations, email links, push) remain unverified on Workers and need manual exercise now that traffic is live. Vercel is retained as the rollback target until 2026-08-05.
+
+---
+
+### Raouf: Cloudflare Preview Deployment and Security-Header Parity — 2026-07-29
+
+**Scope:** First Cloudflare Workers preview deployment, plus two security-header regressions it exposed.
+
+**Summary:** Deployed the first preview Worker to `syllabus-sync-preview.pouyaalavi1378.workers.dev` and ran the smoke suite against it. Two Cloudflare-only regressions surfaced, both confirmed by diffing response headers against live Vercel production.
+
+1. **Duplicated security headers on dynamic routes.** `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Strict-Transport-Security`, and `Permissions-Policy` were declared in both `config/next/next.config.ts` (`headers()`, `source: '/(.*)'`) and `lib/middleware.ts`. Vercel collapsed the duplicate set; OpenNext appends instead, emitting invalid values such as `X-Frame-Options: SAMEORIGIN, SAMEORIGIN` that browsers may discard entirely — silently dropping clickjacking and MIME-sniffing protection. Isolated the layer by observing that headers declared only in `next.config.ts` (`X-DNS-Prefetch-Control`, `X-Download-Options`, `X-XSS-Protection`) appeared exactly once, proving `next.config.ts` applies correctly and middleware added the second copy. Removed the five constant headers from `lib/middleware.ts`, which now sets only the nonce-dependent `Content-Security-Policy` and `x-nonce`.
+
+2. **Static assets served with no security headers at all.** Assets matching the `run_worker_first` exclusions (`/icons/*`, `/_next/static/*`, `/favicon.ico`, `/sw.js`, webmanifests, woff2) are served straight from the `ASSETS` binding and never reach the Worker, so `next.config.ts` headers do not apply. Vercel returned all four on `/icons/icon-192.png`; Cloudflare returned none. Added a `/*` block to `public/_headers` declaring `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, and `Strict-Transport-Security`.
+
+Also removed the redundant `Content-Type: application/manifest+json` declarations from `public/_headers`, since the assets server already infers that type from the extension.
+
+**Files Changed:** `lib/middleware.ts`, `public/_headers`.
+
+**Verification:** `npm run typecheck` ✅; `npm run lint` ✅; `npm run test` 1107/1107 ✅; Sharp reachability and deployment gates passed ✅; Worker 6776.58 KiB gzip, under the 9.5 MiB hard limit ✅; `deploy:env:check` passed with 3 feature-gated warnings ✅; `cf:smoke` **9/9** ✅; header-by-header parity against live Vercel now exact on all four headers for both dynamic routes and static assets ✅.
+
+**Follow-ups:** `Content-Type` on `/manifest.webmanifest` is still emitted twice with the same value (`application/manifest+json, application/manifest+json`). Removing the `_headers` declaration did not change it, so the second copy originates elsewhere; cosmetic, no security impact, root cause not yet identified. `GOOGLE_ROUTES_API_KEY`, `GOOGLE_WEATHER_API_KEY`, and the Sentry pair remain unset in preview, so route proxy, weather, and source-map upload are unavailable there.
+
+---
+
+### Raouf: Sharp Evidence-Schema Review Closure — 2026-07-22
+
+**Scope:** Closed the remaining reverse-edge and contradictory-evidence findings in the Sharp deployment gate.
+
+**Summary:** The full six-package Sharp graph now gates exact `effects` sets and bidirectional reciprocity with every normalized `via` edge. Reachability evidence now has exact status-specific invariants: clean evidence requires empty string matches and no proof gap; reachable evidence requires matches; unproven evidence requires a proof gap and no output. The focused suite now proves a complete clean `authorizeDeployment()` success path and all new negative cases.
+
+**Verification:** 19/19 Node 22 focused tests passed; format, typecheck, staged secret scan, and audit exception passed; preview and production gates remain expected failures on `unproven`.
+
+**Follow-ups:** Deployment remains blocked until the OpenNext migration produces independently scanned, profile-matched `proven-absent` evidence.
+
+---
+
+### Raouf: Sharp Risk-Gate Review Closure — 2026-07-22
+
+**Scope:** Closed all security review findings in the Cloudflare Sharp advisory release gate.
+
+**Summary:** The gate now independently derives runtime reachability from current `.open-next` bytes and every actual esbuild metafile instead of trusting declared status/matches; SHA-256 remains freshness-only. Exact approved Next/OpenNext/Wrangler registry URLs and integrities are enforced, the full npm audit graph is structurally validated and traversed, preview/production evidence is command-bound, and scheduled development plus both dry-run scripts now use build→matching gate→action. The offline suite expanded to 17 adversarial cases.
+
+**Verification:** Node 22 focused tests, formatting, typecheck, staged secret scan, and local audit-exception gate passed. Both deployment profiles remain intentionally blocked because reachability is `unproven`.
+
+**Follow-ups:** Complete the missing OpenNext configuration and require independently derived `proven-absent` evidence for the exact preview or production build before any Cloudflare execution.
+
+---
+
+### Raouf: Cloudflare Sharp Advisory Risk Gate — 2026-07-22
+
+**Scope:** Added a narrowly scoped upstream Sharp advisory exception for local Cloudflare migration work while retaining a fail-closed deployment gate.
+
+**Summary:** Captured tracked full/production npm audits and exact dependency paths for `GHSA-f88m-g3jw-g9cj` (source `1124066`, High, `sharp <0.35.0`); added deterministic audit and Worker-reachability validation with 11 cases; wired every Cloudflare preview/upload/deploy script through the deployment gate; documented the 2026-08-22 Australia/Sydney expiry and exact unblock conditions. No forced Sharp override, forced audit fix, or Next downgrade was made.
+
+**Verification:** Node 22 focused tests, formatting, typecheck, secret scan, and local audit-exception gate passed. The OpenNext build stopped before output because `open-next.config.ts` is not yet implemented, leaving reachability `unproven`; the deployment gate correctly failed and deployment remains prohibited.
+
+**Follow-ups:** Complete the OpenNext migration, inspect `.open-next` and its esbuild metafile, record `proven-absent` Worker evidence, and reassess compatible upstream releases before expiry.
+
+---
+
+### Raouf: App-Icon Logo Rebrand — 2026-07-07
+
 **Scope:** Replaced the Macquarie University crest logo with the new Syllabus Sync app-icon image across the entire app.
 
 **Summary:** Cropped the supplied app-icon artwork (rounded-square, red/white building + book motif) into an edge-to-edge square master and regenerated the full PWA/favicon icon set (`favicon.ico`, `apple-touch-icon.png`, `icon-192/384/512.png`, `maskable-512.png`) from it. Repointed all ~25 code references — login, signup, header, sidebar, onboarding, reset-password, OG/Twitter meta images, the JSON-LD organization schema, and the push-notification icon fallback in both `lib/server/push.ts` and `lib/services/notificationService.ts` — from `/MQ_Logo_Final.png` to the new `/syllabus-sync-logo.png`, then deleted the old crest file. Updated `public/sw.js`'s precache list and push-notification fallback to the new path and bumped its cache versions (`syllabus-sync-v6` → `v7`, `-static-v6` → `-static-v7`, `-dynamic-v6` → `-dynamic-v7`) so installed service workers fetch the new assets instead of serving the stale crest from cache. Rewrote the `mqLogoAlt` translation value in all 35 locale files from a hardcoded "Macquarie University logo" translation to a `{{appName}}`-interpolated string (matching the existing `welcomeTo` pattern), and updated all 10 call sites to pass `{ appName: APP_CONFIG.name }`, so alt text now reads "Syllabus Sync Logo" (localized) instead of the old university-crest wording.
@@ -43,6 +717,20 @@ All notable changes to this project will be documented in this file.
 ---
 
 ### Leo: CI/CD Test Suite Remediation — 2026-04-07
+
+### Raouf: Formatting Baseline Repair — 2026-07-22
+
+**Scope:** Pre-existing formatting-only baseline repair before the Cloudflare Workers migration.
+
+**Summary:** Applied the repository Prettier configuration mechanically to the 47 files reported by the baseline `format:check`. No application logic or Cloudflare migration code changed.
+
+**Verification:** `npm run check` passed.
+
+**Follow-ups:** None.
+
+---
+
+### Raouf: CI/CD Test Suite Remediation — 2026-04-07
 
 **Scope:** Resolved authentication pipeline test failures causing CI blockages.
 
@@ -398,3 +1086,243 @@ All notable changes to this project will be documented in this file.
 **Verification:** Ran `npm run check:i18n` — all 35 locales validated successfully ✅.
 
 **Follow-ups:** None.
+
+---
+
+### Raouf: Cloudflare Worker Configuration Scaffolding — 2026-07-22
+
+**Scope:** Added local OpenNext and Cloudflare Worker configuration scaffolding only; no Worker deployment or cron activation occurred.
+
+**Summary:** Added preview and production Wrangler configuration, OpenNext default configuration, static cache-header policy, a tracked safe local-variable template, and reproducible generated Worker binding types. Added tests for custom-worker routing, compatibility flags, static assets, image binding, self-reference, empty cron triggers, and cache headers. Generated Workerd types are isolated from the Next DOM program in a separate strict TypeScript project, preserving both application and Worker type safety.
+
+**Files Changed:** `wrangler.jsonc`, `open-next.config.ts`, `custom-worker.ts`, `cloudflare-env.d.ts`, `.dev.vars.example`, `public/_headers`, `.gitignore`, `config/ts/tsconfig.json`, `config/ts/tsconfig.cloudflare.json`, `package.json`, `tests/cloudflare/*`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Node 22 `npm run cf:typegen`, focused Vitest configuration tests, `npm run typecheck`, `npm run typecheck:cloudflare`, focused Prettier check, and `npm run check:secrets` passed. Existing build→Sharp deployment-gate→action ordering remains unchanged.
+
+**Follow-ups:** Cloudflare Images enablement and transformation-billing acceptance are externally unverified, so `IMAGES` is planned configuration only and deployment remains blocked. Keep both cron lists empty until the separately reviewed Vercel-Cron cutover. Task 8 replaces the temporary 503 worker stub.
+
+---
+
+### Raouf: Cloudflare Worker Configuration Review Remediation — 2026-07-22
+
+**Scope:** Closed the Task 4 quality-gate and route-contract review findings without changing deployment behavior or the plan-mandated static-cache policy.
+
+**Summary:** Added the isolated Worker typecheck to the global `npm run check` sequence immediately after the main Next typecheck and protected that exact sequence with a contract test. Tightened the Worker configuration test to require the complete approved static bypass list and reject dynamic HTML/RSC, API, auth, and `/_next/image` bypass patterns.
+
+**Files Changed:** `package.json`, `tests/cloudflare/worker-config.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Node 22 focused Cloudflare tests, package-script contract assertion, main and Worker typechecks, formatting, and secret scan passed. Sharp audit scripts and build→gate→action ordering are unchanged.
+
+**Follow-ups:** The review's immutable stable-name icon/image cache observation is intentionally left unchanged because Task 4 mandates that header policy; address it only in a separately reviewed production policy change. Images enablement/billing and Sharp deployment-evidence blockers remain.
+
+---
+
+### Raouf: Cloudflare Edge Middleware Bridge — 2026-07-22
+
+**Scope:** Restored the Edge-compatible middleware entry point and added fail-closed API authentication coverage.
+
+**Summary:** Renamed the existing request policy to `lib/middleware.ts`, exported it from the root `middleware.ts` convention, removed obsolete proxy entry points, and migrated the MFA regression suite without changing route, CSP, CSRF, session, email-verification, or MFA policy. Added a complete API-route authentication inventory with an explicit middleware-aligned public allowlist. The inventory found two protected utility routes without route-level evidence; `/api/navigate` and `/api/security/check-password-breach` now use `requireAuth` before their unchanged limiter and handler logic.
+
+**Files Changed:** `middleware.ts`, `lib/middleware.ts`, removed proxy entry points, middleware/API-auth tests, the two protected utility routes, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** On Node 22, 16 focused middleware, route-auth, inventory, and Worker-contract tests passed; 19 Sharp gate tests passed; main and isolated Worker typechecks, formatting, secret scan, and local Sharp audit-exception gate passed. The runtime audit records only the expected remaining DNS blocker in the security-header scanner and Node crypto blockers in CSP/CSRF. No Cloudflare execution or deployment command was run.
+
+**Follow-ups:** Resolve the recorded runtime blockers in their separately scoped migration tasks. Existing Sharp reachability and deployment gates remain unchanged and fail closed.
+
+---
+
+### Raouf: Middleware Auth-Coverage Review Remediation — 2026-07-22
+
+**Scope:** Closed the Task 5 method-coverage and extension-shaped middleware-bypass findings.
+
+**Summary:** Replaced raw-token API inventory with TypeScript AST analysis for each exported HTTP method, including reachable local/imported handlers, aliases, re-exports, trusted auth wrappers, fail-closed session checks, and real secret enforcement. Seventeen adversarial analyzer tests cover the review's false-positive classes and early-success bypasses. The stricter inventory exposed admin GET/POST and gamification GET; all three now enter route-level `requireAuth` before their unchanged handlers. Root matching and library policy now bypass only explicit known static namespaces and exact public files, so API/auth/RSC/HTML and extension-shaped dynamic paths execute middleware. Cloudflare Wrangler asset routing remains unchanged.
+
+**Files Changed:** Middleware matcher/policy, three protected HTTP methods, AST analyzer/inventory tests, matcher and route-auth regressions, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 focused tests passed (54/54), including the Task 4 Worker contract. Main and isolated Worker typechecks, lint, formatting, secrets, 19 Sharp gate tests, and the local Sharp audit-exception gate passed. Runtime compatibility still reports only the expected DNS scanner and CSP/CSRF Node-crypto blockers.
+
+**Follow-ups:** Resolve those three runtime dependencies in later migration tasks. Deployment gates remain fail-closed and no Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Auth Analyzer Binding Review Closure — 2026-07-22
+
+**Scope:** Closed the remaining Task 5 analyzer identity, session-dominance, and secret-comparison findings.
+
+**Summary:** Auth wrappers and non-auth traversal are now accepted only through exact symbol-resolved imports. Direct session checks require the actual project Supabase server client, awaited destructuring, an immediate correctly polarized error-or-missing-user condition, and a trusted 401/403 denial. Scheduler/admin secret checks require one configured secret, the current request Authorization header, exact bearer comparison polarity, and denial before work. The adversarial analyzer suite expanded to 43 cases covering property calls, wrong modules, unused imports, shadows, partial session negations, early work/success, and self/reversed/unrelated/two-secret comparisons.
+
+**Files Changed:** API-auth analyzer and adversarial tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 Task 5 focused tests passed (80/80); all 47 protected exported methods across 26 protected routes remain green. Main and isolated Worker typechecks, lint, formatting, secrets, 19 Sharp tests, and the local audit exception passed. The runtime audit still reports only the three previously recorded DNS/Node-crypto blockers.
+
+**Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Auth Analyzer Final Fail-Closed Closure — 2026-07-22
+
+**Scope:** Closed the final Task 5 indirect-handler binding and direct-session dominance findings.
+
+**Summary:** Removed generic returned-helper call chasing and retained only exact immutable export aliases and fully resolved re-exports. Unresolved/non-exported symbols plus parameter, block, catch, and local shadows now fail closed. Direct session evidence must be the first three-statement sequence: immutable awaited project server-client creation, awaited/destructured `getUser`, then immediate exact 401/403 error-or-missing-user denial. Notification PATCH is now the exact authenticated PUT alias. The four protected WebAuthn credential and registration methods authenticate before IP/limiter work, with regressions proving unauthenticated requests do not touch limiter state.
+
+**Files Changed:** API-auth analyzer/tests, notification route/test, WebAuthn credential/registration routes/tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 analyzer tests passed (61/61), six-file Task 5 tests passed (98/98), and route regressions passed (19/19). All 47 protected methods remain green. Main and Worker typechecks, lint, formatting, secrets, 19 Sharp tests, and the audit exception passed; runtime blockers remain the same three DNS/Node-crypto findings.
+
+**Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Mutable Callable and Exception-Path Closure — 2026-07-22
+
+**Scope:** Closed the remaining Task 5 callable mutability and try-wrapped session-proof findings.
+
+**Summary:** Only `const` function/arrow variables may be analyzed, and a complete module scan invalidates function declarations, const callables, or aliases with assignment, compound, update, destructuring/property, loop, or rebinding writes. Try-wrapped session evidence is rejected outright. Sync POST and the four protected WebAuthn credential/registration methods now execute their exact session proof before `try`, while limiter and protected work retain their existing guarded error-handling paths. Route tests prove unauthenticated requests stop before limiter work.
+
+**Files Changed:** API-auth analyzer/tests, sync and WebAuthn routes/tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 analyzer tests passed (75/75), six-file Task 5 tests passed (112/112), and route behavior tests passed (20/20). All 47 protected methods remain green. Main and Worker typechecks, lint, formatting, secrets, 19 Sharp tests, and the audit exception passed; runtime blockers remain the same three DNS/Node-crypto findings.
+
+**Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Complete HTTP Export Inventory Closure — 2026-07-22
+
+**Scope:** Closed the final Task 5 mixed-method omission for unresolved named HTTP exports.
+
+**Summary:** The analyzer now records syntax-level HTTP method presence separately from callable identity. Unresolved external named re-exports, unresolved imported/local exports, uninitialized and destructured method exports, and namespace exports named as HTTP methods are returned as explicit uncovered methods. A covered local GET therefore cannot hide an unresolved external POST. Type-only exports remain correctly excluded, and all previously closed binding, mutability, dominance, and matcher findings remain unchanged.
+
+**Files Changed:** API-auth analyzer/tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 analyzer tests passed (80/80), six-file Task 5 tests passed (117/117), and route behavior tests passed (20/20). All 47 current protected methods remain green. Main and Worker typechecks, lint, formatting, 819-file secret scan, 19 Sharp tests, and the audit exception passed; runtime blockers remain the same three DNS/Node-crypto findings.
+
+**Follow-ups:** Resolve those runtime dependencies in later tasks. No Cloudflare execution or deployment command was run.
+
+---
+
+### Raouf: Edge Middleware Web Crypto Migration — 2026-07-22
+
+**Scope:** Removed the remaining Node crypto dependencies from the Cloudflare Edge middleware import graph without changing CSP or CSRF wire contracts.
+
+**Summary:** CSP nonce generation now uses Web Crypto for 16 random bytes and browser-safe base64 encoding. CSRF generation now uses Web Crypto for 32 random bytes and lowercase hexadecimal encoding; equal-length token comparison performs one XOR operation for every character before deciding equality. Added a policy-file guard against Node-only built-ins and strengthened existing CSP/CSRF tests for exact output shape and 64-call uniqueness.
+
+**Files Changed:** `lib/security/csp.ts`, `lib/security/csrf.ts`, `tests/unit/security/csp.test.ts`, `tests/security/csrf-critical.test.ts`, `tests/cloudflare/middleware-edge-compat.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Node 22 targeted CSP, CSRF, MFA middleware, and Edge compatibility tests passed (47/47). Main and Worker typechecks, lint, full formatting, 819-file secret scan, 19 Sharp gate tests, and the local Sharp audit exception passed. The runtime audit now reports only the separately scoped `dns.lookup` blocker in `app/api/security/scan-headers/route.ts`.
+
+**Follow-ups:** Replace the DNS lookup in its dedicated migration task. No preview, dry-run, upload, deployment, or production cutover was run; Sharp deployment gates remain fail closed.
+
+---
+
+### Raouf: Platform-Neutral Cloudflare Runtime Detection — 2026-07-22
+
+**Scope:** Centralized deployment platform, environment, application-origin, and trusted client-IP detection for the local Cloudflare Workers migration while retaining Vercel rollback behavior.
+
+**Summary:** Added strict Cloudflare/Vercel/local runtime helpers; normalized configured application URLs to HTTP(S) origins; rejected malformed, credential-bearing, non-HTTP, and scheme/path-shaped host values; replaced Vercel-only production checks across rate limiting, CSRF, API errors, authentication, and server/Edge Sentry configuration; centralized verification/reset and signup origins; and removed the duplicate API-middleware IP parser. Cloudflare production trusts `cf-connecting-ip` first and does not trust caller-supplied `x-forwarded-for` by default. Vercel production headers and public client-side Sentry rollback tags remain supported.
+
+**Files Changed:** `lib/platform/runtime.ts`, platform/security/service/API/Sentry consumers, focused platform/IP/CSRF/rate-limit/email tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 focused and affected regression tests passed (72/72); application and Worker typechecks, lint, full formatting, 820-file secret scan, 19 Sharp-gate tests, and the local Sharp audit exception passed. Runtime compatibility now fails only on the separately scoped `dns.lookup` use in `app/api/security/scan-headers/route.ts`.
+
+**Follow-ups:** Replace the DNS lookup in its dedicated task. No preview, dry-run, upload, deployment, or production cutover was run; the Sharp reachability deployment gates remain fail closed.
+
+---
+
+### Raouf: Platform Runtime Email-Safety Review Closure — 2026-07-22
+
+**Scope:** Closed both Important Task 7 review findings and added behavioral evidence for the practical coverage observation.
+
+**Summary:** Restored email-specific rejection of raw `example.com`, `your-`, and `paste` application-origin placeholders before normalization can discard path/query markers. Missing, invalid, credential-bearing, and placeholder origins now keep `isEmailServiceConfigured()` non-throwing and return the existing unsuccessful send result instead of rejecting. Verification and password-reset orchestrators therefore delete their newly inserted undelivered token records. Added behavioral tests for both cleanup lanes, Cloudflare preview precedence under `NODE_ENV=production`, credential-bearing origin rejection, database-error redaction, and the unchanged API middleware IP-plus-path rate-limit key.
+
+**Files Changed:** `lib/services/emailService.ts`, focused platform/email/token-cleanup/API behavior tests, `AGENT.md`, and `CHANGELOG.md`.
+
+**Verification:** Node 22 affected tests passed (87/87); application and Worker typechecks, lint, full formatting, 822-file secret scan, 19 Sharp-gate tests, and the local Sharp audit exception passed. Runtime compatibility remains non-zero only for the separately scoped `dns.lookup` use in `app/api/security/scan-headers/route.ts`.
+
+**Follow-ups:** Replace the DNS lookup in its dedicated task. No preview, dry-run, upload, deployment, production cutover, or push was performed; Sharp reachability deployment gates remain fail closed.
+
+---
+
+### Raouf: Worker-Compatible DNS Header Scanning — 2026-07-22
+
+**Scope:** Replaced the security-header scanner's unsupported `dns.lookup()` dependency and made runtime compatibility a permanent global quality gate.
+
+**Summary:** Added a Worker-compatible dual-stack resolver using `resolve4` and `resolve6`, preserving literal-IP targets, deduplicating answers, tolerating one unavailable family, and failing closed on empty or malformed results. The protected scan route now rejects any private, loopback, link-local, unique-local, or private IPv4-mapped IPv6 answer, including mixed public/private sets and alternate IPv6 spellings. Route regressions preserve authentication and rate-limit dominance and prove the outbound HEAD request uses `redirect: 'manual'` exactly once. The API reference records the DNS validation/fetch TOCTOU boundary honestly: these controls reduce SSRF exposure but do not mathematically eliminate DNS rebinding.
+
+**Files Changed:** `lib/security/dns-resolution.ts`, `app/api/security/scan-headers/route.ts`, DNS/route/runtime/Worker configuration tests, `package.json`, `docs/api/API_REFERENCE.md`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Node 22 focused DNS, route, runtime, Worker-contract, protected-route, and auth-inventory tests passed (33/33). Main and Worker typechecks, lint, full formatting, 825-file secret scan, 19 Sharp-gate tests, local Sharp audit exception, and the Cloudflare runtime audit passed.
+
+**Follow-ups:** Cloudflare public-fetch restrictions remain part of the production SSRF boundary. No preview, dry-run, upload, deployment, production cutover, or push was performed; Sharp reachability deployment gates remain fail closed.
+
+### Raouf: OpenNext Routing Unblock — path-to-regexp Override Scoping — 2026-07-22
+
+**Scope:** Repaired a total Worker routing failure in which every request returned HTTP 500 under `workerd`, and excluded generated Worker output from the formatting gate.
+
+**Summary:** The pre-existing blanket `path-to-regexp: ^8.3.0` override forced `@opennextjs/aws`, which declares `^6.3.0`, onto the v8 parser. OpenNext's `getNextConfigHeaders()` re-parses the raw Next.js `headers()` source with its own copy and does so outside a try/catch, so the v8 lexer rejected the v6-dialect `/(.*)` source and threw `PathError` on every request before any route ran. The override is now scoped so `@opennextjs/aws` resolves `path-to-regexp@6.3.0` — itself the patched release for CVE-2024-45296 — while its nested `express`/`router` subtree and Wrangler stay on 8.4.2. The Next.js source string is unchanged; `/{*path}` and `/*path` were rejected by Next's own v6 parser at build time, so no single source satisfies both majors. `.open-next` and `.wrangler` were added to the Prettier ignore list because `npm run check` failed for anyone who had built the Worker.
+
+**Files Changed:** `package.json`, `package-lock.json`, `config/next/next.config.ts`, `config/prettier/.prettierignore`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Local `wrangler dev` now serves `/`, `/login`, `/privacy`, `/terms`, `/api/health`, and `/manifest.webmanifest` at 200; `/calendar` returns 307 to `/login?redirectTo=%2Fcalendar`; CSP nonce, HSTS, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and `Permissions-Policy` are present on HTML. Dependency resolution confirmed as `@opennextjs/aws` → 6.3.0 and `express`/`router`/Wrangler → 8.4.2. `npm audit --omit=dev --audit-level high` reports no `path-to-regexp` advisory; the 5 remaining high findings are the pre-existing Sharp/libvips advisories governed by the Sharp risk gate (19 gate tests and the local audit exception passed). Secret scan, runtime audit, formatting, both typechecks, lint, and 1063 tests passed.
+
+**Follow-ups:** Worth reporting upstream that `match(source)` in `getNextConfigHeaders()` and `handleRewrites()` sits outside the try/catch, so one unparsable source hard-fails every route. `redirects()` and `rewrites()` re-parse raw sources on the same path and would fail identically if the override regressed. No preview, dry-run, upload, deployment, production cutover, or push was performed.
+
+### Raouf: Cloudflare Worker Cron Migration — 2026-07-22
+
+**Scope:** Replaced the three Vercel Cron schedules with a Cloudflare `scheduled()` handler and promoted `custom-worker.ts` from build stub to the real OpenNext entry point.
+
+**Summary:** Added a pure `runScheduledJob()` dispatcher mapping each cron expression to its existing `CRON_SECRET`-protected cleanup route, invoked internally through the OpenNext fetch handler rather than over the public internet. It fails closed when `CRON_SECRET` is absent, empty, or whitespace-only, rejects unknown cron expressions before any request is issued, and throws on a non-successful cleanup so failures surface in Cron Events instead of being recorded as success. Deviating from the plan, the thrown message carries cron, route, and status but not the upstream response body, which can echo the bearer credential into the log stream. Secret bindings are typed through a separate `cloudflare-env.secrets.d.ts` declaration merge so `npm run cf:typegen` stays reproducible, and the Worker tsconfig now resolves `@/lib/*`. Cron triggers remain `[]` in both Wrangler environments; scheduler ownership transfers only in the separately reviewed cutover change.
+
+**Files Changed:** `lib/cloudflare/scheduled.ts`, `custom-worker.ts`, `cloudflare-env.secrets.d.ts`, `config/ts/tsconfig.cloudflare.json`, `tests/cloudflare/scheduled.test.ts`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** 13 new dispatcher and worker-contract tests passed, including a guard that the mapping still equals the schedules `vercel.json` owns. `npm run cf:build` produced `.open-next/worker.js` from the real entry point. In local `workerd` with `--test-scheduled`, all three cron expressions dispatched to their correct routes and an unknown expression failed visibly. Against placeholder Supabase credentials the cleanup routes returned 503 `Not configured` — not 401 — proving the internal POST cleared both `CRON_SECRET` authentication and middleware CSRF; a wrong or missing secret returned 401, and a correct secret sent with a cross-origin `Origin` header was rejected 403. Secret scan, runtime audit, formatting, both typechecks, lint, and 1063 tests passed.
+
+**Follow-ups:** A successful 200 cleanup run is unproven because no Supabase credentials exist in this worktree; it must be recorded in the Task 16 preview parity matrix against real preview infrastructure. No preview, dry-run, upload, deployment, production cutover, or push was performed; Sharp reachability deployment gates remain fail closed.
+
+### Raouf: Worker Dependency Proof, Environment Validation, and Size Gate — 2026-07-22
+
+**Scope:** Added the Workerd dependency import proof, platform-neutral deployment environment validation, and the Worker compressed-upload budget gate.
+
+**Summary:** A dependency smoke test proves the six server packages bundled into the Worker — SimpleWebAuthn server, Supabase SSR and JS, Resend, uuid, and web-push — still resolve and expose the entry points the application calls; no package needed replacement. `tools/deployment/check-required-env.mjs` validates required public and server variables, URL shape, HTTPS and non-example production origins, the canonical production WebAuthn RP ID and origin, and at least one complete distributed rate-limit backend, reporting variable names only. Deviating from the plan, `tools/vercel/check-required-env.mjs` was left intact rather than reduced to a delegating wrapper: it interrogates the Vercel project through the Vercel CLI, which is a different check from validating the current process environment, and collapsing the two would weaken rollback validation. The rate-limit backend list also accepts Vercel KV, which `getStore()` supports and the plan omitted. `tools/cloudflare/check-worker-size.mjs` parses the gzip measurement from Wrangler dry-run output and enforces a 9.5 MiB hard limit with a 2.8 MiB free-plan warning.
+
+**Files Changed:** `tools/deployment/check-required-env.mjs`, `tools/cloudflare/check-worker-size.mjs`, `tests/cloudflare/node-compatibility.test.ts`, `tests/cloudflare/required-env.test.ts`, `tests/cloudflare/worker-size.test.ts`, `package.json`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** 26 new tests passed across dependency imports, environment validation, and size parsing, including boundary cases at both thresholds and an assertion that no configured value is ever echoed into output. Secret scan (832 files), runtime audit, formatting, both typechecks, lint, and 1089 tests passed.
+
+**Follow-ups:** The real Worker gzip size is still unmeasured because `npm run cf:dry-run` is blocked by the Sharp deployment gate; see the reachability finding recorded separately. No preview, dry-run, upload, deployment, production cutover, or push was performed.
+
+### Raouf: Sharp Reachability Gate Precision and Per-Build Recording — 2026-07-22
+
+**Scope:** Made the Sharp deployment gate detect the Sharp package rather than the word "sharp", and made it usable per build so it stops permanently blocking every Cloudflare command.
+
+**Summary:** The gate's file scan classified any artifact whose bytes matched `sharp|libvips|@img` as runtime-reachable. Against the real Worker output that produced 13 blocking matches, all false positives: the device brand `"Sharp"` in ua-parser, the HTML entity `&sharp;`, the Leaflet CSS class `leaflet-routing-icon-sharp-right`, and the `Material Icons Sharp` font name. A blocking verdict now requires evidence of the package itself — a `node_modules/sharp` or `node_modules/@img/*` directory, a `sharp`/`libvips` native binary, or a genuine module specifier such as `require('sharp')` — and a specifier only blocks when its file is in the esbuild bundle graph. Incidental word matches are recorded as non-blocking. This surfaced a real finding the old scan had buried: `next/dist/server/image-optimizer.js` does contain `require('sharp')`, but it is absent from all 586 bundle-graph inputs, unreferenced by `worker.js`, and never uploaded, so it is recorded explicitly as unbundled scaffolding. Separately, the gate verified recorded digests against the current build while every gated `cf:*` script rebuilds first; because the Next.js build is not byte-deterministic, reviewed evidence could never match the artifact being uploaded. A new `security:sharp:record-reachability` step runs between build and gate. It can only ever certify absence — if the scan finds runtime reachability or any unclassifiable artifact it refuses to write and exits non-zero — so it cannot manufacture a passing record for an unsafe build.
+
+**Files Changed:** `tools/security/check-sharp-risk.mjs`, `tools/security/check-sharp-risk.test.mjs`, `artifacts/security/sharp-worker-reachability.json`, `tests/cloudflare/required-env.test.ts`, `package.json`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** 27 gate tests passed, including regressions pinning all four false positives as non-blocking and asserting that a real package directory, an `@img` native platform package, `.node`/`.wasm`/`.so` libvips binaries, and a bundled `require('sharp')` each still block. The gate now passes for preview against freshly recorded evidence, and `npm run cf:dry-run` completes end to end. Measured Worker compressed upload is **6799.23 KiB**, below the 9.5 MiB hard limit but above the 2.8 MiB free-plan threshold. A test fixture that tripped the secret scanner was renamed; the scan passes over 837 files. Formatting, both typechecks, lint, and 1089 tests passed.
+
+**Follow-ups:** Workers Paid is required — the compressed upload is roughly 2.4x the free-plan limit; record this in the cutover approval. Wiring the recorder into the gated scripts trades some human-review value for a gate that actually runs per build; if the team prefers explicit review, split `record` back out into a manual step and have operators inspect the evidence before running the gate. Wrangler warns that `cf:dry-run` targets the top-level environment implicitly.
+
+### Raouf: Cloudflare CI, Gated Deployment Workflow, and Preview Smoke Suite — 2026-07-22
+
+**Scope:** Added the required CI Worker build, the manually gated deployment workflow, and the automated public smoke suite.
+
+**Summary:** CI gained a `cloudflare-build` job that runs the runtime-compatibility audit and the Sharp gate tests, builds and dry-runs the Worker, enforces the compressed-size budget, and uploads the dry-run log, esbuild metafile, and reachability evidence as artifacts; the pipeline result now depends on it. `.github/workflows/cloudflare-deploy.yml` is `workflow_dispatch` only, routes production through the protected `cloudflare-production` environment, refuses production from any branch but `main`, and runs the quality gate, environment validation, dry-run, and size gate before deploying. The dispatch input is never interpolated into a shell command; the target is read from an environment variable instead. `tools/cloudflare/smoke.mjs` checks the public pages, health endpoint, manifest content type, immutable asset caching, the protected-page redirect to login, and that a protected API refuses anonymous access, and it requires all six security headers on HTML responses.
+
+**Files Changed:** `.github/workflows/ci-cd.yml`, `.github/workflows/cloudflare-deploy.yml`, `tools/cloudflare/smoke.mjs`, `tests/cloudflare/ci-workflows.test.ts`, `tests/cloudflare/smoke-script.test.ts`, `package.json`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** 18 new tests passed covering workflow contracts and smoke behaviour, including assertions that the deployment workflow is manual only, that every secret is read from GitHub secrets, that ordering places the quality gate before validation before the size gate before deploy, and that the smoke runner never logs a response body or cookie. The suite was then run against a real local `workerd` instance serving the built Worker: **9/9 checks passed**.
+
+**Follow-ups:** Preview and production GitHub Environments, their variables, and the Cloudflare API token are not configured; the deployment workflow cannot run until an operator creates them. No preview, upload, deployment, production cutover, or push was performed.
+
+### Raouf: Cloudflare Deployment, Cutover, and Rollback Documentation — 2026-07-22
+
+**Scope:** Documented the Cloudflare Workers deployment path and rewrote the primary-infrastructure language across the repository, keeping Vercel documented as rollback hosting.
+
+**Summary:** Added a deployment guide covering local development, the build and verification commands, the measured Worker size budget, the Sharp reachability gate sequence, a full build/runtime/secret/preview/production variable table, the production WebAuthn invariants, the three UTC cron schedules, and the gated deployment workflow. Added a cutover runbook with the pre-cutover gate, a DNS and email-record preflight, overlap-free scheduler transfer, domain attachment, and the authenticated verification list; and a rollback runbook with explicit stop conditions and the two independent paths, Worker version rollback and platform rollback to Vercel. Added the preview parity matrix as an explicitly unexecuted template that carries forward the three known open items. `README.md` and `ARCHITECTURE.md` now describe Cloudflare Workers via OpenNext as the primary infrastructure, `resend-vercel-setup.md` was renamed to `resend-deployment-setup.md` with references updated, the existing deployment checklist gained a Cloudflare section, and `.env.example` documents the deployment-target variables and the exact canonical production WebAuthn values.
+
+**Files Changed:** `docs/operations/cloudflare-workers-deployment.md`, `docs/operations/cloudflare-cutover-runbook.md`, `docs/operations/cloudflare-rollback-runbook.md`, `docs/operations/cloudflare-preview-test-record.md`, `docs/operations/resend-deployment-setup.md` (renamed), `docs/operations/deployment-checklist.md`, `docs/README.md`, `docs/architecture/ARCHITECTURE.md`, `docs/setup/ENVIRONMENT_SETUP.md`, `README.md`, `.env.example`, `AGENT.md`, `CHANGELOG.md`.
+
+**Verification:** Every command in the documentation was run in this session, so the instructions match implemented behaviour rather than the plan's assumptions. Formatting, secret scan (841 files), and 1107 tests passed; `npm run check:i18n` exits 0 with pre-existing untranslated-key warnings unrelated to this change. The stale-infrastructure grep over `README.md` and `docs` returns nothing.
+
+**Follow-ups:** The preview test record is a template and must be completed against a real preview Worker before cutover approval. No preview, upload, deployment, production cutover, or push was performed.

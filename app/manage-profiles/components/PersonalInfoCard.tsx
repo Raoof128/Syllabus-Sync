@@ -73,27 +73,6 @@ export function PersonalInfoCard({ form, email, disabled }: Props) {
           </div>
 
           {/* Student ID */}
-          <div className="space-y-1.5">
-            <Label htmlFor="studentId" className="text-sm font-medium text-mq-content-secondary">
-              {t('studentId')}
-            </Label>
-            <Input
-              id="studentId"
-              {...register('studentId')}
-              placeholder={t('studentIdPlaceholder')}
-              maxLength={8}
-              inputMode="numeric"
-              disabled={disabled}
-              className={errors.studentId ? 'border-mq-error' : ''}
-              aria-invalid={!!errors.studentId}
-              aria-describedby={errors.studentId ? 'studentId-error' : undefined}
-            />
-            {errors.studentId && (
-              <p id="studentId-error" className="text-mq-error text-xs">
-                {errors.studentId.message}
-              </p>
-            )}
-          </div>
         </div>
       </div>
     </MagicCard>

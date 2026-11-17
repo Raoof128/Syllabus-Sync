@@ -3,11 +3,11 @@
  * Tests CSRF middleware that protects against cross-site request forgery
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { webcrypto } from "node:crypto";
+import { describe, it, expect } from "vitest";
 import { NextRequest } from "next/server";
 import {
   generateCSRFToken,
+  validateCSRF,
   validateCSRFToken,
   validateOrigin,
 } from "@/lib/security/csrf";
@@ -47,40 +47,19 @@ class MockRequest {
 }
 
 describe("CSRF Protection", () => {
-  beforeEach(() => {
-    // The CSRF helpers run on the Edge runtime and therefore use the Web Crypto
-    // API (`crypto.getRandomValues`) rather than Node's `crypto` module. This
-    // stub mirrors that interface. Randomness is delegated to the real
-    // implementation so the uniqueness assertions below stay meaningful.
-    vi.stubGlobal("crypto", {
-      randomUUID: () => webcrypto.randomUUID(),
-      getRandomValues: <T extends ArrayBufferView>(array: T): T =>
-        webcrypto.getRandomValues(array as unknown as Uint8Array) as unknown as T,
-    });
-  });
-
   describe("generateCSRFToken", () => {
-    it("should generate a valid CSRF token", () => {
+    it("returns 32 random bytes encoded as lowercase hexadecimal", () => {
       const token = generateCSRFToken();
 
-      expect(token).toBeDefined();
-      expect(typeof token).toBe("string");
-      expect(token.length).toBeGreaterThan(16); // Should be reasonable length
+      expect(token).toHaveLength(64);
+      expect(token).toMatch(/^[0-9a-f]{64}$/);
     });
 
-    it("should generate unique tokens", () => {
-      const token1 = generateCSRFToken();
-      const token2 = generateCSRFToken();
-
-      expect(token1).not.toBe(token2);
-    });
-
-    it("should be cryptographically secure", () => {
-      const tokens = Array.from({ length: 100 }, () => generateCSRFToken());
-      const uniqueTokens = new Set(tokens);
-
-      // All tokens should be unique (very high probability test)
-      expect(uniqueTokens.size).toBe(100);
+    it("does not repeat across calls", () => {
+      const values = new Set(
+        Array.from({ length: 64 }, () => generateCSRFToken()),
+      );
+      expect(values.size).toBe(64);
     });
   });
 
@@ -179,6 +158,28 @@ describe("CSRF Protection", () => {
 
       const result = validateOrigin(mockRequest);
       expect(result.valid).toBe(true); // Same-host requests are allowed
+    });
+
+    it("trusts the normalized Cloudflare application origin in both validators", () => {
+      const previousAppUrl = process.env.NEXT_PUBLIC_APP_URL;
+      process.env.NEXT_PUBLIC_APP_URL = "https://www.syllabus-sync.app/account";
+
+      try {
+        const mockRequest = new MockRequest("POST", [
+          ["Origin", "https://www.syllabus-sync.app"],
+          ["Host", "worker-preview.example.workers.dev"],
+        ]) as any;
+
+        expect(validateOrigin(mockRequest).valid).toBe(true);
+        expect(validateCSRF(mockRequest).valid).toBe(true);
+      } finally {
+        if (previousAppUrl === undefined) {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete process.env.NEXT_PUBLIC_APP_URL;
+        } else {
+          process.env.NEXT_PUBLIC_APP_URL = previousAppUrl;
+        }
+      }
     });
   });
 

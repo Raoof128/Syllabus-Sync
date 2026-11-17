@@ -15,14 +15,17 @@ import {
 } from '@/lib/security/csp';
 
 describe('generateNonce', () => {
-  it('generates a base64 string', () => {
+  it('returns 16 random bytes encoded as base64', () => {
     const nonce = generateNonce();
-    expect(typeof nonce).toBe('string');
-    expect(nonce.length).toBeGreaterThan(0);
+    const bytes = Buffer.from(nonce, 'base64');
+
+    expect(bytes).toHaveLength(16);
+    expect(nonce).toMatch(/^[A-Za-z0-9+/]+={0,2}$/);
   });
 
-  it('generates unique nonces', () => {
-    expect(generateNonce()).not.toBe(generateNonce());
+  it('does not repeat across calls', () => {
+    const values = new Set(Array.from({ length: 64 }, () => generateNonce()));
+    expect(values.size).toBe(64);
   });
 });
 

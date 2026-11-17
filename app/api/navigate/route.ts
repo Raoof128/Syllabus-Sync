@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { jsonError, jsonSuccess, ERROR_CODES } from '@/app/api/_lib/response';
 import { apiLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
-import { parseJsonBody } from '@/app/api/_lib/middleware';
+import { parseJsonBody, requireAuth } from '@/app/api/_lib/middleware';
 import { validateOrigin } from '@/lib/security/csrf';
 import { createHash } from 'crypto';
 import { logger } from '@/lib/logger';
@@ -233,7 +233,7 @@ function generateDemoRoute(start: { lat: number; lng: number }, end: { lat: numb
   };
 }
 
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest) {
   // SECURITY: Validate origin for CSRF protection on mutation requests
   const originResult = validateOrigin(request);
   if (!originResult.valid) {
@@ -379,4 +379,8 @@ export async function POST(request: NextRequest) {
 
     return jsonError('Internal Server Error', 500, ERROR_CODES.INTERNAL_ERROR);
   }
+}
+
+export async function POST(request: NextRequest) {
+  return requireAuth(request, async () => handlePost(request));
 }

@@ -46,13 +46,13 @@ Documentation for developers interacting with or extending the backend.
 
 Runbooks and checklists for managing the application lifecycle.
 
-| Document                                                                 | Description                                                           |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| [Environment Setup](./operations/ENVIRONMENT_SETUP.md)                   | Prerequisites, local configuration, and required third-party services |
-| [Deployment Checklist](./operations/deployment-checklist.md)             | Pre-production quality gates and release verification steps           |
-| [Google Maps Platform Setup](./operations/google-maps-platform-setup.md) | Configuration for Google Maps Embed API, Routes API, and Places API   |
-| [Legacy Resend and Vercel Setup](./operations/resend-vercel-setup.md)    | Historical Vercel instructions; not the production release path       |
-| [Supabase OAuth Setup](./operations/supabase-oauth-setup.md)             | OAuth provider configuration for Supabase Auth                        |
+| Document                                                                  | Description                                                           |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [Environment Setup](./operations/ENVIRONMENT_SETUP.md)                    | Prerequisites, local configuration, and required third-party services |
+| [Deployment Checklist](./operations/deployment-checklist.md)              | Pre-production quality gates and release verification steps           |
+| [Google Maps Platform Setup](./operations/google-maps-platform-setup.md)  | Configuration for Google Maps Embed API, Routes API, and Places API   |
+| [Legacy Resend and Vercel Setup](./operations/resend-deployment-setup.md) | Historical Vercel instructions; not the production release path       |
+| [Supabase OAuth Setup](./operations/supabase-oauth-setup.md)              | OAuth provider configuration for Supabase Auth                        |
 
 ## Project Planning
 

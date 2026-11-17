@@ -110,19 +110,23 @@ export async function consumeChallenge(
   const admin = createAdminClient();
   if (!admin) return null;
 
+  // Claim the challenge with a single atomic DELETE ... RETURNING. Reading and
+  // then deleting in two statements let two concurrent callers both observe the
+  // row before either delete committed, and discarding the delete result meant a
+  // failed delete silently left the challenge usable until it expired. Returning
+  // a row here is therefore proof that this caller — and only this caller —
+  // removed it.
   const { data, error } = await admin
     .from('webauthn_challenges')
-    .select('*')
+    .delete()
     .eq('challenge', challenge)
     .eq('type', type)
     .gt('expires_at', new Date().toISOString())
+    .select()
     .limit(1)
     .single();
 
   if (error || !data) return null;
-
-  // Delete the challenge (one-time use)
-  await admin.from('webauthn_challenges').delete().eq('id', data.id);
 
   return {
     id: data.id,
@@ -222,13 +226,22 @@ export async function updateCredentialCounter(
   const admin = createAdminClient();
   if (!admin) return;
 
-  const { error } = await admin
+  const update = admin
     .from('webauthn_credentials')
     .update({
       counter: newCounter,
       last_used_at: new Date().toISOString(),
     })
     .eq('credential_id', credentialId);
+
+  // Where the authenticator maintains a real counter, only ever move it
+  // forwards: an unguarded write would let a replayed assertion rewind it and
+  // erase the very signal that proves a replay happened. Synced platform
+  // passkeys (iCloud Keychain, Google Password Manager) always report 0, and
+  // @simplewebauthn skips its counter check in that case — guarding those would
+  // match no rows and silently stop `last_used_at` from advancing, so they take
+  // the unguarded path.
+  const { error } = newCounter > 0 ? await update.lt('counter', newCounter) : await update;
 
   if (error) {
     logger.error('Failed to update credential counter:', error);
@@ -274,22 +287,46 @@ function mapDbCredential(data: Record<string, unknown>): WebAuthnCredential {
 }
 
 /**
- * Get RP ID from environment or request host.
+ * SECURITY (BA-0003): see the matching note in app/api/auth/passkey/_lib.ts.
+ * `WEBAUTHN_RP_ID`/`WEBAUTHN_ORIGIN` are the anchors that bind an assertion to
+ * this site; falling back to the caller's own `Host`/`Origin` made the origin
+ * check compare an attacker-supplied value against itself. Fails closed on any
+ * deployed runtime, host-derived fallback kept for local development only.
+ *
+ * Read inside the function, never at module scope (BA-0017).
+ */
+const isDeployedRuntime = () => process.env.NODE_ENV === 'production';
+
+/**
+ * Get RP ID from environment, or from the request host in local development.
  */
 export function getRelyingPartyId(host: string): string {
   // Use env override if set (for production), trimming whitespace/newlines
   const envRpId = process.env.WEBAUTHN_RP_ID?.trim();
   if (envRpId) return envRpId;
 
+  if (isDeployedRuntime()) {
+    throw new Error(
+      'WEBAUTHN_RP_ID is not configured; refusing to derive the RP ID from request headers',
+    );
+  }
+
   // Extract hostname without port
   return host.split(':')[0];
 }
 
 /**
- * Get expected origin from environment or request.
+ * Get expected origin from environment, or from the request in local development.
  */
 export function getExpectedOrigin(requestOrigin: string): string {
   const envOrigin = process.env.WEBAUTHN_ORIGIN?.trim();
   if (envOrigin) return envOrigin;
+
+  if (isDeployedRuntime()) {
+    throw new Error(
+      'WEBAUTHN_ORIGIN is not configured; refusing to trust the caller-supplied Origin header',
+    );
+  }
+
   return requestOrigin;
 }

@@ -1,0 +1,167 @@
+/**
+ * Reproduction and regression guard for BA-0052 (P1) — mutually recursive RLS
+ * policies made `public.schedules` and `public.schedule_members` permanently
+ * unqueryable.
+ *
+ * 20260220100000_realtime_offline.sql created a two-node cycle:
+ *
+ *   schedules."Users can view shared schedules"
+ *     USING (id IN (SELECT schedule_id FROM public.schedule_members WHERE user_id = auth.uid()))
+ *   schedule_members."Schedule owners can view all members"
+ *     USING (schedule_id IN (SELECT id FROM public.schedules WHERE owner_id = auth.uid()))
+ *
+ * Reading either table evaluates the other table's policies, which re-evaluate
+ * the first. PostgreSQL aborts with 42P17.
+ *
+ * Verified live against production on 2026-08-02 (PostgREST + anon key: both
+ * tables HTTP 500 / 42P17) and reproduced on a clean PostgreSQL 15.18 for the
+ * `authenticated` role, so every signed-in user was affected from 2026-02-20
+ * until the fix.
+ *
+ * The first test pins the specific fix. The second is the one that matters
+ * long-term: it builds the policy cross-reference graph from the FINAL state of
+ * all migrations and fails on ANY cycle. This project's audit history shows the
+ * same lesson twice (BA-0021, BA-0030, then BA-0048): enumerated lists miss the
+ * next instance, catalog-wide sweeps do not.
+ */
+
+import { describe, it, expect } from 'vitest';
+import { readFile, readdir } from 'node:fs/promises';
+import path from 'node:path';
+
+const MIGRATIONS_DIR = path.resolve(process.cwd(), 'supabase/migrations');
+
+async function migrationSqlInOrder(): Promise<string[]> {
+  const files = (await readdir(MIGRATIONS_DIR)).filter((f) => f.endsWith('.sql')).sort();
+  return Promise.all(files.map((f) => readFile(path.join(MIGRATIONS_DIR, f), 'utf8')));
+}
+
+/** Strip line and block comments so commented-out SQL never counts as real. */
+function stripComments(sql: string): string {
+  return sql.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/--[^\n]*/g, ' ');
+}
+
+type Policy = { table: string; name: string; body: string };
+
+/**
+ * Replays every migration in filename order and returns the surviving policies,
+ * keyed by `table\u0000policyname`. A later DROP removes; a later CREATE wins.
+ * This mirrors how Postgres actually ends up, rather than treating the
+ * migration set as one flat blob.
+ */
+async function finalPolicies(): Promise<Map<string, Policy>> {
+  const live = new Map<string, Policy>();
+  for (const raw of await migrationSqlInOrder()) {
+    const sql = stripComments(raw);
+
+    for (const m of sql.matchAll(
+      /DROP\s+POLICY\s+(?:IF\s+EXISTS\s+)?"?([^"\s;]+)"?\s+ON\s+(?:public\.)?"?([A-Za-z_][A-Za-z0-9_]*)"?/gi,
+    )) {
+      live.delete(`${m[2].toLowerCase()}\u0000${m[1].toLowerCase()}`);
+    }
+
+    // Capture the policy body up to the terminating semicolon.
+    for (const m of sql.matchAll(
+      /CREATE\s+POLICY\s+"?([^"\n]+?)"?\s+ON\s+(?:public\.)?"?([A-Za-z_][A-Za-z0-9_]*)"?([\s\S]*?);/gi,
+    )) {
+      const table = m[2].toLowerCase();
+      const name = m[1].trim().toLowerCase();
+      live.set(`${table}\u0000${name}`, { table, name, body: m[3] });
+    }
+  }
+  return live;
+}
+
+/** Tables named inside a policy body's FROM/JOIN clauses, excluding self. */
+function referencedTables(policy: Policy): Set<string> {
+  const refs = new Set<string>();
+  for (const m of policy.body.matchAll(
+    /\b(?:FROM|JOIN)\s+(?:public\.)?"?([A-Za-z_][A-Za-z0-9_]*)"?/gi,
+  )) {
+    const t = m[1].toLowerCase();
+    if (t !== policy.table) refs.add(t);
+  }
+  return refs;
+}
+
+describe('BA-0052: RLS policies must not recurse', () => {
+  it('breaks the schedules <-> schedule_members cycle with SECURITY DEFINER helpers', async () => {
+    const policies = await finalPolicies();
+
+    const shared = policies.get('schedules\u0000users can view shared schedules');
+    expect(shared, 'schedules SELECT policy for shared access must exist').toBeDefined();
+    // Must no longer read schedule_members directly.
+    expect(shared!.body).not.toMatch(/FROM\s+(?:public\.)?schedule_members/i);
+    expect(shared!.body).toMatch(/is_schedule_member\s*\(/i);
+
+    const members = policies.get('schedule_members\u0000schedule owners can view all members');
+    expect(members, 'schedule_members SELECT policy for owners must exist').toBeDefined();
+    expect(members!.body).not.toMatch(/FROM\s+(?:public\.)?schedules/i);
+    expect(members!.body).toMatch(/owns_schedule\s*\(/i);
+  });
+
+  it('defines both helpers as SECURITY DEFINER with a pinned search_path', async () => {
+    const sql = stripComments((await migrationSqlInOrder()).join('\n'));
+    for (const fn of ['is_schedule_member', 'owns_schedule']) {
+      const def = new RegExp(
+        `CREATE\\s+OR\\s+REPLACE\\s+FUNCTION\\s+public\\.${fn}\\s*\\([\\s\\S]*?AS\\s*\\$\\$`,
+        'i',
+      ).exec(sql);
+      expect(def, `${fn} must be defined`).not.toBeNull();
+      expect(def![0], `${fn} must be SECURITY DEFINER`).toMatch(/SECURITY\s+DEFINER/i);
+      // An unpinned search_path on a SECURITY DEFINER body is hijackable.
+      expect(def![0], `${fn} must pin search_path`).toMatch(/SET\s+search_path\s*=/i);
+    }
+  });
+
+  it('grants EXECUTE on the helpers to authenticated', async () => {
+    // Postgres enforces EXECUTE on functions called from an RLS policy against
+    // the CALLING role. Without this grant every query on these tables fails
+    // with 42501 instead of 42P17 — a different breakage, not a fix.
+    const sql = stripComments((await migrationSqlInOrder()).join('\n'));
+    expect(sql).toMatch(
+      /GRANT\s+EXECUTE\s+ON\s+FUNCTION\s+public\.is_schedule_member\(uuid\)\s+TO\s+[^;]*authenticated/i,
+    );
+    expect(sql).toMatch(
+      /GRANT\s+EXECUTE\s+ON\s+FUNCTION\s+public\.owns_schedule\(uuid\)\s+TO\s+[^;]*authenticated/i,
+    );
+  });
+
+  it('contains no cross-table policy reference cycle anywhere in public', async () => {
+    const policies = await finalPolicies();
+
+    // table -> set of tables its surviving policies read
+    const graph = new Map<string, Set<string>>();
+    for (const p of policies.values()) {
+      const edges = graph.get(p.table) ?? new Set<string>();
+      for (const r of referencedTables(p)) edges.add(r);
+      graph.set(p.table, edges);
+    }
+
+    // Any table reachable from itself is a cycle; Postgres raises 42P17 the
+    // first time such a table is queried under RLS.
+    const cycles: string[] = [];
+    for (const start of graph.keys()) {
+      const seen = new Set<string>();
+      const stack = [...(graph.get(start) ?? [])];
+      while (stack.length) {
+        const cur = stack.pop()!;
+        if (cur === start) {
+          cycles.push(start);
+          break;
+        }
+        if (seen.has(cur)) continue;
+        seen.add(cur);
+        // Only follow tables that themselves carry policies.
+        for (const nxt of graph.get(cur) ?? []) stack.push(nxt);
+      }
+    }
+
+    expect(
+      cycles,
+      `RLS policy recursion detected for: ${cycles.join(', ')}. ` +
+        'Break the cycle with a SECURITY DEFINER helper that takes no user id, ' +
+        'as 20260802010000_fix_schedules_rls_recursion.sql does.',
+    ).toEqual([]);
+  });
+});

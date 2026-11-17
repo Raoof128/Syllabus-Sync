@@ -11,9 +11,11 @@ import {
 import { loginLimiter } from '@/lib/services/rateLimitService';
 import { getClientIP } from '@/lib/security/ip';
 import { emailKeyPrefix } from '@/lib/security/identifiers';
+import { logAuthAuditEvent, userIdentifier } from '@/lib/security/auth-audit';
 import { checkSignInProvider, buildMismatchMessage } from '@/lib/auth/providerGuard';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { isProductionDeployment } from '@/lib/platform/runtime';
 
 const signinSchema = z.object({
   email: z.string().email(),
@@ -26,13 +28,7 @@ const DEV_EMAILS = process.env.DEV_BYPASS_EMAILS
   ? process.env.DEV_BYPASS_EMAILS.split(',').map((e) => e.trim().toLowerCase())
   : [];
 
-// SECURITY: Stricter production detection
-// - VERCEL_ENV is set by Vercel and cannot be spoofed
-// - NODE_ENV alone can be manipulated in local environments
-// This ensures dev features are NEVER enabled on Vercel production
-const isRealProduction =
-  process.env.VERCEL_ENV === 'production' ||
-  (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV);
+const isRealProduction = isProductionDeployment();
 const isDevelopment = process.env.NODE_ENV === 'development' && !isRealProduction;
 
 function isDevEmail(email: string): boolean {
@@ -195,6 +191,13 @@ export async function POST(request: NextRequest) {
         email: `${email.substring(0, 3)}***`,
         error: error.message,
       });
+      // Q3: a failed sign-in is the audit row that matters most, and it was
+      // the one we never wrote. The identifier is hashed — recording attempted
+      // addresses in plaintext would build a target list, not an audit trail.
+      logAuthAuditEvent('signin_failed', request, {
+        user: userIdentifier(email),
+        reason: error.message,
+      });
       const response = jsonError(GENERIC_AUTH_ERROR, 401, ERROR_CODES.UNAUTHORIZED);
       response.headers.set('X-RateLimit-Remaining', remaining.toString());
       return response;
@@ -213,6 +216,10 @@ export async function POST(request: NextRequest) {
       } catch (signOutError) {
         logger.warn('Provider-guard signOut failed (non-fatal)', signOutError);
       }
+      logAuthAuditEvent('signin_provider_mismatch', request, {
+        userId: data.user?.id ?? null,
+        signupProvider: guard.signupProvider,
+      });
       const response = jsonError(
         buildMismatchMessage(guard.signupProvider),
         401,
@@ -222,6 +229,11 @@ export async function POST(request: NextRequest) {
       response.headers.set('X-RateLimit-Remaining', remaining.toString());
       return response;
     }
+
+    logAuthAuditEvent('signin_success', request, {
+      userId: data.user?.id ?? null,
+      aal: data.session?.user?.factors?.length ? 'mfa_enrolled' : 'password_only',
+    });
 
     const response = jsonSuccess({
       user: data.user,

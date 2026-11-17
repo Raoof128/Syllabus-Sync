@@ -82,6 +82,53 @@ jobs:
       - name: Run unit and integration tests
         run: npm test
 
+  migrations:
+    name: Fresh Database Build
+    runs-on: ubuntu-latest
+
+    # BA-0053: no pass of this project had ever replayed the migration set
+    # against an empty database. Doing so on 2026-08-02 found 6 of 78
+    # migrations fatally broken, which meant there was no reproducible path to
+    # a new environment and therefore no tested recovery path.
+    #
+    # tools/database/verify-fresh-build.sh was written that day and its header
+    # says "This script exists so that can never again be true without CI
+    # saying so." Nothing called it. The 2026-08-02 audit report went on to
+    # state the fix was "gated in CI", which the external reviewer would have
+    # taken at face value. This job is what makes that sentence true, added
+    # 2026-08-17 while answering their Q2.
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends postgresql-client
+
+      - name: Build a database from supabase/migrations/ alone
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: tools/database/verify-fresh-build.sh
+
   build:
     name: Next.js and Cloudflare build
     runs-on: ubuntu-latest

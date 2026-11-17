@@ -4,10 +4,19 @@
  * SECURITY: This module provides consistent, secure IP extraction across all API routes.
  * It prioritizes verified proxy headers that cannot be spoofed by end users.
  *
- * Trust only the header owned by the configured deployment runtime.
+ * Trust hierarchy (in production):
+ * 1. x-vercel-forwarded-for - Set by Vercel's edge network (highest trust)
+ * 2. cf-connecting-ip - Set by Cloudflare (high trust)
+ * 3. x-forwarded-for - Standard header (lower trust, validated)
+ * 4. x-real-ip - Fallback
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest } from "next/server";
+import {
+  getConfiguredAppOrigin,
+  getDeploymentPlatform,
+  isProductionDeployment,
+} from "@/lib/platform/runtime";
 
 // ============================================================================
 // IP VALIDATION
@@ -18,7 +27,7 @@ import { NextRequest } from 'next/server';
  * Accepts both IPv4 and IPv6 formats
  */
 export function isValidIP(ip: string): boolean {
-  if (!ip || typeof ip !== 'string') return false;
+  if (!ip || typeof ip !== "string") return false;
 
   // Trim and check length (prevent DoS via long strings)
   const trimmed = ip.trim();
@@ -28,7 +37,7 @@ export function isValidIP(ip: string): boolean {
   const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
   if (ipv4Pattern.test(trimmed)) {
     // Validate each octet is 0-255
-    const octets = trimmed.split('.');
+    const octets = trimmed.split(".");
     return octets.every((octet) => {
       const num = parseInt(octet, 10);
       return num >= 0 && num <= 255;
@@ -57,7 +66,7 @@ export function isValidIP(ip: string): boolean {
 function extractFirstIP(header: string | null): string | null {
   if (!header) return null;
 
-  const firstIp = header.split(',')[0]?.trim();
+  const firstIp = header.split(",")[0]?.trim();
   if (firstIp && isValidIP(firstIp)) {
     return firstIp;
   }
@@ -69,6 +78,11 @@ function extractFirstIP(header: string | null): string | null {
 // MAIN IP EXTRACTION
 // ============================================================================
 
+export interface GetClientIPOptions {
+  /** Trust x-forwarded-for header even in production (not recommended) */
+  trustForwardedFor?: boolean;
+}
+
 interface HeaderAccessor {
   get(name: string): string | null;
 }
@@ -77,7 +91,7 @@ interface HeaderAccessor {
  * Securely extracts client IP address from request headers
  *
  * SECURITY CONSIDERATIONS:
- * - In production, trusts only the configured platform's proxy headers
+ * - In production, only trusts headers set by verified proxies (Vercel, Cloudflare)
  * - In development, accepts x-forwarded-for for local testing
  * - Returns 'unknown' if no valid IP can be determined (fail-safe)
  *
@@ -85,41 +99,64 @@ interface HeaderAccessor {
  * @param options - Optional configuration
  * @returns Client IP address or 'unknown'
  */
-export function getClientIPFromHeaders(headers: HeaderAccessor): string {
-  if (process.env.NODE_ENV === 'production') {
-    if (process.env.DEPLOYMENT_PLATFORM === 'cloudflare') {
-      const cfIp = headers.get('cf-connecting-ip');
-      if (cfIp && isValidIP(cfIp)) return cfIp;
-      return 'unknown';
+export function getClientIPFromHeaders(
+  headers: HeaderAccessor,
+  options: GetClientIPOptions = {},
+): string {
+  const production = isProductionDeployment();
+  const platform = getDeploymentPlatform();
+  const { trustForwardedFor = false } = options;
+
+  // In production, prefer verified proxy headers that cannot be spoofed
+  if (production) {
+    if (platform === "cloudflare") {
+      const cloudflareIp = headers.get("cf-connecting-ip");
+      if (cloudflareIp && isValidIP(cloudflareIp)) return cloudflareIp;
     }
 
-    if (process.env.VERCEL === '1' || Boolean(process.env.VERCEL_ENV)) {
-      const vercelIp = extractFirstIP(headers.get('x-vercel-forwarded-for'));
+    if (platform === "vercel") {
+      const vercelIp = extractFirstIP(headers.get("x-vercel-forwarded-for"));
       if (vercelIp) return vercelIp;
-      const realIp = headers.get('x-real-ip');
-      if (realIp && isValidIP(realIp)) return realIp;
-      const forwardedIp = extractFirstIP(headers.get('x-forwarded-for'));
+    }
+
+    const realIp = headers.get("x-real-ip");
+    if (realIp && isValidIP(realIp)) return realIp;
+
+    if (platform === "vercel" || trustForwardedFor) {
+      const forwardedIp = extractFirstIP(headers.get("x-forwarded-for"));
       if (forwardedIp) return forwardedIp;
     }
-    return 'unknown';
+  } else {
+    // In development, accept standard headers for local testing
+    const forwardedIp = extractFirstIP(headers.get("x-forwarded-for"));
+    if (forwardedIp) return forwardedIp;
+
+    const realIp = headers.get("x-real-ip");
+    if (realIp && isValidIP(realIp)) return realIp;
+
+    // Local dev fallback: keep rate limiting stable rather than collapsing to a shared "unknown".
+    return "127.0.0.1";
   }
 
-  const forwardedIp = extractFirstIP(headers.get('x-forwarded-for'));
-  if (forwardedIp) return forwardedIp;
-  const realIp = headers.get('x-real-ip');
-  if (realIp && isValidIP(realIp)) return realIp;
-  return '127.0.0.1';
+  // Last resort: return 'unknown' (fail-safe for rate limiting)
+  return "unknown";
 }
 
-export function getClientIP(request: NextRequest): string {
-  return getClientIPFromHeaders(request.headers);
+export function getClientIP(
+  request: NextRequest,
+  options: GetClientIPOptions = {},
+): string {
+  return getClientIPFromHeaders(request.headers, options);
 }
 
 /**
  * Get client identifier for rate limiting
  * Uses IP address but could be extended to include user ID for authenticated requests
  */
-export function getRateLimitIdentifier(request: NextRequest, userId?: string): string {
+export function getRateLimitIdentifier(
+  request: NextRequest,
+  userId?: string,
+): string {
   if (userId) {
     // For authenticated requests, use user ID for more accurate limiting
     return `user:${userId}`;
@@ -138,12 +175,12 @@ export function getRateLimitIdentifier(request: NextRequest, userId?: string): s
  * Used for CORS and CSRF protection
  */
 export function isTrustedOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get('origin');
+  const origin = request.headers.get("origin");
 
   if (!origin) {
     // No origin header - could be same-origin request or non-browser client
     // Check referer as fallback
-    const referer = request.headers.get('referer');
+    const referer = request.headers.get("referer");
     if (!referer) return true; // Same-origin or API client
 
     try {
@@ -166,13 +203,14 @@ export function isTrustedOrigin(request: NextRequest): boolean {
  * Check if a host matches our allowed hosts
  */
 function isSameHost(host: string): boolean {
+  const configuredOrigin = getConfiguredAppOrigin();
   const allowedHosts = [
-    'localhost',
-    '127.0.0.1',
-    process.env.NEXT_PUBLIC_APP_URL
-      ? new URL(process.env.NEXT_PUBLIC_APP_URL).host
-      : 'syllabus-sync.vercel.app',
+    "localhost",
+    "127.0.0.1",
+    configuredOrigin ? new URL(configuredOrigin).host : "syllabus-sync.vercel.app",
   ];
 
-  return allowedHosts.some((allowed) => host === allowed || host.endsWith(`.${allowed}`));
+  return allowedHosts.some(
+    (allowed) => host === allowed || host.endsWith(`.${allowed}`),
+  );
 }

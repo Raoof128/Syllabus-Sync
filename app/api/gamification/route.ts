@@ -143,7 +143,7 @@ function generateDemoEvents(): XPEvent[] {
  * GET /api/gamification - Get user's gamification profile
  * Returns demo data if not authenticated
  */
-export async function GET(request: NextRequest) {
+async function handleGet(request: NextRequest) {
   // SECURITY: Apply rate limiting
   const clientIP = getClientIP(request);
   const { allowed, resetIn } = await apiLimiter(`gamification:${clientIP}`);
@@ -194,10 +194,13 @@ export async function GET(request: NextRequest) {
     let profileData = initialProfileData;
 
     if (profileError?.code === 'PGRST116') {
-      // No profile exists, create one
+      // No profile exists, create one. This goes through a SECURITY DEFINER RPC
+      // rather than a direct insert: `authenticated` no longer holds INSERT on
+      // gamification_profiles, because a direct grant there also let a client
+      // write its own xp (BA-0026). The RPC takes no arguments and creates a row
+      // only for auth.uid().
       const { data: newProfile, error: createError } = await supabase
-        .from('gamification_profiles')
-        .insert({ user_id: userId })
+        .rpc('ensure_my_gamification_profile')
         .select('*')
         .single();
 
@@ -276,6 +279,10 @@ export async function GET(request: NextRequest) {
 
     return jsonSuccess(response);
   });
+}
+
+export async function GET(request: NextRequest) {
+  return requireAuth(request, async () => handleGet(request));
 }
 
 /**

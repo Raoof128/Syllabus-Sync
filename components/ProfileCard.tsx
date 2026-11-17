@@ -97,10 +97,7 @@ const ProfileCard = React.memo(
                 </h3>
                 <p className="text-xs sm:text-sm text-mq-content-secondary">{profile.email}</p>
                 <div className="flex items-center gap-4 mt-1 text-xs text-mq-content-tertiary">
-                  <span>
-                    {t('idPrefix')}
-                    {profile.studentId}
-                  </span>
+                  <span>{t('idPrefix')}</span>
                   <span>•</span>
                   <span>
                     {profile.course} • {profile.year}

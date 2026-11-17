@@ -14,6 +14,14 @@ const mocks = vi.hoisted(() => ({
   getClientIpMock: vi.fn(() => '127.0.0.1'),
 }));
 
+vi.mock('@/lib/security/password-breach', () => ({
+  // BA-0041 added a server-side HIBP lookup to these routes. Mocked here so the
+  // suite stays deterministic and offline-capable — the guard's own behaviour is
+  // covered by tests/security/breached-password-enforced.test.ts. Returning
+  // false keeps these cases exercising the paths they were written for.
+  isPasswordBreachBlocked: vi.fn(async () => false),
+}));
+
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => createAdminClientMock(),
 }));
@@ -117,7 +125,6 @@ describe('signup API', () => {
         agreedToTerms: true,
         _gotcha: '',
         fullName: 'Test Student',
-        studentId: '12345678',
         faculty: 'Science',
         course: 'CS',
         year: '2026',
@@ -158,7 +165,6 @@ describe('signup API', () => {
         agreedToTerms: true,
         _gotcha: 'hello',
         fullName: 'Bot',
-        studentId: '0',
         faculty: '',
         course: '',
         year: '',
@@ -203,7 +209,6 @@ describe('signup API', () => {
         agreedToTerms: true,
         _gotcha: '',
         fullName: 'Existing User',
-        studentId: '99999999',
         faculty: 'Science',
         course: 'CS',
         year: '2026',
@@ -245,7 +250,6 @@ describe('signup API', () => {
         agreedToTerms: true,
         _gotcha: '',
         fullName: 'Taken User',
-        studentId: '88888888',
         faculty: 'Science',
         course: 'CS',
         year: '2026',

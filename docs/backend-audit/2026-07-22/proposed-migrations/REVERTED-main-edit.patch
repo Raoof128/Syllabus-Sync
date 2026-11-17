@@ -1,0 +1,41 @@
+diff --git a/supabase/migrations/20260114013519_add_soft_deletes_constraints_seeds.sql b/supabase/migrations/20260114013519_add_soft_deletes_constraints_seeds.sql
+index b8f65d38..41826524 100644
+--- a/supabase/migrations/20260114013519_add_soft_deletes_constraints_seeds.sql
++++ b/supabase/migrations/20260114013519_add_soft_deletes_constraints_seeds.sql
+@@ -242,6 +242,20 @@ END $$;
+ -- ============================================================================
+ 
+ -- User activity summary (refreshed periodically)
++-- NOTE (Lane D audit fix): mv_user_activity_summary/mv_deadline_analytics/
++-- mv_xp_leaderboard already exist at this point in migration history (created
++-- by 20260114000000_add_missing_materialized_views.sql with a narrower
++-- column set). `CREATE MATERIALIZED VIEW IF NOT EXISTS` against an
++-- already-existing name is a silent no-op of the body -- it does NOT replace
++-- the existing definition. That left this file's intended richer schema
++-- (week_start/priority/type on mv_deadline_analytics in particular) never
++-- actually applied, and caused the very next statement
++-- (CREATE UNIQUE INDEX ... ON mv_deadline_analytics(week_start, user_id,
++-- priority, type)) to hard-fail with "column does not exist" on any fresh
++-- database replay, since those columns were never added to the still-old
++-- matview shape. DROP + recreate to make this file's upgrade actually take
++-- effect and make the migration chain replayable from scratch again.
++DROP MATERIALIZED VIEW IF EXISTS public.mv_user_activity_summary;
+ CREATE MATERIALIZED VIEW IF NOT EXISTS public.mv_user_activity_summary AS
+ SELECT 
+     p.id AS user_id,
+@@ -266,6 +280,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_user_activity_summary_user_id
+ ON public.mv_user_activity_summary(user_id);
+ 
+ -- Deadline analytics by week
++DROP MATERIALIZED VIEW IF EXISTS public.mv_deadline_analytics;
+ CREATE MATERIALIZED VIEW IF NOT EXISTS public.mv_deadline_analytics AS
+ SELECT 
+     date_trunc('week', d.due_date) AS week_start,
+@@ -286,6 +301,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_mv_deadline_analytics_key
+ ON public.mv_deadline_analytics(week_start, user_id, priority, type);
+ 
+ -- XP leaderboard (top users by XP)
++DROP MATERIALIZED VIEW IF EXISTS public.mv_xp_leaderboard;
+ CREATE MATERIALIZED VIEW IF NOT EXISTS public.mv_xp_leaderboard AS
+ SELECT 
+     p.id AS user_id,

@@ -571,7 +571,6 @@ export type Database = {
           faculty: string | null;
           full_name: string | null;
           id: string;
-          student_id: string | null;
           updated_at: string | null;
           year: string | null;
         };
@@ -583,7 +582,6 @@ export type Database = {
           faculty?: string | null;
           full_name?: string | null;
           id?: string;
-          student_id?: string | null;
           updated_at?: string | null;
           year?: string | null;
         };
@@ -595,7 +593,6 @@ export type Database = {
           faculty?: string | null;
           full_name?: string | null;
           id?: string;
-          student_id?: string | null;
           updated_at?: string | null;
           year?: string | null;
         };
@@ -1089,7 +1086,6 @@ export type Database = {
           level: number | null;
           longest_streak: number | null;
           streak_days: number | null;
-          student_id: string | null;
           updated_at: string | null;
           xp: number | null;
           year: string | null;
@@ -1112,6 +1108,10 @@ export type Database = {
         Returns: Json;
       };
       calculate_level: { Args: { p_xp: number }; Returns: number };
+      ensure_my_gamification_profile: {
+        Args: never;
+        Returns: Database['public']['Tables']['gamification_profiles']['Row'][];
+      };
       cleanup_expired_email_verifications: { Args: never; Returns: number };
       cleanup_expired_password_resets: { Args: never; Returns: number };
       cleanup_expired_rate_limits: { Args: never; Returns: number };
@@ -1133,7 +1133,6 @@ export type Database = {
         Args: {
           p_email: string;
           p_full_name?: string;
-          p_student_id?: string;
           p_user_id: string;
         };
         Returns: Json;
@@ -1176,7 +1175,6 @@ export type Database = {
           level: number;
           longest_streak: number;
           streak_days: number;
-          student_id: string;
           updated_at: string;
           xp: number;
           year: string;

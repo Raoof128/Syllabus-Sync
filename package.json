@@ -48,7 +48,11 @@
     "cf:versions:list": "wrangler versions list",
     "cf:deployments:list": "wrangler deployments list",
     "cf:verify-output": "node tools/cloudflare/verify-open-next-output.mjs",
-    "test:e2e": "playwright test --config config/playwright.config.ts"
+    "test:e2e": "playwright test --config config/playwright.config.ts",
+    "check:cloudflare-runtime": "node tools/cloudflare/check-runtime-compat.mjs",
+    "check:worker-size": "node tools/cloudflare/check-worker-size.mjs",
+    "deploy:env:check": "node tools/deployment/check-required-env.mjs",
+    "cf:smoke": "node tools/cloudflare/smoke.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

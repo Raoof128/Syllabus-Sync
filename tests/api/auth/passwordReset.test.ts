@@ -4,6 +4,14 @@ import { POST } from '@/app/api/auth/password/reset/route';
 
 const createAdminClientMock = vi.fn();
 
+vi.mock('@/lib/security/password-breach', () => ({
+  // BA-0041 added a server-side HIBP lookup to these routes. Mocked here so the
+  // suite stays deterministic and offline-capable — the guard's own behaviour is
+  // covered by tests/security/breached-password-enforced.test.ts. Returning
+  // false keeps these cases exercising the paths they were written for.
+  isPasswordBreachBlocked: vi.fn(async () => false),
+}));
+
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => createAdminClientMock(),
 }));
@@ -30,6 +38,10 @@ function makePasswordResetsTable(record: { id: string; user_id: string } | null)
     error: record ? null : { message: 'not found' },
   }));
 
+  // BA-0006: the route now terminates the consuming UPDATE with `.select('id')`
+  // and treats a zero-row result as "token already spent", so this double has
+  // to report an affected row count instead of resolving on the second `.eq()`.
+  // Race behaviour itself is covered by tests/api/auth/token-single-use-rowcount.test.ts.
   const updateChain: any = {};
   updateChain.eq = vi.fn(() => updateChain);
   updateChain.select = vi.fn(() => updateChain);

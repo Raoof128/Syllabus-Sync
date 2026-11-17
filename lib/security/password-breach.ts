@@ -22,6 +22,24 @@ const HIBP_API_URL = "https://api.pwnedpasswords.com/range/";
 const HIBP_USER_AGENT = "Syllabus-Sync-Security-Check";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+/**
+ * Wall-clock ceiling for the HIBP lookup.
+ *
+ * `isPasswordBreachBlocked` documents that this check FAILS OPEN so that
+ * api.pwnedpasswords.com cannot take signup and password reset down with it.
+ * That promise was not actually implemented: the fetch below had no timeout and
+ * no abort signal, so a connection that hung rather than failing never settled,
+ * `checkPasswordBreach` never returned, and the caller sat inside the signup /
+ * reset request until the platform killed it. Failing open only works if the
+ * failure is BOUNDED — an unreachable dependency has to become a fast local
+ * decision, not an inherited hang.
+ *
+ * 2.5s is chosen against the surrounding budget: the edge middleware allows 6s
+ * for auth resolution in production, so a password-setting request has to leave
+ * room for its own Supabase work as well.
+ */
+const HIBP_TIMEOUT_MS = 2_500;
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -167,12 +185,15 @@ export async function checkPasswordBreach(
   }
 
   try {
-    // Fetch breach data from HIBP API
+    // Fetch breach data from HIBP API. `AbortSignal.timeout` is available on
+    // both the Node and Workers runtimes; on abort, fetch rejects and the
+    // catch below returns the safe fail-open default.
     const response = await fetch(`${apiUrl}${prefix}`, {
       method: "GET",
       headers: {
         "User-Agent": HIBP_USER_AGENT,
       },
+      signal: AbortSignal.timeout(HIBP_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -452,5 +473,54 @@ export async function handlePasswordBreachCheck(
       },
       { status: 500 },
     );
+  }
+}
+
+// ============================================================================
+// SERVER-SIDE ENFORCEMENT (BA-0041)
+// ============================================================================
+
+/**
+ * Minimum number of appearances in breach corpora before a password is refused.
+ *
+ * 1 is deliberate: HIBP's corpus is of *already-leaked* credentials, so a single
+ * appearance means the plaintext is in a public wordlist and will be tried by
+ * any credential-stuffing run.
+ */
+const BREACH_BLOCK_THRESHOLD = 1;
+
+/**
+ * Server-side guard for password-setting flows.
+ *
+ * This module previously had no server-side caller at all. The breach check was
+ * exposed at `/api/security/check-password-breach` and consumed only by
+ * `components/security/PasswordStrengthIndicator.tsx`, which made it a UX hint
+ * rather than a control — posting directly to the signup or password-reset API
+ * bypassed it. Supabase's platform-level `password_hibp_enabled` would cover
+ * this, but it requires the Pro plan (the Management API returns HTTP 402 on
+ * Free), so enforcement belongs here.
+ *
+ * FAILS OPEN by design. `api.pwnedpasswords.com` is a third-party dependency and
+ * must not be able to take registration and password reset down with it. A
+ * breached password admitted during an outage is still constrained by the
+ * 12-character policy, rate limiting and MFA. The alternative — failing closed —
+ * trades a marginal credential-quality gain for a total availability loss on a
+ * dependency we do not control.
+ *
+ * @returns `true` only when the password is known-breached and must be refused.
+ */
+export async function isPasswordBreachBlocked(password: string): Promise<boolean> {
+  if (!password) return false;
+
+  try {
+    const result = await checkPasswordBreach(password);
+    return result.breachCount >= BREACH_BLOCK_THRESHOLD;
+  } catch (error) {
+    logger.warn(
+      "Password breach check unavailable; allowing the password (fail-open). " +
+        "The length/complexity policy, rate limiting and MFA still apply.",
+      { reason: error instanceof Error ? error.message : "unknown" },
+    );
+    return false;
   }
 }

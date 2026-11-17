@@ -1,5 +1,10 @@
 -- Database Schema for Syllabus Sync
--- Last Updated: 2026-01-19
+-- Last Updated: 2026-07-30
+--
+-- KNOWN DRIFT: this snapshot is hand-maintained and lags the migration chain.
+-- It does not show `profiles.faculty` or the faculty column in `user_details`,
+-- both of which exist in production. Treat supabase/migrations/ as authoritative
+-- and the live catalog as the final word.
 --
 -- REFERENCE DOCUMENT ONLY
 -- =======================
@@ -22,7 +27,7 @@
 -- USER DATA FLOW:
 -- ==============
 -- 1. auth.users: Managed by Supabase Auth (email, password, metadata)
--- 2. profiles: Public user data (full_name, student_id, course, year, avatar)
+-- 2. profiles: Public user data (full_name, course, year, avatar)
 --    - profiles.id = auth.users.id (NOT a separate ID!)
 -- 3. gamification_profiles: XP, streaks, levels (linked via user_id)
 --
@@ -82,7 +87,6 @@ CREATE TABLE public.profiles (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   email text NOT NULL,
   full_name text,
-  student_id text,
   course text,
   year text,
   avatar_url text,
@@ -333,7 +337,6 @@ SELECT
     p.id,
     p.email,
     p.full_name,
-    p.student_id,
     p.course,
     p.year,
     p.avatar_url,
@@ -424,14 +427,21 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION public.get_my_profile()
 RETURNS TABLE (
-    id uuid, email text, full_name text, student_id text, course text, year text,
+    id uuid, email text, full_name text, course text, year text,
     avatar_url text, created_at timestamptz, updated_at timestamptz,
     xp integer, streak_days integer, longest_streak integer, last_activity_date date, level integer
 )
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
-    RETURN QUERY SELECT * FROM public.user_details ud WHERE ud.id = auth.uid();
+    -- Columns listed explicitly on purpose: `SELECT *` into a declared TABLE
+    -- type silently breaks when the view changes shape. See migration
+    -- 20260730160000_fix_student_id_function_residue.sql (BA-0051).
+    RETURN QUERY
+    SELECT ud.id, ud.email, ud.full_name, ud.course, ud.year, ud.avatar_url,
+           ud.created_at, ud.updated_at, ud.xp, ud.streak_days,
+           ud.longest_streak, ud.last_activity_date, ud.level
+    FROM public.user_details ud WHERE ud.id = auth.uid();
 END;
 $$;
 

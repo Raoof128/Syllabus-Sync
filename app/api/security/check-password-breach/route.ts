@@ -16,8 +16,9 @@ import {
 import { passwordBreachLimiter } from "@/lib/services/rateLimitService";
 import { getClientIP } from "@/lib/security/ip";
 import { logger } from "@/lib/logger";
+import { requireAuth } from "@/app/api/_lib/middleware";
 
-export async function POST(request: NextRequest) {
+async function handlePost(request: NextRequest) {
   const clientIp = getClientIP(request);
   const { allowed, remaining, resetIn, limit } =
     await passwordBreachLimiter(clientIp);
@@ -75,4 +76,8 @@ export async function POST(request: NextRequest) {
       ERROR_CODES.INTERNAL_ERROR,
     );
   }
+}
+
+export async function POST(request: NextRequest) {
+  return requireAuth(request, async () => handlePost(request));
 }
