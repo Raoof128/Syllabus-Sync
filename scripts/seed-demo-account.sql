@@ -7,7 +7,7 @@
 --   1. Create the user first via Supabase Dashboard:
 --      Authentication > Users > Add User (email + password)
 --      Email: charanya.demo@mq.edu.au
---      Password: Demo2024!MQ
+--      Password: (set in the Supabase dashboard; not stored in this repository)
 --      Check "Auto Confirm User"
 --
 --   2. Copy the user's UUID from the dashboard.

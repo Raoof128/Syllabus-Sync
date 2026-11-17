@@ -3,7 +3,7 @@
 -- ============================================================================
 -- USAGE:
 --   1. Create user in Supabase Dashboard > Authentication > Users > Add User
---      Email: amin.demo@mq.edu.au   Password: Demo2024!MQ
+--      Email: amin.demo@mq.edu.au   Password: (set in the Supabase dashboard; not stored in this repository)
 --      Check "Auto Confirm User"
 --   2. Run this script in the Supabase SQL Editor.
 --   3. To reset: run reset-demo-professors.sql first, then re-run this.

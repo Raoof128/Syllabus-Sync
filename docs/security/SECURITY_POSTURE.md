@@ -1,5 +1,7 @@
 # Security Posture and Hardening Report
 
+> **Correction, 17 November 2026.** A review of this document against the code found that it lists some controls as implemented that are present only as unused modules. Request signing (`lib/security/request-signing.ts`), IP anomaly detection (`lib/security/ip-anomaly-detection.ts`), device fingerprinting (`lib/security/device-fingerprinting.ts`) and MFA backup codes (`lib/security/two-factor-backup-codes.ts`) are not called by any route or by the request proxy. Treat the statements about them below as design intent, not as controls in force. The legacy passkey registration route also stores credential data in `user_metadata`, which the WebAuthn section below says does not happen.
+
 > **Historical security snapshot:** Some Vercel runtime and proxy-level API-auth descriptions below are outdated. Use the [current architecture guide](../architecture/ARCHITECTURE.md) and inspect the implementation before relying on a control claim. This file is not a current certification or completed security audit.
 
 **System:** Syllabus Sync Campus Platform
