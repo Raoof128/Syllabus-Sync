@@ -14,7 +14,7 @@
 - No layout/sizing changes to any `<Image>` component — only the `src` changes.
 - The `mqLogoAlt` translation **key name** is unchanged; only its **value** changes, in all 35 locale files under `locales/*/translations.json`.
 - Per the Raouf Change Protocol (`AGENT.md`), the final task must run `npm run check` and append a "Raouf:" entry to both `AGENT.md` and `CHANGELOG.md`.
-- Source image for the new logo: `/Users/raoof.r12/.claude/image-cache/60cc0513-0c9c-493c-b2f9-7f956910016f/1.png` (1254×1254, has a white margin + drop shadow around the rounded-square artwork that must be cropped out). If this file is not present when a task runs, stop and ask the user to re-share the image before proceeding.
+- Source image for the new logo: `<local-image-cache>/1.png` (1254×1254, has a white margin + drop shadow around the rounded-square artwork that must be cropped out). If this file is not present when a task runs, stop and ask the user to re-share the image before proceeding.
 
 ---
 
@@ -32,7 +32,7 @@
 - [ ] **Step 1: Crop the source image to a clean edge-to-edge square master**
 
 ```bash
-SRC="/Users/raoof.r12/.claude/image-cache/60cc0513-0c9c-493c-b2f9-7f956910016f/1.png"
+SRC="<local-image-cache>/1.png"
 mkdir -p /tmp/logo-work
 magick "$SRC" -fuzz 8% -trim +repage -gravity North -crop 1050x1050+0+0 +repage /tmp/logo-work/master.png
 identify /tmp/logo-work/master.png

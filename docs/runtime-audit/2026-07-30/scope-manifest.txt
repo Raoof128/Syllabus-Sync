@@ -1112,10 +1112,10 @@ public/tiles/5/9/8.png  out-of-scope:binary-or-data-asset
 public/tiles/5/9/9.png  out-of-scope:binary-or-data-asset
 public/tiles/tilemapresource.xml  out-of-scope:static-asset
 scripts/reset-demo-account.sql  enumerated-only
-scripts/reset-demo-lizzy-amin.sql  enumerated-only
+scripts/reset-demo-2-3.sql  enumerated-only  (renamed 2026-11-17)
 scripts/seed-demo-account.sql  enumerated-only
-scripts/seed-demo-amin.sql  enumerated-only
-scripts/seed-demo-lizzy.sql  enumerated-only
+scripts/seed-demo-3.sql  enumerated-only  (renamed 2026-11-17)
+scripts/seed-demo-2.sql  enumerated-only  (renamed 2026-11-17)
 sentry.client.config.ts  read-in-full:lane-lib
 sentry.edge.config.ts  read-in-full:lane-lib
 sentry.server.config.ts  read-in-full:lane-lib

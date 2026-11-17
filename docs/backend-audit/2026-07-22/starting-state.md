@@ -3,7 +3,7 @@
 **Audit branch:** `audit/backend-hardening-cloudflare`
 **Parent branch:** `feat/cloudflare-workers-migration`
 **Starting commit:** `cefc79e6` (`docs(cloudflare): record the production cutover`)
-**Worktree:** `/Users/raoof.r12/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit`
+**Worktree:** `/Users/<user>/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit`
 **Reviewer:** claude-opus-5
 **Phase 0 executed:** 2026-07-29 (Australia/Sydney)
 

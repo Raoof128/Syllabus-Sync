@@ -1,12 +1,15 @@
+-- NOTE (17 Nov 2026): the account in this script is a placeholder (demoN@example.com).
+-- The script predates the removal of profiles.student_id on 30 Jul 2026 and has not
+-- been run against the current schema; check the column lists before using it.
 -- ============================================================================
--- DEMO ACCOUNT SEED — Lizzy Clarkson (Student)
+-- DEMO ACCOUNT SEED — Demo Student Two (Student)
 -- ============================================================================
 -- USAGE:
 --   1. Create user in Supabase Dashboard > Authentication > Users > Add User
---      Email: lizzy.demo@mq.edu.au   Password: (set in the Supabase dashboard; not stored in this repository)
+--      Email: demo2@example.com   Password: (set in the Supabase dashboard; not stored in this repository)
 --      Check "Auto Confirm User"
 --   2. Run this script in the Supabase SQL Editor.
---   3. To reset: run reset-demo-lizzy.sql first, then re-run this.
+--   3. To reset: run reset-demo-2-3.sql first, then re-run this.
 -- ============================================================================
 
 DO $$
@@ -20,13 +23,13 @@ DECLARE
   v_unit4 uuid := gen_random_uuid();
 
 BEGIN
-  SELECT id INTO v_uid FROM auth.users WHERE email = 'lizzy.demo@mq.edu.au';
+  SELECT id INTO v_uid FROM auth.users WHERE email = 'demo2@example.com';
 
   IF v_uid IS NULL THEN
-    RAISE EXCEPTION 'User not found. Create the user first in Supabase Dashboard with email: lizzy.demo@mq.edu.au';
+    RAISE EXCEPTION 'User not found. Create the user first in Supabase Dashboard with email: demo2@example.com';
   END IF;
 
-  RAISE NOTICE 'Seeding demo data for Lizzy Clarkson: %', v_uid;
+  RAISE NOTICE 'Seeding demo data for Demo Student Two: %', v_uid;
 
   -- ========================================================================
   -- Profile
@@ -34,8 +37,8 @@ BEGIN
   INSERT INTO public.profiles (id, email, full_name, student_id, course, year, faculty, created_at, updated_at)
   VALUES (
     v_uid,
-    'lizzy.demo@mq.edu.au',
-    'Lizzy Clarkson',
+    'demo2@example.com',
+    'Demo Student Two',
     '46023456',
     'Bachelor of Computing (Cyber Security)',
     '2',
@@ -327,9 +330,9 @@ BEGIN
   -- DONE
   -- ========================================================================
   RAISE NOTICE '═══════════════════════════════════════════════════════════════';
-  RAISE NOTICE 'DEMO SEED COMPLETE for lizzy.demo@mq.edu.au';
+  RAISE NOTICE 'DEMO SEED COMPLETE for demo2@example.com';
   RAISE NOTICE '═══════════════════════════════════════════════════════════════';
-  RAISE NOTICE 'Profile:       Lizzy Clarkson — B. Computing (Cyber Security), Year 2';
+  RAISE NOTICE 'Profile:       Demo Student Two — B. Computing (Cyber Security), Year 2';
   RAISE NOTICE 'Units:         4 (COMP1350, COMP2250, MATH1020, COMP2050)';
   RAISE NOTICE 'Class Times:   8 slots (Mon–Fri)';
   RAISE NOTICE 'Deadlines:     7 (5 upcoming, 2 completed)';

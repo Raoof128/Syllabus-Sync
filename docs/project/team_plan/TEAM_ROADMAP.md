@@ -217,7 +217,7 @@ Version: 0.5.9 | Last Updated: January 06, 2026
 
 **Objective:** Upgrade perceived security and modernity with enterprise-grade authentication.
 
-**Backend Implementation (Roauf Abedini):**
+**Backend Implementation (Raouf Abedini):**
 
 - Enable Supabase Passkeys (WebAuthn) for passwordless authentication
 - Maintain email/password fallback for compatibility
@@ -347,11 +347,11 @@ Version: 0.5.9 | Last Updated: January 06, 2026
 | ---------------- | --------------------------------- | -------------- |
 | **Home Tab**     | Pouya                             | 🚧 In Progress |
 | **Calendar Tab** | Pouya                             | 🚧 In Progress |
-| **Feed Tab**     | Pouya (50%) + Roauf Abedini (50%) | 🚧 Shared      |
-| **Map Tab**      | Roauf Abedini                     | 🚧 In Progress |
-| **Settings Tab** | Roauf Abedini                     | 🚧 In Progress |
+| **Feed Tab**     | Pouya (50%) + Raouf Abedini (50%) | 🚧 Shared      |
+| **Map Tab**      | Raouf Abedini                     | 🚧 In Progress |
+| **Settings Tab** | Raouf Abedini                     | 🚧 In Progress |
 
-### 👨‍💻 Roauf Abedini - Backend Lead & Map/Settings Owner
+### 👨‍💻 Raouf Abedini - Backend Lead & Map/Settings Owner
 
 **Primary Focus:** Map Tab, Settings Tab, Feed Tab (Backend), Database, API, Authentication, Infrastructure
 
@@ -540,5 +540,5 @@ Version: 0.5.9 | Last Updated: January 06, 2026
 
 **Questions?** Contact team leads:
 
-- **Roauf Abedini**: Map Tab, Settings Tab, Backend, Database, API, Infrastructure
+- **Raouf Abedini**: Map Tab, Settings Tab, Backend, Database, API, Infrastructure
 - **Pouya**: Home Tab, Calendar Tab, Frontend, UI/UX, Components, User Experience

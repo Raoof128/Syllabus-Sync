@@ -13,7 +13,7 @@ DECLARE
   v_unit_ids uuid[];
 BEGIN
   -- Find the demo user
-  SELECT id INTO v_uid FROM auth.users WHERE email = 'charanya.demo@mq.edu.au';
+  SELECT id INTO v_uid FROM auth.users WHERE email = 'demo1@example.com';
 
   IF v_uid IS NULL THEN
     RAISE NOTICE 'Demo user not found — nothing to reset.';

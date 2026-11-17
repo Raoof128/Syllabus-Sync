@@ -2,7 +2,7 @@
 
 **Syllabus Sync -- Data Protection and Privacy Practices**
 
-Last Updated: 2026-07-30
+Last Updated: 2026-11-17
 
 ---
 
@@ -27,7 +27,7 @@ Syllabus Sync follows the principle of data minimization (GDPR Article 5(1)(c)).
 
 - We do not sell personal data.
 - We do not serve advertising or build advertising profiles.
-- We do not perform behavioral tracking beyond what is necessary for security (IP anomaly detection, device fingerprinting for account protection).
+- We do not perform behavioral tracking. The IP address and user agent of a request are recorded with security events (see the table below); there is no device fingerprinting or IP anomaly profiling in force.
 - We do not retain data beyond its stated purpose.
 
 **Field removed 2026-07-30: student ID.**
@@ -51,7 +51,7 @@ The following table enumerates every category of personal data processed by the 
 | **Academic planning**        | Units (subjects), class times, deadlines, events, todos                                                                                    | Core application functionality. Basis: contractual necessity.                                                       | `docs/database/database-schema.sql` (`public.units`, `public.class_times`, `public.deadlines`, `public.events`), `supabase/migrations/20260124001000_create_todos_table.sql` |
 | **Notification preferences** | In-app notifications, notification preference toggles (email/push, reminder timing)                                                        | Deliver user-configured reminders and alerts. Basis: consent (user-configured).                                     | `docs/database/database-schema.sql` (`public.notifications`, `public.user_preferences`), `lib/store/notificationPreferencesStore.ts`                                         |
 | **Security and audit**       | Audit event metadata: action type, severity, IP address (`inet`), user-agent, timestamp                                                    | Security monitoring, abuse detection, incident investigation. Basis: legitimate interest (security of the service). | `lib/security/audit.ts`, `supabase/migrations/20260214003000_restore_missing_core_security_tables.sql` (`public.audit_logs`, `public.auth_audit_logs`)                       |
-| **MFA credentials**          | TOTP factors (managed by Supabase Auth), WebAuthn credential public keys, challenge records, hashed backup codes                           | Strong authentication and account recovery. Basis: legitimate interest (account security).                          | `app/api/auth/mfa/*`, `app/api/webauthn/*`, `supabase/migrations/20260207000000_add_webauthn_tables.sql`                                                                     |
+| **MFA credentials**          | TOTP factors (managed by Supabase Auth), WebAuthn credential public keys, challenge records                                                | Strong authentication and account recovery. Basis: legitimate interest (account security).                          | `app/api/auth/mfa/*`, `app/api/webauthn/*`, `supabase/migrations/20260207000000_add_webauthn_tables.sql`                                                                     |
 | **Email verification**       | Token hash, user ID, expiry timestamp, used flag                                                                                           | Verify email ownership, prevent token replay. Basis: contractual necessity.                                         | `lib/security/emailVerification.ts`, `supabase/migrations/20260213000000_email_verifications.sql`                                                                            |
 | **Session metadata**         | Session device label (derived from user-agent string), session scope, session cookies                                                      | Session display and user session management. Basis: contractual necessity.                                          | `app/api/auth/sessions/route.ts`, `lib/supabase/middleware.ts`                                                                                                               |
 | **Location (feature-gated)** | Latitude/longitude, only when user invokes navigation or weather features                                                                  | Navigation routing and weather display. Basis: consent (user-initiated action).                                     | `app/api/navigate/route.ts`, `app/api/weather/route.ts`, `features/map/hooks/useMapLocation.ts`                                                                              |
@@ -80,7 +80,7 @@ Data is not used for profiling, automated decision-making, or any purpose not li
 | ---------------------- | --------------------------- | ------------------------------------------------- | --------------------------------- |
 | Secure HTTP cookie     | `sb-access-token`           | Supabase session access token                     | Session (refreshed automatically) |
 | Secure HTTP cookie     | `sb-refresh-token`          | Supabase session refresh token                    | 7 days (configurable)             |
-| Secure HTTP cookie     | `__Host-csrf`               | CSRF protection token (double-submit pattern)     | 24 hours                          |
+| Secure HTTP cookie     | `__Host-csrf`               | CSRF protection token                             | 24 hours                          |
 | Browser localStorage   | Application preference keys | Persist UI state (theme, language, sidebar state) | Until logout or manual clear      |
 | Browser sessionStorage | Transient application state | Short-lived UI state                              | Browser session                   |
 | Service Worker cache   | API response cache          | Offline support and performance                   | Cleared on logout                 |
@@ -95,16 +95,16 @@ Data is not used for profiling, automated decision-making, or any purpose not li
 
 The following controls are implemented to protect the confidentiality, integrity, and availability of personal data:
 
-| Control                             | What It Protects                                                                            | Evidence                                                                                         |
-| ----------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| **Row-Level Security (RLS)**        | Prevents any user from accessing another user's data at the database query-execution level  | `lib/supabase/schema.sql`, `supabase/migrations/20260108131028_add_user_id_and_rls_policies.sql` |
-| **Encryption at rest (AES-256)**    | Protects stored data from unauthorized access to the storage medium                         | Supabase managed encryption                                                                      |
-| **Encryption in transit (TLS 1.3)** | Protects data during transmission between client and server                                 | Vercel and Supabase platform configuration                                                       |
-| **Input validation (Zod schemas)**  | Prevents injection attacks and ensures data integrity                                       | `app/api/_lib/middleware.ts`, `lib/schemas/auth.ts`                                              |
-| **Rate limiting**                   | Prevents brute-force attacks against authentication endpoints                               | `lib/services/rateLimitService.ts`                                                               |
-| **Token hashing**                   | Email verification tokens are hashed before storage, preventing replay from database access | `lib/security/emailVerification.ts`                                                              |
-| **Cache-Control headers**           | Sensitive responses (MFA enrollment) include `no-store` to prevent caching                  | `app/api/auth/mfa/enroll/route.ts`                                                               |
-| **PII redaction in audit logs**     | Sensitive payload data is stripped by `sanitizeForAudit` before storage                     | `lib/security/audit.ts`                                                                          |
+| Control                            | What It Protects                                                                            | Evidence                                                                                         |
+| ---------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **Row-Level Security (RLS)**       | Prevents any user from accessing another user's data at the database query-execution level  | `lib/supabase/schema.sql`, `supabase/migrations/20260108131028_add_user_id_and_rls_policies.sql` |
+| **Encryption at rest**             | Protects stored data from unauthorized access to the storage medium                         | Provided by Supabase as a platform default; not configured or verified in this repository        |
+| **Encryption in transit (TLS)**    | Protects data during transmission between client and server                                 | Cloudflare and Supabase platform configuration; HSTS is set by `lib/proxy.ts`                    |
+| **Input validation (Zod schemas)** | Prevents injection attacks and ensures data integrity                                       | `app/api/_lib/middleware.ts`, `lib/schemas/auth.ts`                                              |
+| **Rate limiting**                  | Prevents brute-force attacks against authentication endpoints                               | `lib/services/rateLimitService.ts`                                                               |
+| **Token hashing**                  | Email verification tokens are hashed before storage, preventing replay from database access | `lib/security/emailVerification.ts`                                                              |
+| **Cache-Control headers**          | Sensitive responses (MFA enrollment) include `no-store` to prevent caching                  | `app/api/auth/mfa/enroll/route.ts`                                                               |
+| **PII redaction in audit logs**    | Sensitive payload data is stripped by `sanitizeForAudit` before storage                     | `lib/security/audit.ts`                                                                          |
 
 ---
 
@@ -112,15 +112,15 @@ The following controls are implemented to protect the confidentiality, integrity
 
 The following third-party services process data on behalf of the application. Each service receives only the minimum data necessary for its function.
 
-| Processor                             | Purpose                                       | Data Shared                                                           | Data Handling                                                               |
-| ------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **Supabase** (Supabase Inc.)          | Authentication, database, file storage        | Account identifiers, application data, security/audit records         | Encrypted at rest (AES-256), RLS enforced, hosted in managed infrastructure |
-| **Resend** (Resend Inc.)              | Transactional email delivery                  | Recipient email address, verification message content                 | Processed for delivery only, subject to Resend's data processing agreement  |
-| **Google Maps Platform**              | Map routing and place search                  | Coordinates and place identifiers submitted by user action            | Processed per Google's data processing terms                                |
-| **Google Weather API**                | Weather information display                   | Geographic coordinates (latitude/longitude)                           | Coordinates used for lookup only                                            |
-| **Upstash** (Upstash Inc.)            | Distributed rate-limit counters               | Derived request identifiers (hashed IP + route prefix), counter state | No PII stored; only rate-limit metadata                                     |
-| **Vercel** (Vercel Inc.)              | Application hosting, edge compute, cron jobs  | HTTP request metadata (IP, headers), application runtime              | Subject to Vercel's data processing agreement                               |
-| **Sentry** (Functional Software Inc.) | Error and performance monitoring (if enabled) | Runtime diagnostic metadata, error context, stack traces              | PII scrubbing configured; subject to Sentry's DPA                           |
+| Processor                             | Purpose                                       | Data Shared                                                           | Data Handling                                                                     |
+| ------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **Supabase** (Supabase Inc.)          | Authentication, database, file storage        | Account identifiers, application data, security/audit records         | Encrypted at rest by the provider, RLS enforced, hosted in managed infrastructure |
+| **Resend** (Resend Inc.)              | Transactional email delivery                  | Recipient email address, verification message content                 | Processed for delivery only, subject to Resend's data processing agreement        |
+| **Google Maps Platform**              | Map routing and place search                  | Coordinates and place identifiers submitted by user action            | Processed per Google's data processing terms                                      |
+| **Google Weather API**                | Weather information display                   | Geographic coordinates (latitude/longitude)                           | Coordinates used for lookup only                                                  |
+| **Upstash** (Upstash Inc.)            | Distributed rate-limit counters               | Derived request identifiers (hashed IP + route prefix), counter state | No PII stored; only rate-limit metadata                                           |
+| **Cloudflare** (Cloudflare, Inc.)     | Application hosting (Workers), scheduled jobs | HTTP request metadata (IP, headers), application runtime              | Subject to Cloudflare's data processing terms                                     |
+| **Sentry** (Functional Software Inc.) | Error and performance monitoring (if enabled) | Runtime diagnostic metadata, error context, stack traces              | PII scrubbing configured; subject to Sentry's DPA                                 |
 
 **Evidence:** `lib/services/emailService.ts`, `app/api/navigate/route.ts`, `app/api/weather/route.ts`, `lib/services/rateLimitService.ts`, `config/sentry/sentry.client.config.ts`
 
@@ -182,7 +182,7 @@ Syllabus Sync is designed for university students and is not directed at childre
 
 ## 11. International Data Transfers
 
-Application data is processed through Supabase (infrastructure region selected at project creation) and Vercel (edge network with global presence). Where data is transferred outside the user's jurisdiction, it is protected by the data processing agreements of the respective service providers, which include Standard Contractual Clauses where required by GDPR.
+Application data is processed through Supabase (infrastructure region selected at project creation) and Cloudflare (edge network with global presence). Where data is transferred outside the user's jurisdiction, it is protected by the data processing agreements of the respective service providers, which include Standard Contractual Clauses where required by GDPR.
 
 ---
 

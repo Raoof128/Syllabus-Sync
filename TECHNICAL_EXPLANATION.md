@@ -1,52 +1,43 @@
 # Technical Architecture & Engineering Decisions
 
-> **Historical design record:** Several sections below describe an earlier Vercel deployment and proxy-level API auth gate. They are retained for decision history, not as an implementation guide. For the current Cloudflare/OpenNext runtime and route-level API authentication, use the [architecture guide](./docs/architecture/ARCHITECTURE.md) and [production checklist](./docs/operations/deployment-checklist.md).
+**Checked against the code on 17 November 2026.** An earlier version of this document described a Vercel deployment and a proxy that authenticated every API request through an `isPublicApiPath()` allowlist. Neither is how the code works now, and sections 1, 2, 3.1, 3.4, 5 and 7 were rewritten to match it. For the runtime in detail, see the [architecture guide](./docs/architecture/ARCHITECTURE.md).
 
-**System:** Syllabus Sync -- A Secure, Edge-First Campus Platform
+**System:** Syllabus Sync, a student planning application
 **Author:** Raouf
-**Audience:** Senior Engineers, Security Architects, Technical Reviewers
 
 ---
 
 ## Overview
 
-Syllabus Sync is a production-grade "Campus OS" built on Next.js 16, Supabase (PostgreSQL), and Vercel Edge infrastructure. This document is an architecture decision record (ADR). It explains the _why_ behind each major technical choice, the trade-offs evaluated, and the problems each decision solves. Every claim maps to a concrete implementation in the repository.
+Syllabus Sync is built on Next.js 16 and Supabase (PostgreSQL), and is deployed as a Cloudflare Worker through OpenNext. This document records why some of the larger technical choices were made and what they cost.
 
 ---
 
-## 1. Edge-First Request Pipeline
+## 1. Request Pipeline
 
-### 1.1 The Problem: Auth at the Wrong Layer
+### 1.1 What the proxy does
 
-Most web applications enforce authorization inside API route handlers. This creates two failure modes:
+Page and API requests pass through one function, `lib/proxy.ts`, before they reach a route (static assets are served directly and get their headers from `public/_headers`). The proxy:
 
-1. **Coverage gaps.** A single forgotten auth check in one route handler exposes an entire resource. In a serverless architecture with dozens of API routes, this is a statistical inevitability.
-2. **Wasted compute.** Unauthorized requests still invoke the serverless function, spin up a cold start, and consume billing units before being rejected.
+- generates a per-request nonce and sets the Content Security Policy and the other security headers (HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`), so no rendered response can omit them;
+- rejects state-changing requests whose `Origin` or `Referer` does not match the site or a trusted origin;
+- for page navigations, looks up the session and redirects signed-out users to the login page, unverified users to `/verify`, and users who still owe a second factor to the MFA step.
 
-### 1.2 The Decision: Proxy Middleware Auth Gate
+### 1.2 What the proxy does not do
 
-All requests -- pages, API calls, and static assets -- pass through a single edge function (`lib/proxy.ts`) before reaching any application code. This function is the system's Zero-Trust boundary.
+The proxy is not an authentication gate for API routes. An earlier design resolved the session at the proxy for every `/api/*` request; it was removed because a page that fired many API calls in parallel had each one present the same refresh token at the proxy, Supabase rate-limited all but one, and signed-in users were bounced to the login page. Each API route now authenticates for itself, most of them through `requireAuth` or `requireAuthWithRateLimit` in `app/api/_lib/middleware.ts`.
 
-**Route classification and the allowlist model.** The function `isPublicApiPath()` maintains an explicit allowlist of routes that may bypass authentication (auth callbacks, health checks, public map proxies, CSP reporting). Every other `/api/*` route requires a valid Supabase JWT. This is a deny-by-default model: adding a new API route without updating the allowlist results in a 401, not an accidental data leak.
+The cost of this choice is the one the original design set out to avoid: a new route is only protected if its author adds the check. `tests/security/api-auth-coverage.test.ts` is an inventory test that fails when a route file has no recognised authentication call and is not on its public allowlist.
 
-**Why this matters.** The auth decision happens at the edge, at the CDN layer, before Vercel provisions a serverless function. Unauthorized traffic never reaches the application runtime. This reduces attack surface, eliminates an entire class of "forgot the auth check" bugs, and cuts infrastructure cost under abuse scenarios.
+### 1.3 Deadlines on upstream calls
 
-**Security headers as a side effect.** Because every request transits the proxy, security headers (CSP with per-request nonces, HSTS with preload, X-Frame-Options, Permissions-Policy) are injected uniformly. There is no route that can accidentally omit them.
+A slow Supabase response must not hang the Worker.
 
-### 1.3 Handling Serverless Edge Constraints
+**Fetch wrapper (`lib/supabase/fetch.ts`).** Supabase calls use `fetchWithTimeout`, which enforces a 15-second deadline (20 seconds in development) by combining the caller's `AbortSignal` with a timeout signal.
 
-Vercel Edge functions operate under strict execution time limits. A slow upstream Supabase response (network partition, regional outage, connection reset) would hang the edge function and cascade into 504 Gateway Timeouts for all users.
+**Session lookup deadline.** The proxy gives the session lookup for a page 6 seconds (`PROXY_AUTH_DEADLINE_MS`). If Supabase has not answered, the request proceeds as signed-out, so the user sees a login redirect and not a blank screen.
 
-**Fail-fast fetch wrapper (`lib/supabase/fetch.ts`).** Every Supabase call from the edge uses `fetchWithTimeout`, which enforces a hard 15-second deadline (20 seconds in development). The implementation composes `AbortSignal` instances, combining the caller's cancellation signal with the timeout signal so that whichever fires first terminates the request.
-
-**Auth resolution deadline.** The proxy imposes a separate 6-second deadline (`PROXY_AUTH_DEADLINE_MS`) on session validation. If Supabase cannot confirm the session within 6 seconds:
-
-- For protected page routes, the request proceeds as unauthenticated (the user sees a login redirect rather than a blank screen).
-- For protected API routes, the proxy returns a `503 AUTH_UNAVAILABLE` response, signaling the client to retry.
-
-This is a deliberate trade-off: during a Supabase outage, users lose access to authenticated features but the application remains responsive. The alternative -- blocking indefinitely -- would make the entire platform appear offline.
-
-**MFA assurance level check.** For users with TOTP or passkey MFA enrolled, the proxy performs a second edge call to verify the authenticator assurance level (AAL). This also races against a deadline (2.5 seconds in production). If MFA status cannot be determined, API routes return 503 rather than silently downgrading the security posture.
+**Assurance-level deadline.** The second-factor lookup is given 2.5 seconds in production (`MFA_AAL_DEADLINE_MS`).
 
 ---
 
@@ -54,22 +45,24 @@ This is a deliberate trade-off: during a Supabase outage, users lose access to a
 
 ### 2.1 The Problem: In-Memory State in Serverless
 
-Traditional rate limiting libraries (e.g., `express-rate-limit`) store counters in process memory. In a serverless environment, each request may execute in a different isolate with its own memory space. An attacker sending 1,000 requests may hit 1,000 different isolates, each of which sees the request as "the first one."
+Traditional rate limiting libraries (e.g., `express-rate-limit`) store counters in process memory. On a serverless platform each request may run in a different isolate with its own memory, so an in-memory counter does not limit anything.
 
 ### 2.2 The Decision: Tiered Storage with Fail-Closed Semantics
 
 The rate limiting service (`lib/services/rateLimitService.ts`) implements a pluggable storage backend with a strict priority chain:
 
-1. **Upstash Redis** (preferred) -- stateless REST API, no persistent connections, purpose-built for serverless.
-2. **Vercel KV** -- same REST protocol, alternative provider.
-3. **Supabase PostgreSQL** -- distributed via RPC calls (`ratelimit_increment`), viable for low-to-medium traffic.
+1. **Upstash Redis** -- REST API, no persistent connections.
+2. **A store with the same REST protocol** (the `KV_REST_API_*` variables).
+3. **Supabase PostgreSQL** -- a `ratelimit_increment` function called over RPC.
 4. **In-memory** -- development only.
 
-**The fail-closed design.** Security-critical endpoints (login, signup, password reset, passkey authentication) are configured with `failClosed: true`. If the rate limit store is unreachable or misconfigured in production, these endpoints _reject all requests_ rather than silently allowing unlimited attempts. This prevents a Redis outage from becoming a brute-force window.
+The limiter is a fixed-window counter per key.
+
+**The fail-closed design.** Security-critical endpoints (login, signup, password reset, passkey authentication) are configured with `failClosed: true`. If the rate limit store is unreachable or misconfigured in production, these endpoints reject requests instead of allowing unlimited attempts, so a store outage does not become a brute-force window.
 
 Non-critical endpoints (general API reads, bulk operations) use `failClosed: false`, prioritizing availability over strict enforcement. This is an explicit trade-off documented in the configuration.
 
-**Why not a WAF?** A Web Application Firewall would provide similar protection but introduces vendor lock-in and opaque rules. The application-level implementation allows per-endpoint tuning (20 signups/hour vs. 200 API calls/minute vs. 10 password resets/hour) and makes rate limiting logic auditable alongside the application code.
+**Why in the application?** Limits in the application can be tuned per endpoint (5 signups per hour, 10 login attempts per 15 minutes, 10 password resets per hour, 200 general API calls per minute) and are reviewed alongside the code. The full table is in the [security posture document](./docs/security/SECURITY_POSTURE.md).
 
 ---
 
@@ -79,15 +72,15 @@ Non-critical endpoints (general API reads, bulk operations) use `failClosed: fal
 
 Application-layer authorization is necessary but insufficient. A single missing `WHERE user_id = ?` clause in a query creates an Insecure Direct Object Reference (IDOR) vulnerability. In a codebase with dozens of data access patterns, this is difficult to prevent through code review alone.
 
-**Decision:** Every table in the PostgreSQL database has Row-Level Security (RLS) enabled. Policies are defined at the database level, enforcing that `auth.uid()` matches the row owner for all SELECT, INSERT, UPDATE, and DELETE operations. Even if an API route contains a flawed query, the database engine blocks cross-tenant data access.
+**Decision:** Each of the 27 tables the migrations create has Row-Level Security enabled. User-owned tables have policies that require `auth.uid()` to match the row owner; internal tables (verification and reset tokens, rate-limit counters) have no policy for application roles at all. A flawed query in a route that uses the caller's own session is therefore still confined to the caller's rows.
 
-This creates true defense-in-depth: the application layer checks authorization, and the database layer independently enforces it. Neither trusts the other.
+The limit of this control: routes that use the service-role client bypass RLS, and so do `SECURITY DEFINER` functions, so those need their own checks. Several findings in the audit records under `docs/` were of exactly that kind.
 
 ### 3.2 Signup Atomicity via PostgreSQL Triggers
 
-**The problem.** User signup requires two operations: creating an Auth record (in `auth.users`) and creating a profile row (in `public.profiles`). The original implementation performed these as sequential API calls in the signup route handler. If the profile insertion failed (network error, constraint violation, serverless timeout), the system produced an orphaned Auth user with no corresponding profile -- breaking downstream queries that JOIN on the profile.
+**The problem.** User signup requires two operations: creating an Auth record (in `auth.users`) and creating a profile row (in `public.profiles`). The original implementation performed these as sequential API calls in the signup route handler. If the profile insertion failed (network error, constraint violation, timeout), the system produced an Auth user with no profile, which broke queries that join on the profile.
 
-**The fix.** A PostgreSQL trigger (`on_auth_user_created`) fires automatically when a row is inserted into `auth.users`, creating a blank `public.profiles` row within the same database transaction. This guarantees atomicity: either both records exist or neither does. The application code cannot bypass this invariant because it is enforced at the storage layer.
+**The fix.** A PostgreSQL trigger (`on_auth_user_created`) fires when a row is inserted into `auth.users` and creates the `public.profiles` row in the same transaction, so either both records exist or neither does. The signup route still upserts the profile afterwards to fill in the remaining fields.
 
 ### 3.3 Securing the Gamification RPC Layer
 
@@ -95,17 +88,18 @@ The platform includes XP and streak mechanics. Client-controlled XP awards are i
 
 **Decision:** XP mutations are delegated to a PostgreSQL RPC function (`award_xp`) defined as `SECURITY DEFINER SET search_path = public`. The function:
 
-- Validates that `auth.uid()` matches the target `user_id`, preventing cross-user mutation.
-- Runs with elevated privileges but has public execution revoked; only the `authenticated` role may call it.
-- Executes atomically within a single database transaction, preventing partial XP/streak updates.
+- Rejects a call unless `auth.uid()` matches the target `user_id` (the service role is exempt).
+- Has execution revoked from the `anon` role.
+- Awards a given (user, event type, reference) only once.
+- Runs in a single transaction, so XP and streak cannot be half-updated.
 
-This moves the trust boundary from the client to the database. The API route is a thin passthrough; the business logic and authorization live where they cannot be circumvented by client manipulation.
+The XP amounts come from a server-side table, not from the request.
 
 ### 3.4 Audit Logging
 
-All sensitive mutations are recorded via the `log_audit` RPC into the `audit_logs` table, capturing the actor, action, old/new data payloads, IP address, and User Agent.
+Security-relevant events are recorded through the `log_audit` function into the `audit_logs` table, with the actor, action, old/new data payloads, IP address and user agent. Application roles can only add rows. The log is not tamper-evident: there is no hash chain, the service role can modify rows, and a retention function deletes old ones.
 
-**PII handling trade-off.** The `old_data`/`new_data` JSON payloads are sanitized via `sanitizeForAudit` to strip passwords and API keys. However, IP addresses and User Agents are stored in plaintext (cast to `inet` and `text`) to support IP anomaly detection and incident response. This is a deliberate decision: forensic capability was prioritized over minimizing PII storage, with the understanding that audit log access is restricted to the service role.
+**PII handling trade-off.** The `old_data`/`new_data` JSON payloads are sanitized via `sanitizeForAudit` to strip passwords and API keys. IP addresses and user agents are stored in plaintext (`inet` and `text`) to support incident response. Forensic use was put ahead of minimising stored personal data. (An IP anomaly detection module exists in `lib/security/` but nothing calls it.)
 
 ---
 
@@ -142,13 +136,15 @@ Protection entries expire after 2 minutes, ensuring that genuinely deleted notif
 
 ---
 
-## 5. Authentication: FIDO2 WebAuthn (Passkeys)
+## 5. Authentication: WebAuthn Passkeys
 
-**Decision:** The platform supports hardware-backed passwordless authentication via FIDO2 WebAuthn.
+**Decision:** The platform supports passkeys through WebAuthn, alongside passwords with optional TOTP or SMS second factors.
 
-**Authenticator scope constraint.** The `authenticatorAttachment` is explicitly set to `'platform'`, restricting passkeys to built-in device authenticators (FaceID, TouchID, Windows Hello). This was a deliberate UX trade-off: platform authenticators provide a frictionless biometric flow that students will actually use, whereas requiring a roaming authenticator (YubiKey) would introduce friction that reduces adoption on a campus platform.
+**Two implementations.** The current routes under `app/api/webauthn/` store credentials in a `webauthn_credentials` table and issue single-use challenges that expire after five minutes. An older set under `app/api/auth/passkey/` keeps credential data in the user's `user_metadata` and restricts registration to platform authenticators (`authenticatorAttachment: 'platform'`). Both are still in the code; consolidating them is open work.
 
-**CSRF integration.** The proxy middleware validates CSRF tokens (double-submit cookie pattern with `__Host-csrf` prefix) for all mutation requests. WebAuthn authentication endpoints are listed in `isPublicApiPath()` because the challenge-response protocol provides its own replay protection, making CSRF tokens redundant for those routes.
+**Origin binding.** In production the relying-party ID and expected origin come from `WEBAUTHN_RP_ID` and `WEBAUTHN_ORIGIN`. The code refuses to derive them from request headers, because a caller-supplied `Host` or `Origin` would let an attacker's page choose what the assertion is checked against.
+
+**Cross-site requests.** The proxy applies an origin check to state-changing requests. It is not a double-submit token check: a `__Host-csrf` cookie is issued and token validation exists in `lib/security/csrf.ts`, but only the gamification routes call it.
 
 ---
 
@@ -168,24 +164,26 @@ The `useMapLocation` hook fuses three heading sources with a priority cascade:
 
 **Outlier rejection.** GPS samples with large coordinate jumps (exceeding a distance threshold relative to the previous sample) or low accuracy scores are discarded. This prevents the map marker from jumping across buildings when the device briefly triangulates to a distant cell tower.
 
-**Server-side API proxies.** Google Maps API calls (Routes, Places search, Places details) are proxied through server-side API routes (`/api/maps/*`) rather than called directly from the client. This keeps the API key server-side, enables per-route rate limiting via `apiLimiter`, and allows origin validation via `isTrustedOrigin`. The proxy routes are listed in `isPublicApiPath()` because they serve unauthenticated map views.
+**Server-side API proxies.** Google Maps API calls (Routes, Places search, Places details) are proxied through server-side API routes (`/api/maps/*`) rather than called directly from the client. This keeps the API key server-side, enables per-route rate limiting via `apiLimiter`, and allows origin validation via `isTrustedOrigin`.
 
 ---
 
 ## 7. Development Operations & Quality Gates
 
-**Automated quality pipeline.** The command `npm run check` executes a six-stage gate: secret scanning, formatting (Prettier), type checking (strict TypeScript), linting (ESLint with zero-warning policy), testing (Vitest unit + Playwright E2E, 500+ tests), and production build. All stages must pass before deployment.
+**Local gate.** `npm run check` runs the secrets scan, the Prettier check, the TypeScript check, ESLint, the Vitest suite (1,399 tests in 167 files on 17 November 2026) and a production build.
 
-**Secret scanning.** A custom pre-commit hook (`tools/security/check-secrets.mjs`) scans staged files for patterns matching API keys, tokens, and credentials. This runs before the commit is created, not in CI, ensuring secrets never enter the repository history.
+**CI.** `.github/workflows/ci-cd.yml` runs on every pull request: `npm audit` on production dependencies, the secrets scan, the translation check, a documentation link check, format, lint, types and tests, a database built from the migrations alone, the Next.js and Cloudflare build, and Playwright end-to-end tests. It does not deploy.
 
-**Observability.** Sentry is integrated across three runtimes -- Edge Middleware, Server Components, and Client Components -- providing unified error tracking with source maps.
+**Secret scanning.** `tools/security/check-secrets.mjs` scans tracked files for patterns that look like API keys and tokens. It runs in CI and as part of `npm run check`.
 
-**Deployment.** Production deploys execute via `npx vercel --prod` after the full quality gate passes. Vercel's deployment model (immutable deployments with instant rollback) complements the serverless architecture.
+**Observability.** Sentry configuration files exist for the client, server and edge runtimes (`config/sentry/`). Request bodies and sensitive headers are removed before an event is sent (`lib/observability/sentry-scrub.ts`).
+
+**Deployment.** Production runs on Cloudflare Workers. Deployment is a manual step run by an authorized maintainer; see the [deployment checklist](./docs/operations/deployment-checklist.md).
 
 ---
 
 ## Related Documents
 
 - [Architecture Overview](./docs/architecture/ARCHITECTURE.md) -- Component-level system design and data flow.
-- [Security Posture Report](./docs/security/SECURITY_POSTURE.md) -- Complete catalogue of implemented security controls with STRIDE threat model.
+- [Security Posture](./docs/security/SECURITY_POSTURE.md) -- Controls in force, modules that exist but are not in force, and known limitations.
 - [Route Inventory](./docs/inventory/ROUTE_INVENTORY.md) -- Mapping of the Next.js App Router structure.

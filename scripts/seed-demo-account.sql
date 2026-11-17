@@ -1,3 +1,6 @@
+-- NOTE (17 Nov 2026): the account in this script is a placeholder (demoN@example.com).
+-- The script predates the removal of profiles.student_id on 30 Jul 2026 and has not
+-- been run against the current schema; check the column lists before using it.
 -- ============================================================================
 -- DEMO ACCOUNT SEED SCRIPT — Syllabus Sync
 -- ============================================================================
@@ -6,7 +9,7 @@
 -- USAGE:
 --   1. Create the user first via Supabase Dashboard:
 --      Authentication > Users > Add User (email + password)
---      Email: charanya.demo@mq.edu.au
+--      Email: demo1@example.com
 --      Password: (set in the Supabase dashboard; not stored in this repository)
 --      Check "Auto Confirm User"
 --
@@ -42,10 +45,10 @@ BEGIN
   -- ========================================================================
   -- Look up the demo user by email
   -- ========================================================================
-  SELECT id INTO v_uid FROM auth.users WHERE email = 'charanya.demo@mq.edu.au';
+  SELECT id INTO v_uid FROM auth.users WHERE email = 'demo1@example.com';
 
   IF v_uid IS NULL THEN
-    RAISE EXCEPTION 'Demo user not found. Create the user first via Supabase Dashboard with email: charanya.demo@mq.edu.au';
+    RAISE EXCEPTION 'Demo user not found. Create the user first via Supabase Dashboard with email: demo1@example.com';
   END IF;
 
   RAISE NOTICE 'Seeding demo data for user: %', v_uid;
@@ -56,8 +59,8 @@ BEGIN
   INSERT INTO public.profiles (id, email, full_name, student_id, course, year, faculty, created_at, updated_at)
   VALUES (
     v_uid,
-    'charanya.demo@mq.edu.au',
-    'Charanya Ravi',
+    'demo1@example.com',
+    'Demo Student One',
     '46012345',
     'Bachelor of Information Technology',
     '3',
@@ -357,9 +360,9 @@ BEGIN
   -- DONE
   -- ========================================================================
   RAISE NOTICE '═══════════════════════════════════════════════════════════════';
-  RAISE NOTICE 'DEMO SEED COMPLETE for charanya.demo@mq.edu.au';
+  RAISE NOTICE 'DEMO SEED COMPLETE for demo1@example.com';
   RAISE NOTICE '═══════════════════════════════════════════════════════════════';
-  RAISE NOTICE 'Profile:       Charanya Ravi — B. IT, Year 3, Sci & Eng';
+  RAISE NOTICE 'Profile:       Demo Student One — B. IT, Year 3, Sci & Eng';
   RAISE NOTICE 'Units:         4 (COMP2350, ISYS3001, COMP3850, STAT2372)';
   RAISE NOTICE 'Class Times:   8 slots (Mon–Fri)';
   RAISE NOTICE 'Deadlines:     7 (5 upcoming, 2 completed)';

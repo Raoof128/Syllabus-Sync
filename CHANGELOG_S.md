@@ -476,7 +476,7 @@ Raouf: 2026-03-06 (Australia/Sydney)
 Scope: Google Maps Console Noise Remediation
 Summary: Reduced the remaining Google map console noise to the app-controlled minimum. `GoogleMapCanvas` now uses Google’s `DEMO_MAP_ID` fallback when a project-specific `NEXT_PUBLIC_GOOGLE_MAP_ID` is absent, which keeps the JavaScript map on vector rendering with `AdvancedMarkerElement` and removes the deprecation path through `google.maps.Marker`. `GoogleMapController` now computes routes through a `useEffectEvent` flow with request-key deduplication and a configuration-failure latch so a missing or failing routes backend does not hammer `/api/maps/routes` on every rerender. `MapClient` now preloads the campus raster image only in campus view, avoiding the unnecessary preload warning when users open Google mode. Also added `GOOGLE_ROUTES_API_KEY` to local `.env.local`, synced it to Vercel `development`/`preview`/`production`, and redeployed production.
 Files: Modified `features/map/components/GoogleMapCanvas.tsx`, `features/map/components/GoogleMapController.tsx`, `features/map/components/MapClient.tsx`, `app/api/maps/routes/route.ts`, `.env.local`; synchronized `GOOGLE_ROUTES_API_KEY` in Vercel.
-Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapCanvas.tsx features/map/components/GoogleMapController.tsx features/map/components/MapClient.tsx app/api/maps/routes/route.ts` ✅; `npm run typecheck` ✅; `npm run test -- tests/api/maps/routes.test.ts tests/map/decodePolyline.test.ts` ✅; `vercel env ls` shows `GOOGLE_ROUTES_API_KEY` in development/preview/production; `npm run vercel:deploy:prod` ✅ and production re-aliased to `https://syllabus-sync-ashy.vercel.app`.
+Verification: `npx eslint --config config/eslint/eslint.config.mjs features/map/components/GoogleMapCanvas.tsx features/map/components/GoogleMapController.tsx features/map/components/MapClient.tsx app/api/maps/routes/route.ts` ✅; `npm run typecheck` ✅; `npm run test -- tests/api/maps/routes.test.ts tests/map/decodePolyline.test.ts` ✅; `vercel env ls` shows `GOOGLE_ROUTES_API_KEY` in development/preview/production; `npm run vercel:deploy:prod` ✅ and production re-aliased to `https://syllabus-sync-<alias>.vercel.app`.
 Follow-ups: Browser-extension `Frame with ID ... was removed` errors and ad-blocker `mapsjs/gen_204?csp_test=true net::ERR_BLOCKED_BY_CLIENT` messages are external to the app. If Google Routes upstream rejects the reused key because of API restrictions, replace `GOOGLE_ROUTES_API_KEY` in Vercel with a dedicated server-side key that has the Routes API enabled.
 
 Raouf: 2026-03-06 (Australia/Sydney)
@@ -490,7 +490,7 @@ Raouf: 2026-03-06 (Australia/Sydney)
 Scope: Google Maps Browser Key Environment Remediation
 Summary: Investigated the runtime error `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not configured` by checking local env files and the linked Vercel project with the Vercel CLI. Root cause was an env-name mismatch left over from the iframe implementation: local and Vercel still had `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`, while the new JavaScript Google Maps path expects `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`. Added the new browser key name to local `.env.local`, created/overrode `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in Vercel for `development`, `preview`, and `production`, and triggered a fresh production deployment so the live app would rebuild against the corrected env set.
 Files: Updated `.env.local`; synchronized Vercel environment variables for `development`, `preview`, and `production`.
-Verification: `vercel env ls` shows `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in all three environments; `npm run vercel:deploy:prod` completed and production was aliased to `https://syllabus-sync-ashy.vercel.app`.
+Verification: `vercel env ls` shows `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in all three environments; `npm run vercel:deploy:prod` completed and production was aliased to `https://syllabus-sync-<alias>.vercel.app`.
 Follow-ups: `GOOGLE_ROUTES_API_KEY` is still absent in Vercel and will need to be added before Google route computation can work in production navigation flows.
 
 Raouf: 2026-03-06 (Australia/Sydney)
@@ -1065,17 +1065,17 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Files Changed
 
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/global-error.tsx`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/loading.tsx`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/page.tsx`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/app/map/position-editor/page.tsx`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/components/layout/WeatherWidget.tsx`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/ar/translations.json`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/es/translations.json`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/fr/translations.json`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/ru/translations.json`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/zh/translations.json`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/locales/ja/translations.json`
+- `<repo>/app/global-error.tsx`
+- `<repo>/app/loading.tsx`
+- `<repo>/app/page.tsx`
+- `<repo>/app/map/position-editor/page.tsx`
+- `<repo>/components/layout/WeatherWidget.tsx`
+- `<repo>/locales/ar/translations.json`
+- `<repo>/locales/es/translations.json`
+- `<repo>/locales/fr/translations.json`
+- `<repo>/locales/ru/translations.json`
+- `<repo>/locales/zh/translations.json`
+- `<repo>/locales/ja/translations.json`
 
 #### Verification
 
@@ -1105,8 +1105,8 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Files Changed
 
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+- `<repo>/features/map/components/GoogleMapEmbed.tsx`
+- `<repo>/tests/map/GoogleMapEmbed.test.tsx`
 
 #### Verification
 
@@ -1136,8 +1136,8 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Files Changed
 
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapLocation.ts`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/useMapLocation.test.ts`
+- `<repo>/features/map/hooks/useMapLocation.ts`
+- `<repo>/tests/map/useMapLocation.test.ts`
 
 #### Verification
 
@@ -1163,7 +1163,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Files Changed
 
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+- `<repo>/tests/map/GoogleMapEmbed.test.tsx`
 
 #### Verification
 
@@ -1190,8 +1190,8 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Files Changed
 
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+- `<repo>/features/map/components/GoogleMapEmbed.tsx`
+- `<repo>/tests/map/GoogleMapEmbed.test.tsx`
 
 #### Verification
 
@@ -1227,9 +1227,9 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Files Changed
 
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapNavigation.ts`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/hooks/useMapLocation.ts`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/useMapNavigation.test.ts`
+- `<repo>/features/map/hooks/useMapNavigation.ts`
+- `<repo>/features/map/hooks/useMapLocation.ts`
+- `<repo>/tests/map/useMapNavigation.test.ts`
 
 #### Verification
 
@@ -1265,9 +1265,9 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Files Changed
 
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/MapClient.tsx`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/features/map/components/GoogleMapEmbed.tsx`
-- `/Users/raoof.r12/Desktop/Raouf/MQ_Project/syllabus-sync/tests/map/GoogleMapEmbed.test.tsx`
+- `<repo>/features/map/components/MapClient.tsx`
+- `<repo>/features/map/components/GoogleMapEmbed.tsx`
+- `<repo>/tests/map/GoogleMapEmbed.test.tsx`
 
 #### Verification
 
@@ -1361,7 +1361,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 ---
 
-### Roauf Abedini: Professional PDF Generation — 2026-02-22
+### Raouf Abedini: Professional PDF Generation — 2026-02-22
 
 **Scope:** Professional PDF Generation
 **Type:** Chore
@@ -1378,7 +1378,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 ---
 
-### Roauf Abedini: Professional Documentation Refinement — 2026-02-22
+### Raouf Abedini: Professional Documentation Refinement — 2026-02-22
 
 **Scope:** Professional Documentation Refinement & Condensation
 **Type:** Chore
@@ -1388,7 +1388,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 1. **System Architecture Integration:**
    - Injected the complete Mermaid graph visual representation mapping the platform's Technical System Architecture directly into the finalized documentation bundle.
 2. **Name Identity Adjustments:**
-   - Swapped out all instances of backend engineering authorship from "Raouf" to "Roauf Abedini" throughout the main `README.md`, `TEAM_ROADMAP.md` tracking lines, and generated documentation artifacts.
+   - Swapped out all instances of backend engineering authorship from "Raouf" to "Raouf Abedini" throughout the main `README.md`, `TEAM_ROADMAP.md` tracking lines, and generated documentation artifacts.
 
 #### Verification
 
@@ -1711,8 +1711,8 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 - `npm run check` ✅ (Formatting, Typecheck, Lint, Tests, Build).
 - `vercel deploy --prod` ✅.
-- Inspect URL: https://vercel.com/perkycoders/syllabus-sync/AMzEQoB4gHoK7mjExEiJnzzRaPvL
-- Production URL: https://syllabus-sync-52umrpk59-perkycoders.vercel.app / https://syllabus-sync-ashy.vercel.app
+- Inspect URL: https://vercel.com/<team>/syllabus-sync/<deployment>
+- Production URL: https://syllabus-sync-<deployment>-<team>.vercel.app / https://syllabus-sync-<alias>.vercel.app
 
 ### Raouf: Repository-wide i18n Audit & Remediation — 2026-02-21
 
@@ -2061,9 +2061,9 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Deployment
 
-- Inspect: `https://vercel.com/perkycoders/syllabus-sync/DfrZxx1UDipnUHRp6r9VjuYTbdQm`
-- Production deployment: `https://syllabus-sync-gwyo2gnyc-perkycoders.vercel.app`
-- Production alias: `https://syllabus-sync-ashy.vercel.app`
+- Inspect: `https://vercel.com/<team>/syllabus-sync/<deployment>`
+- Production deployment: `https://syllabus-sync-<deployment>-<team>.vercel.app`
+- Production alias: `https://syllabus-sync-<alias>.vercel.app`
 
 ---
 
@@ -2102,9 +2102,9 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Deployment
 
-- Inspect: `https://vercel.com/perkycoders/syllabus-sync/E7Vsgr2oQ3bVLW1x2UTKqvff8Ubq`
-- Production deployment: `https://syllabus-sync-l2fjpjbh1-perkycoders.vercel.app`
-- Production alias: `https://syllabus-sync-ashy.vercel.app`
+- Inspect: `https://vercel.com/<team>/syllabus-sync/<deployment>`
+- Production deployment: `https://syllabus-sync-<deployment>-<team>.vercel.app`
+- Production alias: `https://syllabus-sync-<alias>.vercel.app`
 
 ---
 
@@ -2163,9 +2163,9 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Deployment
 
-- Inspect: `https://vercel.com/perkycoders/syllabus-sync/FUaYDNGgYCLjCKe3zN1tfs5deeQ6`
-- Production deployment: `https://syllabus-sync-cx38jd22c-perkycoders.vercel.app`
-- Production alias: `https://syllabus-sync-ashy.vercel.app`
+- Inspect: `https://vercel.com/<team>/syllabus-sync/<deployment>`
+- Production deployment: `https://syllabus-sync-<deployment>-<team>.vercel.app`
+- Production alias: `https://syllabus-sync-<alias>.vercel.app`
 
 ### Raouf: Map View Toggle Scaffolding (Step 1) — 2026-02-19
 
@@ -2220,9 +2220,9 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 #### Deployment
 
 - `npm run vercel:deploy:prod` ✅
-- Inspect: `https://vercel.com/perkycoders/syllabus-sync/5FuuGXjwQ3CPjbJuyr6iaJTy9s1m`
-- Production deployment: `https://syllabus-sync-bhngwvn4t-perkycoders.vercel.app`
-- Production alias: `https://syllabus-sync-ashy.vercel.app`
+- Inspect: `https://vercel.com/<team>/syllabus-sync/<deployment>`
+- Production deployment: `https://syllabus-sync-<deployment>-<team>.vercel.app`
+- Production alias: `https://syllabus-sync-<alias>.vercel.app`
 
 ---
 
@@ -2260,9 +2260,9 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 #### Deployment
 
 - `npm run vercel:deploy:prod` ✅
-- Inspect: `https://vercel.com/perkycoders/syllabus-sync/BEWhTuzZQAjntipeUS3MKXundD4E`
-- Production deployment: `https://syllabus-sync-dnhto9826-perkycoders.vercel.app`
-- Production alias: `https://syllabus-sync-ashy.vercel.app`
+- Inspect: `https://vercel.com/<team>/syllabus-sync/<deployment>`
+- Production deployment: `https://syllabus-sync-<deployment>-<team>.vercel.app`
+- Production alias: `https://syllabus-sync-<alias>.vercel.app`
 
 ---
 
@@ -2367,7 +2367,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 #### Verification
 
 - `npm run check` ✅ (64 test files, 478 tests passing)
-- `npm run vercel:deploy:prod` ✅ → https://syllabus-sync-ashy.vercel.app
+- `npm run vercel:deploy:prod` ✅ → https://syllabus-sync-<alias>.vercel.app
 
 ---
 
@@ -2393,7 +2393,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 #### Verification
 
 - `npm run check` ✅ (64 test files, 478 tests passing)
-- `npm run vercel:deploy:prod` ✅ → https://syllabus-sync-ashy.vercel.app
+- `npm run vercel:deploy:prod` ✅ → https://syllabus-sync-<alias>.vercel.app
 
 ---
 
@@ -2427,7 +2427,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 - `npm run typecheck` ✅
 - `npm run test:ci` ✅ (483/483 pass)
-- `npm run vercel:deploy:prod` ✅ → https://syllabus-sync-ashy.vercel.app
+- `npm run vercel:deploy:prod` ✅ → https://syllabus-sync-<alias>.vercel.app
 
 ---
 
@@ -2472,7 +2472,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 - `npm run typecheck` ✅
 - `npm run test:ci` ✅ (483/483 pass — honeypot test fixed)
-- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-<alias>.vercel.app)
 
 ---
 
@@ -2505,7 +2505,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 - `npm run typecheck` ✅
 - `npm run test:ci` ✅ (483/483 pass)
-- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-<alias>.vercel.app)
 
 ---
 
@@ -2540,7 +2540,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 - `npm run typecheck` ✅
 - `npm run test:ci` ✅ (483/483 pass)
-- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-<alias>.vercel.app)
 
 ---
 
@@ -2557,7 +2557,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 - `npm run typecheck` ✅
 - `npm run test:ci` ✅ (483/483 pass)
-- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-<alias>.vercel.app)
 
 ---
 
@@ -2582,7 +2582,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 - `npm run typecheck` ✅
 - `npm run test:ci` ✅ (483/483 pass)
-- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-ashy.vercel.app)
+- `npm run vercel:deploy:prod` ✅ (aliased to syllabus-sync-<alias>.vercel.app)
 
 #### Files Changed
 
@@ -2622,7 +2622,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 - `npm run typecheck` ✅
 - `npm run test` ✅ (483/483 pass)
-- `npm run vercel:deploy:prod` ✅ — aliased to `https://syllabus-sync-ashy.vercel.app`
+- `npm run vercel:deploy:prod` ✅ — aliased to `https://syllabus-sync-<alias>.vercel.app`
 
 ---
 
@@ -2651,7 +2651,7 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 - `npm run typecheck` ✅
 - `npm run test` ✅ (483/483 pass)
-- `npm run vercel:deploy:prod` ✅ — aliased to `https://syllabus-sync-ashy.vercel.app`
+- `npm run vercel:deploy:prod` ✅ — aliased to `https://syllabus-sync-<alias>.vercel.app`
 
 ---
 
@@ -2662,21 +2662,21 @@ Comprehensive security audit of all API routes. Fixed error message leakage (7 l
 
 #### Root Cause
 
-The Supabase `uri_allow_list` only contained `syllabus-sync-perkycoders.vercel.app` URLs, but the canonical Vercel production URL is `syllabus-sync-ashy.vercel.app`. When users accessed from the canonical URL:
+The Supabase `uri_allow_list` only contained `syllabus-sync-<team>.vercel.app` URLs, but the canonical Vercel production URL is `syllabus-sync-<alias>.vercel.app`. When users accessed from the canonical URL:
 
-1. `handleGoogleLogin()` constructed callback URL using `window.location.origin` (`syllabus-sync-ashy.vercel.app`)
+1. `handleGoogleLogin()` constructed callback URL using `window.location.origin` (`syllabus-sync-<alias>.vercel.app`)
 2. Supabase rejected this callback URL (not in allowlist)
-3. The PKCE `code_verifier` cookie was set on `syllabus-sync-ashy.vercel.app` but Supabase redirected to `syllabus-sync-perkycoders.vercel.app`
+3. The PKCE `code_verifier` cookie was set on `syllabus-sync-<alias>.vercel.app` but Supabase redirected to `syllabus-sync-<team>.vercel.app`
 4. Cookie lost across domains, `exchangeCodeForSession` failed
 
 #### Changes
 
 1. **Supabase auth config** (Management API):
-   - Updated `site_url` to `https://syllabus-sync-ashy.vercel.app`
+   - Updated `site_url` to `https://syllabus-sync-<alias>.vercel.app`
    - Added both Vercel domains to `uri_allow_list` with callback, confirm, and reset-password paths
 
 2. **Vercel env var** (`NEXT_PUBLIC_APP_URL`):
-   - Changed from `syllabus-sync-perkycoders.vercel.app` to `syllabus-sync-ashy.vercel.app`
+   - Changed from `syllabus-sync-<team>.vercel.app` to `syllabus-sync-<alias>.vercel.app`
 
 3. **OAuth error feedback** (`LoginClient.tsx`):
    - Login page now reads `error` query param from callback redirects
@@ -4939,7 +4939,7 @@ Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Vercel Production Redeploy + Google Maps Embed Key Propagation
 Summary: Configured Vercel env variable `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` for `production`, `preview`, and `development`, then redeployed production using Vercel CLI.
 Files: None (no source-code edits).
-Verification: Deployment `dpl_EH16eiLn7FbingHTDVkNxkcmJHhR` is `Ready`; production URL `https://syllabus-sync-3jwspailj-perkycoders.vercel.app`; alias `https://syllabus-sync-ashy.vercel.app` active.
+Verification: Deployment `dpl_<redacted>` is `Ready`; production URL `https://syllabus-sync-<deployment>-<team>.vercel.app`; alias `https://syllabus-sync-<alias>.vercel.app` active.
 
 Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Vercel Env Rollback Reversal (Restore Google Maps Key)
@@ -4963,7 +4963,7 @@ Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Production Redeploy — Map UX Fixes (Light Mode + Embedded Google Nav)
 Summary: Redeployed production with fixes for light-mode building selection styling and in-app embedded Google navigation initiation from building card.
 Files: None (deployment only).
-Verification: Deployment `dpl_4zvYNZvwdUmHGnty5DKi1hhUSC2Y` is Ready; production alias `https://syllabus-sync-ashy.vercel.app` points to the new build.
+Verification: Deployment `dpl_<redacted>` is Ready; production alias `https://syllabus-sync-<alias>.vercel.app` points to the new build.
 
 Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Log Maintenance Cleanup
@@ -4981,7 +4981,7 @@ Raouf: 2026-03-03 (Australia/Sydney)
 Scope: Vercel Google Maps Key Sync + Production Redeploy (New User Key)
 Summary: Updated Vercel env `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` with the new provided key across all environments and redeployed production.
 Files: None (infrastructure operation).
-Verification: Deployment `dpl_5p5ExMw98WRw7c2zwwPA3fCs1MYj` status `Ready`; alias `https://syllabus-sync-ashy.vercel.app` active.
+Verification: Deployment `dpl_<redacted>` status `Ready`; alias `https://syllabus-sync-<alias>.vercel.app` active.
 
 Raouf: 2026-03-13 (Australia/Sydney)
 Scope: Repository-Wide i18n Audit + Remediation

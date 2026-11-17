@@ -1,6 +1,6 @@
 # Lane K — Cloudflare Workers / OpenNext Portability Audit
 
-**Scope root:** `/Users/raoof.r12/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit` (read-only)
+**Scope root:** `/Users/<user>/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit` (read-only)
 **Target:** `custom-worker.ts`, `open-next.config.ts`, `wrangler.jsonc`, `cloudflare-env.d.ts`, `next.config.ts`, `config/next/**`, `config/sentry/**`, `lib/cloudflare/**`, `lib/server/**`, `lib/services/**`, `lib/supabase/**`, `tools/cloudflare/**`, `tools/deployment/**`, `.github/workflows/**`, `public/sw.js`, `infra/docker/**`
 **Stack:** Next.js 16 App Router → `@opennextjs/cloudflare` 1.20.2 → single Cloudflare Worker, Supabase backend. Production cut over to Cloudflare on 2026-07-29 and is serving live traffic.
 **Method:** static review of every in-scope file, cross-checked against `@opennextjs/cloudflare` runtime source in `node_modules` (env population, `getCloudflareContext` timing), `wrangler.jsonc` environment-inheritance rules verified empirically with `wrangler deploy --dry-run --env production` (temp build artifacts created for this were deleted afterward; git status confirmed clean, no files modified/staged/committed), and Cloudflare's own `scheduled()`/`waitUntil` docs.

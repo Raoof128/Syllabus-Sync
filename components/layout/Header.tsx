@@ -263,7 +263,7 @@ const Header = memo(() => {
         // Extract name from email prefix and capitalize it
         if (user?.email) {
           const emailPrefix = user.email.split('@')[0];
-          // Remove numbers from the end of the email prefix (e.g., "pouyaalavi1378" -> "pouyaalavi")
+          // Remove numbers from the end of the email prefix (e.g., "jsmith1378" -> "jsmith")
           const nameWithoutNumbers = emailPrefix.replace(/\d+$/, '');
           // Capitalize first letter
           if (nameWithoutNumbers.length > 0) {

@@ -3,6 +3,13 @@
  *
  * This file exports all security-related modules for easy importing.
  * It provides a centralized location for all security utilities.
+ *
+ * STATUS (17 Nov 2026): nothing in the app imports this barrel; routes import the
+ * individual modules. Several modules re-exported here are not wired into any
+ * route (request-signing, ip-anomaly-detection, device-fingerprinting,
+ * two-factor-backup-codes, session-termination, sri, sri-enhanced,
+ * csp-enhanced). A name appearing in this file is not evidence that a control
+ * is in force. See docs/security/SECURITY_POSTURE.md, section 3.
  */
 
 // ============================================================================

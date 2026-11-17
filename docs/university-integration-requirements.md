@@ -50,19 +50,19 @@ We propose migrating from the current internal authentication model to **Single 
 
 ## 4. Security & Compliance Framework
 
-Syllabus Sync is built on a **Zero-Trust** security architecture, ready for university-level audit.
+This section was corrected on 17 November 2026 to state what the code does. It has not had an independent security audit. The PDF copy of this paper in the same folder predates the correction.
 
 ### 4.1 Data Governance
 
-- **Residency:** All data is hosted within the Sydney AWS region (ap-southeast-2) via Supabase.
-- **Encryption:** AES-256 at rest and TLS 1.3 in transit.
+- **Residency:** Application data is stored in a Supabase project. The hosting region is a project setting and is not recorded in this repository.
+- **Encryption:** At rest and in transit, as provided by Supabase and Cloudflare. The application does not add its own encryption layer.
 - **Minimization:** Only necessary academic metadata is stored; personal identifiers are restricted to the minimum required for SSO mapping.
 
 ### 4.2 Application Hardening
 
-- **Middleware Gates:** Every request is validated at the Vercel Edge for session integrity and CSRF compliance.
+- **Request proxy:** Page and API requests pass through a proxy that sets security headers and applies an origin check to state-changing requests. API routes authenticate for themselves.
 - **Tenant Isolation:** Enforced via PostgreSQL Row-Level Security (RLS) at the database layer.
-- **Auditability:** Centralized, tamper-evident logging of all sensitive data access and system mutations.
+- **Auditability:** A central audit log of security-relevant events that application roles can only append to. It is not cryptographically tamper-evident.
 
 ---
 
