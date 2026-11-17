@@ -1,5 +1,10 @@
 # Cloudflare Cutover Runbook
 
+> **Historical document.** This describes the Cloudflare deployment pipeline that the backend security work used in
+> July and August 2026 (a custom worker entry, per-environment deploy scripts and the Sharp risk gate). That pipeline was
+> not carried into this repository when the two lines of work were merged on 17 November 2026, so the scripts and files
+> named below no longer exist here. It is kept as a record of how that deployment was run.
+
 > **Audience:** The operator performing the production cutover, with the rollback runbook open.
 > **This is never an unattended step.** It requires preview evidence, explicit owner approval, and
 > a named operator present.
