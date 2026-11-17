@@ -1,5 +1,10 @@
 # Sharp Advisory Risk Gate for Cloudflare Migration
 
+> **Historical document.** This describes the Cloudflare deployment pipeline that the backend security work used in
+> July and August 2026 (a custom worker entry, per-environment deploy scripts and the Sharp risk gate). That pipeline was
+> not carried into this repository when the two lines of work were merged on 17 November 2026, so the scripts and files
+> named below no longer exist here. It is kept as a record of how that deployment was run.
+
 **Status:** Local migration work may continue. Cloudflare preview, upload, public deployment, and production cutover are prohibited.
 
 **Owner decision (2026-07-22, Australia/Sydney):** Do not force Sharp 0.35.3, run `npm audit fix --force`, or downgrade Next.js. Reassess upstream compatibility and Worker bundle reachability before any deployment.

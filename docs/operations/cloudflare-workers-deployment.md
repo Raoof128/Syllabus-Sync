@@ -1,5 +1,10 @@
 # Cloudflare Workers Deployment
 
+> **Historical document.** This describes the Cloudflare deployment pipeline that the backend security work used in
+> July and August 2026 (a custom worker entry, per-environment deploy scripts and the Sharp risk gate). That pipeline was
+> not carried into this repository when the two lines of work were merged on 17 November 2026, so the scripts and files
+> named below no longer exist here. It is kept as a record of how that deployment was run.
+
 > **Audience:** Engineers building, verifying, and deploying Syllabus Sync on Cloudflare Workers.
 > **Status:** Migration in progress. Vercel remains the live production host and the rollback target.
 
