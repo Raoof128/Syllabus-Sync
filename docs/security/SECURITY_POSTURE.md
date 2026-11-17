@@ -203,7 +203,7 @@ During signup and password reset, candidate passwords are checked against the Ha
 
 **Audit Logging Architecture**
 
-The `audit_logs` table provides a tamper-evident record of security-relevant events. Each entry captures:
+The `audit_logs` table records security-relevant events. Application roles can only add rows, through `SECURITY DEFINER` functions; row-level security denies them updates and deletes. It is not cryptographically tamper-evident: there is no hash chain, the service role can modify rows, and a retention function deletes old ones. Each entry captures:
 
 - Actor identity (user ID)
 - Action type (strongly typed: `LOGIN`, `PASSWORD_CHANGE`, `MFA_ENABLE`, `SUSPICIOUS_ACTIVITY`, etc.)

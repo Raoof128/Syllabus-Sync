@@ -178,7 +178,7 @@
 
 ## 10. Audit Logging and Monitoring
 
-**Control Objective:** Verify that security-relevant events are logged with sufficient detail for forensic analysis, that PII is redacted from payloads, and that the logging mechanism is tamper-resistant (database triggers, `SECURITY DEFINER` RPCs).
+**Control Objective:** Verify that security-relevant events are logged with sufficient detail for forensic analysis, that PII is redacted from payloads, and that application roles can only append to the log (database triggers, `SECURITY DEFINER` RPCs, row-level security). The log is not cryptographically tamper-evident.
 
 **NIST:** AU-2, AU-3, AU-6, AU-8 | **OWASP:** A09:2021
 
