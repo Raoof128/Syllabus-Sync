@@ -4,7 +4,7 @@ Scope: `app/api/auth/**`, `app/api/webauthn/**`, `app/auth/**`, `app/login/actio
 `lib/security/{webauthn,emailVerification,passwordReset,mfa,two-factor-backup-codes,
 session-termination,audit}.ts`, `app/api/audit/route.ts`, export/deletion surfaces.
 
-Repo audited (read-only): `/Users/raoof.r12/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit`
+Repo audited (read-only): `/Users/<user>/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit`
 
 Known finding **not re-reported**: BA-0001 — `consumeChallenge()` in `lib/security/webauthn.ts:106-134`
 does a non-atomic SELECT-then-DELETE and discards the DELETE result (P2). Its siblings are

@@ -1,7 +1,7 @@
 # Backend Security Audit — Lanes G, H, I
 
 **Scope:** External fetch/SSRF (G), email & push (H), cron/cleanup (I)
-**Target:** `/Users/raoof.r12/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit` (branch `audit/backend-hardening-cloudflare`)
+**Target:** `/Users/<user>/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit` (branch `audit/backend-hardening-cloudflare`)
 **Platform:** Next.js App Router on Cloudflare Workers (`nodejs_compat`, `global_fetch_strictly_public`), Supabase — **live in production**
 **Date:** 2026-07-29 (same day as the Vercel→Cloudflare cron cutover)
 

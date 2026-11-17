@@ -1,4 +1,12 @@
 /**
+ * STATUS: not wired into any route as of 17 Nov 2026.
+ *
+ * Nothing imports this module except the barrel `lib/security/index.ts`, and
+ * nothing imports that barrel. It is design work, not a control in force, and
+ * must not be listed as implemented. The CSP in force is built by `buildNonceCSP` in `./csp.ts`.
+ */
+
+/**
  * Enhanced CSP (Content Security Policy) Configuration
  *
  * SECURITY: This module defines the CSP configuration with hash-based script validation

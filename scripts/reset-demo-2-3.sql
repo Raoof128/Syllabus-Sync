@@ -1,5 +1,5 @@
 -- ============================================================================
--- RESET DEMO ACCOUNTS — Lizzy Clarkson & Amin Beheshti
+-- RESET DEMO ACCOUNTS — Demo Student Two & Demo Student Three
 -- ============================================================================
 -- Cleans all seeded data for both demo users without deleting auth accounts.
 -- Run this in Supabase SQL Editor BEFORE re-running the seed scripts.
@@ -9,7 +9,7 @@
 
 DO $$
 DECLARE
-  v_emails text[] := ARRAY['lizzy.demo@mq.edu.au', 'amin.demo@mq.edu.au'];
+  v_emails text[] := ARRAY['demo2@example.com', 'demo3@example.com'];
   v_email text;
   v_uid uuid;
   v_unit_ids uuid[];
@@ -67,8 +67,8 @@ BEGIN
   END LOOP;
 
   RAISE NOTICE '═══════════════════════════════════════════════════════════════';
-  RAISE NOTICE 'RESET COMPLETE — ready to re-seed with seed-demo-lizzy.sql';
-  RAISE NOTICE '                                    and seed-demo-amin.sql';
+  RAISE NOTICE 'RESET COMPLETE — ready to re-seed with seed-demo-2.sql';
+  RAISE NOTICE '                                    and seed-demo-3.sql';
   RAISE NOTICE '═══════════════════════════════════════════════════════════════';
 
 END $$;

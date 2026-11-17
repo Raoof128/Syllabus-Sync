@@ -8,26 +8,26 @@ This directory is the navigation hub for project documentation. Start with the c
 
 Structural decisions, component interactions, and the technical patterns that power the platform.
 
-| Document                                                    | Description                                                                                                            |
-| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| [Architecture Overview](./architecture/ARCHITECTURE.md)     | High-level system architecture, Next.js App Router patterns, and Supabase integration strategy                         |
-| [Technical Explanation](../TECHNICAL_EXPLANATION.md)        | Deep-dive into edge middleware, Zero-Trust pipelines, optimistic state management, and the fused-heading map algorithm |
-| [Route and File Inventory](./inventory/ROUTE_INVENTORY.md)  | Comprehensive map of Next.js routes, API handlers, and directory structure                                             |
-| [Navigation Model](./navigation/ROUTES_AND_NAVIGATION.md)   | How user-visible navigation (sidebar, shells) maps to underlying Next.js routing                                       |
-| [Repository Inventory](./reference/REPOSITORY_INVENTORY.md) | Full directory-level inventory of the codebase                                                                         |
+| Document                                                    | Description                                                                                                                          |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| [Architecture Overview](./architecture/ARCHITECTURE.md)     | High-level system architecture, Next.js App Router patterns, and Supabase integration strategy                                       |
+| [Technical Explanation](../TECHNICAL_EXPLANATION.md)        | Why the larger technical choices were made: request pipeline, rate limiting, database controls, optimistic state, map heading fusion |
+| [Route and File Inventory](./inventory/ROUTE_INVENTORY.md)  | Comprehensive map of Next.js routes, API handlers, and directory structure                                                           |
+| [Navigation Model](./navigation/ROUTES_AND_NAVIGATION.md)   | How user-visible navigation (sidebar, shells) maps to underlying Next.js routing                                                     |
+| [Repository Inventory](./reference/REPOSITORY_INVENTORY.md) | Full directory-level inventory of the codebase                                                                                       |
 
 ## Security and Compliance
 
 Current reporting guidance and historical security-review material.
 
-| Document                                                            | Description                                                           |
-| ------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| [Security Posture Report](./security/SECURITY_POSTURE.md)           | Historical snapshot; reverify all control claims against current code |
-| [Security Evidence Index](./security/SECURITY_EVIDENCE_INDEX.md)    | Historical code pointers for security review                          |
-| [Header Scanner Boundary](./security/HEADER_SCANNER_LIMITATION.md)  | Approved-host scope and Worker network assumptions                    |
-| [Development Dependency Advisories](./security/DEV_DEPENDENCIES.md) | Remaining lint-tool advisory chain and upgrade decision               |
-| [Security Policy](../SECURITY.md)                                   | Vulnerability disclosure process and high-level security tenets       |
-| [Privacy Policy](./policies/privacy-policy.md)                      | Data collection, processing, retention, and user deletion rights      |
+| Document                                                            | Description                                                                                                   |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| [Security Posture](./security/SECURITY_POSTURE.md)                  | Controls in force, modules present but not in force, known limitations (checked against the code 17 Nov 2026) |
+| [Security Evidence Index](./security/SECURITY_EVIDENCE_INDEX.md)    | Map from control categories to source files (checked against the code 17 Nov 2026)                            |
+| [Header Scanner Boundary](./security/HEADER_SCANNER_LIMITATION.md)  | Approved-host scope and Worker network assumptions                                                            |
+| [Development Dependency Advisories](./security/DEV_DEPENDENCIES.md) | Remaining lint-tool advisory chain and upgrade decision                                                       |
+| [Security Policy](../SECURITY.md)                                   | Vulnerability disclosure process and high-level security tenets                                               |
+| [Privacy Policy](./policies/privacy-policy.md)                      | Data collection, processing, retention, and user deletion rights                                              |
 
 ## Internationalisation
 
@@ -116,7 +116,7 @@ Project-level policies and contributor guidelines (located in the repository roo
 
 **For contributors:** Start with [Contributing Guidelines](../CONTRIBUTING.md), then [Environment Setup](./operations/ENVIRONMENT_SETUP.md).
 
-**For security reviewers:** Start with [Security Posture Report](./security/SECURITY_POSTURE.md), then [Security Evidence Index](./security/SECURITY_EVIDENCE_INDEX.md).
+**For security reviewers:** Start with [Security Posture](./security/SECURITY_POSTURE.md), then [Security Evidence Index](./security/SECURITY_EVIDENCE_INDEX.md).
 
 **For stakeholders:** Start with the [public project information site](https://info.syllabus-sync.app), then the [current project direction](../README.md#roadmap-not-yet-built). The [industry deck](./presentations/syllabus-sync-industry-deck.md) is historical.
 

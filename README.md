@@ -43,7 +43,7 @@ University tools are often fragmented — timetables, deadlines, campus maps, an
 
 - **Unified Academic Management:** Enrolled units, class times, and assessment deadlines in a single dashboard and calendar.
 - **Basic Campus Support:** A Leaflet-based campus map with building search and an embedded Google Maps view — location context, not turn-by-turn wayfinding.
-- **Security-Focused Architecture:** Defence-in-depth with WebAuthn (passkeys), TOTP-based MFA, edge middleware auth gating, rate limiting, and PostgreSQL Row-Level Security.
+- **Security-Focused Architecture:** WebAuthn (passkeys), TOTP-based MFA, route-level API authentication, rate limiting, and PostgreSQL Row-Level Security.
 - **Engagement Mechanics:** XP and streak tracking to nudge consistent use, backed by anti-abuse rate limiting.
 - **Contributor Checks:** The repository provides commands for secrets, formatting, types, lint, tests, and builds; see the validation section for the current CI scope.
 
@@ -80,7 +80,7 @@ These screenshots show selected interfaces; the product is still being developed
 ║  🗓  Unit tracking, class schedule, and assessment deadline manager  ║
 ║  ☀️  Weather-aware planning via Open-Meteo / Google Weather          ║
 ║  🗺  Basic campus map: Leaflet + Google Maps Embed, building search  ║
-║  🔐  WebAuthn passkeys, TOTP MFA, RLS, CSRF, edge rate limiting      ║
+║  🔐  WebAuthn passkeys, TOTP MFA, RLS, origin checks, rate limiting  ║
 ║  🌍  35 locale dictionaries · RTL layout support                     ║
 ║  🎮  XP and streak tracking (leaderboard/achievements: backend only) ║
 ║  🔔  Push + in-app notifications (email reminders: not yet wired)    ║
@@ -98,21 +98,21 @@ These screenshots show selected interfaces; the product is still being developed
 
 ### Runtime Stack
 
-| Layer               | Technology                                                             |
-| ------------------- | ---------------------------------------------------------------------- |
-| **Framework**       | Next.js 16 (App Router), `middleware.ts` entrypoint for `lib/proxy.ts` |
-| **UI**              | React 19, Tailwind CSS 4, Radix UI primitives, Framer Motion           |
-| **State**           | Zustand (persisted stores), TanStack Query                             |
-| **Database & Auth** | Supabase PostgreSQL with Row-Level Security, Supabase Auth             |
-| **Infrastructure**  | Cloudflare Workers with the OpenNext adapter                           |
-| **Rate Limiting**   | Upstash Redis, fail-closed on security-critical routes in production   |
-| **Error Tracking**  | Sentry (client, server, edge configs)                                  |
-| **Testing**         | Vitest + Testing Library + Playwright E2E                              |
+| Layer               | Technology                                                               |
+| ------------------- | ------------------------------------------------------------------------ |
+| **Framework**       | Next.js 16 (App Router), `middleware.ts` entrypoint for `lib/proxy.ts`   |
+| **UI**              | React 19, Tailwind CSS 4, Radix UI primitives, Framer Motion             |
+| **State**           | Zustand (persisted stores), TanStack Query                               |
+| **Database & Auth** | Supabase PostgreSQL with Row-Level Security, Supabase Auth               |
+| **Infrastructure**  | Cloudflare Workers with the OpenNext adapter                             |
+| **Rate Limiting**   | Upstash Redis or a Postgres counter, fail-closed on auth-critical routes |
+| **Error Tracking**  | Sentry (client, server, edge configs)                                    |
+| **Testing**         | Vitest + Testing Library + Playwright E2E                                |
 
 ### Key Architectural Decisions
 
 - **Intentional `middleware.ts` Entrypoint:** the runtime entry file stays `middleware.ts` because this Cloudflare/OpenNext setup expects the framework convention there; the actual request logic lives in `lib/proxy.ts`.
-- **Fail-Closed Rate Limiting:** `lib/services/rateLimitService.ts` denies requests to security-critical endpoints (login, signup, password reset) if the Upstash store is unavailable in production, rather than silently allowing traffic through.
+- **Fail-Closed Rate Limiting:** `lib/services/rateLimitService.ts` denies requests to security-critical endpoints (login, signup, password reset) if the rate-limit store is unavailable in production, rather than silently allowing traffic through.
 - **API Auth:** Each protected `/api/*` route must use a shared auth helper or a reviewed inline `getUser()` check. Adding a route does not automatically protect it.
 - **Single-Provider-Per-Account:** A user who signs up with email/password can't sign in with Google on the same account, even if Supabase auto-links identities — enforced via `lib/auth/providerGuard.ts`.
 - **Runtime-Specific IP Trust:** client IP handling depends on the deployment runtime. On Cloudflare, `CF-Connecting-IP` is the reviewed trusted source; do not assume the same trust model on other proxies or local Node servers.
@@ -129,15 +129,16 @@ These screenshots show selected interfaces; the product is still being developed
 
 - **Authentication:** WebAuthn passkeys (`@simplewebauthn`) and TOTP MFA; see the route tests and security evidence for current coverage.
 - **Authorisation:** PostgreSQL Row-Level Security enforced across Supabase tables.
-- **Transport & Policy:** Strict Content Security Policy, CSRF token verification (`lib/security/csrf.ts`), HTTPS-enforced deployment.
-- **Rate Limiting:** Upstash Redis-backed, fail-closed on auth-critical routes.
-- **Audit Logging:** Structured logging for sensitive auth/session operations (`lib/security/audit.ts`).
+- **Transport & Policy:** Nonce-based Content Security Policy, an origin check on state-changing requests (`lib/security/csrf.ts`), HSTS.
+- **Rate Limiting:** Shared-store counters (Upstash Redis or Postgres), fail-closed on auth-critical routes.
+- **Audit Logging:** An append-only (for application roles) log of sensitive auth/session operations (`lib/security/audit.ts`). It is not tamper-evident.
+- **Not in force:** request signing, IP anomaly detection, device fingerprinting, MFA backup codes and Subresource Integrity exist as modules in `lib/security/` that no route uses. See the security posture document.
 - **Secret Scanning:** Custom `check:secrets` script runs in CI for pushes and pull requests targeting `main` or `develop`.
 - **Header Scanner Boundary:** the authenticated header scanner is intentionally restricted to `https://www.syllabus-sync.app/` and `https://info.syllabus-sync.app/`; it is not a general-purpose arbitrary-host scanner.
 
 Accessibility is treated as a linting concern, not a certified standard: the codebase uses `eslint-plugin-jsx-a11y` and supports RTL layouts across 35 locales, but there is no formal WCAG audit in this repo — don't take that as a compliance claim.
 
-> **For Security Reviewers:** [Security Posture Report](./docs/security/SECURITY_POSTURE.md) | [Security Evidence Index](./docs/security/SECURITY_EVIDENCE_INDEX.md)
+> **For Security Reviewers:** [Security Posture](./docs/security/SECURITY_POSTURE.md) | [Security Evidence Index](./docs/security/SECURITY_EVIDENCE_INDEX.md)
 
 <br/>
 
@@ -294,8 +295,7 @@ For Cloudflare packaging, run `npm run cf:build` and `npm run cf:verify-output` 
 ### Dependency audit status
 
 - `npm audit --omit=dev --audit-level high` is the production-focused gate and should stay clean.
-- The full audit still reports five high-severity entries in the development-only `eslint-config-next` → `@next/eslint-plugin-next` → `fast-glob` → `micromatch` chain.
-- That chain is tooling-only, not shipped runtime code. The currently suggested downgrade is breaking for this Next.js 16 line. See [Development dependency advisories](./docs/security/DEV_DEPENDENCIES.md) before changing it.
+- On 17 November 2026 the full `npm audit` (development dependencies included) reported no high or critical advisory: 22 moderate and 1 low, of which 5 moderate are in production dependencies. See [Development dependency advisories](./docs/security/DEV_DEPENDENCIES.md).
 
 <br/>
 

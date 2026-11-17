@@ -17,18 +17,20 @@ creating its own record: **0.9 seconds**.
 
 ## Identifiers
 
+Account, zone, domain, record and Worker version IDs were removed from this public copy on 17 November 2026.
+
 - Worker: `syllabus-sync-production`
-- Worker version ID: `2e584cab-591e-4537-b6cd-cf2475d63fb4`
-- Custom domain ID: `dcc47c21057702b9851694f67bbfacb21659ad54`
-- Cloudflare account: `d630de5216d2cdc67a6497b7fc709ea4`
-- Zone: `syllabus-sync.app` (`896915eb7d6a09165f73ffbb5141a42a`)
+- Worker version ID: `<redacted>`
+- Custom domain ID: `<redacted>`
+- Cloudflare account: `<redacted>`
+- Zone: `syllabus-sync.app` (zone ID redacted)
 - Cutover commit: `7b5fdcd8` — activated production cron triggers
 - Compressed upload: 6776.32 KiB gzip (limit 9.5 MiB; Workers Paid active)
 
 ## DNS change
 
-`www.syllabus-sync.app` `CNAME` → `d7d1c31a817c29cd.vercel-dns-017.com`
-(record `b7cce34a2feaf709ef24b6cc815725dc`) was deleted, and the Workers custom
+`www.syllabus-sync.app` `CNAME` → `<redacted>.vercel-dns-017.com`
+(record ID redacted) was deleted, and the Workers custom
 domain created its own record in the same zone. Restoring that CNAME is the
 traffic rollback.
 

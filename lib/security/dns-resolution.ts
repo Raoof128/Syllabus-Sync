@@ -1,3 +1,11 @@
+/**
+ * STATUS: not wired into any route as of 17 Nov 2026.
+ *
+ * Only `tests/cloudflare/dns-resolution.test.ts` imports this module. The header
+ * scan route restricts its target with the allowlist in `./scan-target.ts`
+ * and does not resolve DNS.
+ */
+
 import { resolve4, resolve6 } from 'node:dns/promises';
 import { isIP } from 'node:net';
 

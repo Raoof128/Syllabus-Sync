@@ -1,6 +1,6 @@
 # Lane A + Lane F Findings — Request Policy / Middleware & CSRF/CSP/IP/Rate-Limits
 
-Target: `/Users/raoof.r12/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit`
+Target: `/Users/<user>/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit`
 Stack: Next.js App Router on Cloudflare Workers (OpenNext), Supabase Auth. **Live in production.**
 
 Scope reviewed: `middleware.ts`, `lib/middleware.ts`, `lib/supabase/middleware.ts`, `lib/supabase/fetch.ts`,

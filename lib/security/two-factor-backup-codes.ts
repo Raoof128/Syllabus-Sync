@@ -1,4 +1,12 @@
 /**
+ * STATUS: not wired into any route as of 17 Nov 2026.
+ *
+ * Nothing imports this module except the barrel `lib/security/index.ts`, and
+ * nothing imports that barrel. It is design work, not a control in force, and
+ * must not be listed as implemented. There are no MFA backup codes in force.
+ */
+
+/**
  * 2FA Backup Codes Management
  *
  * SECURITY: This module provides 2FA backup code generation and validation.

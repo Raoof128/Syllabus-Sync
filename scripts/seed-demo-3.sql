@@ -1,12 +1,15 @@
+-- NOTE (17 Nov 2026): the account in this script is a placeholder (demoN@example.com).
+-- The script predates the removal of profiles.student_id on 30 Jul 2026 and has not
+-- been run against the current schema; check the column lists before using it.
 -- ============================================================================
--- DEMO ACCOUNT SEED — Amin Beheshti (Student)
+-- DEMO ACCOUNT SEED — Demo Student Three (Student)
 -- ============================================================================
 -- USAGE:
 --   1. Create user in Supabase Dashboard > Authentication > Users > Add User
---      Email: amin.demo@mq.edu.au   Password: (set in the Supabase dashboard; not stored in this repository)
+--      Email: demo3@example.com   Password: (set in the Supabase dashboard; not stored in this repository)
 --      Check "Auto Confirm User"
 --   2. Run this script in the Supabase SQL Editor.
---   3. To reset: run reset-demo-professors.sql first, then re-run this.
+--   3. To reset: run reset-demo-2-3.sql first, then re-run this.
 -- ============================================================================
 
 DO $$
@@ -20,13 +23,13 @@ DECLARE
   v_unit4 uuid := gen_random_uuid();
 
 BEGIN
-  SELECT id INTO v_uid FROM auth.users WHERE email = 'amin.demo@mq.edu.au';
+  SELECT id INTO v_uid FROM auth.users WHERE email = 'demo3@example.com';
 
   IF v_uid IS NULL THEN
-    RAISE EXCEPTION 'User not found. Create the user first in Supabase Dashboard with email: amin.demo@mq.edu.au';
+    RAISE EXCEPTION 'User not found. Create the user first in Supabase Dashboard with email: demo3@example.com';
   END IF;
 
-  RAISE NOTICE 'Seeding demo data for Amin Beheshti: %', v_uid;
+  RAISE NOTICE 'Seeding demo data for Demo Student Three: %', v_uid;
 
   -- ========================================================================
   -- Profile
@@ -34,8 +37,8 @@ BEGIN
   INSERT INTO public.profiles (id, email, full_name, student_id, course, year, faculty, created_at, updated_at)
   VALUES (
     v_uid,
-    'amin.demo@mq.edu.au',
-    'Amin Beheshti',
+    'demo3@example.com',
+    'Demo Student Three',
     '46034567',
     'Master of Data Science',
     '1',
@@ -334,9 +337,9 @@ BEGIN
   -- DONE
   -- ========================================================================
   RAISE NOTICE '═══════════════════════════════════════════════════════════════';
-  RAISE NOTICE 'DEMO SEED COMPLETE for amin.demo@mq.edu.au';
+  RAISE NOTICE 'DEMO SEED COMPLETE for demo3@example.com';
   RAISE NOTICE '═══════════════════════════════════════════════════════════════';
-  RAISE NOTICE 'Profile:       Amin Beheshti — M. Data Science, Year 1';
+  RAISE NOTICE 'Profile:       Demo Student Three — M. Data Science, Year 1';
   RAISE NOTICE 'Units:         4 (DATA2001, COMP6210, STAT2170, COMP6200)';
   RAISE NOTICE 'Class Times:   8 slots (Mon–Fri)';
   RAISE NOTICE 'Deadlines:     7 (5 upcoming, 2 completed)';

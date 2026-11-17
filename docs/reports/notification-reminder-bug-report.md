@@ -231,7 +231,7 @@ The `ClientLayout` calls `checkAuth` on every window focus event. `checkAuth` ca
 
 - **Unit tests:** 91 files, 857 tests — all passing
 - **TypeScript:** `npx tsc --noEmit` — clean
-- **Production deployment:** Verified on https://syllabus-sync-ashy.vercel.app
+- **Production deployment:** Verified on https://syllabus-sync-<alias>.vercel.app
 
 ---
 

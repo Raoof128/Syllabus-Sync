@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### Raouf: Security Documents Checked Against the Code; Private Identifiers Removed — 2026-11-17
+
+**Scope:** Documentation accuracy and privacy, plus status comments on security modules that no route uses. No application behaviour changed.
+
+**Summary:** The security posture document, the evidence index and the technical explanation described several controls as implemented that exist only as unused modules (request signing, IP anomaly detection, device fingerprinting, MFA backup codes, SRI), and described a proxy-level API auth gate that no longer exists. They now state what the code does and list the unused modules separately; each of those modules carries a "not wired into any route" comment. An email draft to a named staff member is removed, demo seed scripts use placeholder accounts, and local paths, a team Gmail address and hosting identifiers are replaced with placeholders (they remain in git history). Audit findings that the current tree shows closed carry a dated status line.
+
+**Verification:** Typecheck, lint, format check, 1,399 tests in 167 files, secrets scan, translation check, local link check and the production dependency audit passed.
+
+**Follow-ups:** The `.pptx` and `.pdf` copies of the deck and the integration paper are uncorrected.
+
+---
+
 ### Raouf: Merging the Backend Security Work Into the October Trunk — 2026-11-17
 
 **Scope:** One merge of the October 2026 trunk (product, branding, build and deploy setup, CI) with the July–August 2026 backend security work, which had diverged since April.
@@ -39,8 +51,6 @@ All notable changes to this project will be documented in this file.
 **Follow-ups:** Review translation quality and separately evaluate the header-scanner DNS rebinding fix before implementation.
 
 ---
-
-### Leo: App-Icon Logo Rebrand — 2026-07-07
 
 ### Raouf: Closing the External Review's Code-Side Findings — 2026-08-17
 
@@ -471,7 +481,7 @@ tests. `tools/database/verify-fresh-build.sh` is a first step; it should be wire
 
 **Verification:** `npm run check` exit code 0 — 1269 tests across 143 files (up from 1260/141), Prettier clean, both typechecks clean, Lint OK, production build compiled ✅. Nine new assertions cover the exact signup link, a legacy nested `/login` redirect still in someone's inbox, destination forwarding, rejection of an attacker-supplied `redirectTo`, both OAuth branches (direct follow, and onboarding for an incomplete profile), and the three `/verify` states. Two pre-existing assertions in `callback.test.ts` were deliberately updated: they locked the old behaviour of following `redirectTo` on the email-verification path, which is now one hop shorter and keeps the banner. Live config verified read-only against the Supabase Management API: `site_url` = `https://www.syllabus-sync.app` matching the Worker's `NEXT_PUBLIC_APP_URL`, `uri_allow_list` covers `https://www.syllabus-sync.app/**` so the callback redirect is permitted, `mailer_autoconfirm` = false so confirmation is genuinely enforced, anonymous auth off, signups enabled.
 
-**Follow-ups:** Production verification emails are sent through **Gmail SMTP** (`smtp.gmail.com`) from `Perkycoders <perkycoders@gmail.com>` — a personal address, subject to Gmail's ~500/day relay cap and unable to DKIM-align with `syllabus-sync.app`, so these emails risk spam-foldering and look off-brand at exactly the moment a new user is deciding to trust the product. Resend is already configured and used for the resend path; moving Supabase SMTP onto it is the obvious fix but needs the owner's decision, so it is untouched here. Related: the initial email and the resent email use two different mechanisms with different links and lifetimes (Supabase native `/auth/callback?code=`, `mailer_otp_exp` 3600s, versus the custom Resend token at `/verify?token=`, 20 minutes), and `/api/auth/email/send-verification` has no callers at all. Worth consolidating. Not verified here: a live end-to-end signup on Workers, which would create a real account and send real mail — the cutover follow-up asking for manual exercise of authenticated flows still stands.
+**Follow-ups:** Production verification emails are sent through **Gmail SMTP** (`smtp.gmail.com`) from `a team Gmail account (`<team-gmail-address>`)` — a personal address, subject to Gmail's ~500/day relay cap and unable to DKIM-align with `syllabus-sync.app`, so these emails risk spam-foldering and look off-brand at exactly the moment a new user is deciding to trust the product. Resend is already configured and used for the resend path; moving Supabase SMTP onto it is the obvious fix but needs the owner's decision, so it is untouched here. Related: the initial email and the resent email use two different mechanisms with different links and lifetimes (Supabase native `/auth/callback?code=`, `mailer_otp_exp` 3600s, versus the custom Resend token at `/verify?token=`, 20 minutes), and `/api/auth/email/send-verification` has no callers at all. Worth consolidating. Not verified here: a live end-to-end signup on Workers, which would create a real account and send real mail — the cutover follow-up asking for manual exercise of authenticated flows still stands.
 
 ---
 
@@ -650,7 +660,7 @@ Storage was the other substantive area. The `avatars` bucket could be **listed a
 
 **Scope:** First Cloudflare Workers preview deployment, plus two security-header regressions it exposed.
 
-**Summary:** Deployed the first preview Worker to `syllabus-sync-preview.pouyaalavi1378.workers.dev` and ran the smoke suite against it. Two Cloudflare-only regressions surfaced, both confirmed by diffing response headers against live Vercel production.
+**Summary:** Deployed the first preview Worker to `syllabus-sync-preview.<account>.workers.dev` and ran the smoke suite against it. Two Cloudflare-only regressions surfaced, both confirmed by diffing response headers against live Vercel production.
 
 1. **Duplicated security headers on dynamic routes.** `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Strict-Transport-Security`, and `Permissions-Policy` were declared in both `config/next/next.config.ts` (`headers()`, `source: '/(.*)'`) and `lib/middleware.ts`. Vercel collapsed the duplicate set; OpenNext appends instead, emitting invalid values such as `X-Frame-Options: SAMEORIGIN, SAMEORIGIN` that browsers may discard entirely — silently dropping clickjacking and MIME-sniffing protection. Isolated the layer by observing that headers declared only in `next.config.ts` (`X-DNS-Prefetch-Control`, `X-Download-Options`, `X-XSS-Protection`) appeared exactly once, proving `next.config.ts` applies correctly and middleware added the second copy. Removed the five constant headers from `lib/middleware.ts`, which now sets only the nonce-dependent `Content-Security-Policy` and `x-nonce`.
 
@@ -715,8 +725,6 @@ Also removed the redundant `Content-Type: application/manifest+json` declaration
 **Follow-ups:** None.
 
 ---
-
-### Leo: CI/CD Test Suite Remediation — 2026-04-07
 
 ### Raouf: Formatting Baseline Repair — 2026-07-22
 

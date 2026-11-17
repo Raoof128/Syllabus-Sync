@@ -1,4 +1,12 @@
 /**
+ * STATUS: not wired into any route as of 17 Nov 2026.
+ *
+ * Nothing imports this module except the barrel `lib/security/index.ts`, and
+ * nothing imports that barrel. It is design work, not a control in force, and
+ * must not be listed as implemented. It reads and writes a `user_sessions` table that nothing else writes to. Sessions are revoked through Supabase Auth (`auth.signOut({ scope })`) in `app/api/auth/password/route.ts` and `app/api/auth/sessions/route.ts`.
+ */
+
+/**
  * Session Termination on Password Change
  *
  * SECURITY: This module provides functionality to terminate all user sessions

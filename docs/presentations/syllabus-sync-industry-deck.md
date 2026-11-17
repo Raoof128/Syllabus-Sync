@@ -8,7 +8,7 @@ description: Industry stakeholder presentation covering architecture, security p
 
 # Syllabus Sync
 
-> **Historical presentation:** This deck predates the current Leo Alavi identity, repository URL, Cloudflare deployment, and independent-platform positioning. Do not use its links or claims for a current application; see the [README](../../README.md) and [public information site](https://info.syllabus-sync.app).
+> **Historical presentation:** This deck predates the current Leo Alavi identity, repository URL, Cloudflare deployment, and independent-platform positioning. Do not use its links or claims for a current application; see the [README](../../README.md) and [public information site](https://info.syllabus-sync.app). On 17 November 2026 the security table and the team table below were corrected against the code; the counts (tests, endpoints, documents) are of March 2026, the missed-deadline statistic has no source in this repository, and the `.pptx` copy in this folder is uncorrected.
 
 ## The Campus Platform Built Like Production Software
 
@@ -74,22 +74,22 @@ flowchart LR
 
 ## Security Posture
 
-Security is not a feature -- it is the architecture. Every layer enforces defense-in-depth.
+What is in force, as corrected on 17 November 2026:
 
 ### Implemented Controls
 
-| Control                       | Implementation                                                                                                   |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| **Zero-Trust Middleware**     | All requests pass through edge auth gate before reaching compute. 6s fail-fast deadline prevents upstream hangs. |
-| **WebAuthn Passkeys**         | FIDO2 platform authenticators for passwordless, phishing-resistant login                                         |
-| **Row-Level Security**        | Every table has RLS policies scoped to `auth.uid()`. No application-layer bypass possible.                       |
-| **Content Security Policy**   | Dynamic CSP with nonce-based script allowlisting. Inline scripts blocked by default.                             |
-| **Distributed Rate Limiting** | Redis-backed (Upstash). Fails closed in production -- if Redis is down, requests are denied, not allowed.        |
-| **API Request Signing**       | HMAC integrity verification on sensitive mutation endpoints                                                      |
-| **Secrets Scanner**           | Automated detection of leaked credentials in pre-commit and CI                                                   |
-| **Audit Logging**             | Database-level audit trail for all sensitive operations                                                          |
+| Control                       | Implementation                                                                                                                                                                |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Request proxy**             | A request proxy sets security headers and applies an origin check to state-changing requests. API routes authenticate for themselves.                                         |
+| **WebAuthn Passkeys**         | Passkey registration and sign-in through WebAuthn                                                                                                                             |
+| **Row-Level Security**        | Every table has RLS enabled; user-owned tables have policies scoped to `auth.uid()`. Service-role code and `SECURITY DEFINER` functions bypass it and carry their own checks. |
+| **Content Security Policy**   | Dynamic CSP with nonce-based script allowlisting. Inline scripts blocked by default.                                                                                          |
+| **Distributed Rate Limiting** | Shared-store counters. Limiters on login, signup and password reset deny requests if the store is unreachable.                                                                |
+| **API Request Signing**       | Not in force. A signing module exists in `lib/security/` but no route uses it.                                                                                                |
+| **Secrets Scanner**           | Detection of credential-shaped strings in tracked files, run in CI                                                                                                            |
+| **Audit Logging**             | Append-only (for application roles) log of security-relevant events; not tamper-evident                                                                                       |
 
-**Evidence:** Every control is linked to its source code implementation in [`docs/security/SECURITY_EVIDENCE_INDEX.md`](../security/SECURITY_EVIDENCE_INDEX.md).
+**Evidence:** Controls are mapped to source files in [`docs/security/SECURITY_EVIDENCE_INDEX.md`](../security/SECURITY_EVIDENCE_INDEX.md).
 
 ---
 
@@ -216,10 +216,10 @@ Current project direction: [README roadmap](../../README.md#roadmap-not-yet-buil
 
 ## Team
 
-| Name                        | Role            | Focus                                                |
-| --------------------------- | --------------- | ---------------------------------------------------- |
-| Mohammad Raouf Abedini      | Lead Maintainer | Security architecture, AI workflows, backend systems |
-| Mohammad Pouya Alavi Naeini | Co-Maintainer   | System architecture, infrastructure, deployment      |
+| Name                   | Role          | Focus                                          |
+| ---------------------- | ------------- | ---------------------------------------------- |
+| Mohammad Raouf Abedini | Co-Maintainer | Backend and security                           |
+| Leo Alavi              | Co-Maintainer | Frontend, product, integration, infrastructure |
 
 ---
 

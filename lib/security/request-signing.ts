@@ -1,4 +1,12 @@
 /**
+ * STATUS: not wired into any route as of 17 Nov 2026.
+ *
+ * Nothing imports this module except the barrel `lib/security/index.ts`, and
+ * nothing imports that barrel. It is design work, not a control in force, and
+ * must not be listed as implemented. No request is signed or verified with this module.
+ */
+
+/**
  * API Request Signing
  *
  * SECURITY: This module provides request signing capabilities for API endpoints.

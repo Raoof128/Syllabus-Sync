@@ -2,7 +2,7 @@
 
 **Scope:** `supabase/migrations/` — 64 files, reviewed chronologically (by filename timestamp, which is also Supabase's application order), from `20260104000000_initial_schema.sql` through `20260405125806_remove_sample_user_seed.sql`.
 **Method:** Read every migration in order; tracked each table's RLS/grant/policy state as it was created, weakened, re-fixed, or re-weakened; derived the **effective schema state as of the last migration touching each object**. No DB access — all findings are inferred from tracked SQL only. Two "PLAUSIBLE" findings depend on a standard Supabase platform default (view-owner role has `BYPASSRLS`) that cannot be confirmed from migration files alone; this is called out explicitly where it applies.
-**Repo audited:** `/Users/raoof.r12/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit` (read-only).
+**Repo audited:** `/Users/<user>/Desktop/Raouf/MQ_Research/Syllabus-Sync-backend-audit` (read-only).
 
 ---
 

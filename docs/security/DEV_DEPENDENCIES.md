@@ -1,6 +1,8 @@
 # Development dependency advisory status
 
-The production dependency audit (`npm audit --omit=dev --audit-level high`) reports zero vulnerabilities as of 2026-10-03. The full audit reports five high-severity package entries in one development-only chain:
+**Status, 17 November 2026.** After the lockfile update that came with the merge of the backend security work, `npm audit --omit=dev --audit-level high` passes (5 moderate advisories in production dependencies, none high or critical), and the full audit reports 22 moderate and 1 low, none high or critical. The chain described below no longer appears as high severity. The text that follows is the 3 October 2026 note, kept for the reasoning about not force-downgrading.
+
+As of 2026-10-03 the production dependency audit reported zero vulnerabilities and the full audit reported five high-severity package entries in one development-only chain:
 
 `eslint-config-next` → `@next/eslint-plugin-next` → `fast-glob` → `micromatch` → `braces`.
 
