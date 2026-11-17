@@ -17,7 +17,7 @@ The demo account for Syllabus Sync is ready. You can log in now and explore the 
 
 - URL: https://syllabus-sync-ashy.vercel.app
 - Email: charanya.demo@mq.edu.au
-- Password: Demo2024!MQ
+- Password: (set in the Supabase dashboard; not stored in this repository)
 
 **What's included in the demo:**
 

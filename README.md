@@ -178,6 +178,8 @@ The current app is Macquarie-focused. Institution-specific adapters and broader 
 
 ### Maintainers
 
+This repository is Raouf Abedini's copy of the shared project. The upstream that the team deploys from is [leoalavi/syllabus-sync](https://github.com/leoalavi/syllabus-sync), which is why issue, security-report and clone links below point there. This copy carries the July–August 2026 backend security work (security test suites, migrations and audit records) merged onto the October 2026 trunk.
+
 | Name          | Role                                                            |
 | ------------- | --------------------------------------------------------------- |
 | Leo Alavi     | Co-maintainer — frontend, product, integration & infrastructure |
